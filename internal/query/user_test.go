@@ -18,6 +18,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
+	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -1328,5 +1329,273 @@ func TestQueries_IsUserAdmin(t *testing.T) {
 			err = mock.ExpectationsWereMet()
 			assert.NoError(t, err)
 		})
+	}
+}
+
+func TestQueries_SearchUsers(t *testing.T) {
+	const instanceID = "inst-1"
+	ctx := authz.WithInstanceID(t.Context(), instanceID)
+	permCtx := authz.SetCtxData(ctx, authz.CtxData{UserID: "caller"})
+
+	loginNameQuery, err := NewUserLoginNameExistsQuery("user@org.localhost", TextEqualsIgnoreCase)
+	require.NoError(t, err)
+	orgQuery, err := NewUserResourceOwnerSearchQuery("org1", TextEquals)
+	require.NoError(t, err)
+
+	type args struct {
+		ctx               context.Context
+		queries           *UserSearchQueries
+		permissionCheckV2 bool
+	}
+	tests := []struct {
+		name      string
+		args      args
+		count     uint64
+		pageRows  [][]driver.Value
+		wantCount uint64
+		wantUsers []*User
+	}{
+		{
+			name: "count applied to page",
+			args: args{
+				ctx: ctx,
+				queries: &UserSearchQueries{
+					SearchRequest: SearchRequest{Limit: 20},
+				},
+			},
+			count:     42,
+			pageRows:  [][]driver.Value{humanUsersQueryRow()},
+			wantCount: 42,
+			wantUsers: []*User{expectedHumanUser()},
+		},
+		{
+			name: "empty page with non-zero count",
+			args: args{
+				ctx: ctx,
+				queries: &UserSearchQueries{
+					SearchRequest: SearchRequest{Limit: 20, Offset: 17500},
+				},
+			},
+			count:     100,
+			wantCount: 100,
+			wantUsers: []*User{},
+		},
+		{
+			name: "permission clause on count and page",
+			args: args{
+				ctx: permCtx,
+				queries: &UserSearchQueries{
+					SearchRequest: SearchRequest{Limit: 20},
+					Queries:       []SearchQuery{orgQuery},
+				},
+				permissionCheckV2: true,
+			},
+			count:     3,
+			pageRows:  [][]driver.Value{humanUsersQueryRow()},
+			wantCount: 3,
+			wantUsers: []*User{expectedHumanUser()},
+		},
+		{
+			name: "login-name seek on count and inner page",
+			args: args{
+				ctx: ctx,
+				queries: &UserSearchQueries{
+					SearchRequest: SearchRequest{Limit: 20},
+					Queries:       []SearchQuery{loginNameQuery},
+				},
+			},
+			count:     1,
+			pageRows:  [][]driver.Value{humanUsersQueryRow()},
+			wantCount: 1,
+			wantUsers: []*User{expectedHumanUser()},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			countStmt, countArgs := mustUsersCountSQL(t, tt.args.ctx, cloneUserSearchQueries(tt.args.queries), tt.args.permissionCheckV2)
+			pageStmt, pageArgs := mustUsersPageSQL(t, tt.args.ctx, cloneUserSearchQueries(tt.args.queries), tt.args.permissionCheckV2)
+			latestStmt, latestArgs := mustLatestUserStateSQL(t, instanceID)
+
+			if tt.args.permissionCheckV2 {
+				assert.Contains(t, countStmt, "eventstore.permitted_orgs")
+				assert.Contains(t, usersPageSubquery(t, pageStmt), "eventstore.permitted_orgs")
+			}
+			if tt.args.queries.Offset > 0 {
+				assert.Contains(t, usersPageSubquery(t, pageStmt), fmt.Sprintf("OFFSET %d", tt.args.queries.Offset))
+			}
+			if len(tt.args.queries.Queries) == 1 && tt.args.queries.Queries[0] == loginNameQuery {
+				assert.Contains(t, countStmt, "login_name_matches")
+				assert.Contains(t, usersPageSubquery(t, pageStmt), "login_name_matches")
+			}
+
+			client, mock, err := sqlmock.New(
+				sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual),
+				sqlmock.ValueConverterOption(new(db_mock.TypeConverter)),
+			)
+			require.NoError(t, err)
+			defer client.Close()
+
+			countRows := sqlmock.NewRows(countUsersCols).AddRow(tt.count)
+			mock.ExpectQuery(countStmt).WithArgs(toDriverValues(countArgs)...).WillReturnRows(countRows)
+
+			pageRows := sqlmock.NewRows(usersCols)
+			for _, row := range tt.pageRows {
+				pageRows.AddRow(row...)
+			}
+			mock.ExpectQuery(pageStmt).WithArgs(toDriverValues(pageArgs)...).WillReturnRows(pageRows)
+
+			mock.ExpectQuery(latestStmt).WithArgs(toDriverValues(latestArgs)...).WillReturnRows(
+				sqlmock.NewRows([]string{"event_date", "position", "last_updated"}),
+			)
+
+			q := &Queries{client: &database.DB{DB: client}}
+			got, err := q.searchUsers(tt.args.ctx, cloneUserSearchQueries(tt.args.queries), tt.args.permissionCheckV2)
+			require.NoError(t, err)
+			require.NotNil(t, got)
+			assert.Equal(t, tt.wantCount, got.Count)
+			assert.Equal(t, tt.wantUsers, got.Users)
+			assert.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
+func TestQueries_CountUsers_AppliesFilters(t *testing.T) {
+	ctx := authz.WithInstanceID(t.Context(), "inst-1")
+	orgQuery, err := NewUserResourceOwnerSearchQuery("org1", TextEquals)
+	require.NoError(t, err)
+	queries := &UserSearchQueries{Queries: []SearchQuery{orgQuery}}
+
+	stmt, args := mustUsersCountSQL(t, ctx, queries, false)
+	assert.Contains(t, stmt, "resource_owner")
+	assert.Contains(t, args, "org1")
+
+	client, mock, err := sqlmock.New(
+		sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual),
+		sqlmock.ValueConverterOption(new(db_mock.TypeConverter)),
+	)
+	require.NoError(t, err)
+	defer client.Close()
+
+	mock.ExpectQuery(stmt).WithArgs(toDriverValues(args)...).WillReturnRows(
+		sqlmock.NewRows(countUsersCols).AddRow(uint64(7)),
+	)
+
+	q := &Queries{client: &database.DB{DB: client}}
+	got, err := q.CountUsers(ctx, queries)
+	require.NoError(t, err)
+	assert.Equal(t, uint64(7), got)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func cloneUserSearchQueries(q *UserSearchQueries) *UserSearchQueries {
+	cloned := *q
+	if q.Queries != nil {
+		cloned.Queries = append([]SearchQuery(nil), q.Queries...)
+	}
+	cloned.sortingConsumed = false
+	return &cloned
+}
+
+func mustUsersCountSQL(t *testing.T, ctx context.Context, queries *UserSearchQueries, permissionCheckV2 bool) (string, []any) {
+	t.Helper()
+	builder, _ := queries.prepareUsersCountQuery(ctx, permissionCheckV2)
+	stmt, args, err := builder.ToSql()
+	require.NoError(t, err)
+	return stmt, args
+}
+
+func mustUsersPageSQL(t *testing.T, ctx context.Context, queries *UserSearchQueries, permissionCheckV2 bool) (string, []any) {
+	t.Helper()
+	builder, _ := queries.prepareUsersQuery(ctx, permissionCheckV2)
+	stmt, args, err := builder.ToSql()
+	require.NoError(t, err)
+	return stmt, args
+}
+
+func mustLatestUserStateSQL(t *testing.T, instanceID string) (string, []any) {
+	t.Helper()
+	query, _ := prepareLatestState()
+	stmt, args, err := query.
+		Where(sq.Or{sq.Eq{CurrentStateColProjectionName.identifier(): userTable.name}}).
+		Where(sq.Eq{CurrentStateColInstanceID.identifier(): instanceID}).
+		OrderBy(CurrentStateColEventDate.identifier() + " DESC").
+		ToSql()
+	require.NoError(t, err)
+	return stmt, args
+}
+
+func toDriverValues(args []any) []driver.Value {
+	vals := make([]driver.Value, len(args))
+	for i, arg := range args {
+		vals[i] = arg
+	}
+	return vals
+}
+
+func humanUsersQueryRow() []driver.Value {
+	return []driver.Value{
+		"id",
+		testNow,
+		testNow,
+		"resource_owner",
+		uint64(20211108),
+		domain.UserStateActive,
+		domain.UserTypeHuman,
+		"username",
+		database.TextArray[string]{"login_name1", "login_name2"},
+		"login_name1",
+		"id",
+		"first_name",
+		"last_name",
+		"nick_name",
+		"display_name",
+		"de",
+		domain.GenderUnspecified,
+		"avatar_key",
+		"email",
+		true,
+		"phone",
+		true,
+		true,
+		testNow,
+		testNow,
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
+		"id",
+	}
+}
+
+func expectedHumanUser() *User {
+	return &User{
+		ID:                 "id",
+		CreationDate:       testNow,
+		ChangeDate:         testNow,
+		ResourceOwner:      "resource_owner",
+		Sequence:           20211108,
+		State:              domain.UserStateActive,
+		Type:               domain.UserTypeHuman,
+		Username:           "username",
+		LoginNames:         database.TextArray[string]{"login_name1", "login_name2"},
+		PreferredLoginName: "login_name1",
+		Human: &Human{
+			FirstName:              "first_name",
+			LastName:               "last_name",
+			NickName:               "nick_name",
+			DisplayName:            "display_name",
+			AvatarKey:              "avatar_key",
+			PreferredLanguage:      language.German,
+			Gender:                 domain.GenderUnspecified,
+			Email:                  "email",
+			IsEmailVerified:        true,
+			Phone:                  "phone",
+			IsPhoneVerified:        true,
+			PasswordChangeRequired: true,
+			PasswordChanged:        testNow,
+			MFAInitSkipped:         testNow,
+		},
 	}
 }

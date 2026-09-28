@@ -624,7 +624,13 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, p
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	countQuery, countScan := queries.prepareUsersCountQuery(ctx, permissionCheckV2)
+	// Count and page are separate pooled queries. Postgres does not reuse
+	// COUNT(*) work across statements, even on one connection; buffer cache
+	// is cluster-wide. A concurrent write between them can make Count and
+	// the page disagree. A shared read-only transaction is not used here.
+	plan := queries.planUserSearch(ctx, permissionCheckV2)
+
+	countQuery, countScan := queries.usersCountQuery(ctx, plan)
 	countStmt, countArgs, err := countQuery.ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-Cnt01", "Errors.Query.SQLStatement")
@@ -638,7 +644,7 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, p
 		return nil, zerrors.ThrowInternal(err, "QUERY-Cnt02", "Errors.Internal")
 	}
 
-	query, scan := queries.prepareUsersQuery(ctx, permissionCheckV2)
+	query, scan := queries.usersPageQuery(ctx, plan)
 	stmt, args, err := query.ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatement")
@@ -1454,8 +1460,10 @@ func (p userSearchPlan) applyPagePaging(query sq.SelectBuilder, req *UserSearchQ
 // or selecting display columns. COUNT(*) OVER () is avoided so PostgreSQL can
 // aggregate from the users index instead of materializing every joined row.
 func (q *UserSearchQueries) prepareUsersCountQuery(ctx context.Context, permissionCheckV2 bool) (sq.SelectBuilder, func(*sql.Rows) (uint64, error)) {
-	plan := q.planUserSearch(ctx, permissionCheckV2)
+	return q.usersCountQuery(ctx, q.planUserSearch(ctx, permissionCheckV2))
+}
 
+func (q *UserSearchQueries) usersCountQuery(ctx context.Context, plan userSearchPlan) (sq.SelectBuilder, func(*sql.Rows) (uint64, error)) {
 	countExpr := "COUNT(*)"
 	if plan.needsMetadataJoin {
 		countExpr = "COUNT(DISTINCT " + UserIDCol.identifier() + ")"
@@ -1475,8 +1483,10 @@ func (q *UserSearchQueries) prepareUsersCountQuery(ctx context.Context, permissi
 // Login-equality filters (username, email, phone, login name EQUALS /
 // EQUALS_IGNORE_CASE) become an indexed UNION of ID seeks.
 func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionCheckV2 bool) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
-	plan := q.planUserSearch(ctx, permissionCheckV2)
+	return q.usersPageQuery(ctx, q.planUserSearch(ctx, permissionCheckV2))
+}
 
+func (q *UserSearchQueries) usersPageQuery(ctx context.Context, plan userSearchPlan) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 	pageQuery := plan.applyConstraints(ctx, sq.Select(
 		UserIDCol.identifier(),
 		q.SortingColumn.orderBy()+" AS sort_col",
