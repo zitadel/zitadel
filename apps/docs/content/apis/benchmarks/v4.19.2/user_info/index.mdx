@@ -1,0 +1,99 @@
+---
+title: user info benchmark of zitadel v4.19.2
+sidebar_label: user info
+---
+
+import OutputSource from "./output.json";
+import { BenchmarkChart } from '@/components/benchmark_chart';
+
+Benchmark results of the v4.19.2 release of Zitadel.
+
+## Performance test results
+
+| Metric                                | Value                                                                            |
+|:--------------------------------------|:---------------------------------------------------------------------------------|
+| Baseline                              | none                                                                             |
+| Purpose                               | Test current performance                                                         |
+| Test start                            | 2026-09-28 22:16:03 UTC                                                                      |
+| Test end                              | 2026-09-28 22:46:03 UTC                                                                        |
+| Test duration                         | 30min                                                                          |
+| Executed test                         | user\_info                                                                    |
+| k6 version                            | v2.1.0                                                                           |
+| VUs                                   | 600                                                                              |
+| Client location                       | EU1                                                                              |
+| ZITADEL location                      | EU1                                                                              |
+| ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 2<br/>Container max scale: 7<br/>Concurrency: 400 requests per container<br/>Scales on demand. v4.17.1 ran pinned at 7, so instance counts are not comparable. |
+| ZITADEL Version                       | v4.19.2                                                                           |
+| ZITADEL Settings                      | Eventstore autovacuum (new in v4.17): Enabled: true<br/>VacuumThreshold: 1000000<br/>AnalyzeThreshold: 1000000<br/>Tuned for the ~4,000 events/s expected during the benchmark, per the [tuning guide](https://zitadel.com/docs/self-hosting/manage/tuning#reading-events).<br/>Database pool: MaxOpenConns 6, MaxIdleConns 6, MaxConnIdleTime 1m<br/>Projections: TransactionDuration 0s, RequeueEvery 180s<br/>Shared QA environment: notification workers and other QA traffic use the same database. |
+| ZITADEL feature flags                 | Enabled: loginDefaultOrg (instance), oidcTokenExchange (system), enableBackChannelLogout (system), consoleUseV2UserApi (instance)<br/>improvedPerformance (instance): IMPROVED_PERFORMANCE_PROJECT_GRANT, IMPROVED_PERFORMANCE_PROJECT, IMPROVED_PERFORMANCE_USER_GRANT, IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED<br/>Disabled: userSchema, debugOidcParentError, oidcSingleV1SessionTermination, loginV2 (explicitly false at instance), permissionCheckV2<br/>Captured from the instance **before** the run (2026-09-28 16:53:59 UTC; sequence 5, last changed 2026-09-28 16:37:36 UTC).                                                                                  |
+| Database                              | type: psql<br />version: 17 (Cloud SQL POSTGRES_17)<br/>`auto_explain` on: log_analyze, log_timing, log_nested_statements, log_verbose, log_min_duration 10 ms. This adds overhead to every statement slower than 10 ms; production does not run it.                                                   |
+| Database location                     | EU1                                                                              |
+| Database specification                | Cloud SQL Enterprise Plus, `db-perf-optimized-N-8`<br/>vCPU: 8<br/>memory: 64 GB<br/>Data cache: enabled                                                       |
+| ZITADEL metrics during test           |                                                                                  |
+| Observed errors                       | 83 of 16,188,654 requests failed (0.00%): 2x connection reset, 81x not individually logged (see k6 output). 83 of 16,188,659 checks failed (0.00%): openid configuration (2 failed), userinfo status ok (80 failed), org removed (1 failed)<br/>76 of the failed requests are HTTP 429 with the same plain-text `Rate exceeded.` body as in `password_session` in the first two minutes (22:16–22:17 UTC), directly after the `password_session` run; none after that. The failed `org removed` check is a harness defect: teardown used the measured user's token, which cannot delete the org. It is fixed in the same change as this page.                                                                          |
+| Top 3 most expensive database queries |                                                                                  |
+| Database metrics during test          |                                                                                  |
+| k6 Iterations per second              | 8984                                                                       |
+| k6 output                             | [output](#k6-output)                                                             |
+| flowchart outcome                     |                                                                                  |
+
+## Endpoint latencies
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output
+```bash
+  █ TOTAL RESULTS 
+
+    checks_total.......: 16188659 8984.283414/s
+    checks_succeeded...: 99.99%   16188576 out of 16188659
+    checks_failed......: 0.00%    83 out of 16188659
+
+    ✓ user defined
+    ✓ authorize status ok
+    ✓ login name status ok
+    ✓ login shows password page
+    ✓ password status ok
+    ✓ password callback
+    ✓ code set
+    ✓ token status ok
+    ✓ access token created
+    ✓ id token created
+    ✓ info created
+    ✓ org created
+    ✓ create user is status ok
+    ✗ openid configuration
+      ↳  99% — ✓ 600 / ✗ 2
+    ✗ userinfo status ok
+      ↳  99% — ✓ 16187952 / ✗ 80
+    ✗ org removed
+      ↳  0% — ✓ 0 / ✗ 1
+
+    CUSTOM
+    login_ui_enter_login_name_duration...: min=72.15ms  avg=80.69ms  max=89.23ms  p(50)=80.69ms  p(95)=88.38ms  p(99)=89.06ms 
+    login_ui_enter_password_duration.....: min=13.2ms   avg=179.88ms max=346.55ms p(50)=179.88ms p(95)=329.89ms p(99)=343.22ms
+    login_ui_init_login_duration.........: min=33.41ms  avg=38.55ms  max=43.68ms  p(50)=38.55ms  p(95)=43.17ms  p(99)=43.58ms 
+    login_ui_token_duration..............: min=49.53ms  avg=51.96ms  max=54.39ms  p(50)=51.96ms  p(95)=54.15ms  p(99)=54.34ms 
+    oidc_user_info_duration..............: min=390.07µs avg=66.48ms  max=12.36s   p(50)=24.97ms  p(95)=262.78ms p(99)=320.86ms
+    org_create_org_duration..............: min=25.8ms   avg=25.8ms   max=25.8ms   p(50)=25.8ms   p(95)=25.8ms   p(99)=25.8ms  
+    user_create_human_duration...........: min=302.5ms  avg=302.5ms  max=302.5ms  p(50)=302.5ms  p(95)=302.5ms  p(99)=302.5ms 
+
+    HTTP
+    http_req_duration....................: min=390.07µs avg=66.48ms  max=12.36s   p(50)=24.97ms  p(95)=262.78ms p(99)=320.86ms
+      { expected_response:true }.........: min=2.92ms   avg=66.45ms  max=10.08s   p(50)=24.97ms  p(95)=262.78ms p(99)=320.85ms
+    http_req_failed......................: 0.00%    83 out of 16188654
+    http_reqs............................: 16188654 8984.280639/s
+
+    EXECUTION
+    iteration_duration...................: min=632.26µs avg=66.69ms  max=12.36s   p(50)=25.15ms  p(95)=262.99ms p(99)=321.23ms
+    iterations...........................: 16188034 8983.936555/s
+    vus..................................: 600      min=0              max=600
+    vus_max..............................: 600      min=600            max=600
+
+    NETWORK
+    data_received........................: 11 GB    6.1 MB/s
+    data_sent............................: 1.3 GB   708 kB/s
+
+running (30m01.9s), 000/600 VUs, 16188034 complete and 0 interrupted iterations
+default ✓ [ 100% ] 600 VUs  30m0s
+```

@@ -1,0 +1,103 @@
+---
+title: machine client credentials login benchmark of zitadel v4.19.2
+sidebar_label: machine client credentials login
+---
+
+import OutputSource from "./output.json";
+import { BenchmarkChart } from '@/components/benchmark_chart';
+
+Benchmark results of the v4.19.2 release of Zitadel.
+
+## Performance test results
+
+| Metric                                | Value                                                                            |
+|:--------------------------------------|:---------------------------------------------------------------------------------|
+| Baseline                              | none                                                                             |
+| Purpose                               | Test current performance                                                         |
+| Test start                            | 2026-09-28 18:10:06 UTC                                                                      |
+| Test end                              | 2026-09-28 18:40:06 UTC                                                                        |
+| Test duration                         | 30min                                                                          |
+| Executed test                         | machine\_client\_credentials\_login                                                                    |
+| k6 version                            | v2.1.0                                                                           |
+| VUs                                   | 600                                                                              |
+| Client location                       | EU1                                                                              |
+| ZITADEL location                      | EU1                                                                              |
+| ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 2<br/>Container max scale: 7<br/>Concurrency: 400 requests per container<br/>Scales on demand. v4.17.1 ran pinned at 7, so instance counts are not comparable. |
+| ZITADEL Version                       | v4.19.2                                                                           |
+| ZITADEL Settings                      | Eventstore autovacuum (new in v4.17): Enabled: true<br/>VacuumThreshold: 1000000<br/>AnalyzeThreshold: 1000000<br/>Tuned for the ~4,000 events/s expected during the benchmark, per the [tuning guide](https://zitadel.com/docs/self-hosting/manage/tuning#reading-events).<br/>Database pool: MaxOpenConns 6, MaxIdleConns 6, MaxConnIdleTime 1m<br/>Projections: TransactionDuration 0s, RequeueEvery 180s<br/>Shared QA environment: notification workers and other QA traffic use the same database. |
+| ZITADEL feature flags                 | Enabled: loginDefaultOrg (instance), oidcTokenExchange (system), enableBackChannelLogout (system), consoleUseV2UserApi (instance)<br/>improvedPerformance (instance): IMPROVED_PERFORMANCE_PROJECT_GRANT, IMPROVED_PERFORMANCE_PROJECT, IMPROVED_PERFORMANCE_USER_GRANT, IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED<br/>Disabled: userSchema, debugOidcParentError, oidcSingleV1SessionTermination, loginV2 (explicitly false at instance), permissionCheckV2<br/>Captured from the instance **before** the run (2026-09-28 16:53:59 UTC; sequence 5, last changed 2026-09-28 16:37:36 UTC).                                                                                  |
+| Database                              | type: psql<br />version: 17 (Cloud SQL POSTGRES_17)<br/>`auto_explain` on: log_analyze, log_timing, log_nested_statements, log_verbose, log_min_duration 10 ms. This adds overhead to every statement slower than 10 ms; production does not run it.                                                   |
+| Database location                     | EU1                                                                              |
+| Database specification                | Cloud SQL Enterprise Plus, `db-perf-optimized-N-8`<br/>vCPU: 8<br/>memory: 64 GB<br/>Data cache: enabled                                                       |
+| ZITADEL metrics during test           |                                                                                  |
+| Observed errors                       | 38 of 7,270,615 requests failed (0.00%): 36x request timeout, 2x connection reset. 18 iterations aborted on a null response body. 38 of 10,904,111 checks failed (0.00%): client credentials status ok (19 failed), userinfo status ok (19 failed)<br/>36 of the 38 failed requests are 60-second timeouts within a single minute (18:39 UTC): a bounded event, reported separately from the service's behaviour under load.                                                                          |
+| Top 3 most expensive database queries |                                                                                  |
+| Database metrics during test          |                                                                                  |
+| k6 Iterations per second              | 2006                                                                       |
+| k6 output                             | [output](#k6-output)                                                             |
+| flowchart outcome                     |                                                                                  |
+
+## Endpoint latencies
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output
+```bash
+  █ TOTAL RESULTS 
+
+    checks_total.......: 10904111 6017.93719/s
+    checks_succeeded...: 99.99%   10904073 out of 10904111
+    checks_failed......: 0.00%    38 out of 10904111
+
+    ✓ user defined
+    ✓ authorize status ok
+    ✓ login name status ok
+    ✓ login shows password page
+    ✓ password status ok
+    ✓ password callback
+    ✓ code set
+    ✓ token status ok
+    ✓ access token created
+    ✓ id token created
+    ✓ info created
+    ✓ org created
+    ✓ create user is status ok
+    ✓ generate machine secret status ok
+    ✓ openid configuration
+    ✗ client credentials status ok
+      ↳  99% — ✓ 3634093 / ✗ 19
+    ✓ client credentials token ok
+    ✗ userinfo status ok
+      ↳  99% — ✓ 3634074 / ✗ 19
+    ✓ org removed
+
+    CUSTOM
+    login_ui_enter_login_name_duration...: min=87.21ms  avg=87.21ms  max=87.21ms p(50)=87.21ms  p(95)=87.21ms  p(99)=87.21ms 
+    login_ui_enter_password_duration.....: min=14.24ms  avg=14.24ms  max=14.24ms p(50)=14.24ms  p(95)=14.24ms  p(99)=14.24ms 
+    login_ui_init_login_duration.........: min=55.56ms  avg=55.56ms  max=55.56ms p(50)=55.56ms  p(95)=55.56ms  p(99)=55.56ms 
+    login_ui_token_duration..............: min=69.92ms  avg=69.92ms  max=69.92ms p(50)=69.92ms  p(95)=69.92ms  p(99)=69.92ms 
+    oidc_client_credentials_duration.....: min=280.77µs avg=183.05ms max=1m0s    p(50)=49.9ms   p(95)=843.02ms p(99)=984.62ms
+    oidc_user_info_duration..............: min=1.68ms   avg=113.44ms max=1m0s    p(50)=29.76ms  p(95)=525.98ms p(99)=624ms   
+    org_create_org_duration..............: min=29.56ms  avg=29.56ms  max=29.56ms p(50)=29.56ms  p(95)=29.56ms  p(99)=29.56ms 
+    user_add_machine_secret_duration.....: min=46.64ms  avg=1.48s    max=2.82s   p(50)=1.45s    p(95)=2.67s    p(99)=2.78s   
+    user_create_machine_duration.........: min=25.6ms   avg=1.33s    max=6.16s   p(50)=62.78ms  p(95)=6s       p(99)=6.08s   
+
+    HTTP
+    http_req_duration....................: min=280.77µs avg=148.57ms max=1m0s    p(50)=40.61ms  p(95)=706.78ms p(99)=928.13ms
+      { expected_response:true }.........: min=8.74ms   avg=148.27ms max=6.51s   p(50)=40.61ms  p(95)=706.75ms p(99)=928.08ms
+    http_req_failed......................: 0.00%   38 out of 7270615
+    http_reqs............................: 7270615 4012.624633/s
+
+    EXECUTION
+    iteration_duration...................: min=15.52ms  avg=297.16ms max=1m0s    p(50)=161.94ms p(95)=924.54ms p(99)=1.3s    
+    iterations...........................: 3634112 2005.652525/s
+    vus..................................: 0       min=0             max=600
+    vus_max..............................: 600     min=600           max=600
+
+    NETWORK
+    data_received........................: 8.0 GB  4.4 MB/s
+    data_sent............................: 3.0 GB  1.7 MB/s
+
+running (30m11.9s), 000/600 VUs, 3634112 complete and 0 interrupted iterations
+default ✓ [ 100% ] 600 VUs  30m0s
+```

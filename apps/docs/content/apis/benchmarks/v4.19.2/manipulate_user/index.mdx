@@ -1,0 +1,99 @@
+---
+title: manipulate user benchmark of zitadel v4.19.2
+sidebar_label: manipulate user
+---
+
+import OutputSource from "./output.json";
+import { BenchmarkChart } from '@/components/benchmark_chart';
+
+Benchmark results of the v4.19.2 release of Zitadel.
+
+## Performance test results
+
+| Metric                                | Value                                                                            |
+|:--------------------------------------|:---------------------------------------------------------------------------------|
+| Baseline                              | none                                                                             |
+| Purpose                               | Test current performance                                                         |
+| Test start                            | 2026-09-28 20:00:48 UTC                                                                      |
+| Test end                              | 2026-09-28 20:30:54 UTC                                                                        |
+| Test duration                         | 30min                                                                          |
+| Executed test                         | manipulate\_user                                                                    |
+| k6 version                            | v2.1.0                                                                           |
+| VUs                                   | 600<br/>v4.17.1 ran this target at 200 VUs, so its figures are not directly comparable with these.                                                                              |
+| Client location                       | EU1                                                                              |
+| ZITADEL location                      | EU1                                                                              |
+| ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 2<br/>Container max scale: 7<br/>Concurrency: 400 requests per container<br/>Scales on demand. v4.17.1 ran pinned at 7, so instance counts are not comparable. |
+| ZITADEL Version                       | v4.19.2                                                                           |
+| ZITADEL Settings                      | Eventstore autovacuum (new in v4.17): Enabled: true<br/>VacuumThreshold: 1000000<br/>AnalyzeThreshold: 1000000<br/>Tuned for the ~4,000 events/s expected during the benchmark, per the [tuning guide](https://zitadel.com/docs/self-hosting/manage/tuning#reading-events).<br/>Database pool: MaxOpenConns 6, MaxIdleConns 6, MaxConnIdleTime 1m<br/>Projections: TransactionDuration 0s, RequeueEvery 180s<br/>Shared QA environment: notification workers and other QA traffic use the same database. |
+| ZITADEL feature flags                 | Enabled: loginDefaultOrg (instance), oidcTokenExchange (system), enableBackChannelLogout (system), consoleUseV2UserApi (instance)<br/>improvedPerformance (instance): IMPROVED_PERFORMANCE_PROJECT_GRANT, IMPROVED_PERFORMANCE_PROJECT, IMPROVED_PERFORMANCE_USER_GRANT, IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED<br/>Disabled: userSchema, debugOidcParentError, oidcSingleV1SessionTermination, loginV2 (explicitly false at instance), permissionCheckV2<br/>Captured from the instance **before** the run (2026-09-28 16:53:59 UTC; sequence 5, last changed 2026-09-28 16:37:36 UTC).                                                                                  |
+| Database                              | type: psql<br />version: 17 (Cloud SQL POSTGRES_17)<br/>`auto_explain` on: log_analyze, log_timing, log_nested_statements, log_verbose, log_min_duration 10 ms. This adds overhead to every statement slower than 10 ms; production does not run it.                                                   |
+| Database location                     | EU1                                                                              |
+| Database specification                | Cloud SQL Enterprise Plus, `db-perf-optimized-N-8`<br/>vCPU: 8<br/>memory: 64 GB<br/>Data cache: enabled                                                       |
+| ZITADEL metrics during test           |                                                                                  |
+| Observed errors                       | none                                                                          |
+| Top 3 most expensive database queries |                                                                                  |
+| Database metrics during test          |                                                                                  |
+| k6 Iterations per second              | 66                                                                       |
+| k6 output                             | [output](#k6-output)                                                             |
+| flowchart outcome                     |                                                                                  |
+
+## Endpoint latencies
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output
+```bash
+  █ TOTAL RESULTS 
+
+    checks_total.......: 476301  263.474619/s
+    checks_succeeded...: 100.00% 476301 out of 476301
+    checks_failed......: 0.00%   0 out of 476301
+
+    ✓ user defined
+    ✓ authorize status ok
+    ✓ login name status ok
+    ✓ login shows password page
+    ✓ password status ok
+    ✓ password callback
+    ✓ code set
+    ✓ token status ok
+    ✓ access token created
+    ✓ id token created
+    ✓ info created
+    ✓ org created
+    ✓ create user is status ok
+    ✓ update user is status ok
+    ✓ lock user is status ok
+    ✓ delete user is status ok
+    ✓ org removed
+
+    CUSTOM
+    delete_user_duration.................: min=23.58ms  avg=310.42ms max=5.27s   p(50)=121.62ms p(95)=1.4s    p(99)=2.16s  
+    lock_user_duration...................: min=14.26ms  avg=174.85ms max=4.63s   p(50)=22.19ms  p(95)=1.2s    p(99)=1.83s  
+    login_ui_enter_login_name_duration...: min=65.73ms  avg=65.73ms  max=65.73ms p(50)=65.73ms  p(95)=65.73ms p(99)=65.73ms
+    login_ui_enter_password_duration.....: min=15.16ms  avg=15.16ms  max=15.16ms p(50)=15.16ms  p(95)=15.16ms p(99)=15.16ms
+    login_ui_init_login_duration.........: min=36.87ms  avg=36.87ms  max=36.87ms p(50)=36.87ms  p(95)=36.87ms p(99)=36.87ms
+    login_ui_token_duration..............: min=54.46ms  avg=54.46ms  max=54.46ms p(50)=54.46ms  p(95)=54.46ms p(99)=54.46ms
+    org_create_org_duration..............: min=58.91ms  avg=58.91ms  max=58.91ms p(50)=58.91ms  p(95)=58.91ms p(99)=58.91ms
+    update_human_duration................: min=14.98ms  avg=174.79ms max=5.23s   p(50)=22.23ms  p(95)=1.2s    p(99)=1.85s  
+    user_create_human_duration...........: min=273.8ms  avg=498.13ms max=14.04s  p(50)=297.66ms p(95)=1.52s   p(99)=2.34s  
+
+    HTTP
+    http_req_duration....................: min=14.26ms  avg=1.81s    max=29.76s  p(50)=218.6ms  p(95)=21.03s  p(99)=25.37s 
+      { expected_response:true }.........: min=14.26ms  avg=1.81s    max=29.76s  p(50)=218.6ms  p(95)=21.03s  p(99)=25.37s 
+    http_req_failed......................: 0.00%  0 out of 595370
+    http_reqs............................: 595370 329.339816/s
+
+    EXECUTION
+    iteration_duration...................: min=400.62ms avg=9.08s    max=35.94s  p(50)=2.66s    p(95)=26.49s  p(99)=28.41s 
+    iterations...........................: 119072 65.866857/s
+    vus..................................: 31     min=0           max=600
+    vus_max..............................: 600    min=600         max=600
+
+    NETWORK
+    data_received........................: 333 MB 184 kB/s
+    data_sent............................: 102 MB 57 kB/s
+
+running (30m07.8s), 000/600 VUs, 119072 complete and 0 interrupted iterations
+default ✓ [ 100% ] 600 VUs  30m0s
+```

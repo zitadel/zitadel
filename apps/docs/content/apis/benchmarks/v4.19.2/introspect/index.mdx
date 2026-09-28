@@ -1,0 +1,103 @@
+---
+title: introspect benchmark of zitadel v4.19.2
+sidebar_label: introspect
+---
+
+import OutputSource from "./output.json";
+import { BenchmarkChart } from '@/components/benchmark_chart';
+
+Benchmark results of the v4.19.2 release of Zitadel.
+
+## Performance test results
+
+| Metric                                | Value                                                                            |
+|:--------------------------------------|:---------------------------------------------------------------------------------|
+| Baseline                              | none                                                                             |
+| Purpose                               | Test current performance                                                         |
+| Test start                            | 2026-09-28 22:58:10 UTC                                                                      |
+| Test end                              | 2026-09-28 23:28:10 UTC                                                                        |
+| Test duration                         | 30min                                                                          |
+| Executed test                         | introspect                                                                    |
+| k6 version                            | v2.1.0                                                                           |
+| VUs                                   | 600                                                                              |
+| Client location                       | EU1                                                                              |
+| ZITADEL location                      | EU1                                                                              |
+| ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 2<br/>Container max scale: 7<br/>Concurrency: 400 requests per container<br/>Scales on demand. v4.17.1 ran pinned at 7, so instance counts are not comparable. |
+| ZITADEL Version                       | v4.19.2                                                                           |
+| ZITADEL Settings                      | Eventstore autovacuum (new in v4.17): Enabled: true<br/>VacuumThreshold: 1000000<br/>AnalyzeThreshold: 1000000<br/>Tuned for the ~4,000 events/s expected during the benchmark, per the [tuning guide](https://zitadel.com/docs/self-hosting/manage/tuning#reading-events).<br/>Database pool: MaxOpenConns 6, MaxIdleConns 6, MaxConnIdleTime 1m<br/>Projections: TransactionDuration 0s, RequeueEvery 180s<br/>Shared QA environment: notification workers and other QA traffic use the same database. |
+| ZITADEL feature flags                 | Enabled: loginDefaultOrg (instance), oidcTokenExchange (system), enableBackChannelLogout (system), consoleUseV2UserApi (instance)<br/>improvedPerformance (instance): IMPROVED_PERFORMANCE_PROJECT_GRANT, IMPROVED_PERFORMANCE_PROJECT, IMPROVED_PERFORMANCE_USER_GRANT, IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED<br/>Disabled: userSchema, debugOidcParentError, oidcSingleV1SessionTermination, loginV2 (explicitly false at instance), permissionCheckV2<br/>Captured from the instance **before** the run (2026-09-28 16:53:59 UTC; sequence 5, last changed 2026-09-28 16:37:36 UTC).                                                                                  |
+| Database                              | type: psql<br />version: 17 (Cloud SQL POSTGRES_17)<br/>`auto_explain` on: log_analyze, log_timing, log_nested_statements, log_verbose, log_min_duration 10 ms. This adds overhead to every statement slower than 10 ms; production does not run it.                                                   |
+| Database location                     | EU1                                                                              |
+| Database specification                | Cloud SQL Enterprise Plus, `db-perf-optimized-N-8`<br/>vCPU: 8<br/>memory: 64 GB<br/>Data cache: enabled                                                       |
+| ZITADEL metrics during test           |                                                                                  |
+| Observed errors                       | 3 of 8,721,738 requests failed (0.00%): 3x connection reset. 2 iterations aborted on a null response body. 5 of 17,441,066 checks failed (0.00%): introspect status ok (3 failed), introspect active (2 failed)<br/>This is the second attempt. The first, in the scheduled slot at 18:03 UTC, failed during setup when 10 of 600 concurrent project creations returned HTTP 500 within one second; nothing was measured, and the target was re-run at the end of the sweep.                                                                          |
+| Top 3 most expensive database queries |                                                                                  |
+| Database metrics during test          |                                                                                  |
+| k6 Iterations per second              | 4810                                                                       |
+| k6 output                             | [output](#k6-output)                                                             |
+| flowchart outcome                     |                                                                                  |
+
+## Endpoint latencies
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output
+```bash
+  █ TOTAL RESULTS 
+
+    checks_total.......: 17441066 9621.454393/s
+    checks_succeeded...: 99.99%   17441061 out of 17441066
+    checks_failed......: 0.00%    5 out of 17441066
+
+    ✓ user defined
+    ✓ authorize status ok
+    ✓ login name status ok
+    ✓ login shows password page
+    ✓ password status ok
+    ✓ password callback
+    ✓ code set
+    ✓ token status ok
+    ✓ access token created
+    ✓ id token created
+    ✓ info created
+    ✓ org created
+    ✓ add project status ok
+    ✓ add api status ok
+    ✓ add app key status ok
+    ✓ openid configuration
+    ✗ introspect status ok
+      ↳  99% — ✓ 8719318 / ✗ 3
+    ✗ introspect active
+      ↳  99% — ✓ 8719319 / ✗ 2
+    ✓ org removed
+
+    CUSTOM
+    app_add_app_duration.................: min=25.47ms  avg=303.82ms max=439.06ms p(50)=340.9ms  p(95)=429.6ms  p(99)=438.34ms
+    app_add_app_key_duration.............: min=75ms     avg=3.54s    max=6.99s    p(50)=3.73s    p(95)=6.75s    p(99)=6.82s   
+    login_ui_enter_login_name_duration...: min=84.67ms  avg=86.06ms  max=87.45ms  p(50)=86.06ms  p(95)=87.31ms  p(99)=87.42ms 
+    login_ui_enter_password_duration.....: min=2.72ms   avg=7.03ms   max=11.34ms  p(50)=7.03ms   p(95)=10.9ms   p(99)=11.25ms 
+    login_ui_init_login_duration.........: min=45.93ms  avg=46.15ms  max=46.36ms  p(50)=46.15ms  p(95)=46.34ms  p(99)=46.36ms 
+    login_ui_token_duration..............: min=71.22ms  avg=71.61ms  max=72.01ms  p(50)=71.61ms  p(95)=71.97ms  p(99)=72ms    
+    oidc_introspect_duration.............: min=9.58ms   avg=123.25ms max=1.13s    p(50)=66.14ms  p(95)=385.89ms p(99)=465.59ms
+    org_create_org_duration..............: min=31.74ms  avg=31.74ms  max=31.74ms  p(50)=31.74ms  p(95)=31.74ms  p(99)=31.74ms 
+    project_add_project_duration.........: min=53.95ms  avg=382.37ms max=486.26ms p(50)=423.24ms p(95)=475.25ms p(99)=479.59ms
+
+    HTTP
+    http_req_duration....................: min=378.85µs avg=123.51ms max=6.99s    p(50)=66.16ms  p(95)=386.02ms p(99)=465.86ms
+      { expected_response:true }.........: min=2.72ms   avg=123.51ms max=6.99s    p(50)=66.16ms  p(95)=386.02ms p(99)=465.86ms
+    http_req_failed......................: 0.00%   3 out of 8721738
+    http_reqs............................: 8721738 4811.391941/s
+
+    EXECUTION
+    iteration_duration...................: min=685.46µs avg=123.78ms max=2.05s    p(50)=66.66ms  p(95)=386.42ms p(99)=466.23ms
+    iterations...........................: 8719321 4810.05859/s
+    vus..................................: 0       min=0            max=600
+    vus_max..............................: 600     min=600          max=600
+
+    NETWORK
+    data_received........................: 404 GB  223 MB/s
+    data_sent............................: 10 GB   5.6 MB/s
+
+running (30m12.7s), 000/600 VUs, 8719321 complete and 0 interrupted iterations
+default ✓ [ 100% ] 600 VUs  30m0s
+```

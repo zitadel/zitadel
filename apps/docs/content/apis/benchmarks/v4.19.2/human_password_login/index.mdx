@@ -1,0 +1,99 @@
+---
+title: human password login benchmark of zitadel v4.19.2
+sidebar_label: human password login
+---
+
+import OutputSource from "./output.json";
+import { BenchmarkChart } from '@/components/benchmark_chart';
+
+Benchmark results of the v4.19.2 release of Zitadel.
+
+## Performance test results
+
+| Metric                                | Value                                                                            |
+|:--------------------------------------|:---------------------------------------------------------------------------------|
+| Baseline                              | none                                                                             |
+| Purpose                               | Test current performance                                                         |
+| Test start                            | 2026-09-28 17:32:42 UTC                                                                      |
+| Test end                              | 2026-09-28 18:02:49 UTC                                                                        |
+| Test duration                         | 30min                                                                          |
+| Executed test                         | human\_password\_login                                                                    |
+| k6 version                            | v2.1.0                                                                           |
+| VUs                                   | 600                                                                              |
+| Client location                       | EU1                                                                              |
+| ZITADEL location                      | EU1                                                                              |
+| ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 2<br/>Container max scale: 7<br/>Concurrency: 400 requests per container<br/>Scales on demand. v4.17.1 ran pinned at 7, so instance counts are not comparable. |
+| ZITADEL Version                       | v4.19.2                                                                           |
+| ZITADEL Settings                      | Eventstore autovacuum (new in v4.17): Enabled: true<br/>VacuumThreshold: 1000000<br/>AnalyzeThreshold: 1000000<br/>Tuned for the ~4,000 events/s expected during the benchmark, per the [tuning guide](https://zitadel.com/docs/self-hosting/manage/tuning#reading-events).<br/>Database pool: MaxOpenConns 6, MaxIdleConns 6, MaxConnIdleTime 1m<br/>Projections: TransactionDuration 0s, RequeueEvery 180s<br/>Shared QA environment: notification workers and other QA traffic use the same database. |
+| ZITADEL feature flags                 | Enabled: loginDefaultOrg (instance), oidcTokenExchange (system), enableBackChannelLogout (system), consoleUseV2UserApi (instance)<br/>improvedPerformance (instance): IMPROVED_PERFORMANCE_PROJECT_GRANT, IMPROVED_PERFORMANCE_PROJECT, IMPROVED_PERFORMANCE_USER_GRANT, IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED<br/>Disabled: userSchema, debugOidcParentError, oidcSingleV1SessionTermination, loginV2 (explicitly false at instance), permissionCheckV2<br/>Captured from the instance **before** the run (2026-09-28 16:53:59 UTC; sequence 5, last changed 2026-09-28 16:37:36 UTC).                                                                                  |
+| Database                              | type: psql<br />version: 17 (Cloud SQL POSTGRES_17)<br/>`auto_explain` on: log_analyze, log_timing, log_nested_statements, log_verbose, log_min_duration 10 ms. This adds overhead to every statement slower than 10 ms; production does not run it.                                                   |
+| Database location                     | EU1                                                                              |
+| Database specification                | Cloud SQL Enterprise Plus, `db-perf-optimized-N-8`<br/>vCPU: 8<br/>memory: 64 GB<br/>Data cache: enabled                                                       |
+| ZITADEL metrics during test           |                                                                                  |
+| Observed errors                       | 25 of 1,149,819 requests failed (0.00%): 24x request timeout, 1x not individually logged (see k6 output). 32 of 1,721,316 checks failed (0.00%): password status ok (25 failed), password callback (7 failed)<br/>24 of the 25 failed requests are 60-second timeouts within a single minute (17:43 UTC), with none before or after: a bounded event, reported separately from the service's behaviour under load.                                                                          |
+| Top 3 most expensive database queries |                                                                                  |
+| Database metrics during test          |                                                                                  |
+| k6 Iterations per second              | 78                                                                       |
+| k6 output                             | [output](#k6-output)                                                             |
+| flowchart outcome                     |                                                                                  |
+
+## Endpoint latencies
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output
+```bash
+  █ TOTAL RESULTS 
+
+    checks_total.......: 1721316 940.748105/s
+    checks_succeeded...: 99.99%  1721284 out of 1721316
+    checks_failed......: 0.00%   32 out of 1721316
+
+    ✓ user defined
+    ✓ authorize status ok
+    ✓ login name status ok
+    ✓ login shows password page
+    ✗ password status ok
+      ↳  99% — ✓ 143336 / ✗ 25
+    ✗ password callback
+      ↳  99% — ✓ 143329 / ✗ 7
+    ✓ code set
+    ✓ token status ok
+    ✓ access token created
+    ✓ id token created
+    ✓ info created
+    ✓ org created
+    ✓ create user is status ok
+    ✓ openid configuration
+    ✓ userinfo status ok
+    ✓ org removed
+
+    CUSTOM
+    human_password_login_duration........: min=528ms    avg=7.53s    max=43.46s  p(50)=6.91s    p(95)=18.88s  p(99)=24.31s 
+    login_ui_enter_login_name_duration...: min=39.82ms  avg=1.98s    max=25.17s  p(50)=297.59ms p(95)=8.8s    p(99)=20s    
+    login_ui_enter_password_duration.....: min=1.12ms   avg=26.54ms  max=59.64s  p(50)=1.91ms   p(95)=2.63ms  p(99)=5.74ms 
+    login_ui_init_login_duration.........: min=20.58ms  avg=865.81ms max=9.69s   p(50)=213.25ms p(95)=5.98s   p(99)=7.75s  
+    login_ui_token_duration..............: min=25.52ms  avg=899.43ms max=9.72s   p(50)=227.21ms p(95)=6.02s   p(99)=7.79s  
+    oidc_user_info_duration..............: min=8.78ms   avg=757.91ms max=9.7s    p(50)=143.61ms p(95)=5.93s   p(99)=7.73s  
+    org_create_org_duration..............: min=23.89ms  avg=23.89ms  max=23.89ms p(50)=23.89ms  p(95)=23.89ms p(99)=23.89ms
+    user_create_human_duration...........: min=505.91ms avg=11.33s   max=18.55s  p(50)=11.53s   p(95)=18.18s  p(99)=18.37s 
+
+    HTTP
+    http_req_duration....................: min=1.12ms   avg=950.22ms max=59.64s  p(50)=204.28ms p(95)=6.18s   p(99)=8.39s  
+      { expected_response:true }.........: min=1.12ms   avg=949.03ms max=25.17s  p(50)=204.27ms p(95)=6.18s   p(99)=8.38s  
+    http_req_failed......................: 0.00%   25 out of 1149819
+    http_reqs............................: 1149819 628.408755/s
+
+    EXECUTION
+    iteration_duration...................: min=528.11ms avg=7.54s    max=1m6s    p(50)=6.91s    p(95)=18.89s  p(99)=24.35s 
+    iterations...........................: 143360  78.350314/s
+    vus..................................: 9       min=0             max=600
+    vus_max..............................: 600     min=600           max=600
+
+    NETWORK
+    data_received........................: 2.6 GB  1.4 MB/s
+    data_sent............................: 535 MB  292 kB/s
+
+running (30m29.7s), 000/600 VUs, 143360 complete and 0 interrupted iterations
+default ✓ [ 100% ] 600 VUs  30m0s
+```
