@@ -286,6 +286,14 @@ func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// The provider/certificate used to verify the response is selected from the request path (data.IDPID),
+	// but the user is resolved under the intent's IDP. Make sure they are the same IDP, otherwise an
+	// assertion signed by one SAML IDP could be accepted for an intent targeting a different one.
+	if err := checkSAMLIntentIDP(data.IDPID, intent.IDPID); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	session, err := saml2.NewSession(samlProvider, intent.RequestID, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -525,7 +533,12 @@ func (h *Handler) handleSLO(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// For the moment we just make sure the callback matches the IDP it was started on / intended for.
+	// Make sure the callback matches the IDP the logout was started on / intended for, so a logout
+	// response cannot be consumed through a different SAML IDP's path.
+	if err := checkSAMLIntentIDP(data.IDPID, logoutState.IDPID); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	provider, err := h.getProvider(ctx, data.IDPID)
 	if err != nil {
@@ -661,6 +674,17 @@ func (h *Handler) fetchIDPUserFromCode(ctx context.Context, identityProvider idp
 		return nil, nil, err
 	}
 	return user, session, nil
+}
+
+// checkSAMLIntentIDP ensures the IdP named in the request path (which selects the certificate used to
+// verify the assertion/response) is the same IdP the intent or federated logout was started for.
+// Without this check an assertion signed by one SAML IdP is accepted for an intent targeting a
+// different one (IdP confusion).
+func checkSAMLIntentIDP(requestIDPID, intentIDPID string) error {
+	if requestIDPID != intentIDPID {
+		return zerrors.ThrowInvalidArgument(nil, "SAML-9aj20fb1xl", "Errors.Intent.IDPInvalid")
+	}
+	return nil
 }
 
 func (h *Handler) checkExternalUser(ctx context.Context, idpID, externalUserID string) (userID string, err error) {
