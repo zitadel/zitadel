@@ -12,6 +12,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -713,6 +714,40 @@ func (q *Queries) SearchClaimedUserIDsOfOrgDomain(ctx context.Context, domain, o
 	return userIDs, err
 }
 
+//go:embed user_is_admin.sql
+var userIsAdminQuery string
+
+// IsUserAdmin checks if the user has any memberships in instance, org, project or project_grant.
+// When at least 1 membership is found, true is returned. False otherwise.
+func (q *Queries) IsUserAdmin(ctx context.Context, userID string) (isAdmin bool, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	// If trigger fails, the membership projections might be outdated,
+	// As this is important for security, we return the error.
+	// Other trigger errors are typically only debug logged.
+	ctx, err = q.triggerMemberProjections(ctx)
+	if err != nil {
+		return false, zerrors.ThrowInternal(err, "QUERY-UTh3k", "Errors.Internal")
+	}
+
+	err = q.client.QueryRowContext(ctx,
+		func(row *sql.Row) error {
+			return row.Scan(&isAdmin)
+		},
+		userIsAdminQuery,
+		authz.GetInstance(ctx).InstanceID(), userID,
+	)
+	if errors.Is(err, sql.ErrNoRows) {
+		logging.WithError(ctx, err).Debug("user not admin", "userID", userID)
+		return false, nil
+	}
+	if err != nil {
+		return false, zerrors.ThrowInternal(err, "QUERY-Ao1re", "Errors.Internal")
+	}
+	return isAdmin, nil
+}
+
 func (r *UserSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
 	query, err := NewUserResourceOwnerSearchQuery(orgID, TextEquals)
 	if err != nil {
@@ -863,8 +898,10 @@ func searchQueryHasMetadataFilter(qry SearchQuery) bool {
 	}
 }
 
-func triggerUserProjections(ctx context.Context) {
-	triggerBatch(ctx, projection.UserProjection, projection.LoginNameProjection)
+func triggerUserProjections(ctx context.Context) context.Context {
+	ctx, err := triggerBatch(ctx, projection.UserProjection, projection.LoginNameProjection)
+	logging.OnError(ctx, err).Debug("could not trigger user projections")
+	return ctx
 }
 
 var joinLoginNames = `LEFT JOIN LATERAL (` +
