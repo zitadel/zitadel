@@ -170,6 +170,7 @@ const (
 	SAMLIDCol                         = "idp_id"
 	SAMLInstanceIDCol                 = "instance_id"
 	SAMLMetadataCol                   = "metadata"
+	SAMLMetadataURLCol                = "metadata_url"
 	SAMLKeyCol                        = "key"
 	SAMLCertificateCol                = "certificate"
 	SAMLBindingCol                    = "binding"
@@ -385,6 +386,7 @@ func (*idpTemplateProjection) Init() *old_handler.Check {
 			handler.NewColumn(SAMLIDCol, handler.ColumnTypeText),
 			handler.NewColumn(SAMLInstanceIDCol, handler.ColumnTypeText),
 			handler.NewColumn(SAMLMetadataCol, handler.ColumnTypeBytes),
+			handler.NewColumn(SAMLMetadataURLCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(SAMLKeyCol, handler.ColumnTypeJSONB),
 			handler.NewColumn(SAMLCertificateCol, handler.ColumnTypeBytes),
 			handler.NewColumn(SAMLBindingCol, handler.ColumnTypeText, handler.Nullable()),
@@ -2031,6 +2033,7 @@ func (p *idpTemplateProjection) reduceSAMLIDPAdded(event eventstore.Event) (*han
 		handler.NewCol(SAMLIDCol, idpEvent.ID),
 		handler.NewCol(SAMLInstanceIDCol, idpEvent.Aggregate().InstanceID),
 		handler.NewCol(SAMLMetadataCol, idpEvent.Metadata),
+		handler.NewCol(SAMLMetadataURLCol, idpEvent.MetadataURL),
 		handler.NewCol(SAMLKeyCol, idpEvent.Key),
 		handler.NewCol(SAMLCertificateCol, idpEvent.Certificate),
 		handler.NewCol(SAMLBindingCol, idpEvent.Binding),
@@ -2557,6 +2560,9 @@ func reduceSAMLIDPChangedColumns(idpEvent idp.SAMLIDPChangedEvent) []handler.Col
 	SAMLCols := make([]handler.Column, 0, 5)
 	if idpEvent.Metadata != nil {
 		SAMLCols = append(SAMLCols, handler.NewCol(SAMLMetadataCol, idpEvent.Metadata))
+	}
+	if idpEvent.MetadataURL != nil {
+		SAMLCols = append(SAMLCols, handler.NewCol(SAMLMetadataURLCol, *idpEvent.MetadataURL))
 	}
 	if idpEvent.Key != nil {
 		SAMLCols = append(SAMLCols, handler.NewCol(SAMLKeyCol, idpEvent.Key))

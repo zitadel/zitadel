@@ -2826,11 +2826,12 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_saml (idp_id, instance_id, metadata, key, certificate, binding, with_signed_request, signature_algorithm, transient_mapping_attribute_name, federated_logout_enabled, name_id_format) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_saml (idp_id, instance_id, metadata, metadata_url, key, certificate, binding, with_signed_request, signature_algorithm, transient_mapping_attribute_name, federated_logout_enabled, name_id_format) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
 								[]byte("metadata"),
+								"",
 								anyArg{},
 								anyArg{},
 								"binding",
@@ -2902,11 +2903,12 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_saml (idp_id, instance_id, metadata, key, certificate, binding, with_signed_request, signature_algorithm, transient_mapping_attribute_name, federated_logout_enabled, name_id_format) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_saml (idp_id, instance_id, metadata, metadata_url, key, certificate, binding, with_signed_request, signature_algorithm, transient_mapping_attribute_name, federated_logout_enabled, name_id_format) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
 								[]byte("metadata"),
+								"",
 								anyArg{},
 								anyArg{},
 								"binding",
