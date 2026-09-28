@@ -132,13 +132,13 @@ func TestPrepareUsersQuery_LoginNameEqualsUsesIndexedJoin(t *testing.T) {
 	sql, args, err := builder.ToSql()
 	require.NoError(t, err)
 
-	inner := usersPageSubquery(t, sql)
+	inner, outer := splitUsersPageSQL(t, sql)
 	assert.Contains(t, inner, "INNER JOIN")
 	assert.Contains(t, inner, "login_name_matches")
 	assert.Contains(t, inner, "login_names3_users")
 	assert.Contains(t, inner, "user_name_lower")
 	assert.NotContains(t, inner, "login_name_lower")
-	assert.NotContains(t, sql[strings.Index(sql, ") AS page"):], "login_name_matches")
+	assert.NotContains(t, outer, "login_name_matches")
 	assert.NotContains(t, sql, "user_metadata5")
 	assert.NotContains(t, sql, "SELECT DISTINCT")
 	assert.Contains(t, args, "inst-1")
@@ -203,14 +203,14 @@ func TestPrepareUsersQuery_LoginNameOrEmailUsesUnion(t *testing.T) {
 	sql, args, err := builder.ToSql()
 	require.NoError(t, err)
 
-	inner := usersPageSubquery(t, sql)
+	inner, outer := splitUsersPageSQL(t, sql)
 	assert.Contains(t, inner, "UNION")
 	assert.Contains(t, inner, "AS matches")
 	assert.Contains(t, inner, "login_name_matches")
 	assert.Contains(t, inner, "login_names3_users")
 	assert.Contains(t, inner, "LOWER("+HumanEmailCol.identifier()+")")
 	assert.NotContains(t, inner, "login_name_lower")
-	assert.NotContains(t, sql[strings.Index(sql, ") AS page"):], "AS matches")
+	assert.NotContains(t, outer, "AS matches")
 	assert.Contains(t, args, "user@example.com")
 }
 
@@ -230,13 +230,13 @@ func TestPrepareUsersQuery_UsernameOrEmailUsesUnion(t *testing.T) {
 	sql, args, err := builder.ToSql()
 	require.NoError(t, err)
 
-	inner := usersPageSubquery(t, sql)
+	inner, outer := splitUsersPageSQL(t, sql)
 	assert.Contains(t, inner, "UNION")
 	assert.Contains(t, inner, "AS matches")
 	assert.Contains(t, inner, "LOWER("+UserUsernameCol.identifier()+")")
 	assert.Contains(t, inner, "LOWER("+HumanEmailCol.identifier()+")")
 	assert.NotContains(t, inner, "login_name_matches")
-	assert.NotContains(t, sql[strings.Index(sql, ") AS page"):], "AS matches")
+	assert.NotContains(t, outer, "AS matches")
 	assert.Contains(t, args, "user165000")
 	assert.Contains(t, args, "user@example.com")
 }
@@ -257,12 +257,12 @@ func TestPrepareUsersQuery_EmailOrPhoneUsesUnion(t *testing.T) {
 	sql, args, err := builder.ToSql()
 	require.NoError(t, err)
 
-	inner := usersPageSubquery(t, sql)
+	inner, outer := splitUsersPageSQL(t, sql)
 	assert.Contains(t, inner, "UNION")
 	assert.Contains(t, inner, "AS matches")
 	assert.Contains(t, inner, "LOWER("+HumanEmailCol.identifier()+")")
 	assert.Contains(t, inner, "LOWER("+HumanPhoneCol.identifier()+")")
-	assert.NotContains(t, sql[strings.Index(sql, ") AS page"):], "AS matches")
+	assert.NotContains(t, outer, "AS matches")
 	assert.Contains(t, args, "user@example.com")
 	assert.Contains(t, args, "+41000000000")
 }
@@ -500,15 +500,13 @@ func TestPrepareUsersQuery_PaginatesBeforeLoginNamesJoin(t *testing.T) {
 	sql, _, err := builder.ToSql()
 	require.NoError(t, err)
 
-	inner := usersPageSubquery(t, sql)
-	pageIdx := strings.Index(sql, ") AS page")
-	lateralIdx := strings.Index(sql, "LEFT JOIN LATERAL")
-	require.Greater(t, lateralIdx, pageIdx)
+	inner, outer := splitUsersPageSQL(t, sql)
 	assert.Contains(t, inner, "LIMIT 20")
 	assert.Contains(t, inner, "OFFSET 17500")
 	assert.NotContains(t, inner, "login_names3")
 	assert.NotContains(t, inner, "users14_humans")
-	assert.Contains(t, sql[pageIdx:], "login_names3")
+	assert.Contains(t, outer, "LEFT JOIN LATERAL")
+	assert.Contains(t, outer, "login_names3")
 	assert.NotContains(t, sql, "COUNT(*) OVER ()")
 }
 
@@ -621,11 +619,18 @@ func TestPrepareUsersCountQuery_LoginNameOrEmailUsesUnion(t *testing.T) {
 	assert.Contains(t, args, "user@example.com")
 }
 
-func usersPageSubquery(t *testing.T, sql string) string {
+func usersPageSubquery(t *testing.T, stmt string) string {
 	t.Helper()
-	fromIdx := strings.Index(sql, "FROM (SELECT")
-	pageIdx := strings.Index(sql, ") AS page")
-	require.Greater(t, fromIdx, 0, sql)
-	require.Greater(t, pageIdx, fromIdx, sql)
-	return sql[fromIdx:pageIdx]
+	inner, _ := splitUsersPageSQL(t, stmt)
+	return inner
+}
+
+func splitUsersPageSQL(t *testing.T, stmt string) (inner, outer string) {
+	t.Helper()
+	fromIdx := strings.Index(stmt, "FROM (SELECT")
+	pageIdx := strings.Index(stmt, ") AS page")
+	if fromIdx < 0 || pageIdx < 0 || pageIdx <= fromIdx {
+		t.Fatalf("page subquery not found: %s", stmt)
+	}
+	return stmt[fromIdx:pageIdx], stmt[pageIdx:]
 }
