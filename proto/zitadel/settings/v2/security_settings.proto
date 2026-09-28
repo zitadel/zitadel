@@ -14,6 +14,26 @@ message SecuritySettings {
   // If enabled, users are allowed to impersonate other users.
   // The impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well".
   bool enable_impersonation = 2;
+
+  // DynamicClientRegistrationSettings defines if OAuth 2.0 clients may register
+  // themselves at runtime (RFC 7591) and whether they may do so without a token.
+  DynamicClientRegistrationSettings dynamic_client_registration = 3;
+}
+
+message DynamicClientRegistrationSettings {
+  // Enabled states if the OAuth 2.0 Dynamic Client Registration endpoint (RFC 7591) is
+  // served and advertised as `registration_endpoint` in the discovery document.
+  // When disabled, the endpoint responds with 404 and is absent from discovery.
+  bool enabled = 1;
+
+  // AllowUnauthenticated states if clients may register without a bearer token, as
+  // required by the Model Context Protocol (MCP) flow. Such clients are homed in the
+  // instance's default organization. It only has an effect if enabled is true.
+  //
+  // When false, registration requires an access token whose user holds the
+  // `project.app.register_dynamic` permission in the token's organization, and the
+  // client is homed in that organization.
+  bool allow_unauthenticated = 2;
 }
 
 message EmbeddedIframeSettings{

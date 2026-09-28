@@ -43,27 +43,31 @@ type App struct {
 }
 
 type OIDCApp struct {
-	RedirectURIs             database.TextArray[string]
-	ResponseTypes            database.NumberArray[domain.OIDCResponseType]
-	GrantTypes               database.NumberArray[domain.OIDCGrantType]
-	AppType                  domain.OIDCApplicationType
-	ClientID                 string
-	AuthMethodType           domain.OIDCAuthMethodType
-	PostLogoutRedirectURIs   database.TextArray[string]
-	Version                  domain.OIDCVersion
-	ComplianceProblems       database.TextArray[string]
-	IsDevMode                bool
-	AccessTokenType          domain.OIDCTokenType
-	AssertAccessTokenRole    bool
-	AssertIDTokenRole        bool
-	AssertIDTokenUserinfo    bool
-	ClockSkew                time.Duration
-	AdditionalOrigins        database.TextArray[string]
-	AllowedOrigins           database.TextArray[string]
-	SkipNativeAppSuccessPage bool
-	BackChannelLogoutURI     string
-	LoginVersion             domain.LoginVersion
-	LoginBaseURI             *string
+	RedirectURIs                  database.TextArray[string]
+	ResponseTypes                 database.NumberArray[domain.OIDCResponseType]
+	GrantTypes                    database.NumberArray[domain.OIDCGrantType]
+	AppType                       domain.OIDCApplicationType
+	ClientID                      string
+	AuthMethodType                domain.OIDCAuthMethodType
+	PostLogoutRedirectURIs        database.TextArray[string]
+	Version                       domain.OIDCVersion
+	ComplianceProblems            database.TextArray[string]
+	IsDevMode                     bool
+	AccessTokenType               domain.OIDCTokenType
+	AssertAccessTokenRole         bool
+	AssertIDTokenRole             bool
+	AssertIDTokenUserinfo         bool
+	ClockSkew                     time.Duration
+	AdditionalOrigins             database.TextArray[string]
+	AllowedOrigins                database.TextArray[string]
+	SkipNativeAppSuccessPage      bool
+	BackChannelLogoutURI          string
+	LoginVersion                  domain.LoginVersion
+	LoginBaseURI                  *string
+	IOSTeamID                     string
+	IOSBundleID                   string
+	AndroidPackageName            string
+	AndroidSHA256CertFingerprints database.TextArray[string]
 }
 
 type SAMLApp struct {
@@ -276,6 +280,22 @@ var (
 	}
 	AppOIDCConfigColumnLoginBaseURI = Column{
 		name:  projection.AppOIDCConfigColumnLoginBaseURI,
+		table: appOIDCConfigsTable,
+	}
+	AppOIDCConfigColumnIOSTeamID = Column{
+		name:  projection.AppOIDCConfigColumnIOSTeamID,
+		table: appOIDCConfigsTable,
+	}
+	AppOIDCConfigColumnIOSBundleID = Column{
+		name:  projection.AppOIDCConfigColumnIOSBundleID,
+		table: appOIDCConfigsTable,
+	}
+	AppOIDCConfigColumnAndroidPackageName = Column{
+		name:  projection.AppOIDCConfigColumnAndroidPackageName,
+		table: appOIDCConfigsTable,
+	}
+	AppOIDCConfigColumnAndroidSHA256CertFingerprints = Column{
+		name:  projection.AppOIDCConfigColumnAndroidSHA256CertFingerprints,
 		table: appOIDCConfigsTable,
 	}
 )
@@ -725,6 +745,10 @@ func prepareAppQuery(activeOnly bool) (sq.SelectBuilder, func(*sql.Row) (*App, e
 		AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
 		AppOIDCConfigColumnLoginVersion.identifier(),
 		AppOIDCConfigColumnLoginBaseURI.identifier(),
+		AppOIDCConfigColumnIOSTeamID.identifier(),
+		AppOIDCConfigColumnIOSBundleID.identifier(),
+		AppOIDCConfigColumnAndroidPackageName.identifier(),
+		AppOIDCConfigColumnAndroidSHA256CertFingerprints.identifier(),
 
 		AppSAMLConfigColumnAppID.identifier(),
 		AppSAMLConfigColumnEntityID.identifier(),
@@ -794,6 +818,10 @@ func scanApp(row *sql.Row) (*App, error) {
 		&oidcConfig.backChannelLogoutURI,
 		&oidcConfig.loginVersion,
 		&oidcConfig.loginBaseURI,
+		&oidcConfig.iosTeamID,
+		&oidcConfig.iosBundleID,
+		&oidcConfig.androidPackageName,
+		&oidcConfig.androidSHA256CertFingerprints,
 
 		&samlConfig.appID,
 		&samlConfig.entityID,
@@ -848,6 +876,10 @@ func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 			AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
 			AppOIDCConfigColumnLoginVersion.identifier(),
 			AppOIDCConfigColumnLoginBaseURI.identifier(),
+			AppOIDCConfigColumnIOSTeamID.identifier(),
+			AppOIDCConfigColumnIOSBundleID.identifier(),
+			AppOIDCConfigColumnAndroidPackageName.identifier(),
+			AppOIDCConfigColumnAndroidSHA256CertFingerprints.identifier(),
 		).From(appsTable.identifier()).
 			Join(join(AppOIDCConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*App, error) {
@@ -887,6 +919,10 @@ func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 				&oidcConfig.backChannelLogoutURI,
 				&oidcConfig.loginVersion,
 				&oidcConfig.loginBaseURI,
+				&oidcConfig.iosTeamID,
+				&oidcConfig.iosBundleID,
+				&oidcConfig.androidPackageName,
+				&oidcConfig.androidSHA256CertFingerprints,
 			)
 
 			if err != nil {
@@ -1004,6 +1040,10 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 			AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
 			AppOIDCConfigColumnLoginVersion.identifier(),
 			AppOIDCConfigColumnLoginBaseURI.identifier(),
+			AppOIDCConfigColumnIOSTeamID.identifier(),
+			AppOIDCConfigColumnIOSBundleID.identifier(),
+			AppOIDCConfigColumnAndroidPackageName.identifier(),
+			AppOIDCConfigColumnAndroidSHA256CertFingerprints.identifier(),
 
 			AppSAMLConfigColumnAppID.identifier(),
 			AppSAMLConfigColumnEntityID.identifier(),
@@ -1061,6 +1101,10 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 					&oidcConfig.backChannelLogoutURI,
 					&oidcConfig.loginVersion,
 					&oidcConfig.loginBaseURI,
+					&oidcConfig.iosTeamID,
+					&oidcConfig.iosBundleID,
+					&oidcConfig.androidPackageName,
+					&oidcConfig.androidSHA256CertFingerprints,
 
 					&samlConfig.appID,
 					&samlConfig.entityID,
@@ -1148,26 +1192,30 @@ func prepareLoginVersionBySAMLAppID() (sq.SelectBuilder, func(*sql.Row) (domain.
 }
 
 type sqlOIDCConfig struct {
-	appID                    sql.NullString
-	version                  sql.NullInt32
-	clientID                 sql.NullString
-	redirectUris             database.TextArray[string]
-	applicationType          sql.NullInt16
-	authMethodType           sql.NullInt16
-	postLogoutRedirectUris   database.TextArray[string]
-	devMode                  sql.NullBool
-	accessTokenType          sql.NullInt16
-	accessTokenRoleAssertion sql.NullBool
-	iDTokenRoleAssertion     sql.NullBool
-	iDTokenUserinfoAssertion sql.NullBool
-	clockSkew                sql.NullInt64
-	additionalOrigins        database.TextArray[string]
-	responseTypes            database.NumberArray[domain.OIDCResponseType]
-	grantTypes               database.NumberArray[domain.OIDCGrantType]
-	skipNativeAppSuccessPage sql.NullBool
-	backChannelLogoutURI     sql.NullString
-	loginVersion             sql.NullInt16
-	loginBaseURI             sql.NullString
+	appID                         sql.NullString
+	version                       sql.NullInt32
+	clientID                      sql.NullString
+	redirectUris                  database.TextArray[string]
+	applicationType               sql.NullInt16
+	authMethodType                sql.NullInt16
+	postLogoutRedirectUris        database.TextArray[string]
+	devMode                       sql.NullBool
+	accessTokenType               sql.NullInt16
+	accessTokenRoleAssertion      sql.NullBool
+	iDTokenRoleAssertion          sql.NullBool
+	iDTokenUserinfoAssertion      sql.NullBool
+	clockSkew                     sql.NullInt64
+	additionalOrigins             database.TextArray[string]
+	responseTypes                 database.NumberArray[domain.OIDCResponseType]
+	grantTypes                    database.NumberArray[domain.OIDCGrantType]
+	skipNativeAppSuccessPage      sql.NullBool
+	backChannelLogoutURI          sql.NullString
+	loginVersion                  sql.NullInt16
+	loginBaseURI                  sql.NullString
+	iosTeamID                     sql.NullString
+	iosBundleID                   sql.NullString
+	androidPackageName            sql.NullString
+	androidSHA256CertFingerprints database.TextArray[string]
 }
 
 func (c sqlOIDCConfig) set(app *App) {
@@ -1175,24 +1223,28 @@ func (c sqlOIDCConfig) set(app *App) {
 		return
 	}
 	app.OIDCConfig = &OIDCApp{
-		Version:                  domain.OIDCVersion(c.version.Int32),
-		ClientID:                 c.clientID.String,
-		RedirectURIs:             c.redirectUris,
-		AppType:                  domain.OIDCApplicationType(c.applicationType.Int16),
-		AuthMethodType:           domain.OIDCAuthMethodType(c.authMethodType.Int16),
-		PostLogoutRedirectURIs:   c.postLogoutRedirectUris,
-		IsDevMode:                c.devMode.Bool,
-		AccessTokenType:          domain.OIDCTokenType(c.accessTokenType.Int16),
-		AssertAccessTokenRole:    c.accessTokenRoleAssertion.Bool,
-		AssertIDTokenRole:        c.iDTokenRoleAssertion.Bool,
-		AssertIDTokenUserinfo:    c.iDTokenUserinfoAssertion.Bool,
-		ClockSkew:                time.Duration(c.clockSkew.Int64),
-		AdditionalOrigins:        c.additionalOrigins,
-		ResponseTypes:            c.responseTypes,
-		GrantTypes:               c.grantTypes,
-		SkipNativeAppSuccessPage: c.skipNativeAppSuccessPage.Bool,
-		BackChannelLogoutURI:     c.backChannelLogoutURI.String,
-		LoginVersion:             domain.LoginVersion(c.loginVersion.Int16),
+		Version:                       domain.OIDCVersion(c.version.Int32),
+		ClientID:                      c.clientID.String,
+		RedirectURIs:                  c.redirectUris,
+		AppType:                       domain.OIDCApplicationType(c.applicationType.Int16),
+		AuthMethodType:                domain.OIDCAuthMethodType(c.authMethodType.Int16),
+		PostLogoutRedirectURIs:        c.postLogoutRedirectUris,
+		IsDevMode:                     c.devMode.Bool,
+		AccessTokenType:               domain.OIDCTokenType(c.accessTokenType.Int16),
+		AssertAccessTokenRole:         c.accessTokenRoleAssertion.Bool,
+		AssertIDTokenRole:             c.iDTokenRoleAssertion.Bool,
+		AssertIDTokenUserinfo:         c.iDTokenUserinfoAssertion.Bool,
+		ClockSkew:                     time.Duration(c.clockSkew.Int64),
+		AdditionalOrigins:             c.additionalOrigins,
+		ResponseTypes:                 c.responseTypes,
+		GrantTypes:                    c.grantTypes,
+		SkipNativeAppSuccessPage:      c.skipNativeAppSuccessPage.Bool,
+		BackChannelLogoutURI:          c.backChannelLogoutURI.String,
+		LoginVersion:                  domain.LoginVersion(c.loginVersion.Int16),
+		IOSTeamID:                     c.iosTeamID.String,
+		IOSBundleID:                   c.iosBundleID.String,
+		AndroidPackageName:            c.androidPackageName.String,
+		AndroidSHA256CertFingerprints: c.androidSHA256CertFingerprints,
 	}
 	if c.loginBaseURI.Valid {
 		app.OIDCConfig.LoginBaseURI = &c.loginBaseURI.String

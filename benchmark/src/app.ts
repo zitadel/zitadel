@@ -19,6 +19,7 @@ export function createAPI(name: string, projectId: string, org: Org, accessToken
         authMethodType: 'API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT',
       }),
       {
+        tags: { name: '/management/v1/projects/{projectId}/apps/api' },
         headers: {
           authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
@@ -51,6 +52,7 @@ export function createAppKey(appId: string, projectId: string, org: Org, accessT
         type: 'KEY_TYPE_JSON',
       }),
       {
+        tags: { name: '/management/v1/projects/{projectId}/apps/{appId}/keys' },
         headers: {
           authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',

@@ -1821,11 +1821,11 @@ message RetrieveIdentityProviderIntentRequest{
     }
   ];
   string idp_intent_token = 2 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
+    (validate.rules).string = {min_len: 1, max_len: 500},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "token of the idp intent, previously returned on the success response of the IDP callback"
       min_length: 1;
-      max_length: 200;
+      max_length: 500;
       example: "\"SJKL3ioIDpo342ioqw98fjp3sdf32wahb=\"";
     }
   ];

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { sendVerification, trySendVerification } from "./verify";
+import { sendVerification, trySendVerification, verifyTOTP } from "./verify";
 
 import {
   createInviteCode,
@@ -23,6 +23,15 @@ vi.mock("@/lib/zitadel", () => ({
   getLoginSettings: vi.fn(),
   sendEmailCode: vi.fn(),
   createInviteCode: vi.fn(),
+  verifyTOTPRegistration: vi.fn(),
+}));
+
+vi.mock("../session", () => ({
+  loadMostRecentSession: vi.fn(),
+}));
+
+vi.mock("./enrollment-guard", () => ({
+  getEnrollmentAuthorizationError: vi.fn(),
 }));
 
 vi.mock("next/headers", () => ({
@@ -342,5 +351,65 @@ describe("trySendVerification", () => {
     });
 
     expect(result).toBe(false);
+  });
+});
+
+describe("verifyTOTP", () => {
+  let mockLoadMostRecentSession: any;
+  let mockVerifyTOTPRegistration: any;
+  let mockGetEnrollmentAuthorizationError: any;
+
+  const totpSession = {
+    id: "session-1",
+    factors: { user: { id: "victim-1", loginName: "victim@example.com" } },
+  };
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    const _headers = await import("next/headers");
+    vi.mocked(_headers.headers).mockResolvedValue(new Headers() as any);
+
+    mockLoadMostRecentSession = vi.mocked((await import("../session")).loadMostRecentSession);
+    mockVerifyTOTPRegistration = vi.mocked((await import("@/lib/zitadel")).verifyTOTPRegistration);
+    mockGetEnrollmentAuthorizationError = vi.mocked((await import("./enrollment-guard")).getEnrollmentAuthorizationError);
+
+    mockLoadMostRecentSession.mockResolvedValue(totpSession);
+  });
+
+  test("rejects TOTP enrollment on an unauthenticated (identify-only) session", async () => {
+    mockGetEnrollmentAuthorizationError.mockResolvedValue(
+      "You have to authenticate or have a valid User Verification Check",
+    );
+
+    const result = await verifyTOTP("123456", "victim@example.com", "org-1");
+
+    expect(result).toEqual({ error: "You have to authenticate or have a valid User Verification Check" });
+    expect(mockGetEnrollmentAuthorizationError).toHaveBeenCalledWith({
+      serviceConfig: {},
+      session: totpSession,
+      userId: "victim-1",
+    });
+    expect(mockVerifyTOTPRegistration).not.toHaveBeenCalled();
+  });
+
+  test("verifies TOTP registration when the session is authorized", async () => {
+    mockGetEnrollmentAuthorizationError.mockResolvedValue(null);
+    mockVerifyTOTPRegistration.mockResolvedValue({ done: true });
+
+    const result = await verifyTOTP("123456", "victim@example.com", "org-1");
+
+    expect(mockVerifyTOTPRegistration).toHaveBeenCalledWith({
+      serviceConfig: {},
+      code: "123456",
+      userId: "victim-1",
+    });
+    expect(result).toEqual({ done: true });
+  });
+
+  test("throws when the session has no user id", async () => {
+    mockLoadMostRecentSession.mockResolvedValue({ id: "session-1", factors: {} });
+
+    await expect(verifyTOTP("123456")).rejects.toThrow("No user id found in session.");
+    expect(mockVerifyTOTPRegistration).not.toHaveBeenCalled();
   });
 });

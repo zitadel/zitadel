@@ -501,6 +501,7 @@ Errors:
         AlreadyReady: A autenticação de vários fatores por OTP (senha única) já está configurada
         NotExisting: A autenticação de vários fatores por OTP (senha única) não existe
         InvalidCode: Código inválido
+        Reused: Este código já foi utilizado. Aguarde um novo código
         NotReady: A autenticação de vários fatores por OTP (senha única) não está pronta
     Locked: O usuário está bloqueado
     SomethingWentWrong: Algo deu errado

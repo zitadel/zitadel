@@ -65,6 +65,11 @@ describe("idp type mapping utilities", () => {
       expect(result).toBe("jwt");
     });
 
+    it("should map ZITADEL to 'zitadel'", () => {
+      const result = idpTypeToSlug(IdentityProviderType.ZITADEL);
+      expect(result).toBe("zitadel");
+    });
+
     it("should throw error for unknown identity provider type", () => {
       // Using a value that doesn't match any known type
       const unknownType = 9999 as IdentityProviderType;
@@ -92,6 +97,7 @@ describe("idp type mapping utilities", () => {
         IdentityProviderType.OIDC,
         IdentityProviderType.LDAP,
         IdentityProviderType.JWT,
+        IdentityProviderType.ZITADEL,
       ];
 
       handledTypes.forEach((type) => {
@@ -178,6 +184,11 @@ describe("idp type mapping utilities", () => {
       expect(result).toBe(IdentityProviderType.JWT);
     });
 
+    it("should map IDP_TYPE_ZITADEL to ZITADEL", () => {
+      const result = idpTypeToIdentityProviderType(IDPType.IDP_TYPE_ZITADEL);
+      expect(result).toBe(IdentityProviderType.ZITADEL);
+    });
+
     it("should throw error for unknown IDP type", () => {
       // Using a value that doesn't match any known type
       const unknownType = 9999 as IDPType;
@@ -203,6 +214,7 @@ describe("idp type mapping utilities", () => {
         IDPType.IDP_TYPE_OAUTH,
         IDPType.IDP_TYPE_OIDC,
         IDPType.IDP_TYPE_JWT,
+        IDPType.IDP_TYPE_ZITADEL,
       ];
 
       handledTypes.forEach((type) => {
@@ -310,6 +322,7 @@ describe("idp type mapping utilities", () => {
         IdentityProviderType.OAUTH,
         IdentityProviderType.LDAP,
         IdentityProviderType.JWT,
+        IdentityProviderType.ZITADEL,
       ];
 
       const slugs = types.map((type) => idpTypeToSlug(type));

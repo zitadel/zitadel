@@ -505,6 +505,7 @@ Errors:
         AlreadyReady: Wieloskładnikowe OTP (jednorazowe hasło) jest już skonfigurowane
         NotExisting: Wieloskładnikowe OTP (jednorazowe hasło) nie istnieje
         InvalidCode: Nieprawidłowy kod
+        Reused: Ten kod został już użyty. Poczekaj na nowy kod
         NotReady: Wieloskładnikowe OTP (jednorazowe hasło) nie jest gotowe
     Locked: Użytkownik jest zablokowany
     SomethingWentWrong: Coś poszło nie tak

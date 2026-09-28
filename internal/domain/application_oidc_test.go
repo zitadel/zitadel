@@ -669,3 +669,84 @@ func TestOIDCOriginAllowList(t *testing.T) {
 		})
 	}
 }
+
+func TestOIDCApp_AppLinkConfigValid(t *testing.T) {
+	tests := []struct {
+		name string
+		app  *OIDCApp
+		want bool
+	}{
+		{
+			name: "empty config",
+			app:  &OIDCApp{},
+			want: true,
+		},
+		{
+			name: "ios both set",
+			app: &OIDCApp{
+				IOSTeamID:   gu.Ptr("TEAMID"),
+				IOSBundleID: gu.Ptr("com.example.app"),
+			},
+			want: true,
+		},
+		{
+			name: "ios team only",
+			app: &OIDCApp{
+				IOSTeamID: gu.Ptr("TEAMID"),
+			},
+			want: false,
+		},
+		{
+			name: "ios bundle only",
+			app: &OIDCApp{
+				IOSBundleID: gu.Ptr("com.example.app"),
+			},
+			want: false,
+		},
+		{
+			name: "ios both empty strings",
+			app: &OIDCApp{
+				IOSTeamID:   gu.Ptr(""),
+				IOSBundleID: gu.Ptr(""),
+			},
+			want: true,
+		},
+		{
+			name: "android package only",
+			app: &OIDCApp{
+				AndroidPackageName: gu.Ptr("com.example.app"),
+			},
+			want: true,
+		},
+		{
+			name: "android package and fingerprints",
+			app: &OIDCApp{
+				AndroidPackageName:            gu.Ptr("com.example.app"),
+				AndroidSHA256CertFingerprints: []string{"AA:BB"},
+			},
+			want: true,
+		},
+		{
+			name: "android fingerprints without package",
+			app: &OIDCApp{
+				AndroidSHA256CertFingerprints: []string{"AA:BB"},
+			},
+			want: false,
+		},
+		{
+			name: "android fingerprints with empty package",
+			app: &OIDCApp{
+				AndroidPackageName:            gu.Ptr("  "),
+				AndroidSHA256CertFingerprints: []string{"AA:BB"},
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.app.AppLinkConfigValid(); got != tt.want {
+				t.Errorf("AppLinkConfigValid() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

@@ -1,0 +1,102 @@
+name: Move commented To-be-closed issues to review
+
+# Two triggers doing the same job:
+#   - issue_comment: reacts instantly to a new comment on a single issue.
+#   - schedule (daily): full sweep of every To-be-closed issue, as a safety
+#     net in case the instant trigger ever misses one.
+#
+# Handles labels being removed and re-applied: uses the FIRST "labeled"
+# event as the reference point (not the most recent), so a comment from any
+# earlier labeling cycle still counts even after a manual removal and
+# re-application. Re-application isn't reliably a deliberate "still close
+# this" decision -- accidental re-labeling has happened before -- so this
+# errs toward flagging for human review rather than risking a missed reply.
+
+on:
+  issue_comment:
+    types: [created]
+  schedule:
+    - cron: "0 7 * * *" # daily at 07:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  issues: write
+
+jobs:
+  move-to-review:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'issue_comment' || github.event.issue.pull_request == null
+    steps:
+      - name: Swap labels for commented-on issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          EVENT_NAME: ${{ github.event_name }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
+        run: |
+          set -euo pipefail
+
+          CLOSE_LABEL="To-be-closed"
+          REVIEW_LABEL="to-be-reviewed"
+
+          gh label create "$REVIEW_LABEL" --repo "$REPO" \
+            --description "Pulled out of the to-be-closed queue after a reply; needs a maintainer to review." \
+            --color "FBCA04" 2>/dev/null || true
+
+          check_and_swap() {
+            local NUM="$1"
+
+            LABEL_EVENT=$(CLOSE_LABEL="$CLOSE_LABEL" gh api "repos/$REPO/issues/$NUM/events" --paginate \
+              --jq '[.[] | select(.event=="labeled" and ((.label.name // "") | ascii_downcase) == (env.CLOSE_LABEL | ascii_downcase))] | sort_by(.created_at) | first | .created_at')
+
+            if [[ -z "$LABEL_EVENT" || "$LABEL_EVENT" == "null" ]]; then
+              echo "#$NUM: couldn't find a labeling event, skipping"
+              return
+            fi
+
+            # Exclude our own auto-generated round comments (shared opening
+            # line, or the invisible marker) so only genuine replies count.
+            HUMAN_COMMENTS=$(LABEL_EVENT="$LABEL_EVENT" gh api "repos/$REPO/issues/$NUM/comments" --paginate \
+              --jq '[.[] | select(
+                .created_at > env.LABEL_EVENT
+                and (.user.login | test("\\[bot\\]$") | not)
+                and (.body | startswith("Thanks for filing this issue. As part of an ongoing backlog cleanup, we'"'"'re closing") | not)
+                and (.body | contains("<!-- zitadel-backlog-cleanup-auto-comment -->") | not)
+              )] | length')
+
+            if [[ "$HUMAN_COMMENTS" -gt 0 ]]; then
+              echo "#$NUM: got a reply since $LABEL_EVENT -- moving to '$REVIEW_LABEL'"
+              gh issue edit "$NUM" --repo "$REPO" --remove-label "$CLOSE_LABEL" --add-label "$REVIEW_LABEL"
+            else
+              echo "#$NUM: no reply since $LABEL_EVENT"
+            fi
+          }
+
+          if [[ "$EVENT_NAME" == "issue_comment" ]]; then
+            if [[ "$COMMENT_AUTHOR" == *"[bot]" ]]; then
+              echo "Comment from a bot ($COMMENT_AUTHOR) -- ignoring."
+              exit 0
+            fi
+            LABELS=$(gh issue view "$ISSUE_NUMBER" --repo "$REPO" --json labels --jq '.labels[].name')
+            if ! echo "$LABELS" | grep -qxi "$CLOSE_LABEL"; then
+              echo "Issue #$ISSUE_NUMBER doesn't have '$CLOSE_LABEL' -- nothing to do."
+              exit 0
+            fi
+            check_and_swap "$ISSUE_NUMBER"
+          else
+            echo "Full daily sweep of all '$CLOSE_LABEL' issues..."
+            ISSUES=$(gh issue list --repo "$REPO" --search "is:open label:\"$CLOSE_LABEL\"" --limit 1000 --json number --jq '.[].number')
+            ISSUE_COUNT=$(echo "$ISSUES" | wc -w | tr -d ' ')
+            if [[ "$ISSUE_COUNT" -ge 1000 ]]; then
+              echo "Warning: reached the 1000 issue cap for label '$CLOSE_LABEL'; there may be additional issues not processed."
+            fi
+            if [[ -z "$ISSUES" ]]; then
+              echo "No $CLOSE_LABEL issues found."
+              exit 0
+            fi
+            for NUM in $ISSUES; do
+              echo "--- Checking #$NUM ---"
+              check_and_swap "$NUM"
+            done
+          fi

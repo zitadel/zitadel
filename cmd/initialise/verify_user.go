@@ -6,6 +6,7 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -58,11 +59,36 @@ func VerifyUser(username, password string) func(context.Context, *database.DB) e
 			logging.Info(ctx, "config.database.postgres.user.username is same as config.database.postgres.admin.username, skipping create user", "username", username)
 			return nil
 		}
-		logging.Info(ctx, "verify user", "username", username)
-		if password != "" {
-			createUserStmt += " WITH PASSWORD '" + password + "'"
+
+		// Check if the role already exists in the catalog before attempting CREATE USER.
+		// This avoids PostgreSQL logging the full CREATE USER statement (including the
+		// plaintext password) when the role already exists on re-deploy / re-init.
+		var exists bool
+		err = db.QueryRowContext(ctx, func(r *sql.Row) error {
+			return r.Scan(&exists)
+		}, "SELECT EXISTS(SELECT 1 FROM pg_roles WHERE rolname = $1)", username)
+		if err != nil {
+			return fmt.Errorf("unable to check if user exists: %w", err)
+		}
+		if exists {
+			logging.Info(ctx, "user already exists, skipping creation", "username", username)
+			return nil
 		}
 
-		return exec(ctx, db, fmt.Sprintf(createUserStmt, username), []string{roleAlreadyExistsCode})
+		logging.Info(ctx, "verify user", "username", username)
+		// Format the username first so the password is never part of a fmt format string
+		// (passwords may contain '%' which would be interpreted as format verbs).
+		stmt := fmt.Sprintf(createUserStmt, username)
+		if password != "" {
+			stmt += " WITH PASSWORD " + quotePostgresLiteral(password)
+		}
+
+		return exec(ctx, db, stmt, []string{roleAlreadyExistsCode})
 	}
+}
+
+// quotePostgresLiteral returns s as a single-quoted PostgreSQL string literal,
+// escaping embedded single quotes by doubling them.
+func quotePostgresLiteral(s string) string {
+	return "'" + strings.ReplaceAll(s, "'", "''") + "'"
 }

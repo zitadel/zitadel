@@ -4,11 +4,11 @@ This package contains code for benchmarking specific endpoints of the API using 
 
 ## Prerequisite
 
-* [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
-* [k6](https://k6.io/docs/get-started/installation/)
-* [go](https://go.dev/doc/install)
-* [xk6](https://github.com/grafana/xk6#local-installation) (make sure `~/go/bin` is in your `${PATH}`)
-* running the API
+- [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+- [k6](https://k6.io/docs/get-started/installation/)
+- [go](https://go.dev/doc/install)
+- [xk6](https://github.com/grafana/xk6#local-installation) (make sure `~/go/bin` is in your `${PATH}`)
+- running the API
 
 ## Structure
 
@@ -18,63 +18,69 @@ The use cases under tests are defined in `src/use_cases`. The implementation of 
 
 ### Env vars
 
-* `VUS`: Amount of parallel processes execute the test (default is 20)
-* `DURATION`: Defines how long the tests are executed (default is `200s`)
-* `ZITADEL_HOST`: URL of ZITADEL (default is `http://localhost:8080`)
-* `ADMIN_LOGIN_NAME`: Loginanme of a human user with `IAM_OWNER`-role
-* `ADMIN_PASSWORD`: password of the human user
+- `VUS`: Amount of parallel processes execute the test (default is 20)
+- `DURATION`: Defines how long the tests are executed (default is `200s`)
+- `ZITADEL_HOST`: URL of ZITADEL (default is `http://localhost:8080`)
+- `ADMIN_LOGIN_NAME`: Loginanme of a human user with `IAM_OWNER`-role
+- `ADMIN_PASSWORD`: password of the human user
+- `USER_AMOUNT`: Number of users created during setup for list-users benchmarks (default is `2500`)
+- `SETUP_CONCURRENCY`: Max in-flight user-create requests during list-users setup (default is `50`). Large `USER_AMOUNT` with unbounded parallelism can exhaust ephemeral ports (`can't assign requested address`).
 
 To setup the tests we use the credentials of management console and log in using an admin. The user must be able to create organizations and all resources inside organizations.
 
-* `ADMIN_LOGIN_NAME`: `zitadel-admin@zitadel.localhost`
-* `ADMIN_PASSWORD`: `Password1!`
+- `ADMIN_LOGIN_NAME`: `zitadel-admin@zitadel.localhost`
+- `ADMIN_PASSWORD`: `Password1!`
 
 ### Test
 
 Before you run the tests you need an initialized user. The tests don't implement the change password screen during login.
 
-* `make human_password_login`  
+- `make human_password_login`  
   setup: creates human users  
   test: uses the previously created humans to sign in using the login ui
-* `make machine_pat_login`  
+- `make machine_pat_login`  
   setup: creates machines and a pat for each machine  
   test: calls user info endpoint with the given pats
-* `make machine_client_credentials_login`  
+- `make machine_client_credentials_login`  
   setup: creates machines and a client credential secret for each machine  
   test: calls token endpoint with the `client_credentials` grant type.
-* `make user_info`  
+- `make user_info`  
   setup: creates human users and signs them in  
   test: calls user info endpoint using the given humans
-* `make manipulate_user`  
-  test: creates a human, updates its profile, locks the user and then deletes it 
-* `make introspect`  
+- `make manipulate_user`  
+  test: creates a human, updates its profile, locks the user and then deletes it
+- `make introspect`  
   setup: creates projects, one api per project, one key per api and generates the jwt from the given keys  
   test: calls introspection endpoint using the given JWTs
-* `make add_session`  
+- `make add_session`  
   setup: creates human users  
   test: creates new sessions with user id check
-* `make oidc_session`  
+- `make oidc_session`  
   setup: creates a service account to create the auth request and session.  
   test: creates an auth request, a session and links the session to the auth request. Implementation of [this flow](https://zitadel.com/docs/guides/integrate/login-ui/oidc-standard).
-* `make otp_session`  
+- `make otp_session`  
   setup: creates 1 human user for each VU and adds OTP Email to it  
   test: creates a session based on the login name of the user, sets the OTP Email challenge to the session and afterwards checks the OTP code
-* `make password_session`  
+- `make password_session`  
   setup: creates 1 human user for each VU and adds OTP Email to it  
   test: creates a session based on the login name of the user and checks for the password on a second step
-* `make machine_jwt_profile_grant`  
+- `make machine_jwt_profile_grant`  
   setup: generates private/public key, creates service accounts, adds a key  
-  test: creates a token and calls user info 
-* `make machine_jwt_profile_grant_single_user`  
+  test: creates a token and calls user info
+- `make machine_jwt_profile_grant_single_user`  
   setup: generates private/public key, creates service account, adds a key  
   test: creates a token and calls user info in parallel for the same user
-* `make users_by_metadata_key`  
+- `make users_by_metadata_key`  
   setup: creates for half of the VUS a human user and a machine for the other half, adds 3 metadata to each user
   test: calls the list users endpoint and filters by a metadata key
-* `make users_by_metadata_value`  
+- `make users_by_metadata_value`  
   setup: creates for half of the VUS a human user and a machine for the other half, adds 3 metadata to each user
   test: calls the list users endpoint and filters by a metadata value
-* `make verify_all_user_grants_exists`  
+- `make users_by_login_name`  
+  setup: creates `USER_AMOUNT` human users (default `2500`) in a new org, with `SETUP_CONCURRENCY` parallel creates (default `50`)  
+  test: calls ListUsers the same way as login v2 (`loginNameQuery` with `EQUALS_IGNORE_CASE`, `organizationIdQuery`, `limit: 2`)  
+  note: to reproduce multi-second latency on the old query plan, use a large dataset, e.g. `USER_AMOUNT=100000 VUS=10 DURATION=60s`
+- `make verify_all_user_grants_exists`  
   setup: creates 50 projects, 1 machine per VU
   test: creates a machine and grants all projects to the machine
   teardown: the organization is not removed to verify the data of the projections are correct. You can find additional information [at the bottom of this file](./src/use_cases/verify_all_user_grants_exist.ts)

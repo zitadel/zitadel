@@ -14,18 +14,10 @@ type passwordlessPromptData struct {
 	userData
 }
 
-type passwordlessPromptFormData struct{}
-
-func (l *Login) handlePasswordlessPrompt(w http.ResponseWriter, r *http.Request) {
-	data := new(passwordlessPromptFormData)
-	authReq, err := l.getAuthRequestAndParseData(r, data)
-	if err != nil {
-		l.renderError(w, r, authReq, err)
-		return
-	}
-	l.renderPasswordlessRegistration(w, r, authReq, "", "", "", "", 0, nil)
-}
-
+// renderPasswordlessPrompt shows the informational passwordless prompt page for the
+// PasswordlessRegistrationPromptStep, instructing the user to complete setup via the link
+// they were emailed. The interactive auth-request based setup that this page used to POST to
+// was a never-active leftover and has been removed (GHSA-45f2-5q3r-xgg6).
 func (l *Login) renderPasswordlessPrompt(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
 	translator := l.getTranslator(r.Context(), authReq)
 	data := &passwordlessPromptData{

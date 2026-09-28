@@ -237,7 +237,7 @@ func unmarshalIdpUser(idpUserData []byte, idpUser idp.User) (idp.User, error) {
 	return idpUser, nil
 }
 
-func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.EncryptionAlgorithm) (_ *user.RetrieveIdentityProviderIntentResponse, err error) {
+func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.AuthEncryptionAlgorithm) (_ *user.RetrieveIdentityProviderIntentResponse, err error) {
 	rawInformation := new(structpb.Struct)
 	err = rawInformation.UnmarshalJSON(intent.IDPUser)
 	if err != nil {
@@ -279,7 +279,7 @@ func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.Encr
 	return information, nil
 }
 
-func idpOAuthTokensToPb(idpIDToken string, idpAccessToken, idpRefreshToken *crypto.CryptoValue, alg crypto.EncryptionAlgorithm) (_ *user.IDPInformation_Oauth, err error) {
+func idpOAuthTokensToPb(idpIDToken string, idpAccessToken, idpRefreshToken *crypto.CryptoValue, alg crypto.AuthEncryptionAlgorithm) (_ *user.IDPInformation_Oauth, err error) {
 	var idToken *string
 	if idpIDToken != "" {
 		idToken = &idpIDToken

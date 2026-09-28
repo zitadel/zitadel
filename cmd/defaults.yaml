@@ -1,5 +1,18 @@
 Instrumentation:
   ServiceName: "zitadel" # ZITADEL_INSTRUMENTATION_SERVICENAME
+  # Resource detectors describe the platform ZITADEL runs on. Their attributes
+  # are attached to every exported trace, metric and log, and telemetry backends
+  # use them to tell instances apart instead of merging them into one series.
+  # Detection is off by default: each detector probes its platform on startup and
+  # the attributes it finds identify the account and host to whichever backend
+  # you export to. Enable one or more of:
+  #   "google": Detects Cloud Run, GKE, GCE, App Engine and Cloud Functions by
+  #             querying the Google Cloud metadata server. Required when
+  #             exporting to Google Cloud: without it every instance reports as
+  #             the same empty generic_node and the series overlap.
+  # Leave the list empty to disable detection. An empty or unknown entry is a
+  # config error and fails startup.
+  Detectors: [] # ZITADEL_INSTRUMENTATION_DETECTORS (comma separated list)
   Trace:
     Fraction: 1.0 # ZITADEL_INSTRUMENTATION_TRACE_FRACTION
     # Trust incoming trace context from remote services for distributed tracing.
@@ -536,6 +549,11 @@ Projections:
   Customizations:
     custom_texts:
       BulkLimit: 400
+    # The sessions projection processes the highest event volume.
+    # A higher bulk limit amortizes the fixed cost per batch over more events,
+    # which shortens catch-up after the projection fell behind.
+    sessions:
+      BulkLimit: 1000 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_SESSIONS_BULKLIMIT
     project_grant_fields:
       TransactionDuration: 0s
       BulkLimit: 2000
@@ -669,6 +687,10 @@ OIDC:
       Path: /oauth/v2/keys # ZITADEL_OIDC_CUSTOMENDPOINTS_KEYS_PATH
     DeviceAuth:
       Path: /oauth/v2/device_authorization # ZITADEL_OIDC_CUSTOMENDPOINTS_DEVICEAUTH_PATH
+    # OAuth 2.0 Dynamic Client Registration (RFC 7591). The endpoint is only served and
+    # advertised when it is enabled in the instance's security settings.
+    Registration:
+      Path: /oauth/v2/register # ZITADEL_OIDC_CUSTOMENDPOINTS_REGISTRATION_PATH
   DeviceAuth:
     Lifetime: 5m # ZITADEL_OIDC_DEVICEAUTH_LIFETIME
     PollInterval: 5s # ZITADEL_OIDC_DEVICEAUTH_POLLINTERVAL
@@ -1667,6 +1689,7 @@ InternalAuthZ:
         - "project.role.delete"
         - "project.app.read"
         - "project.app.write"
+        - "project.app.register_dynamic"
         - "project.app.delete"
         - "project.grant.read"
         - "project.grant.write"
@@ -1782,6 +1805,7 @@ InternalAuthZ:
         - "project.role.delete"
         - "project.app.read"
         - "project.app.write"
+        - "project.app.register_dynamic"
         - "project.app.delete"
         - "project.grant.read"
         - "project.grant.write"
@@ -1884,6 +1908,7 @@ InternalAuthZ:
         - "project.role.delete"
         - "project.app.read"
         - "project.app.write"
+        - "project.app.register_dynamic"
         - "project.grant.read"
         - "project.grant.write"
         - "project.grant.delete"
@@ -2039,6 +2064,9 @@ InternalAuthZ:
         - "policy.read"
         - "project.read:self"
         - "project.create"
+    - Role: "ORG_DYNAMIC_CLIENT_REGISTRAR"
+      Permissions:
+        - "project.app.register_dynamic"
     - Role: "ORG_ADMIN_IMPERSONATOR"
       Permissions:
         - "admin.impersonation"
@@ -2260,6 +2288,7 @@ SystemAuthZ:
         - "project.role.delete"
         - "project.app.read"
         - "project.app.write"
+        - "project.app.register_dynamic"
         - "project.app.delete"
         - "project.grant.read"
         - "project.grant.write"
@@ -2375,6 +2404,7 @@ SystemAuthZ:
         - "project.role.delete"
         - "project.app.read"
         - "project.app.write"
+        - "project.app.register_dynamic"
         - "project.app.delete"
         - "project.grant.read"
         - "project.grant.write"

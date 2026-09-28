@@ -63,6 +63,15 @@ Native Applications are installed on a thin client, such as a smartphone or desk
 
 <AuthType components={props.components} appType="native" />
 
+#### Native app links
+
+For native passkeys, configure OS association on the OIDC app under **Native App Links**:
+
+* **iOS:** Team ID and Bundle ID (published in `/.well-known/apple-app-site-association`)
+* **Android:** Package name and SHA-256 certificate fingerprints (published in `/.well-known/assetlinks.json`)
+
+See [Native app links for passkeys](/guides/integrate/login/oidc/native-app-links) for endpoint details, caching, and verification.
+
 ### User Agent
 
 User Agent Applications are executed entirely in the web browser (Client-Side).
@@ -219,3 +228,4 @@ Ensure the management of application settings is limited to authorized users onl
 ## References
 
 - [Recommended OIDC Flows](../../integrate/login/oidc/oauth-recommended-flows)
+- [Native app links for passkeys](../../integrate/login/oidc/native-app-links)

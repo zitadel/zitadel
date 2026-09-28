@@ -464,6 +464,7 @@ Errors:
         AlreadyReady: A többfaktoros OTP (OneTimePassword) már be van állítva
         NotExisting: A többfaktoros OTP (OneTimePassword) nem létezik
         InvalidCode: Érvénytelen kód
+        Reused: Ezt a kódot már felhasználták. Kérjük, várjon egy új kódra
         NotReady: A többfaktoros OTP (OneTimePassword) nem áll készen
     Locked: A felhasználó zárolva van
     SomethingWentWrong: Valami elromlott

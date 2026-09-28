@@ -1,0 +1,171 @@
+<cnsl-create-layout
+  title="{{ id ? ('IDP.DETAIL.TITLE' | translate) : ('IDP.CREATE.TITLE' | translate) }}"
+  (closed)="close()"
+>
+  <div class="identity-provider-create-content">
+    <div class="identity-provider-title-row">
+      <img class="idp-logo dark" src="./assets/images/zitadel-logo-solo-light.svg" alt="zitadel" />
+      <img class="idp-logo light" src="./assets/images/zitadel-logo-solo-dark.svg" alt="zitadel" />
+      <h1>{{ 'IDP.CREATE.ZITADEL.TITLE' | translate }}</h1>
+      @if (exists$ | async) {
+        @if ({ isNotActive: (activateLink$ | async) }; as idp) {
+          <div
+            class="cnsl-state-dot"
+            [matTooltip]="(idp.isNotActive ? 'IDP.STATES.2' : 'IDP.STATES.1') | translate"
+            [ngClass]="{ active: !idp.isNotActive, inactive: !!idp.isNotActive }"
+          ></div>
+        }
+      }
+      @if (loading) {
+        <mat-spinner diameter="25" color="primary"></mat-spinner>
+      }
+    </div>
+
+    <cnsl-provider-next
+      [configureProvider]="(justCreated$ | async) === ''"
+      [configureTitle]="'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE' | translate: { provider: 'ZITADEL' }"
+      [configureDescription]="'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION' | translate: { provider: 'ZITADEL' }"
+      configureLink="https://zitadel.com/docs/guides/integrate/identity-providers"
+      [autofillLink]="autofillLink$ | async"
+      [activateLink]="activateLink$ | async"
+      [copyUrls]="copyUrls$ | async"
+      [expanded]="!!(expandWhatNow$ | async)"
+      (activate)="activate()"
+    ></cnsl-provider-next>
+
+    <p class="identity-provider-desc cnsl-secondary-text">{{ 'IDP.CREATE.ZITADEL.DESCRIPTION' | translate }}</p>
+
+    <form [formGroup]="form" (ngSubmit)="submitForm()">
+      <div class="identity-provider-content">
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
+          <input cnslInput formControlName="name" />
+        </cnsl-form-field>
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.ISSUER' | translate }}</cnsl-label>
+          <input cnslInput formControlName="issuer" />
+        </cnsl-form-field>
+      </div>
+
+      <div class="identity-provider-content">
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'IDP.CLIENTID' | translate }}</cnsl-label>
+          <input cnslInput formControlName="clientId" />
+        </cnsl-form-field>
+
+        @if (provider) {
+          <mat-checkbox [(ngModel)]="updateClientSecret" [ngModelOptions]="{ standalone: true }">{{
+            'IDP.UPDATECLIENTSECRET' | translate
+          }}</mat-checkbox>
+        }
+        @if (!provider || (provider && updateClientSecret)) {
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'IDP.CLIENTSECRET' | translate }}</cnsl-label>
+            <input cnslInput formControlName="clientSecret" />
+          </cnsl-form-field>
+        }
+
+        @if (isAdmin) {
+          <div class="instance-roles-info">
+            <h2>{{ 'IDP.INSTANCEROLESINFO' | translate }}</h2>
+            <p class="checkbox-desc cnsl-secondary-text">{{ 'IDP.INSTANCEROLESINFO_DESC' | translate }}</p>
+            @for (info of instanceRolesInfoList; track $index) {
+              <div class="flex-line">
+                <cnsl-form-field class="formfield">
+                  <cnsl-label>{{ 'IDP.ORGANIZATIONID' | translate }}</cnsl-label>
+                  <input cnslInput [value]="info.organizationId" disabled />
+                </cnsl-form-field>
+                <cnsl-form-field class="formfield">
+                  <cnsl-label>{{ 'IDP.ORGANIZATIONDOMAIN' | translate }}</cnsl-label>
+                  <input cnslInput [value]="info.organizationDomain" disabled />
+                </cnsl-form-field>
+                <button type="button" mat-icon-button (click)="removeRolesInfo($index)">
+                  <mat-icon>remove_circle_outline</mat-icon>
+                </button>
+              </div>
+            }
+            <div class="flex-line">
+              <cnsl-form-field class="formfield">
+                <cnsl-label>{{ 'IDP.ORGANIZATIONID' | translate }}</cnsl-label>
+                <input cnslInput [formControl]="rolesInfoOrgId" />
+              </cnsl-form-field>
+              <cnsl-form-field class="formfield">
+                <cnsl-label>{{ 'IDP.ORGANIZATIONDOMAIN' | translate }}</cnsl-label>
+                <input cnslInput [formControl]="rolesInfoOrgDomain" />
+              </cnsl-form-field>
+              <button
+                type="button"
+                mat-icon-button
+                [disabled]="!rolesInfoOrgId.value || !rolesInfoOrgDomain.value"
+                (click)="addRolesInfo()"
+              >
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+          </div>
+        }
+
+        <div class="identity-provider-optional-h-wrapper">
+          <h2>{{ 'IDP.OPTIONAL' | translate }}</h2>
+          <button (click)="showOptional = !showOptional" type="button" mat-icon-button>
+            @if (showOptional) {
+              <mat-icon>keyboard_arrow_up</mat-icon>
+            }
+            @if (!showOptional) {
+              <mat-icon>keyboard_arrow_down</mat-icon>
+            }
+          </button>
+        </div>
+        @if (showOptional) {
+          <div>
+            <div class="idp-scopes">
+              <div class="flex-line">
+                <cnsl-form-field class="formfield">
+                  <cnsl-label>{{ 'IDP.SCOPESLIST' | translate }}</cnsl-label>
+                  <input
+                    cnslInput
+                    #scopeInput
+                    [matChipInputFor]="chipScopesList"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                    [matChipInputAddOnBlur]="true"
+                    (matChipInputTokenEnd)="addScope($event)"
+                  />
+                </cnsl-form-field>
+                <button class="scope-add-button" type="button" (click)="addScopeFromInput(scopeInput)" mat-icon-button>
+                  <mat-icon>add</mat-icon>
+                </button>
+              </div>
+              <cnsl-form-field class="formfield">
+                <mat-chip-grid #chipScopesList aria-label="scope selection">
+                  @for (scope of scopesList?.value; track scope) {
+                    <mat-chip-row class="chip" removable (removed)="removeScope(scope)">
+                      {{ scope }} <mat-icon matChipRemove>cancel</mat-icon>
+                    </mat-chip-row>
+                  }
+                </mat-chip-grid>
+              </cnsl-form-field>
+            </div>
+            <cnsl-provider-options
+              [initialOptions]="provider?.config?.options"
+              (optionsChanged)="options = $event"
+            ></cnsl-provider-options>
+          </div>
+        }
+      </div>
+
+      <div class="identity-provider-create-actions">
+        <button
+          color="primary"
+          mat-raised-button
+          class="continue-button"
+          [disabled]="form.invalid || form.disabled"
+          type="submit"
+        >
+          @if ({ exists: (exists$ | async) }; as idp) {
+            <span>{{ (!!idp.exists ? 'ACTIONS.SAVE' : 'ACTIONS.CREATE') | translate }}</span>
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</cnsl-create-layout>

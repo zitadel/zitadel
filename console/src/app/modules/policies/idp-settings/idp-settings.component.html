@@ -153,6 +153,23 @@
     class="item card"
     [routerLink]="
       serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'provider', 'zitadel', 'create']
+        : serviceType === PolicyComponentServiceType.MGMT
+          ? ['/org', 'provider', 'zitadel', 'create']
+          : []
+    "
+  >
+    <img class="idp-logo dark" src="./assets/images/zitadel-logo-solo-light.svg" alt="ZITADEL" />
+    <img class="idp-logo light" src="./assets/images/zitadel-logo-solo-dark.svg" alt="ZITADEL" />
+    <div class="text-container">
+      <span class="title">ZITADEL</span>
+    </div>
+  </a>
+
+  <a
+    class="item card"
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
         ? ['/instance', 'provider', 'oauth', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
           ? ['/org', 'provider', 'oauth', 'create']

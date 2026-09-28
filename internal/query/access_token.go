@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -21,6 +22,7 @@ type OIDCSessionAccessTokenReadModel struct {
 	eventstore.ReadModel
 
 	UserID                string
+	UserResourceOwner     string
 	SessionID             string
 	ClientID              string
 	Audience              []string
@@ -77,6 +79,7 @@ func (wm *OIDCSessionAccessTokenReadModel) Query() *eventstore.SearchQueryBuilde
 
 func (wm *OIDCSessionAccessTokenReadModel) reduceAdded(e *oidcsession.AddedEvent) {
 	wm.UserID = e.UserID
+	wm.UserResourceOwner = e.UserResourceOwner
 	wm.SessionID = e.SessionID
 	wm.ClientID = e.ClientID
 	wm.Audience = e.Audience
@@ -119,7 +122,7 @@ func (q *Queries) ActiveAccessTokenByToken(ctx context.Context, token string) (m
 	if !model.AccessTokenExpiration.After(time.Now()) {
 		return nil, zerrors.ThrowUnauthenticated(nil, "QUERY-SAF3rf", "Errors.OIDCSession.Token.Expired")
 	}
-	if err = q.checkSessionNotTerminatedAfter(ctx, model.SessionID, model.UserID, model.Position, model.UserAgent.GetFingerprintID()); err != nil {
+	if err = q.checkSessionNotTerminatedAfter(ctx, model.SessionID, model.UserID, model.UserResourceOwner, model.Position, model.UserAgent.GetFingerprintID()); err != nil {
 		return nil, err
 	}
 	return model, nil
@@ -139,19 +142,20 @@ func (q *Queries) accessTokenByOIDCSessionAndTokenID(ctx context.Context, oidcSe
 	return model, nil
 }
 
-// checkSessionNotTerminatedAfter checks if a [session.TerminateType] event (or user events leading to a session termination)
+// checkSessionNotTerminatedAfter checks if a [session.TerminateType] event (or user / org events leading to a session termination)
 // occurred after a certain time and will return an error if so.
-func (q *Queries) checkSessionNotTerminatedAfter(ctx context.Context, sessionID, userID string, position decimal.Decimal, fingerprintID string) (err error) {
+func (q *Queries) checkSessionNotTerminatedAfter(ctx context.Context, sessionID, userID, resourceOwner string, position decimal.Decimal, fingerprintID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if sessionID == "" && userID == "" && fingerprintID == "" {
+	if sessionID == "" && userID == "" && fingerprintID == "" && resourceOwner == "" {
 		return nil
 	}
 	model := &sessionTerminatedModel{
 		sessionID:     sessionID,
 		position:      position,
 		userID:        userID,
+		resourceOwner: resourceOwner,
 		fingerPrintID: fingerprintID,
 	}
 	err = q.eventstore.FilterToQueryReducer(ctx, model)
@@ -169,6 +173,7 @@ type sessionTerminatedModel struct {
 	position      decimal.Decimal
 	sessionID     string
 	userID        string
+	resourceOwner string
 	fingerPrintID string
 
 	events     int
@@ -219,6 +224,16 @@ func (s *sessionTerminatedModel) Query() *eventstore.SearchQueryBuilder {
 				PositionAfter(s.position).
 				Builder()
 		}
+	}
+	if s.resourceOwner != "" {
+		builder = builder.AddQuery().
+			AggregateTypes(org.AggregateType).
+			AggregateIDs(s.resourceOwner).
+			EventTypes(
+				org.OrgDeactivatedEventType,
+			).
+			PositionAfter(s.position).
+			Builder()
 	}
 	return builder
 }

@@ -2,6 +2,7 @@ package project
 
 import (
 	"context"
+	"slices"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -15,6 +16,8 @@ const (
 	OIDCConfigChangedType           = applicationEventTypePrefix + "config.oidc.changed"
 	OIDCConfigSecretChangedType     = applicationEventTypePrefix + "config.oidc.secret.changed"
 	OIDCConfigSecretHashUpdatedType = applicationEventTypePrefix + "config.oidc.secret.updated"
+
+	OIDCConfigRegistrationTokenChangedType = applicationEventTypePrefix + "config.oidc.registration_token.changed"
 )
 
 type OIDCConfigAddedEvent struct {
@@ -29,23 +32,27 @@ type OIDCConfigAddedEvent struct {
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
 	HashedSecret string              `json:"hashedSecret,omitempty"`
 
-	RedirectUris             []string                   `json:"redirectUris,omitempty"`
-	ResponseTypes            []domain.OIDCResponseType  `json:"responseTypes,omitempty"`
-	GrantTypes               []domain.OIDCGrantType     `json:"grantTypes,omitempty"`
-	ApplicationType          domain.OIDCApplicationType `json:"applicationType,omitempty"`
-	AuthMethodType           domain.OIDCAuthMethodType  `json:"authMethodType,omitempty"`
-	PostLogoutRedirectUris   []string                   `json:"postLogoutRedirectUris,omitempty"`
-	DevMode                  bool                       `json:"devMode,omitempty"`
-	AccessTokenType          domain.OIDCTokenType       `json:"accessTokenType,omitempty"`
-	AccessTokenRoleAssertion bool                       `json:"accessTokenRoleAssertion,omitempty"`
-	IDTokenRoleAssertion     bool                       `json:"idTokenRoleAssertion,omitempty"`
-	IDTokenUserinfoAssertion bool                       `json:"idTokenUserinfoAssertion,omitempty"`
-	ClockSkew                time.Duration              `json:"clockSkew,omitempty"`
-	AdditionalOrigins        []string                   `json:"additionalOrigins,omitempty"`
-	SkipNativeAppSuccessPage bool                       `json:"skipNativeAppSuccessPage,omitempty"`
-	BackChannelLogoutURI     string                     `json:"backChannelLogoutURI,omitempty"`
-	LoginVersion             domain.LoginVersion        `json:"loginVersion,omitempty"`
-	LoginBaseURI             string                     `json:"loginBaseURI,omitempty"`
+	RedirectUris                  []string                   `json:"redirectUris,omitempty"`
+	ResponseTypes                 []domain.OIDCResponseType  `json:"responseTypes,omitempty"`
+	GrantTypes                    []domain.OIDCGrantType     `json:"grantTypes,omitempty"`
+	ApplicationType               domain.OIDCApplicationType `json:"applicationType,omitempty"`
+	AuthMethodType                domain.OIDCAuthMethodType  `json:"authMethodType,omitempty"`
+	PostLogoutRedirectUris        []string                   `json:"postLogoutRedirectUris,omitempty"`
+	DevMode                       bool                       `json:"devMode,omitempty"`
+	AccessTokenType               domain.OIDCTokenType       `json:"accessTokenType,omitempty"`
+	AccessTokenRoleAssertion      bool                       `json:"accessTokenRoleAssertion,omitempty"`
+	IDTokenRoleAssertion          bool                       `json:"idTokenRoleAssertion,omitempty"`
+	IDTokenUserinfoAssertion      bool                       `json:"idTokenUserinfoAssertion,omitempty"`
+	ClockSkew                     time.Duration              `json:"clockSkew,omitempty"`
+	AdditionalOrigins             []string                   `json:"additionalOrigins,omitempty"`
+	SkipNativeAppSuccessPage      bool                       `json:"skipNativeAppSuccessPage,omitempty"`
+	BackChannelLogoutURI          string                     `json:"backChannelLogoutURI,omitempty"`
+	LoginVersion                  domain.LoginVersion        `json:"loginVersion,omitempty"`
+	LoginBaseURI                  string                     `json:"loginBaseURI,omitempty"`
+	IOSTeamID                     string                     `json:"iosTeamId,omitempty"`
+	IOSBundleID                   string                     `json:"iosBundleId,omitempty"`
+	AndroidPackageName            string                     `json:"androidPackageName,omitempty"`
+	AndroidSHA256CertFingerprints []string                   `json:"androidSha256CertFingerprints,omitempty"`
 }
 
 func (e *OIDCConfigAddedEvent) Payload() interface{} {
@@ -80,6 +87,10 @@ func NewOIDCConfigAddedEvent(
 	backChannelLogoutURI string,
 	loginVersion domain.LoginVersion,
 	loginBaseURI string,
+	iosTeamID string,
+	iosBundleID string,
+	androidPackageName string,
+	androidSHA256CertFingerprints []string,
 ) *OIDCConfigAddedEvent {
 	return &OIDCConfigAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -87,27 +98,31 @@ func NewOIDCConfigAddedEvent(
 			aggregate,
 			OIDCConfigAddedType,
 		),
-		Version:                  version,
-		AppID:                    appID,
-		ClientID:                 clientID,
-		HashedSecret:             hashedSecret,
-		RedirectUris:             redirectUris,
-		ResponseTypes:            responseTypes,
-		GrantTypes:               grantTypes,
-		ApplicationType:          applicationType,
-		AuthMethodType:           authMethodType,
-		PostLogoutRedirectUris:   postLogoutRedirectUris,
-		DevMode:                  devMode,
-		AccessTokenType:          accessTokenType,
-		AccessTokenRoleAssertion: accessTokenRoleAssertion,
-		IDTokenRoleAssertion:     idTokenRoleAssertion,
-		IDTokenUserinfoAssertion: idTokenUserinfoAssertion,
-		ClockSkew:                clockSkew,
-		AdditionalOrigins:        additionalOrigins,
-		SkipNativeAppSuccessPage: skipNativeAppSuccessPage,
-		BackChannelLogoutURI:     backChannelLogoutURI,
-		LoginVersion:             loginVersion,
-		LoginBaseURI:             loginBaseURI,
+		Version:                       version,
+		AppID:                         appID,
+		ClientID:                      clientID,
+		HashedSecret:                  hashedSecret,
+		RedirectUris:                  redirectUris,
+		ResponseTypes:                 responseTypes,
+		GrantTypes:                    grantTypes,
+		ApplicationType:               applicationType,
+		AuthMethodType:                authMethodType,
+		PostLogoutRedirectUris:        postLogoutRedirectUris,
+		DevMode:                       devMode,
+		AccessTokenType:               accessTokenType,
+		AccessTokenRoleAssertion:      accessTokenRoleAssertion,
+		IDTokenRoleAssertion:          idTokenRoleAssertion,
+		IDTokenUserinfoAssertion:      idTokenUserinfoAssertion,
+		ClockSkew:                     clockSkew,
+		AdditionalOrigins:             additionalOrigins,
+		SkipNativeAppSuccessPage:      skipNativeAppSuccessPage,
+		BackChannelLogoutURI:          backChannelLogoutURI,
+		LoginVersion:                  loginVersion,
+		LoginBaseURI:                  loginBaseURI,
+		IOSTeamID:                     iosTeamID,
+		IOSBundleID:                   iosBundleID,
+		AndroidPackageName:            androidPackageName,
+		AndroidSHA256CertFingerprints: androidSHA256CertFingerprints,
 	}
 }
 
@@ -202,7 +217,19 @@ func (e *OIDCConfigAddedEvent) Validate(cmd eventstore.Command) bool {
 	if e.LoginVersion != c.LoginVersion {
 		return false
 	}
-	return e.LoginBaseURI == c.LoginBaseURI
+	if e.LoginBaseURI != c.LoginBaseURI {
+		return false
+	}
+	if e.IOSTeamID != c.IOSTeamID {
+		return false
+	}
+	if e.IOSBundleID != c.IOSBundleID {
+		return false
+	}
+	if e.AndroidPackageName != c.AndroidPackageName {
+		return false
+	}
+	return slices.Equal(e.AndroidSHA256CertFingerprints, c.AndroidSHA256CertFingerprints)
 }
 
 func OIDCConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
@@ -221,25 +248,29 @@ func OIDCConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error
 type OIDCConfigChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Version                  *domain.OIDCVersion         `json:"oidcVersion,omitempty"`
-	AppID                    string                      `json:"appId"`
-	RedirectUris             *[]string                   `json:"redirectUris,omitempty"`
-	ResponseTypes            *[]domain.OIDCResponseType  `json:"responseTypes,omitempty"`
-	GrantTypes               *[]domain.OIDCGrantType     `json:"grantTypes,omitempty"`
-	ApplicationType          *domain.OIDCApplicationType `json:"applicationType,omitempty"`
-	AuthMethodType           *domain.OIDCAuthMethodType  `json:"authMethodType,omitempty"`
-	PostLogoutRedirectUris   *[]string                   `json:"postLogoutRedirectUris,omitempty"`
-	DevMode                  *bool                       `json:"devMode,omitempty"`
-	AccessTokenType          *domain.OIDCTokenType       `json:"accessTokenType,omitempty"`
-	AccessTokenRoleAssertion *bool                       `json:"accessTokenRoleAssertion,omitempty"`
-	IDTokenRoleAssertion     *bool                       `json:"idTokenRoleAssertion,omitempty"`
-	IDTokenUserinfoAssertion *bool                       `json:"idTokenUserinfoAssertion,omitempty"`
-	ClockSkew                *time.Duration              `json:"clockSkew,omitempty"`
-	AdditionalOrigins        *[]string                   `json:"additionalOrigins,omitempty"`
-	SkipNativeAppSuccessPage *bool                       `json:"skipNativeAppSuccessPage,omitempty"`
-	BackChannelLogoutURI     *string                     `json:"backChannelLogoutURI,omitempty"`
-	LoginVersion             *domain.LoginVersion        `json:"loginVersion,omitempty"`
-	LoginBaseURI             *string                     `json:"loginBaseURI,omitempty"`
+	Version                       *domain.OIDCVersion         `json:"oidcVersion,omitempty"`
+	AppID                         string                      `json:"appId"`
+	RedirectUris                  *[]string                   `json:"redirectUris,omitempty"`
+	ResponseTypes                 *[]domain.OIDCResponseType  `json:"responseTypes,omitempty"`
+	GrantTypes                    *[]domain.OIDCGrantType     `json:"grantTypes,omitempty"`
+	ApplicationType               *domain.OIDCApplicationType `json:"applicationType,omitempty"`
+	AuthMethodType                *domain.OIDCAuthMethodType  `json:"authMethodType,omitempty"`
+	PostLogoutRedirectUris        *[]string                   `json:"postLogoutRedirectUris,omitempty"`
+	DevMode                       *bool                       `json:"devMode,omitempty"`
+	AccessTokenType               *domain.OIDCTokenType       `json:"accessTokenType,omitempty"`
+	AccessTokenRoleAssertion      *bool                       `json:"accessTokenRoleAssertion,omitempty"`
+	IDTokenRoleAssertion          *bool                       `json:"idTokenRoleAssertion,omitempty"`
+	IDTokenUserinfoAssertion      *bool                       `json:"idTokenUserinfoAssertion,omitempty"`
+	ClockSkew                     *time.Duration              `json:"clockSkew,omitempty"`
+	AdditionalOrigins             *[]string                   `json:"additionalOrigins,omitempty"`
+	SkipNativeAppSuccessPage      *bool                       `json:"skipNativeAppSuccessPage,omitempty"`
+	BackChannelLogoutURI          *string                     `json:"backChannelLogoutURI,omitempty"`
+	LoginVersion                  *domain.LoginVersion        `json:"loginVersion,omitempty"`
+	LoginBaseURI                  *string                     `json:"loginBaseURI,omitempty"`
+	IOSTeamID                     *string                     `json:"iosTeamId,omitempty"`
+	IOSBundleID                   *string                     `json:"iosBundleId,omitempty"`
+	AndroidPackageName            *string                     `json:"androidPackageName,omitempty"`
+	AndroidSHA256CertFingerprints *[]string                   `json:"androidSha256CertFingerprints,omitempty"`
 }
 
 func (e *OIDCConfigChangedEvent) Payload() interface{} {
@@ -396,6 +427,34 @@ func ChangeOIDCLoginBaseURI(loginBaseURI string) func(event *OIDCConfigChangedEv
 	}
 }
 
+func ChangeIOSTeamID(iosTeamID string) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.IOSTeamID = &iosTeamID
+	}
+}
+
+func ChangeIOSBundleID(iosBundleID string) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.IOSBundleID = &iosBundleID
+	}
+}
+
+func ChangeAndroidPackageName(androidPackageName string) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.AndroidPackageName = &androidPackageName
+	}
+}
+
+func ChangeAndroidSHA256CertFingerprints(fingerprints []string) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		if fingerprints == nil {
+			// explicitly set them to empty so we can differentiate "not set" in the event in case of no changes
+			fingerprints = make([]string, 0)
+		}
+		e.AndroidSHA256CertFingerprints = &fingerprints
+	}
+}
+
 func OIDCConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &OIDCConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -491,5 +550,47 @@ func (e *OIDCConfigSecretHashUpdatedEvent) Payload() interface{} {
 }
 
 func (e *OIDCConfigSecretHashUpdatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+// OIDCConfigRegistrationTokenChangedEvent stores the hash of the registration access token
+// (RFC 7592 §3) of a dynamically registered OIDC client. The token authenticates the read,
+// update and delete operations on the client's registration. As with a client secret only the
+// hash is persisted (and projected); the token itself is returned to the client once and never
+// stored in clear text. The event is written on registration and again whenever the token is
+// rotated (on update).
+type OIDCConfigRegistrationTokenChangedEvent struct {
+	*eventstore.BaseEvent `json:"-"`
+
+	AppID       string `json:"appId"`
+	HashedToken string `json:"hashedToken,omitempty"`
+}
+
+func NewOIDCConfigRegistrationTokenChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	appID string,
+	hashedToken string,
+) *OIDCConfigRegistrationTokenChangedEvent {
+	return &OIDCConfigRegistrationTokenChangedEvent{
+		BaseEvent: eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			OIDCConfigRegistrationTokenChangedType,
+		),
+		AppID:       appID,
+		HashedToken: hashedToken,
+	}
+}
+
+func (e *OIDCConfigRegistrationTokenChangedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+	e.BaseEvent = b
+}
+
+func (e *OIDCConfigRegistrationTokenChangedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *OIDCConfigRegistrationTokenChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }

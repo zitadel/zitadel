@@ -1252,6 +1252,64 @@ func TestServer_SystemUsers_ListUsers(t *testing.T) {
 	}
 }
 
+func TestServer_ListUsers_UsernameAndOr(t *testing.T) {
+	iamOwnerCtx := InstancePermissionV2.WithAuthorizationToken(OrgCTX, integration.UserTypeIAMOwner)
+	orgResp := InstancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+	alice := createUser(iamOwnerCtx, InstancePermissionV2, orgResp.OrganizationId, false)
+	bob := createUser(iamOwnerCtx, InstancePermissionV2, orgResp.OrganizationId, false)
+	orgQuery := OrganizationIdQuery(orgResp.OrganizationId)
+
+	tests := []struct {
+		name          string
+		queries       []*user.SearchQuery
+		wantUsernames []string
+	}{
+		{
+			name: "org and username or username",
+			queries: []*user.SearchQuery{
+				orgQuery,
+				OrQuery([]*user.SearchQuery{UsernameQuery(alice.Username), UsernameQuery(bob.Username)}),
+			},
+			wantUsernames: []string{alice.Username, bob.Username},
+		},
+		{
+			name: "org and sibling usernames",
+			queries: []*user.SearchQuery{
+				orgQuery,
+				UsernameQuery(alice.Username),
+				UsernameQuery(bob.Username),
+			},
+		},
+		{
+			name: "nested and of or and org",
+			queries: []*user.SearchQuery{
+				AndQuery([]*user.SearchQuery{
+					OrQuery([]*user.SearchQuery{UsernameQuery(alice.Username), UsernameQuery(bob.Username)}),
+					orgQuery,
+				}),
+			},
+			wantUsernames: []string{alice.Username, bob.Username},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := &user.ListUsersRequest{Queries: tt.queries}
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamOwnerCtx, 20*time.Second)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := InstancePermissionV2.Client.UserV2.ListUsers(iamOwnerCtx, req)
+				require.NoError(ttt, err)
+
+				gotUsernames := make([]string, 0, len(got.GetResult()))
+				for _, u := range got.GetResult() {
+					gotUsernames = append(gotUsernames, u.GetUsername())
+				}
+				assert.ElementsMatch(ttt, tt.wantUsernames, gotUsernames)
+			}, retryDuration, tick, "timeout waiting for expected user result")
+		})
+	}
+}
+
 func InUserIDsQuery(ids []string) *user.SearchQuery {
 	return &user.SearchQuery{
 		Query: &user.SearchQuery_InUserIdsQuery{
@@ -1306,6 +1364,16 @@ func OrQuery(queries []*user.SearchQuery) *user.SearchQuery {
 	return &user.SearchQuery{
 		Query: &user.SearchQuery_OrQuery{
 			OrQuery: &user.OrQuery{
+				Queries: queries,
+			},
+		},
+	}
+}
+
+func AndQuery(queries []*user.SearchQuery) *user.SearchQuery {
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_AndQuery{
+			AndQuery: &user.AndQuery{
 				Queries: queries,
 			},
 		},

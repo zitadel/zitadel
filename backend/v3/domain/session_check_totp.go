@@ -85,7 +85,7 @@ func (t *TOTPCheckCommand) Events(ctx context.Context, opts *InvokeOpts) ([]even
 	events := make([]eventstore.Command, 1, 2)
 	userAgg := &user.NewAggregate(t.FetchedUser.ID, t.FetchedUser.OrganizationID).Aggregate
 	if t.IsCheckSuccessful {
-		events[0] = user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil)
+		events[0] = user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, nil)
 		return append(events, session.NewTOTPCheckedEvent(ctx, &session.NewAggregate(t.SessionID, t.InstanceID).Aggregate, t.CheckedAt)), nil
 	}
 	events[0] = user.NewHumanOTPCheckFailedEvent(ctx, userAgg, nil)

@@ -977,6 +977,12 @@ func (s securitySettings) SetSettingFields(value domain.SecuritySettingsAttribut
 	if value.EnableImpersonation != nil {
 		changes = append(changes, s.SetEnableImpersonation(*value.EnableImpersonation))
 	}
+	if value.EnableDynamicClientRegistration != nil {
+		changes = append(changes, s.SetEnableDynamicClientRegistration(*value.EnableDynamicClientRegistration))
+	}
+	if value.AllowUnauthenticatedDynamicClientRegistration != nil {
+		changes = append(changes, s.SetAllowUnauthenticatedDynamicClientRegistration(*value.AllowUnauthenticatedDynamicClientRegistration))
+	}
 	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
 }
 
@@ -990,6 +996,14 @@ func (securitySettings) SetAllowedOrigins(value []string) db_json.JsonUpdate {
 
 func (securitySettings) SetEnableImpersonation(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"enableImpersonation"}, value)
+}
+
+func (securitySettings) SetEnableDynamicClientRegistration(value bool) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"enableDynamicClientRegistration"}, value)
+}
+
+func (securitySettings) SetAllowUnauthenticatedDynamicClientRegistration(value bool) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"allowUnauthenticatedDynamicClientRegistration"}, value)
 }
 
 func SecuritySettingsRepository() domain.SecuritySettingsRepository {

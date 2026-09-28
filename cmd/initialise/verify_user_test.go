@@ -32,6 +32,9 @@ func Test_verifyUser(t *testing.T) {
 					expectQuery("SELECT current_user", nil, []string{"current_user"}, [][]driver.Value{
 						{"postgres"},
 					}),
+					expectQuery("SELECT EXISTS(SELECT 1 FROM pg_roles WHERE rolname = $1)", nil, []string{"exists"}, [][]driver.Value{
+						{false},
+					}, "zitadel-user"),
 					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER \"zitadel-user\"", sql.ErrTxDone),
 				),
 				username: "zitadel-user",
@@ -46,6 +49,9 @@ func Test_verifyUser(t *testing.T) {
 					expectQuery("SELECT current_user", nil, []string{"current_user"}, [][]driver.Value{
 						{"postgres"},
 					}),
+					expectQuery("SELECT EXISTS(SELECT 1 FROM pg_roles WHERE rolname = $1)", nil, []string{"exists"}, [][]driver.Value{
+						{false},
+					}, "zitadel-user"),
 					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER \"zitadel-user\"", nil),
 				),
 				username: "zitadel-user",
@@ -60,6 +66,9 @@ func Test_verifyUser(t *testing.T) {
 					expectQuery("SELECT current_user", nil, []string{"current_user"}, [][]driver.Value{
 						{"postgres"},
 					}),
+					expectQuery("SELECT EXISTS(SELECT 1 FROM pg_roles WHERE rolname = $1)", nil, []string{"exists"}, [][]driver.Value{
+						{false},
+					}, "zitadel-user"),
 					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER \"zitadel-user\" WITH PASSWORD 'password'", nil),
 				),
 				username: "zitadel-user",
@@ -68,18 +77,51 @@ func Test_verifyUser(t *testing.T) {
 			targetErr: nil,
 		},
 		{
-			name: "already exists",
+			name: "correct with password containing percent and quote",
 			args: args{
 				db: prepareDB(t,
 					expectQuery("SELECT current_user", nil, []string{"current_user"}, [][]driver.Value{
 						{"postgres"},
 					}),
-					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER \"zitadel-user\" WITH PASSWORD 'password'", nil),
+					expectQuery("SELECT EXISTS(SELECT 1 FROM pg_roles WHERE rolname = $1)", nil, []string{"exists"}, [][]driver.Value{
+						{false},
+					}, "zitadel-user"),
+					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER \"zitadel-user\" WITH PASSWORD 'p%''ass'", nil),
 				),
 				username: "zitadel-user",
-				password: "",
+				password: "p%'ass",
 			},
 			targetErr: nil,
+		},
+		{
+			name: "already exists in catalog, skip creation",
+			args: args{
+				db: prepareDB(t,
+					expectQuery("SELECT current_user", nil, []string{"current_user"}, [][]driver.Value{
+						{"postgres"},
+					}),
+					expectQuery("SELECT EXISTS(SELECT 1 FROM pg_roles WHERE rolname = $1)", nil, []string{"exists"}, [][]driver.Value{
+						{true},
+					}, "zitadel-user"),
+				),
+				username: "zitadel-user",
+				password: "password",
+			},
+			targetErr: nil,
+		},
+		{
+			name: "catalog check fails",
+			args: args{
+				db: prepareDB(t,
+					expectQuery("SELECT current_user", nil, []string{"current_user"}, [][]driver.Value{
+						{"postgres"},
+					}),
+					expectQuery("SELECT EXISTS(SELECT 1 FROM pg_roles WHERE rolname = $1)", sql.ErrConnDone, []string{"exists"}, [][]driver.Value{}, "zitadel-user"),
+				),
+				username: "zitadel-user",
+				password: "password",
+			},
+			targetErr: sql.ErrConnDone,
 		},
 		{
 			name: "same user, skip create",

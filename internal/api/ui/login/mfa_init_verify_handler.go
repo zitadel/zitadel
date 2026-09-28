@@ -31,6 +31,9 @@ func (l *Login) handleMFAInitVerify(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
+	if !l.checkMFAPromptStep(w, r, authReq) {
+		return
+	}
 	var verifyData *mfaVerifyData
 	switch data.MFAType {
 	case domain.MFATypeTOTP:

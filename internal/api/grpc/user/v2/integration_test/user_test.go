@@ -2215,6 +2215,83 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 	}
 }
 
+// TestServer_ListAuthenticationMethodTypes_CrossOrg asserts that an org owner - or the read only
+// org owner viewer - of one organization cannot list the authentication methods of a user of
+// another organization. A leak shows up as AUTHENTICATION_METHOD_TYPE_PASSWORD.
+func TestServer_ListAuthenticationMethodTypes_CrossOrg(t *testing.T) {
+	// The victim lives in another organization than the callers and has a password set, so a
+	// successful cross-org read shows up as a leaked AUTHENTICATION_METHOD_TYPE_PASSWORD.
+	orgB := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
+	victimID := Instance.CreateHumanUserVerified(
+		IamCTX, orgB.GetOrganizationId(), integration.Email(), integration.Phone(),
+	).GetUserId()
+	Instance.SetUserPassword(IamCTX, victimID, integration.UserPassword, false)
+
+	// The bystander lives in the callers' own organization and is the target of the positive
+	// controls below.
+	bystanderID := Instance.CreateHumanUser(OrgCTX).GetUserId()
+	Instance.SetUserPassword(OrgCTX, bystanderID, integration.UserPassword, false)
+
+	// Both callers hold their role in the default org only. OrgCTX is already an ORG_OWNER there.
+	_, viewerPAT, err := Instance.CreateMachineUserPATWithMembership(OrgCTX, "ORG_OWNER_VIEWER")
+	require.NoError(t, err)
+	viewerCTX := integration.WithAuthorizationToken(CTX, viewerPAT)
+
+	// requireReadsPassword asserts the caller sees the user's password method. Used for the
+	// positive controls, which are not decoration: memberships and auth methods are projected
+	// asynchronously, so without them a denial below could be a false pass caused by a
+	// membership that has not been projected yet.
+	requireReadsPassword := func(t *testing.T, ctx context.Context, userID string) {
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+			got, err := Client.ListAuthenticationMethodTypes(ctx, &user.ListAuthenticationMethodTypesRequest{
+				UserId: userID,
+			})
+			require.NoError(ttt, err)
+			assert.Equal(ttt, []user.AuthenticationMethodType{
+				user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSWORD,
+			}, got.GetAuthMethodTypes())
+		}, retryDuration, tick, "timeout waiting for expected auth methods result")
+	}
+
+	// requireDeniedVictim reproduces the reported request. No retry: the permission check runs
+	// before the query, so a denial is immediate and not eventually consistent.
+	requireDeniedVictim := func(t *testing.T, ctx context.Context) {
+		got, err := Client.ListAuthenticationMethodTypes(ctx, &user.ListAuthenticationMethodTypesRequest{
+			UserId: victimID,
+		})
+		require.Errorf(t, err, "cross-org read succeeded and leaked auth methods: %v", got.GetAuthMethodTypes())
+		// The legacy permission path reports "membership not found" (NotFound) because the
+		// caller has no membership in the victim's org at all; the v2 permission check reports
+		// PermissionDenied. Either is a correct denial.
+		assert.Contains(t, []codes.Code{codes.NotFound, codes.PermissionDenied}, status.Code(err))
+	}
+
+	t.Run("org owner reads a user in its own org", func(t *testing.T) {
+		requireReadsPassword(t, OrgCTX, bystanderID)
+	})
+
+	t.Run("org owner viewer reads a user in its own org", func(t *testing.T) {
+		requireReadsPassword(t, viewerCTX, bystanderID)
+	})
+
+	t.Run("org owner is denied a user in another org", func(t *testing.T) {
+		requireDeniedVictim(t, OrgCTX)
+	})
+
+	t.Run("org owner viewer is denied a user in another org", func(t *testing.T) {
+		requireDeniedVictim(t, viewerCTX)
+	})
+
+	t.Run("instance wide user manager is allowed", func(t *testing.T) {
+		// IAM_USER_MANAGER holds user.read instance wide, so it must keep working across
+		// organizations - the check narrows the org, it must not narrow the role set.
+		_, pat, err := Instance.CreateMachineUserPATWithMembership(IamCTX, "IAM_USER_MANAGER")
+		require.NoError(t, err)
+		requireReadsPassword(t, integration.WithAuthorizationToken(CTX, pat), victimID)
+	})
+}
+
 func TestServer_ListAuthenticationFactors(t *testing.T) {
 	tests := []struct {
 		name    string

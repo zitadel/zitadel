@@ -47,29 +47,35 @@ func AddOIDCAppRequestToDomain(req *mgmt_pb.AddOIDCAppRequest) (*domain.OIDCApp,
 	if err != nil {
 		return nil, err
 	}
+	iosTeamID, iosBundleID := app_grpc.IOSAppLinkConfigToDomain(req.GetIos())
+	androidPackageName, androidFingerprints := app_grpc.AndroidAppLinkConfigToDomain(req.GetAndroid())
 	return &domain.OIDCApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: req.ProjectId,
 		},
-		AppName:                  req.Name,
-		OIDCVersion:              gu.Ptr(app_grpc.OIDCVersionToDomain(req.Version)),
-		RedirectUris:             req.RedirectUris,
-		ResponseTypes:            app_grpc.OIDCResponseTypesToDomain(req.ResponseTypes),
-		GrantTypes:               app_grpc.OIDCGrantTypesToDomain(req.GrantTypes),
-		ApplicationType:          gu.Ptr(app_grpc.OIDCApplicationTypeToDomain(req.AppType)),
-		AuthMethodType:           gu.Ptr(app_grpc.OIDCAuthMethodTypeToDomain(req.AuthMethodType)),
-		PostLogoutRedirectUris:   req.PostLogoutRedirectUris,
-		DevMode:                  gu.Ptr(req.GetDevMode()),
-		AccessTokenType:          gu.Ptr(app_grpc.OIDCTokenTypeToDomain(req.AccessTokenType)),
-		AccessTokenRoleAssertion: gu.Ptr(req.GetAccessTokenRoleAssertion()),
-		IDTokenRoleAssertion:     gu.Ptr(req.GetIdTokenRoleAssertion()),
-		IDTokenUserinfoAssertion: gu.Ptr(req.GetIdTokenUserinfoAssertion()),
-		ClockSkew:                gu.Ptr(req.GetClockSkew().AsDuration()),
-		AdditionalOrigins:        req.AdditionalOrigins,
-		SkipNativeAppSuccessPage: gu.Ptr(req.GetSkipNativeAppSuccessPage()),
-		BackChannelLogoutURI:     gu.Ptr(req.GetBackChannelLogoutUri()),
-		LoginVersion:             gu.Ptr(loginVersion),
-		LoginBaseURI:             gu.Ptr(loginBaseURI),
+		AppName:                       req.Name,
+		OIDCVersion:                   gu.Ptr(app_grpc.OIDCVersionToDomain(req.Version)),
+		RedirectUris:                  req.RedirectUris,
+		ResponseTypes:                 app_grpc.OIDCResponseTypesToDomain(req.ResponseTypes),
+		GrantTypes:                    app_grpc.OIDCGrantTypesToDomain(req.GrantTypes),
+		ApplicationType:               gu.Ptr(app_grpc.OIDCApplicationTypeToDomain(req.AppType)),
+		AuthMethodType:                gu.Ptr(app_grpc.OIDCAuthMethodTypeToDomain(req.AuthMethodType)),
+		PostLogoutRedirectUris:        req.PostLogoutRedirectUris,
+		DevMode:                       gu.Ptr(req.GetDevMode()),
+		AccessTokenType:               gu.Ptr(app_grpc.OIDCTokenTypeToDomain(req.AccessTokenType)),
+		AccessTokenRoleAssertion:      gu.Ptr(req.GetAccessTokenRoleAssertion()),
+		IDTokenRoleAssertion:          gu.Ptr(req.GetIdTokenRoleAssertion()),
+		IDTokenUserinfoAssertion:      gu.Ptr(req.GetIdTokenUserinfoAssertion()),
+		ClockSkew:                     gu.Ptr(req.GetClockSkew().AsDuration()),
+		AdditionalOrigins:             req.AdditionalOrigins,
+		SkipNativeAppSuccessPage:      gu.Ptr(req.GetSkipNativeAppSuccessPage()),
+		BackChannelLogoutURI:          gu.Ptr(req.GetBackChannelLogoutUri()),
+		LoginVersion:                  gu.Ptr(loginVersion),
+		LoginBaseURI:                  gu.Ptr(loginBaseURI),
+		IOSTeamID:                     iosTeamID,
+		IOSBundleID:                   iosBundleID,
+		AndroidPackageName:            androidPackageName,
+		AndroidSHA256CertFingerprints: androidFingerprints,
 	}, nil
 }
 
@@ -112,28 +118,35 @@ func UpdateOIDCAppConfigRequestToDomain(app *mgmt_pb.UpdateOIDCAppConfigRequest)
 	if err != nil {
 		return nil, err
 	}
+	// nested messages: omit = no change; present (incl. empty) = set/clear
+	iosTeamID, iosBundleID := app_grpc.IOSAppLinkConfigToDomain(app.Ios)
+	androidPackageName, androidFingerprints := app_grpc.AndroidAppLinkConfigToDomain(app.Android)
 	return &domain.OIDCApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: app.ProjectId,
 		},
-		AppID:                    app.AppId,
-		RedirectUris:             app.RedirectUris,
-		ResponseTypes:            app_grpc.OIDCResponseTypesToDomain(app.ResponseTypes),
-		GrantTypes:               app_grpc.OIDCGrantTypesToDomain(app.GrantTypes),
-		ApplicationType:          gu.Ptr(app_grpc.OIDCApplicationTypeToDomain(app.AppType)),
-		AuthMethodType:           gu.Ptr(app_grpc.OIDCAuthMethodTypeToDomain(app.AuthMethodType)),
-		PostLogoutRedirectUris:   app.PostLogoutRedirectUris,
-		DevMode:                  gu.Ptr(app.GetDevMode()),
-		AccessTokenType:          gu.Ptr(app_grpc.OIDCTokenTypeToDomain(app.AccessTokenType)),
-		AccessTokenRoleAssertion: gu.Ptr(app.GetAccessTokenRoleAssertion()),
-		IDTokenRoleAssertion:     gu.Ptr(app.GetIdTokenRoleAssertion()),
-		IDTokenUserinfoAssertion: gu.Ptr(app.GetIdTokenUserinfoAssertion()),
-		ClockSkew:                gu.Ptr(app.GetClockSkew().AsDuration()),
-		AdditionalOrigins:        app.AdditionalOrigins,
-		SkipNativeAppSuccessPage: gu.Ptr(app.GetSkipNativeAppSuccessPage()),
-		BackChannelLogoutURI:     gu.Ptr(app.GetBackChannelLogoutUri()),
-		LoginVersion:             gu.Ptr(loginVersion),
-		LoginBaseURI:             gu.Ptr(loginBaseURI),
+		AppID:                         app.AppId,
+		RedirectUris:                  app.RedirectUris,
+		ResponseTypes:                 app_grpc.OIDCResponseTypesToDomain(app.ResponseTypes),
+		GrantTypes:                    app_grpc.OIDCGrantTypesToDomain(app.GrantTypes),
+		ApplicationType:               gu.Ptr(app_grpc.OIDCApplicationTypeToDomain(app.AppType)),
+		AuthMethodType:                gu.Ptr(app_grpc.OIDCAuthMethodTypeToDomain(app.AuthMethodType)),
+		PostLogoutRedirectUris:        app.PostLogoutRedirectUris,
+		DevMode:                       gu.Ptr(app.GetDevMode()),
+		AccessTokenType:               gu.Ptr(app_grpc.OIDCTokenTypeToDomain(app.AccessTokenType)),
+		AccessTokenRoleAssertion:      gu.Ptr(app.GetAccessTokenRoleAssertion()),
+		IDTokenRoleAssertion:          gu.Ptr(app.GetIdTokenRoleAssertion()),
+		IDTokenUserinfoAssertion:      gu.Ptr(app.GetIdTokenUserinfoAssertion()),
+		ClockSkew:                     gu.Ptr(app.GetClockSkew().AsDuration()),
+		AdditionalOrigins:             app.AdditionalOrigins,
+		SkipNativeAppSuccessPage:      gu.Ptr(app.GetSkipNativeAppSuccessPage()),
+		BackChannelLogoutURI:          gu.Ptr(app.GetBackChannelLogoutUri()),
+		LoginVersion:                  gu.Ptr(loginVersion),
+		LoginBaseURI:                  gu.Ptr(loginBaseURI),
+		IOSTeamID:                     iosTeamID,
+		IOSBundleID:                   iosBundleID,
+		AndroidPackageName:            androidPackageName,
+		AndroidSHA256CertFingerprints: androidFingerprints,
 	}, nil
 }
 

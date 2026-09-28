@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"encoding/xml"
 	"net/url"
@@ -241,11 +240,7 @@ func (c *Commands) RequestSAMLIDPIntent(ctx context.Context, writeModel *IDPInte
 }
 
 func (c *Commands) generateIntentToken(intentID string) (string, error) {
-	token, err := c.idpConfigEncryption.Encrypt([]byte(intentID))
-	if err != nil {
-		return "", err
-	}
-	return base64.RawURLEncoding.EncodeToString(token), nil
+	return c.idpConfigEncryption.EncryptToken(intentID)
 }
 
 func (c *Commands) SucceedLDAPIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, userID string, session *ldap.Session) (string, error) {

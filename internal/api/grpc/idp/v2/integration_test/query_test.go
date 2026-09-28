@@ -283,12 +283,6 @@ func TestServer_GetIDPByID(t *testing.T) {
 								ClientId: "test-client",
 								Issuer:   "zitadel.example.com",
 								Scopes:   []string{"email", "profile"},
-								InstanceRolesInfo: []*idp.InstanceRolesInfo{
-									{
-										OrganizationId:     "org1",
-										OrganizationDomain: "org1.com",
-									},
-								},
 							},
 						},
 						Options: &idp.Options{

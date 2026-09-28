@@ -24,35 +24,47 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/app"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
+	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
 )
 
 func setImpersonationPolicy(t *testing.T, instance *integration.Instance, value bool) {
-	iamCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	instance.SetImpersonationPolicy(CTX, t, value)
+}
 
-	policy, err := instance.Client.Admin.GetSecurityPolicy(iamCTX, &admin.GetSecurityPolicyRequest{})
-	require.NoError(t, err)
-	if policy.GetPolicy().GetEnableImpersonation() != value {
-		_, err = instance.Client.Admin.SetSecurityPolicy(iamCTX, &admin.SetSecurityPolicyRequest{
-			EnableImpersonation: value,
-		})
-		require.NoError(t, err)
-	}
-
-	retryDuration := time.Minute
-	if ctxDeadline, ok := iamCTX.Deadline(); ok {
-		retryDuration = time.Until(ctxDeadline)
-	}
-	require.EventuallyWithT(t,
-		func(ttt *assert.CollectT) {
-			f, err := instance.Client.Admin.GetSecurityPolicy(iamCTX, &admin.GetSecurityPolicyRequest{})
-			assert.NoError(ttt, err)
-			if f.GetPolicy().GetEnableImpersonation() != value {
-				return
-			}
-		},
+// awaitImpersonationDenied retries the token exchange until the impersonation is rejected
+// because the actor lacks the required permission.
+// Retries are needed because both the actor's permissions and the subject's admin state are
+// resolved from eventually consistent projections. As long as the memberships are not projected
+// yet, the exchange either succeeds or fails with an unrelated "membership not found" error.
+func awaitImpersonationDenied(ctx context.Context, t *testing.T, exchanger tokenexchange.TokenExchanger, subjectUserID, actorToken string, requestedTokenType oidc.TokenType) {
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		_, err := tokenexchange.ExchangeToken(ctx, exchanger, subjectUserID, oidc_api.UserIDTokenType, actorToken, oidc.AccessTokenType, nil, nil, nil, requestedTokenType)
+		if assert.Error(ttt, err) {
+			assert.ErrorContains(ttt, err, "No matching permissions found")
+		}
+	},
 		retryDuration,
-		time.Second,
-		"timed out waiting for ensuring impersonation policy")
+		tick,
+		"timed out waiting for the impersonation to be denied")
+}
+
+// awaitImpersonationAllowed retries the token exchange until it succeeds and returns the response.
+// See [awaitImpersonationDenied] on why retries are needed.
+func awaitImpersonationAllowed(ctx context.Context, t *testing.T, exchanger tokenexchange.TokenExchanger, subjectUserID, actorToken string, requestedTokenType oidc.TokenType) *oidc.TokenExchangeResponse {
+	var resp *oidc.TokenExchangeResponse
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		got, err := tokenexchange.ExchangeToken(ctx, exchanger, subjectUserID, oidc_api.UserIDTokenType, actorToken, oidc.AccessTokenType, nil, nil, nil, requestedTokenType)
+		if !assert.NoError(ttt, err) {
+			return
+		}
+		resp = got
+	},
+		retryDuration,
+		tick,
+		"timed out waiting for the impersonation to be allowed")
+	return resp
 }
 
 func createMachineUserPATWithMembership(ctx context.Context, t *testing.T, instance *integration.Instance, roles ...string) (userID, pat string) {
@@ -688,6 +700,67 @@ func TestServer_TokenExchangeImpersonation(t *testing.T) {
 	}
 }
 
+// TestServer_TokenExchangeAdminImpersonation_GHSA_w4gv_rcwj_w6r5 asserts that an actor which
+// only holds the `impersonation` permission cannot impersonate an administrator.
+// Impersonating an administrator requires the `admin.impersonation` permission, which is
+// only granted by the *_ADMIN_IMPERSONATOR roles.
+// A user is considered an administrator as soon as they have any membership.
+func TestServer_TokenExchangeAdminImpersonation_GHSA_w4gv_rcwj_w6r5(t *testing.T) {
+	instance := integration.NewInstance(CTX)
+	ctx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+
+	setImpersonationPolicy(t, instance, true)
+
+	client, keyData, err := instance.CreateOIDCTokenExchangeClient(ctx, t)
+	require.NoError(t, err)
+	signer, err := rp.SignerFromKeyFile(keyData)()
+	require.NoError(t, err)
+	exchanger, err := tokenexchange.NewTokenExchangerJWTProfile(ctx, instance.OIDCIssuer(), client.GetClientId(), signer)
+	require.NoError(t, err)
+	relyingParty, err := rp.NewRelyingPartyOIDC(ctx, instance.OIDCIssuer(), client.GetClientId(), "", "", []string{"openid"}, rp.WithJWTProfile(rp.SignerFromKeyFile(keyData)))
+	require.NoError(t, err)
+	resourceServer, err := instance.CreateResourceServerJWTProfile(ctx, keyData)
+	require.NoError(t, err)
+
+	// ORG_END_USER_IMPERSONATOR is only granted the `impersonation` permission,
+	// ORG_ADMIN_IMPERSONATOR is granted `admin.impersonation` on top of it.
+	endUserImpersonatorID, endUserImpersonatorPAT := createMachineUserPATWithMembership(ctx, t, instance, "ORG_END_USER_IMPERSONATOR")
+	adminImpersonatorID, adminImpersonatorPAT := createMachineUserPATWithMembership(ctx, t, instance, "ORG_ADMIN_IMPERSONATOR")
+
+	// A user without any membership is a regular end user.
+	regularUser := instance.CreateHumanUser(ctx)
+	// A user with an org membership is an administrator.
+	adminUserID, _ := createMachineUserPATWithMembership(ctx, t, instance, "ORG_OWNER")
+
+	t.Run("end user impersonator may impersonate a regular user", func(t *testing.T) {
+		resp := awaitImpersonationAllowed(ctx, t, exchanger, regularUser.GetUserId(), endUserImpersonatorPAT, oidc.AccessTokenType)
+		accessTokenVerifier(ctx, resourceServer, regularUser.GetUserId(), endUserImpersonatorID)(t, resp.AccessToken)
+		idTokenVerifier(ctx, relyingParty, regularUser.GetUserId(), endUserImpersonatorID)(t, resp.IDToken)
+	})
+
+	t.Run("SECURITY: end user impersonator may not impersonate an admin user", func(t *testing.T) {
+		awaitImpersonationDenied(ctx, t, exchanger, adminUserID, endUserImpersonatorPAT, oidc.AccessTokenType)
+	})
+
+	t.Run("SECURITY: end user impersonator may not impersonate an admin user, requested type: JWT", func(t *testing.T) {
+		awaitImpersonationDenied(ctx, t, exchanger, adminUserID, endUserImpersonatorPAT, oidc.JWTTokenType)
+	})
+
+	// The subtests above already waited for the membership of adminUserID to be projected,
+	// so the following case is guaranteed to take the admin impersonation path.
+	t.Run("admin impersonator may impersonate an admin user", func(t *testing.T) {
+		resp := awaitImpersonationAllowed(ctx, t, exchanger, adminUserID, adminImpersonatorPAT, oidc.AccessTokenType)
+		accessTokenVerifier(ctx, resourceServer, adminUserID, adminImpersonatorID)(t, resp.AccessToken)
+		idTokenVerifier(ctx, relyingParty, adminUserID, adminImpersonatorID)(t, resp.IDToken)
+	})
+
+	t.Run("admin impersonator may impersonate a regular user", func(t *testing.T) {
+		resp := awaitImpersonationAllowed(ctx, t, exchanger, regularUser.GetUserId(), adminImpersonatorPAT, oidc.AccessTokenType)
+		accessTokenVerifier(ctx, resourceServer, regularUser.GetUserId(), adminImpersonatorID)(t, resp.AccessToken)
+		idTokenVerifier(ctx, relyingParty, regularUser.GetUserId(), adminImpersonatorID)(t, resp.IDToken)
+	})
+}
+
 func TestServer_TokenExchangeImpersonationClientCredentialsActor(t *testing.T) {
 	instance := integration.NewInstance(CTX)
 	ctx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -764,4 +837,96 @@ func TestImpersonation_API_Call(t *testing.T) {
 	status := status.Convert(err)
 	assert.Equal(t, codes.PermissionDenied, status.Code())
 	assert.Equal(t, "Errors.TokenExchange.Token.NotForAPI (APP-Shi0J)", status.Message())
+}
+
+// TestServer_TokenExchange_OrgRoleIDScopeDownscope covers #12413: a broad access
+// token can be exchanged with urn:zitadel:iam:org:roles:id:{orgID} even when that
+// scope was not present on the subject token, and roles claims are filtered.
+func TestServer_TokenExchange_OrgRoleIDScopeDownscope(t *testing.T) {
+	const (
+		roleFoo = "foo"
+		roleBar = "bar"
+	)
+
+	project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
+	client, keyData, err := Instance.CreateOIDCWebClientJWT(CTX, redirectURI, logoutRedirectURI, project.GetId(),
+		app.OIDCGrantType_OIDC_GRANT_TYPE_TOKEN_EXCHANGE,
+		app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE,
+		app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN,
+	)
+	require.NoError(t, err)
+
+	_, err = Instance.Client.Mgmt.UpdateProject(CTX, &management.UpdateProjectRequest{
+		Id:                   project.GetId(),
+		Name:                 integration.ProjectName(),
+		ProjectRoleAssertion: true,
+	})
+	require.NoError(t, err)
+
+	addProjectRolesGrants(t, User.GetUserId(), project.GetId(), roleFoo, roleBar)
+	grantedOrgID := addProjectOrgGrant(t, User.GetUserId(), project.GetId(), roleFoo, roleBar)
+
+	authRequestID := createAuthRequest(t, Instance, client.GetClientId(), redirectURI, oidc.ScopeOpenID, oidc.ScopeProfile)
+	sessionID, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
+	linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+		AuthRequestId: authRequestID,
+		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+			Session: &oidc_pb.Session{
+				SessionId:    sessionID,
+				SessionToken: sessionToken,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	provider, err := rp.NewRelyingPartyOIDC(CTX, Instance.OIDCIssuer(), client.GetClientId(), "", redirectURI, []string{oidc.ScopeOpenID},
+		rp.WithJWTProfile(rp.SignerFromKeyFile(keyData)))
+	require.NoError(t, err)
+	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
+	broadTokens, err := rp.CodeExchange[*oidc.IDTokenClaims](context.Background(), code, provider, codeExchangeOptions(t, provider)...)
+	require.NoError(t, err)
+
+	broadUserinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, broadTokens.AccessToken, broadTokens.TokenType, User.GetUserId(), provider)
+	require.NoError(t, err)
+	assertProjectRoleClaims(t, project.GetId(), broadUserinfo.Claims, true, []string{roleFoo, roleBar}, []string{Instance.DefaultOrg.Id, grantedOrgID})
+
+	signer, err := rp.SignerFromKeyFile(keyData)()
+	require.NoError(t, err)
+	exchanger, err := tokenexchange.NewTokenExchangerJWTProfile(CTX, Instance.OIDCIssuer(), client.GetClientId(), signer)
+	require.NoError(t, err)
+
+	orgRoleScope := domain.OrgRoleIDScope + grantedOrgID
+	exchanged, err := tokenexchange.ExchangeToken(
+		CTX,
+		exchanger,
+		broadTokens.AccessToken,
+		oidc.AccessTokenType,
+		"",
+		"",
+		nil,
+		nil,
+		[]string{oidc.ScopeOpenID, orgRoleScope},
+		oidc.AccessTokenType,
+	)
+	require.NoError(t, err)
+	assert.Contains(t, []string(exchanged.Scopes), orgRoleScope)
+
+	narrowUserinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, exchanged.AccessToken, exchanged.TokenType, User.GetUserId(), provider)
+	require.NoError(t, err)
+	assertProjectRoleClaims(t, project.GetId(), narrowUserinfo.Claims, true, []string{roleFoo, roleBar}, []string{grantedOrgID})
+
+	// Widening to another org after downscoping must fail.
+	_, err = tokenexchange.ExchangeToken(
+		CTX,
+		exchanger,
+		exchanged.AccessToken,
+		oidc.AccessTokenType,
+		"",
+		"",
+		nil,
+		nil,
+		[]string{oidc.ScopeOpenID, domain.OrgRoleIDScope + Instance.DefaultOrg.Id},
+		oidc.AccessTokenType,
+	)
+	require.Error(t, err)
 }

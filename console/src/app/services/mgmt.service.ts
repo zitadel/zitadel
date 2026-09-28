@@ -89,6 +89,8 @@ import {
   AddSecondFactorToLoginPolicyResponse,
   AddUserGrantRequest,
   AddUserGrantResponse,
+  AddZitadelProviderRequest,
+  AddZitadelProviderResponse,
   BulkAddProjectRolesRequest,
   BulkAddProjectRolesResponse,
   BulkRemoveUserGrantRequest,
@@ -526,6 +528,8 @@ import {
   UpdateUserGrantResponse,
   UpdateUserNameRequest,
   UpdateUserNameResponse,
+  UpdateZitadelProviderRequest,
+  UpdateZitadelProviderResponse,
   ValidateOrgDomainRequest,
   ValidateOrgDomainResponse,
 } from '../proto/generated/zitadel/management_pb';
@@ -1049,6 +1053,14 @@ export class ManagementService {
     req: UpdateGenericOIDCProviderRequest,
   ): Promise<UpdateGenericOIDCProviderResponse.AsObject> {
     return this.grpcService.mgmt.updateGenericOIDCProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addZitadelProvider(req: AddZitadelProviderRequest): Promise<AddZitadelProviderResponse.AsObject> {
+    return this.grpcService.mgmt.addZitadelProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateZitadelProvider(req: UpdateZitadelProviderRequest): Promise<UpdateZitadelProviderResponse.AsObject> {
+    return this.grpcService.mgmt.updateZitadelProvider(req, null).then((resp) => resp.toObject());
   }
 
   public addGenericOAuthProvider(req: AddGenericOAuthProviderRequest): Promise<AddGenericOAuthProviderResponse.AsObject> {

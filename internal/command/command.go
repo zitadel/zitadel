@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/go-jose/go-jose/v4"
@@ -56,7 +57,7 @@ type Commands struct {
 	externalSecure bool
 	externalPort   uint16
 
-	idpConfigEncryption             crypto.EncryptionAlgorithm
+	idpConfigEncryption             crypto.AuthEncryptionAlgorithm
 	smtpEncryption                  crypto.EncryptionAlgorithm
 	smsEncryption                   crypto.EncryptionAlgorithm
 	userEncryption                  crypto.EncryptionAlgorithm
@@ -109,6 +110,9 @@ type Commands struct {
 	loginPaths       LoginPaths
 	ipLookupFunction internal_net.IPLookupFunc
 	denyList         []denylist.AddressChecker
+
+	ownerDeleteReady       func(context.Context) (bool, error)
+	ownerDeleteReadyCached atomic.Bool
 }
 
 //go:generate mockgen -package command -destination ./mock_login_paths.go . LoginPaths
@@ -130,7 +134,8 @@ func StartCommands(
 	externalDomain string,
 	externalSecure bool,
 	externalPort uint16,
-	idpConfigEncryption, otpEncryption, smtpEncryption, smsEncryption, userEncryption, domainVerificationEncryption, samlEncryption, targetEncryption crypto.EncryptionAlgorithm,
+	idpConfigEncryption crypto.AuthEncryptionAlgorithm,
+	otpEncryption, smtpEncryption, smsEncryption, userEncryption, domainVerificationEncryption, samlEncryption, targetEncryption crypto.EncryptionAlgorithm,
 	oidcEncryption crypto.AuthEncryptionAlgorithm,
 	httpClient *http.Client,
 	permissionCheck domain.PermissionCheck,
@@ -164,31 +169,33 @@ func StartCommands(
 	}
 	ipLookupFunction := net.LookupIP
 	repo = &Commands{
-		eventstore:                      es,
-		static:                          staticStore,
-		idGenerator:                     idGenerator,
-		zitadelRoles:                    zitadelRoles,
-		externalDomain:                  externalDomain,
-		externalSecure:                  externalSecure,
-		externalPort:                    externalPort,
-		keySize:                         defaults.KeyConfig.Size,
-		certKeySize:                     defaults.KeyConfig.CertificateSize,
-		privateKeyLifetime:              defaults.KeyConfig.PrivateKeyLifetime,
-		publicKeyLifetime:               defaults.KeyConfig.PublicKeyLifetime,
-		certificateLifetime:             defaults.KeyConfig.CertificateLifetime,
-		maxIdPIntentLifetime:            defaults.MaxIdPIntentLifetime,
-		idpConfigEncryption:             idpConfigEncryption,
-		smtpEncryption:                  smtpEncryption,
-		smsEncryption:                   smsEncryption,
-		userEncryption:                  userEncryption,
-		targetEncryption:                targetEncryption,
-		userPasswordHasher:              userPasswordHasher,
-		secretHasher:                    secretHasher,
-		machineKeySize:                  int(defaults.SecretGenerators.MachineKeySize),
-		applicationKeySize:              int(defaults.SecretGenerators.ApplicationKeySize),
-		domainVerificationAlg:           domainVerificationEncryption,
-		domainVerificationGenerator:     crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, domainVerificationEncryption),
-		domainVerificationValidator:     api_http.ValidateDomain,
+		eventstore:                  es,
+		static:                      staticStore,
+		idGenerator:                 idGenerator,
+		zitadelRoles:                zitadelRoles,
+		externalDomain:              externalDomain,
+		externalSecure:              externalSecure,
+		externalPort:                externalPort,
+		keySize:                     defaults.KeyConfig.Size,
+		certKeySize:                 defaults.KeyConfig.CertificateSize,
+		privateKeyLifetime:          defaults.KeyConfig.PrivateKeyLifetime,
+		publicKeyLifetime:           defaults.KeyConfig.PublicKeyLifetime,
+		certificateLifetime:         defaults.KeyConfig.CertificateLifetime,
+		maxIdPIntentLifetime:        defaults.MaxIdPIntentLifetime,
+		idpConfigEncryption:         idpConfigEncryption,
+		smtpEncryption:              smtpEncryption,
+		smsEncryption:               smsEncryption,
+		userEncryption:              userEncryption,
+		targetEncryption:            targetEncryption,
+		userPasswordHasher:          userPasswordHasher,
+		secretHasher:                secretHasher,
+		machineKeySize:              int(defaults.SecretGenerators.MachineKeySize),
+		applicationKeySize:          int(defaults.SecretGenerators.ApplicationKeySize),
+		domainVerificationAlg:       domainVerificationEncryption,
+		domainVerificationGenerator: crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, domainVerificationEncryption),
+		domainVerificationValidator: func(domain, token, verifier string, checkType api_http.CheckType) error {
+			return api_http.ValidateDomain(domain, token, verifier, checkType, httpClient)
+		},
 		keyAlgorithm:                    oidcEncryption,
 		authAlgorithm:                   oidcEncryption,
 		certificateAlgorithm:            samlEncryption,
@@ -235,6 +242,8 @@ func StartCommands(
 		ipLookupFunction: ipLookupFunction,
 		denyList:         denyList,
 	}
+
+	repo.ownerDeleteReady = repo.uniqueConstraintOwnersBackfillFinalized
 
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {
 		repo.newHashedSecret = newHashedSecretWithDefault(secretHasher, defaultSecretGenerators.ClientSecret)

@@ -61,14 +61,14 @@ func (s *Server) getSignerOnce() sign.SignerFunc {
 }
 
 // userInfoFunc is a getter function that allows add-hoc retrieval of a user.
-type userInfoFunc func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType) (*oidc.UserInfo, error)
+type userInfoFunc func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType, actor *domain.TokenActor) (*oidc.UserInfo, error)
 
 // getUserInfo returns a function which retrieves userinfo from the database once.
 // However, each time, role claims are asserted and also action flows will trigger.
 func (s *Server) getUserInfo(userID, projectID, clientID string, projectRoleAssertion, userInfoAssertion bool, scope []string) userInfoFunc {
 	userInfo := s.userInfo(userID, scope, projectID, clientID, projectRoleAssertion, userInfoAssertion, false)
-	return func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType) (*oidc.UserInfo, error) {
-		return userInfo(ctx, roleAssertion, triggerType)
+	return func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType, actor *domain.TokenActor) (*oidc.UserInfo, error) {
+		return userInfo(ctx, roleAssertion, triggerType, actor)
 	}
 }
 
@@ -76,7 +76,7 @@ func (*Server) createIDToken(ctx context.Context, client op.Client, getUserInfo 
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	userInfo, err := getUserInfo(ctx, roleAssertion, domain.TriggerTypePreUserinfoCreation)
+	userInfo, err := getUserInfo(ctx, roleAssertion, domain.TriggerTypePreUserinfoCreation, actor)
 	if err != nil {
 		return "", 0, err
 	}
@@ -120,7 +120,7 @@ func (s *Server) createJWT(ctx context.Context, client op.Client, session *comma
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	userInfo, err := getUserInfo(ctx, assertRoles, domain.TriggerTypePreAccessTokenCreation)
+	userInfo, err := getUserInfo(ctx, assertRoles, domain.TriggerTypePreAccessTokenCreation, session.Actor)
 	if err != nil {
 		return "", err
 	}
