@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -245,8 +246,7 @@ var (
 		"password_set",
 		"count",
 	}
-	usersQuery = `SELECT *, COUNT(*) OVER () FROM (` +
-		`SELECT projections.users14.id,` +
+	usersQuery = `SELECT projections.users14.id,` +
 		` projections.users14.creation_date,` +
 		` projections.users14.change_date,` +
 		` projections.users14.resource_owner,` +
@@ -276,13 +276,18 @@ var (
 		` projections.users14_machines.description,` +
 		` projections.users14_machines.secret,` +
 		` projections.users14_machines.access_token_type,` +
-		` projections.users14.id` +
-		` FROM projections.users14` +
+		` page.sort_col` +
+		` FROM (SELECT projections.users14.id, projections.users14.id AS sort_col FROM projections.users14 WHERE projections.users14.instance_id = $1 ORDER BY projections.users14.id DESC) AS page` +
+		` JOIN projections.users14 ON projections.users14.id = page.id AND projections.users14.instance_id = $2` +
 		` LEFT JOIN projections.users14_humans ON projections.users14.id = projections.users14_humans.user_id AND projections.users14.instance_id = projections.users14_humans.instance_id` +
 		` LEFT JOIN projections.users14_machines ON projections.users14.id = projections.users14_machines.user_id AND projections.users14.instance_id = projections.users14_machines.instance_id` +
 		` LEFT JOIN LATERAL (SELECT ARRAY_AGG(ln.login_name ORDER BY ln.login_name) AS login_names, MAX(CASE WHEN ln.is_primary THEN ln.login_name ELSE NULL END) AS preferred_login_name FROM projections.login_names3 AS ln WHERE ln.user_id = projections.users14.id AND ln.instance_id = projections.users14.instance_id) AS login_names ON TRUE` +
-		` WHERE projections.users14.instance_id = $1 ORDER BY projections.users14.id DESC` +
-		`) AS results`
+		` ORDER BY page.sort_col DESC`
+	usersQueryWithLimitOffset = strings.Replace(usersQuery,
+		`ORDER BY projections.users14.id DESC) AS page`,
+		`ORDER BY projections.users14.id DESC LIMIT 2 OFFSET 1) AS page`,
+		1,
+	)
 	usersCols = []string{
 		"id",
 		"creation_date",
@@ -316,10 +321,9 @@ var (
 		"description",
 		"secret",
 		"access_token_type",
-		"id",
-		"count",
+		"sort_col",
 	}
-	countUsersQuery = "SELECT COUNT(*) OVER () FROM projections.users14"
+	countUsersQuery = "SELECT COUNT(*) FROM projections.users14 WHERE projections.users14.instance_id = $1"
 	countUsersCols  = []string{"count"}
 )
 
@@ -896,9 +900,6 @@ func Test_UserPrepares(t *testing.T) {
 				),
 			},
 			object: &Users{
-				SearchResponse: SearchResponse{
-					Count: 1,
-				},
 				Users: []*User{
 					{
 						ID:                 "id",
@@ -981,9 +982,6 @@ func Test_UserPrepares(t *testing.T) {
 				),
 			},
 			object: &Users{
-				SearchResponse: SearchResponse{
-					Count: 1,
-				},
 				Users: []*User{
 					{
 						ID:                 "id",
@@ -1029,7 +1027,7 @@ func Test_UserPrepares(t *testing.T) {
 			},
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(usersQuery+` LIMIT 2 OFFSET 1`),
+					regexp.QuoteMeta(usersQueryWithLimitOffset),
 					usersCols,
 					[][]driver.Value{
 						{
@@ -1106,9 +1104,6 @@ func Test_UserPrepares(t *testing.T) {
 				),
 			},
 			object: &Users{
-				SearchResponse: SearchResponse{
-					Count: 2,
-				},
 				Users: []*User{
 					{
 						ID:                 "id",
@@ -1180,8 +1175,11 @@ func Test_UserPrepares(t *testing.T) {
 			object: (*Users)(nil),
 		},
 		{
-			name:    "prepareCountUsersQuery no result",
-			prepare: prepareCountUsersQuery,
+			name: "prepareCountUsersQuery no result",
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (uint64, error)) {
+				q := &UserSearchQueries{}
+				return q.prepareUsersCountQuery(t.Context(), false)
+			},
 			want: want{
 				sqlExpectations: mockQuery(
 					regexp.QuoteMeta(countUsersQuery),
@@ -1192,8 +1190,11 @@ func Test_UserPrepares(t *testing.T) {
 			object: uint64(0),
 		},
 		{
-			name:    "prepareCountUsersQuery one result",
-			prepare: prepareCountUsersQuery,
+			name: "prepareCountUsersQuery one result",
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (uint64, error)) {
+				q := &UserSearchQueries{}
+				return q.prepareUsersCountQuery(t.Context(), false)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(countUsersQuery),
@@ -1204,8 +1205,11 @@ func Test_UserPrepares(t *testing.T) {
 			object: uint64(1),
 		},
 		{
-			name:    "prepareCountUsersQuery multiple results",
-			prepare: prepareCountUsersQuery,
+			name: "prepareCountUsersQuery multiple results",
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (uint64, error)) {
+				q := &UserSearchQueries{}
+				return q.prepareUsersCountQuery(t.Context(), false)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(countUsersQuery),
@@ -1216,8 +1220,11 @@ func Test_UserPrepares(t *testing.T) {
 			object: uint64(2),
 		},
 		{
-			name:    "prepareCountUsersQuery sql err",
-			prepare: prepareCountUsersQuery,
+			name: "prepareCountUsersQuery sql err",
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (uint64, error)) {
+				q := &UserSearchQueries{}
+				return q.prepareUsersCountQuery(t.Context(), false)
+			},
 			want: want{
 				sqlExpectations: mockQueryErr(
 					regexp.QuoteMeta(countUsersQuery),
