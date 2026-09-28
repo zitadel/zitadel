@@ -27,6 +27,42 @@ func setImpersonationPolicy(t *testing.T, instance *integration.Instance, value 
 	instance.SetImpersonationPolicy(CTX, t, value)
 }
 
+// awaitImpersonationDenied retries the token exchange until the impersonation is rejected
+// because the actor lacks the required permission.
+// Retries are needed because both the actor's permissions and the subject's admin state are
+// resolved from eventually consistent projections. As long as the memberships are not projected
+// yet, the exchange either succeeds or fails with an unrelated "membership not found" error.
+func awaitImpersonationDenied(ctx context.Context, t *testing.T, exchanger tokenexchange.TokenExchanger, subjectUserID, actorToken string, requestedTokenType oidc.TokenType) {
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		_, err := tokenexchange.ExchangeToken(ctx, exchanger, subjectUserID, oidc_api.UserIDTokenType, actorToken, oidc.AccessTokenType, nil, nil, nil, requestedTokenType)
+		if assert.Error(ttt, err) {
+			assert.ErrorContains(ttt, err, "No matching permissions found")
+		}
+	},
+		retryDuration,
+		tick,
+		"timed out waiting for the impersonation to be denied")
+}
+
+// awaitImpersonationAllowed retries the token exchange until it succeeds and returns the response.
+// See [awaitImpersonationDenied] on why retries are needed.
+func awaitImpersonationAllowed(ctx context.Context, t *testing.T, exchanger tokenexchange.TokenExchanger, subjectUserID, actorToken string, requestedTokenType oidc.TokenType) *oidc.TokenExchangeResponse {
+	var resp *oidc.TokenExchangeResponse
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		got, err := tokenexchange.ExchangeToken(ctx, exchanger, subjectUserID, oidc_api.UserIDTokenType, actorToken, oidc.AccessTokenType, nil, nil, nil, requestedTokenType)
+		if !assert.NoError(ttt, err) {
+			return
+		}
+		resp = got
+	},
+		retryDuration,
+		tick,
+		"timed out waiting for the impersonation to be allowed")
+	return resp
+}
+
 func createMachineUserPATWithMembership(ctx context.Context, t *testing.T, instance *integration.Instance, roles ...string) (userID, pat string) {
 	userID, pat, err := instance.CreateMachineUserPATWithMembership(ctx, roles...)
 	require.NoError(t, err)
@@ -517,6 +553,67 @@ func TestServer_TokenExchangeImpersonation(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestServer_TokenExchangeAdminImpersonation_GHSA_w4gv_rcwj_w6r5 asserts that an actor which
+// only holds the `impersonation` permission cannot impersonate an administrator.
+// Impersonating an administrator requires the `admin.impersonation` permission, which is
+// only granted by the *_ADMIN_IMPERSONATOR roles.
+// A user is considered an administrator as soon as they have any membership.
+func TestServer_TokenExchangeAdminImpersonation_GHSA_w4gv_rcwj_w6r5(t *testing.T) {
+	instance := integration.NewInstance(CTX)
+	ctx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+
+	setImpersonationPolicy(t, instance, true)
+
+	client, keyData, err := instance.CreateOIDCTokenExchangeClient(ctx, t)
+	require.NoError(t, err)
+	signer, err := rp.SignerFromKeyFile(keyData)()
+	require.NoError(t, err)
+	exchanger, err := tokenexchange.NewTokenExchangerJWTProfile(ctx, instance.OIDCIssuer(), client.GetClientId(), signer)
+	require.NoError(t, err)
+	relyingParty, err := rp.NewRelyingPartyOIDC(ctx, instance.OIDCIssuer(), client.GetClientId(), "", "", []string{"openid"}, rp.WithJWTProfile(rp.SignerFromKeyFile(keyData)))
+	require.NoError(t, err)
+	resourceServer, err := instance.CreateResourceServerJWTProfile(ctx, keyData)
+	require.NoError(t, err)
+
+	// ORG_END_USER_IMPERSONATOR is only granted the `impersonation` permission,
+	// ORG_ADMIN_IMPERSONATOR is granted `admin.impersonation` on top of it.
+	endUserImpersonatorID, endUserImpersonatorPAT := createMachineUserPATWithMembership(ctx, t, instance, "ORG_END_USER_IMPERSONATOR")
+	adminImpersonatorID, adminImpersonatorPAT := createMachineUserPATWithMembership(ctx, t, instance, "ORG_ADMIN_IMPERSONATOR")
+
+	// A user without any membership is a regular end user.
+	regularUser := instance.CreateHumanUser(ctx)
+	// A user with an org membership is an administrator.
+	adminUserID, _ := createMachineUserPATWithMembership(ctx, t, instance, "ORG_OWNER")
+
+	t.Run("end user impersonator may impersonate a regular user", func(t *testing.T) {
+		resp := awaitImpersonationAllowed(ctx, t, exchanger, regularUser.GetUserId(), endUserImpersonatorPAT, oidc.AccessTokenType)
+		accessTokenVerifier(ctx, resourceServer, regularUser.GetUserId(), endUserImpersonatorID)(t, resp.AccessToken)
+		idTokenVerifier(ctx, relyingParty, regularUser.GetUserId(), endUserImpersonatorID)(t, resp.IDToken)
+	})
+
+	t.Run("SECURITY: end user impersonator may not impersonate an admin user", func(t *testing.T) {
+		awaitImpersonationDenied(ctx, t, exchanger, adminUserID, endUserImpersonatorPAT, oidc.AccessTokenType)
+	})
+
+	t.Run("SECURITY: end user impersonator may not impersonate an admin user, requested type: JWT", func(t *testing.T) {
+		awaitImpersonationDenied(ctx, t, exchanger, adminUserID, endUserImpersonatorPAT, oidc.JWTTokenType)
+	})
+
+	// The subtests above already waited for the membership of adminUserID to be projected,
+	// so the following case is guaranteed to take the admin impersonation path.
+	t.Run("admin impersonator may impersonate an admin user", func(t *testing.T) {
+		resp := awaitImpersonationAllowed(ctx, t, exchanger, adminUserID, adminImpersonatorPAT, oidc.AccessTokenType)
+		accessTokenVerifier(ctx, resourceServer, adminUserID, adminImpersonatorID)(t, resp.AccessToken)
+		idTokenVerifier(ctx, relyingParty, adminUserID, adminImpersonatorID)(t, resp.IDToken)
+	})
+
+	t.Run("admin impersonator may impersonate a regular user", func(t *testing.T) {
+		resp := awaitImpersonationAllowed(ctx, t, exchanger, regularUser.GetUserId(), adminImpersonatorPAT, oidc.AccessTokenType)
+		accessTokenVerifier(ctx, resourceServer, regularUser.GetUserId(), adminImpersonatorID)(t, resp.AccessToken)
+		idTokenVerifier(ctx, relyingParty, regularUser.GetUserId(), adminImpersonatorID)(t, resp.IDToken)
+	})
 }
 
 // This test tries to call the zitadel API with an impersonated token,

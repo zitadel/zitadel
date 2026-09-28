@@ -1,12 +1,14 @@
 package query
 
 import (
+	"context"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query/projection"
 )
 
 type MembersQuery struct {
@@ -70,4 +72,13 @@ type Member struct {
 	DisplayName        string
 	AvatarURL          string
 	UserType           domain.UserType
+}
+
+func triggerMemberProjections(ctx context.Context) (context.Context, error) {
+	return triggerBatch(ctx,
+		projection.InstanceMemberProjection,
+		projection.OrgMemberProjection,
+		projection.ProjectMemberProjection,
+		projection.ProjectGrantMemberProjection,
+	)
 }
