@@ -88,6 +88,9 @@ The masterkey [encrypts sensitive data at rest](/concepts/architecture/secrets).
 ZITADEL_MASTERKEY=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)
 echo "ZITADEL_MASTERKEY=$ZITADEL_MASTERKEY" >> .env
 
+# Generate the Login UI session cookie secret (at least 32 characters)
+echo "LOGIN_SESSION_COOKIE_SECRET=$(openssl rand -base64 32)" >> .env
+
 # Set strong database passwords
 echo "POSTGRES_ADMIN_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)" >> .env
 echo "POSTGRES_ZITADEL_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)" >> .env
