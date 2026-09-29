@@ -135,10 +135,13 @@ func TestPrepareUsersQuery_LoginNameEqualsUsesIndexedJoin(t *testing.T) {
 	inner, outer := splitUsersPageSQL(t, sql)
 	assert.Contains(t, inner, "INNER JOIN")
 	assert.Contains(t, inner, "login_name_matches")
+	assert.GreaterOrEqual(t, strings.Count(sql, "login_name_matches"), 2)
 	assert.Contains(t, inner, "login_names3_users")
 	assert.Contains(t, inner, "user_name_lower")
 	assert.NotContains(t, inner, "login_name_lower")
 	assert.NotContains(t, outer, "login_name_matches")
+	assert.Contains(t, sql, "(SELECT COUNT(*)")
+	assert.NotContains(t, sql, "COUNT(*) OVER ()")
 	assert.NotContains(t, sql, "user_metadata5")
 	assert.NotContains(t, sql, "SELECT DISTINCT")
 	assert.Contains(t, args, "inst-1")
@@ -490,13 +493,15 @@ func TestPrepareUsersQuery_MetadataFilterKeepsDistinctJoin(t *testing.T) {
 	inner := usersPageSubquery(t, sql)
 	assert.Contains(t, inner, "SELECT DISTINCT")
 	assert.Contains(t, inner, "user_metadata5")
-	assert.Contains(t, inner, "COUNT(*) OVER ()")
+	assert.Contains(t, sql, "COUNT(DISTINCT")
+	assert.NotContains(t, inner, "COUNT(")
+	assert.NotContains(t, sql, "COUNT(*) OVER ()")
 	distinctIdx := strings.Index(inner, "SELECT DISTINCT")
 	idsIdx := strings.Index(inner, ") AS ids")
 	if distinctIdx < 0 || idsIdx < 0 || idsIdx <= distinctIdx {
 		t.Fatalf("distinct ids subquery not found: %s", inner)
 	}
-	assert.NotContains(t, inner[distinctIdx:idsIdx], "COUNT(*) OVER ()")
+	assert.NotContains(t, inner[distinctIdx:idsIdx], "COUNT(")
 }
 
 func TestPrepareUsersQuery_PaginatesBeforeLoginNamesJoin(t *testing.T) {
@@ -511,12 +516,14 @@ func TestPrepareUsersQuery_PaginatesBeforeLoginNamesJoin(t *testing.T) {
 	inner, outer := splitUsersPageSQL(t, sql)
 	assert.Contains(t, inner, "LIMIT 20")
 	assert.Contains(t, inner, "OFFSET 17500")
-	assert.Contains(t, inner, "COUNT(*) OVER ()")
+	assert.Contains(t, sql, "(SELECT COUNT(*)")
+	assert.NotContains(t, inner, "SELECT COUNT(*)")
+	assert.NotContains(t, sql, "COUNT(*) OVER ()")
 	assert.NotContains(t, inner, "login_names3")
 	assert.NotContains(t, inner, "users14_humans")
 	assert.Contains(t, outer, "LEFT JOIN LATERAL")
 	assert.Contains(t, outer, "login_names3")
-	assert.NotContains(t, outer, "COUNT(*) OVER ()")
+	assert.NotContains(t, outer, "SELECT COUNT(*)")
 }
 
 func TestPrepareUsersQuery_DisplayNameFilterJoinsHumansInPage(t *testing.T) {

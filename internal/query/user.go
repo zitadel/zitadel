@@ -1436,24 +1436,27 @@ func (q *UserSearchQueries) prepareUsersCountQuery(ctx context.Context, permissi
 	return q.usersCountQuery(ctx, q.planUserSearch(ctx, permissionCheckV2))
 }
 
-func (q *UserSearchQueries) usersCountQuery(ctx context.Context, plan userSearchPlan) (sq.SelectBuilder, func(*sql.Rows) (uint64, error)) {
+func (p userSearchPlan) matchingCountSelect(ctx context.Context) sq.SelectBuilder {
 	countExpr := "COUNT(*)"
-	if plan.needsMetadataJoin {
+	if p.needsMetadataJoin {
 		countExpr = "COUNT(DISTINCT " + UserIDCol.identifier() + ")"
 	}
+	return p.applyConstraints(ctx, sq.Select(countExpr), false)
+}
 
-	query := plan.applyConstraints(ctx, sq.Select(countExpr), false).
-		PlaceholderFormat(sq.Dollar)
+func (q *UserSearchQueries) usersCountQuery(ctx context.Context, plan userSearchPlan) (sq.SelectBuilder, func(*sql.Rows) (uint64, error)) {
+	query := plan.matchingCountSelect(ctx).PlaceholderFormat(sq.Dollar)
 	return query, scanUsersCount
 }
 
 // prepareUsersQuery creates the select query for searching users and returns a matching scan function.
-// Matching IDs are selected first with filters, permissions, COUNT(*) OVER () and LIMIT/OFFSET.
-// Humans, machines and login_names are joined afterwards so the login_names3 view
-// is expanded only for the returned page, not for every matching user.
+// Matching IDs are selected first with filters, permissions and LIMIT/OFFSET.
+// An uncorrelated scalar COUNT(*) (InitPlan) supplies total_result without a
+// window over every matching ID. Humans, machines and login_names are joined
+// afterwards so the login_names3 view is expanded only for the returned page.
 //
 // Metadata JOIN and DISTINCT are only applied when a metadata filter is present.
-// DISTINCT is nested inside the window so COUNT(*) OVER () counts unique IDs.
+// DISTINCT stays on the page subquery; COUNT(DISTINCT id) is used for the total.
 // Login-equality filters (username, email, phone, login name EQUALS /
 // EQUALS_IGNORE_CASE) become an indexed UNION of ID seeks.
 func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionCheckV2 bool) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
@@ -1472,14 +1475,12 @@ func (q *UserSearchQueries) usersPageQuery(ctx context.Context, plan userSearchP
 		pageQuery = sq.Select(
 			"id",
 			"sort_col",
-			countColumn.identifier()+" AS total",
 		).FromSelect(distinctIDs, "ids").
 			OrderByClause(q.pageOrderClause("sort_col", "id"))
 	} else {
 		pageQuery = plan.applyConstraints(ctx, sq.Select(
 			idCols[0],
 			idCols[1],
-			countColumn.identifier()+" AS total",
 		), true).
 			OrderByClause(q.pageOrderClause("sort_col", UserIDCol.identifier()))
 	}
@@ -1517,7 +1518,7 @@ func (q *UserSearchQueries) usersPageQuery(ctx context.Context, plan userSearchP
 		MachineSecretCol.identifier(),
 		MachineAccessTokenTypeCol.identifier(),
 		"page.sort_col",
-		"page.total").
+	).Column(sq.ConcatExpr("(", plan.matchingCountSelect(ctx), ") AS total")).
 		FromSelect(pageQuery, "page").
 		Join(userTable.identifier()+" ON "+UserIDCol.identifier()+" = page.id AND "+UserInstanceIDCol.identifier()+" = ?", plan.instanceID).
 		LeftJoin(join(HumanUserIDCol, UserIDCol)).

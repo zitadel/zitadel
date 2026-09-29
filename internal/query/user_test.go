@@ -278,9 +278,9 @@ var (
 		` projections.users14_machines.secret,` +
 		` projections.users14_machines.access_token_type,` +
 		` page.sort_col,` +
-		` page.total` +
-		` FROM (SELECT projections.users14.id, projections.users14.id AS sort_col, COUNT(*) OVER () AS total FROM projections.users14 WHERE projections.users14.instance_id = $1 ORDER BY sort_col DESC) AS page` +
-		` JOIN projections.users14 ON projections.users14.id = page.id AND projections.users14.instance_id = $2` +
+		` (SELECT COUNT(*) FROM projections.users14 WHERE projections.users14.instance_id = $1) AS total` +
+		` FROM (SELECT projections.users14.id, projections.users14.id AS sort_col FROM projections.users14 WHERE projections.users14.instance_id = $2 ORDER BY sort_col DESC) AS page` +
+		` JOIN projections.users14 ON projections.users14.id = page.id AND projections.users14.instance_id = $3` +
 		` LEFT JOIN projections.users14_humans ON projections.users14.id = projections.users14_humans.user_id AND projections.users14.instance_id = projections.users14_humans.instance_id` +
 		` LEFT JOIN projections.users14_machines ON projections.users14.id = projections.users14_machines.user_id AND projections.users14.instance_id = projections.users14_machines.instance_id` +
 		` LEFT JOIN LATERAL (SELECT ARRAY_AGG(ln.login_name ORDER BY ln.login_name) AS login_names, MAX(CASE WHEN ln.is_primary THEN ln.login_name ELSE NULL END) AS preferred_login_name FROM projections.login_names3 AS ln WHERE ln.user_id = projections.users14.id AND ln.instance_id = projections.users14.instance_id) AS login_names ON TRUE` +
@@ -1360,7 +1360,7 @@ func TestQueries_SearchUsers(t *testing.T) {
 		wantUsers []*User
 	}{
 		{
-			name: "count applied from window",
+			name: "count applied from scalar subquery",
 			args: args{
 				ctx: ctx,
 				queries: &UserSearchQueries{
@@ -1417,16 +1417,20 @@ func TestQueries_SearchUsers(t *testing.T) {
 			latestStmt, latestArgs := mustLatestUserStateSQL(t, instanceID)
 			inner, outer := splitUsersPageSQL(t, pageStmt)
 
-			assert.Contains(t, inner, "COUNT(*) OVER ()")
-			assert.NotContains(t, outer, "COUNT(*) OVER ()")
+			assert.NotContains(t, pageStmt, "COUNT(*) OVER ()")
+			assert.Contains(t, pageStmt, "(SELECT COUNT(*)")
+			assert.NotContains(t, inner, "SELECT COUNT(*)")
+			assert.NotContains(t, outer, "SELECT COUNT(*)")
 			if tt.args.permissionCheckV2 {
 				assert.Contains(t, inner, "eventstore.permitted_orgs")
+				assert.GreaterOrEqual(t, strings.Count(pageStmt, "eventstore.permitted_orgs"), 2)
 			}
 			if tt.args.queries.Offset > 0 {
 				assert.Contains(t, inner, fmt.Sprintf("OFFSET %d", tt.args.queries.Offset))
 			}
 			if len(tt.args.queries.Queries) == 1 && tt.args.queries.Queries[0] == loginNameQuery {
 				assert.Contains(t, inner, "login_name_matches")
+				assert.GreaterOrEqual(t, strings.Count(pageStmt, "login_name_matches"), 2)
 			}
 
 			client, mock, err := sqlmock.New(
