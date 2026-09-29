@@ -528,6 +528,7 @@ type HumanOTPEmailCodeAddedEvent struct {
 	Code              *crypto.CryptoValue `json:"code,omitempty"`
 	Expiry            time.Duration       `json:"expiry,omitempty"`
 	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
+	GeneratorID       string              `json:"generatorId,omitempty"`
 	*AuthRequestInfo
 }
 
@@ -553,6 +554,7 @@ func NewHumanOTPEmailCodeAddedEvent(
 	code *crypto.CryptoValue,
 	expiry time.Duration,
 	info *AuthRequestInfo,
+	generatorID string,
 ) *HumanOTPEmailCodeAddedEvent {
 	return &HumanOTPEmailCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -564,6 +566,7 @@ func NewHumanOTPEmailCodeAddedEvent(
 		Expiry:            expiry,
 		AuthRequestInfo:   info,
 		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
+		GeneratorID:       generatorID,
 	}
 }
 

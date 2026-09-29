@@ -54,6 +54,8 @@ const (
 	ActionFunctionPreUserinfo
 	ActionFunctionPreAccessToken
 	ActionFunctionPreSAMLResponse
+	ActionFunctionPreOTPSMSCode
+	ActionFunctionPreOTPEmailCode
 	actionFunctionCount
 )
 
@@ -73,6 +75,10 @@ func (s ActionFunction) LocalizationKey() string {
 		return "preaccesstoken"
 	case ActionFunctionPreSAMLResponse:
 		return "presamlresponse"
+	case ActionFunctionPreOTPSMSCode:
+		return "preotpsmscode"
+	case ActionFunctionPreOTPEmailCode:
+		return "preotpemailcode"
 	case ActionFunctionUnspecified, actionFunctionCount:
 		fallthrough
 	default:
@@ -85,6 +91,8 @@ func AllActionFunctions() []string {
 		ActionFunctionPreUserinfo.LocalizationKey(),
 		ActionFunctionPreAccessToken.LocalizationKey(),
 		ActionFunctionPreSAMLResponse.LocalizationKey(),
+		ActionFunctionPreOTPSMSCode.LocalizationKey(),
+		ActionFunctionPreOTPEmailCode.LocalizationKey(),
 	}
 }
 
