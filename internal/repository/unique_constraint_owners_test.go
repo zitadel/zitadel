@@ -195,6 +195,7 @@ func TestBulkRemoveKeyedAndByOwnerAreExclusive(t *testing.T) {
 				hasKeyed = true
 			case eventstore.UniqueConstraintRemoveByOwner:
 				hasByOwner = true
+			case eventstore.UniqueConstraintAdd, eventstore.UniqueConstraintInstanceRemove:
 			}
 		}
 		assert.False(t, hasKeyed && hasByOwner, "UniqueConstraints must not mix keyed remove and RemoveByOwner")
