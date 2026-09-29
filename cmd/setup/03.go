@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 
 	"golang.org/x/text/language"
@@ -55,6 +56,9 @@ type FirstInstance struct {
 func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error {
 	if mig.Skip {
 		return nil
+	}
+	if err := mig.validatePassword(); err != nil {
+		return err
 	}
 	keyStorage, err := mig.verifyEncryptionKeys(ctx)
 	if err != nil {
@@ -201,6 +205,50 @@ func outputStdoutOrPath(path string, content string) (err error) {
 
 func (mig *FirstInstance) String() string {
 	return "03_default_instance"
+}
+
+var (
+	hasLower  = regexp.MustCompile(`[a-z]`).MatchString
+	hasUpper  = regexp.MustCompile(`[A-Z]`).MatchString
+	hasDigit  = regexp.MustCompile(`[0-9]`).MatchString
+	hasSymbol = regexp.MustCompile(`[^A-Za-z0-9]`).MatchString
+)
+
+// FirstInstancePasswordEnvVar is the environment variable name for the
+// first instance admin password, used in error messages for easy identification.
+const FirstInstancePasswordEnvVar = "ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD"
+
+// validatePassword checks the configured first-instance admin password
+// against the instance's own password complexity policy and returns a
+// human-readable error referencing the environment variable name.
+func (mig *FirstInstance) validatePassword() error {
+	password := ""
+	if mig.Org.Human != nil {
+		password = mig.Org.Human.Password
+	}
+	if password == "" {
+		return nil
+	}
+	policy := mig.instanceSetup.PasswordComplexityPolicy
+	if policy.MinLength > 0 && uint64(len(password)) < policy.MinLength {
+		return fmt.Errorf(
+			"%s: password must be at least %d characters long (got %d)",
+			FirstInstancePasswordEnvVar, policy.MinLength, len(password),
+		)
+	}
+	if policy.HasLowercase && !hasLower(password) {
+		return fmt.Errorf("%s: password must contain at least one lowercase letter", FirstInstancePasswordEnvVar)
+	}
+	if policy.HasUppercase && !hasUpper(password) {
+		return fmt.Errorf("%s: password must contain at least one uppercase letter", FirstInstancePasswordEnvVar)
+	}
+	if policy.HasNumber && !hasDigit(password) {
+		return fmt.Errorf("%s: password must contain at least one number", FirstInstancePasswordEnvVar)
+	}
+	if policy.HasSymbol && !hasSymbol(password) {
+		return fmt.Errorf("%s: password must contain at least one symbol", FirstInstancePasswordEnvVar)
+	}
+	return nil
 }
 
 func verifyKey(ctx context.Context, key *crypto.KeyConfig, storage crypto.KeyStorage) (err error) {
