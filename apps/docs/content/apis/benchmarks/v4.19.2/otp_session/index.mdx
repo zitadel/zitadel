@@ -31,11 +31,11 @@ Benchmark results of the v4.19.2 release of Zitadel.
 | Database specification                | Cloud SQL Enterprise Plus, `db-perf-optimized-N-8`<br/>vCPU: 8<br/>memory: 64 GB<br/>Data cache: enabled                                                       |
 | ZITADEL metrics during test           | CPU: p50 33%, p99 36% (peak 52%)<br/>Memory: p50 6%, peak 14%<br/>Instances: 3 median (3–4), no container startups recorded<br/>Server-side: 522 req/s, latency p50 932ms / p95 2.1s / p99 2.3s<br/>Connection pool (MaxOpenConns 6 per container): 8.8% of 12,639,126 acquires found it empty, mean wait 0.5ms; load carried by 3 of 4 containers |
 | Observed errors                       | none                                                                          |
-| Top 3 most expensive database queries | Not collected for this sweep: the Query Insights collection returned no data. Its cause has been fixed in the collection and the ranking will be added when it has been re-run. |
+| Top 3 most expensive database queries | 1: OIDC application with project checks (`projections.apps7`) (4,714 s)<br/>2: Push events (`eventstore.push`) (3,264 s)<br/>3: Projection handler lock (`pg_advisory_xact_lock`) — **lock wait** (3,188 s)<br/>Advisory-lock wait: 35% of the database time in this window.<br/>Ranked by total accumulated execution time summed across concurrent sessions (Cloud SQL Query Insights), not CPU time; it can exceed the wall-clock window. |
 | Database metrics during test          | CPU: 47% median, 50% peak<br/>Memory: 39%<br/>Connections: 23<br/>Transactions: 7,037/s<br/>IOPS: read 6, write 1765 |
 | k6 Iterations per second              | 173                                                                       |
 | k6 output                             | [output](#k6-output)                                                             |
-| flowchart outcome                     | **Not concluded.** Neither the database (47%), the containers (33%) nor the connection pool (8.8% of acquires found it empty) ran out. The query breakdown is needed to say where the time went. |
+| flowchart outcome                     | **Log potential issue and scale.** No resource ran out (database 47%, containers 33%, pool 8.8% empty) on 3 containers, and 35% of database time is advisory-lock wait. The lock contention and the few containers are the issue, not capacity. |
 
 ## Endpoint latencies
 

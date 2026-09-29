@@ -31,11 +31,11 @@ Benchmark results of the v4.19.2 release of Zitadel.
 | Database specification                | Cloud SQL Enterprise Plus, `db-perf-optimized-N-8`<br/>vCPU: 8<br/>memory: 64 GB<br/>Data cache: enabled                                                       |
 | ZITADEL metrics during test           | CPU: p50 60%, p99 63% (peak 69%)<br/>Memory: p50 4%, peak 10%<br/>Instances: 7 median (5–7), 4 container startups<br/>Server-side: 8,740 req/s, latency p50 12ms / p95 163ms / p99 177ms<br/>Connection pool (MaxOpenConns 6 per container): 82.5% of 90,293,526 acquires found it empty, mean wait 9.4ms; load carried by 7 of 9 containers |
 | Observed errors                       | none                                                                          |
-| Top 3 most expensive database queries | Not collected for this sweep: the Query Insights collection returned no data. Its cause has been fixed in the collection and the ranking will be added when it has been re-run. |
+| Top 3 most expensive database queries | 1: User with preferred login name (token and userinfo path) (2,764 s)<br/>2: Query events (`eventstore.events2`) (668 s)<br/>3: Projection state (`projections.current_states`) (423 s)<br/>Advisory-lock wait: 5% of the database time in this window.<br/>Ranked by total accumulated execution time summed across concurrent sessions (Cloud SQL Query Insights), not CPU time; it can exceed the wall-clock window. |
 | Database metrics during test          | CPU: 91% median, 91% peak<br/>Memory: 39%<br/>Connections: 47<br/>Transactions: 52,493/s<br/>IOPS: read 0, write 12 |
 | k6 Iterations per second              | 8371                                                                       |
 | k6 output                             | [output](#k6-output)                                                             |
-| flowchart outcome                     | **Scale (database).** Database CPU is the limit at 91% median, with containers at 60%. Whether more database vCPU buys throughput depends on how much of that time is lock wait, which the missing query breakdown would show. |
+| flowchart outcome                     | **Scale (database).** Database CPU is the limit at 91% median, with containers at 60%. Advisory-lock wait is only 5% of database time, so that time is work, and more database vCPU should buy throughput. |
 
 ## Endpoint latencies
 
