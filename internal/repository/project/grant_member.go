@@ -195,8 +195,9 @@ func GrantMemberRemovedEventMapper(event eventstore.Event) (eventstore.Event, er
 type GrantMemberCascadeRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserID  string `json:"userId"`
-	GrantID string `json:"grantId"`
+	UserID                string `json:"userId"`
+	GrantID               string `json:"grantId"`
+	skipUniqueConstraints bool
 }
 
 func (e *GrantMemberCascadeRemovedEvent) Payload() interface{} {
@@ -204,7 +205,14 @@ func (e *GrantMemberCascadeRemovedEvent) Payload() interface{} {
 }
 
 func (e *GrantMemberCascadeRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	if e.skipUniqueConstraints {
+		return nil
+	}
 	return []*eventstore.UniqueConstraint{NewRemoveProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID)}
+}
+
+func (e *GrantMemberCascadeRemovedEvent) SkipUniqueConstraints() {
+	e.skipUniqueConstraints = true
 }
 
 func NewProjectGrantMemberCascadeRemovedEvent(

@@ -308,12 +308,11 @@ func (c *Commands) RemoveProjectGrant(ctx context.Context, projectID, grantID, r
 	if err := c.checkPermissionDeleteProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.AggregateID, existingGrant.GrantID); err != nil {
 		return nil, err
 	}
-	events := make([]eventstore.Command, 0)
-	events = append(events, project.NewGrantRemovedEvent(ctx,
-		ProjectAggregateFromWriteModelWithCTX(ctx, &existingGrant.WriteModel),
-		existingGrant.GrantID,
-		existingGrant.GrantedOrgID,
-	))
+	removed, ownerDeleteReady, err := c.newGrantRemovedEvent(ctx, existingGrant)
+	if err != nil {
+		return nil, err
+	}
+	events := []eventstore.Command{removed}
 
 	for _, userGrantID := range cascadeUserGrantIDs {
 		event, _, err := c.removeUserGrant(ctx, userGrantID, "", true, true, nil)
@@ -322,6 +321,7 @@ func (c *Commands) RemoveProjectGrant(ctx context.Context, projectID, grantID, r
 			continue
 		}
 		if event != nil {
+			skipCascadeUniqueConstraints(ownerDeleteReady, event)
 			events = append(events, event)
 		}
 	}
@@ -351,13 +351,11 @@ func (c *Commands) DeleteProjectGrant(ctx context.Context, projectID, grantID, g
 	if err := c.checkPermissionDeleteProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.AggregateID, existingGrant.GrantID); err != nil {
 		return nil, err
 	}
-	events := make([]eventstore.Command, 0)
-	events = append(events, project.NewGrantRemovedEvent(ctx,
-		ProjectAggregateFromWriteModelWithCTX(ctx, &existingGrant.WriteModel),
-		existingGrant.GrantID,
-		existingGrant.GrantedOrgID,
-	),
-	)
+	removed, ownerDeleteReady, err := c.newGrantRemovedEvent(ctx, existingGrant)
+	if err != nil {
+		return nil, err
+	}
+	events := []eventstore.Command{removed}
 
 	for _, userGrantID := range cascadeUserGrantIDs {
 		event, _, err := c.removeUserGrant(ctx, userGrantID, "", true, true, nil)
@@ -366,6 +364,7 @@ func (c *Commands) DeleteProjectGrant(ctx context.Context, projectID, grantID, g
 			continue
 		}
 		if event != nil {
+			skipCascadeUniqueConstraints(ownerDeleteReady, event)
 			events = append(events, event)
 		}
 	}
@@ -378,6 +377,18 @@ func (c *Commands) DeleteProjectGrant(ctx context.Context, projectID, grantID, g
 		return nil, err
 	}
 	return writeModelToObjectDetails(&existingGrant.WriteModel), nil
+}
+
+func (c *Commands) newGrantRemovedEvent(ctx context.Context, existingGrant *ProjectGrantWriteModel) (eventstore.Command, bool, error) {
+	agg := ProjectAggregateFromWriteModelWithCTX(ctx, &existingGrant.WriteModel)
+	ownerDeleteReady, err := c.isUniqueConstraintOwnerDeleteReady(ctx)
+	if err != nil {
+		return nil, false, err
+	}
+	if ownerDeleteReady {
+		return project.NewGrantRemovedByOwnerEvent(ctx, agg, existingGrant.GrantID, existingGrant.GrantedOrgID), true, nil
+	}
+	return project.NewGrantRemovedEvent(ctx, agg, existingGrant.GrantID, existingGrant.GrantedOrgID), false, nil
 }
 
 func (c *Commands) projectGrantWriteModelByID(ctx context.Context, grantID, grantedOrgID, projectID, resourceOwner string) (member *ProjectGrantWriteModel, err error) {

@@ -26,6 +26,18 @@ func (c *Commands) isUniqueConstraintOwnerDeleteReady(ctx context.Context) (bool
 	return ready, nil
 }
 
+func skipCascadeUniqueConstraints(ready bool, cmds ...eventstore.Command) {
+	if !ready {
+		return
+	}
+	for _, cmd := range cmds {
+		if cmd == nil {
+			continue
+		}
+		eventstore.SkipCommandUniqueConstraints(cmd)
+	}
+}
+
 func (c *Commands) uniqueConstraintOwnersBackfillFinalized(ctx context.Context) (bool, error) {
 	var state uniqueConstraintOwnersBackfillState
 	if err := c.eventstore.FilterToQueryReducer(ctx, &state); err != nil {
