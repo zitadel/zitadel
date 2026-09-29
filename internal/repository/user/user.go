@@ -186,6 +186,7 @@ type UserRemovedEvent struct {
 	userName          string
 	externalIDPs      []*domain.UserIDPLink
 	loginMustBeDomain bool
+	removeByOwner     bool
 }
 
 func (e *UserRemovedEvent) Payload() interface{} {
@@ -193,14 +194,18 @@ func (e *UserRemovedEvent) Payload() interface{} {
 }
 
 func (e *UserRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	events := make([]*eventstore.UniqueConstraint, 0, 2+len(e.externalIDPs))
+	if e.removeByOwner {
+		return []*eventstore.UniqueConstraint{
+			eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerUser, e.Aggregate().ID),
+		}
+	}
+	events := make([]*eventstore.UniqueConstraint, 0, 1+len(e.externalIDPs))
 	if e.userName != "" {
 		events = append(events, NewRemoveUsernameUniqueConstraint(e.userName, e.Aggregate().ResourceOwner, e.loginMustBeDomain))
 	}
 	for _, idp := range e.externalIDPs {
 		events = append(events, NewRemoveUserIDPLinkUniqueConstraint(idp.IDPConfigID, idp.ExternalUserID))
 	}
-	events = append(events, eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerUser, e.Aggregate().ID))
 	return events
 }
 
@@ -221,6 +226,15 @@ func NewUserRemovedEvent(
 		externalIDPs:      externalIDPs,
 		loginMustBeDomain: userLoginMustBeDomain,
 	}
+}
+
+func NewUserRemovedByOwnerEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *UserRemovedEvent {
+	removed := NewUserRemovedEvent(ctx, aggregate, "", nil, false)
+	removed.removeByOwner = true
+	return removed
 }
 
 func UserRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
@@ -418,7 +432,7 @@ func NewDomainClaimedEvent(
 			UserDomainClaimedType,
 		),
 		UserName:              userName,
-		URLTemplate:       urlTemplate,
+		URLTemplate:           urlTemplate,
 		oldUserName:           oldUserName,
 		userLoginMustBeDomain: userLoginMustBeDomain,
 		TriggeredAtOrigin:     http.DomainContext(ctx).Origin(),
