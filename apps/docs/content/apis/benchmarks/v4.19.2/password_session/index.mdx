@@ -13,9 +13,9 @@ Benchmark results of the v4.19.2 release of Zitadel.
 | Metric                                | Value                                                                            |
 |:--------------------------------------|:---------------------------------------------------------------------------------|
 | Baseline                              | none                                                                             |
-| Purpose                               | Test current performance                                                         |
-| Test start                            | 2026-09-28 21:42:23 UTC                                                                      |
-| Test end                              | 2026-09-28 22:12:33 UTC                                                                        |
+| Purpose                               | Re-run with the password hash cost lowered to bcrypt 8, so the result measures ZITADEL rather than password hashing. At bcrypt cost 12, in the sweep on 2026-09-28: 102 iterations/s, p95 12.08 s, and 13,304 requests (3.62%) refused by Cloud Run with HTTP 429 while all 7 containers were CPU-saturated. This run also used the harness fixes from the same change, which tag the login UI requests; the requests themselves are unchanged. |
+| Test start                            | 2026-09-29 11:24:57 UTC                                                                      |
+| Test end                              | 2026-09-29 11:54:59 UTC                                                                        |
 | Test duration                         | 30min                                                                          |
 | Executed test                         | password\_session                                                                    |
 | k6 version                            | v2.1.0                                                                           |
@@ -24,18 +24,18 @@ Benchmark results of the v4.19.2 release of Zitadel.
 | ZITADEL location                      | EU1                                                                              |
 | ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 2<br/>Container max scale: 7<br/>Concurrency: 400 requests per container<br/>Scales on demand. v4.17.1 ran pinned at 7, so instance counts are not comparable. |
 | ZITADEL Version                       | v4.19.2                                                                           |
-| ZITADEL Settings                      | Eventstore autovacuum (new in v4.17): Enabled: true<br/>VacuumThreshold: 1000000<br/>AnalyzeThreshold: 1000000<br/>Tuned for the ~4,000 events/s expected during the benchmark, per the [tuning guide](https://zitadel.com/docs/self-hosting/manage/tuning#reading-events).<br/>Database pool: MaxOpenConns 6, MaxIdleConns 6, MaxConnIdleTime 1m<br/>Projections: TransactionDuration 0s, RequeueEvery 180s<br/>Shared QA environment: notification workers and other QA traffic use the same database. |
-| ZITADEL feature flags                 | Enabled: loginDefaultOrg (instance), oidcTokenExchange (system), enableBackChannelLogout (system), consoleUseV2UserApi (instance)<br/>improvedPerformance (instance): IMPROVED_PERFORMANCE_PROJECT_GRANT, IMPROVED_PERFORMANCE_PROJECT, IMPROVED_PERFORMANCE_USER_GRANT, IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED<br/>Disabled: userSchema, debugOidcParentError, oidcSingleV1SessionTermination, loginV2 (explicitly false at instance), permissionCheckV2<br/>Captured from the instance **before** the run (2026-09-28 16:53:59 UTC; sequence 5, last changed 2026-09-28 16:37:36 UTC).                                                                                  |
+| ZITADEL Settings                      | Eventstore autovacuum (new in v4.17): Enabled: true<br/>VacuumThreshold: 1000000<br/>AnalyzeThreshold: 1000000<br/>Tuned for the ~4,000 events/s expected during the benchmark, per the [tuning guide](https://zitadel.com/docs/self-hosting/manage/tuning#reading-events).<br/>Database pool: MaxOpenConns 6, MaxIdleConns 6, MaxConnIdleTime 1m<br/>Projections: TransactionDuration 0s, RequeueEvery 180s<br/>Shared QA environment: notification workers and other QA traffic use the same database.<br/>Password hasher: bcrypt, cost 8 (`Limits.Bcrypt.MinCost` 8); the sweep ran cost 12 |
+| ZITADEL feature flags                 | Enabled: loginDefaultOrg (instance), oidcTokenExchange (system), enableBackChannelLogout (system), consoleUseV2UserApi (instance)<br/>improvedPerformance (instance): IMPROVED_PERFORMANCE_PROJECT_GRANT, IMPROVED_PERFORMANCE_PROJECT, IMPROVED_PERFORMANCE_USER_GRANT, IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED<br/>Disabled: userSchema, debugOidcParentError, oidcSingleV1SessionTermination, loginV2 (explicitly false at instance), permissionCheckV2<br/>Captured from the instance **before** the run (2026-09-29 10:47:07 UTC; sequence 5, last changed 2026-09-28 16:37:36 UTC).                                                                                  |
 | Database                              | type: psql<br />version: 17 (Cloud SQL POSTGRES_17)<br/>`auto_explain` on: log_analyze, log_timing, log_nested_statements, log_verbose, log_min_duration 10 ms. This adds overhead to every statement slower than 10 ms; production does not run it.                                                   |
 | Database location                     | EU1                                                                              |
 | Database specification                | Cloud SQL Enterprise Plus, `db-perf-optimized-N-8`<br/>vCPU: 8<br/>memory: 64 GB<br/>Data cache: enabled                                                       |
-| ZITADEL metrics during test           | CPU: p50 63%, p99 80% (peak 92%)<br/>Memory: p50 5%, peak 12%<br/>Instances: 7 median (3–7), 3 container startups<br/>Server-side: 205 req/s, latency p50 229ms / p95 3.0s / p99 3.2s<br/>Connection pool (MaxOpenConns 6 per container): 1.8% of 5,108,372 acquires found it empty, mean wait 1.2ms; load carried by 7 of 7 containers |
-| Observed errors                       | 13,304 of 366,516 requests failed (3.62%): none of the 13,304 individually logged (see k6 output). 13,304 of 365,919 checks failed (3.63%): add Session status ok (6982 failed), set Session status ok (6322 failed)<br/>All 13,304 are HTTP 429 with the plain-text body `Rate exceeded.`. ZITADEL returns its errors as JSON, and Cloud Run's own request metrics count 13,389 HTTP 429s for the service across the sweep, which matches this run plus the 76 at the start of `user_info`: the platform refused them. While all 7 containers ran at 80–91% CPU (p99), Cloud Run admitted 6–8 requests at a time per container and held up to 677 more pending in front of them. They started 16 minutes in (21:58 UTC), peaked at 1,913 per minute at 22:04 and declined to 136 in the last minute, under a constant 600 VUs. Counted from the raw k6 output.                                                                          |
-| Top 3 most expensive database queries | 1: Projection handler lock (`pg_advisory_xact_lock`) — **lock wait** (9,153 s)<br/>2: Eventstore read barrier on `events2` (`pg_advisory_lock` / `unlock`) — **lock wait** (2,033 s)<br/>3: Shared advisory lock on `events2`, taken by every push — **lock wait** (1,093 s)<br/>Advisory-lock wait: 78% of the database time in this window.<br/>Ranked by total accumulated execution time summed across concurrent sessions (Cloud SQL Query Insights), not CPU time; it can exceed the wall-clock window. |
-| Database metrics during test          | CPU: 25% median, 28% peak<br/>Memory: 39%<br/>Connections: 46<br/>Transactions: 2,949/s<br/>IOPS: read 5, write 972 |
-| k6 Iterations per second              | 102                                                                       |
+| ZITADEL metrics during test           | CPU: p50 44%, p99 47% (peak 58%)<br/>Memory: p50 6%, peak 10%<br/>Instances: 3 median (2–4), 1 container startup<br/>Server-side: 372 req/s, latency p50 982ms / p95 2.3s / p99 2.5s<br/>Connection pool (MaxOpenConns 6 per container): 2.2% of 9,359,272 acquires found it empty, mean wait 0.1ms; load carried by 3 of 5 containers |
+| Observed errors                       | none                                                                          |
+| Top 3 most expensive database queries | 1: Projection handler lock (`pg_advisory_xact_lock`) — **lock wait** (3,364 s)<br/>2: Eventstore read barrier on `events2` (`pg_advisory_lock` / `unlock`) — **lock wait** (3,115 s)<br/>3: Push events (`eventstore.push`) (843 s)<br/>Advisory-lock wait: 60% of the database time in this window.<br/>Ranked by total accumulated execution time summed across concurrent sessions (Cloud SQL Query Insights), not CPU time; it can exceed the wall-clock window. |
+| Database metrics during test          | CPU: 35% median, 36% peak<br/>Memory: 39%<br/>Connections: 23<br/>Transactions: 5,232/s<br/>IOPS: read 12, write 1648 |
+| k6 Iterations per second              | 184                                                                       |
 | k6 output                             | [output](#k6-output)                                                             |
-| flowchart outcome                     | **Scale (containers).** Container CPU is the limit (p50 63%, database 25%), spent verifying passwords: every iteration checks one password at bcrypt cost 12, and 42 vCPU verify about 105 per second. Cloud Run itself refused 13,304 requests (HTTP 429) while all 7 containers were saturated; see Observed errors. This measures the configured hash cost more than ZITADEL; a run at a lower cost is planned. |
+| flowchart outcome                     | **Log potential issue.** No resource ran out (database 35%, containers 44%, pool 2.2% empty), on 3 containers, and 60% of database time is advisory-lock wait, led by the projection handler lock. The lock contention is the limit, not capacity. |
 
 ## Endpoint latencies
 
@@ -45,9 +45,9 @@ Benchmark results of the v4.19.2 release of Zitadel.
 ```bash
   █ TOTAL RESULTS 
 
-    checks_total.......: 365919 199.948922/s
-    checks_succeeded...: 96.36% 352615 out of 365919
-    checks_failed......: 3.63%  13304 out of 365919
+    checks_total.......: 668481  369.40571/s
+    checks_succeeded...: 100.00% 668481 out of 668481
+    checks_failed......: 0.00%   0 out of 668481
 
     ✓ user defined
     ✓ authorize status ok
@@ -63,40 +63,38 @@ Benchmark results of the v4.19.2 release of Zitadel.
     ✓ org created
     ✓ create user is status ok
     ✓ set email otp status ok
-    ✗ add Session status ok
-      ↳  96% — ✓ 178862 / ✗ 6982
-    ✗ set Session status ok
-      ↳  96% — ✓ 172540 / ✗ 6322
+    ✓ add Session status ok
+    ✓ set Session status ok
     ✓ org removed
 
     CUSTOM
-    login_ui_enter_login_name_duration...: min=76.56ms avg=76.56ms max=76.56ms p(50)=76.56ms  p(95)=76.56ms p(99)=76.56ms
-    login_ui_enter_password_duration.....: min=10.48ms avg=10.48ms max=10.48ms p(50)=10.48ms  p(95)=10.48ms p(99)=10.48ms
-    login_ui_init_login_duration.........: min=41.08ms avg=41.08ms max=41.08ms p(50)=41.08ms  p(95)=41.08ms p(99)=41.08ms
-    login_ui_token_duration..............: min=60.26ms avg=60.26ms max=60.26ms p(50)=60.26ms  p(95)=60.26ms p(99)=60.26ms
-    org_create_org_duration..............: min=32.43ms avg=32.43ms max=32.43ms p(50)=32.43ms  p(95)=32.43ms p(99)=32.43ms
-    password_session_duration............: min=278ms   avg=6.14s   max=23.33s  p(50)=4.77s    p(95)=16.27s  p(99)=18.54s 
-    session_add_session_duration.........: min=6.17ms  avg=4.28s   max=18.97s  p(50)=2.03s    p(95)=15.15s  p(99)=16.98s 
-    session_set_session_duration.........: min=6.32ms  avg=1.59s   max=12.07s  p(50)=377.34ms p(95)=9.27s   p(99)=11.25s 
-    set_human_email_otp_duration.........: min=16.22ms avg=23.85ms max=46.52ms p(50)=20.82ms  p(95)=40.63ms p(99)=44.89ms
-    user_create_human_duration...........: min=467.4ms avg=9.27s   max=14.05s  p(50)=10.25s   p(95)=13.36s  p(99)=13.75s 
+    login_ui_enter_login_name_duration...: min=57.63ms avg=57.63ms  max=57.63ms  p(50)=57.63ms  p(95)=57.63ms  p(99)=57.63ms
+    login_ui_enter_password_duration.....: min=10.08ms avg=10.08ms  max=10.08ms  p(50)=10.08ms  p(95)=10.08ms  p(99)=10.08ms
+    login_ui_init_login_duration.........: min=31.94ms avg=31.94ms  max=31.94ms  p(50)=31.94ms  p(95)=31.94ms  p(99)=31.94ms
+    login_ui_token_duration..............: min=68.9ms  avg=68.9ms   max=68.9ms   p(50)=68.9ms   p(95)=68.9ms   p(99)=68.9ms 
+    org_create_org_duration..............: min=33.31ms avg=33.31ms  max=33.31ms  p(50)=33.31ms  p(95)=33.31ms  p(99)=33.31ms
+    password_session_duration............: min=63ms    avg=3.23s    max=9.55s    p(50)=3.15s    p(95)=6.6s     p(99)=7.12s  
+    session_add_session_duration.........: min=22.52ms avg=2.83s    max=8.47s    p(50)=2.95s    p(95)=5.67s    p(99)=5.96s  
+    session_set_session_duration.........: min=33.98ms avg=398.27ms max=4.18s    p(50)=43.32ms  p(95)=1.35s    p(99)=1.49s  
+    set_human_email_otp_duration.........: min=19.98ms avg=113.16ms max=196.36ms p(50)=129.58ms p(95)=181.29ms p(99)=192.4ms
+    user_create_human_duration...........: min=73.55ms avg=870.24ms max=1.39s    p(50)=954.02ms p(95)=1.31s    p(99)=1.32s  
 
     HTTP
-    http_req_duration....................: min=6.17ms  avg=2.97s   max=18.97s  p(50)=618.62ms p(95)=12.08s  p(99)=16.34s 
-      { expected_response:true }.........: min=10.26ms avg=3.07s   max=18.97s  p(50)=708.55ms p(95)=12.37s  p(99)=16.38s 
-    http_req_failed......................: 3.62%  13304 out of 366516
-    http_reqs............................: 366516 200.275141/s
+    http_req_duration....................: min=10.08ms avg=1.61s    max=8.47s    p(50)=780.2ms  p(95)=5.52s    p(99)=5.83s  
+      { expected_response:true }.........: min=10.08ms avg=1.61s    max=8.47s    p(50)=780.2ms  p(95)=5.52s    p(99)=5.83s  
+    http_req_failed......................: 0.00%  0 out of 669078
+    http_reqs............................: 669078 369.735615/s
 
     EXECUTION
-    iteration_duration...................: min=7.09ms  avg=5.82s   max=23.33s  p(50)=4.26s    p(95)=16.14s  p(99)=18.48s 
-    iterations...........................: 185844 101.550637/s
-    vus..................................: 15     min=0               max=600
-    vus_max..............................: 600    min=600             max=600
+    iteration_duration...................: min=63.06ms avg=3.23s    max=9.55s    p(50)=3.15s    p(95)=6.6s     p(99)=7.12s  
+    iterations...........................: 333634 184.3677/s
+    vus..................................: 41     min=0           max=600
+    vus_max..............................: 600    min=600         max=600
 
     NETWORK
-    data_received........................: 271 MB 148 kB/s
-    data_sent............................: 123 MB 67 kB/s
+    data_received........................: 504 MB 279 kB/s
+    data_sent............................: 225 MB 125 kB/s
 
-running (30m30.1s), 000/600 VUs, 185844 complete and 0 interrupted iterations
+running (30m09.6s), 000/600 VUs, 333634 complete and 0 interrupted iterations
 default ✓ [ 100% ] 600 VUs  30m0s
 ```
