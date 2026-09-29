@@ -624,27 +624,7 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, p
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	// Count and page are separate pooled queries. Postgres does not reuse
-	// COUNT(*) work across statements, even on one connection; buffer cache
-	// is cluster-wide. A concurrent write between them can make Count and
-	// the page disagree. A shared read-only transaction is not used here.
-	plan := queries.planUserSearch(ctx, permissionCheckV2)
-
-	countQuery, countScan := queries.usersCountQuery(ctx, plan)
-	countStmt, countArgs, err := countQuery.ToSql()
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-Cnt01", "Errors.Query.SQLStatement")
-	}
-	var count uint64
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
-		count, err = countScan(rows)
-		return err
-	}, countStmt, countArgs...)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-Cnt02", "Errors.Internal")
-	}
-
-	query, scan := queries.usersPageQuery(ctx, plan)
+	query, scan := queries.prepareUsersQuery(ctx, permissionCheckV2)
 	stmt, args, err := query.ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatement")
@@ -657,7 +637,6 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, p
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-AG4gs", "Errors.Internal")
 	}
-	users.Count = count
 	users.State, err = q.latestState(ctx, userTable)
 	return users, err
 }
@@ -918,41 +897,22 @@ func searchQueryHasMetadataFilter(qry SearchQuery) bool {
 	}
 }
 
-func searchQueriesUseTable(queries []SearchQuery, tableName string) bool {
+func searchQueriesUse(queries []SearchQuery, match func(Column) bool) bool {
 	return slices.ContainsFunc(queries, func(qry SearchQuery) bool {
-		return searchQueryUsesTable(qry, tableName)
+		return searchQueryUses(qry, match)
 	})
 }
 
-func searchQueryUsesTable(qry SearchQuery, tableName string) bool {
+func searchQueryUses(qry SearchQuery, match func(Column) bool) bool {
 	switch v := qry.(type) {
 	case *OrQuery:
-		return searchQueriesUseTable(v.queries, tableName)
+		return searchQueriesUse(v.queries, match)
 	case *AndQuery:
-		return searchQueriesUseTable(v.queries, tableName)
+		return searchQueriesUse(v.queries, match)
 	case *NotQuery:
-		return searchQueryUsesTable(v.query, tableName)
+		return searchQueryUses(v.query, match)
 	default:
-		return qry.Col().table.name == tableName
-	}
-}
-
-func searchQueriesUseTableAlias(queries []SearchQuery, alias string) bool {
-	return slices.ContainsFunc(queries, func(qry SearchQuery) bool {
-		return searchQueryUsesTableAlias(qry, alias)
-	})
-}
-
-func searchQueryUsesTableAlias(qry SearchQuery, alias string) bool {
-	switch v := qry.(type) {
-	case *OrQuery:
-		return searchQueriesUseTableAlias(v.queries, alias)
-	case *AndQuery:
-		return searchQueriesUseTableAlias(v.queries, alias)
-	case *NotQuery:
-		return searchQueryUsesTableAlias(v.query, alias)
-	default:
-		return qry.Col().table.alias == alias
+		return match(qry.Col())
 	}
 }
 
@@ -1404,11 +1364,17 @@ func (q *UserSearchQueries) planUserSearch(ctx context.Context, permissionCheckV
 		loginEqualitySeeks:     seeks,
 		loginEqualityExtracted: extracted,
 		needsMetadataJoin:      q.hasMetadataFilter(),
-		needsHumanJoin:         searchQueriesUseTable(filters, humanTable.name),
-		needsMachineJoin:       searchQueriesUseTable(filters, machineTable.name),
-		needsLoginNamesJoin:    searchQueriesUseTableAlias(filters, userLoginNamesTable.alias),
-		sortTableName:          q.SortingColumn.table.name,
-		permissionCheckV2:      permissionCheckV2,
+		needsHumanJoin: searchQueriesUse(filters, func(col Column) bool {
+			return col.table.name == humanTable.name
+		}),
+		needsMachineJoin: searchQueriesUse(filters, func(col Column) bool {
+			return col.table.name == machineTable.name
+		}),
+		needsLoginNamesJoin: searchQueriesUse(filters, func(col Column) bool {
+			return col.table.alias == userLoginNamesTable.alias
+		}),
+		sortTableName:     q.SortingColumn.table.name,
+		permissionCheckV2: permissionCheckV2,
 	}
 }
 
@@ -1443,10 +1409,6 @@ func (p userSearchPlan) applyConstraints(ctx context.Context, query sq.SelectBui
 }
 
 func (p userSearchPlan) applyPagePaging(query sq.SelectBuilder, req *UserSearchQueries) sq.SelectBuilder {
-	if p.needsMetadataJoin {
-		query = query.Distinct()
-	}
-	query = req.consumeSorting(query)
 	if req.Offset > 0 {
 		query = query.Offset(req.Offset)
 	}
@@ -1456,9 +1418,20 @@ func (p userSearchPlan) applyPagePaging(query sq.SelectBuilder, req *UserSearchQ
 	return query
 }
 
+func (q *UserSearchQueries) pageOrderClause(sortExpr, idExpr string) string {
+	dir := ""
+	if !q.Asc {
+		dir = " DESC"
+	}
+	clause := sortExpr + dir
+	if q.SortingColumn.identifier() != UserIDCol.identifier() {
+		clause += ", " + idExpr + dir
+	}
+	return clause
+}
+
 // prepareUsersCountQuery counts matching users without expanding login_names3
-// or selecting display columns. COUNT(*) OVER () is avoided so PostgreSQL can
-// aggregate from the users index instead of materializing every joined row.
+// or selecting display columns. Used by CountUsers (SCIM count=0).
 func (q *UserSearchQueries) prepareUsersCountQuery(ctx context.Context, permissionCheckV2 bool) (sq.SelectBuilder, func(*sql.Rows) (uint64, error)) {
 	return q.usersCountQuery(ctx, q.planUserSearch(ctx, permissionCheckV2))
 }
@@ -1475,11 +1448,12 @@ func (q *UserSearchQueries) usersCountQuery(ctx context.Context, plan userSearch
 }
 
 // prepareUsersQuery creates the select query for searching users and returns a matching scan function.
-// Matching IDs are selected first with filters, permissions and LIMIT/OFFSET.
+// Matching IDs are selected first with filters, permissions, COUNT(*) OVER () and LIMIT/OFFSET.
 // Humans, machines and login_names are joined afterwards so the login_names3 view
 // is expanded only for the returned page, not for every matching user.
 //
 // Metadata JOIN and DISTINCT are only applied when a metadata filter is present.
+// DISTINCT is nested inside the window so COUNT(*) OVER () counts unique IDs.
 // Login-equality filters (username, email, phone, login name EQUALS /
 // EQUALS_IGNORE_CASE) become an indexed UNION of ID seeks.
 func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionCheckV2 bool) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
@@ -1487,16 +1461,29 @@ func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionChe
 }
 
 func (q *UserSearchQueries) usersPageQuery(ctx context.Context, plan userSearchPlan) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
-	pageQuery := plan.applyConstraints(ctx, sq.Select(
+	idCols := []string{
 		UserIDCol.identifier(),
-		q.SortingColumn.orderBy()+" AS sort_col",
-	), true)
-	pageQuery = plan.applyPagePaging(pageQuery, q)
-
-	orderClause := "page.sort_col"
-	if !q.Asc {
-		orderClause += " DESC"
+		q.SortingColumn.orderBy() + " AS sort_col",
 	}
+
+	var pageQuery sq.SelectBuilder
+	if plan.needsMetadataJoin {
+		distinctIDs := plan.applyConstraints(ctx, sq.Select(idCols...), true).Distinct()
+		pageQuery = sq.Select(
+			"id",
+			"sort_col",
+			countColumn.identifier()+" AS total",
+		).FromSelect(distinctIDs, "ids").
+			OrderByClause(q.pageOrderClause("sort_col", "id"))
+	} else {
+		pageQuery = plan.applyConstraints(ctx, sq.Select(
+			idCols[0],
+			idCols[1],
+			countColumn.identifier()+" AS total",
+		), true).
+			OrderByClause(q.pageOrderClause("sort_col", UserIDCol.identifier()))
+	}
+	pageQuery = plan.applyPagePaging(pageQuery, q)
 
 	query := sq.Select(
 		UserIDCol.identifier(),
@@ -1529,13 +1516,14 @@ func (q *UserSearchQueries) usersPageQuery(ctx context.Context, plan userSearchP
 		MachineDescriptionCol.identifier(),
 		MachineSecretCol.identifier(),
 		MachineAccessTokenTypeCol.identifier(),
-		"page.sort_col").
+		"page.sort_col",
+		"page.total").
 		FromSelect(pageQuery, "page").
 		Join(userTable.identifier()+" ON "+UserIDCol.identifier()+" = page.id AND "+UserInstanceIDCol.identifier()+" = ?", plan.instanceID).
 		LeftJoin(join(HumanUserIDCol, UserIDCol)).
 		LeftJoin(join(MachineUserIDCol, UserIDCol)).
 		JoinClause(joinLoginNames).
-		OrderByClause(orderClause).
+		OrderByClause(q.pageOrderClause("page.sort_col", "page.id")).
 		PlaceholderFormat(sq.Dollar)
 
 	return query, scanUsersPage
@@ -1543,6 +1531,7 @@ func (q *UserSearchQueries) usersPageQuery(ctx context.Context, plan userSearchP
 
 func scanUsersPage(rows *sql.Rows) (*Users, error) {
 	users := make([]*User, 0)
+	var count uint64
 	for rows.Next() {
 		u := new(User)
 		loginNames := database.TextArray[string]{}
@@ -1586,6 +1575,7 @@ func scanUsersPage(rows *sql.Rows) (*Users, error) {
 			&machine.accessTokenType,
 
 			&orderByValue,
+			&count,
 		)
 		if err != nil {
 			return nil, err
@@ -1630,7 +1620,8 @@ func scanUsersPage(rows *sql.Rows) (*Users, error) {
 	}
 
 	return &Users{
-		Users: users,
+		SearchResponse: SearchResponse{Count: count},
+		Users:          users,
 	}, nil
 }
 

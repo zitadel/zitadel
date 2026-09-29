@@ -277,16 +277,17 @@ var (
 		` projections.users14_machines.description,` +
 		` projections.users14_machines.secret,` +
 		` projections.users14_machines.access_token_type,` +
-		` page.sort_col` +
-		` FROM (SELECT projections.users14.id, projections.users14.id AS sort_col FROM projections.users14 WHERE projections.users14.instance_id = $1 ORDER BY projections.users14.id DESC) AS page` +
+		` page.sort_col,` +
+		` page.total` +
+		` FROM (SELECT projections.users14.id, projections.users14.id AS sort_col, COUNT(*) OVER () AS total FROM projections.users14 WHERE projections.users14.instance_id = $1 ORDER BY sort_col DESC) AS page` +
 		` JOIN projections.users14 ON projections.users14.id = page.id AND projections.users14.instance_id = $2` +
 		` LEFT JOIN projections.users14_humans ON projections.users14.id = projections.users14_humans.user_id AND projections.users14.instance_id = projections.users14_humans.instance_id` +
 		` LEFT JOIN projections.users14_machines ON projections.users14.id = projections.users14_machines.user_id AND projections.users14.instance_id = projections.users14_machines.instance_id` +
 		` LEFT JOIN LATERAL (SELECT ARRAY_AGG(ln.login_name ORDER BY ln.login_name) AS login_names, MAX(CASE WHEN ln.is_primary THEN ln.login_name ELSE NULL END) AS preferred_login_name FROM projections.login_names3 AS ln WHERE ln.user_id = projections.users14.id AND ln.instance_id = projections.users14.instance_id) AS login_names ON TRUE` +
 		` ORDER BY page.sort_col DESC`
 	usersQueryWithLimitOffset = strings.Replace(usersQuery,
-		`ORDER BY projections.users14.id DESC) AS page`,
-		`ORDER BY projections.users14.id DESC LIMIT 2 OFFSET 1) AS page`,
+		`ORDER BY sort_col DESC) AS page`,
+		`ORDER BY sort_col DESC LIMIT 2 OFFSET 1) AS page`,
 		1,
 	)
 	usersCols = []string{
@@ -323,6 +324,7 @@ var (
 		"secret",
 		"access_token_type",
 		"sort_col",
+		"count",
 	}
 	countUsersQuery = "SELECT COUNT(*) FROM projections.users14 WHERE projections.users14.instance_id = $1"
 	countUsersCols  = []string{"count"}
@@ -901,6 +903,7 @@ func Test_UserPrepares(t *testing.T) {
 				),
 			},
 			object: &Users{
+				SearchResponse: SearchResponse{Count: 1},
 				Users: []*User{
 					{
 						ID:                 "id",
@@ -983,6 +986,7 @@ func Test_UserPrepares(t *testing.T) {
 				),
 			},
 			object: &Users{
+				SearchResponse: SearchResponse{Count: 1},
 				Users: []*User{
 					{
 						ID:                 "id",
@@ -1105,6 +1109,7 @@ func Test_UserPrepares(t *testing.T) {
 				),
 			},
 			object: &Users{
+				SearchResponse: SearchResponse{Count: 2},
 				Users: []*User{
 					{
 						ID:                 "id",
@@ -1350,38 +1355,35 @@ func TestQueries_SearchUsers(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		count     uint64
 		pageRows  [][]driver.Value
 		wantCount uint64
 		wantUsers []*User
 	}{
 		{
-			name: "count applied to page",
+			name: "count applied from window",
 			args: args{
 				ctx: ctx,
 				queries: &UserSearchQueries{
 					SearchRequest: SearchRequest{Limit: 20},
 				},
 			},
-			count:     42,
-			pageRows:  [][]driver.Value{humanUsersQueryRow()},
+			pageRows:  [][]driver.Value{humanUsersQueryRow(42)},
 			wantCount: 42,
 			wantUsers: []*User{expectedHumanUser()},
 		},
 		{
-			name: "empty page with non-zero count",
+			name: "empty page has zero count",
 			args: args{
 				ctx: ctx,
 				queries: &UserSearchQueries{
 					SearchRequest: SearchRequest{Limit: 20, Offset: 17500},
 				},
 			},
-			count:     100,
-			wantCount: 100,
+			wantCount: 0,
 			wantUsers: []*User{},
 		},
 		{
-			name: "permission clause on count and page",
+			name: "permission clause on page subquery",
 			args: args{
 				ctx: permCtx,
 				queries: &UserSearchQueries{
@@ -1390,13 +1392,12 @@ func TestQueries_SearchUsers(t *testing.T) {
 				},
 				permissionCheckV2: true,
 			},
-			count:     3,
-			pageRows:  [][]driver.Value{humanUsersQueryRow()},
+			pageRows:  [][]driver.Value{humanUsersQueryRow(3)},
 			wantCount: 3,
 			wantUsers: []*User{expectedHumanUser()},
 		},
 		{
-			name: "login-name seek on count and inner page",
+			name: "login-name seek on inner page",
 			args: args{
 				ctx: ctx,
 				queries: &UserSearchQueries{
@@ -1404,8 +1405,7 @@ func TestQueries_SearchUsers(t *testing.T) {
 					Queries:       []SearchQuery{loginNameQuery},
 				},
 			},
-			count:     1,
-			pageRows:  [][]driver.Value{humanUsersQueryRow()},
+			pageRows:  [][]driver.Value{humanUsersQueryRow(1)},
 			wantCount: 1,
 			wantUsers: []*User{expectedHumanUser()},
 		},
@@ -1413,20 +1413,20 @@ func TestQueries_SearchUsers(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			countStmt, countArgs := mustUsersCountSQL(t, tt.args.ctx, cloneUserSearchQueries(tt.args.queries), tt.args.permissionCheckV2)
 			pageStmt, pageArgs := mustUsersPageSQL(t, tt.args.ctx, cloneUserSearchQueries(tt.args.queries), tt.args.permissionCheckV2)
 			latestStmt, latestArgs := mustLatestUserStateSQL(t, instanceID)
+			inner, outer := splitUsersPageSQL(t, pageStmt)
 
+			assert.Contains(t, inner, "COUNT(*) OVER ()")
+			assert.NotContains(t, outer, "COUNT(*) OVER ()")
 			if tt.args.permissionCheckV2 {
-				assert.Contains(t, countStmt, "eventstore.permitted_orgs")
-				assert.Contains(t, usersPageSubquery(t, pageStmt), "eventstore.permitted_orgs")
+				assert.Contains(t, inner, "eventstore.permitted_orgs")
 			}
 			if tt.args.queries.Offset > 0 {
-				assert.Contains(t, usersPageSubquery(t, pageStmt), fmt.Sprintf("OFFSET %d", tt.args.queries.Offset))
+				assert.Contains(t, inner, fmt.Sprintf("OFFSET %d", tt.args.queries.Offset))
 			}
 			if len(tt.args.queries.Queries) == 1 && tt.args.queries.Queries[0] == loginNameQuery {
-				assert.Contains(t, countStmt, "login_name_matches")
-				assert.Contains(t, usersPageSubquery(t, pageStmt), "login_name_matches")
+				assert.Contains(t, inner, "login_name_matches")
 			}
 
 			client, mock, err := sqlmock.New(
@@ -1435,9 +1435,6 @@ func TestQueries_SearchUsers(t *testing.T) {
 			)
 			require.NoError(t, err)
 			defer client.Close()
-
-			countRows := sqlmock.NewRows(countUsersCols).AddRow(tt.count)
-			mock.ExpectQuery(countStmt).WithArgs(toDriverValues(countArgs)...).WillReturnRows(countRows)
 
 			pageRows := sqlmock.NewRows(usersCols)
 			for _, row := range tt.pageRows {
@@ -1533,7 +1530,7 @@ func toDriverValues(args []any) []driver.Value {
 	return vals
 }
 
-func humanUsersQueryRow() []driver.Value {
+func humanUsersQueryRow(count uint64) []driver.Value {
 	return []driver.Value{
 		"id",
 		testNow,
@@ -1566,6 +1563,7 @@ func humanUsersQueryRow() []driver.Value {
 		nil,
 		nil,
 		"id",
+		count,
 	}
 }
 
