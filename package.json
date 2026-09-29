@@ -3,12 +3,10 @@
   "private": true,
   "name": "@zitadel/zitadel",
   "scripts": {
-    "changeset": "changeset",
     "clean:all": "pnpm run clean && rm -rf .nx node_modules"
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.69.0",
-    "@changesets/cli": "^2.31.0",
     "nx": "22.7.7",
     "sass": "^1.99.0",
     "shiki": "^3.23.0",
