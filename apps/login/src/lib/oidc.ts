@@ -1,6 +1,7 @@
 import { isSafeRedirectUri } from "@/lib/client-utils";
 import { Cookie } from "@/lib/cookies";
 import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
+import { invalidSessionTokenRedirect, isStaleSessionToken } from "@/lib/invalid-session-token";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { createCallback, getLoginSettings, ServiceConfig } from "@/lib/zitadel";
 import { Code, create } from "@zitadel/client";
@@ -76,6 +77,17 @@ export async function loginWithOIDCAndSession({
       } catch (error: unknown) {
         // handle already handled gracefully as these could come up if old emails with requestId are used (reset password, register emails etc.)
         console.error(error);
+        if (
+          isClassifiedError(error) &&
+          isStaleSessionToken(error.code, `${error.rawMessage ?? ""} ${error.message ?? ""}`)
+        ) {
+          return invalidSessionTokenRedirect({
+            loginName: selectedSession.factors?.user?.loginName,
+            organization: selectedSession.factors?.user?.organizationId,
+            requestId: `oidc_${authRequest}`,
+          });
+        }
+
         if (isClassifiedError(error) && error.code === Code.FailedPrecondition) {
           const loginSettings = await getLoginSettings({
             serviceConfig,
