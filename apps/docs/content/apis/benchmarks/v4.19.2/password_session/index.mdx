@@ -35,7 +35,7 @@ Benchmark results of the v4.19.2 release of Zitadel.
 | Database metrics during test          | CPU: 35% median, 36% peak<br/>Memory: 39%<br/>Connections: 23<br/>Transactions: 5,232/s<br/>IOPS: read 12, write 1648 |
 | k6 Iterations per second              | 184                                                                       |
 | k6 output                             | [output](#k6-output)                                                             |
-| flowchart outcome                     | **Log potential issue.** No resource ran out (database 35%, containers 44%, pool 2.2% empty), on 3 containers, and 60% of database time is advisory-lock wait, led by the projection handler lock. The lock contention is the limit, not capacity. |
+| flowchart outcome                     | **Log potential issue.** No resource ran out (database 35%, containers 44%, pool 2.2% empty), on 3 containers, and 60% of database time is advisory-lock wait, led by the projection handler lock. The lock contention is the limit, not capacity: every session creation triggers the user and login-name projections, and those triggers wait for each other. Follow-up: [#12835](https://github.com/zitadel/zitadel/issues/12835). |
 
 ## Endpoint latencies
 
