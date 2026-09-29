@@ -29,13 +29,13 @@ Benchmark results of the v4.19.2 release of Zitadel.
 | Database                              | type: psql<br />version: 17 (Cloud SQL POSTGRES_17)<br/>`auto_explain` on: log_analyze, log_timing, log_nested_statements, log_verbose, log_min_duration 10 ms. This adds overhead to every statement slower than 10 ms; production does not run it.                                                   |
 | Database location                     | EU1                                                                              |
 | Database specification                | Cloud SQL Enterprise Plus, `db-perf-optimized-N-8`<br/>vCPU: 8<br/>memory: 64 GB<br/>Data cache: enabled                                                       |
-| ZITADEL metrics during test           |                                                                                  |
+| ZITADEL metrics during test           | CPU: p50 54%, p99 61% (peak 71%)<br/>Memory: p50 5%, peak 9%<br/>Instances: 5 median (5–7), 1 container startup<br/>Server-side: 2,459 req/s, latency p50 13ms / p95 320ms / p99 423ms<br/>Connection pool (MaxOpenConns 6 per container): 61.2% of 33,630,632 acquires found it empty, mean wait 13.9ms; load carried by 5 of 7 containers |
 | Observed errors                       | none                                                                          |
-| Top 3 most expensive database queries |                                                                                  |
-| Database metrics during test          |                                                                                  |
+| Top 3 most expensive database queries | Not collected for this sweep: the Query Insights collection returned no data. Its cause has been fixed in the collection and the ranking will be added when it has been re-run. |
+| Database metrics during test          | CPU: 76% median, 79% peak<br/>Memory: 39%<br/>Connections: 35<br/>Transactions: 19,724/s<br/>IOPS: read 0, write 2752 |
 | k6 Iterations per second              | 2334                                                                       |
 | k6 output                             | [output](#k6-output)                                                             |
-| flowchart outcome                     |                                                                                  |
+| flowchart outcome                     | **Log potential issue and scale.** Neither resource ran out (database 76%, containers 54%), and the service ran on 5 containers: 61% of connection-pool acquires found the pool (6 per container) empty. The autoscaler follows CPU, so it did not add the capacity the pool was short of. |
 
 ## Endpoint latencies
 

@@ -29,13 +29,13 @@ Benchmark results of the v4.19.2 release of Zitadel.
 | Database                              | type: psql<br />version: 17 (Cloud SQL POSTGRES_17)<br/>`auto_explain` on: log_analyze, log_timing, log_nested_statements, log_verbose, log_min_duration 10 ms. This adds overhead to every statement slower than 10 ms; production does not run it.                                                   |
 | Database location                     | EU1                                                                              |
 | Database specification                | Cloud SQL Enterprise Plus, `db-perf-optimized-N-8`<br/>vCPU: 8<br/>memory: 64 GB<br/>Data cache: enabled                                                       |
-| ZITADEL metrics during test           |                                                                                  |
+| ZITADEL metrics during test           | CPU: p50 60%, p99 71% (peak 74%)<br/>Memory: p50 4%, peak 14%<br/>Instances: 7 median (6–7), 35 container startups<br/>Server-side: 9,391 req/s, latency p50 11ms / p95 136ms / p99 156ms<br/>Connection pool (MaxOpenConns 6 per container): 81.1% of 80,085,120 acquires found it empty, mean wait 10.0ms; load carried by 7 containers. 34 containers started between 22:17 and 22:22 UTC and most lived about a minute before the count settled at 7; the cause is not established |
 | Observed errors                       | 83 of 16,188,654 requests failed (0.00%): 2x connection reset, 81x not individually logged (see k6 output). 83 of 16,188,659 checks failed (0.00%): openid configuration (2 failed), userinfo status ok (80 failed), org removed (1 failed)<br/>76 of the failed requests are HTTP 429 with the same plain-text `Rate exceeded.` body as in `password_session` in the first two minutes (22:16–22:17 UTC), directly after the `password_session` run; none after that. The failed `org removed` check is a harness defect: teardown used the measured user's token, which cannot delete the org. It is fixed in the same change as this page.                                                                          |
-| Top 3 most expensive database queries |                                                                                  |
-| Database metrics during test          |                                                                                  |
+| Top 3 most expensive database queries | Not collected for this sweep: the Query Insights collection returned no data. Its cause has been fixed in the collection and the ranking will be added when it has been re-run. |
+| Database metrics during test          | CPU: 95% median, 96% peak<br/>Memory: 39%<br/>Connections: 47<br/>Transactions: 47,015/s<br/>IOPS: read 0, write 10 |
 | k6 Iterations per second              | 8984                                                                       |
 | k6 output                             | [output](#k6-output)                                                             |
-| flowchart outcome                     |                                                                                  |
+| flowchart outcome                     | **Scale (database).** Database CPU is the limit at 95% median, with containers at 60%. Whether more database vCPU buys throughput depends on how much of that time is lock wait, which the missing query breakdown would show. |
 
 ## Endpoint latencies
 

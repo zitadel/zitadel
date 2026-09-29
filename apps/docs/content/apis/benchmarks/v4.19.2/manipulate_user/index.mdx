@@ -29,13 +29,13 @@ Benchmark results of the v4.19.2 release of Zitadel.
 | Database                              | type: psql<br />version: 17 (Cloud SQL POSTGRES_17)<br/>`auto_explain` on: log_analyze, log_timing, log_nested_statements, log_verbose, log_min_duration 10 ms. This adds overhead to every statement slower than 10 ms; production does not run it.                                                   |
 | Database location                     | EU1                                                                              |
 | Database specification                | Cloud SQL Enterprise Plus, `db-perf-optimized-N-8`<br/>vCPU: 8<br/>memory: 64 GB<br/>Data cache: enabled                                                       |
-| ZITADEL metrics during test           |                                                                                  |
+| ZITADEL metrics during test           | CPU: p50 56%, p99 60% (peak 88%)<br/>Memory: p50 6%, peak 13%<br/>Instances: 7 (constant), no container startups recorded<br/>Server-side: 349 req/s, latency p50 88ms / p95 10.7s / p99 12.8s<br/>Connection pool (MaxOpenConns 6 per container): 1.3% of 9,874,806 acquires found it empty, mean wait 0.6ms; load carried by 7 of 7 containers |
 | Observed errors                       | none                                                                          |
-| Top 3 most expensive database queries |                                                                                  |
-| Database metrics during test          |                                                                                  |
+| Top 3 most expensive database queries | Not collected for this sweep: the Query Insights collection returned no data. Its cause has been fixed in the collection and the ranking will be added when it has been re-run. |
+| Database metrics during test          | CPU: 49% median, 51% peak<br/>Memory: 39%<br/>Connections: 47<br/>Transactions: 5,844/s<br/>IOPS: read 1, write 2149 |
 | k6 Iterations per second              | 66                                                                       |
 | k6 output                             | [output](#k6-output)                                                             |
-| flowchart outcome                     |                                                                                  |
+| flowchart outcome                     | **Not concluded.** Neither the database (49%), the containers (56%) nor the connection pool (1.3% of acquires found it empty) ran out. The query breakdown is needed to say where the time went. |
 
 ## Endpoint latencies
 

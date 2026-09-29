@@ -29,13 +29,13 @@ Benchmark results of the v4.19.2 release of Zitadel.
 | Database                              | type: psql<br />version: 17 (Cloud SQL POSTGRES_17)<br/>`auto_explain` on: log_analyze, log_timing, log_nested_statements, log_verbose, log_min_duration 10 ms. This adds overhead to every statement slower than 10 ms; production does not run it.                                                   |
 | Database location                     | EU1                                                                              |
 | Database specification                | Cloud SQL Enterprise Plus, `db-perf-optimized-N-8`<br/>vCPU: 8<br/>memory: 64 GB<br/>Data cache: enabled                                                       |
-| ZITADEL metrics during test           |                                                                                  |
+| ZITADEL metrics during test           | CPU: p50 52%, p99 57% (peak 64%)<br/>Memory: p50 5%, peak 8%<br/>Instances: 7 (constant), 1 container startup<br/>Server-side: 4,055 req/s, latency p50 19ms / p95 389ms / p99 444ms<br/>Connection pool (MaxOpenConns 6 per container): 80.7% of 46,685,392 acquires found it empty, mean wait 19.3ms; load carried by 7 of 7 containers |
 | Observed errors                       | 38 of 7,270,615 requests failed (0.00%): 36x request timeout, 2x connection reset. 18 iterations aborted on a null response body. 38 of 10,904,111 checks failed (0.00%): client credentials status ok (19 failed), userinfo status ok (19 failed)<br/>36 of the 38 failed requests are 60-second timeouts within a single minute (18:39 UTC): a bounded event, reported separately from the service's behaviour under load.                                                                          |
-| Top 3 most expensive database queries |                                                                                  |
-| Database metrics during test          |                                                                                  |
+| Top 3 most expensive database queries | Not collected for this sweep: the Query Insights collection returned no data. Its cause has been fixed in the collection and the ranking will be added when it has been re-run. |
+| Database metrics during test          | CPU: 95% median, 95% peak<br/>Memory: 39%<br/>Connections: 47<br/>Transactions: 26,368/s<br/>IOPS: read 2, write 1881 |
 | k6 Iterations per second              | 2006                                                                       |
 | k6 output                             | [output](#k6-output)                                                             |
-| flowchart outcome                     |                                                                                  |
+| flowchart outcome                     | **Scale (database).** Database CPU is the limit at 95% median, with containers at 52%. Whether more database vCPU buys throughput depends on how much of that time is lock wait, which the missing query breakdown would show. |
 
 ## Endpoint latencies
 
