@@ -877,24 +877,9 @@ func newLoginNameExistsViewQuery(value string, comparison TextComparison) (Searc
 }
 
 func (q *UserSearchQueries) hasMetadataFilter() bool {
-	return searchQueriesHaveMetadataFilter(q.Queries)
-}
-
-func searchQueriesHaveMetadataFilter(queries []SearchQuery) bool {
-	return slices.ContainsFunc(queries, searchQueryHasMetadataFilter)
-}
-
-func searchQueryHasMetadataFilter(qry SearchQuery) bool {
-	switch v := qry.(type) {
-	case *OrQuery:
-		return searchQueriesHaveMetadataFilter(v.queries)
-	case *AndQuery:
-		return searchQueriesHaveMetadataFilter(v.queries)
-	case *NotQuery:
-		return searchQueryHasMetadataFilter(v.query)
-	default:
-		return qry.Col().table.name == userMetadataTable.name
-	}
+	return searchQueriesUse(q.Queries, func(col Column) bool {
+		return col.table.name == userMetadataTable.name
+	})
 }
 
 func searchQueriesUse(queries []SearchQuery, match func(Column) bool) bool {
@@ -1336,8 +1321,9 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 }
 
 // userSearchPlan captures the joins and remaining filters needed to identify
-// matching users. Display-only joins (humans, machines, login_names) are applied
-// after LIMIT so they do not run for every matching row.
+// matching users. Display joins (humans, machines, login_names) run after LIMIT
+// on the outer page. applyConstraints still joins them before LIMIT when a
+// remaining filter or the sort column needs them (for example sorting by first name).
 type userSearchPlan struct {
 	instanceID             string
 	filters                []SearchQuery
@@ -1409,16 +1395,6 @@ func (p userSearchPlan) applyConstraints(ctx context.Context, query sq.SelectBui
 	return query
 }
 
-func (p userSearchPlan) applyPagePaging(query sq.SelectBuilder, req *UserSearchQueries) sq.SelectBuilder {
-	if req.Offset > 0 {
-		query = query.Offset(req.Offset)
-	}
-	if req.Limit > 0 {
-		query = query.Limit(req.Limit)
-	}
-	return query
-}
-
 func (q *UserSearchQueries) pageOrderClause(sortExpr, idExpr string) string {
 	dir := ""
 	if !q.Asc {
@@ -1431,10 +1407,14 @@ func (q *UserSearchQueries) pageOrderClause(sortExpr, idExpr string) string {
 	return clause
 }
 
-// prepareUsersCountQuery counts matching users without expanding login_names3
-// or selecting display columns. Used by CountUsers (SCIM count=0).
+// prepareUsersCountQuery counts matching users without selecting display columns.
+// Used by CountUsers (SCIM count=0). It can still add the login_names3 LATERAL
+// if a filter uses preferred_login_name or aggregated login_names (no API path
+// currently does).
 func (q *UserSearchQueries) prepareUsersCountQuery(ctx context.Context, permissionCheckV2 bool) (sq.SelectBuilder, func(*sql.Rows) (uint64, error)) {
-	return q.usersCountQuery(ctx, q.planUserSearch(ctx, permissionCheckV2))
+	plan := q.planUserSearch(ctx, permissionCheckV2)
+	query := plan.matchingCountSelect(ctx).PlaceholderFormat(sq.Dollar)
+	return query, scanUsersCount
 }
 
 func (p userSearchPlan) matchingCountSelect(ctx context.Context) sq.SelectBuilder {
@@ -1445,48 +1425,37 @@ func (p userSearchPlan) matchingCountSelect(ctx context.Context) sq.SelectBuilde
 	return p.applyConstraints(ctx, sq.Select(countExpr), false)
 }
 
-func (p userSearchPlan) scalarTotal(ctx context.Context) sq.Sqlizer {
-	return sq.ConcatExpr("(", p.matchingCountSelect(ctx), ") AS total")
-}
-
-func (q *UserSearchQueries) usersCountQuery(ctx context.Context, plan userSearchPlan) (sq.SelectBuilder, func(*sql.Rows) (uint64, error)) {
-	query := plan.matchingCountSelect(ctx).PlaceholderFormat(sq.Dollar)
-	return query, scanUsersCount
-}
-
 // prepareUsersQuery creates the select query for searching users and returns a matching scan function.
 // Matching IDs are selected first with filters, permissions and LIMIT/OFFSET.
 // A scalar COUNT(*) (COUNT(DISTINCT id) with a metadata filter) supplies the total.
 // Humans, machines and login_names are joined afterwards so the login_names3 view
-// is expanded only for the returned page.
+// is expanded only for the returned page, except when a remaining filter or the
+// sort column needs those joins before LIMIT.
 // Login-equality filters (username, email, phone, login name EQUALS /
 // EQUALS_IGNORE_CASE) become an indexed UNION of ID seeks.
 func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionCheckV2 bool) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
-	return q.usersPageQuery(ctx, q.planUserSearch(ctx, permissionCheckV2))
-}
-
-func (q *UserSearchQueries) usersPageQuery(ctx context.Context, plan userSearchPlan) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+	plan := q.planUserSearch(ctx, permissionCheckV2)
 	idCols := []string{
 		UserIDCol.identifier(),
 		q.SortingColumn.orderBy() + " AS sort_col",
 	}
 
-	var pageQuery sq.SelectBuilder
+	pageQuery := plan.applyConstraints(ctx, sq.Select(idCols...), true)
+	idExpr := UserIDCol.identifier()
 	if plan.needsMetadataJoin {
-		distinctIDs := plan.applyConstraints(ctx, sq.Select(idCols...), true).Distinct()
 		pageQuery = sq.Select(
 			"id",
 			"sort_col",
-		).FromSelect(distinctIDs, "ids").
-			OrderByClause(q.pageOrderClause("sort_col", "id"))
-	} else {
-		pageQuery = plan.applyConstraints(ctx, sq.Select(
-			idCols[0],
-			idCols[1],
-		), true).
-			OrderByClause(q.pageOrderClause("sort_col", UserIDCol.identifier()))
+		).FromSelect(pageQuery.Distinct(), "ids")
+		idExpr = "id"
 	}
-	pageQuery = plan.applyPagePaging(pageQuery, q)
+	pageQuery = pageQuery.OrderByClause(q.pageOrderClause("sort_col", idExpr))
+	if q.Offset > 0 {
+		pageQuery = pageQuery.Offset(q.Offset)
+	}
+	if q.Limit > 0 {
+		pageQuery = pageQuery.Limit(q.Limit)
+	}
 
 	query := sq.Select(
 		UserIDCol.identifier(),
@@ -1520,7 +1489,7 @@ func (q *UserSearchQueries) usersPageQuery(ctx context.Context, plan userSearchP
 		MachineSecretCol.identifier(),
 		MachineAccessTokenTypeCol.identifier(),
 		"page.sort_col",
-	).Column(plan.scalarTotal(ctx)).
+	).Column(sq.ConcatExpr("(", plan.matchingCountSelect(ctx), ") AS total")).
 		FromSelect(pageQuery, "page").
 		Join(userTable.identifier()+" ON "+UserIDCol.identifier()+" = page.id AND "+UserInstanceIDCol.identifier()+" = ?", plan.instanceID).
 		LeftJoin(join(HumanUserIDCol, UserIDCol)).
