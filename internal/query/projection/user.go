@@ -100,9 +100,8 @@ func (*userProjection) Init() *old_handler.Check {
 			handler.NewColumn(UserTypeCol, handler.ColumnTypeEnum),
 		},
 			handler.NewPrimaryKey(UserInstanceIDCol, UserIDCol),
-			handler.WithIndex(handler.NewIndex("username", []string{UserUsernameCol})),
 			handler.WithIndex(handler.NewIndex("username_lower", []string{UserInstanceIDCol, "LOWER(" + UserUsernameCol + ")"})),
-			handler.WithIndex(handler.NewIndex("resource_owner", []string{UserResourceOwnerCol})),
+			handler.WithIndex(handler.NewIndex("instance_resource_owner", []string{UserInstanceIDCol, UserResourceOwnerCol, UserIDCol}, handler.WithInclude(UserTypeCol))),
 		),
 		handler.NewSuffixedTable([]*handler.InitColumn{
 			handler.NewColumn(HumanUserIDCol, handler.ColumnTypeText),
