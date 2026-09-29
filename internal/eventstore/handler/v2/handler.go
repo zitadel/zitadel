@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"log/slog"
+	"maps"
 	"math/rand"
 	"slices"
 	"sync"
@@ -583,18 +584,12 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	if err != nil {
 		return additionalIteration, err
 	}
-	// stop execution if currentState.position >= config.maxPosition
-	if !config.maxPosition.IsZero() && currentState.position.GreaterThanOrEqual(config.maxPosition) {
+	if !config.maxPosition.IsZero() && currentState.cursor.Position.GreaterThanOrEqual(config.maxPosition) {
 		return false, nil
 	}
 
-	if config.minPosition.GreaterThan(decimal.NewFromInt(0)) {
-		currentState.position = config.minPosition
-		currentState.offset = 0
-	}
-
 	var statements []*Statement
-	statements, additionalIteration, err = h.generateStatements(ctx, tx, currentState)
+	statements, additionalIteration, err = h.generateStatements(ctx, tx, currentState, config.minPosition)
 	if err != nil {
 		return additionalIteration, err
 	}
@@ -607,7 +602,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 
 		h.metrics.ProjectionEventsProcessed(ctx, h.ProjectionName(), int64(len(statements)), err == nil)
 
-		if err == nil && currentState.aggregateID != "" && len(statements) > 0 {
+		if err == nil && currentState.cursor.AggregateID != "" && len(statements) > 0 {
 			// Don't update projection timing or latency unless we successfully processed events
 			h.metrics.ProjectionUpdateTiming(ctx, h.ProjectionName(), float64(time.Since(start).Seconds()))
 			h.metrics.ProjectionStateLatency(ctx, h.ProjectionName(), time.Since(currentState.eventTimestamp).Seconds())
@@ -627,12 +622,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		return false, err
 	}
 
-	currentState.position = statements[lastProcessedIndex].Position
-	currentState.offset = statements[lastProcessedIndex].offset
-	currentState.aggregateID = statements[lastProcessedIndex].Aggregate.ID
-	currentState.aggregateType = statements[lastProcessedIndex].Aggregate.Type
-	currentState.sequence = statements[lastProcessedIndex].Sequence
-	currentState.eventTimestamp = statements[lastProcessedIndex].CreationDate
+	currentState.applyStatement(statements[lastProcessedIndex])
 
 	setStateErr := h.setState(ctx, tx, currentState)
 	if setStateErr != nil {
@@ -642,7 +632,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	return additionalIteration, err
 }
 
-func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentState *state) (_ []*Statement, additionalIteration bool, err error) {
+func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentState *state, minPosition decimal.Decimal) (_ []*Statement, additionalIteration bool, err error) {
 	if h.triggerWithoutEvents != nil {
 		stmt, err := h.triggerWithoutEvents(pseudo.NewScheduledEvent(ctx, time.Now(), currentState.instanceID))
 		if err != nil {
@@ -651,30 +641,17 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 		return []*Statement{stmt}, false, nil
 	}
 
-	events, err := h.es.Filter(ctx, h.eventQuery(currentState).SetTx(tx))
+	events, err := h.es.Filter(ctx, h.eventQuery(currentState, minPosition).SetTx(tx))
 	if err != nil {
 		logging.WithError(ctx, err).Debug("filter eventstore failed")
 		return nil, false, err
 	}
 	eventAmount := len(events)
 
-	statements, err := h.eventsToStatements(ctx, tx, events, currentState)
+	statements, err := h.eventsToStatements(ctx, tx, events)
 	if err != nil || len(statements) == 0 {
 		return nil, false, err
 	}
-
-	idx := skipPreviouslyReducedStatements(statements, currentState)
-	if idx+1 == len(statements) {
-		currentState.position = statements[len(statements)-1].Position
-		currentState.offset = statements[len(statements)-1].offset
-		currentState.aggregateID = statements[len(statements)-1].Aggregate.ID
-		currentState.aggregateType = statements[len(statements)-1].Aggregate.Type
-		currentState.sequence = statements[len(statements)-1].Sequence
-		currentState.eventTimestamp = statements[len(statements)-1].CreationDate
-
-		return nil, false, nil
-	}
-	statements = statements[idx+1:]
 
 	additionalIteration = eventAmount == int(h.bulkLimit)
 	if len(statements) < len(events) {
@@ -683,18 +660,6 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	}
 
 	return statements, additionalIteration, nil
-}
-
-func skipPreviouslyReducedStatements(statements []*Statement, currentState *state) int {
-	for i, statement := range statements {
-		if statement.Position.Equal(currentState.position) &&
-			statement.Aggregate.ID == currentState.aggregateID &&
-			statement.Aggregate.Type == currentState.aggregateType &&
-			statement.Sequence == currentState.sequence {
-			return i
-		}
-	}
-	return -1
 }
 
 func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, statements []*Statement) (lastProcessedIndex int, err error) {
@@ -743,32 +708,41 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, statement *S
 	return nil
 }
 
-func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder {
+func (h *Handler) eventQuery(currentState *state, minPosition decimal.Decimal) *eventstore.SearchQueryBuilder {
 	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AwaitOpenTransactions().
 		Limit(uint64(h.bulkLimit)).
 		OrderAsc().
 		InstanceID(currentState.instanceID)
 
-	if currentState.position.GreaterThan(decimal.Decimal{}) {
-		builder = builder.PositionAtLeast(currentState.position)
-		if currentState.offset > 0 {
-			builder = builder.Offset(currentState.offset)
-		}
+	if minPosition.GreaterThan(decimal.NewFromInt(0)) {
+		builder = builder.PositionAtLeast(minPosition)
+	} else if !currentState.cursor.IsZero() {
+		builder = builder.AfterEventSortKey(currentState.cursor)
 	}
 
 	if h.queryGlobal {
 		return builder
 	}
 
+	// Reading each event type separately keeps the cost of a batch bounded by the bulk limit.
+	// A single query for all event types must read every matching event after the position before it can sort and limit them,
+	// so a projection that falls behind would get slower the further behind it is.
+	// Handlers which subscribe to all events of an aggregate (no event types) keep the single query.
+	if !slices.ContainsFunc(slices.Collect(maps.Values(h.eventTypes)), func(eventTypes []eventstore.EventType) bool { return len(eventTypes) == 0 }) {
+		builder = builder.ScanEventTypesSeparately()
+		for _, aggregate := range slices.Sorted(maps.Keys(h.eventTypes)) {
+			builder = builder.AddQuery().AggregateTypes(aggregate).EventTypes(h.eventTypes[aggregate]...).Builder()
+		}
+		return builder
+	}
+
 	aggregateTypes := make([]eventstore.AggregateType, 0, len(h.eventTypes))
 	eventTypes := make([]eventstore.EventType, 0, len(h.eventTypes))
-
 	for aggregate, events := range h.eventTypes {
 		aggregateTypes = append(aggregateTypes, aggregate)
 		eventTypes = append(eventTypes, events...)
 	}
-
 	return builder.AddQuery().AggregateTypes(aggregateTypes...).EventTypes(eventTypes...).Builder()
 }
 

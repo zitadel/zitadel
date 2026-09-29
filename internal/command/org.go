@@ -395,7 +395,7 @@ func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, reso
 	if err != nil {
 		return nil, err
 	}
-	_, err = c.checkUserExists(ctx, userID, resourceOwner)
+	userResourceOwner, err := c.checkUserExists(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -403,7 +403,7 @@ func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, reso
 	if err := addMember.IsValid(c.zitadelRoles); err != nil {
 		return nil, err
 	}
-	events = append(events, org.NewMemberAddedEvent(ctx, orgAgg, addMember.UserID, addMember.Roles...))
+	events = append(events, org.NewMemberAddedEvent(ctx, orgAgg, addMember.UserID, addMember.Roles...).WithUserResourceOwner(userResourceOwner))
 	if setOrgInactive {
 		deactivateOrgEvent := org.NewOrgDeactivatedEvent(ctx, orgAgg)
 		events = append(events, deactivateOrgEvent)
@@ -578,6 +578,14 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate, permissionCheck Organizati
 				return nil, nil
 			}
 
+			ownerDeleteReady, err := c.isUniqueConstraintOwnerDeleteReady(ctx)
+			if err != nil {
+				return nil, err
+			}
+			if ownerDeleteReady {
+				return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name, nil, false, nil, nil, nil)}, nil
+			}
+
 			domainPolicy, err := domainPolicyWriteModel(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err
@@ -588,9 +596,13 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate, permissionCheck Organizati
 				return nil, err
 			}
 
-			usernames, err := OrgUsers(ctx, filter, a.ID)
+			orgUsers, err := OrgUsers(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err
+			}
+			usernames := make([]string, len(orgUsers))
+			for i, u := range orgUsers {
+				usernames[i] = u.Username
 			}
 			domains, err := OrgDomains(ctx, filter, a.ID)
 			if err != nil {
@@ -733,12 +745,7 @@ func OrgDomains(ctx context.Context, filter preparation.FilterToQueryReducer, or
 	return names, nil
 }
 
-type userIDName struct {
-	name string
-	id   string
-}
-
-func OrgUsers(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) ([]string, error) {
+func OrgUsers(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) ([]user.UsernameChange, error) {
 	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		InstanceID(authz.GetInstance(ctx).InstanceID()).
 		ResourceOwner(orgID).
@@ -757,30 +764,30 @@ func OrgUsers(ctx context.Context, filter preparation.FilterToQueryReducer, orgI
 		return nil, err
 	}
 
-	users := make([]userIDName, 0)
+	users := make([]user.UsernameChange, 0)
 	for _, event := range events {
 		switch eventTyped := event.(type) {
 		case *user.HumanAddedEvent:
-			users = append(users, userIDName{eventTyped.UserName, eventTyped.Aggregate().ID})
+			users = append(users, user.UsernameChange{Username: eventTyped.UserName, UserID: eventTyped.Aggregate().ID})
 		case *user.MachineAddedEvent:
-			users = append(users, userIDName{eventTyped.UserName, eventTyped.Aggregate().ID})
+			users = append(users, user.UsernameChange{Username: eventTyped.UserName, UserID: eventTyped.Aggregate().ID})
 		case *user.HumanRegisteredEvent:
-			users = append(users, userIDName{eventTyped.UserName, eventTyped.Aggregate().ID})
+			users = append(users, user.UsernameChange{Username: eventTyped.UserName, UserID: eventTyped.Aggregate().ID})
 		case *user.DomainClaimedEvent:
 			for i := range users {
-				if users[i].id == eventTyped.Aggregate().ID {
-					users[i].name = eventTyped.UserName
+				if users[i].UserID == eventTyped.Aggregate().ID {
+					users[i].Username = eventTyped.UserName
 				}
 			}
 		case *user.UsernameChangedEvent:
 			for i := range users {
-				if users[i].id == eventTyped.Aggregate().ID {
-					users[i].name = eventTyped.UserName
+				if users[i].UserID == eventTyped.Aggregate().ID {
+					users[i].Username = eventTyped.UserName
 				}
 			}
 		case *user.UserRemovedEvent:
 			for i := range users {
-				if users[i].id == eventTyped.Aggregate().ID {
+				if users[i].UserID == eventTyped.Aggregate().ID {
 					users[i] = users[len(users)-1]
 					users = users[:len(users)-1]
 					break
@@ -788,11 +795,7 @@ func OrgUsers(ctx context.Context, filter preparation.FilterToQueryReducer, orgI
 			}
 		}
 	}
-	names := make([]string, len(users))
-	for i := range users {
-		names[i] = users[i].name
-	}
-	return names, nil
+	return users, nil
 }
 
 func ExistsOrg(ctx context.Context, filter preparation.FilterToQueryReducer, id string) (exists bool, err error) {

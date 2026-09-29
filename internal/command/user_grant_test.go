@@ -462,7 +462,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 							"project1",
 							"",
 							[]string{"rolekey1"},
-						),
+						).WithOwnerOrgs("org1", "org1", ""),
 					),
 				),
 				idGenerator: func(t *testing.T) id.Generator {
@@ -550,7 +550,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 							"project1",
 							"",
 							[]string{"rolekey1"},
-						),
+						).WithOwnerOrgs("org1", "org1", ""),
 					),
 				),
 				idGenerator: func(t *testing.T) id.Generator {
@@ -631,7 +631,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 							"project1",
 							"projectgrant1",
 							[]string{"rolekey1"},
-						),
+						).WithOwnerOrgs("org1", "org1", "org1"),
 					),
 				),
 				idGenerator: func(t *testing.T) id.Generator {
@@ -705,7 +705,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 							"project1",
 							"",
 							[]string{"rolekey1"},
-						),
+						).WithOwnerOrgs("org1", "org1", ""),
 					),
 				),
 				idGenerator: func(t *testing.T) id.Generator {
@@ -783,7 +783,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 							"project1",
 							"projectgrant1",
 							[]string{"rolekey1"},
-						),
+						).WithOwnerOrgs("org1", "org2", "org1"),
 					),
 				),
 				idGenerator: func(t *testing.T) id.Generator {
@@ -866,7 +866,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 							"project1",
 							"projectgrant1",
 							[]string{"rolekey1"},
-						),
+						).WithOwnerOrgs("org1", "org1", "org2"),
 					),
 				),
 				idGenerator: func(t *testing.T) id.Generator {
@@ -3225,31 +3225,31 @@ func TestCommandSide_removeRoleFromUserGrant(t *testing.T) {
 		{
 			name:             "advisory scenario, remove two adjacent leading roles",
 			existingRoleKeys: []string{"admin", "viewer", "editor"},
-			roleKeysToRemove: map[string]bool{"admin":true, "viewer":true},
+			roleKeysToRemove: map[string]bool{"admin": true, "viewer": true},
 			want:             []string{"editor"},
 		},
 		{
 			name:             "remove first two of four",
 			existingRoleKeys: []string{"a", "b", "c", "d"},
-			roleKeysToRemove: map[string]bool{"a":true, "b":true},
+			roleKeysToRemove: map[string]bool{"a": true, "b": true},
 			want:             []string{"c", "d"},
 		},
 		{
 			name:             "remove two adjacent middle roles",
 			existingRoleKeys: []string{"a", "b", "c", "d"},
-			roleKeysToRemove: map[string]bool{"b":true, "c":true},
+			roleKeysToRemove: map[string]bool{"b": true, "c": true},
 			want:             []string{"a", "d"},
 		},
 		{
 			name:             "remove two non-adjacent roles",
 			existingRoleKeys: []string{"a", "b", "c", "d"},
-			roleKeysToRemove: map[string]bool{"a":true, "c":true},
+			roleKeysToRemove: map[string]bool{"a": true, "c": true},
 			want:             []string{"b", "d"},
 		},
 		{
 			name:             "remove all roles",
 			existingRoleKeys: []string{"x", "y", "z"},
-			roleKeysToRemove: map[string]bool{"x":true, "y":true, "z":true},
+			roleKeysToRemove: map[string]bool{"x": true, "y": true, "z": true},
 			want:             []string{},
 		},
 	}

@@ -52,6 +52,7 @@ const (
 	TokenReasonClientCredentials
 	TokenReasonExchange
 	TokenReasonImpersonation
+	TokenReasonAdminImpersonation
 )
 
 type TokenActor struct {

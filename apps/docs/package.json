@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "generate:index-pages": "tsx scripts/generate-index-pages.ts",
+    "generate:error-reference": "tsx scripts/generate-error-reference.ts",
     "fetch:remote-content": "node scripts/fetch-remote-content.mjs",
     "generate:proto-docs": "node scripts/generate-proto-docs.mjs",
     "generate:api-reference": "node scripts/generate-api-reference.ts --only-generate",
@@ -24,7 +25,6 @@
   "dependencies": {
     "@headlessui/react": "^2.2.10",
     "@heroicons/react": "^2.2.0",
-    "@inkeep/cxkit-react": "^0.5.117",
     "@scalar/api-reference": "^1.55.3",
     "@shikijs/rehype": "^4.0.2",
     "@shikijs/types": "^4.0.2",

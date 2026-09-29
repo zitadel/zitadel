@@ -45,6 +45,7 @@ type event struct {
 	createdAt time.Time
 	sequence  uint64
 	position  decimal.Decimal
+	inTxOrder uint32
 }
 
 // TODO: remove on v3
@@ -158,6 +159,11 @@ func (e *event) Sequence() uint64 {
 // Position implements [eventstore.Event]
 func (e *event) Position() decimal.Decimal {
 	return e.position
+}
+
+// InTxOrder implements [eventstore.Event]
+func (e *event) InTxOrder() uint32 {
+	return e.inTxOrder
 }
 
 // Unmarshal implements [eventstore.Event]

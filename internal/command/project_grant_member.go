@@ -38,7 +38,7 @@ func (c *Commands) AddProjectGrantMember(ctx context.Context, member *AddProject
 	if err := member.IsValid(c.zitadelRoles); err != nil {
 		return nil, err
 	}
-	_, err = c.checkUserExists(ctx, member.UserID, "")
+	userResourceOwner, err := c.checkUserExists(ctx, member.UserID, "")
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (c *Commands) AddProjectGrantMember(ctx context.Context, member *AddProject
 			member.UserID,
 			member.ProjectGrantID,
 			member.Roles...,
-		))
+		).WithOwnerOrgs(userResourceOwner, grantedOrgID))
 	if err != nil {
 		return nil, err
 	}

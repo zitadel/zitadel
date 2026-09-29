@@ -66,6 +66,10 @@ func (m *MockMetrics) RegisterValueObserver(name, description string, callbackFu
 	return nil
 }
 
+func (m *MockMetrics) RegisterCounterObserver(name, description string, callbackFunc metric.Int64Callback) error {
+	return nil
+}
+
 func (m *MockMetrics) RegisterHistogram(name, description, unit string, buckets []float64) error {
 	return nil
 }
