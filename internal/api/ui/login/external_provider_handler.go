@@ -1580,7 +1580,10 @@ func mapExternalUserToLoginUser(externalUser *domain.ExternalUser, mustBeDomain 
 // actually returned. The remaining fields (name, nickname, language, and the possibly-edited
 // email/phone) are legitimately editable on this page and are taken from the form.
 func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOptionFormData, linkingUser *domain.ExternalUser) *domain.ExternalUser {
-	isEmailVerified := linkingUser.IsEmailVerified && formData.Email == linkingUser.Email
+	// The email is compared case-insensitively: an Entra-verified "user@DOMAINE.com" and the
+	// pre-filled/edited "user@domaine.com" are the same address, so a mere difference in
+	// capitalization must not drop the IDP-verified flag and force re-verification.
+	isEmailVerified := linkingUser.IsEmailVerified && strings.EqualFold(string(formData.Email), string(linkingUser.Email))
 	isPhoneVerified := linkingUser.IsPhoneVerified && formData.Phone == linkingUser.Phone
 	return &domain.ExternalUser{
 		IDPConfigID:       linkingUser.IDPConfigID,
