@@ -101,7 +101,9 @@ func (*userProjection) Init() *old_handler.Check {
 		},
 			handler.NewPrimaryKey(UserInstanceIDCol, UserIDCol),
 			handler.WithIndex(handler.NewIndex("username_lower", []string{UserInstanceIDCol, "LOWER(" + UserUsernameCol + ")"})),
-			handler.WithIndex(handler.NewIndex("instance_resource_owner", []string{UserInstanceIDCol, UserResourceOwnerCol, UserIDCol}, handler.WithInclude(UserTypeCol))),
+			handler.WithIndex(handler.NewIndex("instance_resource_owner", []string{UserInstanceIDCol, UserResourceOwnerCol, UserIDCol},
+				handler.WithInclude(UserTypeCol), // org-scoped COUNT with type filter can be index-only
+			)),
 		),
 		handler.NewSuffixedTable([]*handler.InitColumn{
 			handler.NewColumn(HumanUserIDCol, handler.ColumnTypeText),

@@ -13,9 +13,10 @@ import (
 )
 
 const (
-	users14InstanceResourceOwnerCreate = "CREATE INDEX CONCURRENTLY IF NOT EXISTS users14_instance_resource_owner_idx ON projections.users14 (instance_id, resource_owner, id) INCLUDE (type);\n"
-	users14ResourceOwnerDrop           = "DROP INDEX CONCURRENTLY IF EXISTS projections.users14_resource_owner_idx;\n"
-	users14UsernameDrop                = "DROP INDEX CONCURRENTLY IF EXISTS projections.users14_username_idx;\n"
+	users14InstanceResourceOwnerCreate = "-- INCLUDE (type) so org-scoped COUNT(*) with a type filter can be index-only and skip the heap.\n" +
+		"CREATE INDEX CONCURRENTLY IF NOT EXISTS users14_instance_resource_owner_idx ON projections.users14 (instance_id, resource_owner, id) INCLUDE (type);\n"
+	users14ResourceOwnerDrop = "DROP INDEX CONCURRENTLY IF EXISTS projections.users14_resource_owner_idx;\n"
+	users14UsernameDrop      = "DROP INDEX CONCURRENTLY IF EXISTS projections.users14_username_idx;\n"
 )
 
 func TestUsers14InstanceResourceOwnerIndex_Execute(t *testing.T) {
