@@ -1505,13 +1505,16 @@ func TestCommandSide_RemoveOrgOwnerDeleteReady(t *testing.T) {
 				),
 			),
 			expectPush(
-				org.NewOrgRemovedEvent(
-					context.Background(), &org.NewAggregate("org1").Aggregate, "org", nil, false, nil, nil, nil,
+				org.NewOrgRemovedByOwnerEvent(
+					context.Background(), &org.NewAggregate("org1").Aggregate, "org",
 				),
 			),
 		)(t),
 		ownerDeleteReady: func(context.Context) (bool, error) { return true, nil },
 	}
+	assertOwnerOnlyUniqueConstraints(t, org.NewOrgRemovedByOwnerEvent(
+		context.Background(), &org.NewAggregate("org1").Aggregate, "org",
+	), eventstore.UniqueConstraintOwnerOrg, "org1")
 	_, err := r.RemoveOrg(context.Background(), "org1", nil, false)
 	assert.NoError(t, err)
 }

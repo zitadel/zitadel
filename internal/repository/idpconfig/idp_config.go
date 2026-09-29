@@ -235,8 +235,9 @@ func IDPConfigReactivatedEventMapper(event eventstore.Event) (eventstore.Event, 
 type IDPConfigRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ConfigID string `json:"idpConfigId"`
-	name     string
+	ConfigID      string `json:"idpConfigId"`
+	name          string
+	removeByOwner bool
 }
 
 func NewIDPConfigRemovedEvent(
@@ -252,14 +253,28 @@ func NewIDPConfigRemovedEvent(
 	}
 }
 
+func NewIDPConfigRemovedByOwnerEvent(
+	base *eventstore.BaseEvent,
+	configID string,
+	name string,
+) *IDPConfigRemovedEvent {
+	removed := NewIDPConfigRemovedEvent(base, configID, name)
+	removed.removeByOwner = true
+	return removed
+}
+
 func (e *IDPConfigRemovedEvent) Payload() interface{} {
 	return e
 }
 
 func (e *IDPConfigRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	if e.removeByOwner {
+		return []*eventstore.UniqueConstraint{
+			eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerIDP, e.ConfigID),
+		}
+	}
 	return []*eventstore.UniqueConstraint{
 		NewRemoveIDPConfigNameUniqueConstraint(e.name, e.Aggregate().ResourceOwner),
-		eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerIDP, e.ConfigID),
 	}
 }
 

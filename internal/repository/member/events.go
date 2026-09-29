@@ -253,7 +253,8 @@ func RemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 type MemberCascadeRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserID string `json:"userId"`
+	UserID                string `json:"userId"`
+	skipUniqueConstraints bool
 }
 
 func (e *MemberCascadeRemovedEvent) Payload() interface{} {
@@ -261,7 +262,14 @@ func (e *MemberCascadeRemovedEvent) Payload() interface{} {
 }
 
 func (e *MemberCascadeRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	if e.skipUniqueConstraints {
+		return nil
+	}
 	return []*eventstore.UniqueConstraint{NewRemoveMemberUniqueConstraint(e.Aggregate().ID, e.UserID)}
+}
+
+func (e *MemberCascadeRemovedEvent) SkipUniqueConstraints() {
+	e.skipUniqueConstraints = true
 }
 
 func (e *MemberCascadeRemovedEvent) FieldOperations(prefix string) []*eventstore.FieldOperation {
