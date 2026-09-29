@@ -146,19 +146,15 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-l40ykb3xh2", "Errors.Org.DomainPolicy.NotExisting")
 	}
 	var events []eventstore.Command
-	userName := existingUser.UserName
-	idpLinks := existingUser.IDPLinks
-	orgScoped := domainPolicy.UserLoginMustBeDomain
 	ownerDeleteReady, err := c.isUniqueConstraintOwnerDeleteReady(ctx)
 	if err != nil {
 		return nil, err
 	}
 	if ownerDeleteReady {
-		userName = ""
-		idpLinks = nil
-		orgScoped = false
+		events = append(events, user.NewUserRemovedByOwnerEvent(ctx, &existingUser.Aggregate().Aggregate))
+	} else {
+		events = append(events, user.NewUserRemovedEvent(ctx, &existingUser.Aggregate().Aggregate, existingUser.UserName, existingUser.IDPLinks, domainPolicy.UserLoginMustBeDomain))
 	}
-	events = append(events, user.NewUserRemovedEvent(ctx, &existingUser.Aggregate().Aggregate, userName, idpLinks, orgScoped))
 
 	for _, grantID := range cascadingGrantIDs {
 		removeEvent, _, err := c.removeUserGrant(ctx, grantID, "", true, true, nil)
@@ -166,6 +162,7 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 			logging.WithFields("usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
 			continue
 		}
+		skipCascadeUniqueConstraints(ownerDeleteReady, removeEvent)
 		events = append(events, removeEvent)
 	}
 
@@ -174,6 +171,7 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 		if err != nil {
 			return nil, err
 		}
+		skipCascadeUniqueConstraints(ownerDeleteReady, membershipEvents...)
 		events = append(events, membershipEvents...)
 	}
 

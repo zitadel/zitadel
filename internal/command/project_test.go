@@ -1410,15 +1410,17 @@ func TestCommandSide_RemoveProjectOwnerDeleteReady(t *testing.T) {
 				),
 			),
 			expectPush(
-				project.NewProjectRemovedEvent(context.Background(),
+				project.NewProjectRemovedByOwnerEvent(context.Background(),
 					&project.NewAggregate("project1", "org1").Aggregate,
-					"project",
-					nil),
+					"project"),
 			),
 		)(t),
 		checkPermission:  newMockPermissionCheckAllowed(),
 		ownerDeleteReady: func(context.Context) (bool, error) { return true, nil },
 	}
+	assertOwnerOnlyUniqueConstraints(t, project.NewProjectRemovedByOwnerEvent(context.Background(),
+		&project.NewAggregate("project1", "org1").Aggregate,
+		"project"), eventstore.UniqueConstraintOwnerProject, "project1")
 	got, err := r.RemoveProject(context.Background(), "project1", "org1")
 	require.NoError(t, err)
 	assertObjectDetails(t, &domain.ObjectDetails{ResourceOwner: "org1"}, got)

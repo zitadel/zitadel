@@ -365,18 +365,11 @@ func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner s
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
 
-	uniqueConstraints, err := c.projectRemovedUniqueConstraints(ctx, projectID, resourceOwner)
+	removed, ownerDeleteReady, err := c.newProjectRemovedEvent(ctx, existingProject)
 	if err != nil {
 		return nil, err
 	}
-
-	events := []eventstore.Command{
-		project.NewProjectRemovedEvent(ctx,
-			ProjectAggregateFromWriteModelWithCTX(ctx, &existingProject.WriteModel),
-			existingProject.Name,
-			uniqueConstraints,
-		),
-	}
+	events := []eventstore.Command{removed}
 
 	for _, grantID := range cascadingUserGrantIDs {
 		event, _, err := c.removeUserGrant(ctx, grantID, "", true, false, nil)
@@ -384,6 +377,7 @@ func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner s
 			logging.WithFields("id", "COMMAND-b8Djf", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
 			continue
 		}
+		skipCascadeUniqueConstraints(ownerDeleteReady, event)
 		events = append(events, event)
 	}
 
@@ -414,23 +408,18 @@ func (c *Commands) DeleteProject(ctx context.Context, id, resourceOwner string, 
 		return time.Time{}, err
 	}
 
-	uniqueConstraints, err := c.projectRemovedUniqueConstraints(ctx, id, resourceOwner)
+	removed, ownerDeleteReady, err := c.newProjectRemovedEvent(ctx, existing)
 	if err != nil {
 		return time.Time{}, err
 	}
-	events := []eventstore.Command{
-		project.NewProjectRemovedEvent(ctx,
-			ProjectAggregateFromWriteModelWithCTX(ctx, &existing.WriteModel),
-			existing.Name,
-			uniqueConstraints,
-		),
-	}
+	events := []eventstore.Command{removed}
 	for _, grantID := range cascadingUserGrantIDs {
 		event, _, err := c.removeUserGrant(ctx, grantID, "", true, false, nil)
 		if err != nil {
 			logging.WithFields("id", "COMMAND-b8Djf", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
 			continue
 		}
+		skipCascadeUniqueConstraints(ownerDeleteReady, event)
 		events = append(events, event)
 	}
 
@@ -440,14 +429,23 @@ func (c *Commands) DeleteProject(ctx context.Context, id, resourceOwner string, 
 	return existing.WriteModel.ChangeDate, nil
 }
 
-func (c *Commands) projectRemovedUniqueConstraints(ctx context.Context, projectID, resourceOwner string) ([]*eventstore.UniqueConstraint, error) {
+func (c *Commands) newProjectRemovedEvent(ctx context.Context, existing *ProjectWriteModel) (eventstore.Command, bool, error) {
+	agg := ProjectAggregateFromWriteModelWithCTX(ctx, &existing.WriteModel)
 	ownerDeleteReady, err := c.isUniqueConstraintOwnerDeleteReady(ctx)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	if ownerDeleteReady {
-		return nil, nil
+		return project.NewProjectRemovedByOwnerEvent(ctx, agg, existing.Name), true, nil
 	}
+	uniqueConstraints, err := c.projectRemovedUniqueConstraints(ctx, existing.AggregateID, existing.ResourceOwner)
+	if err != nil {
+		return nil, false, err
+	}
+	return project.NewProjectRemovedEvent(ctx, agg, existing.Name, uniqueConstraints), false, nil
+}
+
+func (c *Commands) projectRemovedUniqueConstraints(ctx context.Context, projectID, resourceOwner string) ([]*eventstore.UniqueConstraint, error) {
 	samlEntityIDsAgg, err := c.getSAMLEntityIdsWriteModelByProjectID(ctx, projectID, resourceOwner)
 	if err != nil {
 		return nil, err

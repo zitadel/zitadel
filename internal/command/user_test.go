@@ -1464,16 +1464,16 @@ func TestCommandSide_RemoveUserOwnerDeleteReady(t *testing.T) {
 				),
 			),
 			expectPush(
-				user.NewUserRemovedEvent(context.Background(),
+				user.NewUserRemovedByOwnerEvent(context.Background(),
 					&user.NewAggregate("user1", "org1").Aggregate,
-					"",
-					nil,
-					false,
 				),
 			),
 		)(t),
 		ownerDeleteReady: func(context.Context) (bool, error) { return true, nil },
 	}
+	assertOwnerOnlyUniqueConstraints(t, user.NewUserRemovedByOwnerEvent(context.Background(),
+		&user.NewAggregate("user1", "org1").Aggregate,
+	), eventstore.UniqueConstraintOwnerUser, "user1")
 	got, err := r.RemoveUser(context.Background(), "user1", "org1", nil)
 	require.NoError(t, err)
 	assertObjectDetails(t, &domain.ObjectDetails{ResourceOwner: "org1"}, got)
