@@ -1370,6 +1370,7 @@ func (q *UserSearchQueries) planUserSearch(ctx context.Context, permissionCheckV
 		needsMachineJoin: searchQueriesUse(filters, func(col Column) bool {
 			return col.table.name == machineTable.name
 		}),
+		// Display alias (preferred_login_name / aggregated login_names), not LoginNameQuery EQUALS.
 		needsLoginNamesJoin: searchQueriesUse(filters, func(col Column) bool {
 			return col.table.alias == userLoginNamesTable.alias
 		}),
@@ -1444,6 +1445,10 @@ func (p userSearchPlan) matchingCountSelect(ctx context.Context) sq.SelectBuilde
 	return p.applyConstraints(ctx, sq.Select(countExpr), false)
 }
 
+func (p userSearchPlan) scalarTotal(ctx context.Context) sq.Sqlizer {
+	return sq.ConcatExpr("(", p.matchingCountSelect(ctx), ") AS total")
+}
+
 func (q *UserSearchQueries) usersCountQuery(ctx context.Context, plan userSearchPlan) (sq.SelectBuilder, func(*sql.Rows) (uint64, error)) {
 	query := plan.matchingCountSelect(ctx).PlaceholderFormat(sq.Dollar)
 	return query, scanUsersCount
@@ -1451,12 +1456,9 @@ func (q *UserSearchQueries) usersCountQuery(ctx context.Context, plan userSearch
 
 // prepareUsersQuery creates the select query for searching users and returns a matching scan function.
 // Matching IDs are selected first with filters, permissions and LIMIT/OFFSET.
-// An uncorrelated scalar COUNT(*) (InitPlan) supplies total_result without a
-// window over every matching ID. Humans, machines and login_names are joined
-// afterwards so the login_names3 view is expanded only for the returned page.
-//
-// Metadata JOIN and DISTINCT are only applied when a metadata filter is present.
-// DISTINCT stays on the page subquery; COUNT(DISTINCT id) is used for the total.
+// A scalar COUNT(*) (COUNT(DISTINCT id) with a metadata filter) supplies the total.
+// Humans, machines and login_names are joined afterwards so the login_names3 view
+// is expanded only for the returned page.
 // Login-equality filters (username, email, phone, login name EQUALS /
 // EQUALS_IGNORE_CASE) become an indexed UNION of ID seeks.
 func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionCheckV2 bool) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
@@ -1518,7 +1520,7 @@ func (q *UserSearchQueries) usersPageQuery(ctx context.Context, plan userSearchP
 		MachineSecretCol.identifier(),
 		MachineAccessTokenTypeCol.identifier(),
 		"page.sort_col",
-	).Column(sq.ConcatExpr("(", plan.matchingCountSelect(ctx), ") AS total")).
+	).Column(plan.scalarTotal(ctx)).
 		FromSelect(pageQuery, "page").
 		Join(userTable.identifier()+" ON "+UserIDCol.identifier()+" = page.id AND "+UserInstanceIDCol.identifier()+" = ?", plan.instanceID).
 		LeftJoin(join(HumanUserIDCol, UserIDCol)).

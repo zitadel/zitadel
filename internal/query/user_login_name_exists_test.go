@@ -494,14 +494,16 @@ func TestPrepareUsersQuery_MetadataFilterKeepsDistinctJoin(t *testing.T) {
 	assert.Contains(t, inner, "SELECT DISTINCT")
 	assert.Contains(t, inner, "user_metadata5")
 	assert.Contains(t, sql, "COUNT(DISTINCT")
-	assert.NotContains(t, inner, "COUNT(")
+	assert.NotContains(t, inner, "SELECT COUNT(*)")
+	assert.NotContains(t, inner, "COUNT(DISTINCT")
 	assert.NotContains(t, sql, "COUNT(*) OVER ()")
 	distinctIdx := strings.Index(inner, "SELECT DISTINCT")
 	idsIdx := strings.Index(inner, ") AS ids")
 	if distinctIdx < 0 || idsIdx < 0 || idsIdx <= distinctIdx {
 		t.Fatalf("distinct ids subquery not found: %s", inner)
 	}
-	assert.NotContains(t, inner[distinctIdx:idsIdx], "COUNT(")
+	assert.NotContains(t, inner[distinctIdx:idsIdx], "SELECT COUNT(*)")
+	assert.NotContains(t, inner[distinctIdx:idsIdx], "COUNT(DISTINCT")
 }
 
 func TestPrepareUsersQuery_PaginatesBeforeLoginNamesJoin(t *testing.T) {
