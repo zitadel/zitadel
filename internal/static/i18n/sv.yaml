@@ -1375,6 +1375,51 @@ EventTypes:
     activated: "Webbnyckel aktiverad"
     deactivated: "Webnyckel avaktiverad"
     removed: "Webbnyckeln har tagits bort"
+  session:
+    added: "Session skapad"
+    user:
+      checked: "Sessionens användare kontrollerad"
+    password:
+      checked: "Sessionens lösenord kontrollerat"
+    intent:
+      checked: "Sessionens IDP-intent kontrollerad"
+    webAuthN:
+      challenged: "Sessionens WebAuthN-utmaning skapad"
+      checked: "Sessionens WebAuthN kontrollerad"
+    totp:
+      checked: "Sessionens TOTP kontrollerad"
+    otp:
+      sms:
+        challenged: "Sessionens OTP SMS-utmaning skapad"
+        sent: "Sessionens OTP SMS-kod skickad"
+        checked: "Sessionens OTP SMS kontrollerad"
+      email:
+        challenged: "Sessionens OTP E-post-utmaning skapad"
+        sent: "Sessionens OTP E-postkod skickad"
+        checked: "Sessionens OTP E-post kontrollerad"
+    recoveryCode:
+      checked: "Sessionens återställningskod kontrollerad"
+    token:
+      set: "Sessionens token inställd"
+    metadata:
+      set: "Sessionens metadata inställd"
+    lifetime:
+      set: "Sessionens livslängd inställd"
+    terminated: "Session avslutad"
+  oidc_session:
+    added: "OIDC-session skapad"
+    access_token:
+      added: "OIDC-sessionens åtkomsttoken skapad"
+      revoked: "OIDC-sessionens åtkomsttoken återkallad"
+    refresh_token:
+      added: "OIDC-sessionens uppdateringstoken skapad"
+      renewed: "OIDC-sessionens uppdateringstoken förnyad"
+      revoked: "OIDC-sessionens uppdateringstoken återkallad"
+  saml_session:
+    added: "SAML-session skapad"
+    saml_response:
+      added: "SAML-sessionens svar skapat"
+      revoked: "SAML-sessionens svar återkallat"
 Application:
   OIDC:
     UnsupportedVersion: "Din OIDC-version stöds inte"

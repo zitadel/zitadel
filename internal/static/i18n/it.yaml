@@ -1372,6 +1372,51 @@ EventTypes:
     activated: "Web Key attivato"
     deactivated: "Web Key disattivato"
     removed: "Web Key rimosso"
+  session:
+    added: "Sessione creata"
+    user:
+      checked: "Utente della sessione verificato"
+    password:
+      checked: "Password della sessione verificata"
+    intent:
+      checked: "Intent del provider di identità della sessione verificato"
+    webAuthN:
+      challenged: "Challenge WebAuthN della sessione creata"
+      checked: "WebAuthN della sessione verificato"
+    totp:
+      checked: "TOTP della sessione verificato"
+    otp:
+      sms:
+        challenged: "Challenge OTP SMS della sessione creata"
+        sent: "Codice OTP SMS della sessione inviato"
+        checked: "OTP SMS della sessione verificato"
+      email:
+        challenged: "Challenge OTP e-mail della sessione creata"
+        sent: "Codice OTP e-mail della sessione inviato"
+        checked: "OTP e-mail della sessione verificato"
+    recoveryCode:
+      checked: "Codice di recupero della sessione verificato"
+    token:
+      set: "Token della sessione impostato"
+    metadata:
+      set: "Metadati della sessione impostati"
+    lifetime:
+      set: "Durata della sessione impostata"
+    terminated: "Sessione terminata"
+  oidc_session:
+    added: "Sessione OIDC creata"
+    access_token:
+      added: "Access Token della sessione OIDC creato"
+      revoked: "Access Token della sessione OIDC revocato"
+    refresh_token:
+      added: "Refresh Token della sessione OIDC creato"
+      renewed: "Refresh Token della sessione OIDC rinnovato"
+      revoked: "Refresh Token della sessione OIDC revocato"
+  saml_session:
+    added: "Sessione SAML creata"
+    saml_response:
+      added: "Risposta SAML della sessione creata"
+      revoked: "Risposta SAML della sessione revocata"
 Application:
   OIDC:
     UnsupportedVersion: "La tua versione di OIDC non è supportata"
