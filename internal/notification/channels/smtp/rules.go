@@ -1,11 +1,14 @@
 package smtp
 
 import (
+	"errors"
 	"fmt"
 	"net"
+	"reflect"
 	"slices"
 	"strings"
 	"text/template"
+	"text/template/parse"
 
 	"github.com/zitadel/zitadel/internal/notification/messages"
 )
@@ -35,11 +38,12 @@ type RuleMatch struct {
 // are lower-cased when read from the runtime configuration.
 type RuleHeader struct {
 	Name string
-	// Value is a text/template, [RuleData] is passed as data.
+	// Value can contain text and placeholders for the fields of [RuleData], e.g. {{.InstanceID}}.
+	// Other template actions are not supported.
 	Value string
 }
 
-// RuleData is passed to the templates of the header values.
+// RuleData provides the placeholders of the header values.
 // It intentionally does not contain any personal data.
 type RuleData struct {
 	InstanceID string
@@ -103,13 +107,52 @@ func compileHeaders(configs []RuleHeader) ([]*compiledHeader, error) {
 		if err != nil {
 			return nil, fmt.Errorf("header %q: %w", config.Name, err)
 		}
-		// fields unknown to RuleData are only detected on execution
-		if err = value.Execute(new(strings.Builder), RuleData{}); err != nil {
+		if err = validateHeaderTemplate(value); err != nil {
 			return nil, fmt.Errorf("header %q: %w", config.Name, err)
 		}
 		headers[i] = &compiledHeader{name: config.Name, value: value}
 	}
 	return headers, nil
+}
+
+var errUnsupportedHeaderTemplate = errors.New("value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}")
+
+// validateHeaderTemplate ensures that the value only consists of text and placeholders for the fields of [RuleData].
+// Other actions like conditions, functions or nested templates are rejected,
+// because whether they fail can depend on the data and would only be detected when an email is sent.
+func validateHeaderTemplate(tmpl *template.Template) error {
+	if len(tmpl.Templates()) > 1 {
+		return errUnsupportedHeaderTemplate
+	}
+	if tmpl.Tree == nil || tmpl.Root == nil {
+		return nil
+	}
+	for _, node := range tmpl.Root.Nodes {
+		switch n := node.(type) {
+		case *parse.TextNode:
+			continue
+		case *parse.ActionNode:
+			if !isRuleDataPlaceholder(n.Pipe) {
+				return errUnsupportedHeaderTemplate
+			}
+		default:
+			return errUnsupportedHeaderTemplate
+		}
+	}
+	return nil
+}
+
+// isRuleDataPlaceholder reports whether the pipeline is a single field of [RuleData], e.g. {{.InstanceID}}.
+func isRuleDataPlaceholder(pipe *parse.PipeNode) bool {
+	if pipe == nil || len(pipe.Decl) != 0 || len(pipe.Cmds) != 1 || len(pipe.Cmds[0].Args) != 1 {
+		return false
+	}
+	field, ok := pipe.Cmds[0].Args[0].(*parse.FieldNode)
+	if !ok || len(field.Ident) != 1 {
+		return false
+	}
+	_, ok = reflect.TypeFor[RuleData]().FieldByName(field.Ident[0])
+	return ok
 }
 
 // Match returns the [Rule] of the first rule matching the SMTP provider.
