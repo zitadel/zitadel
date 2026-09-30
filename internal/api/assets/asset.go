@@ -147,12 +147,14 @@ const (
 // OpenType fonts whose table directory does not start with one of the
 // commonly recognized SFNT table tags, are misdetected as
 // application/octet-stream by content-based mimetype sniffing.
+// Every value must have the "font/" prefix so that it still passes the font
+// uploader's content type allow-list. .eot is deliberately not listed: its
+// type is application/vnd.ms-fontobject, which the allow-list rejects.
 var fontExtensionContentTypes = map[string]string{
 	".ttf":   "font/ttf",
 	".otf":   "font/otf",
 	".woff":  "font/woff",
 	".woff2": "font/woff2",
-	".eot":   "application/vnd.ms-fontobject",
 	".ttc":   "font/collection",
 }
 

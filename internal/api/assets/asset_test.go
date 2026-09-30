@@ -28,6 +28,24 @@ func TestRefineContentType(t *testing.T) {
 			want:        "font/woff2",
 		},
 		{
+			name:        "octet-stream woff is refined to font/woff",
+			contentType: "application/octet-stream",
+			filename:    "custom-font.woff",
+			want:        "font/woff",
+		},
+		{
+			name:        "octet-stream ttc is refined to font/collection",
+			contentType: "application/octet-stream",
+			filename:    "custom-font.ttc",
+			want:        "font/collection",
+		},
+		{
+			name:        "octet-stream eot is left untouched so it stays allowed",
+			contentType: "application/octet-stream",
+			filename:    "custom-font.eot",
+			want:        "application/octet-stream",
+		},
+		{
 			name:        "octet-stream with unknown extension is left untouched",
 			contentType: "application/octet-stream",
 			filename:    "custom-font.bin",
@@ -52,5 +70,14 @@ func TestRefineContentType(t *testing.T) {
 				t.Errorf("refineContentType() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestRefinedFontContentTypesAreAllowed(t *testing.T) {
+	uploader := (&Handler{}).UploadOrgLabelPolicyFont()
+	for ext, contentType := range fontExtensionContentTypes {
+		if !uploader.ContentTypeAllowed(contentType) {
+			t.Errorf("refined content type %q for %s is rejected by the font uploader allow-list", contentType, ext)
+		}
 	}
 }
