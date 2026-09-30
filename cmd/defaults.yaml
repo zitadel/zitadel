@@ -619,8 +619,8 @@ Notifications:
   #     # Removes HTML from custom message texts. Simple formatting (br, strong, b, em, i, u, p) is kept,
   #     # all other elements like links, images or styles are removed, their text is kept.
   #     DisableCustomHTML: true
-  #     # Headers are added to every email. The values are Go templates,
-  #     # which are able to use {{.InstanceID}} and {{.OrgID}}.
+  #     # Headers are added to every email. The values can contain text
+  #     # and the placeholders {{.InstanceID}} and {{.OrgID}}.
   #     Headers:
   #       - Name: X-Instance-ID
   #         Value: "{{.InstanceID}}"
