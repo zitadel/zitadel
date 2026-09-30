@@ -5,10 +5,12 @@ import (
 	"html"
 	"strings"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/i18n"
+	zchannels "github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/channels/email"
 	"github.com/zitadel/zitadel/internal/notification/channels/set"
 	"github.com/zitadel/zitadel/internal/notification/channels/sms"
@@ -17,6 +19,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/templates"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Notify func(
@@ -51,6 +54,19 @@ func SendEmail(
 		messageType string,
 		allowUnverifiedNotificationChannel bool,
 	) error {
+		// The provider is resolved before the content is rendered,
+		// because the rule of the provider defines how it is rendered.
+		emailChannels, config, err := channels.Email(ctx)
+		logging.OnError(ctx, err).Error("could not create email channel")
+		if emailChannels == nil || emailChannels.Len() == 0 {
+			return zchannels.NewCancelError(
+				zerrors.ThrowPreconditionFailed(nil, "MAIL-w8nfow", "Errors.Notification.Channels.NotPresent"),
+			)
+		}
+		rule, err := smtpRule(ctx, channels, config, user)
+		if err != nil {
+			return err
+		}
 		args = mapNotifyUserToArgs(user, args)
 		sanitizeArgsForHTML(args)
 		url, err := urlFromTemplate(urlTmpl, args)
@@ -58,6 +74,11 @@ func SendEmail(
 			return err
 		}
 		data := GetTemplateData(ctx, translator, args, url, messageType, user.PreferredLanguage.String(), colors)
+		if rule.DisableCustomHTML {
+			// The texts contain the custom message texts of the instance / org with the already escaped arguments.
+			// Only the texts are restricted, the arguments remain escaped and are never rendered.
+			data.RestrictHTML()
+		}
 		template, err := templates.GetParsedTemplate(mailhtml, data)
 		if err != nil {
 			return err
@@ -65,6 +86,9 @@ func SendEmail(
 		return generateEmail(
 			ctx,
 			channels,
+			emailChannels,
+			config,
+			rule,
 			user,
 			template,
 			data,
@@ -73,6 +97,15 @@ func SendEmail(
 			triggeringEventType,
 		)
 	}
+}
+
+// smtpRule returns the rule of the operator for the provider.
+// Rules are only applied to SMTP providers.
+func smtpRule(ctx context.Context, channels ChannelChains, config *email.Config, user *query.NotifyUser) (smtp.Rule, error) {
+	if config == nil || config.SMTPConfig == nil {
+		return smtp.Rule{}, nil
+	}
+	return channels.SMTPRule(ctx, config.SMTPConfig, user.ResourceOwner)
 }
 
 func sanitizeArgsForHTML(args map[string]any) {
