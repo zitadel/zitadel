@@ -93,7 +93,9 @@ type WorkerConfig struct {
 // nowFunc makes [time.Now] mockable
 type nowFunc func() time.Time
 
-type Sent func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error
+// Sent is called after a notification was sent to set the corresponding event on the aggregate.
+// deliverySuppressed is true if an email was accepted, but intentionally not sent to the provider.
+type Sent func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, deliverySuppressed bool, args map[string]any) error
 
 var sentHandlers map[eventstore.EventType]Sent
 
@@ -160,6 +162,7 @@ func (w *NotificationWorker) sendNotificationQueue(ctx context.Context, request 
 	}
 
 	generatorInfo := new(senders.CodeGeneratorInfo)
+	deliverySuppressed := new(bool)
 	var notify types.Notify
 	switch request.NotificationType {
 	case domain.NotificationTypeEmail:
@@ -167,7 +170,7 @@ func (w *NotificationWorker) sendNotificationQueue(ctx context.Context, request 
 		if err != nil {
 			return err
 		}
-		notify = types.SendEmail(ctx, w.channels, string(template.Template), translator, notifyUser, colors, request.EventType, nil)
+		notify = types.SendEmail(ctx, w.channels, string(template.Template), translator, notifyUser, colors, request.EventType, deliverySuppressed)
 	case domain.NotificationTypeSms:
 		notify = types.SendSMS(ctx, w.channels, translator, notifyUser, colors, request.EventType, request.Aggregate.InstanceID, jobID, generatorInfo)
 	}
@@ -183,7 +186,7 @@ func (w *NotificationWorker) sendNotificationQueue(ctx context.Context, request 
 		return err
 	}
 
-	err = sentHandler(authz.WithInstanceID(ctx, request.Aggregate.InstanceID), w.commands, request.Aggregate.ID, request.Aggregate.ResourceOwner, generatorInfo, args)
+	err = sentHandler(authz.WithInstanceID(ctx, request.Aggregate.InstanceID), w.commands, request.Aggregate.ID, request.Aggregate.ResourceOwner, generatorInfo, *deliverySuppressed, args)
 	logging.WithFields("instanceID", request.Aggregate.InstanceID, "notification", request.Aggregate.ID).
 		OnError(err).Error("could not set notification event on aggregate")
 	return nil

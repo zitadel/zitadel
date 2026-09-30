@@ -172,7 +172,8 @@ func (u *userNotifierLegacy) reduceInitCodeAdded(event eventstore.Event) (*handl
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e.Type(), nil).
+		deliverySuppressed := new(bool)
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e.Type(), deliverySuppressed).
 			SendUserInitCode(ctx, notifyUser, code, e.AuthRequestID)
 		if err != nil {
 			if errors.Is(err, &channels.CancelError{}) {
@@ -181,7 +182,7 @@ func (u *userNotifierLegacy) reduceInitCodeAdded(event eventstore.Event) (*handl
 			}
 			return err
 		}
-		return u.commands.HumanInitCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, false)
+		return u.commands.HumanInitCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, *deliverySuppressed)
 	}), nil
 }
 
@@ -233,7 +234,8 @@ func (u *userNotifierLegacy) reduceEmailCodeAdded(event eventstore.Event) (*hand
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type(), nil).
+		deliverySuppressed := new(bool)
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type(), deliverySuppressed).
 			SendEmailVerificationCode(ctx, notifyUser, code, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
 			if errors.Is(err, &channels.CancelError{}) {
@@ -242,7 +244,7 @@ func (u *userNotifierLegacy) reduceEmailCodeAdded(event eventstore.Event) (*hand
 			}
 			return err
 		}
-		return u.commands.HumanEmailVerificationCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, false)
+		return u.commands.HumanEmailVerificationCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, *deliverySuppressed)
 	}), nil
 }
 
@@ -297,7 +299,8 @@ func (u *userNotifierLegacy) reducePasswordCodeAdded(event eventstore.Event) (*h
 			return err
 		}
 		generatorInfo := new(senders.CodeGeneratorInfo)
-		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type(), nil)
+		deliverySuppressed := new(bool)
+		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type(), deliverySuppressed)
 		if e.NotificationType == domain.NotificationTypeSms {
 			notify = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e.Type(), e.Aggregate().InstanceID, e.ID, generatorInfo)
 		}
@@ -309,7 +312,7 @@ func (u *userNotifierLegacy) reducePasswordCodeAdded(event eventstore.Event) (*h
 			}
 			return err
 		}
-		return u.commands.PasswordCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, generatorInfo, false)
+		return u.commands.PasswordCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, generatorInfo, *deliverySuppressed)
 	}), nil
 }
 
@@ -523,7 +526,8 @@ func (u *userNotifierLegacy) reduceOTPEmail(
 	if err != nil {
 		return nil, err
 	}
-	notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type(), nil)
+	deliverySuppressed := new(bool)
+	notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type(), deliverySuppressed)
 	err = notify.SendOTPEmailCode(ctx, link, plainCode, expiry)
 	if err != nil {
 		if errors.Is(err, &channels.CancelError{}) {
@@ -532,7 +536,7 @@ func (u *userNotifierLegacy) reduceOTPEmail(
 		}
 		return nil, err
 	}
-	err = sentCommand(ctx, event.Aggregate().ID, event.Aggregate().ResourceOwner, false)
+	err = sentCommand(ctx, event.Aggregate().ID, event.Aggregate().ResourceOwner, *deliverySuppressed)
 	if err != nil {
 		return nil, err
 	}
@@ -577,7 +581,8 @@ func (u *userNotifierLegacy) reduceDomainClaimed(event eventstore.Event) (*handl
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type(), nil).
+		deliverySuppressed := new(bool)
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type(), deliverySuppressed).
 			SendDomainClaimed(ctx, notifyUser, e.UserName, e.URLTemplate)
 		if err != nil {
 			if errors.Is(err, &channels.CancelError{}) {
@@ -586,7 +591,7 @@ func (u *userNotifierLegacy) reduceDomainClaimed(event eventstore.Event) (*handl
 			}
 			return err
 		}
-		return u.commands.UserDomainClaimedSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, false)
+		return u.commands.UserDomainClaimedSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, *deliverySuppressed)
 	}), nil
 }
 
@@ -635,7 +640,8 @@ func (u *userNotifierLegacy) reducePasswordlessCodeRequested(event eventstore.Ev
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type(), nil).
+		deliverySuppressed := new(bool)
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type(), deliverySuppressed).
 			SendPasswordlessRegistrationLink(ctx, notifyUser, code, e.ID, e.URLTemplate)
 		if err != nil {
 			if errors.Is(err, &channels.CancelError{}) {
@@ -644,7 +650,7 @@ func (u *userNotifierLegacy) reducePasswordlessCodeRequested(event eventstore.Ev
 			}
 			return err
 		}
-		return u.commands.HumanPasswordlessInitCodeSent(ctx, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.ID, false)
+		return u.commands.HumanPasswordlessInitCodeSent(ctx, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.ID, *deliverySuppressed)
 	}), nil
 }
 
@@ -698,7 +704,8 @@ func (u *userNotifierLegacy) reducePasswordChanged(event eventstore.Event) (*han
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type(), nil).
+		deliverySuppressed := new(bool)
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type(), deliverySuppressed).
 			SendPasswordChange(ctx, notifyUser)
 		if err != nil {
 			if errors.Is(err, &channels.CancelError{}) {
@@ -707,7 +714,7 @@ func (u *userNotifierLegacy) reducePasswordChanged(event eventstore.Event) (*han
 			}
 			return err
 		}
-		return u.commands.PasswordChangeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, false)
+		return u.commands.PasswordChangeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, *deliverySuppressed)
 	}), nil
 }
 
@@ -815,7 +822,8 @@ func (u *userNotifierLegacy) reduceInviteCodeAdded(event eventstore.Event) (*han
 		if err != nil {
 			return err
 		}
-		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type(), nil)
+		deliverySuppressed := new(bool)
+		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type(), deliverySuppressed)
 		err = notify.SendInviteCode(ctx, notifyUser, code, e.ApplicationName, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
 			if errors.Is(err, &channels.CancelError{}) {
@@ -824,7 +832,7 @@ func (u *userNotifierLegacy) reduceInviteCodeAdded(event eventstore.Event) (*han
 			}
 			return err
 		}
-		return u.commands.InviteCodeSent(ctx, e.Aggregate().ID, e.Aggregate().ResourceOwner, false)
+		return u.commands.InviteCodeSent(ctx, e.Aggregate().ID, e.Aggregate().ResourceOwner, *deliverySuppressed)
 	}), nil
 }
 

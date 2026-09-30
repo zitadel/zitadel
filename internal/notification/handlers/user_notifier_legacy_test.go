@@ -70,6 +70,34 @@ func Test_userNotifierLegacy_reduceInitCodeAdded(t *testing.T) {
 				}, w
 		},
 	}, {
+		name: "reserved recipient domain, not sent but flagged",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
+			// no message is expected, but the notification is set to sent and flagged
+			codeAlg, code := cryptoValue(t, ctrl, "testcode")
+			expectTemplateWithReservedNotifyUserQueries(queries, "{{.LogoURL}}")
+			commands.EXPECT().HumanInitCodeSent(gomock.Any(), orgID, userID, true).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+					userDataCrypto: codeAlg,
+					smtpRules:      suppressReservedRecipientDomainsRules(t),
+				}, args{
+					event: &user.HumanInitialCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:              code,
+						Expiry:            time.Hour,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
+		},
+	}, {
 		name: "asset url without event trigger url",
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 			givenTemplate := "{{.LogoURL}}"
@@ -1978,7 +2006,8 @@ func newUserNotifierLegacy(t *testing.T, ctrl *gomock.Controller, queries *mock.
 			return origin.String() + defaultOTPEmailTemplate
 		},
 		channels: &notificationChannels{
-			Chain: *senders.ChainChannels(channel),
+			Chain:     *senders.ChainChannels(channel),
+			SMTPRules: f.smtpRules,
 			emailConfig: &email.Config{
 				ProviderConfig: &email.Provider{
 					ID:          "emailProviderID",
