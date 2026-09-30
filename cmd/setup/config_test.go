@@ -240,6 +240,44 @@ Actions:
 				},
 			})
 		},
+	}, {
+		// Regression test for https://github.com/zitadel/zitadel/issues/11765 —
+		// ensure the FLAT shape documented in cmd/defaults.yaml and
+		// apps/docs/content/self-hosting/manage/production.mdx
+		// (DefaultInstance.SMTPConfiguration.SMTP.{Host,User,Password})
+		// actually binds onto the InstanceSetup struct. Before this fix the
+		// SMTP struct embedded the runtime channel type whose auth fields
+		// are nested under PlainAuth, so User/Password were silently
+		// dropped during config bind.
+		name: "smtp configuration ok",
+		args: args{yaml: `
+DefaultInstance:
+  SMTPConfiguration:
+    SMTP:
+      Host: smtp.example.com:587
+      User: smtp-user
+      Password: smtp-password
+    TLS: true
+    From: no-reply@example.com
+    FromName: Example
+    ReplyToAddress: no-reply@example.com
+Log:
+  Level: info
+Actions:
+  HTTP:
+    DenyList: []
+`},
+		want: func(t *testing.T, config *Config) {
+			require.NotNil(t, config.DefaultInstance.SMTPConfiguration)
+			smtp := config.DefaultInstance.SMTPConfiguration
+			assert.Equal(t, "smtp.example.com:587", smtp.SMTP.Host)
+			assert.Equal(t, "smtp-user", smtp.SMTP.User)
+			assert.Equal(t, "smtp-password", smtp.SMTP.Password)
+			assert.True(t, smtp.Tls)
+			assert.Equal(t, "no-reply@example.com", smtp.From)
+			assert.Equal(t, "Example", smtp.FromName)
+			assert.Equal(t, "no-reply@example.com", smtp.ReplyToAddress)
+		},
 	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
