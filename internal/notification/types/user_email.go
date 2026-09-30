@@ -38,6 +38,7 @@ func generateEmail(
 			Recipients:          []string{recipient},
 			Subject:             data.Subject,
 			Content:             html.UnescapeString(template),
+			Headers:             rule.Headers,
 			TriggeringEventType: triggeringEventType,
 		}
 		return emailChannels.HandleMessage(message)

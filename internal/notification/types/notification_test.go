@@ -95,11 +95,12 @@ func TestSendEmail(t *testing.T) {
 	}
 	ruleErr := errors.New("rule error")
 
-	expectMessage := func(content string) *messages.Email {
+	expectMessage := func(content string, headers map[string]string) *messages.Email {
 		return &messages.Email{
 			Recipients:          []string{"user@example.com"},
 			Subject:             "Invitation to App",
 			Content:             content,
+			Headers:             headers,
 			TriggeringEventType: eventType,
 		}
 	}
@@ -138,9 +139,10 @@ func TestSendEmail(t *testing.T) {
 			displayName:       "O'Brien <b>",
 			wantRuleRequested: true,
 			wantMessage: expectMessage(
-				`<html><h1>Hello O&#39;Brien &lt;b&gt;,</h1>` +
-					`<p>Click <a href="https://other.example">here</a> to join App</p>` +
+				`<html><h1>Hello O&#39;Brien &lt;b&gt;,</h1>`+
+					`<p>Click <a href="https://other.example">here</a> to join App</p>`+
 					`<a href="https://login.example.com/invite?userID=user1&code=code1">Accept</a></html>`,
+				nil,
 			),
 		},
 		{
@@ -153,9 +155,10 @@ func TestSendEmail(t *testing.T) {
 			displayName:       "O'Brien <b>",
 			wantRuleRequested: true,
 			wantMessage: expectMessage(
-				`<html><h1>Hello O&#39;Brien &lt;b&gt;,</h1>` +
-					`<p>Click here to join App</p>` +
+				`<html><h1>Hello O&#39;Brien &lt;b&gt;,</h1>`+
+					`<p>Click here to join App</p>`+
 					`<a href="https://login.example.com/invite?userID=user1&code=code1">Accept</a></html>`,
+				nil,
 			),
 		},
 		{
@@ -168,9 +171,10 @@ func TestSendEmail(t *testing.T) {
 			displayName:       "Bob",
 			wantRuleRequested: true,
 			wantMessage: expectMessage(
-				`<html><h1>Hello Bob,</h1>` +
-					`<p>Use <strong>code1</strong><br>to join App</p>` +
+				`<html><h1>Hello Bob,</h1>`+
+					`<p>Use <strong>code1</strong><br>to join App</p>`+
 					`<a href="https://login.example.com/invite?userID=user1&code=code1">Accept</a></html>`,
+				nil,
 			),
 		},
 		{
@@ -183,9 +187,10 @@ func TestSendEmail(t *testing.T) {
 			displayName:       "<b>Bob</b><br>",
 			wantRuleRequested: true,
 			wantMessage: expectMessage(
-				`<html><h1>Hello &lt;b&gt;Bob&lt;/b&gt;&lt;br&gt;,</h1>` +
-					`<p>Use <strong>code1</strong><br>to join App</p>` +
+				`<html><h1>Hello &lt;b&gt;Bob&lt;/b&gt;&lt;br&gt;,</h1>`+
+					`<p>Use <strong>code1</strong><br>to join App</p>`+
 					`<a href="https://login.example.com/invite?userID=user1&code=code1">Accept</a></html>`,
+				nil,
 			),
 		},
 		{
@@ -195,9 +200,10 @@ func TestSendEmail(t *testing.T) {
 			displayName:       "Bob",
 			wantRuleRequested: true,
 			wantMessage: expectMessage(
-				`<html><h1>Hello Bob,</h1>` +
-					`<p>Dieser Benutzer wurde soeben im Zitadel erstellt. Mit dem Benutzernamen <br><strong>bob@example.com</strong><br> kannst du dich anmelden. (Code <strong>code1</strong>)</p>` +
+				`<html><h1>Hello Bob,</h1>`+
+					`<p>Dieser Benutzer wurde soeben im Zitadel erstellt. Mit dem Benutzernamen <br><strong>bob@example.com</strong><br> kannst du dich anmelden. (Code <strong>code1</strong>)</p>`+
 					`<a href="https://login.example.com/invite?userID=user1&code=code1">Accept</a></html>`,
+				nil,
 			),
 		},
 		{
@@ -210,9 +216,28 @@ func TestSendEmail(t *testing.T) {
 			displayName:       "Bob",
 			wantRuleRequested: true,
 			wantMessage: expectMessage(
-				`<html><h1>Hello Bob,</h1>` +
-					`<p>Dieser Benutzer wurde soeben im Zitadel erstellt. Mit dem Benutzernamen <br><strong>bob@example.com</strong><br> kannst du dich anmelden. (Code <strong>code1</strong>)</p>` +
+				`<html><h1>Hello Bob,</h1>`+
+					`<p>Dieser Benutzer wurde soeben im Zitadel erstellt. Mit dem Benutzernamen <br><strong>bob@example.com</strong><br> kannst du dich anmelden. (Code <strong>code1</strong>)</p>`+
 					`<a href="https://login.example.com/invite?userID=user1&code=code1">Accept</a></html>`,
+				nil,
+			),
+		},
+		{
+			name: "headers of the rule are passed to the message",
+			channels: &testChannels{
+				emailConfig: smtpConfig,
+				rule: smtp.Rule{
+					Headers: map[string]string{"X-Instance-ID": "instance1"},
+				},
+			},
+			text:              linkText,
+			displayName:       "Bob",
+			wantRuleRequested: true,
+			wantMessage: expectMessage(
+				`<html><h1>Hello Bob,</h1>`+
+					`<p>Click <a href="https://other.example">here</a> to join App</p>`+
+					`<a href="https://login.example.com/invite?userID=user1&code=code1">Accept</a></html>`,
+				map[string]string{"X-Instance-ID": "instance1"},
 			),
 		},
 		{
