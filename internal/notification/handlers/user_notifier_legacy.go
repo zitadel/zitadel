@@ -172,7 +172,7 @@ func (u *userNotifierLegacy) reduceInitCodeAdded(event eventstore.Event) (*handl
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e.Type()).
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e.Type(), nil).
 			SendUserInitCode(ctx, notifyUser, code, e.AuthRequestID)
 		if err != nil {
 			if errors.Is(err, &channels.CancelError{}) {
@@ -233,7 +233,7 @@ func (u *userNotifierLegacy) reduceEmailCodeAdded(event eventstore.Event) (*hand
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type()).
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type(), nil).
 			SendEmailVerificationCode(ctx, notifyUser, code, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
 			if errors.Is(err, &channels.CancelError{}) {
@@ -297,7 +297,7 @@ func (u *userNotifierLegacy) reducePasswordCodeAdded(event eventstore.Event) (*h
 			return err
 		}
 		generatorInfo := new(senders.CodeGeneratorInfo)
-		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type())
+		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type(), nil)
 		if e.NotificationType == domain.NotificationTypeSms {
 			notify = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e.Type(), e.Aggregate().InstanceID, e.ID, generatorInfo)
 		}
@@ -523,7 +523,7 @@ func (u *userNotifierLegacy) reduceOTPEmail(
 	if err != nil {
 		return nil, err
 	}
-	notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type())
+	notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type(), nil)
 	err = notify.SendOTPEmailCode(ctx, link, plainCode, expiry)
 	if err != nil {
 		if errors.Is(err, &channels.CancelError{}) {
@@ -577,7 +577,7 @@ func (u *userNotifierLegacy) reduceDomainClaimed(event eventstore.Event) (*handl
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type()).
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type(), nil).
 			SendDomainClaimed(ctx, notifyUser, e.UserName, e.URLTemplate)
 		if err != nil {
 			if errors.Is(err, &channels.CancelError{}) {
@@ -635,7 +635,7 @@ func (u *userNotifierLegacy) reducePasswordlessCodeRequested(event eventstore.Ev
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type()).
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type(), nil).
 			SendPasswordlessRegistrationLink(ctx, notifyUser, code, e.ID, e.URLTemplate)
 		if err != nil {
 			if errors.Is(err, &channels.CancelError{}) {
@@ -698,7 +698,7 @@ func (u *userNotifierLegacy) reducePasswordChanged(event eventstore.Event) (*han
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type()).
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type(), nil).
 			SendPasswordChange(ctx, notifyUser)
 		if err != nil {
 			if errors.Is(err, &channels.CancelError{}) {
@@ -815,7 +815,7 @@ func (u *userNotifierLegacy) reduceInviteCodeAdded(event eventstore.Event) (*han
 		if err != nil {
 			return err
 		}
-		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type())
+		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type(), nil)
 		err = notify.SendInviteCode(ctx, notifyUser, code, e.ApplicationName, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
 			if errors.Is(err, &channels.CancelError{}) {

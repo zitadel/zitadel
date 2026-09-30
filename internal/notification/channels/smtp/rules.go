@@ -21,6 +21,9 @@ type RuleConfig struct {
 	// Simple formatting (line breaks, bold, italic, underline, paragraphs) is kept,
 	// all other elements like links, images or styles are removed, their text is kept.
 	RestrictCustomHTML bool
+	// SuppressReservedRecipientDomains accepts notifications to recipients of reserved domains (RFC 2606, RFC 6761)
+	// like example.com or .test, but does not send them to the provider.
+	SuppressReservedRecipientDomains bool
 	// Headers are added to every email sent through the matching provider.
 	// The names are canonicalized (e.g. x-instance-id becomes X-Instance-Id),
 	// the values can contain text and the placeholders {{.InstanceID}} and {{.OrgID}}.
@@ -58,18 +61,20 @@ var headerPlaceholders = map[string]func(RuleData) string{
 // Rule is the result of the first matching [RuleConfig].
 // The zero value is returned if no rule matches.
 type Rule struct {
-	RestrictCustomHTML bool
-	Headers            map[string]string
+	RestrictCustomHTML               bool
+	SuppressReservedRecipientDomains bool
+	Headers                          map[string]string
 }
 
 // Rules are the compiled [RuleConfig]s in the order they were defined.
 type Rules []*compiledRule
 
 type compiledRule struct {
-	hosts              []hostPort
-	users              []string
-	senderDomains      []string
-	restrictCustomHTML bool
+	hosts                            []hostPort
+	users                            []string
+	senderDomains                    []string
+	restrictCustomHTML               bool
+	suppressReservedRecipientDomains bool
 	// headers with canonical names
 	headers map[string]string
 }
@@ -112,11 +117,12 @@ func compileRule(config RuleConfig) (*compiledRule, error) {
 		return nil, err
 	}
 	return &compiledRule{
-		hosts:              hosts,
-		users:              users,
-		senderDomains:      senderDomains,
-		restrictCustomHTML: config.RestrictCustomHTML,
-		headers:            headers,
+		hosts:                            hosts,
+		users:                            users,
+		senderDomains:                    senderDomains,
+		restrictCustomHTML:               config.RestrictCustomHTML,
+		suppressReservedRecipientDomains: config.SuppressReservedRecipientDomains,
+		headers:                          headers,
 	}, nil
 }
 
@@ -169,8 +175,9 @@ func (r Rules) Match(config *Config, data RuleData) Rule {
 			continue
 		}
 		return Rule{
-			RestrictCustomHTML: rule.restrictCustomHTML,
-			Headers:            rule.renderHeaders(data),
+			RestrictCustomHTML:               rule.restrictCustomHTML,
+			SuppressReservedRecipientDomains: rule.suppressReservedRecipientDomains,
+			Headers:                          rule.renderHeaders(data),
 		}
 	}
 	return Rule{}

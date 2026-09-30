@@ -45,6 +45,30 @@ func (e EmailAddress) Domain() string {
 	return address[index+1:]
 }
 
+// reservedDomains are reserved by RFC 2606 and RFC 6761 and can never receive emails.
+// Subdomains of them are reserved as well.
+var reservedDomains = []string{
+	"example.com",
+	"example.net",
+	"example.org",
+	"localhost",
+	"test",
+	"example",
+	"invalid",
+}
+
+// IsReservedDomain reports whether the domain of the address is reserved (RFC 2606, RFC 6761)
+// and can therefore never receive an email, e.g. example.com or user.test.
+func (e EmailAddress) IsReservedDomain() bool {
+	domain := strings.ToLower(strings.TrimSuffix(e.Domain(), "."))
+	for _, reserved := range reservedDomains {
+		if domain == reserved || strings.HasSuffix(domain, "."+reserved) {
+			return true
+		}
+	}
+	return false
+}
+
 type Email struct {
 	es_models.ObjectRoot
 

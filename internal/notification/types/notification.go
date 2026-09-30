@@ -43,6 +43,13 @@ type ChannelChains interface {
 	SMTPRule(ctx context.Context, config *smtp.Config, orgID string) smtp.Rule
 }
 
+// SuppressedEmailsCounter counts the emails, which were not sent to the provider,
+// because the recipient domain is reserved and the operator rule of the provider suppresses them.
+const SuppressedEmailsCounter = "suppressed_deliveries_email"
+
+// SendEmail returns a [Notify] function, which sends the notification as email.
+// deliverySuppressed is optional and set to true if the email was accepted but not sent to the provider,
+// because the recipient domain is reserved and the operator rule of the provider suppresses them.
 func SendEmail(
 	ctx context.Context,
 	channels ChannelChains,
@@ -51,6 +58,7 @@ func SendEmail(
 	user *query.NotifyUser,
 	colors *query.LabelPolicy,
 	triggeringEventType eventstore.EventType,
+	deliverySuppressed *bool,
 ) Notify {
 	return func(
 		urlTmpl string,
@@ -96,6 +104,7 @@ func SendEmail(
 			args,
 			allowUnverifiedNotificationChannel,
 			triggeringEventType,
+			deliverySuppressed,
 		)
 	}
 }

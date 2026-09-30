@@ -623,6 +623,9 @@ Notifications:
   #     # Removes HTML from custom message texts. Simple formatting (br, strong, b, em, i, u, p) is kept,
   #     # all other elements like links, images or styles are removed, their text is kept.
   #     RestrictCustomHTML: true
+  #     # Notifications to recipients of reserved domains (RFC 2606, RFC 6761) like example.com or .test
+  #     # are accepted, but not sent to the provider. The notification is marked as sent, but flagged as not delivered.
+  #     SuppressReservedRecipientDomains: true
   #     # Headers are added to every email. The names are canonicalized (X-Instance-Id),
   #     # the values can contain text and the placeholders {{.InstanceID}} and {{.OrgID}}.
   #     Headers:
