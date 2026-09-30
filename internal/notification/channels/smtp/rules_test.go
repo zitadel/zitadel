@@ -60,11 +60,105 @@ func TestCompileRules(t *testing.T) {
 			wantErr: `header "X-Header"`,
 		},
 		{
-			name: "unknown template field",
+			name: "unsupported template, unknown field",
 			configs: []RuleConfig{{
-				Headers: []RuleHeader{{Name: "X-Header", Value: "{{.UserID}}"}},
+				Headers: []RuleHeader{{Name: "X-Header", Value: `{{.UserID}}`}},
 			}},
-			wantErr: `header "X-Header"`,
+			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
+		},
+		{
+			name: "unsupported template, unknown field hidden by condition",
+			configs: []RuleConfig{{
+				Headers: []RuleHeader{{Name: "X-Header", Value: `{{if .InstanceID}}{{.UserID}}{{end}}`}},
+			}},
+			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
+		},
+		{
+			name: "unsupported template, condition",
+			configs: []RuleConfig{{
+				Headers: []RuleHeader{{Name: "X-Header", Value: `{{if .InstanceID}}a{{else}}b{{end}}`}},
+			}},
+			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
+		},
+		{
+			name: "unsupported template, function",
+			configs: []RuleConfig{{
+				Headers: []RuleHeader{{Name: "X-Header", Value: `{{printf "%s" .InstanceID}}`}},
+			}},
+			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
+		},
+		{
+			name: "unsupported template, index function",
+			configs: []RuleConfig{{
+				Headers: []RuleHeader{{Name: "X-Header", Value: `{{index .InstanceID 100}}`}},
+			}},
+			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
+		},
+		{
+			name: "unsupported template, pipeline",
+			configs: []RuleConfig{{
+				Headers: []RuleHeader{{Name: "X-Header", Value: `{{.InstanceID | len}}`}},
+			}},
+			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
+		},
+		{
+			name: "unsupported template, chained field",
+			configs: []RuleConfig{{
+				Headers: []RuleHeader{{Name: "X-Header", Value: `{{.InstanceID.Foo}}`}},
+			}},
+			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
+		},
+		{
+			name: "unsupported template, with",
+			configs: []RuleConfig{{
+				Headers: []RuleHeader{{Name: "X-Header", Value: `{{with .InstanceID}}{{.}}{{end}}`}},
+			}},
+			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
+		},
+		{
+			name: "unsupported template, range",
+			configs: []RuleConfig{{
+				Headers: []RuleHeader{{Name: "X-Header", Value: `{{range .InstanceID}}{{.}}{{end}}`}},
+			}},
+			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
+		},
+		{
+			name: "unsupported template, variable",
+			configs: []RuleConfig{{
+				Headers: []RuleHeader{{Name: "X-Header", Value: `{{$id := .InstanceID}}{{$id}}`}},
+			}},
+			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
+		},
+		{
+			name: "unsupported template, dot",
+			configs: []RuleConfig{{
+				Headers: []RuleHeader{{Name: "X-Header", Value: `{{.}}`}},
+			}},
+			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
+		},
+		{
+			name: "unsupported template, nested template",
+			configs: []RuleConfig{{
+				Headers: []RuleHeader{{Name: "X-Header", Value: `{{define "x"}}{{.UserID}}{{end}}{{template "x" .}}`}},
+			}},
+			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
+		},
+		{
+			name: "unsupported template, defined template",
+			configs: []RuleConfig{{
+				Headers: []RuleHeader{{Name: "X-Header", Value: `{{define "x"}}{{.UserID}}{{end}}text`}},
+			}},
+			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
+		},
+		{
+			name: "text and placeholders with trim markers",
+			configs: []RuleConfig{{
+				Headers: []RuleHeader{
+					{Name: "X-Header", Value: "prefix-{{ .InstanceID }}-{{- .OrgID -}} -suffix"},
+					{Name: "X-Empty", Value: ""},
+					{Name: "X-Text", Value: "text"},
+				},
+			}},
 		},
 	}
 	for _, tt := range tests {
