@@ -194,7 +194,30 @@ export async function sendPassword(
         // Force fallback if settings can't be loaded
         throw new Error("Could not load login settings");
       }
-    } catch {
+    } catch (error: any) {
+      if ("failedAttempts" in error && error.failedAttempts) {
+        recordAuthFailure("password", "invalid_password", command.organization);
+        if (loginSettingsByUser?.ignoreUnknownUsernames) {
+          return { error: t("errors.failedToAuthenticateNoLimit") };
+        }
+        const lockoutSettings = await getLockoutSettings({
+          serviceConfig,
+          orgId: command.organization ?? sessionCookie.organization,
+        });
+
+        const hasLimit =
+          lockoutSettings?.maxPasswordAttempts !== undefined && lockoutSettings?.maxPasswordAttempts > BigInt(0);
+        const locked = hasLimit && error.failedAttempts >= lockoutSettings?.maxPasswordAttempts;
+        const messageKey = hasLimit ? "errors.failedToAuthenticate" : "errors.failedToAuthenticateNoLimit";
+
+        return {
+          error: t(messageKey, {
+            failedAttempts: error.failedAttempts,
+            maxPasswordAttempts: hasLimit ? String(lockoutSettings?.maxPasswordAttempts ?? 0) : "?",
+            lockoutMessage: locked ? t("errors.accountLockedContactAdmin") : "",
+          }),
+        };
+      }
       logger.warn("[Password] Could not update session");
       // If the session was terminated or any other error occurred during update,
       // we fall back to creating a new session.
