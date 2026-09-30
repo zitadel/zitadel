@@ -1,0 +1,68 @@
+InitCode:
+  Title: Konfigurimi i përdoruesit
+  PreHeader: Konfigurimi i përdoruesit
+  Subject: Konfigurimi i përdoruesit
+  Greeting: Përshëndetje {{.DisplayName}},
+  Text: Përdoruesi juaj u krijua. Për të hyrë, përdorni emrin e përdoruesit {{.PreferredLoginName}}. Ju lutemi klikoni butonin më poshtë për të përfunduar konfigurimin. (Kodi {{.Code}}) Nëse nuk e keni kërkuar këtë email, ju lutemi shpërfilleni.
+  ButtonText: Përfundo konfigurimin
+PasswordReset:
+  Title: Rivendosni fjalëkalimin
+  PreHeader: Rivendosni fjalëkalimin
+  Subject: Rivendosni fjalëkalimin
+  Greeting: Përshëndetje {{.DisplayName}},
+  Text: Morëm një kërkesë për rivendosjen e fjalëkalimit. Ju lutemi përdorni butonin më poshtë për të rivendosur fjalëkalimin tuaj. (Kodi {{.Code}}) Nëse nuk e keni kërkuar këtë email, ju lutemi shpërfilleni.
+  ButtonText: Rivendos fjalëkalimin
+VerifyEmail:
+  Title: Verifikoni emailin
+  PreHeader: Verifikoni emailin
+  Subject: Verifikoni emailin
+  Greeting: Përshëndetje {{.DisplayName}},
+  Text: U shtua një adresë e re emaili. Ju lutemi përdorni butonin më poshtë për të verifikuar emailin tuaj. (Kodi {{.Code}}) Nëse nuk keni shtuar një email të ri, ju lutemi shpërfilleni këtë mesazh.
+  ButtonText: Verifiko emailin
+VerifyPhone:
+  Title: Verifikoni telefonin
+  PreHeader: Verifikoni telefonin
+  Subject: Verifikoni telefonin
+  Greeting: Përshëndetje {{.DisplayName}},
+  Text: U shtua një numër i ri telefoni. Ju lutemi përdorni kodin e mëposhtëm për ta verifikuar {{.Code}}
+  ButtonText: Verifiko telefonin
+VerifyEmailOTP:
+  Title: Verifikoni OTP-në
+  PreHeader: Verifikoni OTP-në
+  Subject: Verifikoni OTP-në
+  Greeting: Përshëndetje {{.DisplayName}},
+  Text: Ju lutemi përdorni OTP-në {{.OTP}} për t'u vërtetuar brenda pesë minutave të ardhshme ose klikoni butonin "Vërteto".
+  ButtonText: Vërteto
+VerifySMSOTP:
+  Text: >-
+    {{.OTP}} është OTP-ja juaj për {{ .Domain }}. Përdoreni brenda {{.Expiry}}.
+    
+    @{{.Domain}} #{{.OTP}}
+DomainClaimed:
+  Title: Domeni është marrë në pronësi
+  PreHeader: Ndryshoni emailin / emrin e përdoruesit
+  Subject: Domeni është marrë në pronësi
+  Greeting: Përshëndetje {{.DisplayName}},
+  Text: Domeni {{.Domain}} është marrë në pronësi nga një organizatë. Përdoruesi juaj aktual {{.Username}} nuk është pjesë e kësaj organizate. Prandaj do t'ju duhet të ndryshoni emailin tuaj kur të hyni. Kemi krijuar një emër të përkohshëm përdoruesi ({{.TempUsername}}) për këtë hyrje.
+  ButtonText: Hyr
+PasswordlessRegistration:
+  Title: Shtoni hyrjen me passkey
+  PreHeader: Shtoni hyrjen me passkey
+  Subject: Shtoni hyrjen me passkey
+  Greeting: Përshëndetje {{.DisplayName}},
+  Text: Morëm një kërkesë për të shtuar një token për hyrjen me passkey. Ju lutemi përdorni butonin më poshtë për të shtuar token-in ose pajisjen tuaj për hyrjen me passkey.
+  ButtonText: Shto hyrjen me passkey
+PasswordChange:
+  Title: Fjalëkalimi i përdoruesit u ndryshua
+  PreHeader: Ndryshoni fjalëkalimin
+  Subject: Fjalëkalimi i përdoruesit u ndryshua
+  Greeting: Përshëndetje {{.DisplayName}},
+  Text: Fjalëkalimi i përdoruesit tuaj u ndryshua. Nëse ky ndryshim nuk është bërë nga ju, ju këshillojmë të rivendosni menjëherë fjalëkalimin tuaj.
+  ButtonText: Hyr
+InviteUser:
+  Title: Ftesë për {{.ApplicationName}}
+  PreHeader: Ftesë për {{.ApplicationName}}
+  Subject: Ftesë për {{.ApplicationName}}
+  Greeting: Përshëndetje {{.DisplayName}},
+  Text: Përdoruesi juaj është ftuar në {{.ApplicationName}}. Ju lutemi klikoni butonin më poshtë për të përfunduar procesin e ftesës. Nëse nuk e keni kërkuar këtë email, ju lutemi shpërfilleni.
+  ButtonText: Prano ftesën
