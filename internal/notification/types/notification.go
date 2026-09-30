@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels/email"
 	"github.com/zitadel/zitadel/internal/notification/channels/set"
 	"github.com/zitadel/zitadel/internal/notification/channels/sms"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/templates"
@@ -30,6 +31,9 @@ type ChannelChains interface {
 	SMS(context.Context) (*senders.Chain, *sms.Config, error)
 	Webhook(context.Context, webhook.Config) (*senders.Chain, error)
 	SecurityTokenEvent(context.Context, set.Config) (*senders.Chain, error)
+	// SMTPRule returns the rule defined by the operator for the SMTP provider.
+	// If no rule matches the provider, the zero value is returned.
+	SMTPRule(ctx context.Context, config *smtp.Config, orgID string) (smtp.Rule, error)
 }
 
 func SendEmail(

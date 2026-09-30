@@ -19,7 +19,20 @@ import (
 	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/feature"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 )
+
+var wantSMTPRules = []smtp.RuleConfig{{
+	Match: smtp.RuleMatch{
+		Hosts:         []string{"smtp.example.com"},
+		SenderDomains: []string{"example.com"},
+	},
+	DisableCustomHTML: true,
+	Headers: []smtp.RuleHeader{{
+		Name:  "X-Instance-ID",
+		Value: "{{.InstanceID}}",
+	}},
+}}
 
 func Test_readConfig(t *testing.T) {
 	encodedKey := "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF6aStGRlNKTDdmNXl3NEtUd3pnTQpQMzRlUEd5Y20vTStrVDBNN1Y0Q2d4NVYzRWFESXZUUUtUTGZCYUVCNDV6YjlMdGpJWHpEdzByWFJvUzJoTzZ0CmgrQ1lRQ3ozS0N2aDA5QzBJenhaaUIySVMzSC9hVCs1Qng5RUZZK3ZuQWtaamNjYnlHNVlOUnZtdE9sbnZJZUkKSDdxWjB0RXdrUGZGNUdFWk5QSlB0bXkzVUdWN2lvZmRWUVMxeFJqNzMrYU13NXJ2SDREOElkeWlBQzNWZWtJYgpwdDBWajBTVVgzRHdLdG9nMzM3QnpUaVBrM2FYUkYwc2JGaFFvcWRKUkk4TnFnWmpDd2pxOXlmSTV0eXhZc3duCitKR3pIR2RIdlczaWRPRGxtd0V0NUsycGFzaVJJV0syT0dmcSt3MEVjbHRRSGFidXFFUGdabG1oQ2tSZE5maXgKQndJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg=="
@@ -275,6 +288,38 @@ Actions:
 					{Role: "ORG_OWNER", Permissions: []string{"org.write", "org.read"}},
 				},
 			})
+		},
+	}, {
+		name: "smtp rules ok",
+		args: args{yaml: `
+Notifications:
+  SMTPRules:
+    - Match:
+        Hosts:
+          - smtp.example.com
+        SenderDomains:
+          - example.com
+      DisableCustomHTML: true
+      Headers:
+        - Name: X-Instance-ID
+          Value: "{{.InstanceID}}"
+Log:
+  Level: info
+`},
+		want: func(t *testing.T, config *Config) {
+			assert.Equal(t, wantSMTPRules, config.Notifications.SMTPRules)
+		},
+	}, {
+		name: "smtp rules string ok",
+		args: args{yaml: `
+Notifications:
+  SMTPRules: >
+    [{"Match": {"Hosts": ["smtp.example.com"], "SenderDomains": ["example.com"]}, "DisableCustomHTML": true, "Headers": [{"Name": "X-Instance-ID", "Value": "{{.InstanceID}}"}]}]
+Log:
+  Level: info
+`},
+		want: func(t *testing.T, config *Config) {
+			assert.Equal(t, wantSMTPRules, config.Notifications.SMTPRules)
 		},
 	}}
 	for _, tt := range tests {
