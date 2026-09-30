@@ -177,7 +177,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusherWithCreationDateNow(
-							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123"),
+							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", false),
 						),
 					),
 					expectPush(
@@ -205,7 +205,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusherWithCreationDateNow(
-							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123"),
+							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", false),
 						),
 					),
 					expectFilterError(io.ErrClosedPipe),
@@ -286,7 +286,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusherWithCreationDateNow(
-							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123"),
+							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", false),
 						),
 					),
 					expectPush(
@@ -313,7 +313,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusherWithCreationDateNow(
-							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123"),
+							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", false),
 						),
 					),
 				),
@@ -338,7 +338,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 							time.Now().Add(-2*time.Minute),
 						),
 						eventFromEventPusherWithCreationDate(
-							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123"),
+							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", false),
 							time.Now().Add(-2*time.Minute),
 						),
 					),
@@ -368,7 +368,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 							time.Now().Add(-2*time.Minute),
 						),
 						eventFromEventPusherWithCreationDate(
-							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123"),
+							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", false),
 							time.Now().Add(-2*time.Minute),
 						),
 						eventFromEventPusherWithCreationDateNow(

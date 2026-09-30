@@ -24,17 +24,17 @@ import (
 func init() {
 	RegisterSentHandler(user.HumanInitialCodeAddedType,
 		func(ctx context.Context, commands Commands, id, orgID string, _ *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.HumanInitCodeSent(ctx, orgID, id)
+			return commands.HumanInitCodeSent(ctx, orgID, id, false)
 		},
 	)
 	RegisterSentHandler(user.HumanEmailCodeAddedType,
 		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.HumanEmailVerificationCodeSent(ctx, orgID, id)
+			return commands.HumanEmailVerificationCodeSent(ctx, orgID, id, false)
 		},
 	)
 	RegisterSentHandler(user.HumanPasswordCodeAddedType,
 		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.PasswordCodeSent(ctx, orgID, id, generatorInfo)
+			return commands.PasswordCodeSent(ctx, orgID, id, generatorInfo, false)
 		},
 	)
 	RegisterSentHandler(user.HumanOTPSMSCodeAddedType,
@@ -49,27 +49,27 @@ func init() {
 	)
 	RegisterSentHandler(user.HumanOTPEmailCodeAddedType,
 		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.HumanOTPEmailCodeSent(ctx, id, orgID)
+			return commands.HumanOTPEmailCodeSent(ctx, id, orgID, false)
 		},
 	)
 	RegisterSentHandler(session.OTPEmailChallengedType,
 		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.OTPEmailSent(ctx, id, orgID)
+			return commands.OTPEmailSent(ctx, id, orgID, false)
 		},
 	)
 	RegisterSentHandler(user.UserDomainClaimedType,
 		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.UserDomainClaimedSent(ctx, orgID, id)
+			return commands.UserDomainClaimedSent(ctx, orgID, id, false)
 		},
 	)
 	RegisterSentHandler(user.HumanPasswordlessInitCodeRequestedType,
 		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.HumanPasswordlessInitCodeSent(ctx, id, orgID, args["CodeID"].(string))
+			return commands.HumanPasswordlessInitCodeSent(ctx, id, orgID, args["CodeID"].(string), false)
 		},
 	)
 	RegisterSentHandler(user.HumanPasswordChangedType,
 		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.PasswordChangeSent(ctx, orgID, id)
+			return commands.PasswordChangeSent(ctx, orgID, id, false)
 		},
 	)
 	RegisterSentHandler(user.HumanPhoneCodeAddedType,
@@ -79,7 +79,7 @@ func init() {
 	)
 	RegisterSentHandler(user.HumanInviteCodeAddedType,
 		func(ctx context.Context, commands Commands, id, orgID string, _ *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.InviteCodeSent(ctx, id, orgID)
+			return commands.InviteCodeSent(ctx, id, orgID, false)
 		},
 	)
 }

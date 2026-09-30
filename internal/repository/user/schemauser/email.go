@@ -151,25 +151,30 @@ func NewEmailCodeAddedEvent(
 
 type EmailCodeSentEvent struct {
 	*eventstore.BaseEvent `json:"-"`
+
+	// DeliverySuppressed is true if the notification was accepted, but the email was not sent to the provider,
+	// because the recipient domain is reserved and the operator rule of the provider suppresses them.
+	DeliverySuppressed bool `json:"deliverySuppressed,omitzero"`
 }
 
 func (e *EmailCodeSentEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 func (e *EmailCodeSentEvent) Payload() interface{} {
-	return nil
+	return e
 }
 
 func (e *EmailCodeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func NewEmailCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *EmailCodeSentEvent {
+func NewEmailCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate, deliverySuppressed bool) *EmailCodeSentEvent {
 	return &EmailCodeSentEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			EmailCodeSentType,
 		),
+		DeliverySuppressed: deliverySuppressed,
 	}
 }

@@ -181,7 +181,7 @@ func (u *userNotifierLegacy) reduceInitCodeAdded(event eventstore.Event) (*handl
 			}
 			return err
 		}
-		return u.commands.HumanInitCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
+		return u.commands.HumanInitCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, false)
 	}), nil
 }
 
@@ -242,7 +242,7 @@ func (u *userNotifierLegacy) reduceEmailCodeAdded(event eventstore.Event) (*hand
 			}
 			return err
 		}
-		return u.commands.HumanEmailVerificationCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
+		return u.commands.HumanEmailVerificationCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, false)
 	}), nil
 }
 
@@ -309,7 +309,7 @@ func (u *userNotifierLegacy) reducePasswordCodeAdded(event eventstore.Event) (*h
 			}
 			return err
 		}
-		return u.commands.PasswordCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, generatorInfo)
+		return u.commands.PasswordCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, generatorInfo, false)
 	}), nil
 }
 
@@ -482,7 +482,7 @@ func (u *userNotifierLegacy) reduceOTPEmail(
 	userID,
 	resourceOwner string,
 	urlTmpl func(code string, origin *url.URL, user *query.NotifyUser) (string, error),
-	sentCommand func(ctx context.Context, userID string, resourceOwner string) (err error),
+	sentCommand func(ctx context.Context, userID string, resourceOwner string, deliverySuppressed bool) (err error),
 	eventTypes ...eventstore.EventType,
 ) (*handler.Statement, error) {
 	ctx := HandlerContext(context.Background(), event.Aggregate())
@@ -532,7 +532,7 @@ func (u *userNotifierLegacy) reduceOTPEmail(
 		}
 		return nil, err
 	}
-	err = sentCommand(ctx, event.Aggregate().ID, event.Aggregate().ResourceOwner)
+	err = sentCommand(ctx, event.Aggregate().ID, event.Aggregate().ResourceOwner, false)
 	if err != nil {
 		return nil, err
 	}
@@ -586,7 +586,7 @@ func (u *userNotifierLegacy) reduceDomainClaimed(event eventstore.Event) (*handl
 			}
 			return err
 		}
-		return u.commands.UserDomainClaimedSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
+		return u.commands.UserDomainClaimedSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, false)
 	}), nil
 }
 
@@ -644,7 +644,7 @@ func (u *userNotifierLegacy) reducePasswordlessCodeRequested(event eventstore.Ev
 			}
 			return err
 		}
-		return u.commands.HumanPasswordlessInitCodeSent(ctx, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.ID)
+		return u.commands.HumanPasswordlessInitCodeSent(ctx, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.ID, false)
 	}), nil
 }
 
@@ -707,7 +707,7 @@ func (u *userNotifierLegacy) reducePasswordChanged(event eventstore.Event) (*han
 			}
 			return err
 		}
-		return u.commands.PasswordChangeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
+		return u.commands.PasswordChangeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, false)
 	}), nil
 }
 
@@ -824,7 +824,7 @@ func (u *userNotifierLegacy) reduceInviteCodeAdded(event eventstore.Event) (*han
 			}
 			return err
 		}
-		return u.commands.InviteCodeSent(ctx, e.Aggregate().ID, e.Aggregate().ResourceOwner)
+		return u.commands.InviteCodeSent(ctx, e.Aggregate().ID, e.Aggregate().ResourceOwner, false)
 	}), nil
 }
 

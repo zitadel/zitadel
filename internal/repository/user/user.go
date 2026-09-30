@@ -468,19 +468,28 @@ func DomainClaimedEventMapper(event eventstore.Event) (eventstore.Event, error) 
 
 type DomainClaimedSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	// DeliverySuppressed is true if the notification was accepted, but the email was not sent to the provider,
+	// because the recipient domain is reserved and the operator rule of the provider suppresses them.
+	DeliverySuppressed bool `json:"deliverySuppressed,omitzero"`
 }
 
 func (e *DomainClaimedSentEvent) Payload() interface{} {
-	return nil
+	return e
 }
 
 func (e *DomainClaimedSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
+func (e *DomainClaimedSentEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
 func NewDomainClaimedSentEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	deliverySuppressed bool,
 ) *DomainClaimedSentEvent {
 	return &DomainClaimedSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -488,13 +497,8 @@ func NewDomainClaimedSentEvent(
 			aggregate,
 			UserDomainClaimedSentType,
 		),
+		DeliverySuppressed: deliverySuppressed,
 	}
-}
-
-func DomainClaimedSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	return &DomainClaimedSentEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
 }
 
 type UsernameChangedEvent struct {

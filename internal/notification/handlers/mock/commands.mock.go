@@ -58,45 +58,45 @@ func (mr *MockCommandsMockRecorder) BackChannelLogoutSent(ctx, id, oidcSessionID
 }
 
 // HumanEmailVerificationCodeSent mocks base method.
-func (m *MockCommands) HumanEmailVerificationCodeSent(ctx context.Context, orgID, userID string) error {
+func (m *MockCommands) HumanEmailVerificationCodeSent(ctx context.Context, orgID, userID string, deliverySuppressed bool) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "HumanEmailVerificationCodeSent", ctx, orgID, userID)
+	ret := m.ctrl.Call(m, "HumanEmailVerificationCodeSent", ctx, orgID, userID, deliverySuppressed)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // HumanEmailVerificationCodeSent indicates an expected call of HumanEmailVerificationCodeSent.
-func (mr *MockCommandsMockRecorder) HumanEmailVerificationCodeSent(ctx, orgID, userID any) *gomock.Call {
+func (mr *MockCommandsMockRecorder) HumanEmailVerificationCodeSent(ctx, orgID, userID, deliverySuppressed any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HumanEmailVerificationCodeSent", reflect.TypeOf((*MockCommands)(nil).HumanEmailVerificationCodeSent), ctx, orgID, userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HumanEmailVerificationCodeSent", reflect.TypeOf((*MockCommands)(nil).HumanEmailVerificationCodeSent), ctx, orgID, userID, deliverySuppressed)
 }
 
 // HumanInitCodeSent mocks base method.
-func (m *MockCommands) HumanInitCodeSent(ctx context.Context, orgID, userID string) error {
+func (m *MockCommands) HumanInitCodeSent(ctx context.Context, orgID, userID string, deliverySuppressed bool) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "HumanInitCodeSent", ctx, orgID, userID)
+	ret := m.ctrl.Call(m, "HumanInitCodeSent", ctx, orgID, userID, deliverySuppressed)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // HumanInitCodeSent indicates an expected call of HumanInitCodeSent.
-func (mr *MockCommandsMockRecorder) HumanInitCodeSent(ctx, orgID, userID any) *gomock.Call {
+func (mr *MockCommandsMockRecorder) HumanInitCodeSent(ctx, orgID, userID, deliverySuppressed any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HumanInitCodeSent", reflect.TypeOf((*MockCommands)(nil).HumanInitCodeSent), ctx, orgID, userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HumanInitCodeSent", reflect.TypeOf((*MockCommands)(nil).HumanInitCodeSent), ctx, orgID, userID, deliverySuppressed)
 }
 
 // HumanOTPEmailCodeSent mocks base method.
-func (m *MockCommands) HumanOTPEmailCodeSent(ctx context.Context, userID, resourceOwner string) error {
+func (m *MockCommands) HumanOTPEmailCodeSent(ctx context.Context, userID, resourceOwner string, deliverySuppressed bool) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "HumanOTPEmailCodeSent", ctx, userID, resourceOwner)
+	ret := m.ctrl.Call(m, "HumanOTPEmailCodeSent", ctx, userID, resourceOwner, deliverySuppressed)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // HumanOTPEmailCodeSent indicates an expected call of HumanOTPEmailCodeSent.
-func (mr *MockCommandsMockRecorder) HumanOTPEmailCodeSent(ctx, userID, resourceOwner any) *gomock.Call {
+func (mr *MockCommandsMockRecorder) HumanOTPEmailCodeSent(ctx, userID, resourceOwner, deliverySuppressed any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HumanOTPEmailCodeSent", reflect.TypeOf((*MockCommands)(nil).HumanOTPEmailCodeSent), ctx, userID, resourceOwner)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HumanOTPEmailCodeSent", reflect.TypeOf((*MockCommands)(nil).HumanOTPEmailCodeSent), ctx, userID, resourceOwner, deliverySuppressed)
 }
 
 // HumanOTPSMSCodeSent mocks base method.
@@ -114,17 +114,17 @@ func (mr *MockCommandsMockRecorder) HumanOTPSMSCodeSent(ctx, userID, resourceOwn
 }
 
 // HumanPasswordlessInitCodeSent mocks base method.
-func (m *MockCommands) HumanPasswordlessInitCodeSent(ctx context.Context, userID, resourceOwner, codeID string) error {
+func (m *MockCommands) HumanPasswordlessInitCodeSent(ctx context.Context, userID, resourceOwner, codeID string, deliverySuppressed bool) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "HumanPasswordlessInitCodeSent", ctx, userID, resourceOwner, codeID)
+	ret := m.ctrl.Call(m, "HumanPasswordlessInitCodeSent", ctx, userID, resourceOwner, codeID, deliverySuppressed)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // HumanPasswordlessInitCodeSent indicates an expected call of HumanPasswordlessInitCodeSent.
-func (mr *MockCommandsMockRecorder) HumanPasswordlessInitCodeSent(ctx, userID, resourceOwner, codeID any) *gomock.Call {
+func (mr *MockCommandsMockRecorder) HumanPasswordlessInitCodeSent(ctx, userID, resourceOwner, codeID, deliverySuppressed any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HumanPasswordlessInitCodeSent", reflect.TypeOf((*MockCommands)(nil).HumanPasswordlessInitCodeSent), ctx, userID, resourceOwner, codeID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HumanPasswordlessInitCodeSent", reflect.TypeOf((*MockCommands)(nil).HumanPasswordlessInitCodeSent), ctx, userID, resourceOwner, codeID, deliverySuppressed)
 }
 
 // HumanPhoneVerificationCodeSent mocks base method.
@@ -142,17 +142,17 @@ func (mr *MockCommandsMockRecorder) HumanPhoneVerificationCodeSent(ctx, orgID, u
 }
 
 // InviteCodeSent mocks base method.
-func (m *MockCommands) InviteCodeSent(ctx context.Context, userID, orgID string) error {
+func (m *MockCommands) InviteCodeSent(ctx context.Context, userID, orgID string, deliverySuppressed bool) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "InviteCodeSent", ctx, userID, orgID)
+	ret := m.ctrl.Call(m, "InviteCodeSent", ctx, userID, orgID, deliverySuppressed)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // InviteCodeSent indicates an expected call of InviteCodeSent.
-func (mr *MockCommandsMockRecorder) InviteCodeSent(ctx, userID, orgID any) *gomock.Call {
+func (mr *MockCommandsMockRecorder) InviteCodeSent(ctx, userID, orgID, deliverySuppressed any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InviteCodeSent", reflect.TypeOf((*MockCommands)(nil).InviteCodeSent), ctx, userID, orgID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InviteCodeSent", reflect.TypeOf((*MockCommands)(nil).InviteCodeSent), ctx, userID, orgID, deliverySuppressed)
 }
 
 // MilestonePushed mocks base method.
@@ -170,17 +170,17 @@ func (mr *MockCommandsMockRecorder) MilestonePushed(ctx, instanceID, msType, end
 }
 
 // OTPEmailSent mocks base method.
-func (m *MockCommands) OTPEmailSent(ctx context.Context, sessionID, resourceOwner string) error {
+func (m *MockCommands) OTPEmailSent(ctx context.Context, sessionID, resourceOwner string, deliverySuppressed bool) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "OTPEmailSent", ctx, sessionID, resourceOwner)
+	ret := m.ctrl.Call(m, "OTPEmailSent", ctx, sessionID, resourceOwner, deliverySuppressed)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // OTPEmailSent indicates an expected call of OTPEmailSent.
-func (mr *MockCommandsMockRecorder) OTPEmailSent(ctx, sessionID, resourceOwner any) *gomock.Call {
+func (mr *MockCommandsMockRecorder) OTPEmailSent(ctx, sessionID, resourceOwner, deliverySuppressed any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OTPEmailSent", reflect.TypeOf((*MockCommands)(nil).OTPEmailSent), ctx, sessionID, resourceOwner)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OTPEmailSent", reflect.TypeOf((*MockCommands)(nil).OTPEmailSent), ctx, sessionID, resourceOwner, deliverySuppressed)
 }
 
 // OTPSMSSent mocks base method.
@@ -198,31 +198,31 @@ func (mr *MockCommandsMockRecorder) OTPSMSSent(ctx, sessionID, resourceOwner, ge
 }
 
 // PasswordChangeSent mocks base method.
-func (m *MockCommands) PasswordChangeSent(ctx context.Context, orgID, userID string) error {
+func (m *MockCommands) PasswordChangeSent(ctx context.Context, orgID, userID string, deliverySuppressed bool) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PasswordChangeSent", ctx, orgID, userID)
+	ret := m.ctrl.Call(m, "PasswordChangeSent", ctx, orgID, userID, deliverySuppressed)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // PasswordChangeSent indicates an expected call of PasswordChangeSent.
-func (mr *MockCommandsMockRecorder) PasswordChangeSent(ctx, orgID, userID any) *gomock.Call {
+func (mr *MockCommandsMockRecorder) PasswordChangeSent(ctx, orgID, userID, deliverySuppressed any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PasswordChangeSent", reflect.TypeOf((*MockCommands)(nil).PasswordChangeSent), ctx, orgID, userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PasswordChangeSent", reflect.TypeOf((*MockCommands)(nil).PasswordChangeSent), ctx, orgID, userID, deliverySuppressed)
 }
 
 // PasswordCodeSent mocks base method.
-func (m *MockCommands) PasswordCodeSent(ctx context.Context, orgID, userID string, generatorInfo *senders.CodeGeneratorInfo) error {
+func (m *MockCommands) PasswordCodeSent(ctx context.Context, orgID, userID string, generatorInfo *senders.CodeGeneratorInfo, deliverySuppressed bool) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PasswordCodeSent", ctx, orgID, userID, generatorInfo)
+	ret := m.ctrl.Call(m, "PasswordCodeSent", ctx, orgID, userID, generatorInfo, deliverySuppressed)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // PasswordCodeSent indicates an expected call of PasswordCodeSent.
-func (mr *MockCommandsMockRecorder) PasswordCodeSent(ctx, orgID, userID, generatorInfo any) *gomock.Call {
+func (mr *MockCommandsMockRecorder) PasswordCodeSent(ctx, orgID, userID, generatorInfo, deliverySuppressed any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PasswordCodeSent", reflect.TypeOf((*MockCommands)(nil).PasswordCodeSent), ctx, orgID, userID, generatorInfo)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PasswordCodeSent", reflect.TypeOf((*MockCommands)(nil).PasswordCodeSent), ctx, orgID, userID, generatorInfo, deliverySuppressed)
 }
 
 // UsageNotificationSent mocks base method.
@@ -240,15 +240,15 @@ func (mr *MockCommandsMockRecorder) UsageNotificationSent(ctx, dueEvent any) *go
 }
 
 // UserDomainClaimedSent mocks base method.
-func (m *MockCommands) UserDomainClaimedSent(ctx context.Context, orgID, userID string) error {
+func (m *MockCommands) UserDomainClaimedSent(ctx context.Context, orgID, userID string, deliverySuppressed bool) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UserDomainClaimedSent", ctx, orgID, userID)
+	ret := m.ctrl.Call(m, "UserDomainClaimedSent", ctx, orgID, userID, deliverySuppressed)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UserDomainClaimedSent indicates an expected call of UserDomainClaimedSent.
-func (mr *MockCommandsMockRecorder) UserDomainClaimedSent(ctx, orgID, userID any) *gomock.Call {
+func (mr *MockCommandsMockRecorder) UserDomainClaimedSent(ctx, orgID, userID, deliverySuppressed any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserDomainClaimedSent", reflect.TypeOf((*MockCommands)(nil).UserDomainClaimedSent), ctx, orgID, userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserDomainClaimedSent", reflect.TypeOf((*MockCommands)(nil).UserDomainClaimedSent), ctx, orgID, userID, deliverySuppressed)
 }

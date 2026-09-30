@@ -321,7 +321,7 @@ func (c *Commands) RequestSetPassword(ctx context.Context, userID, resourceOwner
 }
 
 // PasswordCodeSent notification send with code to change password
-func (c *Commands) PasswordCodeSent(ctx context.Context, orgID, userID string, generatorInfo *senders.CodeGeneratorInfo) (err error) {
+func (c *Commands) PasswordCodeSent(ctx context.Context, orgID, userID string, generatorInfo *senders.CodeGeneratorInfo, deliverySuppressed bool) (err error) {
 	if userID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-meEfe", "Errors.User.UserIDMissing")
 	}
@@ -334,12 +334,12 @@ func (c *Commands) PasswordCodeSent(ctx context.Context, orgID, userID string, g
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-3n77z", "Errors.User.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
-	_, err = c.eventstore.Push(ctx, user.NewHumanPasswordCodeSentEvent(ctx, userAgg, generatorInfo))
+	_, err = c.eventstore.Push(ctx, user.NewHumanPasswordCodeSentEvent(ctx, userAgg, generatorInfo, deliverySuppressed))
 	return err
 }
 
 // PasswordChangeSent notification sent that user changed password
-func (c *Commands) PasswordChangeSent(ctx context.Context, orgID, userID string) (err error) {
+func (c *Commands) PasswordChangeSent(ctx context.Context, orgID, userID string, deliverySuppressed bool) (err error) {
 	if userID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-pqlm2n", "Errors.User.UserIDMissing")
 	}
@@ -352,7 +352,7 @@ func (c *Commands) PasswordChangeSent(ctx context.Context, orgID, userID string)
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-x902b2v", "Errors.User.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
-	_, err = c.eventstore.Push(ctx, user.NewHumanPasswordChangeSentEvent(ctx, userAgg))
+	_, err = c.eventstore.Push(ctx, user.NewHumanPasswordChangeSentEvent(ctx, userAgg, deliverySuppressed))
 	return err
 }
 

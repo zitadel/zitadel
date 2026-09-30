@@ -849,6 +849,7 @@ func TestCommandSide_InitCodeSent(t *testing.T) {
 					expectPush(
 						user.NewHumanInitialCodeSentEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
+							false,
 						),
 					),
 				),
@@ -866,7 +867,7 @@ func TestCommandSide_InitCodeSent(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			err := r.HumanInitCodeSent(tt.args.ctx, tt.args.resourceOwner, tt.args.userID)
+			err := r.HumanInitCodeSent(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, false)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

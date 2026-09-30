@@ -97,7 +97,7 @@ func (c *Commands) sendInviteCode(ctx context.Context, invite *CreateUserInvite,
 	return writeModelToObjectDetails(&wm.WriteModel), returnCode, nil
 }
 
-func (c *Commands) InviteCodeSent(ctx context.Context, userID, orgID string) (err error) {
+func (c *Commands) InviteCodeSent(ctx context.Context, userID, orgID string, deliverySuppressed bool) (err error) {
 	if userID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-Sgf31", "Errors.User.UserIDMissing")
 	}
@@ -112,7 +112,7 @@ func (c *Commands) InviteCodeSent(ctx context.Context, userID, orgID string) (er
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Wr3gq", "Errors.User.Code.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModelCtx(ctx, &existingCode.WriteModel)
-	_, err = c.eventstore.Push(ctx, user.NewHumanInviteCodeSentEvent(ctx, userAgg))
+	_, err = c.eventstore.Push(ctx, user.NewHumanInviteCodeSentEvent(ctx, userAgg, deliverySuppressed))
 	return err
 }
 

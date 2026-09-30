@@ -1854,6 +1854,7 @@ func TestCommandSide_UserDomainClaimedSent(t *testing.T) {
 					expectPush(
 						user.NewDomainClaimedSentEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
+							false,
 						),
 					),
 				),
@@ -1871,7 +1872,7 @@ func TestCommandSide_UserDomainClaimedSent(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			err := r.UserDomainClaimedSent(tt.args.ctx, tt.args.resourceOwner, tt.args.userID)
+			err := r.UserDomainClaimedSent(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, false)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

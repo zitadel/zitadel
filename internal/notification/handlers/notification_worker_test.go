@@ -108,7 +108,7 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 				}
 				codeAlg, code := cryptoValue(t, ctrl, "testcode")
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-				commands.EXPECT().InviteCodeSent(gomock.Any(), userID, orgID).Return(nil)
+				commands.EXPECT().InviteCodeSent(gomock.Any(), userID, orgID, false).Return(nil)
 				return fieldsWorker{
 						queries:  queries,
 						commands: commands,
@@ -227,7 +227,7 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 					TriggeringEventType: user.UserDomainClaimedType,
 				}
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-				commands.EXPECT().UserDomainClaimedSent(gomock.Any(), orgID, userID).Return(nil)
+				commands.EXPECT().UserDomainClaimedSent(gomock.Any(), orgID, userID, false).Return(nil)
 				return fieldsWorker{
 						queries:  queries,
 						commands: commands,
