@@ -229,7 +229,7 @@ func projections(
 
 	i18n.MustLoadSupportedLanguagesFromDir()
 
-	notification.Register(
+	err = notification.Register(
 		ctx,
 		config.Projections.Customizations["notifications"],
 		config.Projections.Customizations["notificationsquotas"],
@@ -252,6 +252,7 @@ func projections(
 		nil,
 		httpClient,
 	)
+	logging.OnError(ctx, err).Fatal("unable to register notifications")
 
 	config.Auth.Spooler.Client = client
 	config.Auth.Spooler.Eventstore = es

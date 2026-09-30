@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	_ "github.com/zitadel/zitadel/internal/notification/statik"
 	"github.com/zitadel/zitadel/internal/query"
@@ -42,7 +43,12 @@ func Register(
 	userEncryption, smtpEncryption, smsEncryption crypto.EncryptionAlgorithm,
 	queue *queue.Queue,
 	httpClient *http.Client,
-) {
+) error {
+	smtpRules, err := smtp.CompileRules(notificationWorkerConfig.SMTPRules)
+	if err != nil {
+		return fmt.Errorf("invalid notification config: %w", err)
+	}
+
 	if !notificationWorkerConfig.LegacyEnabled {
 		queue.ShouldStart()
 	}
@@ -51,7 +57,7 @@ func Register(
 	projections = nil
 
 	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption, httpClient)
-	c := newChannels(q)
+	c := newChannels(q, smtpRules)
 	projections = append(projections, handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl, notificationWorkerConfig, queue))
 	projections = append(projections, handlers.NewQuotaNotifier(ctx, projection.ApplyCustomConfig(quotaHandlerCustomConfig), commands, q, c))
 	projections = append(projections, handlers.NewBackChannelLogoutNotifier(
@@ -77,6 +83,7 @@ func Register(
 	if !notificationWorkerConfig.LegacyEnabled {
 		queue.AddWorkers(ctx, handlers.NewNotificationWorker(notificationWorkerConfig, commands, q, c))
 	}
+	return nil
 }
 
 func Start(ctx context.Context) {

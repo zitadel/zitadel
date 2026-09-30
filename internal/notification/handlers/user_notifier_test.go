@@ -13,6 +13,7 @@ import (
 	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -21,6 +22,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels/email"
 	"github.com/zitadel/zitadel/internal/notification/channels/set"
 	"github.com/zitadel/zitadel/internal/notification/channels/sms"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	"github.com/zitadel/zitadel/internal/notification/handlers/mock"
 	"github.com/zitadel/zitadel/internal/notification/messages"
@@ -1950,6 +1952,7 @@ type notificationChannels struct {
 	senders.Chain
 	EmailConfig *email.Config
 	SMSConfig   *sms.Config
+	SMTPRules   smtp.Rules
 }
 
 func (c *notificationChannels) Email(context.Context) (*senders.Chain, *email.Config, error) {
@@ -1966,6 +1969,13 @@ func (c *notificationChannels) Webhook(context.Context, webhook.Config) (*sender
 
 func (c *notificationChannels) SecurityTokenEvent(context.Context, set.Config) (*senders.Chain, error) {
 	return &c.Chain, nil
+}
+
+func (c *notificationChannels) SMTPRule(ctx context.Context, config *smtp.Config, orgID string) (smtp.Rule, error) {
+	return c.SMTPRules.Match(config, smtp.RuleData{
+		InstanceID: authz.GetInstance(ctx).InstanceID(),
+		OrgID:      orgID,
+	})
 }
 
 func expectTemplateQueries(queries *mock.MockQueries, template string) {

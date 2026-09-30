@@ -16,6 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/channels"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/query"
@@ -84,6 +85,9 @@ type WorkerConfig struct {
 	TransactionDuration time.Duration
 	MaxTtl              time.Duration
 	MaxAttempts         uint8
+	// SMTPRules are applied to the emails sent through a matching SMTP provider.
+	// The first matching rule is applied.
+	SMTPRules []smtp.RuleConfig
 }
 
 // nowFunc makes [time.Now] mockable
