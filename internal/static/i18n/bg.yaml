@@ -416,6 +416,10 @@ Errors:
       NotFound: "Правилата за уведомяване по подразбиране не са намерени"
       NotChanged: "Правилата за уведомяване по подразбиране не са променени"
       AlreadyExists: "Политиката за уведомяване по подразбиране вече съществува"
+    SecurityPolicy:
+      ClientIDMetadataDocumentAllowedURL:
+        Invalid: "URL адресът на документа с метаданни на клиентския ID е невалиден"
+        AlreadyExists: "URL адресът на документа с метаданни на клиентския ID вече е разрешен"
   Policy:
     AlreadyExists: "Политиката вече съществува"
     Label:

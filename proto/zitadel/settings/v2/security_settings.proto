@@ -49,7 +49,28 @@ message ClientIDMetadataDocumentSettings {
   // Enabling this makes ZITADEL fetch client-controlled URLs from the public authorization
   // and token endpoints. The fetch goes through the SSRF-safe HTTP client and every
   // redirect_uri must share the origin of the client_id URL.
+  //
+  // Only client_id URLs the instance allows, through allowed_urls or allow_any_url, are
+  // resolved, and only within the URLs the system allows in its runtime configuration
+  // (OIDC.ClientIDMetadataDocument).
   bool enabled = 1;
+
+  // AllowedURLs are the client_id URLs the instance resolves. An entry ending with a slash
+  // allows every client_id it is a prefix of, any other entry allows exactly that client_id.
+  // Entries are compared as plain strings. Every entry must be an https URL with a path, and
+  // without userinfo, fragment or dot path segments.
+  //
+  // Setting the security settings replaces the list. Use AddClientIDMetadataDocumentAllowedURL
+  // and RemoveClientIDMetadataDocumentAllowedURL to change single entries.
+  repeated string allowed_urls = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"https://client.example.com/oauth/metadata\", \"https://clients.example.com/connectors/\"]";
+    }
+  ];
+
+  // AllowAnyURL lets the instance resolve every client_id URL the system allows, regardless of
+  // allowed_urls.
+  bool allow_any_url = 3;
 }
 
 message EmbeddedIframeSettings{

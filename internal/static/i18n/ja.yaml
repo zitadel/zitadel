@@ -417,6 +417,10 @@ Errors:
       NotFound: "デフォルトの通知ポリシーが見つかりません"
       NotChanged: "デフォルトの通知ポリシーは変更されていません"
       AlreadyExists: "デフォルトの通知ポリシーはすでに存在しています"
+    SecurityPolicy:
+      ClientIDMetadataDocumentAllowedURL:
+        Invalid: "クライアントIDメタデータドキュメントのURLが無効です"
+        AlreadyExists: "クライアントIDメタデータドキュメントのURLはすでに許可されています"
   Policy:
     AlreadyExists: "ポリシーはすでに存在します"
     Label:

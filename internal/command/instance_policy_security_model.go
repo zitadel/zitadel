@@ -47,6 +47,22 @@ func (wm *InstanceSecurityPolicyWriteModel) Reduce() error {
 			if e.EnableClientIDMetadataDocument != nil {
 				wm.EnableClientIDMetadataDocument = *e.EnableClientIDMetadataDocument
 			}
+			if e.ClientIDMetadataDocumentAllowedURLs != nil {
+				wm.ClientIDMetadataDocumentAllowedURLs = *e.ClientIDMetadataDocumentAllowedURLs
+			}
+			if e.ClientIDMetadataDocumentAllowAnyURL != nil {
+				wm.ClientIDMetadataDocumentAllowAnyURL = *e.ClientIDMetadataDocumentAllowAnyURL
+			}
+		}
+		if e, ok := event.(*instance.SecurityPolicyClientIDMetadataDocumentAllowedURLAddedEvent); ok {
+			if !slices.Contains(wm.ClientIDMetadataDocumentAllowedURLs, e.URL) {
+				wm.ClientIDMetadataDocumentAllowedURLs = append(wm.ClientIDMetadataDocumentAllowedURLs, e.URL)
+			}
+		}
+		if e, ok := event.(*instance.SecurityPolicyClientIDMetadataDocumentAllowedURLRemovedEvent); ok {
+			wm.ClientIDMetadataDocumentAllowedURLs = slices.DeleteFunc(wm.ClientIDMetadataDocumentAllowedURLs, func(url string) bool {
+				return url == e.URL
+			})
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -59,7 +75,10 @@ func (wm *InstanceSecurityPolicyWriteModel) Query() *eventstore.SearchQueryBuild
 		AggregateTypes(instance.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
-			instance.SecurityPolicySetEventType).
+			instance.SecurityPolicySetEventType,
+			instance.SecurityPolicyClientIDMetadataDocumentAllowedURLAddedEventType,
+			instance.SecurityPolicyClientIDMetadataDocumentAllowedURLRemovedEventType,
+		).
 		Builder()
 }
 
@@ -68,7 +87,7 @@ func (wm *InstanceSecurityPolicyWriteModel) NewSetEvent(
 	aggregate *eventstore.Aggregate,
 	policy *SecurityPolicy,
 ) (*instance.SecurityPolicySetEvent, error) {
-	changes := make([]instance.SecurityPolicyChanges, 0, 6)
+	changes := make([]instance.SecurityPolicyChanges, 0, 8)
 	var err error
 
 	if wm.EnableIframeEmbedding != policy.EnableIframeEmbedding {
@@ -88,6 +107,12 @@ func (wm *InstanceSecurityPolicyWriteModel) NewSetEvent(
 	}
 	if wm.EnableClientIDMetadataDocument != policy.EnableClientIDMetadataDocument {
 		changes = append(changes, instance.ChangeSecurityPolicyEnableClientIDMetadataDocument(policy.EnableClientIDMetadataDocument))
+	}
+	if !slices.Equal(wm.ClientIDMetadataDocumentAllowedURLs, policy.ClientIDMetadataDocumentAllowedURLs) {
+		changes = append(changes, instance.ChangeSecurityPolicyClientIDMetadataDocumentAllowedURLs(policy.ClientIDMetadataDocumentAllowedURLs))
+	}
+	if wm.ClientIDMetadataDocumentAllowAnyURL != policy.ClientIDMetadataDocumentAllowAnyURL {
+		changes = append(changes, instance.ChangeSecurityPolicyClientIDMetadataDocumentAllowAnyURL(policy.ClientIDMetadataDocumentAllowAnyURL))
 	}
 	changeEvent, err := instance.NewSecurityPolicySetEvent(ctx, aggregate, changes)
 	if err != nil {

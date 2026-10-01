@@ -35,6 +35,18 @@ func WithMockClientIDMetadataDocument(enabled bool) MockContextInstanceOpts {
 	}
 }
 
+func WithMockClientIDMetadataDocumentAllowedURLs(allowedURLs ...string) MockContextInstanceOpts {
+	return func(i *instance) {
+		i.cimdAllowedURLs = allowedURLs
+	}
+}
+
+func WithMockClientIDMetadataDocumentAllowAnyURL(allow bool) MockContextInstanceOpts {
+	return func(i *instance) {
+		i.cimdAllowAnyURL = allow
+	}
+}
+
 func WithMockProjectID(projectID string) MockContextInstanceOpts {
 	return func(i *instance) {
 		i.projectID = projectID

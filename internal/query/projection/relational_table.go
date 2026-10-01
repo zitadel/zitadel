@@ -192,6 +192,14 @@ func (p *relationalTablesProjection) Reducers() []handler.AggregateReducer {
 					Event:  instance.SecurityPolicySetEventType,
 					Reduce: p.reduceSecurityPolicySet,
 				},
+				{
+					Event:  instance.SecurityPolicyClientIDMetadataDocumentAllowedURLAddedEventType,
+					Reduce: p.reduceSecurityPolicyClientIDMetadataDocumentAllowedURLAdded,
+				},
+				{
+					Event:  instance.SecurityPolicyClientIDMetadataDocumentAllowedURLRemovedEventType,
+					Reduce: p.reduceSecurityPolicyClientIDMetadataDocumentAllowedURLRemoved,
+				},
 				// 	Notification
 				{
 					Event:  instance.NotificationPolicyAddedEventType,

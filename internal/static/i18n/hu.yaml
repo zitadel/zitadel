@@ -416,6 +416,10 @@ Errors:
       NotFound: "Default Notification Policy nem található"
       NotChanged: "Default Notification Policy nem lett módosítva"
       AlreadyExists: "Default Notification Policy már létezik"
+    SecurityPolicy:
+      ClientIDMetadataDocumentAllowedURL:
+        Invalid: "Az ügyfélazonosító metaadat-dokumentumának URL-je érvénytelen"
+        AlreadyExists: "Az ügyfélazonosító metaadat-dokumentumának URL-je már engedélyezett"
   Policy:
     AlreadyExists: "Policy már létezik"
     Label:

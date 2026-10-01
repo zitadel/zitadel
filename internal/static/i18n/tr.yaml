@@ -417,6 +417,10 @@ Errors:
       NotFound: "Varsayılan Bildirim Politikası bulunamadı"
       NotChanged: "Varsayılan Bildirim Politikası değişmedi"
       AlreadyExists: "Varsayılan Bildirim Politikası zaten mevcut"
+    SecurityPolicy:
+      ClientIDMetadataDocumentAllowedURL:
+        Invalid: "İstemci kimliği meta veri belgesi URL'si geçersiz"
+        AlreadyExists: "İstemci kimliği meta veri belgesi URL'sine zaten izin verilmiş"
   Policy:
     AlreadyExists: "Politika zaten mevcut"
     Label:
