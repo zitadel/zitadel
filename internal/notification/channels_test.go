@@ -16,7 +16,7 @@ func Test_channels_SMTPRule(t *testing.T) {
 			Hosts:         []string{"smtp.example.com"},
 			SenderDomains: []string{"m.example.com"},
 		},
-		DisableCustomHTML: true,
+		RestrictCustomHTML: true,
 		Headers: []smtp.RuleHeader{
 			{Name: "X-Instance-ID", Value: "{{.InstanceID}}"},
 			{Name: "X-Org-ID", Value: "{{.OrgID}}"},
@@ -47,7 +47,7 @@ func Test_channels_SMTPRule(t *testing.T) {
 			rules:  rules,
 			config: &smtp.Config{SMTP: smtp.SMTP{Host: "smtp.example.com:587"}, From: "noreply@m.example.com"},
 			want: smtp.Rule{
-				DisableCustomHTML: true,
+				RestrictCustomHTML: true,
 				Headers: map[string]string{
 					"X-Instance-ID": "instance1",
 					"X-Org-ID":      "org1",
@@ -59,9 +59,7 @@ func Test_channels_SMTPRule(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &channels{smtpRules: tt.rules}
 			ctx := authz.WithInstanceID(t.Context(), "instance1")
-			got, err := c.SMTPRule(ctx, tt.config, "org1")
-			require.NoError(t, err)
-			assert.Equal(t, tt.want, got)
+			assert.Equal(t, tt.want, c.SMTPRule(ctx, tt.config, "org1"))
 		})
 	}
 }

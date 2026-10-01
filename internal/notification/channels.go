@@ -83,7 +83,7 @@ func (c *channels) Email(ctx context.Context) (*senders.Chain, *email.Config, er
 	return chain, emailCfg, err
 }
 
-func (c *channels) SMTPRule(ctx context.Context, config *smtp.Config, orgID string) (smtp.Rule, error) {
+func (c *channels) SMTPRule(ctx context.Context, config *smtp.Config, orgID string) smtp.Rule {
 	return c.smtpRules.Match(config, smtp.RuleData{
 		InstanceID: authz.GetInstance(ctx).InstanceID(),
 		OrgID:      orgID,

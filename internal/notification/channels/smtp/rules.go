@@ -4,12 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"reflect"
 	"slices"
 	"strings"
-	"text/template"
-	"text/template/parse"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/notification/messages"
 )
 
@@ -17,10 +15,10 @@ import (
 // Rules are part of the runtime configuration and can therefore not be changed through the API.
 type RuleConfig struct {
 	Match RuleMatch
-	// DisableCustomHTML removes HTML from custom message texts.
+	// RestrictCustomHTML removes HTML from custom message texts.
 	// Simple formatting (line breaks, bold, italic, underline, paragraphs) is kept,
 	// all other elements like links, images or styles are removed, their text is kept.
-	DisableCustomHTML bool
+	RestrictCustomHTML bool
 	// Headers are added to every email sent through the matching provider.
 	Headers []RuleHeader
 }
@@ -30,6 +28,9 @@ type RuleConfig struct {
 type RuleMatch struct {
 	// Hosts of the SMTP provider. An entry without port matches any port.
 	Hosts []string
+	// Users are the usernames of the SMTP authentication, e.g. the token of the provider.
+	// They identify the account of the provider, as opposed to the sender address, which can be changed in the provider config.
+	Users []string
 	// SenderDomains are the domains of the sender address.
 	SenderDomains []string
 }
@@ -38,41 +39,50 @@ type RuleMatch struct {
 // are lower-cased when read from the runtime configuration.
 type RuleHeader struct {
 	Name string
-	// Value can contain text and placeholders for the fields of [RuleData], e.g. {{.InstanceID}}.
-	// Other template actions are not supported.
+	// Value can contain text and the placeholders {{.InstanceID}} and {{.OrgID}}.
 	Value string
 }
 
-// RuleData provides the placeholders of the header values.
+// RuleData provides the values of the placeholders of the header values.
 // It intentionally does not contain any personal data.
 type RuleData struct {
 	InstanceID string
 	OrgID      string
 }
 
+// headerPlaceholders are the only placeholders supported in header values.
+// Anything else is rejected on startup, because whether it fails could depend on the data
+// and would only be detected when an email is sent.
+var headerPlaceholders = map[string]func(RuleData) string{
+	"{{.InstanceID}}": func(data RuleData) string { return data.InstanceID },
+	"{{.OrgID}}":      func(data RuleData) string { return data.OrgID },
+}
+
 // Rule is the result of the first matching [RuleConfig].
 // The zero value is returned if no rule matches.
 type Rule struct {
-	DisableCustomHTML bool
-	Headers           map[string]string
+	RestrictCustomHTML bool
+	Headers            map[string]string
 }
 
 // Rules are the compiled [RuleConfig]s in the order they were defined.
 type Rules []*compiledRule
 
 type compiledRule struct {
-	hosts             []string
-	senderDomains     []string
-	disableCustomHTML bool
-	headers           []*compiledHeader
+	hosts              []hostPort
+	users              []string
+	senderDomains      []string
+	restrictCustomHTML bool
+	headers            []RuleHeader
 }
 
-type compiledHeader struct {
-	name  string
-	value *template.Template
+type hostPort struct {
+	host string
+	// port is empty if any port matches
+	port string
 }
 
-// CompileRules validates the rules and parses the templates of the header values.
+// CompileRules validates the rules.
 // It is intended to be called on startup to fail fast on an invalid configuration.
 func CompileRules(configs []RuleConfig) (Rules, error) {
 	rules := make(Rules, len(configs))
@@ -82,17 +92,20 @@ func CompileRules(configs []RuleConfig) (Rules, error) {
 			return nil, fmt.Errorf("smtp rule %d: %w", i, err)
 		}
 		rules[i] = &compiledRule{
-			hosts:             normalize(config.Match.Hosts),
-			senderDomains:     normalize(config.Match.SenderDomains),
-			disableCustomHTML: config.DisableCustomHTML,
-			headers:           headers,
+			hosts:              normalizeHosts(config.Match.Hosts),
+			users:              normalizeUsers(config.Match.Users),
+			senderDomains:      normalizeDomains(config.Match.SenderDomains),
+			restrictCustomHTML: config.RestrictCustomHTML,
+			headers:            headers,
 		}
 	}
 	return rules, nil
 }
 
-func compileHeaders(configs []RuleHeader) ([]*compiledHeader, error) {
-	headers := make([]*compiledHeader, len(configs))
+var errUnsupportedHeaderValue = errors.New("value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}")
+
+func compileHeaders(configs []RuleHeader) ([]RuleHeader, error) {
+	headers := make([]RuleHeader, len(configs))
 	for i, config := range configs {
 		if !messages.IsValidEmailHeaderName(config.Name) {
 			return nil, fmt.Errorf("header %q: invalid name", config.Name)
@@ -103,130 +116,128 @@ func compileHeaders(configs []RuleHeader) ([]*compiledHeader, error) {
 		if !messages.IsValidEmailHeaderValue(config.Value) {
 			return nil, fmt.Errorf("header %q: value must not contain line breaks", config.Name)
 		}
-		value, err := template.New(config.Name).Parse(config.Value)
-		if err != nil {
-			return nil, fmt.Errorf("header %q: %w", config.Name, err)
+		if !isValidHeaderValue(config.Value) {
+			return nil, fmt.Errorf("header %q: %w", config.Name, errUnsupportedHeaderValue)
 		}
-		if err = validateHeaderTemplate(value); err != nil {
-			return nil, fmt.Errorf("header %q: %w", config.Name, err)
-		}
-		headers[i] = &compiledHeader{name: config.Name, value: value}
+		headers[i] = config
 	}
 	return headers, nil
 }
 
-var errUnsupportedHeaderTemplate = errors.New("value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}")
-
-// validateHeaderTemplate ensures that the value only consists of text and placeholders for the fields of [RuleData].
-// Other actions like conditions, functions or nested templates are rejected,
-// because whether they fail can depend on the data and would only be detected when an email is sent.
-func validateHeaderTemplate(tmpl *template.Template) error {
-	if len(tmpl.Templates()) > 1 {
-		return errUnsupportedHeaderTemplate
+// isValidHeaderValue reports whether the value consists of text and the supported placeholders only.
+func isValidHeaderValue(value string) bool {
+	for placeholder := range headerPlaceholders {
+		value = strings.ReplaceAll(value, placeholder, "")
 	}
-	if tmpl.Tree == nil || tmpl.Root == nil {
-		return nil
-	}
-	for _, node := range tmpl.Root.Nodes {
-		switch n := node.(type) {
-		case *parse.TextNode:
-			continue
-		case *parse.ActionNode:
-			if !isRuleDataPlaceholder(n.Pipe) {
-				return errUnsupportedHeaderTemplate
-			}
-		default:
-			return errUnsupportedHeaderTemplate
-		}
-	}
-	return nil
-}
-
-// isRuleDataPlaceholder reports whether the pipeline is a single field of [RuleData], e.g. {{.InstanceID}}.
-func isRuleDataPlaceholder(pipe *parse.PipeNode) bool {
-	if pipe == nil || len(pipe.Decl) != 0 || len(pipe.Cmds) != 1 || len(pipe.Cmds[0].Args) != 1 {
-		return false
-	}
-	field, ok := pipe.Cmds[0].Args[0].(*parse.FieldNode)
-	if !ok || len(field.Ident) != 1 {
-		return false
-	}
-	_, ok = reflect.TypeFor[RuleData]().FieldByName(field.Ident[0])
-	return ok
+	return !strings.Contains(value, "{{") && !strings.Contains(value, "}}")
 }
 
 // Match returns the [Rule] of the first rule matching the SMTP provider.
 // If no rule matches, the zero value is returned.
-func (r Rules) Match(config *Config, data RuleData) (Rule, error) {
+func (r Rules) Match(config *Config, data RuleData) Rule {
 	if config == nil {
-		return Rule{}, nil
+		return Rule{}
 	}
 	for _, rule := range r {
 		if !rule.matches(config) {
 			continue
 		}
-		headers, err := rule.renderHeaders(data)
-		if err != nil {
-			return Rule{}, err
-		}
 		return Rule{
-			DisableCustomHTML: rule.disableCustomHTML,
-			Headers:           headers,
-		}, nil
+			RestrictCustomHTML: rule.restrictCustomHTML,
+			Headers:            rule.renderHeaders(data),
+		}
 	}
-	return Rule{}, nil
+	return Rule{}
 }
 
 func (r *compiledRule) matches(config *Config) bool {
 	return matchesHost(r.hosts, config.SMTP.Host) &&
+		matchesUser(r.users, config.SMTP) &&
 		matchesSenderDomain(r.senderDomains, config.From)
 }
 
-func (r *compiledRule) renderHeaders(data RuleData) (map[string]string, error) {
+func (r *compiledRule) renderHeaders(data RuleData) map[string]string {
 	if len(r.headers) == 0 {
-		return nil, nil
+		return nil
 	}
 	headers := make(map[string]string, len(r.headers))
 	for _, header := range r.headers {
-		var value strings.Builder
-		if err := header.value.Execute(&value, data); err != nil {
-			return nil, fmt.Errorf("smtp rule header %q: %w", header.name, err)
+		value := header.Value
+		for placeholder, render := range headerPlaceholders {
+			value = strings.ReplaceAll(value, placeholder, render(data))
 		}
-		headers[header.name] = value.String()
+		headers[header.Name] = value
 	}
-	return headers, nil
+	return headers
 }
 
-func matchesHost(hosts []string, hostAndPort string) bool {
+func matchesHost(hosts []hostPort, hostAndPort string) bool {
 	if len(hosts) == 0 {
 		return true
 	}
-	hostAndPort = strings.ToLower(strings.TrimSpace(hostAndPort))
-	host, _, err := net.SplitHostPort(hostAndPort)
-	if err != nil {
-		// no port defined
-		host = hostAndPort
+	configured := parseHostPort(hostAndPort)
+	return slices.ContainsFunc(hosts, func(h hostPort) bool {
+		return h.host == configured.host && (h.port == "" || h.port == configured.port)
+	})
+}
+
+func matchesUser(users []string, config SMTP) bool {
+	if len(users) == 0 {
+		return true
 	}
-	return slices.Contains(hosts, hostAndPort) || slices.Contains(hosts, host)
+	var user string
+	switch {
+	case config.PlainAuth != nil:
+		user = config.PlainAuth.User
+	case config.XOAuth2Auth != nil:
+		user = config.XOAuth2Auth.User
+	}
+	return user != "" && slices.Contains(users, strings.TrimSpace(user))
 }
 
 func matchesSenderDomain(domains []string, sender string) bool {
 	if len(domains) == 0 {
 		return true
 	}
-	index := strings.LastIndex(sender, "@")
-	if index < 0 {
-		return false
-	}
-	return slices.Contains(domains, strings.ToLower(strings.TrimSpace(sender[index+1:])))
+	senderDomain := domain.EmailAddress(sender).Domain()
+	return senderDomain != "" && slices.Contains(domains, strings.ToLower(senderDomain))
 }
 
-func normalize(values []string) []string {
-	normalized := make([]string, 0, len(values))
+// parseHostPort splits a host with an optional port. Brackets of IPv6 addresses are removed.
+func parseHostPort(value string) hostPort {
+	value = strings.ToLower(strings.TrimSpace(value))
+	if host, port, err := net.SplitHostPort(value); err == nil {
+		return hostPort{host: host, port: port}
+	}
+	return hostPort{host: strings.TrimSuffix(strings.TrimPrefix(value, "["), "]")}
+}
+
+func normalizeHosts(values []string) []hostPort {
+	hosts := make([]hostPort, 0, len(values))
 	for _, value := range values {
-		if value = strings.ToLower(strings.TrimSpace(value)); value != "" {
-			normalized = append(normalized, value)
+		if host := parseHostPort(value); host.host != "" {
+			hosts = append(hosts, host)
 		}
 	}
-	return normalized
+	return hosts
+}
+
+func normalizeUsers(values []string) []string {
+	users := make([]string, 0, len(values))
+	for _, value := range values {
+		if value = strings.TrimSpace(value); value != "" {
+			users = append(users, value)
+		}
+	}
+	return users
+}
+
+func normalizeDomains(values []string) []string {
+	domains := make([]string, 0, len(values))
+	for _, value := range values {
+		if value = strings.ToLower(strings.TrimSpace(value)); value != "" {
+			domains = append(domains, value)
+		}
+	}
+	return domains
 }

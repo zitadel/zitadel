@@ -1971,7 +1971,7 @@ func (c *notificationChannels) SecurityTokenEvent(context.Context, set.Config) (
 	return &c.Chain, nil
 }
 
-func (c *notificationChannels) SMTPRule(ctx context.Context, config *smtp.Config, orgID string) (smtp.Rule, error) {
+func (c *notificationChannels) SMTPRule(ctx context.Context, config *smtp.Config, orgID string) smtp.Rule {
 	return c.SMTPRules.Match(config, smtp.RuleData{
 		InstanceID: authz.GetInstance(ctx).InstanceID(),
 		OrgID:      orgID,

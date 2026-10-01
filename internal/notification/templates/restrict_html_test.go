@@ -98,3 +98,25 @@ func TestTemplateData_RestrictHTML(t *testing.T) {
 		FooterText: "FooterText",
 	}, data)
 }
+
+func TestTemplateData_RestrictHTML_footer(t *testing.T) {
+	tests := []struct {
+		name          string
+		footer        string
+		includeFooter bool
+		want          string
+		wantInclude   bool
+	}{
+		{name: "text footer stays", footer: "Contact <b>us</b>", includeFooter: true, want: "Contact <b>us</b>", wantInclude: true},
+		{name: "footer of removed elements only is dropped", footer: `<img src="https://other.example/x.png">`, includeFooter: true, want: "", wantInclude: false},
+		{name: "not included stays not included", footer: "text", includeFooter: false, want: "text", wantInclude: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			data := &TemplateData{FooterText: tt.footer, IncludeFooter: tt.includeFooter}
+			data.RestrictHTML()
+			assert.Equal(t, tt.want, data.FooterText)
+			assert.Equal(t, tt.wantInclude, data.IncludeFooter)
+		})
+	}
+}
