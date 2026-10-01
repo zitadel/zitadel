@@ -142,17 +142,17 @@ func (mr *MockCommandsMockRecorder) HumanPhoneVerificationCodeSent(ctx, orgID, u
 }
 
 // InviteCodeSent mocks base method.
-func (m *MockCommands) InviteCodeSent(ctx context.Context, orgID, userID string) error {
+func (m *MockCommands) InviteCodeSent(ctx context.Context, userID, orgID string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "InviteCodeSent", ctx, orgID, userID)
+	ret := m.ctrl.Call(m, "InviteCodeSent", ctx, userID, orgID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // InviteCodeSent indicates an expected call of InviteCodeSent.
-func (mr *MockCommandsMockRecorder) InviteCodeSent(ctx, orgID, userID any) *gomock.Call {
+func (mr *MockCommandsMockRecorder) InviteCodeSent(ctx, userID, orgID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InviteCodeSent", reflect.TypeOf((*MockCommands)(nil).InviteCodeSent), ctx, orgID, userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InviteCodeSent", reflect.TypeOf((*MockCommands)(nil).InviteCodeSent), ctx, userID, orgID)
 }
 
 // MilestonePushed mocks base method.

@@ -43,9 +43,12 @@ func (mig *BackfillUniqueConstraintOwners) Check(lastRun map[string]interface{})
 
 	versionChanged := mig.lastVersion != mig.Version
 	if mig.lastVersion == "" {
-		return true
+		return true // first run
 	}
-	return versionChanged || (mig.ForceFinalize && !mig.lastFinalized)
+	if mig.lastFinalized {
+		return false // never re-run after finalize, even on a new binary
+	}
+	return versionChanged || mig.ForceFinalize
 }
 
 func (mig *BackfillUniqueConstraintOwners) finalizeAfterSuccess() {
@@ -83,17 +86,39 @@ func (mig *BackfillUniqueConstraintOwners) Execute(ctx context.Context, _ events
 		}
 	}
 
-	var unmatched int64
-	err = mig.dbClient.QueryRowContext(ctx, func(row *sql.Row) error {
-		return row.Scan(&unmatched)
-	}, `SELECT COUNT(*) FROM eventstore.unique_constraints WHERE unique_type = ANY($1) AND owners = '{}'`,
+	unmatchedByType := make(map[string]int64)
+	err = mig.dbClient.QueryContext(ctx, func(rows *sql.Rows) error {
+		for rows.Next() {
+			var uniqueType string
+			var count int64
+			if scanErr := rows.Scan(&uniqueType, &count); scanErr != nil {
+				return scanErr
+			}
+			unmatchedByType[uniqueType] = count
+		}
+		return nil
+	}, `SELECT unique_type, COUNT(*) FROM eventstore.unique_constraints WHERE unique_type = ANY($1) AND owners = '{}' GROUP BY unique_type`,
 		database.TextArray[string](eventstore.UniqueTypesWithOwners))
 	if err != nil {
 		return err
 	}
+	unmatched, warnUnmatched := unmatchedOwnerCounts(unmatchedByType)
 	mig.finalizeAfterSuccess()
-	logging.Info(ctx, "unique constraint owners backfill complete", "unmatched", unmatched, "finalized", mig.Finalized, "migration", mig.String())
+	logging.Info(ctx, "unique constraint owners backfill complete", "unmatched", unmatched, "unmatched_by_type", unmatchedByType, "finalized", mig.Finalized, "migration", mig.String())
+	if warnUnmatched {
+		logging.Warn(ctx, "unique constraint owners unmatched usernames or org names remain after backfill; owner-only deletes will leave those names blocked", "unmatched_by_type", unmatchedByType, "migration", mig.String())
+	}
 	return nil
+}
+
+func unmatchedOwnerCounts(byType map[string]int64) (total int64, warn bool) {
+	for uniqueType, count := range byType {
+		total += count
+		if count > 0 && (uniqueType == "usernames" || uniqueType == "org_name") {
+			warn = true
+		}
+	}
+	return total, warn
 }
 
 func (mig *BackfillUniqueConstraintOwners) String() string {

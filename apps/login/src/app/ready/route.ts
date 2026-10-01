@@ -1,5 +1,6 @@
 import { applyCustomHeaders } from "@/lib/custom-headers";
 import { createLogger } from "@/lib/logger";
+import { getSessionCookieSecretConfigError, hasSessionCookieSecret } from "@/lib/session-cookie-signature";
 import { NextResponse } from "next/server";
 
 const logger = createLogger("readiness");
@@ -14,12 +15,23 @@ const READINESS_TIMEOUT_MS = 5_000;
  * API's access-log and quota interceptors, so probe traffic is never counted
  * as authenticated requests of the instance.
  *
+ * It also fails if no session cookie signing secret is usable (a local check,
+ * no API call), since every login would otherwise fail when the cookie is written.
+ *
  * The configured API credentials are validated once at process startup
  * (see instrumentation.ts), not on every probe.
  */
 export async function GET() {
   const apiUrl = process.env.ZITADEL_API_URL;
   if (!apiUrl) {
+    return unavailable();
+  }
+
+  // fail fast: without a signing secret every login would fail when the session cookie is written
+  if (!hasSessionCookieSecret()) {
+    logger.error(
+      `Readiness check failed: ${getSessionCookieSecretConfigError() ?? "no session cookie signing secret available (set ZITADEL_SESSION_COOKIE_SECRET)"}`,
+    );
     return unavailable();
   }
 

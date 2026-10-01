@@ -95,7 +95,8 @@ export default async function Page(props: { searchParams: Promise<Record<string 
         {!session && !user && (
           <div className="py-4">
             <Alert>
-              <Translated i18nKey="unknownContext" namespace="error" />
+              {/* context was provided but the session could not be resolved (cookie missing, invalid or expired) */}
+              <Translated i18nKey={loginName || userId ? "sessionExpired" : "unknownContext"} namespace="error" />
             </Alert>
           </div>
         )}

@@ -72,7 +72,8 @@ export default async function Page(props: { searchParams: Promise<Record<string 
         {(!sessionFactors || !enrollmentAuthorized) && (
           <div className="py-4">
             <Alert>
-              <Translated i18nKey="unknownContext" namespace="error" />
+              {/* a loginName was provided but the session could not be resolved (cookie missing, invalid or expired) */}
+              <Translated i18nKey={!sessionFactors && loginName ? "sessionExpired" : "unknownContext"} namespace="error" />
             </Alert>
           </div>
         )}
