@@ -31,12 +31,20 @@ const searchAPI = createSearchAPI('advanced', {
   ],
 });
 
+// fumadocs' built-in default. Its endpoint passes `limit: undefined` when the URL
+// has no `?limit=`, which overrides that default and returns every match (450
+// entries for "oidc").
+const DEFAULT_LIMIT = '60';
+
 // Results only change with a deploy, so the CDN answers repeated queries (cached per
 // URL, i.e. per query and tag) instead of a function that may first have to rebuild
 // the index on a cold start. A static index is not an option: one version alone
 // serializes to over 20 MB of JSON.
 export async function GET(request: Request) {
-  const response = await searchAPI.GET(request);
+  const url = new URL(request.url);
+  if (!url.searchParams.has('limit')) url.searchParams.set('limit', DEFAULT_LIMIT);
+
+  const response = await searchAPI.GET(new Request(url));
   response.headers.set('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=604800');
   return response;
 }
