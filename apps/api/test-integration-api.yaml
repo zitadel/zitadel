@@ -124,6 +124,9 @@ SystemDefaults:
   KeyConfig:
     PrivateKeyLifetime: 7200h
     PublicKeyLifetime: 14400h
+  PasswordHasher:
+    Verifiers:
+      - "firebasescrypt"
 
 OIDC:
   DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2

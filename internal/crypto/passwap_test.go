@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,6 +21,7 @@ import (
 	"github.com/zitadel/passwap/sha2"
 	"github.com/zitadel/passwap/verifier"
 
+	"github.com/zitadel/zitadel/internal/crypto/firebasescrypt"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -175,6 +177,15 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "invalid firebasescrypt",
+			fields: fields{
+				Hasher: HasherConfig{
+					Algorithm: HashNameFirebaseScrypt,
+				},
+			},
+			wantErr: true,
+		},
+		{
 			name: "invalid argon2",
 			fields: fields{
 				Hasher: HasherConfig{
@@ -281,6 +292,19 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 				Verifiers: []HashName{HashNameDrupal7},
 			},
 			wantPrefixes: []string{bcrypt.Prefix, drupal7.Identifier},
+		},
+		{
+			name: "firebasescrypt verifier",
+			fields: fields{
+				Hasher: HasherConfig{
+					Algorithm: HashNameBcrypt,
+					Params: map[string]any{
+						"cost": 3,
+					},
+				},
+				Verifiers: []HashName{HashNameFirebaseScrypt},
+			},
+			wantPrefixes: []string{bcrypt.Prefix, firebasescrypt.Prefix},
 		},
 		{
 			name: "scrypt, error",
@@ -556,6 +580,43 @@ func TestHasher_ValidateEncodedHash(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestHasher_FirebaseScrypt(t *testing.T) {
+	const (
+		// Sample from the firebase/scrypt README.
+		vectorA = "$firebasescrypt$ln=14,r=8$42xEC+ixf3L2lw==$lSrfV15cpx95/sZS2W9c9Kp6i/LVgQNDNC/qzrCnh1SAyZvqmZqAjTdn3aoItz+VHjoZilo78198JAdRuid5lQ==$Bw==$jxspr8Ki0RYycVU8zykbdLGjFQ3McFUH0uiiTvC8pVMXAn210wjLNmdZJzxUECKbm0QsEmYUSDzZvpjeJ9WmXA=="
+		vectorC = "$firebasescrypt$ln=10,r=4$42xEC+ixf3L2lw==$EQ0tlNdKv5ZBDYN7ofOYlhhTEe5Tu9bueDmtDUhLPM+9dcS1u1ALgMcT6N1+U9GsDlVdd3FE2dmz37fU5Y8A9Q==$Bw==$jxspr8Ki0RYycVU8zykbdLGjFQ3McFUH0uiiTvC8pVMXAn210wjLNmdZJzxUECKbm0QsEmYUSDzZvpjeJ9WmXA=="
+	)
+	cfg := &HashConfig{
+		Verifiers: []HashName{HashNameFirebaseScrypt},
+		Hasher: HasherConfig{
+			Algorithm: HashNameBcrypt,
+			Params: map[string]any{
+				"cost": 4,
+			},
+		},
+		Limits: HashLimitsConfig{
+			Bcrypt: BcryptLimitsConfig{MinCost: 4, MaxCost: 16},
+		},
+	}
+	hasher, err := cfg.NewHasher()
+	require.NoError(t, err)
+
+	assert.True(t, hasher.EncodingSupported(vectorA))
+	require.NoError(t, hasher.ValidateEncodedHash(vectorA))
+
+	updated, err := hasher.Verify(vectorA, "user1password")
+	require.NoError(t, err)
+	assert.True(t, strings.HasPrefix(updated, bcrypt.Prefix), updated)
+	_, err = hasher.Verify(updated, "user1password")
+	require.NoError(t, err)
+
+	_, err = hasher.Verify(vectorA, "wrong")
+	assert.ErrorIs(t, err, passwap.ErrPasswordMismatch)
+
+	err = hasher.ValidateEncodedHash(vectorC)
+	assert.ErrorIs(t, err, zerrors.ThrowInvalidArgument(nil, "CRYPT-5uV9n", "Errors.User.Password.Invalid"))
 }
 
 func TestHasherConfig_decodeParams(t *testing.T) {

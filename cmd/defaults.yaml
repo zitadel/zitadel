@@ -926,6 +926,11 @@ SystemDefaults:
       Drupal7:
         MinIterations: 1000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_DRUPAL7_MINITERATIONS
         MaxIterations: 500000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_DRUPAL7_MAXITERATIONS
+      FirebaseScrypt:
+        MinLN: 14 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_FIREBASESCRYPT_MINLN
+        MaxLN: 14 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_FIREBASESCRYPT_MAXLN
+        MinR: 8 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_FIREBASESCRYPT_MINR
+        MaxR: 8 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_FIREBASESCRYPT_MAXR
 
     # Verifiers enable the possibility of verifying
     # passwords that are previously hashed using another
@@ -950,6 +955,7 @@ SystemDefaults:
     #   - "sha2" # crypt(3) SHA-256 and SHA-512
     #   - "scrypt"
     #   - "pbkdf2"   # verifier for all pbkdf2 hash modes.
+    #   - "firebasescrypt" # modified scrypt of Firebase Authentication
   SecretHasher:
     # Set hasher configuration for service accounts, API and OIDC client secrets.
     Hasher:
@@ -1003,6 +1009,11 @@ SystemDefaults:
       Drupal7:
         MinIterations: 1000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_DRUPAL7_MINITERATIONS
         MaxIterations: 500000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_DRUPAL7_MAXITERATIONS
+      FirebaseScrypt:
+        MinLN: 14 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_FIREBASESCRYPT_MINLN
+        MaxLN: 14 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_FIREBASESCRYPT_MAXLN
+        MinR: 8 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_FIREBASESCRYPT_MINR
+        MaxR: 8 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_FIREBASESCRYPT_MAXR
     Verifiers: # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_VERIFIERS
   Multifactors:
     OTP:

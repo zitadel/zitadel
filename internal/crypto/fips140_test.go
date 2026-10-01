@@ -31,6 +31,7 @@ func TestHashName_IsFIPSCompliant(t *testing.T) {
 		{HashNameSha2, false},
 		{HashNameScrypt, false},
 		{HashNameDrupal7, false},
+		{HashNameFirebaseScrypt, false},
 	}
 	for _, tt := range tests {
 		t.Run(string(tt.name), func(t *testing.T) {

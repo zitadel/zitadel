@@ -9,10 +9,12 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
@@ -230,4 +232,54 @@ func TestServer_Deprecated_SetPassword(t *testing.T) {
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
+}
+
+func TestServer_CreateUser_FirebaseScryptPassword(t *testing.T) {
+	// Public sample from the firebase/scrypt README.
+	const (
+		hash     = "$firebasescrypt$ln=14,r=8$42xEC+ixf3L2lw==$lSrfV15cpx95/sZS2W9c9Kp6i/LVgQNDNC/qzrCnh1SAyZvqmZqAjTdn3aoItz+VHjoZilo78198JAdRuid5lQ==$Bw==$jxspr8Ki0RYycVU8zykbdLGjFQ3McFUH0uiiTvC8pVMXAn210wjLNmdZJzxUECKbm0QsEmYUSDzZvpjeJ9WmXA=="
+		password = "user1password"
+	)
+	email := integration.Email()
+	createResp, err := Client.CreateUser(OrgCTX, &user.CreateUserRequest{
+		OrganizationId: Instance.DefaultOrg.Id,
+		Username:       &email,
+		UserType: &user.CreateUserRequest_Human_{
+			Human: &user.CreateUserRequest_Human{
+				Profile: &user.SetHumanProfile{
+					GivenName:  "Donald",
+					FamilyName: "Duck",
+				},
+				Email: &user.SetHumanEmail{
+					Email: email,
+					Verification: &user.SetHumanEmail_IsVerified{
+						IsVerified: true,
+					},
+				},
+				PasswordType: &user.CreateUserRequest_Human_HashedPassword{
+					HashedPassword: &user.HashedPassword{
+						Hash: hash,
+					},
+				},
+			},
+		},
+	})
+	require.NoError(t, err)
+	userID := createResp.GetId()
+
+	Instance.TriggerUserByID(OrgCTX, userID)
+
+	_, err = Instance.Client.SessionV2.CreateSession(LoginCTX, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{UserId: userID},
+			},
+			Password: &session.CheckPassword{
+				Password: "wrong",
+			},
+		},
+	})
+	integration.AssertGrpcStatus(t, codes.InvalidArgument, err)
+
+	Instance.CreatePasswordSession(t, LoginCTX, userID, password)
 }
