@@ -31,7 +31,20 @@ type SecurityPolicy struct {
 
 func (c *Commands) SetSecurityPolicy(ctx context.Context, policy *SecurityPolicy) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareSetSecurityPolicy(instanceAgg, policy)
+	return c.pushSecurityPolicy(ctx, c.prepareSetSecurityPolicy(instanceAgg, policy))
+}
+
+// SetLegacySecurityPolicy sets the security settings the admin v1 and settings v2beta APIs know:
+// iframe embedding, its allowed origins and impersonation. Only those fields of policy are read;
+// every other setting keeps its current value, so a call through these APIs does not reset
+// settings they cannot express, such as dynamic client registration or client ID metadata
+// documents.
+func (c *Commands) SetLegacySecurityPolicy(ctx context.Context, policy *SecurityPolicy) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	return c.pushSecurityPolicy(ctx, c.prepareSetLegacySecurityPolicy(instanceAgg, policy))
+}
+
+func (c *Commands) pushSecurityPolicy(ctx context.Context, validation preparation.Validation) (*domain.ObjectDetails, error) {
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -60,6 +73,26 @@ func (c *Commands) prepareSetSecurityPolicy(a *instance.Aggregate, policy *Secur
 				return nil, err
 			}
 			cmd, err := writeModel.NewSetEvent(ctx, &a.Aggregate, policy)
+			if err != nil {
+				return nil, err
+			}
+			return []eventstore.Command{cmd}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) prepareSetLegacySecurityPolicy(a *instance.Aggregate, legacy *SecurityPolicy) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel, err := c.getSecurityPolicyWriteModel(ctx, filter)
+			if err != nil {
+				return nil, err
+			}
+			policy := writeModel.SecurityPolicy
+			policy.EnableIframeEmbedding = legacy.EnableIframeEmbedding
+			policy.AllowedOrigins = legacy.AllowedOrigins
+			policy.EnableImpersonation = legacy.EnableImpersonation
+			cmd, err := writeModel.NewSetEvent(ctx, &a.Aggregate, &policy)
 			if err != nil {
 				return nil, err
 			}

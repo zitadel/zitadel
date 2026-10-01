@@ -20,7 +20,9 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
+	settings_v2beta "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
 )
 
 // allowedClientIDMetadataAddress is the address the integration API allows client id metadata
@@ -202,6 +204,64 @@ func TestServer_ClientIDMetadataDocument_instanceAllowedURLs(t *testing.T) {
 		setClientIDMetadataDocumentSettings(t, iamCTX, instance, &settings.ClientIDMetadataDocumentSettings{Enabled: true, AllowAnyUrl: true})
 		waitForClientIDMetadataDocumentSupport(t, ctx, issuer, true)
 		assert.GreaterOrEqual(t, fetchCount(t), int32(1))
+	})
+}
+
+// TestServer_ClientIDMetadataDocument_legacySecuritySettings verifies that setting the security
+// settings through the admin v1 and settings v2beta APIs, which do not know client ID metadata
+// documents or dynamic client registration, leaves both untouched.
+func TestServer_ClientIDMetadataDocument_legacySecuritySettings(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	instance := integration.NewInstance(ctx)
+	iamCTX := instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+	issuer := instance.OIDCIssuer()
+
+	enableDynamicClientRegistration(t, iamCTX, instance, true)
+	setClientIDMetadataDocumentSettings(t, iamCTX, instance, &settings.ClientIDMetadataDocumentSettings{
+		Enabled:     true,
+		AllowedUrls: []string{"https://" + allowedClientIDMetadataAddress + "/"},
+		AllowAnyUrl: true,
+	})
+	waitForClientIDMetadataDocumentSupport(t, ctx, issuer, true)
+
+	assertUnchanged := func(t *testing.T) {
+		t.Helper()
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+		require.EventuallyWithT(t, func(tt *assert.CollectT) {
+			current, err := instance.Client.SettingsV2.GetSecuritySettings(iamCTX, &settings.GetSecuritySettingsRequest{})
+			if !assert.NoError(tt, err) {
+				return
+			}
+			assert.True(tt, current.GetSettings().GetEmbeddedIframe().GetEnabled(), "the legacy change must be applied")
+			assert.Equal(tt, &settings.ClientIDMetadataDocumentSettings{
+				Enabled:     true,
+				AllowedUrls: []string{"https://" + allowedClientIDMetadataAddress + "/"},
+				AllowAnyUrl: true,
+			}, current.GetSettings().GetClientIdMetadataDocument())
+			assert.Equal(tt, &settings.DynamicClientRegistrationSettings{Enabled: true, AllowUnauthenticated: true}, current.GetSettings().GetDynamicClientRegistration())
+		}, retryDuration, tick, "security settings not as expected")
+		waitForClientIDMetadataDocumentSupport(t, ctx, issuer, true)
+	}
+
+	t.Run("admin v1", func(t *testing.T) {
+		_, err := instance.Client.Admin.SetSecurityPolicy(iamCTX, &admin.SetSecurityPolicyRequest{
+			EnableIframeEmbedding: true,
+			AllowedOrigins:        []string{"https://origin.example.com"},
+		})
+		require.NoError(t, err)
+		assertUnchanged(t)
+	})
+
+	t.Run("settings v2beta", func(t *testing.T) {
+		_, err := instance.Client.SettingsV2beta.SetSecuritySettings(iamCTX, &settings_v2beta.SetSecuritySettingsRequest{
+			EmbeddedIframe: &settings_v2beta.EmbeddedIframeSettings{
+				Enabled:        true,
+				AllowedOrigins: []string{"https://other-origin.example.com"},
+			},
+		})
+		require.NoError(t, err)
+		assertUnchanged(t)
 	})
 }
 

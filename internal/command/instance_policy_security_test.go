@@ -243,3 +243,54 @@ func securityPolicySetEvent(t *testing.T, changes ...instance.SecurityPolicyChan
 	}
 	return event
 }
+
+// TestCommands_SetLegacySecurityPolicy pins that the admin v1 and settings v2beta APIs only
+// change the settings they know, so a call through them does not reset dynamic client
+// registration or client ID metadata documents.
+func TestCommands_SetLegacySecurityPolicy(t *testing.T) {
+	existing := func(t *testing.T) eventstore.Event {
+		return eventFromEventPusher(securityPolicySetEvent(t,
+			instance.ChangeSecurityPolicyEnableIframeEmbedding(false),
+			instance.ChangeSecurityPolicyAllowedOrigins([]string{"https://origin.example.com"}),
+			instance.ChangeSecurityPolicyEnableDynamicClientRegistration(true),
+			instance.ChangeSecurityPolicyAllowUnauthenticatedDynamicClientRegistration(true),
+			instance.ChangeSecurityPolicyEnableClientIDMetadataDocument(true),
+			instance.ChangeSecurityPolicyClientIDMetadataDocumentAllowedURLs([]string{"https://app.example.com/client"}),
+			instance.ChangeSecurityPolicyClientIDMetadataDocumentAllowAnyURL(true),
+		))
+	}
+
+	t.Run("only the legacy settings change", func(t *testing.T) {
+		c := &Commands{
+			eventstore: expectEventstore(
+				expectFilter(
+					existing(t),
+					eventFromEventPusher(instance.NewSecurityPolicyClientIDMetadataDocumentAllowedURLAddedEvent(context.Background(),
+						&instance.NewAggregate("instanceID").Aggregate, "https://clients.example.com/")),
+				),
+				expectPush(securityPolicySetEvent(t,
+					instance.ChangeSecurityPolicyEnableIframeEmbedding(true),
+					instance.ChangeSecurityPolicyEnableImpersonation(true),
+				)),
+			)(t),
+		}
+		_, err := c.SetLegacySecurityPolicy(authz.WithInstanceID(context.Background(), "instanceID"), &SecurityPolicy{
+			EnableIframeEmbedding: true,
+			AllowedOrigins:        []string{"https://origin.example.com"},
+			EnableImpersonation:   true,
+		})
+		assert.NoError(t, err)
+	})
+
+	t.Run("settings the legacy apis do not know are ignored", func(t *testing.T) {
+		c := &Commands{
+			eventstore: expectEventstore(
+				expectFilter(existing(t)),
+			)(t),
+		}
+		_, err := c.SetLegacySecurityPolicy(authz.WithInstanceID(context.Background(), "instanceID"), &SecurityPolicy{
+			AllowedOrigins: []string{"https://origin.example.com"},
+		})
+		assert.ErrorIs(t, err, zerrors.ThrowPreconditionFailed(nil, "POLICY-EWsf3", "Errors.NoChangesFound"))
+	})
+}
