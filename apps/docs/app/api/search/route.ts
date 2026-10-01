@@ -1,5 +1,6 @@
 // app/api/search/route.ts
 import { NextResponse } from 'next/server';
+import { getVersionFromSlug, getVersionFromUrl } from '@/lib/versions';
 
 const RATE_LIMIT_MAX = 40; // Max requests per IP per minute
 const MAX_CACHE_SIZE = 10000; // Prevent Out-Of-Memory leaks
@@ -43,12 +44,15 @@ export async function GET(request: Request) {
       return NextResponse.json([]);
     }
     const safeQuery = query.substring(0, 150).trim();
+    // Docs version being viewed ('latest' or e.g. 'v4.17'); anything unrecognized falls back to 'latest'.
+    const tag = getVersionFromSlug([searchParams.get('tag') ?? '']);
 
     const baseUrl = process.env.DOCS_SEARCH_URL || 'http://localhost:8080';
     const cleanBaseUrl = baseUrl.replace(/\/+$/, '');
 
     const backendUrl = new URL(`${cleanBaseUrl}/api/search/docs`);
     backendUrl.searchParams.set('q', safeQuery);
+    backendUrl.searchParams.set('tag', tag);
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
@@ -70,7 +74,11 @@ export async function GET(request: Request) {
     }
 
     const data = await response.json();
-    return NextResponse.json(data);
+    // Only return pages of the version being viewed, even if the backend ignores `tag`.
+    const results = Array.isArray(data)
+      ? data.filter((item) => typeof item?.url === 'string' && getVersionFromUrl(item.url) === tag)
+      : [];
+    return NextResponse.json(results);
 
   } catch (error: any) {
     console.error('Proxy Search Error:', error.name === 'AbortError' ? 'Timeout' : error.message);

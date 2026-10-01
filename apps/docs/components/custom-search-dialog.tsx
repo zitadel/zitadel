@@ -56,7 +56,8 @@ const HighlightMatch = ({ text, query }: { text: string; query: string }) => {
 export default function CustomSearchDialog(props: SharedProps) {
     const [query, setQuery] = useState('');
     const [debouncedQuery, setDebouncedQuery] = useState('');
-    const [results, setResults] = useState<SearchResultItem[]>([]);
+    // null hides the list; [] makes SearchDialogList render its own "No results found".
+    const [results, setResults] = useState<SearchResultItem[] | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     const params = useParams();
@@ -72,7 +73,7 @@ export default function CustomSearchDialog(props: SharedProps) {
 
     useEffect(() => {
         if (!debouncedQuery.trim()) {
-            setResults([]);
+            setResults(null);
             setIsLoading(false);
             return;
         }
@@ -157,12 +158,6 @@ export default function CustomSearchDialog(props: SharedProps) {
                 </SearchDialogHeader>
 
                 <SearchDialogList items={results} />
-
-                {!isLoading && debouncedQuery && results.length === 0 && (
-                    <div className="p-6 text-center text-sm text-muted-foreground">
-                        No results found for "<span className="font-semibold text-foreground">{debouncedQuery}</span>".
-                    </div>
-                )}
             </SearchDialogContent>
         </SearchDialog>
     );
