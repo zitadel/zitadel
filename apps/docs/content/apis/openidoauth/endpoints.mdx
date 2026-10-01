@@ -708,9 +708,10 @@ the `client_id` itself is the URL of the document.
 
 <Callout type="warn">
 This is disabled by default. When it is
-[enabled](/guides/integrate/client-id-metadata-document#enable-client-id-metadata-documents) in the instance's security
-settings, the discovery document advertises `client_id_metadata_document_supported: true` and a `client_id` that is an
-HTTPS URL is resolved as a metadata document.
+[enabled](/guides/integrate/client-id-metadata-document#enable-client-id-metadata-documents-for-an-instance) in the
+instance's security settings and both the system and the instance allow at least one `client_id` URL, the discovery
+document advertises `client_id_metadata_document_supported: true` and an allowed `client_id` URL is resolved as a
+metadata document.
 </Callout>
 
 See the [Client ID Metadata Document guide](/guides/integrate/client-id-metadata-document) for the document format, the
