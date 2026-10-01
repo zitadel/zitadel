@@ -1,6 +1,7 @@
 package repository_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"strings"
@@ -5202,4 +5203,69 @@ func TestSetSecuritySettingsFields_dynamicClientRegistrationOnly(t *testing.T) {
 	args := fmt.Sprint(builder.Args()...)
 	assert.Contains(t, args, "enableDynamicClientRegistration")
 	assert.Contains(t, args, "allowUnauthenticatedDynamicClientRegistration")
+}
+
+// TestSecuritySettingsClientIDMetadataDocumentAllowedURLs runs the changes the relational
+// projection applies for added and removed client id metadata document URLs. The settings row
+// only exists once the policy was set, so the insert path must produce the same result as the
+// change on an existing row.
+func TestSecuritySettingsClientIDMetadataDocumentAllowedURLs(t *testing.T) {
+	tx, rollback := transactionForRollback(t)
+	defer rollback()
+
+	repo := repository.SecuritySettingsRepository()
+	apply := func(t *testing.T, instanceID string, insertURLs []string, change database.Change) {
+		t.Helper()
+		insertSettings, err := json.Marshal(domain.SecuritySettingsAttributes{ClientIDMetadataDocumentAllowedURLs: insertURLs})
+		require.NoError(t, err)
+		require.NoError(t, repo.SetColumns(t.Context(), tx, &domain.Settings{
+			InstanceID: instanceID,
+			Settings:   insertSettings,
+		}, change))
+	}
+	get := func(t *testing.T, instanceID string) *domain.SecuritySettings {
+		t.Helper()
+		settings, err := repo.Get(t.Context(), tx, database.WithCondition(repo.InstanceIDCondition(instanceID)))
+		require.NoError(t, err)
+		return settings
+	}
+
+	t.Run("added to settings that do not exist yet", func(t *testing.T) {
+		instanceID := createInstance(t, tx)
+		apply(t, instanceID, []string{"https://app.example.com/client"}, repo.AddClientIDMetadataDocumentAllowedURL("https://app.example.com/client"))
+		assert.Equal(t, []string{"https://app.example.com/client"}, get(t, instanceID).ClientIDMetadataDocumentAllowedURLs)
+	})
+
+	t.Run("removed from settings that do not exist yet", func(t *testing.T) {
+		instanceID := createInstance(t, tx)
+		apply(t, instanceID, nil, repo.RemoveClientIDMetadataDocumentAllowedURL("https://app.example.com/client"))
+		assert.Empty(t, get(t, instanceID).ClientIDMetadataDocumentAllowedURLs)
+	})
+
+	t.Run("added, deduplicated and removed on existing settings", func(t *testing.T) {
+		instanceID := createInstance(t, tx)
+		require.NoError(t, repo.Set(t.Context(), tx, &domain.SecuritySettings{
+			Settings: domain.Settings{InstanceID: instanceID},
+			SecuritySettingsAttributes: domain.SecuritySettingsAttributes{
+				EnableIframeEmbedding:               gu.Ptr(true),
+				AllowedOrigins:                      []string{"origin1"},
+				EnableClientIDMetadataDocument:      gu.Ptr(true),
+				ClientIDMetadataDocumentAllowedURLs: []string{"https://app.example.com/client"},
+				ClientIDMetadataDocumentAllowAnyURL: gu.Ptr(false),
+			},
+		}))
+
+		apply(t, instanceID, []string{"https://clients.example.com/"}, repo.AddClientIDMetadataDocumentAllowedURL("https://clients.example.com/"))
+		apply(t, instanceID, []string{"https://clients.example.com/"}, repo.AddClientIDMetadataDocumentAllowedURL("https://clients.example.com/"))
+		settings := get(t, instanceID)
+		assert.Equal(t, []string{"https://app.example.com/client", "https://clients.example.com/"}, settings.ClientIDMetadataDocumentAllowedURLs)
+		// The other settings are untouched by the array change.
+		assert.Equal(t, gu.Ptr(true), settings.EnableIframeEmbedding)
+		assert.Equal(t, []string{"origin1"}, settings.AllowedOrigins)
+		assert.Equal(t, gu.Ptr(true), settings.EnableClientIDMetadataDocument)
+		assert.Equal(t, gu.Ptr(false), settings.ClientIDMetadataDocumentAllowAnyURL)
+
+		apply(t, instanceID, nil, repo.RemoveClientIDMetadataDocumentAllowedURL("https://app.example.com/client"))
+		assert.Equal(t, []string{"https://clients.example.com/"}, get(t, instanceID).ClientIDMetadataDocumentAllowedURLs)
+	})
 }

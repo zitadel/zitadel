@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -25,49 +26,151 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
-func TestLooksLikeClientIDMetadataURL(t *testing.T) {
-	tests := []struct {
-		clientID string
-		want     bool
-	}{
-		{"https://app.example.com/oauth/client", true},
-		{"https://app.example.com", true},
-		{"https://app.example.com:8443/client", true},
-		{"HTTPS://app.example.com/client", true},
-		{"http://app.example.com/client", false},
-		{"320948502934092851", false},
-		{"320948502934092851@project", false},
-		{"app.example.com/client", false},
-		{"/oauth/client", false},
-		{"", false},
-		{"ftp://app.example.com", false},
-	}
-	for _, tt := range tests {
-		t.Run(tt.clientID, func(t *testing.T) {
-			assert.Equal(t, tt.want, looksLikeClientIDMetadataURL(tt.clientID))
+func TestNewClientIDMetadataAllowlist(t *testing.T) {
+	t.Run("valid entries are kept, blank entries are skipped", func(t *testing.T) {
+		allowlist, err := newClientIDMetadataAllowlist(ClientIDMetadataDocumentConfig{
+			AllowedURLs: []string{
+				"https://app.example.com/client",
+				" https://clients.example.com/ ",
+				"",
+			},
+		})
+		require.NoError(t, err)
+		assert.Equal(t, clientIDMetadataAllowlist{urls: []string{"https://app.example.com/client", "https://clients.example.com/"}}, allowlist)
+		assert.True(t, allowlist.allowsAny())
+	})
+	t.Run("nothing allowed", func(t *testing.T) {
+		allowlist, err := newClientIDMetadataAllowlist(ClientIDMetadataDocumentConfig{})
+		require.NoError(t, err)
+		assert.False(t, allowlist.allowsAny())
+		assert.False(t, allowlist.allows("https://app.example.com/client"))
+	})
+	t.Run("any url allowed", func(t *testing.T) {
+		allowlist, err := newClientIDMetadataAllowlist(ClientIDMetadataDocumentConfig{AllowAnyURL: true})
+		require.NoError(t, err)
+		assert.True(t, allowlist.allowsAny())
+		assert.True(t, allowlist.allows("https://app.example.com/client"))
+	})
+	for _, entry := range []string{
+		"https://app.example.com",
+		"http://app.example.com/client",
+		"https://app.example.com/oauth/../",
+		"https://app.example.com/client#fragment",
+		"app.example.com/client",
+	} {
+		t.Run("invalid entry "+entry, func(t *testing.T) {
+			_, err := newClientIDMetadataAllowlist(ClientIDMetadataDocumentConfig{AllowedURLs: []string{"https://app.example.com/client", entry}})
+			require.Error(t, err)
 		})
 	}
 }
 
-// TestClientIDMetadataDocumentEnabled pins the control plane: resolution is gated on the
-// instance security setting, not on the shape of the client_id alone. With the setting off an
-// https client_id must fall through to the regular database lookup.
-func TestClientIDMetadataDocumentEnabled(t *testing.T) {
+// TestClientIDMetadataResolver_Handles pins the control plane: resolution needs the instance
+// security setting, a valid client_id URL, and both the system and the instance must allow it.
+// Anything else must fall through to the regular database lookup.
+func TestClientIDMetadataResolver_Handles(t *testing.T) {
+	const clientID = "https://app.example.com/client"
 	tests := []struct {
 		name     string
-		enabled  bool
+		system   clientIDMetadataAllowlist
+		instance []authz.MockContextInstanceOpts
 		clientID string
 		want     bool
 	}{
-		{"enabled, url client_id", true, "https://app.example.com/client", true},
-		{"enabled, regular client_id", true, "320948502934092851", false},
-		{"disabled, url client_id", false, "https://app.example.com/client", false},
-		{"disabled, regular client_id", false, "320948502934092851", false},
+		{
+			name:     "system and instance allow the url",
+			system:   clientIDMetadataAllowlist{urls: []string{"https://app.example.com/"}},
+			instance: []authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocumentAllowedURLs(clientID)},
+			clientID: clientID,
+			want:     true,
+		},
+		{
+			name:     "system allows any url, instance allows the url",
+			system:   clientIDMetadataAllowlist{allowAny: true},
+			instance: []authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocumentAllowedURLs("https://app.example.com/")},
+			clientID: clientID,
+			want:     true,
+		},
+		{
+			name:     "system allows the url, instance allows any url",
+			system:   clientIDMetadataAllowlist{urls: []string{clientID}},
+			instance: []authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocumentAllowAnyURL(true)},
+			clientID: clientID,
+			want:     true,
+		},
+		{
+			name:     "both allow any url",
+			system:   clientIDMetadataAllowlist{allowAny: true},
+			instance: []authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocumentAllowAnyURL(true)},
+			clientID: clientID,
+			want:     true,
+		},
+		{
+			name:     "instance allows any url, system does not allow the url",
+			system:   clientIDMetadataAllowlist{urls: []string{"https://other.example.com/"}},
+			instance: []authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocumentAllowAnyURL(true)},
+			clientID: clientID,
+		},
+		{
+			name:     "instance allows the url, system allows nothing",
+			instance: []authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocumentAllowedURLs(clientID)},
+			clientID: clientID,
+		},
+		{
+			name:     "system allows any url, instance allows nothing",
+			system:   clientIDMetadataAllowlist{allowAny: true},
+			clientID: clientID,
+		},
+		{
+			name:     "system allows any url, instance allows another url",
+			system:   clientIDMetadataAllowlist{allowAny: true},
+			instance: []authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocumentAllowedURLs("https://other.example.com/")},
+			clientID: clientID,
+		},
+		{
+			name:     "invalid url under allowed prefixes",
+			system:   clientIDMetadataAllowlist{allowAny: true},
+			instance: []authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocumentAllowAnyURL(true)},
+			clientID: "https://app.example.com/a/../client",
+		},
+		{
+			name:     "regular client_id",
+			system:   clientIDMetadataAllowlist{allowAny: true},
+			instance: []authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocumentAllowAnyURL(true)},
+			clientID: "320948502934092851",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := authz.NewMockContext("instance", "org", "", authz.WithMockClientIDMetadataDocument(tt.enabled))
-			assert.Equal(t, tt.want, clientIDMetadataDocumentEnabled(ctx, tt.clientID))
+			resolver := newClientIDMetadataResolver(http.DefaultClient, tt.system, nil, time.Hour, time.Hour, nil)
+			enabled := append([]authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocument(true)}, tt.instance...)
+			assert.Equal(t, tt.want, resolver.Handles(authz.NewMockContext("instance", "org", "", enabled...), tt.clientID), "enabled")
+			assert.False(t, resolver.Handles(authz.NewMockContext("instance", "org", "", tt.instance...), tt.clientID), "disabled")
+		})
+	}
+}
+
+// TestClientIDMetadataResolver_Supported pins what discovery advertises: support needs the
+// instance setting and at least one allowed client_id URL on both the system and the instance,
+// so a client is never told to use a mechanism that cannot resolve it.
+func TestClientIDMetadataResolver_Supported(t *testing.T) {
+	tests := []struct {
+		name     string
+		system   clientIDMetadataAllowlist
+		instance []authz.MockContextInstanceOpts
+		want     bool
+	}{
+		{"both allow urls", clientIDMetadataAllowlist{urls: []string{"https://app.example.com/"}}, []authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocumentAllowedURLs("https://app.example.com/client")}, true},
+		{"both allow any url", clientIDMetadataAllowlist{allowAny: true}, []authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocumentAllowAnyURL(true)}, true},
+		{"system allows nothing", clientIDMetadataAllowlist{}, []authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocumentAllowAnyURL(true)}, false},
+		{"instance allows nothing", clientIDMetadataAllowlist{allowAny: true}, nil, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			resolver := newClientIDMetadataResolver(http.DefaultClient, tt.system, nil, time.Hour, time.Hour, nil)
+			enabled := append([]authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocument(true)}, tt.instance...)
+			assert.Equal(t, tt.want, resolver.Supported(authz.NewMockContext("instance", "org", "", enabled...)), "enabled")
+			assert.False(t, resolver.Supported(authz.NewMockContext("instance", "org", "", tt.instance...)), "disabled")
 		})
 	}
 }
@@ -161,7 +264,7 @@ func TestCacheTTLFromResponse(t *testing.T) {
 }
 
 func TestClientIDMetadataResolver_ResolveClient(t *testing.T) {
-	ctx := authz.NewMockContext("instance", "org", "")
+	ctx := testResolverContext()
 
 	t.Run("valid document", func(t *testing.T) {
 		server := newMetadataServer(t, http.StatusOK, "", func(clientID string) clientRegistrationRequest {
@@ -172,11 +275,11 @@ func TestClientIDMetadataResolver_ResolveClient(t *testing.T) {
 				TokenEndpointAuthMethod: "none",
 			}
 		})
-		resolver := newTestResolver(server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
+		resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-		client, err := resolver.ResolveClient(ctx, "instance", server.URL)
+		client, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
 		require.NoError(t, err)
-		assert.Equal(t, server.URL, client.ClientID)
+		assert.Equal(t, server.URL+testClientIDPath, client.ClientID)
 		assert.Equal(t, "instance", client.InstanceID)
 		assert.Equal(t, domain.OIDCAuthMethodTypeNone, client.AuthMethodType)
 		assert.Equal(t, domain.OIDCApplicationTypeWeb, client.ApplicationType)
@@ -195,9 +298,9 @@ func TestClientIDMetadataResolver_ResolveClient(t *testing.T) {
 				TokenEndpointAuthMethod: "none",
 			}
 		})
-		resolver := newTestResolver(server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
+		resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-		client, err := resolver.ResolveClient(ctx, "instance", server.URL)
+		client, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
 		require.NoError(t, err)
 		assert.Equal(t, []string{server.URL + "/callback"}, client.RedirectURIs)
 	})
@@ -209,9 +312,9 @@ func TestClientIDMetadataResolver_ResolveClient(t *testing.T) {
 				TokenEndpointAuthMethod: "none",
 			}
 		})
-		resolver := newTestResolver(server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
+		resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-		_, err := resolver.ResolveClient(ctx, "instance", server.URL)
+		_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
 		assertInvalidClient(t, err)
 	})
 
@@ -222,9 +325,9 @@ func TestClientIDMetadataResolver_ResolveClient(t *testing.T) {
 				TokenEndpointAuthMethod: "client_secret_basic",
 			}
 		})
-		resolver := newTestResolver(server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
+		resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-		_, err := resolver.ResolveClient(ctx, "instance", server.URL)
+		_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
 		assertInvalidClient(t, err)
 	})
 
@@ -235,17 +338,17 @@ func TestClientIDMetadataResolver_ResolveClient(t *testing.T) {
 				JWKsURI:      "https://app.example.com/jwks",
 			}
 		})
-		resolver := newTestResolver(server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
+		resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-		_, err := resolver.ResolveClient(ctx, "instance", server.URL)
+		_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
 		assertInvalidClient(t, err)
 	})
 
 	t.Run("non-200 response is rejected", func(t *testing.T) {
 		server := newMetadataServer(t, http.StatusNotFound, "", nil)
-		resolver := newTestResolver(server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
+		resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-		_, err := resolver.ResolveClient(ctx, "instance", server.URL)
+		_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
 		assertInvalidClient(t, err)
 	})
 
@@ -255,9 +358,9 @@ func TestClientIDMetadataResolver_ResolveClient(t *testing.T) {
 			_, _ = w.Write([]byte(`{"redirect_uris":["` + strings.Repeat("a", clientIDMetadataMaxBodyBytes) + `"]}`))
 		}))
 		t.Cleanup(server.Close)
-		resolver := newTestResolver(server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
+		resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-		_, err := resolver.ResolveClient(ctx, "instance", server.URL)
+		_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
 		assertInvalidClient(t, err)
 	})
 
@@ -266,15 +369,15 @@ func TestClientIDMetadataResolver_ResolveClient(t *testing.T) {
 			_, _ = w.Write([]byte("not json"))
 		}))
 		t.Cleanup(server.Close)
-		resolver := newTestResolver(server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
+		resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-		_, err := resolver.ResolveClient(ctx, "instance", server.URL)
+		_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
 		assertInvalidClient(t, err)
 	})
 }
 
 func TestClientIDMetadataResolver_Cache(t *testing.T) {
-	ctx := authz.NewMockContext("instance", "org", "")
+	ctx := testResolverContext()
 	documentCache := gomap.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry](
 		context.Background(),
 		[]clientIDMetadataCacheIndex{clientIDMetadataCacheIndexURL},
@@ -285,11 +388,11 @@ func TestClientIDMetadataResolver_Cache(t *testing.T) {
 		server := newMetadataServer(t, http.StatusOK, "max-age=600", func(clientID string) clientRegistrationRequest {
 			return clientRegistrationRequest{RedirectURIs: []string{clientID + "/callback"}, TokenEndpointAuthMethod: "none"}
 		})
-		resolver := newTestResolver(server.Client(), documentCache)
+		resolver := newTestResolver(server.URL, server.Client(), documentCache)
 
-		_, err := resolver.ResolveClient(ctx, "instance", server.URL)
+		_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
 		require.NoError(t, err)
-		_, err = resolver.ResolveClient(ctx, "instance", server.URL)
+		_, err = resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
 		require.NoError(t, err)
 		assert.Equal(t, int32(1), server.hits.Load())
 	})
@@ -298,22 +401,22 @@ func TestClientIDMetadataResolver_Cache(t *testing.T) {
 		server := newMetadataServer(t, http.StatusOK, "no-store", func(clientID string) clientRegistrationRequest {
 			return clientRegistrationRequest{RedirectURIs: []string{clientID + "/callback"}, TokenEndpointAuthMethod: "none"}
 		})
-		resolver := newTestResolver(server.Client(), documentCache)
+		resolver := newTestResolver(server.URL, server.Client(), documentCache)
 
-		_, err := resolver.ResolveClient(ctx, "instance", server.URL)
+		_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
 		require.NoError(t, err)
-		_, err = resolver.ResolveClient(ctx, "instance", server.URL)
+		_, err = resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
 		require.NoError(t, err)
 		assert.Equal(t, int32(2), server.hits.Load())
 	})
 
 	t.Run("failed resolution is negatively cached", func(t *testing.T) {
 		server := newMetadataServer(t, http.StatusNotFound, "", nil)
-		resolver := newTestResolver(server.Client(), documentCache)
+		resolver := newTestResolver(server.URL, server.Client(), documentCache)
 
-		_, err := resolver.ResolveClient(ctx, "instance", server.URL)
+		_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
 		assertInvalidClient(t, err)
-		_, err = resolver.ResolveClient(ctx, "instance", server.URL)
+		_, err = resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
 		assertInvalidClient(t, err)
 		assert.Equal(t, int32(1), server.hits.Load(), "an unresolvable client_id must not be fetched again within the negative cache window")
 	})
@@ -322,26 +425,26 @@ func TestClientIDMetadataResolver_Cache(t *testing.T) {
 		server := newMetadataServer(t, http.StatusOK, "max-age=600", func(clientID string) clientRegistrationRequest {
 			return clientRegistrationRequest{RedirectURIs: []string{clientID + "/callback"}, TokenEndpointAuthMethod: "none"}
 		})
-		resolver := newTestResolver(server.Client(), documentCache)
+		resolver := newTestResolver(server.URL, server.Client(), documentCache)
 
-		client, err := resolver.ResolveClient(ctx, "instance", server.URL)
+		client, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
 		require.NoError(t, err)
 		require.Equal(t, int32(1), server.hits.Load())
 
 		// Force the cached entry to be expired; the next resolution must re-fetch.
 		documentCache.Set(ctx, &clientIDMetadataCacheEntry{
-			Key:    clientIDMetadataCacheKey("instance", server.URL),
+			Key:    clientIDMetadataCacheKey("instance", server.URL+testClientIDPath),
 			Client: client,
 			Expiry: time.Now().Add(-time.Hour),
 		})
-		_, err = resolver.ResolveClient(ctx, "instance", server.URL)
+		_, err = resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
 		require.NoError(t, err)
 		assert.Equal(t, int32(2), server.hits.Load())
 	})
 }
 
 func TestClientIDMetadataResolver_SSRFDenylist(t *testing.T) {
-	ctx := authz.NewMockContext("instance", "org", "")
+	ctx := testResolverContext()
 	// The test server listens on a loopback address, which the operator denylist blocks at
 	// dial time, so the request must never reach the handler.
 	server := newMetadataServer(t, http.StatusOK, "", func(clientID string) clientRegistrationRequest {
@@ -356,11 +459,143 @@ func TestClientIDMetadataResolver_SSRFDenylist(t *testing.T) {
 		MaxRedirects: 2,
 		DenyList:     checkers,
 	}
-	resolver := newTestResolver(config.NewClient(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
+	resolver := newTestResolver(server.URL, config.NewClient(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-	_, err = resolver.ResolveClient(ctx, "instance", server.URL)
+	_, err = resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
 	assertInvalidClient(t, err)
 	assert.Equal(t, int32(0), server.hits.Load(), "the denylist should block the dial before the request reaches the server")
+}
+
+// TestClientIDMetadataResolver_Allowlist pins that a client_id the system does not allow is
+// rejected before anything else happens: no outbound request and no cache entry, so an
+// unauthenticated caller can neither make the server fetch a URL nor fill the cache.
+func TestClientIDMetadataResolver_Allowlist(t *testing.T) {
+	ctx := testResolverContext()
+	server := newMetadataServer(t, http.StatusOK, "", func(clientID string) clientRegistrationRequest {
+		return clientRegistrationRequest{RedirectURIs: []string{clientID + "/callback"}, TokenEndpointAuthMethod: "none"}
+	})
+	documentCache := gomap.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry](
+		context.Background(),
+		[]clientIDMetadataCacheIndex{clientIDMetadataCacheIndexURL},
+		cache.Config{MaxAge: time.Hour, LastUseAge: time.Hour},
+	)
+
+	for _, allowlist := range []clientIDMetadataAllowlist{
+		{},
+		{urls: []string{"https://app.example.com/"}},
+		{urls: []string{server.URL + "/other/"}},
+		{urls: []string{server.URL + testClientIDPath + "/"}},
+	} {
+		t.Run(strings.Join(allowlist.urls, ","), func(t *testing.T) {
+			resolver := newClientIDMetadataResolver(server.Client(), allowlist, documentCache, time.Hour, time.Hour, nil)
+			_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+			assertInvalidClient(t, err)
+			assert.Equal(t, int32(0), server.hits.Load(), "a client_id that is not allowed must not be fetched")
+			_, found := documentCache.Get(ctx, clientIDMetadataCacheIndexURL, clientIDMetadataCacheKey("instance", server.URL+testClientIDPath))
+			assert.False(t, found, "a client_id that is not allowed must not be cached")
+		})
+	}
+
+	t.Run("exact entry", func(t *testing.T) {
+		resolver := newClientIDMetadataResolver(server.Client(), clientIDMetadataAllowlist{urls: []string{server.URL + testClientIDPath}}, documentCache, time.Hour, time.Hour, nil)
+		client, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		require.NoError(t, err)
+		assert.Equal(t, server.URL+testClientIDPath, client.ClientID)
+	})
+}
+
+// TestClientIDMetadataResolver_InstanceAllowlist pins that the instance narrows what the system
+// allows: a client_id the system allows but the instance does not is neither fetched nor cached.
+func TestClientIDMetadataResolver_InstanceAllowlist(t *testing.T) {
+	server := newMetadataServer(t, http.StatusOK, "", func(clientID string) clientRegistrationRequest {
+		return clientRegistrationRequest{RedirectURIs: []string{clientID + "/callback"}, TokenEndpointAuthMethod: "none"}
+	})
+	documentCache := gomap.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry](
+		context.Background(),
+		[]clientIDMetadataCacheIndex{clientIDMetadataCacheIndexURL},
+		cache.Config{MaxAge: time.Hour, LastUseAge: time.Hour},
+	)
+	resolver := newClientIDMetadataResolver(server.Client(), clientIDMetadataAllowlist{allowAny: true}, documentCache, time.Hour, time.Hour, nil)
+	clientID := server.URL + testClientIDPath
+
+	for name, instance := range map[string][]authz.MockContextInstanceOpts{
+		"nothing allowed":     nil,
+		"other url allowed":   {authz.WithMockClientIDMetadataDocumentAllowedURLs(server.URL + "/other/")},
+		"longer url allowed":  {authz.WithMockClientIDMetadataDocumentAllowedURLs(clientID + "/")},
+		"allow any url false": {authz.WithMockClientIDMetadataDocumentAllowAnyURL(false)},
+	} {
+		t.Run(name, func(t *testing.T) {
+			ctx := authz.NewMockContext("instance", "org", "", instance...)
+			_, err := resolver.ResolveClient(ctx, "instance", clientID)
+			assertInvalidClient(t, err)
+			assert.Equal(t, int32(0), server.hits.Load(), "a client_id the instance does not allow must not be fetched")
+			_, found := documentCache.Get(ctx, clientIDMetadataCacheIndexURL, clientIDMetadataCacheKey("instance", clientID))
+			assert.False(t, found, "a client_id the instance does not allow must not be cached")
+		})
+	}
+
+	t.Run("instance allows the url", func(t *testing.T) {
+		ctx := authz.NewMockContext("instance", "org", "", authz.WithMockClientIDMetadataDocumentAllowedURLs(server.URL+"/"))
+		client, err := resolver.ResolveClient(ctx, "instance", clientID)
+		require.NoError(t, err)
+		assert.Equal(t, clientID, client.ClientID)
+	})
+}
+
+// TestClientIDMetadataResolver_ClientIDMismatch pins that the document must name the URL it is
+// served from as its client_id, compared as plain strings.
+func TestClientIDMetadataResolver_ClientIDMismatch(t *testing.T) {
+	ctx := testResolverContext()
+	for name, documentClientID := range map[string]func(origin string) string{
+		"missing":      func(string) string { return "" },
+		"other client": func(origin string) string { return origin + "/other" },
+		"other host":   func(string) string { return "https://app.example.com" + testClientIDPath },
+		"scheme case": func(origin string) string {
+			return strings.Replace(origin, "https://", "HTTPS://", 1) + testClientIDPath
+		},
+		"trailing slash": func(origin string) string { return origin + testClientIDPath + "/" },
+	} {
+		t.Run(name, func(t *testing.T) {
+			server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				_ = json.NewEncoder(w).Encode(clientIDMetadataDocument{
+					ClientID: documentClientID("https://" + r.Host),
+					clientRegistrationRequest: clientRegistrationRequest{
+						RedirectURIs:            []string{"https://" + r.Host + "/callback"},
+						TokenEndpointAuthMethod: "none",
+					},
+				})
+			}))
+			defer server.Close()
+			resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
+
+			_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+			assertInvalidClient(t, err)
+		})
+	}
+}
+
+// TestClientIDMetadataResolver_NoRedirects pins that the document is only accepted from the
+// client_id URL itself. A redirect is answered with invalid_client and not followed, so an
+// allowed client_id cannot lead the fetch to a URL the allowlist does not allow.
+func TestClientIDMetadataResolver_NoRedirects(t *testing.T) {
+	ctx := testResolverContext()
+	target := newMetadataServer(t, http.StatusOK, "", func(clientID string) clientRegistrationRequest {
+		return clientRegistrationRequest{RedirectURIs: []string{clientID + "/callback"}, TokenEndpointAuthMethod: "none"}
+	})
+	for _, status := range []int{http.StatusMovedPermanently, http.StatusFound, http.StatusTemporaryRedirect, http.StatusPermanentRedirect} {
+		t.Run(strconv.Itoa(status), func(t *testing.T) {
+			redirector := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				http.Redirect(w, r, target.URL+testClientIDPath, status)
+			}))
+			defer redirector.Close()
+			resolver := newTestResolver(redirector.URL, redirector.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
+
+			_, err := resolver.ResolveClient(ctx, "instance", redirector.URL+testClientIDPath)
+			assertInvalidClient(t, err)
+			assert.Equal(t, int32(0), target.hits.Load(), "the redirect must not be followed")
+		})
+	}
 }
 
 // helpers
@@ -386,18 +621,21 @@ func TestClientIDMetadataResolver_CallerCancellation(t *testing.T) {
 		once.Do(func() { close(reached) })
 		<-release
 		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(clientRegistrationRequest{
-			RedirectURIs:            []string{"https://" + r.Host + "/callback"},
-			TokenEndpointAuthMethod: "none",
+		_ = json.NewEncoder(w).Encode(clientIDMetadataDocument{
+			ClientID: "https://" + r.Host + r.URL.Path,
+			clientRegistrationRequest: clientRegistrationRequest{
+				RedirectURIs:            []string{"https://" + r.Host + "/callback"},
+				TokenEndpointAuthMethod: "none",
+			},
 		})
 	}))
 	defer server.Close()
-	resolver := newTestResolver(server.Client(), documentCache)
+	resolver := newTestResolver(server.URL, server.Client(), documentCache)
 
-	cancelCtx, cancel := context.WithCancel(authz.NewMockContext("instance", "org", ""))
+	cancelCtx, cancel := context.WithCancel(testResolverContext())
 	cancelled := make(chan error, 1)
 	go func() {
-		_, err := resolver.ResolveClient(cancelCtx, "instance", server.URL)
+		_, err := resolver.ResolveClient(cancelCtx, "instance", server.URL+testClientIDPath)
 		cancelled <- err
 	}()
 
@@ -416,13 +654,24 @@ func TestClientIDMetadataResolver_CallerCancellation(t *testing.T) {
 
 	// The resolution survived the cancellation, so a later caller resolves normally instead of
 	// hitting a negatively cached failure.
-	client, err := resolver.ResolveClient(authz.NewMockContext("instance", "org", ""), "instance", server.URL)
+	client, err := resolver.ResolveClient(testResolverContext(), "instance", server.URL+testClientIDPath)
 	require.NoError(t, err)
-	assert.Equal(t, server.URL, client.ClientID)
+	assert.Equal(t, server.URL+testClientIDPath, client.ClientID)
 }
 
-func newTestResolver(httpClient *http.Client, documentCache cache.Cache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]) *clientIDMetadataResolver {
-	return newClientIDMetadataResolver(httpClient, documentCache, time.Hour, time.Hour, nil)
+// testResolverContext returns the context of an instance that allows any client_id URL, so the
+// system allowlist of the resolver under test decides.
+func testResolverContext() context.Context {
+	return authz.NewMockContext("instance", "org", "", authz.WithMockClientIDMetadataDocumentAllowAnyURL(true))
+}
+
+// testClientIDPath is the path of the client_id URLs the tests resolve against a test server: a
+// client_id URL must contain a path.
+const testClientIDPath = "/client"
+
+// newTestResolver returns a resolver that allows every client_id URL under serverURL.
+func newTestResolver(serverURL string, httpClient *http.Client, documentCache cache.Cache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]) *clientIDMetadataResolver {
+	return newClientIDMetadataResolver(httpClient, clientIDMetadataAllowlist{urls: []string{serverURL + "/"}}, documentCache, time.Hour, time.Hour, nil)
 }
 
 type metadataServer struct {
@@ -445,7 +694,10 @@ func newMetadataServer(t *testing.T, status int, cacheControl string, build func
 			w.WriteHeader(status)
 			return
 		}
-		_ = json.NewEncoder(w).Encode(build("https://" + r.Host))
+		_ = json.NewEncoder(w).Encode(clientIDMetadataDocument{
+			ClientID:                  "https://" + r.Host + r.URL.Path,
+			clientRegistrationRequest: build("https://" + r.Host),
+		})
 	}))
 	t.Cleanup(server.Close)
 	return server
