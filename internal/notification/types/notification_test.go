@@ -36,7 +36,6 @@ type testChannels struct {
 	noChannel   bool
 	emailConfig *email.Config
 	rule        smtp.Rule
-	ruleErr     error
 
 	ruleRequested bool
 	messages      []zchannels.Message
@@ -68,9 +67,9 @@ func (c *testChannels) SecurityTokenEvent(context.Context, set.Config) (*senders
 	return c.chain(), nil
 }
 
-func (c *testChannels) SMTPRule(context.Context, *smtp.Config, string) (smtp.Rule, error) {
+func (c *testChannels) SMTPRule(context.Context, *smtp.Config, string) smtp.Rule {
 	c.ruleRequested = true
-	return c.rule, c.ruleErr
+	return c.rule
 }
 
 func TestSendEmail(t *testing.T) {
@@ -93,8 +92,6 @@ func TestSendEmail(t *testing.T) {
 	webhookConfig := &email.Config{
 		WebhookConfig: &webhook.Config{CallURL: "https://relay.example.com"},
 	}
-	ruleErr := errors.New("rule error")
-
 	expectMessage := func(content string, headers map[string]string) *messages.Email {
 		return &messages.Email{
 			Recipients:          []string{"user@example.com"},
@@ -122,17 +119,6 @@ func TestSendEmail(t *testing.T) {
 			},
 		},
 		{
-			name: "rule error",
-			channels: &testChannels{
-				emailConfig: smtpConfig,
-				ruleErr:     ruleErr,
-			},
-			wantRuleRequested: true,
-			wantErr: func(t *testing.T, err error) {
-				assert.ErrorIs(t, err, ruleErr)
-			},
-		},
-		{
 			name:              "no rule, HTML of custom texts is rendered",
 			channels:          &testChannels{emailConfig: smtpConfig},
 			text:              linkText,
@@ -149,7 +135,7 @@ func TestSendEmail(t *testing.T) {
 			name: "HTML disabled, link is removed, arguments are still escaped",
 			channels: &testChannels{
 				emailConfig: smtpConfig,
-				rule:        smtp.Rule{DisableCustomHTML: true},
+				rule:        smtp.Rule{RestrictCustomHTML: true},
 			},
 			text:              linkText,
 			displayName:       "O'Brien <b>",
@@ -165,7 +151,7 @@ func TestSendEmail(t *testing.T) {
 			name: "HTML disabled, simple formatting is kept",
 			channels: &testChannels{
 				emailConfig: smtpConfig,
-				rule:        smtp.Rule{DisableCustomHTML: true},
+				rule:        smtp.Rule{RestrictCustomHTML: true},
 			},
 			text:              formattedText,
 			displayName:       "Bob",
@@ -181,7 +167,7 @@ func TestSendEmail(t *testing.T) {
 			name: "HTML disabled, display name with allowed tag is not rendered",
 			channels: &testChannels{
 				emailConfig: smtpConfig,
-				rule:        smtp.Rule{DisableCustomHTML: true},
+				rule:        smtp.Rule{RestrictCustomHTML: true},
 			},
 			text:              formattedText,
 			displayName:       "<b>Bob</b><br>",
@@ -210,7 +196,7 @@ func TestSendEmail(t *testing.T) {
 			name: "HTML disabled, German default text is identical",
 			channels: &testChannels{
 				emailConfig: smtpConfig,
-				rule:        smtp.Rule{DisableCustomHTML: true},
+				rule:        smtp.Rule{RestrictCustomHTML: true},
 			},
 			text:              germanText,
 			displayName:       "Bob",
@@ -244,7 +230,7 @@ func TestSendEmail(t *testing.T) {
 			name: "webhook provider, no rule requested",
 			channels: &testChannels{
 				emailConfig: webhookConfig,
-				rule:        smtp.Rule{DisableCustomHTML: true},
+				rule:        smtp.Rule{RestrictCustomHTML: true},
 			},
 			text:              linkText,
 			displayName:       "Bob",

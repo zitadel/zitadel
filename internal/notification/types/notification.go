@@ -36,7 +36,7 @@ type ChannelChains interface {
 	SecurityTokenEvent(context.Context, set.Config) (*senders.Chain, error)
 	// SMTPRule returns the rule defined by the operator for the SMTP provider.
 	// If no rule matches the provider, the zero value is returned.
-	SMTPRule(ctx context.Context, config *smtp.Config, orgID string) (smtp.Rule, error)
+	SMTPRule(ctx context.Context, config *smtp.Config, orgID string) smtp.Rule
 }
 
 func SendEmail(
@@ -63,10 +63,7 @@ func SendEmail(
 				zerrors.ThrowPreconditionFailed(nil, "MAIL-w8nfow", "Errors.Notification.Channels.NotPresent"),
 			)
 		}
-		rule, err := smtpRule(ctx, channels, config, user)
-		if err != nil {
-			return err
-		}
+		rule := smtpRule(ctx, channels, config, user)
 		args = mapNotifyUserToArgs(user, args)
 		sanitizeArgsForHTML(args)
 		url, err := urlFromTemplate(urlTmpl, args)
@@ -74,7 +71,7 @@ func SendEmail(
 			return err
 		}
 		data := GetTemplateData(ctx, translator, args, url, messageType, user.PreferredLanguage.String(), colors)
-		if rule.DisableCustomHTML {
+		if rule.RestrictCustomHTML {
 			// The texts contain the custom message texts of the instance / org with the already escaped arguments.
 			// Only the texts are restricted, the arguments remain escaped and are never rendered.
 			data.RestrictHTML()
@@ -101,9 +98,9 @@ func SendEmail(
 
 // smtpRule returns the rule of the operator for the provider.
 // Rules are only applied to SMTP providers.
-func smtpRule(ctx context.Context, channels ChannelChains, config *email.Config, user *query.NotifyUser) (smtp.Rule, error) {
+func smtpRule(ctx context.Context, channels ChannelChains, config *email.Config, user *query.NotifyUser) smtp.Rule {
 	if config == nil || config.SMTPConfig == nil {
-		return smtp.Rule{}, nil
+		return smtp.Rule{}
 	}
 	return channels.SMTPRule(ctx, config.SMTPConfig, user.ResourceOwner)
 }
