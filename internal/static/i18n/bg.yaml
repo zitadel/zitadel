@@ -618,6 +618,10 @@ Errors:
     KeyIDMissing: "Липсва KeyID"
     PrivateKeyMissing: "Липсва частен ключ"
     InvalidPrivateKey: "Невалиден формат на частния ключ"
+    SAMLCertificateMissing: "Липсва SAML сертификат"
+    SAMLCertificateInvalid: "Невалиден SAML сертификат"
+    SAMLCertificateExpired: "SAML сертификатът е изтекъл или все още не е валиден"
+    SAMLCertificateKeyMismatch: "Частният ключ не съответства на SAML сертификата"
 
 AggregateTypes:
   action: "Действие"

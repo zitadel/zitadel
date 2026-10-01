@@ -618,6 +618,10 @@ Errors:
     KeyIDMissing: "KeyID saknas"
     PrivateKeyMissing: "Privat nyckel saknas"
     InvalidPrivateKey: "Ogiltigt format för privat nyckel"
+    SAMLCertificateMissing: "SAML-certifikat saknas"
+    SAMLCertificateInvalid: "Ogiltigt SAML-certifikat"
+    SAMLCertificateExpired: "SAML-certifikatet har gått ut eller är inte giltigt ännu"
+    SAMLCertificateKeyMismatch: "Den privata nyckeln matchar inte SAML-certifikatet"
 
 AggregateTypes:
   action: "Åtgärd"

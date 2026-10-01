@@ -618,6 +618,10 @@ Errors:
     KeyIDMissing: "KeyID hiányzik"
     PrivateKeyMissing: "Privát kulcs hiányzik"
     InvalidPrivateKey: "Érvénytelen titkos kulcs formátum"
+    SAMLCertificateMissing: "Hiányzó SAML tanúsítvány"
+    SAMLCertificateInvalid: "Érvénytelen SAML tanúsítvány"
+    SAMLCertificateExpired: "A SAML tanúsítvány lejárt vagy még nem érvényes"
+    SAMLCertificateKeyMismatch: "A titkos kulcs nem egyezik a SAML tanúsítvánnyal"
 
 AggregateTypes:
   action: "Művelet"

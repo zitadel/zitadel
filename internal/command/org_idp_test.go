@@ -5449,6 +5449,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 		want *domain.ObjectDetails
 		err  func(error) bool
 	}
+	key, certificate := newTestSAMLKeyAndCertificate(t)
 	tests := []struct {
 		name   string
 		fields fields
@@ -5615,6 +5616,73 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 				want: &domain.ObjectDetails{ResourceOwner: "org1"},
 			},
 		},
+		{
+			"invalid certificate, error",
+			fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: &SAMLProvider{
+					Name:        "name",
+					Metadata:    validSAMLMetadata,
+					Certificate: []byte("certificate"),
+					Key:         key,
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-khszemchha", "Errors.IDP.SAMLCertificateInvalid"))
+				},
+			},
+		},
+		{
+			name: "ok with certificate",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectPush(
+						org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+							"id1",
+							"name",
+							validSAMLMetadata,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    key,
+							},
+							certificate,
+							"",
+							false,
+							"",
+							nil,
+							"",
+							false,
+							idp.Options{},
+						),
+					),
+				),
+				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: &SAMLProvider{
+					Name:        "name",
+					Metadata:    validSAMLMetadata,
+					Certificate: certificate,
+					Key:         key,
+				},
+			},
+			res: res{
+				id:   "id1",
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -5654,6 +5722,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 		want *domain.ObjectDetails
 		err  func(error) bool
 	}
+	key, certificate := newTestSAMLKeyAndCertificate(t)
 	tests := []struct {
 		name   string
 		fields fields
@@ -5866,6 +5935,88 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
 					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+			},
+		},
+		{
+			"invalid certificate, error",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: &SAMLProvider{
+					Name:     "name",
+					Metadata: validSAMLMetadata,
+					Key:      key,
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-s45bsj7m2u", "Errors.IDP.SAMLCertificateMissing"))
+				},
+			},
+		},
+		{
+			name: "change certificate ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								"name",
+								validSAMLMetadata,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("key"),
+								},
+								[]byte("certificate"),
+								"",
+								false,
+								"",
+								nil,
+								"",
+								false,
+								idp.Options{},
+							)),
+					),
+					expectPush(
+						func() eventstore.Command {
+							event, _ := org.NewSAMLIDPChangedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								[]idp.SAMLIDPChanges{
+									idp.ChangeSAMLKey(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    key,
+									}),
+									idp.ChangeSAMLCertificate(certificate),
+								},
+							)
+							return event
+						}(),
+					),
+				),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: &SAMLProvider{
+					Name:        "name",
+					Metadata:    validSAMLMetadata,
+					Certificate: certificate,
+					Key:         key,
 				},
 			},
 			res: res{

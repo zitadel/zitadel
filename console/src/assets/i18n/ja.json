@@ -2395,7 +2395,14 @@
       "SIGNATUREALGORITHM": "署名アルゴリズム",
       "NAMEIDFORMAT": "NameIDフォーマット",
       "TRANSIENTMAPPINGATTRIBUTENAME": "カスタム属性名",
-      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "NameIDフォーマットが`transient`の場合にユーザーをマッピングするためのカスタム属性名 (例: `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`)"
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "NameIDフォーマットが`transient`の場合にユーザーをマッピングするためのカスタム属性名 (例: `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`)",
+      "CERTIFICATE": "証明書",
+      "PRIVATEKEY": "秘密鍵",
+      "UPLOADCERTIFICATE": "証明書のアップロード",
+      "UPLOADPRIVATEKEY": "秘密鍵のアップロード",
+      "UPDATECERTIFICATE": "証明書の置き換え",
+      "FILEMAXSIZEEXCEEDED": "ファイルの最大サイズを超えています。",
+      "CERTIFICATE_DESC": "必要に応じて、証明書とその秘密鍵（PEM）をアップロードできます。例えば、IDプロバイダーが要求する認証局によって発行された証明書です。これらはリクエストの署名とアサーションの復号に使用されます。指定しない場合は、自己署名証明書が生成されます。"
     },
     "TOAST": {
       "SAVED": "正常に保存されました。",
