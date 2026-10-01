@@ -9,6 +9,10 @@
 *.test
 !/**/.env.test
 
+# protoc plugin binaries built locally
+/protoc-gen-zitadelcli
+/internal/protoc/protoc-gen-zitadelcli/protoc-gen-zitadelcli
+
 # Coverage
 coverage.txt
 profile*.cov
