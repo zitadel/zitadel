@@ -16,10 +16,8 @@ export function Providers({ children }: { children: ReactNode }) {
     <RootProvider
       search={{
         options: {
+          type: 'static',
           api: '/docs/api/search',
-          // Every search index entry is tagged with its docs version (see
-          // app/api/search/route.ts). `defaultTag` applies that filter; `tags`
-          // would only add a visible filter pill.
           defaultTag: getVersionFromSlug(slug),
         },
       }}
