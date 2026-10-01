@@ -18,31 +18,75 @@ Client ID Metadata Documents are disabled by default. ZITADEL fetches the docume
 only enable it once you understand the security model described below.
 </Callout>
 
-## Enable client ID metadata documents
+A `client_id` URL is only resolved when both the system and the instance allow it:
+
+- The **system** decides in its runtime configuration which `client_id` URLs can be resolved at all. No instance can
+  change it, so on a system with several instances no instance can make ZITADEL fetch a URL the system does not allow.
+- Each **instance** enables client ID metadata documents and decides which of those URLs it resolves, in its security
+  settings. They can be changed at runtime through the API, without a restart.
+
+Both allow nothing by default.
+
+## Allow client ID URLs for the system
+
+```yaml
+OIDC:
+  ClientIDMetadataDocument:
+    AllowedURLs: # ZITADEL_OIDC_CLIENTIDMETADATADOCUMENT_ALLOWEDURLS (comma separated list)
+      - https://client.example.com/oauth/metadata
+      - https://clients.example.com/connectors/
+    AllowAnyURL: false # ZITADEL_OIDC_CLIENTIDMETADATADOCUMENT_ALLOWANYURL
+```
+
+`AllowAnyURL` allows every valid `client_id` URL, so that instances decide on their own which ones they resolve. Only
+enable it if every instance of the system may make ZITADEL fetch any public HTTPS URL. The
+`HTTPClient.DenyList` still applies.
+
+ZITADEL does not start with an invalid entry in `AllowedURLs`.
+
+## Allowed URL entries
+
+The system and the instance lists use the same entries:
+
+- An entry that ends with a slash allows every `client_id` it is a prefix of. `https://clients.example.com/connectors/`
+  allows `https://clients.example.com/connectors/1234/metadata`.
+- Any other entry allows exactly that `client_id`.
+- Entries are compared as plain strings, as the
+  [specification](https://datatracker.ietf.org/doc/draft-ietf-oauth-client-id-metadata-document/) requires for client
+  id URLs. `https://client.example.com/oauth/metadata` and `https://client.example.com:443/oauth/metadata` are different
+  client ids.
+- Every entry must itself be a valid client id URL, as described in the [security model](#security-model).
+
+A `client_id` that is not allowed is never fetched or cached. It is looked up as a regular client id and answered with
+`invalid_client`.
+
+## Enable client ID metadata documents for an instance
 
 A `client_id` that is an HTTPS URL is only resolved as a metadata document when it is enabled in the instance's security
 settings. This is a separate switch from
 [`dynamicClientRegistration`](/guides/integrate/dynamic-client-registration#enable-dynamic-client-registration), because
 fetching client-controlled URLs has a different security profile and must be enabled deliberately.
 
-Enable it through the [settings API](/apis/resources/settings_service_v2/settings-service-set-security-settings):
+Enable it through the [settings API](/apis/resources/settings_service_v2/settings-service-set-security-settings), with
+the URLs the instance allows or with `allowAnyUrl` to allow every URL the system allows:
 
 ```bash
 curl --request PUT \
   --url ${CUSTOM_DOMAIN}/v2/settings/security \
   --header 'Authorization: Bearer <token of an IAM_OWNER>' \
   --header 'Content-Type: application/json' \
-  --data '{ "clientIdMetadataDocument": { "enabled": true } }'
+  --data '{ "clientIdMetadataDocument": { "enabled": true, "allowedUrls": ["https://clients.example.com/connectors/"], "allowAnyUrl": false } }'
 ```
 
 <Callout type="warn">
-`SetSecuritySettings` replaces the whole security policy. Send the settings you want to keep in the same request, for
-example `embeddedIframe`, `enableImpersonation` and `dynamicClientRegistration`; omitted messages are reset to their
-defaults. Read the current values first with
+`SetSecuritySettings` replaces the whole security policy, including `allowedUrls`. Send the settings you want to keep
+in the same request, for example `embeddedIframe`, `enableImpersonation` and `dynamicClientRegistration`; omitted
+messages are reset to their defaults. Read the current values first with
 [`GetSecuritySettings`](/apis/resources/settings_service_v2/settings-service-get-security-settings).
 </Callout>
 
-When enabled, the [discovery document](/apis/openidoauth/endpoints#openid-connect-10-discovery) advertises
+When enabled, and both the system and the instance allow at least one `client_id` URL, the
+[discovery document](/apis/openidoauth/endpoints#openid-connect-10-discovery) advertises
 `client_id_metadata_document_supported: true`.
 
 <Callout type="info">
@@ -51,16 +95,35 @@ CIMD clients always use the v2 login, so the instance must have a v2 login confi
 cannot be routed to a login UI.
 </Callout>
 
-The setting is stored on the same security policy as the other instance security settings. Upgrading adds a column to
+The settings are stored on the same security policy as the other instance security settings. Upgrading adds columns to
 `projections.security_policies3` through a setup step, so run `zitadel setup` as usual before starting the new version.
+
+### Add and remove single URLs
+
+`AddClientIDMetadataDocumentAllowedURL` and `RemoveClientIDMetadataDocumentAllowedURL` change one entry of the
+instance's list without replacing the other security settings, so concurrent changes do not overwrite each other. Both
+require `iam.policy.write`.
+
+```bash
+curl --request POST \
+  --url ${CUSTOM_DOMAIN}/zitadel.settings.v2.SettingsService/AddClientIDMetadataDocumentAllowedURL \
+  --header 'Authorization: Bearer <token of an IAM_OWNER>' \
+  --header 'Content-Type: application/json' \
+  --data '{ "url": "https://clients.example.com/connectors/" }'
+```
+
+Adding a URL that is already allowed is answered with `ALREADY_EXISTS`. Removing a URL that is not allowed is not an
+error.
 
 ## Document format
 
 Serve a JSON document at the URL you want to use as the `client_id`. It uses the same members as a
-[Dynamic Client Registration request](/guides/integrate/dynamic-client-registration#supported-metadata):
+[Dynamic Client Registration request](/guides/integrate/dynamic-client-registration#supported-metadata), plus a
+`client_id` member that must be exactly the URL the document is served from:
 
 ```json
 {
+  "client_id": "https://client.example.com/oauth/metadata",
   "client_name": "My MCP Client",
   "redirect_uris": ["https://client.example.com/callback"],
   "grant_types": ["authorization_code", "refresh_token"],
@@ -78,8 +141,15 @@ A client then starts an [authorization code flow](/guides/integrate/login/oidc/l
 The document is fetched and validated on every cache miss. The validation is strict, because the document is served by a
 host the client controls:
 
-- **HTTPS only.** The `client_id` must be an absolute `https` URL. Plain `http` URLs are treated as regular client ids
-  and are not resolved as documents.
+- **Allowed URLs only.** Only a `client_id` both the [system](#allow-client-id-urls-for-the-system) and the
+  [instance](#enable-client-id-metadata-documents-for-an-instance) allow is fetched.
+- **Valid client id URLs only.** The `client_id` must be an absolute `https` URL with a host and a path, and without
+  userinfo, fragment or `.` and `..` path segments. Percent-encoded dots, slashes and backslashes in the path are
+  rejected too, so a `client_id` cannot escape the path of an allowed prefix. Any other value is treated as a regular
+  client id and is not resolved as a document.
+- **Matching `client_id`.** The document's `client_id` member must be exactly the URL it was fetched from.
+- **No redirects.** The document must be served by the `client_id` URL itself. A redirect is not followed and the
+  request is rejected with `invalid_client`.
 - **Origin match.** Every `redirect_uri` must share the exact origin (scheme, host and port) of the `client_id` URL. A
   document can therefore only authorize redirects back to the host that serves it. Redirect URIs with a different origin
   are dropped; if none remain the request is rejected with `invalid_client`.
