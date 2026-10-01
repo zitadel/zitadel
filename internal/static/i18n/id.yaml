@@ -416,6 +416,10 @@ Errors:
       NotFound: "Kebijakan Pemberitahuan Default tidak ditemukan"
       NotChanged: "Kebijakan Pemberitahuan Default tidak diubah"
       AlreadyExists: "Kebijakan Pemberitahuan Default sudah ada"
+    SecurityPolicy:
+      ClientIDMetadataDocumentAllowedURL:
+        Invalid: "URL dokumen metadata ID klien tidak valid"
+        AlreadyExists: "URL dokumen metadata ID klien sudah diizinkan"
   Policy:
     AlreadyExists: "Kebijakan sudah ada"
     Label:

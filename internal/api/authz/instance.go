@@ -35,6 +35,12 @@ type Instance interface {
 	// EnableClientIDMetadataDocument states if a client_id that is an absolute HTTPS URL is
 	// resolved as a Client ID Metadata Document instead of being looked up in the database.
 	EnableClientIDMetadataDocument() bool
+	// ClientIDMetadataDocumentAllowedURLs are the client_id URLs the instance resolves as Client
+	// ID Metadata Documents, within the URLs the system allows.
+	ClientIDMetadataDocumentAllowedURLs() []string
+	// ClientIDMetadataDocumentAllowAnyURL states if the instance resolves every client_id URL the
+	// system allows, regardless of ClientIDMetadataDocumentAllowedURLs.
+	ClientIDMetadataDocumentAllowAnyURL() bool
 	Block() *bool
 	AuditLogRetention() *time.Duration
 	Features() feature.Features
@@ -62,6 +68,8 @@ type instance struct {
 	enableDCR               bool
 	allowUnauthenticatedDCR bool
 	enableCIMD              bool
+	cimdAllowedURLs         []string
+	cimdAllowAnyURL         bool
 }
 
 func (i *instance) Block() *bool {
@@ -118,6 +126,14 @@ func (i *instance) AllowUnauthenticatedDynamicClientRegistration() bool {
 
 func (i *instance) EnableClientIDMetadataDocument() bool {
 	return i.enableCIMD
+}
+
+func (i *instance) ClientIDMetadataDocumentAllowedURLs() []string {
+	return i.cimdAllowedURLs
+}
+
+func (i *instance) ClientIDMetadataDocumentAllowAnyURL() bool {
+	return i.cimdAllowAnyURL
 }
 
 func (i *instance) Features() feature.Features {

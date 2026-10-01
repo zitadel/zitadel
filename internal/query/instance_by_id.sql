@@ -61,6 +61,8 @@ select
 	s.enable_dynamic_client_registration,
 	s.allow_unauthenticated_dynamic_client_registration,
 	s.enable_client_id_metadata_document,
+	s.client_id_metadata_document_allowed_urls,
+	s.client_id_metadata_document_allow_any_url,
     l.audit_log_retention,
     l.block,
 	f.features,

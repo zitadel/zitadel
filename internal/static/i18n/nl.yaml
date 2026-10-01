@@ -416,6 +416,10 @@ Errors:
       NotFound: "Standaard Notificatie Beleid niet gevonden"
       NotChanged: "Standaard Notificatie Beleid is niet veranderd"
       AlreadyExists: "Standaard Notificatie Beleid bestaat al"
+    SecurityPolicy:
+      ClientIDMetadataDocumentAllowedURL:
+        Invalid: "De URL van het client-ID-metadatadocument is ongeldig"
+        AlreadyExists: "De URL van het client-ID-metadatadocument is al toegestaan"
   Policy:
     AlreadyExists: "Beleid bestaat al"
     Label:

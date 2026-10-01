@@ -416,6 +416,10 @@ Errors:
       NotFound: "Výchozí zásady oznámení nenalezeny"
       NotChanged: "Výchozí zásady oznámení nebyly změněny"
       AlreadyExists: "Výchozí zásady oznámení již existují"
+    SecurityPolicy:
+      ClientIDMetadataDocumentAllowedURL:
+        Invalid: "URL dokumentu metadat ID klienta je neplatná"
+        AlreadyExists: "URL dokumentu metadat ID klienta je již povolena"
   Policy:
     AlreadyExists: "Zásada již existuje"
     Label:

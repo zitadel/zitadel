@@ -327,6 +327,10 @@ type securitySettingsJSONChanges interface {
 	SetEnableDynamicClientRegistration(value bool) db_json.JsonUpdate
 	SetAllowUnauthenticatedDynamicClientRegistration(value bool) db_json.JsonUpdate
 	SetEnableClientIDMetadataDocument(value bool) db_json.JsonUpdate
+	SetClientIDMetadataDocumentAllowedURLs(values []string) db_json.JsonUpdate
+	SetClientIDMetadataDocumentAllowAnyURL(value bool) db_json.JsonUpdate
+	AddClientIDMetadataDocumentAllowedURL(value string) database.Change
+	RemoveClientIDMetadataDocumentAllowedURL(value string) database.Change
 }
 
 type SecuritySettings struct {
@@ -342,13 +346,17 @@ type SecuritySettingsAttributes struct {
 	EnableDynamicClientRegistration               *bool `json:"enableDynamicClientRegistration,omitempty"`
 	AllowUnauthenticatedDynamicClientRegistration *bool `json:"allowUnauthenticatedDynamicClientRegistration,omitempty"`
 
-	EnableClientIDMetadataDocument *bool `json:"enableClientIdMetadataDocument,omitempty"`
+	EnableClientIDMetadataDocument      *bool    `json:"enableClientIdMetadataDocument,omitempty"`
+	ClientIDMetadataDocumentAllowedURLs []string `json:"clientIdMetadataDocumentAllowedUrls,omitempty"`
+	ClientIDMetadataDocumentAllowAnyURL *bool    `json:"clientIdMetadataDocumentAllowAnyUrl,omitempty"`
 }
 
 //go:generate mockgen -typed -package domainmock -destination ./mock/security_settings.mock.go . SecuritySettingsRepository
 type SecuritySettingsRepository interface {
 	settingsRepository[SecuritySettings]
 	securitySettingsJSONChanges
+
+	SetColumns(ctx context.Context, client database.QueryExecutor, settings *Settings, changes ...database.Change) error
 }
 
 type domainSettingsJSONChanges interface {
