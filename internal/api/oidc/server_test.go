@@ -2,7 +2,9 @@ package oidc
 
 import (
 	"context"
+	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -164,38 +166,51 @@ func TestServer_createDiscoveryConfig_registrationEndpoint(t *testing.T) {
 }
 
 func TestServer_createDiscoveryConfig_clientIDMetadataDocument(t *testing.T) {
-	s := &Server{
-		LegacyServer: op.NewLegacyServer(
-			func() *op.Provider {
-				//nolint:staticcheck
-				provider, _ := op.NewForwardedOpenIDProvider("path", &op.Config{}, nil)
-				return provider
-			}(),
-			op.Endpoints{Authorization: op.NewEndpoint("auth")},
+	enabledCtx := op.ContextWithIssuer(
+		authz.NewMockContext("instance", "org", "",
+			authz.WithMockClientIDMetadataDocument(true),
+			authz.WithMockClientIDMetadataDocumentAllowAnyURL(true),
 		),
-		registrationEndpoint: op.NewEndpoint("register"),
-	}
+		"https://issuer.com",
+	)
 	tests := []struct {
-		name string
-		ctx  context.Context
-		want bool
+		name      string
+		ctx       context.Context
+		allowlist clientIDMetadataAllowlist
+		want      bool
 	}{
 		{
-			name: "setting disabled, support not advertised",
-			ctx:  op.ContextWithIssuer(context.Background(), "https://issuer.com"),
-			want: false,
+			name:      "setting disabled, support not advertised",
+			ctx:       op.ContextWithIssuer(context.Background(), "https://issuer.com"),
+			allowlist: clientIDMetadataAllowlist{urls: []string{"https://app.example.com/"}},
+			want:      false,
 		},
 		{
-			name: "setting enabled, support advertised",
-			ctx: op.ContextWithIssuer(
-				authz.NewMockContext("instance", "org", "", authz.WithMockClientIDMetadataDocument(true)),
-				"https://issuer.com",
-			),
-			want: true,
+			name:      "setting enabled, support advertised",
+			ctx:       enabledCtx,
+			allowlist: clientIDMetadataAllowlist{urls: []string{"https://app.example.com/"}},
+			want:      true,
+		},
+		{
+			name: "setting enabled without allowed urls, support not advertised",
+			ctx:  enabledCtx,
+			want: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			s := &Server{
+				LegacyServer: op.NewLegacyServer(
+					func() *op.Provider {
+						//nolint:staticcheck
+						provider, _ := op.NewForwardedOpenIDProvider("path", &op.Config{}, nil)
+						return provider
+					}(),
+					op.Endpoints{Authorization: op.NewEndpoint("auth")},
+				),
+				registrationEndpoint:     op.NewEndpoint("register"),
+				clientIDMetadataResolver: newClientIDMetadataResolver(http.DefaultClient, tt.allowlist, nil, time.Hour, time.Hour, nil),
+			}
 			got := s.createDiscoveryConfig(tt.ctx, nil)
 			assert.Equal(t, tt.want, got.ClientIDMetadataDocumentSupported)
 		})

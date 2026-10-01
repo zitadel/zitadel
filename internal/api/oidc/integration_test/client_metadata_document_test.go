@@ -5,6 +5,7 @@ package oidc_test
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -22,9 +23,14 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 )
 
+// allowedClientIDMetadataAddress is the address the integration API allows client id metadata
+// documents to be fetched from, see OIDC.ClientIDMetadataDocument.AllowedURLs in
+// apps/api/test-integration-api.yaml.
+const allowedClientIDMetadataAddress = "127.0.0.1:8091"
+
 // TestServer_ClientIDMetadataDocument covers Client ID Metadata Documents (CIMD) with the
 // setting enabled. The resolver itself (document fetch, origin match, SSRF handling,
-// public-only enforcement and caching) is covered end to end by the unit tests. A full
+// allowlist, public-only enforcement and caching) is covered end to end by the unit tests. A full
 // authorize to token flow against a live document is not exercised here for one reason only:
 // CIMD requires https and the server's outbound HTTP client validates certificates against the
 // system roots, so it does not trust the self-signed certificate of an in-process test server
@@ -41,32 +47,33 @@ func TestServer_ClientIDMetadataDocument(t *testing.T) {
 		assert.Equal(t, true, discovery["client_id_metadata_document_supported"])
 	})
 
-	t.Run("an https client_id triggers an outbound document fetch", func(t *testing.T) {
-		// Serve a metadata document over TLS and count inbound connections. With the setting
-		// on, an https client_id is intercepted and the resolver fetches the document, so the
-		// server observes a connection (the TLS handshake then fails because the cert is not
-		// trusted, which is why the authorization itself errors). A database lookup would never
-		// produce an outbound connection, so this distinguishes "the resolver ran" from a plain
-		// unknown-client error.
-		var connections atomic.Int32
-		server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			_ = json.NewEncoder(w).Encode(map[string]any{
-				"redirect_uris":              []string{redirectURI},
-				"token_endpoint_auth_method": "none",
-			})
-		}))
-		server.Config.ConnState = func(_ net.Conn, state http.ConnState) {
-			if state == http.StateNew {
-				connections.Add(1)
-			}
-		}
-		server.StartTLS()
+	t.Run("an allowed client_id triggers an outbound document fetch", func(t *testing.T) {
+		// With the setting on, an allowed client_id is intercepted and the resolver fetches the
+		// document, so the server observes a connection (the TLS handshake then fails because
+		// the cert is not trusted, which is why the authorization itself errors). A database
+		// lookup would never produce an outbound connection, so this distinguishes "the resolver
+		// ran" from a plain unknown-client error.
+		listener, err := net.Listen("tcp", allowedClientIDMetadataAddress)
+		require.NoError(t, err)
+		server, connections := newClientIDMetadataDocumentServer(listener)
 		defer server.Close()
 
-		_, _, err := Instance.CreateOIDCAuthRequest(CTX, server.URL, Instance.Users.Get(integration.UserTypeLogin).ID, redirectURI, oidc.ScopeOpenID)
+		_, _, err = Instance.CreateOIDCAuthRequest(CTX, server.URL+"/client", Instance.Users.Get(integration.UserTypeLogin).ID, redirectURI, oidc.ScopeOpenID)
 		require.Error(t, err)
 		assert.GreaterOrEqual(t, connections.Load(), int32(1), "the resolver must have attempted to fetch the metadata document")
+	})
+
+	t.Run("a client_id the system does not allow is not fetched, even if the instance allows any url", func(t *testing.T) {
+		// The shared instance allows any URL, so the system allowlist alone keeps this address
+		// out.
+		listener, err := net.Listen("tcp", "127.0.0.1:0")
+		require.NoError(t, err)
+		server, connections := newClientIDMetadataDocumentServer(listener)
+		defer server.Close()
+
+		_, _, err = Instance.CreateOIDCAuthRequest(CTX, server.URL+"/client", Instance.Users.Get(integration.UserTypeLogin).ID, redirectURI, oidc.ScopeOpenID)
+		require.Error(t, err)
+		assert.Equal(t, int32(0), connections.Load(), "a client_id the system does not allow must not be fetched")
 	})
 
 	// Non-URL client_ids keep going through the regular database lookup unchanged: the rest of
@@ -91,9 +98,117 @@ func TestServer_ClientIDMetadataDocument_disabled(t *testing.T) {
 	require.Error(t, err, "an https client_id must not resolve when the feature is disabled")
 }
 
-// enableClientIDMetadataDocument turns CIMD on through the instance's security settings and
-// waits until the change is observable, i.e. until the projection behind the cached instance
-// has caught up and discovery advertises the support.
+// newClientIDMetadataDocumentServer serves a metadata document over TLS on listener and counts
+// the inbound connections.
+func newClientIDMetadataDocumentServer(listener net.Listener) (*httptest.Server, *atomic.Int32) {
+	connections := new(atomic.Int32)
+	server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"client_id":                  "https://" + r.Host + r.URL.Path,
+			"redirect_uris":              []string{redirectURI},
+			"token_endpoint_auth_method": "none",
+		})
+	}))
+	_ = server.Listener.Close()
+	server.Listener = listener
+	server.Config.ConnState = func(_ net.Conn, state http.ConnState) {
+		if state == http.StateNew {
+			connections.Add(1)
+		}
+	}
+	server.StartTLS()
+	return server, connections
+}
+
+// TestServer_ClientIDMetadataDocument_instanceAllowedURLs manages the client_id URLs an instance
+// allows through the API, without any change to the runtime configuration, and asserts on the
+// live server which ones are fetched.
+func TestServer_ClientIDMetadataDocument_instanceAllowedURLs(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	instance := integration.NewInstance(ctx)
+	iamCTX := instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+	issuer := instance.OIDCIssuer()
+	allowedURL := "https://" + allowedClientIDMetadataAddress + "/"
+
+	// fetchCount starts a document server on the address the system allows, authorizes with a
+	// client_id on it and returns how many connections the server saw. Every call uses its own
+	// client_id: a failed resolution is cached for a short window, and the fetches here always
+	// fail on the untrusted test certificate, so a reused client_id would be answered from that
+	// cache instead of being fetched.
+	var fetches int
+	fetchCount := func(t *testing.T) int32 {
+		t.Helper()
+		listener, err := net.Listen("tcp", allowedClientIDMetadataAddress)
+		require.NoError(t, err)
+		server, connections := newClientIDMetadataDocumentServer(listener)
+		defer server.Close()
+		fetches++
+		clientID := fmt.Sprintf("%s/client-%d", server.URL, fetches)
+		_, _, err = instance.CreateOIDCAuthRequest(ctx, clientID, instance.Users.Get(integration.UserTypeLogin).ID, redirectURI, oidc.ScopeOpenID)
+		require.Error(t, err)
+		return connections.Load()
+	}
+
+	setClientIDMetadataDocumentSettings(t, iamCTX, instance, &settings.ClientIDMetadataDocumentSettings{Enabled: true})
+
+	t.Run("enabled without allowed urls, nothing is fetched or advertised", func(t *testing.T) {
+		waitForClientIDMetadataDocumentSupport(t, ctx, issuer, false)
+		assert.Equal(t, int32(0), fetchCount(t))
+	})
+
+	t.Run("an invalid url cannot be added", func(t *testing.T) {
+		_, err := instance.Client.SettingsV2.AddClientIDMetadataDocumentAllowedURL(iamCTX, &settings.AddClientIDMetadataDocumentAllowedURLRequest{
+			Url: "https://" + allowedClientIDMetadataAddress + "/oauth/../",
+		})
+		assert.Equal(t, codes.InvalidArgument, status.Code(err))
+	})
+
+	t.Run("an added url is fetched", func(t *testing.T) {
+		resp, err := instance.Client.SettingsV2.AddClientIDMetadataDocumentAllowedURL(iamCTX, &settings.AddClientIDMetadataDocumentAllowedURLRequest{Url: allowedURL})
+		require.NoError(t, err)
+		assert.NotEmpty(t, resp.GetCreationDate())
+
+		waitForClientIDMetadataDocumentSupport(t, ctx, issuer, true)
+		assert.GreaterOrEqual(t, fetchCount(t), int32(1))
+
+		current, err := instance.Client.SettingsV2.GetSecuritySettings(iamCTX, &settings.GetSecuritySettingsRequest{})
+		require.NoError(t, err)
+		assert.Equal(t, []string{allowedURL}, current.GetSettings().GetClientIdMetadataDocument().GetAllowedUrls())
+	})
+
+	t.Run("an allowed url cannot be added twice", func(t *testing.T) {
+		_, err := instance.Client.SettingsV2.AddClientIDMetadataDocumentAllowedURL(iamCTX, &settings.AddClientIDMetadataDocumentAllowedURLRequest{Url: allowedURL})
+		assert.Equal(t, codes.AlreadyExists, status.Code(err))
+	})
+
+	t.Run("a removed url is no longer fetched", func(t *testing.T) {
+		resp, err := instance.Client.SettingsV2.RemoveClientIDMetadataDocumentAllowedURL(iamCTX, &settings.RemoveClientIDMetadataDocumentAllowedURLRequest{Url: allowedURL})
+		require.NoError(t, err)
+		assert.NotEmpty(t, resp.GetDeletionDate())
+
+		waitForClientIDMetadataDocumentSupport(t, ctx, issuer, false)
+		assert.Equal(t, int32(0), fetchCount(t))
+	})
+
+	t.Run("removing a url that is not allowed is not an error", func(t *testing.T) {
+		resp, err := instance.Client.SettingsV2.RemoveClientIDMetadataDocumentAllowedURL(iamCTX, &settings.RemoveClientIDMetadataDocumentAllowedURLRequest{Url: allowedURL})
+		require.NoError(t, err)
+		assert.Nil(t, resp.GetDeletionDate())
+	})
+
+	t.Run("allow any url fetches every url the system allows", func(t *testing.T) {
+		setClientIDMetadataDocumentSettings(t, iamCTX, instance, &settings.ClientIDMetadataDocumentSettings{Enabled: true, AllowAnyUrl: true})
+		waitForClientIDMetadataDocumentSupport(t, ctx, issuer, true)
+		assert.GreaterOrEqual(t, fetchCount(t), int32(1))
+	})
+}
+
+// enableClientIDMetadataDocument turns CIMD on through the instance's security settings, lets
+// the instance resolve every client_id URL the system allows and waits until the change is
+// observable, i.e. until the projection behind the cached instance has caught up and discovery
+// advertises the support.
 //
 // SetSecuritySettings replaces the whole policy, so the current settings are read first and
 // carried over: several tests share an instance and the dynamic client registration tests
@@ -110,14 +225,42 @@ func enableClientIDMetadataDocument(t *testing.T, ctx context.Context, instance 
 		EnableImpersonation:       current.GetSettings().GetEnableImpersonation(),
 		DynamicClientRegistration: current.GetSettings().GetDynamicClientRegistration(),
 		ClientIdMetadataDocument: &settings.ClientIDMetadataDocumentSettings{
-			Enabled: true,
+			Enabled:     true,
+			AllowAnyUrl: true,
 		},
 	})
 	if status.Code(err) != codes.FailedPrecondition {
 		require.NoError(t, err)
 	}
+	waitForClientIDMetadataDocumentSupport(t, ctx, instance.OIDCIssuer(), true)
+}
 
-	issuer := instance.OIDCIssuer()
+// setClientIDMetadataDocumentSettings sets the client id metadata document settings of the
+// instance and carries the other security settings over, as SetSecuritySettings replaces the
+// whole policy.
+func setClientIDMetadataDocumentSettings(t *testing.T, ctx context.Context, instance *integration.Instance, cimd *settings.ClientIDMetadataDocumentSettings) {
+	t.Helper()
+	current, err := instance.Client.SettingsV2.GetSecuritySettings(ctx, &settings.GetSecuritySettingsRequest{})
+	require.NoError(t, err)
+	if cimd.AllowedUrls == nil {
+		cimd.AllowedUrls = current.GetSettings().GetClientIdMetadataDocument().GetAllowedUrls()
+	}
+	_, err = instance.Client.SettingsV2.SetSecuritySettings(ctx, &settings.SetSecuritySettingsRequest{
+		EmbeddedIframe:            current.GetSettings().GetEmbeddedIframe(),
+		EnableImpersonation:       current.GetSettings().GetEnableImpersonation(),
+		DynamicClientRegistration: current.GetSettings().GetDynamicClientRegistration(),
+		ClientIdMetadataDocument:  cimd,
+	})
+	if status.Code(err) != codes.FailedPrecondition {
+		require.NoError(t, err)
+	}
+}
+
+// waitForClientIDMetadataDocumentSupport waits until discovery advertises client id metadata
+// document support as wanted, i.e. until the projection behind the cached instance has caught
+// up with the last settings change.
+func waitForClientIDMetadataDocumentSupport(t *testing.T, ctx context.Context, issuer string, want bool) {
+	t.Helper()
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	require.EventuallyWithT(t, func(tt *assert.CollectT) {
 		resp, err := http.Get(issuer + "/.well-known/openid-configuration")
@@ -129,8 +272,9 @@ func enableClientIDMetadataDocument(t *testing.T, ctx context.Context, instance 
 		if !assert.NoError(tt, json.NewDecoder(resp.Body).Decode(&discovery)) {
 			return
 		}
-		assert.Equal(tt, true, discovery["client_id_metadata_document_supported"])
-	}, retryDuration, tick, "client id metadata document support not advertised")
+		supported, _ := discovery["client_id_metadata_document_supported"].(bool)
+		assert.Equal(tt, want, supported)
+	}, retryDuration, tick, "client id metadata document support not as expected")
 }
 
 func fetchDiscoveryRaw(t testing.TB, issuer string) map[string]any {

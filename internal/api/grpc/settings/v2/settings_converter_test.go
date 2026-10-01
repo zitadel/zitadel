@@ -541,7 +541,9 @@ func Test_securityPolicyToSettingsPb(t *testing.T) {
 			AllowUnauthenticated: true,
 		},
 		ClientIdMetadataDocument: &settings.ClientIDMetadataDocumentSettings{
-			Enabled: true,
+			Enabled:     true,
+			AllowedUrls: []string{"https://app.example.com/client", "https://clients.example.com/"},
+			AllowAnyUrl: true,
 		},
 	}
 	got := securityPolicyToSettingsPb(&query.SecurityPolicy{
@@ -552,7 +554,9 @@ func Test_securityPolicyToSettingsPb(t *testing.T) {
 		EnableDynamicClientRegistration:               true,
 		AllowUnauthenticatedDynamicClientRegistration: true,
 
-		EnableClientIDMetadataDocument: true,
+		EnableClientIDMetadataDocument:      true,
+		ClientIDMetadataDocumentAllowedURLs: []string{"https://app.example.com/client", "https://clients.example.com/"},
+		ClientIDMetadataDocumentAllowAnyURL: true,
 	})
 	assert.Equal(t, want, got)
 }
@@ -576,7 +580,9 @@ func Test_securitySettingsToCommand(t *testing.T) {
 		EnableDynamicClientRegistration:               true,
 		AllowUnauthenticatedDynamicClientRegistration: true,
 
-		EnableClientIDMetadataDocument: true,
+		EnableClientIDMetadataDocument:      true,
+		ClientIDMetadataDocumentAllowedURLs: []string{"https://app.example.com/client", "https://clients.example.com/"},
+		ClientIDMetadataDocumentAllowAnyURL: true,
 	}
 	got := securitySettingsToCommand(&settings.SetSecuritySettingsRequest{
 		EmbeddedIframe: &settings.EmbeddedIframeSettings{
@@ -589,7 +595,9 @@ func Test_securitySettingsToCommand(t *testing.T) {
 			AllowUnauthenticated: true,
 		},
 		ClientIdMetadataDocument: &settings.ClientIDMetadataDocumentSettings{
-			Enabled: true,
+			Enabled:     true,
+			AllowedUrls: []string{"https://app.example.com/client", "https://clients.example.com/"},
+			AllowAnyUrl: true,
 		},
 	})
 	assert.Equal(t, want, got)
@@ -608,4 +616,6 @@ func Test_securitySettingsToCommand_dynamicClientRegistrationOmitted(t *testing.
 func Test_securitySettingsToCommand_clientIDMetadataDocumentOmitted(t *testing.T) {
 	got := securitySettingsToCommand(&settings.SetSecuritySettingsRequest{})
 	assert.False(t, got.EnableClientIDMetadataDocument)
+	assert.Empty(t, got.ClientIDMetadataDocumentAllowedURLs)
+	assert.False(t, got.ClientIDMetadataDocumentAllowAnyURL)
 }
