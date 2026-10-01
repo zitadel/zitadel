@@ -1,50 +1,79 @@
-import { getBreadcrumbItems } from 'fumadocs-core/breadcrumb';
-import { createSearchAPI } from 'fumadocs-core/search/server';
-import { source, versionSource } from '@/lib/source';
-import { getVersionFromUrl, LATEST_VERSION } from '@/lib/versions';
+// app/api/search/route.ts
+import { NextResponse } from 'next/server';
 
-// Both loaders share one index. Every entry is tagged with its docs version so the
-// client can scope results to the version being viewed (see app/providers.tsx).
-function indexPages(loader: typeof source | typeof versionSource, getTag: (url: string) => string) {
-  const tree = loader.getPageTree();
+const RATE_LIMIT_MAX = 40; // Max requests per IP per minute
+const MAX_CACHE_SIZE = 10000; // Prevent Out-Of-Memory leaks
+const rateLimitCache = new Map<string, { count: number; resetTime: number }>();
 
-  return loader.getPages().map((page) => ({
-    id: page.url,
-    url: page.url,
-    title: page.data.title,
-    description: page.data.description,
-    structuredData: page.data.structuredData,
-    // Sidebar path (e.g. "Deploy & Operate › Self-Hosted"), shown with each result.
-    breadcrumbs: getBreadcrumbItems(page.url, tree)
-      .map((item) => item.name)
-      .filter((name): name is string => typeof name === 'string'),
-    tag: getTag(page.url),
-  }));
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const record = rateLimitCache.get(ip);
+
+  if (!record || now > record.resetTime) {
+    // Memory leak protection: If map gets too big, clear it entirely
+    // (A blunt but highly effective strategy for lightweight proxy rate limiters)
+    if (rateLimitCache.size > MAX_CACHE_SIZE) {
+      rateLimitCache.clear();
+    }
+
+    rateLimitCache.set(ip, { count: 1, resetTime: now + 60000 });
+    return false;
+  }
+
+  if (record.count >= RATE_LIMIT_MAX) return true;
+
+  record.count++;
+  return false;
 }
 
-const searchAPI = createSearchAPI('advanced', {
-  // https://docs.orama.com/docs/orama-js/supported-languages
-  language: 'english',
-  indexes: [
-    ...indexPages(source, () => LATEST_VERSION),
-    ...indexPages(versionSource, getVersionFromUrl),
-  ],
-});
-
-// fumadocs' built-in default. Its endpoint passes `limit: undefined` when the URL
-// has no `?limit=`, which overrides that default and returns every match (450
-// entries for "oidc").
-const DEFAULT_LIMIT = '60';
-
-// Results only change with a deploy, so the CDN answers repeated queries (cached per
-// URL, i.e. per query and tag) instead of a function that may first have to rebuild
-// the index on a cold start. A static index is not an option: one version alone
-// serializes to over 20 MB of JSON.
 export async function GET(request: Request) {
-  const url = new URL(request.url);
-  if (!url.searchParams.has('limit')) url.searchParams.set('limit', DEFAULT_LIMIT);
+  try {
+    // 1. Robust IP Extraction (Handle proxy chains: "ip1, ip2")
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    const ip = forwardedFor ? forwardedFor.split(',')[0].trim() : '127.0.0.1';
 
-  const response = await searchAPI.GET(new Request(url));
-  response.headers.set('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=604800');
-  return response;
+    if (isRateLimited(ip)) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const query = searchParams.get('q');
+
+    if (!query || query.trim() === '') {
+      return NextResponse.json([]);
+    }
+    const safeQuery = query.substring(0, 150).trim();
+
+    const baseUrl = process.env.DOCS_SEARCH_URL || 'http://localhost:8080';
+    const cleanBaseUrl = baseUrl.replace(/\/+$/, '');
+
+    const backendUrl = new URL(`${cleanBaseUrl}/api/search/docs`);
+    backendUrl.searchParams.set('q', safeQuery);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+    const response = await fetch(backendUrl.toString(), {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${process.env.DOCS_SEARCH_SECRET}`,
+        'Content-Type': 'application/json'
+      },
+      signal: controller.signal,
+      next: { revalidate: 300 }
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`Express returned status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return NextResponse.json(data);
+
+  } catch (error: any) {
+    console.error('Proxy Search Error:', error.name === 'AbortError' ? 'Timeout' : error.message);
+    return NextResponse.json([]);
+  }
 }
