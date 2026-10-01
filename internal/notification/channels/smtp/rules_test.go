@@ -20,8 +20,18 @@ func TestCompileRules(t *testing.T) {
 		{
 			name: "valid rule",
 			configs: []RuleConfig{{
-				Match:   RuleMatch{Hosts: []string{"smtp.example.com"}},
+				Match:   RuleMatch{Hosts: []string{"smtp.example.com"}, Users: []string{"token"}},
 				Headers: []RuleHeader{{Name: "X-Instance-ID", Value: "{{.InstanceID}}"}},
+			}},
+		},
+		{
+			name: "text and placeholders",
+			configs: []RuleConfig{{
+				Headers: []RuleHeader{
+					{Name: "X-Header", Value: "prefix-{{.InstanceID}}-{{.OrgID}}-suffix"},
+					{Name: "X-Empty", Value: ""},
+					{Name: "X-Text", Value: "text"},
+				},
 			}},
 		},
 		{
@@ -52,114 +62,35 @@ func TestCompileRules(t *testing.T) {
 			}},
 			wantErr: "value must not contain line breaks",
 		},
-		{
-			name: "invalid template",
+	}
+	unsupported := []struct {
+		name  string
+		value string
+	}{
+		{"unknown placeholder", "{{.UserID}}"},
+		{"placeholder with spaces", "{{ .InstanceID }}"},
+		{"trim markers", "{{- .InstanceID -}}"},
+		{"condition", "{{if .InstanceID}}{{.OrgID}}{{end}}"},
+		{"function", `{{printf "%s" .InstanceID}}`},
+		{"pipeline", "{{.InstanceID | len}}"},
+		{"chained field", "{{.InstanceID.Foo}}"},
+		{"variable", "{{$id := .InstanceID}}{{$id}}"},
+		{"unterminated action", "{{.InstanceID"},
+		{"stray closing braces", "text}}"},
+		{"nested template", `{{define "x"}}{{.OrgID}}{{end}}{{template "x" .}}`},
+	}
+	for _, u := range unsupported {
+		tests = append(tests, struct {
+			name    string
+			configs []RuleConfig
+			wantErr string
+		}{
+			name: "unsupported value, " + u.name,
 			configs: []RuleConfig{{
-				Headers: []RuleHeader{{Name: "X-Header", Value: "{{.InstanceID"}},
-			}},
-			wantErr: `header "X-Header"`,
-		},
-		{
-			name: "unsupported template, unknown field",
-			configs: []RuleConfig{{
-				Headers: []RuleHeader{{Name: "X-Header", Value: `{{.UserID}}`}},
-			}},
-			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
-		},
-		{
-			name: "unsupported template, unknown field hidden by condition",
-			configs: []RuleConfig{{
-				Headers: []RuleHeader{{Name: "X-Header", Value: `{{if .InstanceID}}{{.UserID}}{{end}}`}},
-			}},
-			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
-		},
-		{
-			name: "unsupported template, condition",
-			configs: []RuleConfig{{
-				Headers: []RuleHeader{{Name: "X-Header", Value: `{{if .InstanceID}}a{{else}}b{{end}}`}},
-			}},
-			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
-		},
-		{
-			name: "unsupported template, function",
-			configs: []RuleConfig{{
-				Headers: []RuleHeader{{Name: "X-Header", Value: `{{printf "%s" .InstanceID}}`}},
+				Headers: []RuleHeader{{Name: "X-Header", Value: u.value}},
 			}},
 			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
-		},
-		{
-			name: "unsupported template, index function",
-			configs: []RuleConfig{{
-				Headers: []RuleHeader{{Name: "X-Header", Value: `{{index .InstanceID 100}}`}},
-			}},
-			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
-		},
-		{
-			name: "unsupported template, pipeline",
-			configs: []RuleConfig{{
-				Headers: []RuleHeader{{Name: "X-Header", Value: `{{.InstanceID | len}}`}},
-			}},
-			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
-		},
-		{
-			name: "unsupported template, chained field",
-			configs: []RuleConfig{{
-				Headers: []RuleHeader{{Name: "X-Header", Value: `{{.InstanceID.Foo}}`}},
-			}},
-			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
-		},
-		{
-			name: "unsupported template, with",
-			configs: []RuleConfig{{
-				Headers: []RuleHeader{{Name: "X-Header", Value: `{{with .InstanceID}}{{.}}{{end}}`}},
-			}},
-			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
-		},
-		{
-			name: "unsupported template, range",
-			configs: []RuleConfig{{
-				Headers: []RuleHeader{{Name: "X-Header", Value: `{{range .InstanceID}}{{.}}{{end}}`}},
-			}},
-			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
-		},
-		{
-			name: "unsupported template, variable",
-			configs: []RuleConfig{{
-				Headers: []RuleHeader{{Name: "X-Header", Value: `{{$id := .InstanceID}}{{$id}}`}},
-			}},
-			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
-		},
-		{
-			name: "unsupported template, dot",
-			configs: []RuleConfig{{
-				Headers: []RuleHeader{{Name: "X-Header", Value: `{{.}}`}},
-			}},
-			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
-		},
-		{
-			name: "unsupported template, nested template",
-			configs: []RuleConfig{{
-				Headers: []RuleHeader{{Name: "X-Header", Value: `{{define "x"}}{{.UserID}}{{end}}{{template "x" .}}`}},
-			}},
-			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
-		},
-		{
-			name: "unsupported template, defined template",
-			configs: []RuleConfig{{
-				Headers: []RuleHeader{{Name: "X-Header", Value: `{{define "x"}}{{.UserID}}{{end}}text`}},
-			}},
-			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
-		},
-		{
-			name: "text and placeholders with trim markers",
-			configs: []RuleConfig{{
-				Headers: []RuleHeader{
-					{Name: "X-Header", Value: "prefix-{{ .InstanceID }}-{{- .OrgID -}} -suffix"},
-					{Name: "X-Empty", Value: ""},
-					{Name: "X-Text", Value: "text"},
-				},
-			}},
-		},
+		})
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -176,10 +107,13 @@ func TestCompileRules(t *testing.T) {
 
 func TestRules_Match(t *testing.T) {
 	data := RuleData{InstanceID: "instance1", OrgID: "org1"}
-	provider := &Config{
-		SMTP: SMTP{Host: "smtp.example.com:587"},
-		From: "noreply@example.com",
+	provider := func(host, user, from string) *Config {
+		return &Config{
+			SMTP: SMTP{Host: host, PlainAuth: &PlainAuthConfig{User: user, Password: "secret"}},
+			From: from,
+		}
 	}
+	defaultProvider := provider("smtp.example.com:587", "token", "noreply@example.com")
 
 	tests := []struct {
 		name    string
@@ -189,91 +123,164 @@ func TestRules_Match(t *testing.T) {
 	}{
 		{
 			name:   "no rules",
-			config: provider,
+			config: defaultProvider,
 			want:   Rule{},
 		},
 		{
 			name:    "no provider",
-			configs: []RuleConfig{{DisableCustomHTML: true}},
+			configs: []RuleConfig{{RestrictCustomHTML: true}},
 			config:  nil,
 			want:    Rule{},
 		},
 		{
 			name:    "empty match applies to all providers",
-			configs: []RuleConfig{{DisableCustomHTML: true}},
-			config:  provider,
-			want:    Rule{DisableCustomHTML: true},
+			configs: []RuleConfig{{RestrictCustomHTML: true}},
+			config:  defaultProvider,
+			want:    Rule{RestrictCustomHTML: true},
 		},
+		// hosts
 		{
 			name: "host without port matches any port",
 			configs: []RuleConfig{{
-				Match:             RuleMatch{Hosts: []string{"smtp.example.com"}},
-				DisableCustomHTML: true,
+				Match:              RuleMatch{Hosts: []string{"smtp.example.com"}},
+				RestrictCustomHTML: true,
 			}},
-			config: provider,
-			want:   Rule{DisableCustomHTML: true},
+			config: defaultProvider,
+			want:   Rule{RestrictCustomHTML: true},
 		},
 		{
 			name: "host with port matches",
 			configs: []RuleConfig{{
-				Match:             RuleMatch{Hosts: []string{"smtp.example.com:587"}},
-				DisableCustomHTML: true,
+				Match:              RuleMatch{Hosts: []string{"smtp.example.com:587"}},
+				RestrictCustomHTML: true,
 			}},
-			config: provider,
-			want:   Rule{DisableCustomHTML: true},
+			config: defaultProvider,
+			want:   Rule{RestrictCustomHTML: true},
 		},
 		{
 			name: "host with other port does not match",
 			configs: []RuleConfig{{
-				Match:             RuleMatch{Hosts: []string{"smtp.example.com:25"}},
-				DisableCustomHTML: true,
+				Match:              RuleMatch{Hosts: []string{"smtp.example.com:25"}},
+				RestrictCustomHTML: true,
 			}},
-			config: provider,
+			config: defaultProvider,
 			want:   Rule{},
 		},
 		{
 			name: "host is case insensitive",
 			configs: []RuleConfig{{
-				Match:             RuleMatch{Hosts: []string{" SMTP.Example.com "}},
-				DisableCustomHTML: true,
+				Match:              RuleMatch{Hosts: []string{" SMTP.Example.com "}},
+				RestrictCustomHTML: true,
 			}},
-			config: &Config{SMTP: SMTP{Host: "smtp.EXAMPLE.com:587"}, From: "noreply@example.com"},
-			want:   Rule{DisableCustomHTML: true},
+			config: provider("smtp.EXAMPLE.com:587", "token", "noreply@example.com"),
+			want:   Rule{RestrictCustomHTML: true},
 		},
 		{
 			name: "provider host without port",
 			configs: []RuleConfig{{
-				Match:             RuleMatch{Hosts: []string{"smtp.example.com"}},
-				DisableCustomHTML: true,
+				Match:              RuleMatch{Hosts: []string{"smtp.example.com"}},
+				RestrictCustomHTML: true,
 			}},
-			config: &Config{SMTP: SMTP{Host: "smtp.example.com"}, From: "noreply@example.com"},
-			want:   Rule{DisableCustomHTML: true},
+			config: provider("smtp.example.com", "token", "noreply@example.com"),
+			want:   Rule{RestrictCustomHTML: true},
 		},
+		{
+			name: "IPv6 host with and without port",
+			configs: []RuleConfig{{
+				Match:              RuleMatch{Hosts: []string{"[2001:db8::1]"}},
+				RestrictCustomHTML: true,
+			}, {
+				Match:              RuleMatch{Hosts: []string{"[2001:db8::2]:2525"}},
+				RestrictCustomHTML: true,
+			}},
+			config: provider("[2001:DB8::1]:2525", "token", "noreply@example.com"),
+			want:   Rule{RestrictCustomHTML: true},
+		},
+		{
+			name: "IPv6 host with other port does not match",
+			configs: []RuleConfig{{
+				Match:              RuleMatch{Hosts: []string{"[2001:db8::1]:25"}},
+				RestrictCustomHTML: true,
+			}},
+			config: provider("[2001:db8::1]:2525", "token", "noreply@example.com"),
+			want:   Rule{},
+		},
+		// users
+		{
+			name: "user matches",
+			configs: []RuleConfig{{
+				Match:              RuleMatch{Users: []string{"other", " token "}},
+				RestrictCustomHTML: true,
+			}},
+			config: defaultProvider,
+			want:   Rule{RestrictCustomHTML: true},
+		},
+		{
+			name: "user is case sensitive",
+			configs: []RuleConfig{{
+				Match:              RuleMatch{Users: []string{"TOKEN"}},
+				RestrictCustomHTML: true,
+			}},
+			config: defaultProvider,
+			want:   Rule{},
+		},
+		{
+			name: "other user does not match, even with the same host and sender domain",
+			configs: []RuleConfig{{
+				Match: RuleMatch{
+					Hosts:         []string{"smtp.example.com"},
+					Users:         []string{"token"},
+					SenderDomains: []string{"example.com"},
+				},
+				RestrictCustomHTML: true,
+			}},
+			config: provider("smtp.example.com:587", "other", "noreply@example.com"),
+			want:   Rule{},
+		},
+		{
+			name: "user matches the XOAuth2 user",
+			configs: []RuleConfig{{
+				Match:              RuleMatch{Users: []string{"oauth-user"}},
+				RestrictCustomHTML: true,
+			}},
+			config: &Config{SMTP: SMTP{Host: "smtp.example.com:587", XOAuth2Auth: &XOAuth2AuthConfig{User: "oauth-user"}}},
+			want:   Rule{RestrictCustomHTML: true},
+		},
+		{
+			name: "provider without authentication does not match a user",
+			configs: []RuleConfig{{
+				Match:              RuleMatch{Users: []string{"token"}},
+				RestrictCustomHTML: true,
+			}},
+			config: &Config{SMTP: SMTP{Host: "smtp.example.com:587"}},
+			want:   Rule{},
+		},
+		// sender domains
 		{
 			name: "sender domain matches",
 			configs: []RuleConfig{{
-				Match:             RuleMatch{SenderDomains: []string{"EXAMPLE.com"}},
-				DisableCustomHTML: true,
+				Match:              RuleMatch{SenderDomains: []string{"EXAMPLE.com"}},
+				RestrictCustomHTML: true,
 			}},
-			config: provider,
-			want:   Rule{DisableCustomHTML: true},
+			config: defaultProvider,
+			want:   Rule{RestrictCustomHTML: true},
 		},
 		{
 			name: "subdomain of sender domain does not match",
 			configs: []RuleConfig{{
-				Match:             RuleMatch{SenderDomains: []string{"example.com"}},
-				DisableCustomHTML: true,
+				Match:              RuleMatch{SenderDomains: []string{"example.com"}},
+				RestrictCustomHTML: true,
 			}},
-			config: &Config{SMTP: SMTP{Host: "smtp.example.com:587"}, From: "noreply@mail.example.com"},
+			config: provider("smtp.example.com:587", "token", "noreply@mail.example.com"),
 			want:   Rule{},
 		},
 		{
 			name: "sender without domain does not match",
 			configs: []RuleConfig{{
-				Match:             RuleMatch{SenderDomains: []string{"example.com"}},
-				DisableCustomHTML: true,
+				Match:              RuleMatch{SenderDomains: []string{"example.com"}},
+				RestrictCustomHTML: true,
 			}},
-			config: &Config{SMTP: SMTP{Host: "smtp.example.com:587"}, From: "example.com"},
+			config: provider("smtp.example.com:587", "token", "example.com"),
 			want:   Rule{},
 		},
 		{
@@ -283,9 +290,9 @@ func TestRules_Match(t *testing.T) {
 					Hosts:         []string{"smtp.example.com"},
 					SenderDomains: []string{"example.com"},
 				},
-				DisableCustomHTML: true,
+				RestrictCustomHTML: true,
 			}},
-			config: &Config{SMTP: SMTP{Host: "smtp.example.com:587"}, From: "noreply@other.example"},
+			config: provider("smtp.example.com:587", "token", "noreply@other.example"),
 			want:   Rule{},
 		},
 		{
@@ -295,11 +302,12 @@ func TestRules_Match(t *testing.T) {
 					Hosts:         []string{"smtp.example.com"},
 					SenderDomains: []string{"example.com"},
 				},
-				DisableCustomHTML: true,
+				RestrictCustomHTML: true,
 			}},
-			config: &Config{SMTP: SMTP{Host: "smtp.other.example:587"}, From: "noreply@example.com"},
+			config: provider("smtp.other.example:587", "token", "noreply@example.com"),
 			want:   Rule{},
 		},
+		// order and headers
 		{
 			name: "first match wins",
 			configs: []RuleConfig{
@@ -315,7 +323,7 @@ func TestRules_Match(t *testing.T) {
 					Headers: []RuleHeader{{Name: "X-Rule", Value: "third"}},
 				},
 			},
-			config: provider,
+			config: defaultProvider,
 			want:   Rule{Headers: map[string]string{"X-Rule": "second"}},
 		},
 		{
@@ -323,23 +331,24 @@ func TestRules_Match(t *testing.T) {
 			configs: []RuleConfig{{
 				Match: RuleMatch{
 					Hosts:         []string{"smtp.example.com"},
+					Users:         []string{"token"},
 					SenderDomains: []string{"example.com"},
 				},
-				DisableCustomHTML: true,
+				RestrictCustomHTML: true,
 				Headers: []RuleHeader{
 					{Name: "X-Instance-ID", Value: "{{.InstanceID}}"},
 					{Name: "X-Org-ID", Value: "{{.OrgID}}"},
-					{Name: "X-Tag", Value: "{{.InstanceID}}-{{.OrgID}}"},
+					{Name: "X-Tag", Value: "{{.InstanceID}}-{{.OrgID}}-{{.InstanceID}}"},
 					{Name: "X-Static", Value: "static"},
 				},
 			}},
-			config: provider,
+			config: defaultProvider,
 			want: Rule{
-				DisableCustomHTML: true,
+				RestrictCustomHTML: true,
 				Headers: map[string]string{
 					"X-Instance-ID": "instance1",
 					"X-Org-ID":      "org1",
-					"X-Tag":         "instance1-org1",
+					"X-Tag":         "instance1-org1-instance1",
 					"X-Static":      "static",
 				},
 			},
@@ -349,9 +358,7 @@ func TestRules_Match(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			rules, err := CompileRules(tt.configs)
 			require.NoError(t, err)
-			got, err := rules.Match(tt.config, data)
-			require.NoError(t, err)
-			assert.Equal(t, tt.want, got)
+			assert.Equal(t, tt.want, rules.Match(tt.config, data))
 		})
 	}
 }

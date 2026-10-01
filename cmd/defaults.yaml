@@ -613,12 +613,16 @@ Notifications:
   #       # Hosts of the SMTP provider. An entry without port matches any port.
   #       Hosts:
   #         - smtp.example.com
+  #       # Usernames of the SMTP authentication, e.g. the token of the provider. They identify the account
+  #       # of the provider, as opposed to the sender address, which can be changed in the provider config.
+  #       Users:
+  #         - token
   #       # Domains of the sender address.
   #       SenderDomains:
   #         - example.com
   #     # Removes HTML from custom message texts. Simple formatting (br, strong, b, em, i, u, p) is kept,
   #     # all other elements like links, images or styles are removed, their text is kept.
-  #     DisableCustomHTML: true
+  #     RestrictCustomHTML: true
   #     # Headers are added to every email. The values can contain text
   #     # and the placeholders {{.InstanceID}} and {{.OrgID}}.
   #     Headers:

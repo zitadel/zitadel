@@ -17,6 +17,8 @@ func (data *TemplateData) RestrictHTML() {
 	data.Text = restrictHTML(data.Text)
 	data.ButtonText = restrictHTML(data.ButtonText)
 	data.FooterText = restrictHTML(data.FooterText)
+	// a footer consisting of removed elements only is not rendered
+	data.IncludeFooter = data.IncludeFooter && data.FooterText != ""
 }
 
 func restrictHTML(text string) string {

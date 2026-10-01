@@ -25,9 +25,10 @@ import (
 var wantSMTPRules = []smtp.RuleConfig{{
 	Match: smtp.RuleMatch{
 		Hosts:         []string{"smtp.example.com"},
+		Users:         []string{"token"},
 		SenderDomains: []string{"example.com"},
 	},
-	DisableCustomHTML: true,
+	RestrictCustomHTML: true,
 	Headers: []smtp.RuleHeader{{
 		Name:  "X-Instance-ID",
 		Value: "{{.InstanceID}}",
@@ -297,9 +298,11 @@ Notifications:
     - Match:
         Hosts:
           - smtp.example.com
+        Users:
+          - token
         SenderDomains:
           - example.com
-      DisableCustomHTML: true
+      RestrictCustomHTML: true
       Headers:
         - Name: X-Instance-ID
           Value: "{{.InstanceID}}"
@@ -314,7 +317,7 @@ Log:
 		args: args{yaml: `
 Notifications:
   SMTPRules: >
-    [{"Match": {"Hosts": ["smtp.example.com"], "SenderDomains": ["example.com"]}, "DisableCustomHTML": true, "Headers": [{"Name": "X-Instance-ID", "Value": "{{.InstanceID}}"}]}]
+    [{"Match": {"Hosts": ["smtp.example.com"], "Users": ["token"], "SenderDomains": ["example.com"]}, "RestrictCustomHTML": true, "Headers": [{"Name": "X-Instance-ID", "Value": "{{.InstanceID}}"}]}]
 Log:
   Level: info
 `},
