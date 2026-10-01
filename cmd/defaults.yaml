@@ -731,6 +731,20 @@ OIDC:
     MaxTtl: 5m  # ZITADEL_OIDC_BACKCHANNELLOGOUT_MAXTTL
     # Lifetime of the token used to notify clients through OIDC back-channel logout.
     TokenLifetime: 15m # ZITADEL_OIDC_BACKCHANNELLOGOUT_TOKENLIFETIME
+  # Client ID Metadata Documents let a client use the HTTPS URL of a document describing it as
+  # its client_id. Each instance turns them on and allows client_id URLs in its security settings,
+  # but only within the URLs allowed here, so that no instance can make ZITADEL fetch a URL the
+  # system did not allow. An entry ending with a slash allows every client_id it is a prefix of,
+  # any other entry allows exactly that client_id. Entries are compared as plain strings, so
+  # https://example.com/client and https://example.com:443/client are different client_ids.
+  # Nothing is allowed by default, which resolves no client_id even when an instance turns the
+  # feature on.
+  ClientIDMetadataDocument:
+    AllowedURLs: # ZITADEL_OIDC_CLIENTIDMETADATADOCUMENT_ALLOWEDURLS (comma separated list)
+    # Allows every valid client_id URL, so that instances decide on their own which ones they
+    # resolve. Only enable it if every instance of the system may make ZITADEL fetch any public
+    # HTTPS URL; the HTTPClient.DenyList still applies.
+    AllowAnyURL: false # ZITADEL_OIDC_CLIENTIDMETADATADOCUMENT_ALLOWANYURL
 
 SAML:
   DefaultLoginURLV2: "/ui/v2/login/login?samlRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2

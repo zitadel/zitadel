@@ -45,6 +45,7 @@ type Config struct {
 	PublicKeyCacheMaxAge              time.Duration
 	DefaultBackChannelLogoutLifetime  time.Duration
 	BackChannelLogout                 handlers.BackChannelLogoutWorkerConfig
+	ClientIDMetadataDocument          ClientIDMetadataDocumentConfig
 }
 
 // BackChannelLogoutConfig returns the BackChannelLogoutWorkerConfig and takes the deprecated TokenLifetime into account.
@@ -137,7 +138,11 @@ func NewServer(
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
-	clientIDMetadataResolver := newClientIDMetadataResolver(httpClient, clientIDMetadataDocumentCache, config.DefaultAccessTokenLifetime, config.DefaultIdTokenLifetime, fallbackLogger)
+	clientIDMetadataAllowlist, err := newClientIDMetadataAllowlist(config.ClientIDMetadataDocument)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "OIDC-Rb8tN", "cannot create client id metadata document allowlist")
+	}
+	clientIDMetadataResolver := newClientIDMetadataResolver(httpClient, clientIDMetadataAllowlist, clientIDMetadataDocumentCache, config.DefaultAccessTokenLifetime, config.DefaultIdTokenLifetime, fallbackLogger)
 	storage := newStorage(config, command, query, repo, authAlg, es, ContextToIssuer, federatedLogoutCache, clientIDMetadataResolver)
 	keyCache := newPublicKeyCache(ctx, config.PublicKeyCacheMaxAge, queryKeyFunc(query))
 	accessTokenKeySet := newOidcKeySet(keyCache, withKeyExpiryCheck(true))

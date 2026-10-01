@@ -20,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // Client ID Metadata Document (CIMD) support. A client_id that is an absolute HTTPS URL is
@@ -39,6 +40,14 @@ import (
 // guarded against amplification: concurrent resolutions of the same client_id are collapsed
 // with a singleflight group, and failures are negatively cached for a short floor so a
 // repeated unresolvable client_id does not trigger an outbound request on every call.
+//
+// A client_id URL is only resolved when both the system and the instance allow it. The system
+// allows URLs in the runtime configuration (OIDC.ClientIDMetadataDocument), which no instance can
+// change, so on a multi-instance system no instance can make the server fetch a URL its operator
+// did not allow. Within that, each instance allows URLs in its security settings, which can be
+// changed at runtime through the API. A client_id that is not allowed is never fetched or cached;
+// it falls through to the regular client lookup and is answered with invalid_client, exactly as
+// before CIMD existed. Both layers allow nothing by default.
 
 const (
 	// clientIDMetadataMaxBodyBytes bounds the size of a fetched Client ID Metadata Document.
@@ -57,19 +66,71 @@ const (
 	clientIDMetadataNegativeTTL = time.Minute
 )
 
-// clientIDMetadataDocumentEnabled reports whether the client_id should be resolved as a
-// Client ID Metadata Document: the instance security settings must enable it and the client_id
-// must look like a CIMD URL.
-func clientIDMetadataDocumentEnabled(ctx context.Context, clientID string) bool {
-	return authz.GetInstance(ctx).EnableClientIDMetadataDocument() && looksLikeClientIDMetadataURL(clientID)
+// ClientIDMetadataDocumentConfig is the system configuration of Client ID Metadata Documents.
+type ClientIDMetadataDocumentConfig struct {
+	// AllowedURLs lists the client_id URLs that may be resolved. An entry ending with a slash
+	// allows every client_id it is a prefix of, any other entry allows exactly that client_id.
+	// Entries are compared as plain strings, as the specification requires for client_id URLs.
+	AllowedURLs []string
+	// AllowAnyURL allows every valid client_id URL, regardless of AllowedURLs.
+	AllowAnyURL bool
 }
 
-// looksLikeClientIDMetadataURL reports whether the client_id should be resolved as a Client
-// ID Metadata Document. A regular ZITADEL client_id is a numeric snowflake (optionally
-// suffixed) and is never an absolute HTTPS URL, so this branch is unambiguous.
-func looksLikeClientIDMetadataURL(clientID string) bool {
-	u, err := url.Parse(clientID)
-	return err == nil && u.IsAbs() && strings.EqualFold(u.Scheme, "https") && u.Host != ""
+// clientIDMetadataAllowlist is the validated system configuration: the client_id URLs the
+// system allows, within which every instance chooses its own.
+type clientIDMetadataAllowlist struct {
+	urls     []string
+	allowAny bool
+}
+
+// newClientIDMetadataAllowlist validates the configured entries. Every entry must itself be a
+// valid client_id URL, so that a prefix entry cannot be widened by a client_id that is not one.
+func newClientIDMetadataAllowlist(config ClientIDMetadataDocumentConfig) (clientIDMetadataAllowlist, error) {
+	allowlist := clientIDMetadataAllowlist{
+		urls:     make([]string, 0, len(config.AllowedURLs)),
+		allowAny: config.AllowAnyURL,
+	}
+	for _, entry := range config.AllowedURLs {
+		entry = strings.TrimSpace(entry)
+		if entry == "" {
+			continue
+		}
+		if !domain.IsClientIDMetadataDocumentURL(entry) {
+			return clientIDMetadataAllowlist{}, zerrors.ThrowInvalidArgumentf(nil, "OIDC-qX3vL", "invalid client id metadata document allowed url %q", entry)
+		}
+		allowlist.urls = append(allowlist.urls, entry)
+	}
+	return allowlist, nil
+}
+
+// allowsAny reports whether the system allows at least one client_id URL.
+func (a clientIDMetadataAllowlist) allowsAny() bool {
+	return a.allowAny || len(a.urls) > 0
+}
+
+// allows reports whether the system allows clientID.
+func (a clientIDMetadataAllowlist) allows(clientID string) bool {
+	return a.allowAny || domain.ClientIDMetadataDocumentURLAllowed(a.urls, clientID)
+}
+
+// instanceAllowsAnyClientIDMetadataDocumentURL reports whether the instance in ctx allows at
+// least one client_id URL.
+func instanceAllowsAnyClientIDMetadataDocumentURL(ctx context.Context) bool {
+	instance := authz.GetInstance(ctx)
+	return instance.ClientIDMetadataDocumentAllowAnyURL() || len(instance.ClientIDMetadataDocumentAllowedURLs()) > 0
+}
+
+// instanceAllowsClientIDMetadataDocumentURL reports whether the instance in ctx allows clientID.
+func instanceAllowsClientIDMetadataDocumentURL(ctx context.Context, clientID string) bool {
+	instance := authz.GetInstance(ctx)
+	return instance.ClientIDMetadataDocumentAllowAnyURL() || domain.ClientIDMetadataDocumentURLAllowed(instance.ClientIDMetadataDocumentAllowedURLs(), clientID)
+}
+
+// clientIDMetadataDocument is a fetched Client ID Metadata Document: the client metadata of an
+// RFC 7591 registration request plus the client_id it describes.
+type clientIDMetadataDocument struct {
+	ClientID string `json:"client_id"`
+	clientRegistrationRequest
 }
 
 type clientIDMetadataCacheIndex int
@@ -121,6 +182,7 @@ func StartClientIDMetadataDocumentCache(background context.Context, conf *cache.
 // generic cache; it never touches the database.
 type clientIDMetadataResolver struct {
 	httpClient          *http.Client
+	allowlist           clientIDMetadataAllowlist
 	cache               cache.Cache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]
 	group               singleflight.Group
 	accessTokenLifetime time.Duration
@@ -128,8 +190,13 @@ type clientIDMetadataResolver struct {
 	logger              *slog.Logger
 }
 
+// newClientIDMetadataResolver returns a resolver for the client_id URLs the allowlist allows.
+// The document is fetched with a copy of httpClient that does not follow redirects: the
+// document must be served from the client_id URL itself, and a redirect could otherwise lead
+// the fetch to a URL the allowlist does not allow.
 func newClientIDMetadataResolver(
 	httpClient *http.Client,
+	allowlist clientIDMetadataAllowlist,
 	documentCache cache.Cache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry],
 	accessTokenLifetime, idTokenLifetime time.Duration,
 	logger *slog.Logger,
@@ -137,8 +204,13 @@ func newClientIDMetadataResolver(
 	if logger == nil {
 		logger = slog.Default()
 	}
+	documentClient := *httpClient
+	documentClient.CheckRedirect = func(*http.Request, []*http.Request) error {
+		return http.ErrUseLastResponse
+	}
 	return &clientIDMetadataResolver{
-		httpClient:          httpClient,
+		httpClient:          &documentClient,
+		allowlist:           allowlist,
 		cache:               documentCache,
 		accessTokenLifetime: accessTokenLifetime,
 		idTokenLifetime:     idTokenLifetime,
@@ -160,7 +232,31 @@ func newClientIDMetadataResolver(
 // tracing) the resolution needs; the fetch stays bounded by clientIDMetadataFetchTimeout, so
 // detaching cannot leak a request that runs forever. Each caller still waits on its own
 // context, so a disconnected caller returns immediately instead of blocking on the shared work.
+// Supported reports whether Client ID Metadata Documents can be resolved for the instance in
+// ctx: the instance security settings must enable them, and both the system and the instance
+// must allow at least one client_id URL. Discovery advertises support only then, so a client is
+// not steered towards a mechanism that cannot resolve it.
+func (r *clientIDMetadataResolver) Supported(ctx context.Context) bool {
+	return authz.GetInstance(ctx).EnableClientIDMetadataDocument() && r.allowlist.allowsAny() && instanceAllowsAnyClientIDMetadataDocumentURL(ctx)
+}
+
+// Handles reports whether clientID is resolved as a Client ID Metadata Document: support must be
+// enabled for the instance in ctx and clientID must be a valid client_id URL that both the system
+// and the instance allow. Any other client_id goes through the regular client lookup.
+func (r *clientIDMetadataResolver) Handles(ctx context.Context, clientID string) bool {
+	return authz.GetInstance(ctx).EnableClientIDMetadataDocument() && r.allowed(ctx, clientID)
+}
+
+// allowed reports whether clientID is a valid client_id URL that both the system and the
+// instance in ctx allow.
+func (r *clientIDMetadataResolver) allowed(ctx context.Context, clientID string) bool {
+	return domain.IsClientIDMetadataDocumentURL(clientID) && r.allowlist.allows(clientID) && instanceAllowsClientIDMetadataDocumentURL(ctx, clientID)
+}
+
 func (r *clientIDMetadataResolver) ResolveClient(ctx context.Context, instanceID, clientID string) (*query.OIDCClient, error) {
+	if !r.allowed(ctx, clientID) {
+		return nil, r.invalidClient(ctx, nil, "client_id is not an allowed client id metadata document url")
+	}
 	key := clientIDMetadataCacheKey(instanceID, clientID)
 	if client, negative, ok := r.cached(ctx, key); ok {
 		if negative {
@@ -228,7 +324,7 @@ func (r *clientIDMetadataResolver) cacheSet(ctx context.Context, key string, cli
 
 func (r *clientIDMetadataResolver) fetchAndValidate(ctx context.Context, clientID string) (*query.OIDCClient, time.Duration, error) {
 	clientURL, err := url.Parse(clientID)
-	if err != nil || !clientURL.IsAbs() || !strings.EqualFold(clientURL.Scheme, "https") || clientURL.Host == "" {
+	if err != nil {
 		return nil, 0, r.invalidClient(ctx, err, "client_id is not a valid https url")
 	}
 
@@ -261,9 +357,14 @@ func (r *clientIDMetadataResolver) fetchAndValidate(ctx context.Context, clientI
 		return nil, 0, r.invalidClient(ctx, nil, "client id metadata document is too large")
 	}
 
-	var doc clientRegistrationRequest
+	var doc clientIDMetadataDocument
 	if err := json.Unmarshal(body, &doc); err != nil {
 		return nil, 0, r.invalidClient(ctx, err, "client id metadata document could not be parsed")
+	}
+	// The document must name the URL it was fetched from as its client_id, compared as plain
+	// strings, so a document cannot be served for a client_id other than its own.
+	if doc.ClientID != clientID {
+		return nil, 0, r.invalidClient(ctx, nil, "client id metadata document client_id does not match the client_id url")
 	}
 
 	client, err := r.documentToClient(ctx, clientID, clientURL, &doc)
@@ -278,7 +379,7 @@ func (r *clientIDMetadataResolver) fetchAndValidate(ctx context.Context, clientI
 // clients without a project, secret or dev mode. The reused RFC 7591 mappers reject
 // unsupported grant, response and application types; the origin match restricts the redirect
 // URIs to the client_id origin.
-func (r *clientIDMetadataResolver) documentToClient(ctx context.Context, clientID string, clientURL *url.URL, doc *clientRegistrationRequest) (*query.OIDCClient, error) {
+func (r *clientIDMetadataResolver) documentToClient(ctx context.Context, clientID string, clientURL *url.URL, doc *clientIDMetadataDocument) (*query.OIDCClient, error) {
 	if doc.JWKsURI != "" || len(doc.JWKs) > 0 {
 		return nil, r.invalidClient(ctx, nil, "jwks and jwks_uri are not supported for client id metadata documents")
 	}
