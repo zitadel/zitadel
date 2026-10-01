@@ -97,8 +97,7 @@ func generateEmail(
 }
 
 func countSuppressedEmail(ctx context.Context, recipient string, triggeringEventType eventstore.EventType) {
-	recipientDomain := recipient[strings.LastIndex(recipient, "@")+1:]
-	logging.Debug(ctx, "email to reserved recipient domain not sent", "domain", recipientDomain, "eventType", triggeringEventType)
+	logging.Debug(ctx, "email to reserved recipient domain not sent", "domain", domain.EmailAddress(recipient).Domain(), "eventType", triggeringEventType)
 	err := metrics.AddCount(ctx, SuppressedEmailsCounter, 1, map[string]attribute.Value{
 		"triggering_event_type": attribute.StringValue(string(triggeringEventType)),
 	})

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/riverqueue/river"
@@ -64,8 +63,7 @@ func (w *NotificationWorker) Work(ctx context.Context, job *river.Job[*notificat
 	// The domain claimed event requires the domain as argument, but lacks the user when creating the request event.
 	// Since we set it into the request arguments, it will be passed into a potential retry event.
 	if job.Args.RequiresPreviousDomain && job.Args.Args != nil && job.Args.Args.Domain == "" {
-		index := strings.LastIndex(notifyUser.LastEmail, "@")
-		job.Args.Args.Domain = notifyUser.LastEmail[index+1:]
+		job.Args.Args.Domain = domain.EmailAddress(notifyUser.LastEmail).Domain()
 	}
 
 	err = w.sendNotificationQueue(ctx, job.Args, strconv.Itoa(int(job.ID)), notifyUser)
