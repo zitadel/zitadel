@@ -65,7 +65,7 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 
 	// Client ID Metadata Document clients are ephemeral and have neither a stored login
 	// version nor a legacy (v1) login configuration, so they always use the v2 login.
-	if clientIDMetadataDocumentEnabled(ctx, req.ClientID) {
+	if o.clientIDMetadataResolver.Handles(ctx, req.ClientID) {
 		return o.createAuthRequestLoginClient(ctx, req, userID, loginClient)
 	}
 
@@ -88,7 +88,7 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 }
 
 func (o *OPStorage) createAuthRequestScopeAndAudience(ctx context.Context, clientID string, reqScope []string) (scope, audience []string, orgID string, err error) {
-	if clientIDMetadataDocumentEnabled(ctx, clientID) {
+	if o.clientIDMetadataResolver.Handles(ctx, clientID) {
 		// Client ID Metadata Document clients have no project, so there are no project roles
 		// to assert and the audience is derived from the requested scopes only.
 		orgID, err = o.assertOrgScope(ctx, reqScope)
