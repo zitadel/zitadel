@@ -21,9 +21,12 @@ func TestDeliverySuppressed(t *testing.T) {
 		event  func(suppressed bool) eventstore.Command
 		mapper func(eventstore.Event) (eventstore.Event, error)
 		flag   func(eventstore.Event) bool
+		// payloadLessBefore marks events which had no payload before the flag was introduced
+		payloadLessBefore bool
 	}{
 		{
-			name: "initial code",
+			name:              "initial code",
+			payloadLessBefore: true,
 			event: func(suppressed bool) eventstore.Command {
 				return NewHumanInitialCodeSentEvent(ctx, agg, suppressed)
 			},
@@ -31,7 +34,8 @@ func TestDeliverySuppressed(t *testing.T) {
 			flag:   func(e eventstore.Event) bool { return e.(*HumanInitialCodeSentEvent).DeliverySuppressed },
 		},
 		{
-			name: "email code",
+			name:              "email code",
+			payloadLessBefore: true,
 			event: func(suppressed bool) eventstore.Command {
 				return NewHumanEmailCodeSentEvent(ctx, agg, suppressed)
 			},
@@ -39,7 +43,8 @@ func TestDeliverySuppressed(t *testing.T) {
 			flag:   func(e eventstore.Event) bool { return e.(*HumanEmailCodeSentEvent).DeliverySuppressed },
 		},
 		{
-			name: "invite code",
+			name:              "invite code",
+			payloadLessBefore: true,
 			event: func(suppressed bool) eventstore.Command {
 				return NewHumanInviteCodeSentEvent(ctx, agg, suppressed)
 			},
@@ -71,7 +76,8 @@ func TestDeliverySuppressed(t *testing.T) {
 			flag:   func(e eventstore.Event) bool { return e.(*HumanPasswordlessInitCodeSentEvent).DeliverySuppressed },
 		},
 		{
-			name: "domain claimed",
+			name:              "domain claimed",
+			payloadLessBefore: true,
 			event: func(suppressed bool) eventstore.Command {
 				return NewDomainClaimedSentEvent(ctx, agg, suppressed)
 			},
@@ -79,7 +85,8 @@ func TestDeliverySuppressed(t *testing.T) {
 			flag:   func(e eventstore.Event) bool { return e.(*DomainClaimedSentEvent).DeliverySuppressed },
 		},
 		{
-			name: "password change",
+			name:              "password change",
+			payloadLessBefore: true,
 			event: func(suppressed bool) eventstore.Command {
 				return NewHumanPasswordChangeSentEvent(ctx, agg, suppressed)
 			},
@@ -96,6 +103,10 @@ func TestDeliverySuppressed(t *testing.T) {
 					assert.Contains(t, string(payload), `"deliverySuppressed":true`)
 				} else {
 					assert.NotContains(t, string(payload), "deliverySuppressed")
+					if tt.payloadLessBefore {
+						// the stored payload must not change for events which had none before
+						assert.Nil(t, tt.event(false).Payload())
+					}
 				}
 				mapped, err := tt.mapper(&eventstore.BaseEvent{Agg: agg, Data: payload})
 				require.NoError(t, err)

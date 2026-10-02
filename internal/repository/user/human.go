@@ -313,7 +313,11 @@ type HumanInitialCodeSentEvent struct {
 	DeliverySuppressed bool `json:"deliverySuppressed,omitzero"`
 }
 
+// Payload returns nil if nothing is set, as the event had no payload before the flag was introduced.
 func (e *HumanInitialCodeSentEvent) Payload() interface{} {
+	if !e.DeliverySuppressed {
+		return nil
+	}
 	return e
 }
 
@@ -457,7 +461,11 @@ func (e *HumanInviteCodeSentEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
+// Payload returns nil if nothing is set, as the event had no payload before the flag was introduced.
 func (e *HumanInviteCodeSentEvent) Payload() interface{} {
+	if !e.DeliverySuppressed {
+		return nil
+	}
 	return e
 }
 

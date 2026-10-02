@@ -185,7 +185,11 @@ type HumanEmailCodeSentEvent struct {
 	DeliverySuppressed bool `json:"deliverySuppressed,omitzero"`
 }
 
+// Payload returns nil if nothing is set, as the event had no payload before the flag was introduced.
 func (e *HumanEmailCodeSentEvent) Payload() interface{} {
+	if !e.DeliverySuppressed {
+		return nil
+	}
 	return e
 }
 

@@ -285,6 +285,19 @@ func TestSendEmail(t *testing.T) {
 			wantSuppressed:    true,
 		},
 		{
+			name: "reserved recipient domain is suppressed before connecting to the provider",
+			channels: &testChannels{
+				emailConfig: smtpConfig,
+				rule:        smtp.Rule{SuppressReservedRecipientDomains: true},
+				noChain:     true,
+			},
+			text:              linkText,
+			displayName:       "Bob",
+			recipient:         "user@example.com",
+			wantRuleRequested: true,
+			wantSuppressed:    true,
+		},
+		{
 			name: "reserved recipient domain is suppressed without out parameter",
 			channels: &testChannels{
 				emailConfig: smtpConfig,

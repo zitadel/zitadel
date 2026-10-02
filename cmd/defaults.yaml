@@ -625,6 +625,7 @@ Notifications:
   #     RestrictCustomHTML: true
   #     # Notifications to recipients of reserved domains (RFC 2606, RFC 6761) like example.com or .test
   #     # are accepted, but not sent to the provider. The notification is marked as sent, but flagged as not delivered.
+  #     # The reserved domains include localhost, so do not enable it for a provider that delivers to a local mail sink.
   #     SuppressReservedRecipientDomains: true
   #     # Headers are added to every email. The names are canonicalized (X-Instance-Id),
   #     # the values can contain text and the placeholders {{.InstanceID}} and {{.OrgID}}.
