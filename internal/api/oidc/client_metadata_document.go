@@ -56,6 +56,10 @@ const (
 	// tighter than the shared HTTP client timeout, as the fetch happens inline on the
 	// authorization and token endpoints.
 	clientIDMetadataFetchTimeout = 5 * time.Second
+	// clientIDMetadataResolveTimeout bounds a whole shared resolution: the fetch plus the cache
+	// writes that follow it. The resolution is detached from the caller's cancellation, so this
+	// is what keeps a blocked cache connector from holding the shared call open.
+	clientIDMetadataResolveTimeout = 2 * clientIDMetadataFetchTimeout
 	// clientIDMetadataMaxCacheTTL caps how long a fetched document is cached, regardless of
 	// the Cache-Control or Expires headers the document is served with. It is the authoritative
 	// upper bound; the Caches.ClientIDMetadataDocuments.MaxAge config is a second, independent
@@ -103,21 +107,29 @@ func newClientIDMetadataAllowlist(config ClientIDMetadataDocumentConfig) (client
 	return allowlist, nil
 }
 
-// allowsAny reports whether the system allows at least one client_id URL.
-func (a clientIDMetadataAllowlist) allowsAny() bool {
-	return a.allowAny || len(a.urls) > 0
+// overlaps reports whether at least one client_id URL is allowed by both the system and an
+// instance that allows instanceURLs, or every URL the system allows if instanceAllowAny.
+func (a clientIDMetadataAllowlist) overlaps(instanceURLs []string, instanceAllowAny bool) bool {
+	if a.allowAny {
+		return instanceAllowAny || len(instanceURLs) > 0
+	}
+	if instanceAllowAny {
+		return len(a.urls) > 0
+	}
+	for _, systemURL := range a.urls {
+		for _, instanceURL := range instanceURLs {
+			if domain.ClientIDMetadataDocumentURLAllowed([]string{systemURL}, instanceURL) ||
+				domain.ClientIDMetadataDocumentURLAllowed([]string{instanceURL}, systemURL) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // allows reports whether the system allows clientID.
 func (a clientIDMetadataAllowlist) allows(clientID string) bool {
 	return a.allowAny || domain.ClientIDMetadataDocumentURLAllowed(a.urls, clientID)
-}
-
-// instanceAllowsAnyClientIDMetadataDocumentURL reports whether the instance in ctx allows at
-// least one client_id URL.
-func instanceAllowsAnyClientIDMetadataDocumentURL(ctx context.Context) bool {
-	instance := authz.GetInstance(ctx)
-	return instance.ClientIDMetadataDocumentAllowAnyURL() || len(instance.ClientIDMetadataDocumentAllowedURLs()) > 0
 }
 
 // instanceAllowsClientIDMetadataDocumentURL reports whether the instance in ctx allows clientID.
@@ -187,6 +199,7 @@ type clientIDMetadataResolver struct {
 	group               singleflight.Group
 	accessTokenLifetime time.Duration
 	idTokenLifetime     time.Duration
+	resolveTimeout      time.Duration
 	logger              *slog.Logger
 }
 
@@ -214,6 +227,7 @@ func newClientIDMetadataResolver(
 		cache:               documentCache,
 		accessTokenLifetime: accessTokenLifetime,
 		idTokenLifetime:     idTokenLifetime,
+		resolveTimeout:      clientIDMetadataResolveTimeout,
 		logger:              logger,
 	}
 }
@@ -229,15 +243,17 @@ func newClientIDMetadataResolver(
 // to that one request would let a single client disconnect abort the fetch for every waiter and,
 // worse, store the resulting failure as a negative cache entry that blocks the client_id for
 // everyone until it expires. context.WithoutCancel keeps the values (instance, features,
-// tracing) the resolution needs; the fetch stays bounded by clientIDMetadataFetchTimeout, so
-// detaching cannot leak a request that runs forever. Each caller still waits on its own
+// tracing) the resolution needs; the whole resolution, fetch and cache writes, stays bounded by
+// the resolve timeout, so detaching cannot leak a call that runs forever. Each caller still waits on its own
 // context, so a disconnected caller returns immediately instead of blocking on the shared work.
 // Supported reports whether Client ID Metadata Documents can be resolved for the instance in
-// ctx: the instance security settings must enable them, and both the system and the instance
-// must allow at least one client_id URL. Discovery advertises support only then, so a client is
-// not steered towards a mechanism that cannot resolve it.
+// ctx: the instance security settings must enable them, and at least one client_id URL must be
+// allowed by both the system and the instance. Discovery advertises support only then, so a
+// client is not steered towards a mechanism that cannot resolve it.
 func (r *clientIDMetadataResolver) Supported(ctx context.Context) bool {
-	return authz.GetInstance(ctx).EnableClientIDMetadataDocument() && r.allowlist.allowsAny() && instanceAllowsAnyClientIDMetadataDocumentURL(ctx)
+	instance := authz.GetInstance(ctx)
+	return instance.EnableClientIDMetadataDocument() &&
+		r.allowlist.overlaps(instance.ClientIDMetadataDocumentAllowedURLs(), instance.ClientIDMetadataDocumentAllowAnyURL())
 }
 
 // Handles reports whether clientID is resolved as a Client ID Metadata Document: support must be
@@ -264,8 +280,9 @@ func (r *clientIDMetadataResolver) ResolveClient(ctx context.Context, instanceID
 		}
 		return client, nil
 	}
-	resolveCtx := context.WithoutCancel(ctx)
 	results := r.group.DoChan(key, func() (any, error) {
+		resolveCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), r.resolveTimeout)
+		defer cancel()
 		return r.resolveAndCache(resolveCtx, clientID, key)
 	})
 	select {
@@ -417,7 +434,7 @@ func (r *clientIDMetadataResolver) documentToClient(ctx context.Context, clientI
 		return nil, r.invalidClient(ctx, nil, "the client id metadata document is not compliant")
 	}
 
-	return &query.OIDCClient{
+	client := &query.OIDCClient{
 		InstanceID:      authz.GetInstance(ctx).InstanceID(),
 		ClientID:        clientID,
 		State:           domain.AppStateActive,
@@ -437,7 +454,14 @@ func (r *clientIDMetadataResolver) documentToClient(ctx context.Context, clientI
 			AccessTokenLifetime: r.accessTokenLifetime,
 			IdTokenLifetime:     r.idTokenLifetime,
 		},
-	}, nil
+		// CIMD clients always use the v2 login.
+		LoginVersion: domain.LoginVersion2,
+	}
+	// Like a stored client, a CIMD client uses the login base URI the instance requires.
+	if loginV2 := authz.GetFeatures(ctx).LoginV2; loginV2.Required {
+		client.LoginBaseURI = (*query.URL)(loginV2.BaseURI)
+	}
+	return client, nil
 }
 
 // invalidClient is the single funnel for every resolution failure. They are all reported to the

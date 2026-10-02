@@ -136,7 +136,7 @@ func (p *securityPolicyProjection) reduceClientIDMetadataDocumentAllowedURLAdded
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Jx4mW", "reduce.wrong.event.type %s", instance.SecurityPolicyClientIDMetadataDocumentAllowedURLAddedEventType)
 	}
-	return p.reduceClientIDMetadataDocumentAllowedURLs(e, handler.NewArrayAppendCol(SecurityPolicyColumnClientIDMetadataDocumentAllowedURLs, e.URL)), nil
+	return p.reduceClientIDMetadataDocumentAllowedURLs(e, newArrayAppendUniqueCol(SecurityPolicyColumnClientIDMetadataDocumentAllowedURLs, e.URL)), nil
 }
 
 func (p *securityPolicyProjection) reduceClientIDMetadataDocumentAllowedURLRemoved(event eventstore.Event) (*handler.Statement, error) {
@@ -171,4 +171,16 @@ func (p *securityPolicyProjection) reduceClientIDMetadataDocumentAllowedURLs(e e
 			},
 		),
 	)
+}
+
+// newArrayAppendUniqueCol appends value to the array column unless it is already in it, so two
+// concurrent additions of the same value leave it in the array once.
+func newArrayAppendUniqueCol(column string, value any) handler.Column {
+	return handler.Column{
+		Name:  column,
+		Value: value,
+		ParameterOpt: func(placeholder string) string {
+			return "array_append(array_remove(" + column + ", " + placeholder + "), " + placeholder + ")"
+		},
+	}
 }

@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -165,6 +166,20 @@ func TestServer_ClientIDMetadataDocument_instanceAllowedURLs(t *testing.T) {
 			Url: "https://" + allowedClientIDMetadataAddress + "/oauth/../",
 		})
 		assert.Equal(t, codes.InvalidArgument, status.Code(err))
+	})
+
+	t.Run("setting duplicate or overlong urls is rejected", func(t *testing.T) {
+		for name, urls := range map[string][]string{
+			"duplicate": {allowedURL, allowedURL},
+			"overlong":  {allowedURL + strings.Repeat("a", 2048)},
+		} {
+			t.Run(name, func(t *testing.T) {
+				_, err := instance.Client.SettingsV2.SetSecuritySettings(iamCTX, &settings.SetSecuritySettingsRequest{
+					ClientIdMetadataDocument: &settings.ClientIDMetadataDocumentSettings{Enabled: true, AllowedUrls: urls},
+				})
+				assert.Equal(t, codes.InvalidArgument, status.Code(err))
+			})
+		}
 	})
 
 	t.Run("an added url is fetched", func(t *testing.T) {
