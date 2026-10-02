@@ -655,6 +655,7 @@
     "IAM_OWNER_VIEWER": "Has permission to review the whole instance, including all organizations",
     "IAM_ORG_MANAGER": "Has permission to create and manage organizations",
     "IAM_USER_MANAGER": "Has permission to create and manage users",
+    "IAM_USER_VIEWER": "Has permission to view users",
     "IAM_ADMIN_IMPERSONATOR": "Has permission to impersonate admin and end users from all organizations",
     "IAM_END_USER_IMPERSONATOR": "Has permission to impersonate end users from all organizations",
     "IAM_LOGIN_CLIENT": "Has permission to manage login applications",
