@@ -244,6 +244,7 @@ export class AppComponent {
 
     this.translate.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((language: LangChangeEvent) => {
       this.document.documentElement.lang = language.lang;
+      this.document.title = this.translate.instant('APP_NAME') + ' • ' + this.translate.instant('CONSOLE_TITLE');
     });
   }
 

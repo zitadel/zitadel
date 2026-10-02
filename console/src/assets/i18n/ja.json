@@ -1,5 +1,6 @@
 {
   "APP_NAME": "Zitadel",
+  "CONSOLE_TITLE": "管理コンソール",
   "DESCRIPTIONS": {
     "METADATA_TITLE": "メタデータ",
     "HOME": {
