@@ -25,6 +25,7 @@ import (
 	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/feature"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 func TestNewClientIDMetadataAllowlist(t *testing.T) {
@@ -575,6 +576,45 @@ func TestClientIDMetadataResolver_LoginV2BaseURI(t *testing.T) {
 		assert.Equal(t, domain.LoginVersion2, client.LoginVersion)
 		assert.Nil(t, client.LoginBaseURI)
 	})
+}
+
+// TestClientIDMetadataCacheEntry_JSONRoundTrip pins that a resolved client survives the JSON
+// round trip the PostgreSQL and Redis cache connectors apply, including the login base URI a
+// required Login V2 adds. Without that, every cache read fails and the document is refetched.
+func TestClientIDMetadataCacheEntry_JSONRoundTrip(t *testing.T) {
+	baseURI := mustParseURL(t, "https://login.example.com/ui/v2/login")
+	entry := &clientIDMetadataCacheEntry{
+		Key: clientIDMetadataCacheKey("instance", "https://app.example.com/client"),
+		Client: &query.OIDCClient{
+			ClientID:     "https://app.example.com/client",
+			RedirectURIs: []string{"https://app.example.com/callback"},
+			LoginVersion: domain.LoginVersion2,
+			LoginBaseURI: (*query.URL)(baseURI),
+		},
+		Expiry: time.Now().Add(time.Minute).UTC().Truncate(time.Second),
+	}
+	data, err := json.Marshal(entry)
+	require.NoError(t, err)
+
+	var got clientIDMetadataCacheEntry
+	require.NoError(t, json.Unmarshal(data, &got))
+	require.NotNil(t, got.Client)
+	require.NotNil(t, got.Client.LoginBaseURI)
+	assert.Equal(t, baseURI.String(), got.Client.LoginBaseURI.URL().String())
+	assert.Equal(t, entry.Client.RedirectURIs, got.Client.RedirectURIs)
+	assert.True(t, entry.Expiry.Equal(got.Expiry))
+}
+
+// TestClientIDMetadataResolver_Nil pins that a server built without a resolver treats client
+// ID metadata documents as unsupported instead of dereferencing it.
+func TestClientIDMetadataResolver_Nil(t *testing.T) {
+	var resolver *clientIDMetadataResolver
+	ctx := authz.NewMockContext("instance", "org", "",
+		authz.WithMockClientIDMetadataDocument(true),
+		authz.WithMockClientIDMetadataDocumentAllowAnyURL(true),
+	)
+	assert.False(t, resolver.Supported(ctx))
+	assert.False(t, resolver.Handles(ctx, "https://app.example.com/client"))
 }
 
 // blockingCache is a document cache whose writes block until their context is done, like a
