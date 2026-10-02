@@ -67,20 +67,19 @@ func registerCounter(counter, desc string) {
 	logging.WithFields("metric", counter).OnError(err).Panic("unable to register counter")
 }
 
-func (c *channels) Email(ctx context.Context) (*senders.Chain, *email.Config, error) {
-	emailCfg, err := c.q.GetActiveEmailConfig(ctx)
-	if err != nil {
-		return nil, nil, err
-	}
-	chain, err := senders.EmailChannels(
+func (c *channels) EmailConfig(ctx context.Context) (*email.Config, error) {
+	return c.q.GetActiveEmailConfig(ctx)
+}
+
+func (c *channels) Email(ctx context.Context, config *email.Config) (*senders.Chain, error) {
+	return senders.EmailChannels(
 		ctx,
-		emailCfg,
+		config,
 		c.q.GetFileSystemProvider,
 		c.q.GetLogProvider,
 		c.counters.success.email,
 		c.counters.failed.email,
 	)
-	return chain, emailCfg, err
 }
 
 func (c *channels) SMTPRule(ctx context.Context, config *smtp.Config, orgID string) smtp.Rule {

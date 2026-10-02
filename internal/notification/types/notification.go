@@ -30,7 +30,11 @@ type Notify func(
 ) error
 
 type ChannelChains interface {
-	Email(context.Context) (*senders.Chain, *email.Config, error)
+	// EmailConfig returns the active email provider of the instance.
+	EmailConfig(context.Context) (*email.Config, error)
+	// Email returns the channels of the email provider.
+	// The channels connect to the provider, so they are only created right before an email is sent.
+	Email(context.Context, *email.Config) (*senders.Chain, error)
 	SMS(context.Context) (*senders.Chain, *sms.Config, error)
 	Webhook(context.Context, webhook.Config) (*senders.Chain, error)
 	SecurityTokenEvent(context.Context, set.Config) (*senders.Chain, error)
@@ -56,11 +60,12 @@ func SendEmail(
 	) error {
 		// The provider is resolved before the content is rendered,
 		// because the rule of the provider defines how it is rendered.
-		emailChannels, config, err := channels.Email(ctx)
-		logging.OnError(ctx, err).Error("could not create email channel")
-		if emailChannels == nil || emailChannels.Len() == 0 {
+		// The channels are only created in [generateEmail], as they connect to the provider.
+		config, err := channels.EmailConfig(ctx)
+		if err != nil {
+			logging.OnError(ctx, err).Error("could not get email provider")
 			return zchannels.NewCancelError(
-				zerrors.ThrowPreconditionFailed(nil, "MAIL-w8nfow", "Errors.Notification.Channels.NotPresent"),
+				zerrors.ThrowPreconditionFailed(err, "MAIL-w8nfow", "Errors.Notification.Channels.NotPresent"),
 			)
 		}
 		rule := smtpRule(ctx, channels, config, user)
@@ -83,7 +88,6 @@ func SendEmail(
 		return generateEmail(
 			ctx,
 			channels,
-			emailChannels,
 			config,
 			rule,
 			user,
