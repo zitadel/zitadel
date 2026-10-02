@@ -85,14 +85,14 @@ messages are reset to their defaults. Read the current values first with
 [`GetSecuritySettings`](/apis/resources/settings_service_v2/settings-service-get-security-settings).
 </Callout>
 
-When enabled, and both the system and the instance allow at least one `client_id` URL, the
+When enabled, and at least one `client_id` URL is allowed by both the system and the instance, the
 [discovery document](/apis/openidoauth/endpoints#openid-connect-10-discovery) advertises
 `client_id_metadata_document_supported: true`.
 
 <Callout type="info">
 CIMD clients always use the v2 login, so the instance must have a v2 login configured
-(`OIDC.DefaultLoginURLV2`, or a per-client login base URI). Without it the authorization request
-cannot be routed to a login UI.
+(`OIDC.DefaultLoginURLV2`, or the base URI of the instance's required v2 login). Without it the
+authorization request cannot be routed to a login UI.
 </Callout>
 
 The settings are stored on the same security policy as the other instance security settings. Upgrading adds columns to

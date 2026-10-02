@@ -24,6 +24,7 @@ import (
 	"github.com/zitadel/zitadel/internal/cache/connector/noop"
 	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/feature"
 )
 
 func TestNewClientIDMetadataAllowlist(t *testing.T) {
@@ -37,18 +38,18 @@ func TestNewClientIDMetadataAllowlist(t *testing.T) {
 		})
 		require.NoError(t, err)
 		assert.Equal(t, clientIDMetadataAllowlist{urls: []string{"https://app.example.com/client", "https://clients.example.com/"}}, allowlist)
-		assert.True(t, allowlist.allowsAny())
+		assert.True(t, allowlist.overlaps(nil, true))
 	})
 	t.Run("nothing allowed", func(t *testing.T) {
 		allowlist, err := newClientIDMetadataAllowlist(ClientIDMetadataDocumentConfig{})
 		require.NoError(t, err)
-		assert.False(t, allowlist.allowsAny())
+		assert.False(t, allowlist.overlaps(nil, true))
 		assert.False(t, allowlist.allows("https://app.example.com/client"))
 	})
 	t.Run("any url allowed", func(t *testing.T) {
 		allowlist, err := newClientIDMetadataAllowlist(ClientIDMetadataDocumentConfig{AllowAnyURL: true})
 		require.NoError(t, err)
-		assert.True(t, allowlist.allowsAny())
+		assert.True(t, allowlist.overlaps(nil, true))
 		assert.True(t, allowlist.allows("https://app.example.com/client"))
 	})
 	for _, entry := range []string{
@@ -164,6 +165,12 @@ func TestClientIDMetadataResolver_Supported(t *testing.T) {
 		{"both allow any url", clientIDMetadataAllowlist{allowAny: true}, []authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocumentAllowAnyURL(true)}, true},
 		{"system allows nothing", clientIDMetadataAllowlist{}, []authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocumentAllowAnyURL(true)}, false},
 		{"instance allows nothing", clientIDMetadataAllowlist{allowAny: true}, nil, false},
+		{"instance url under system prefix", clientIDMetadataAllowlist{urls: []string{"https://app.example.com/"}}, []authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocumentAllowedURLs("https://app.example.com/oauth/")}, true},
+		{"system url under instance prefix", clientIDMetadataAllowlist{urls: []string{"https://app.example.com/client"}}, []authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocumentAllowedURLs("https://app.example.com/")}, true},
+		{"system allows any url, instance allows urls", clientIDMetadataAllowlist{allowAny: true}, []authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocumentAllowedURLs("https://app.example.com/client")}, true},
+		{"instance allows any url, system allows urls", clientIDMetadataAllowlist{urls: []string{"https://app.example.com/client"}}, []authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocumentAllowAnyURL(true)}, true},
+		{"lists do not overlap", clientIDMetadataAllowlist{urls: []string{"https://a.example.com/"}}, []authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocumentAllowedURLs("https://b.example.com/")}, false},
+		{"different exact urls", clientIDMetadataAllowlist{urls: []string{"https://app.example.com/a"}}, []authz.MockContextInstanceOpts{authz.WithMockClientIDMetadataDocumentAllowedURLs("https://app.example.com/b")}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -540,6 +547,78 @@ func TestClientIDMetadataResolver_InstanceAllowlist(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, clientID, client.ClientID)
 	})
+}
+
+// TestClientIDMetadataResolver_LoginV2BaseURI pins that a CIMD client uses the v2 login and,
+// like a stored client, the login base URI the instance requires.
+func TestClientIDMetadataResolver_LoginV2BaseURI(t *testing.T) {
+	server := newMetadataServer(t, http.StatusOK, "", func(clientID string) clientRegistrationRequest {
+		return clientRegistrationRequest{RedirectURIs: []string{clientID + "/callback"}, TokenEndpointAuthMethod: "none"}
+	})
+	resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
+	baseURI := mustParseURL(t, "https://login.example.com/ui/v2/login")
+
+	t.Run("login v2 required", func(t *testing.T) {
+		ctx := authz.NewMockContext("instance", "org", "",
+			authz.WithMockClientIDMetadataDocumentAllowAnyURL(true),
+			authz.WithMockFeatures(feature.Features{LoginV2: feature.LoginV2{Required: true, BaseURI: baseURI}}),
+		)
+		client, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		require.NoError(t, err)
+		assert.Equal(t, domain.LoginVersion2, client.LoginVersion)
+		require.NotNil(t, client.LoginBaseURI)
+		assert.Equal(t, baseURI.String(), (*url.URL)(client.LoginBaseURI).String())
+	})
+	t.Run("login v2 not required", func(t *testing.T) {
+		client, err := resolver.ResolveClient(testResolverContext(), "instance", server.URL+testClientIDPath)
+		require.NoError(t, err)
+		assert.Equal(t, domain.LoginVersion2, client.LoginVersion)
+		assert.Nil(t, client.LoginBaseURI)
+	})
+}
+
+// blockingCache is a document cache whose writes block until their context is done, like a
+// connector whose backend does not answer.
+type blockingCache struct {
+	cache.Cache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]
+	setReturned chan struct{}
+}
+
+func (c *blockingCache) Set(ctx context.Context, _ *clientIDMetadataCacheEntry) {
+	<-ctx.Done()
+	close(c.setReturned)
+}
+
+// TestClientIDMetadataResolver_ResolveTimeout pins that the shared resolution, which does not
+// inherit the caller's cancellation, is still bounded as a whole: a cache write that never
+// returns on its own is cancelled by the resolve timeout instead of holding the call open.
+func TestClientIDMetadataResolver_ResolveTimeout(t *testing.T) {
+	server := newMetadataServer(t, http.StatusOK, "", func(clientID string) clientRegistrationRequest {
+		return clientRegistrationRequest{RedirectURIs: []string{clientID + "/callback"}, TokenEndpointAuthMethod: "none"}
+	})
+	documentCache := &blockingCache{
+		Cache:       noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry](),
+		setReturned: make(chan struct{}),
+	}
+	resolver := newTestResolver(server.URL, server.Client(), documentCache)
+	resolver.resolveTimeout = 200 * time.Millisecond
+
+	resolved := make(chan error, 1)
+	go func() {
+		_, err := resolver.ResolveClient(testResolverContext(), "instance", server.URL+testClientIDPath)
+		resolved <- err
+	}()
+	select {
+	case err := <-resolved:
+		require.NoError(t, err)
+	case <-time.After(5 * time.Second):
+		t.Fatal("the resolution was not bounded by the resolve timeout")
+	}
+	select {
+	case <-documentCache.setReturned:
+	default:
+		t.Fatal("the cache write was not cancelled by the resolve timeout")
+	}
 }
 
 // TestClientIDMetadataResolver_ClientIDMismatch pins that the document must name the URL it is
