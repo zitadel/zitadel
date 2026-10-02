@@ -623,11 +623,10 @@ Notifications:
   #     # Removes HTML from custom message texts. Simple formatting (br, strong, b, em, i, u, p) is kept,
   #     # all other elements like links, images or styles are removed, their text is kept.
   #     RestrictCustomHTML: true
-  #     # Headers are added to every email. The values can contain text
-  #     # and the placeholders {{.InstanceID}} and {{.OrgID}}.
+  #     # Headers are added to every email. The names are canonicalized (X-Instance-Id),
+  #     # the values can contain text and the placeholders {{.InstanceID}} and {{.OrgID}}.
   #     Headers:
-  #       - Name: X-Instance-ID
-  #         Value: "{{.InstanceID}}"
+  #       X-Instance-ID: "{{.InstanceID}}"
   SMTPRules: [] # ZITADEL_NOTIFICATIONS_SMTPRULES
 
 Executions:

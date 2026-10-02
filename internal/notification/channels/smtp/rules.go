@@ -3,7 +3,9 @@ package smtp
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"net"
+	"net/textproto"
 	"slices"
 	"strings"
 
@@ -20,7 +22,9 @@ type RuleConfig struct {
 	// all other elements like links, images or styles are removed, their text is kept.
 	RestrictCustomHTML bool
 	// Headers are added to every email sent through the matching provider.
-	Headers []RuleHeader
+	// The names are canonicalized (e.g. x-instance-id becomes X-Instance-Id),
+	// the values can contain text and the placeholders {{.InstanceID}} and {{.OrgID}}.
+	Headers map[string]string
 }
 
 // RuleMatch defines the criteria a SMTP provider must fulfill for the rule to be applied.
@@ -33,14 +37,6 @@ type RuleMatch struct {
 	Users []string
 	// SenderDomains are the domains of the sender address.
 	SenderDomains []string
-}
-
-// RuleHeader is a list entry instead of a map, because keys of maps
-// are lower-cased when read from the runtime configuration.
-type RuleHeader struct {
-	Name string
-	// Value can contain text and the placeholders {{.InstanceID}} and {{.OrgID}}.
-	Value string
 }
 
 // RuleData provides the values of the placeholders of the header values.
@@ -73,7 +69,8 @@ type compiledRule struct {
 	users              []string
 	senderDomains      []string
 	restrictCustomHTML bool
-	headers            []RuleHeader
+	// headers with canonical names
+	headers map[string]string
 }
 
 type hostPort struct {
@@ -104,22 +101,30 @@ func CompileRules(configs []RuleConfig) (Rules, error) {
 
 var errUnsupportedHeaderValue = errors.New("value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}")
 
-func compileHeaders(configs []RuleHeader) ([]RuleHeader, error) {
-	headers := make([]RuleHeader, len(configs))
-	for i, config := range configs {
-		if !messages.IsValidEmailHeaderName(config.Name) {
-			return nil, fmt.Errorf("header %q: invalid name", config.Name)
+// compileHeaders validates the headers and canonicalizes their names.
+// Names are matched case-insensitively, so they must not only differ in case.
+func compileHeaders(configs map[string]string) (map[string]string, error) {
+	headers := make(map[string]string, len(configs))
+	// iterate in a defined order to report the same error on every start
+	for _, name := range slices.Sorted(maps.Keys(configs)) {
+		value := configs[name]
+		if !messages.IsValidEmailHeaderName(name) {
+			return nil, fmt.Errorf("header %q: invalid name", name)
 		}
-		if messages.IsReservedEmailHeader(config.Name) {
-			return nil, fmt.Errorf("header %q: reserved name", config.Name)
+		if messages.IsReservedEmailHeader(name) {
+			return nil, fmt.Errorf("header %q: reserved name", name)
 		}
-		if !messages.IsValidEmailHeaderValue(config.Value) {
-			return nil, fmt.Errorf("header %q: value must not contain line breaks", config.Name)
+		if !messages.IsValidEmailHeaderValue(value) {
+			return nil, fmt.Errorf("header %q: value must not contain line breaks", name)
 		}
-		if !isValidHeaderValue(config.Value) {
-			return nil, fmt.Errorf("header %q: %w", config.Name, errUnsupportedHeaderValue)
+		if !isValidHeaderValue(value) {
+			return nil, fmt.Errorf("header %q: %w", name, errUnsupportedHeaderValue)
 		}
-		headers[i] = config
+		canonical := textproto.CanonicalMIMEHeaderKey(name)
+		if _, ok := headers[canonical]; ok {
+			return nil, fmt.Errorf("header %q: duplicate name", name)
+		}
+		headers[canonical] = value
 	}
 	return headers, nil
 }
@@ -161,12 +166,11 @@ func (r *compiledRule) renderHeaders(data RuleData) map[string]string {
 		return nil
 	}
 	headers := make(map[string]string, len(r.headers))
-	for _, header := range r.headers {
-		value := header.Value
+	for name, value := range r.headers {
 		for placeholder, render := range headerPlaceholders {
 			value = strings.ReplaceAll(value, placeholder, render(data))
 		}
-		headers[header.Name] = value
+		headers[name] = value
 	}
 	return headers
 }
