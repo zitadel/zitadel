@@ -22,18 +22,27 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 )
 
-var wantSMTPRules = []smtp.RuleConfig{{
-	Match: smtp.RuleMatch{
+// assertSMTPRules checks the rules through the compiled result,
+// because keys of maps are lower-cased by viper when read from YAML, but not from the JSON string.
+func assertSMTPRules(t *testing.T, configs []smtp.RuleConfig) {
+	t.Helper()
+	require.Len(t, configs, 1)
+	assert.Equal(t, smtp.RuleMatch{
 		Hosts:         []string{"smtp.example.com"},
 		Users:         []string{"token"},
 		SenderDomains: []string{"example.com"},
-	},
-	RestrictCustomHTML: true,
-	Headers: []smtp.RuleHeader{{
-		Name:  "X-Instance-ID",
-		Value: "{{.InstanceID}}",
-	}},
-}}
+	}, configs[0].Match)
+	rules, err := smtp.CompileRules(configs)
+	require.NoError(t, err)
+	provider := &smtp.Config{
+		SMTP: smtp.SMTP{Host: "smtp.example.com:587", PlainAuth: &smtp.PlainAuthConfig{User: "token"}},
+		From: "noreply@example.com",
+	}
+	assert.Equal(t, smtp.Rule{
+		RestrictCustomHTML: true,
+		Headers:            map[string]string{"X-Instance-Id": "instance1"},
+	}, rules.Match(provider, smtp.RuleData{InstanceID: "instance1", OrgID: "org1"}))
+}
 
 func Test_readConfig(t *testing.T) {
 	encodedKey := "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF6aStGRlNKTDdmNXl3NEtUd3pnTQpQMzRlUEd5Y20vTStrVDBNN1Y0Q2d4NVYzRWFESXZUUUtUTGZCYUVCNDV6YjlMdGpJWHpEdzByWFJvUzJoTzZ0CmgrQ1lRQ3ozS0N2aDA5QzBJenhaaUIySVMzSC9hVCs1Qng5RUZZK3ZuQWtaamNjYnlHNVlOUnZtdE9sbnZJZUkKSDdxWjB0RXdrUGZGNUdFWk5QSlB0bXkzVUdWN2lvZmRWUVMxeFJqNzMrYU13NXJ2SDREOElkeWlBQzNWZWtJYgpwdDBWajBTVVgzRHdLdG9nMzM3QnpUaVBrM2FYUkYwc2JGaFFvcWRKUkk4TnFnWmpDd2pxOXlmSTV0eXhZc3duCitKR3pIR2RIdlczaWRPRGxtd0V0NUsycGFzaVJJV0syT0dmcSt3MEVjbHRRSGFidXFFUGdabG1oQ2tSZE5maXgKQndJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg=="
@@ -304,25 +313,24 @@ Notifications:
           - example.com
       RestrictCustomHTML: true
       Headers:
-        - Name: X-Instance-ID
-          Value: "{{.InstanceID}}"
+        X-Instance-ID: "{{.InstanceID}}"
 Log:
   Level: info
 `},
 		want: func(t *testing.T, config *Config) {
-			assert.Equal(t, wantSMTPRules, config.Notifications.SMTPRules)
+			assertSMTPRules(t, config.Notifications.SMTPRules)
 		},
 	}, {
 		name: "smtp rules string ok",
 		args: args{yaml: `
 Notifications:
   SMTPRules: >
-    [{"Match": {"Hosts": ["smtp.example.com"], "Users": ["token"], "SenderDomains": ["example.com"]}, "RestrictCustomHTML": true, "Headers": [{"Name": "X-Instance-ID", "Value": "{{.InstanceID}}"}]}]
+    [{"Match": {"Hosts": ["smtp.example.com"], "Users": ["token"], "SenderDomains": ["example.com"]}, "RestrictCustomHTML": true, "Headers": {"X-Instance-ID": "{{.InstanceID}}"}}]
 Log:
   Level: info
 `},
 		want: func(t *testing.T, config *Config) {
-			assert.Equal(t, wantSMTPRules, config.Notifications.SMTPRules)
+			assertSMTPRules(t, config.Notifications.SMTPRules)
 		},
 	}}
 	for _, tt := range tests {

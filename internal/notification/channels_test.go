@@ -17,9 +17,9 @@ func Test_channels_SMTPRule(t *testing.T) {
 			SenderDomains: []string{"m.example.com"},
 		},
 		RestrictCustomHTML: true,
-		Headers: []smtp.RuleHeader{
-			{Name: "X-Instance-ID", Value: "{{.InstanceID}}"},
-			{Name: "X-Org-ID", Value: "{{.OrgID}}"},
+		Headers: map[string]string{
+			"X-Instance-Id": "{{.InstanceID}}",
+			"X-Org-Id":      "{{.OrgID}}",
 		},
 	}})
 	require.NoError(t, err)
@@ -49,8 +49,8 @@ func Test_channels_SMTPRule(t *testing.T) {
 			want: smtp.Rule{
 				RestrictCustomHTML: true,
 				Headers: map[string]string{
-					"X-Instance-ID": "instance1",
-					"X-Org-ID":      "org1",
+					"X-Instance-Id": "instance1",
+					"X-Org-Id":      "org1",
 				},
 			},
 		},
