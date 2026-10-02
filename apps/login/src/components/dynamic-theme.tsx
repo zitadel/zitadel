@@ -56,14 +56,7 @@ export function DynamicTheme({
                     <div className="from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 flex w-1/2 flex-col justify-center bg-gradient-to-br p-4 lg:p-8">
                       <div className="mx-auto max-w-[440px] space-y-8">
                         {/* Logo and branding */}
-                        {branding && (
-                          <Logo
-                            lightSrc={branding.lightTheme?.logoUrl}
-                            darkSrc={branding.darkTheme?.logoUrl}
-                            height={150}
-                            width={150}
-                          />
-                        )}
+                        {branding && <Logo lightSrc={branding.lightTheme?.logoUrl} darkSrc={branding.darkTheme?.logoUrl} />}
 
                         {/* First child content (title, description) - only if we have left/right structure */}
                         {hasLeftRightStructure && (
@@ -100,14 +93,7 @@ export function DynamicTheme({
                 <Card>
                   <div className="mx-auto flex flex-col items-center space-y-8">
                     <div className="relative flex flex-row items-center justify-center">
-                      {branding && (
-                        <Logo
-                          lightSrc={branding.lightTheme?.logoUrl}
-                          darkSrc={branding.darkTheme?.logoUrl}
-                          height={150}
-                          width={150}
-                        />
-                      )}
+                      {branding && <Logo lightSrc={branding.lightTheme?.logoUrl} darkSrc={branding.darkTheme?.logoUrl} />}
                     </div>
 
                     {hasMultipleChildren ? (
