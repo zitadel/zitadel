@@ -34,7 +34,9 @@ var _ ChannelChains = (*testChannels)(nil)
 
 // testChannels records the messages passed to the channels.
 type testChannels struct {
-	noChannel   bool
+	noChannel bool
+	// noChain simulates a failed connection to the provider
+	noChain     bool
 	emailConfig *email.Config
 	rule        smtp.Rule
 
@@ -60,6 +62,9 @@ func (c *testChannels) EmailConfig(context.Context) (*email.Config, error) {
 
 func (c *testChannels) Email(context.Context, *email.Config) (*senders.Chain, error) {
 	c.chainsCreated++
+	if c.noChain {
+		return senders.ChainChannels(), nil
+	}
 	return c.chain(), nil
 }
 
@@ -118,6 +123,7 @@ func TestSendEmail(t *testing.T) {
 		urlTemplate       string
 		wantRuleRequested bool
 		wantErr           func(t *testing.T, err error)
+		wantChainsCreated int
 		wantMessage       zchannels.Message
 	}{
 		{
@@ -126,6 +132,16 @@ func TestSendEmail(t *testing.T) {
 			wantErr: func(t *testing.T, err error) {
 				assert.ErrorIs(t, err, new(zchannels.CancelError))
 			},
+		},
+		{
+			name:              "no connection to the provider, canceled",
+			channels:          &testChannels{emailConfig: smtpConfig, noChain: true},
+			text:              linkText,
+			wantRuleRequested: true,
+			wantErr: func(t *testing.T, err error) {
+				assert.ErrorIs(t, err, new(zchannels.CancelError))
+			},
+			wantChainsCreated: 1,
 		},
 		{
 			name:              "invalid url template, no connection to the provider",
@@ -289,7 +305,7 @@ func TestSendEmail(t *testing.T) {
 				tt.wantErr(t, err)
 				assert.Empty(t, tt.channels.messages)
 				// the channels connect to the provider, they must not be created if nothing is sent
-				assert.Zero(t, tt.channels.chainsCreated)
+				assert.Equal(t, tt.wantChainsCreated, tt.channels.chainsCreated)
 				return
 			}
 			require.NoError(t, err)

@@ -40,6 +40,8 @@ func TestIsValidEmailHeaderName(t *testing.T) {
 		{name: "X-Header:", want: false},
 		{name: "X-Header\r\nBcc", want: false},
 		{name: "X-Hëader", want: false},
+		{name: "X-(Meta)", want: false},
+		{name: "X-Meta/1", want: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
