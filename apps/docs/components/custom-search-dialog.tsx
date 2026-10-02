@@ -27,33 +27,14 @@ function escapeRegExp(string: string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-// --- MARKDOWN STRIPPER ---
-// Converts raw MDX/Markdown syntax into clean prose
-function stripMarkdown(markdown: string): string {
-    if (!markdown) return '';
-    return markdown
-        .replace(/```[\s\S]*?```/g, '')             // Remove multi-line code blocks
-        .replace(/`([^`]+)`/g, '$1')                 // Remove inline code ticks
-        .replace(/#{1,6}\s+/g, '')                  // Remove headers (###)
-        .replace(/!\[.*?\]\(.*?\)/g, '')            // Remove images
-        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')     // Convert links [text](url) -> text
-        .replace(/[*_~]{1,3}([^*_~]+)[*_~]{1,3}/g, '$1') // Remove bold / italic / strikethrough
-        .replace(/^\s*>\s+/gm, '')                  // Remove blockquotes
-        .replace(/<[^>]*>/g, '')                    // Remove HTML / MDX tags
-        .replace(/\s+/g, ' ')                       // Collapse multiple whitespace/newlines
-        .trim();
-}
-
 // --- POLISHED HIGHLIGHT COMPONENT ---
 const HighlightMatch = ({ text, query }: { text: string; query: string }) => {
-    const cleanText = stripMarkdown(text);
-
-    if (!query || !cleanText) {
-        return <span className="text-xs text-muted-foreground line-clamp-2">{cleanText}</span>;
+    if (!query || !text) {
+        return <span className="text-xs text-muted-foreground line-clamp-2">{text}</span>;
     }
 
     const safeRegex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
-    const parts = cleanText.split(safeRegex);
+    const parts = text.split(safeRegex);
 
     return (
         <span className="text-xs text-muted-foreground line-clamp-2">
@@ -76,6 +57,7 @@ const HighlightMatch = ({ text, query }: { text: string; query: string }) => {
 export default function CustomSearchDialog(props: SharedProps) {
     const [query, setQuery] = useState('');
     const [debouncedQuery, setDebouncedQuery] = useState('');
+    const [searchType, setSearchType] = useState<'docs' | 'api'>('docs');
     const [results, setResults] = useState<SearchResultItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -102,7 +84,7 @@ export default function CustomSearchDialog(props: SharedProps) {
 
         async function fetchResults() {
             try {
-                const searchUrl = `/docs/api/search?q=${encodeURIComponent(debouncedQuery)}&tag=${encodeURIComponent(currentVersion)}`;
+                const searchUrl = `/docs/api/search?q=${encodeURIComponent(debouncedQuery)}&type=${searchType}&tag=${encodeURIComponent(currentVersion)}`;
                 const res = await fetch(searchUrl, { signal: abortController.signal });
 
                 if (!res.ok) throw new Error('Search failed');
@@ -125,6 +107,7 @@ export default function CustomSearchDialog(props: SharedProps) {
                                     <span className="font-medium text-foreground">
                                         {item.title || 'Documentation Page'}
                                     </span>
+                                    {/* Text is now pre-cleaned by the backend ingestion! */}
                                     <HighlightMatch text={item.description || ''} query={debouncedQuery} />
                                 </div>
                             ),
@@ -151,7 +134,7 @@ export default function CustomSearchDialog(props: SharedProps) {
         fetchResults();
 
         return () => abortController.abort();
-    }, [debouncedQuery, currentVersion]);
+    }, [debouncedQuery, searchType, currentVersion]);
 
     return (
         <SearchDialog
@@ -161,24 +144,55 @@ export default function CustomSearchDialog(props: SharedProps) {
         >
             <SearchDialogOverlay />
             <SearchDialogContent>
-                <SearchDialogHeader>
-                    <SearchDialogIcon />
-                    <SearchDialogInput placeholder="Search documentation..." />
+                <SearchDialogHeader className="flex flex-col gap-2 border-b pb-2">
+                    <div className="flex items-center gap-2 w-full">
+                        <SearchDialogIcon />
+                        <SearchDialogInput placeholder={searchType === 'docs' ? 'Search documentation...' : 'Search API endpoints...'} />
 
-                    {isLoading && (
-                        <div className="flex items-center justify-center px-2">
-                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                        </div>
-                    )}
+                        {isLoading && (
+                            <div className="flex items-center justify-center px-2">
+                                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                            </div>
+                        )}
 
-                    <SearchDialogClose />
+                        <SearchDialogClose />
+                    </div>
+
+                    <div className="flex justify-start w-full gap-1 px-3 pt-1">
+                        <button
+                            type="button"
+                            onClick={() => setSearchType('docs')}
+                            className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${searchType === 'docs'
+                                ? 'bg-primary/10 text-primary border border-primary/20'
+                                : 'text-muted-foreground hover:bg-muted'
+                                }`}
+                        >
+                            Guides & Docs
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setSearchType('api')}
+                            className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${searchType === 'api'
+                                ? 'bg-primary/10 text-primary border border-primary/20'
+                                : 'text-muted-foreground hover:bg-muted'
+                                }`}
+                        >
+                            API Endpoints
+                        </button>
+                    </div>
                 </SearchDialogHeader>
 
-                <SearchDialogList items={results} />
+                {results.length > 0 && <SearchDialogList items={results} />}
+
+                {!debouncedQuery && (
+                    <div className="p-6 text-center text-sm text-muted-foreground">
+                        Type a query to search {searchType === 'docs' ? 'Guides & Docs' : 'API Endpoints'}.
+                    </div>
+                )}
 
                 {!isLoading && debouncedQuery && results.length === 0 && (
                     <div className="p-6 text-center text-sm text-muted-foreground">
-                        No results found for "<span className="font-semibold text-foreground">{debouncedQuery}</span>".
+                        No results found in {searchType === 'docs' ? 'Docs' : 'API Endpoints'} for "<span className="font-semibold text-foreground">{debouncedQuery}</span>".
                     </div>
                 )}
             </SearchDialogContent>
