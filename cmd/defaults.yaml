@@ -1150,6 +1150,9 @@ HTTPClient:
   # CRITICAL SECURITY NOTE: Domain rules (like "localhost") protect application-layer string matches.
   # Underneath, the network dialer relies exclusively on the CIDR ranges below to block resolved IPs and prevent DNS Rebinding.
   # Do not remove the CIDR subnets even if a domain mapping exists.
+  # When outgoing requests go through a proxy (HTTP_PROXY / HTTPS_PROXY), the dialer only reaches the proxy. ZITADEL then
+  # checks each target against this list by resolving its hostname before contacting the proxy, but the proxy resolves
+  # the hostname again on its own, so the proxy must enforce the same deny rules for the protection to hold.
   DenyList: # ZITADEL_HTTPCLIENT_DENYLIST (comma separated list)
     - localhost
     - "0.0.0.0/8"       # Unspecified IPv4 address range / Local network routing trick protection
