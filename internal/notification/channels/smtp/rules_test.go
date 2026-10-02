@@ -21,46 +21,53 @@ func TestCompileRules(t *testing.T) {
 			name: "valid rule",
 			configs: []RuleConfig{{
 				Match:   RuleMatch{Hosts: []string{"smtp.example.com"}, Users: []string{"token"}},
-				Headers: []RuleHeader{{Name: "X-Instance-ID", Value: "{{.InstanceID}}"}},
+				Headers: map[string]string{"X-Instance-ID": "{{.InstanceID}}"},
 			}},
 		},
 		{
 			name: "text and placeholders",
 			configs: []RuleConfig{{
-				Headers: []RuleHeader{
-					{Name: "X-Header", Value: "prefix-{{.InstanceID}}-{{.OrgID}}-suffix"},
-					{Name: "X-Empty", Value: ""},
-					{Name: "X-Text", Value: "text"},
+				Headers: map[string]string{
+					"X-Header": "prefix-{{.InstanceID}}-{{.OrgID}}-suffix",
+					"X-Empty":  "",
+					"X-Text":   "text",
 				},
 			}},
 		},
 		{
 			name: "invalid header name",
 			configs: []RuleConfig{{
-				Headers: []RuleHeader{{Name: "X Invalid", Value: "value"}},
+				Headers: map[string]string{"X Invalid": "value"},
 			}},
 			wantErr: `smtp rule 0: header "X Invalid": invalid name`,
 		},
 		{
 			name: "header name with line break",
 			configs: []RuleConfig{{
-				Headers: []RuleHeader{{Name: "X-Header\r\nBcc", Value: "value"}},
+				Headers: map[string]string{"X-Header\r\nBcc": "value"},
 			}},
 			wantErr: "invalid name",
 		},
 		{
 			name: "reserved header name, case insensitive",
 			configs: []RuleConfig{{}, {
-				Headers: []RuleHeader{{Name: "reply-to", Value: "value"}},
+				Headers: map[string]string{"reply-to": "value"},
 			}},
 			wantErr: `smtp rule 1: header "reply-to": reserved name`,
 		},
 		{
 			name: "header value with line break",
 			configs: []RuleConfig{{
-				Headers: []RuleHeader{{Name: "X-Header", Value: "value\r\nBcc: attacker@example.com"}},
+				Headers: map[string]string{"X-Header": "value\r\nBcc: attacker@example.com"},
 			}},
 			wantErr: "value must not contain line breaks",
+		},
+		{
+			name: "header names differing in case only",
+			configs: []RuleConfig{{
+				Headers: map[string]string{"X-Header": "first", "x-header": "second"},
+			}},
+			wantErr: `smtp rule 0: header "x-header": duplicate name`,
 		},
 	}
 	unsupported := []struct {
@@ -87,7 +94,7 @@ func TestCompileRules(t *testing.T) {
 		}{
 			name: "unsupported value, " + u.name,
 			configs: []RuleConfig{{
-				Headers: []RuleHeader{{Name: "X-Header", Value: u.value}},
+				Headers: map[string]string{"X-Header": u.value},
 			}},
 			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
 		})
@@ -313,14 +320,14 @@ func TestRules_Match(t *testing.T) {
 			configs: []RuleConfig{
 				{
 					Match:   RuleMatch{Hosts: []string{"smtp.other.example"}},
-					Headers: []RuleHeader{{Name: "X-Rule", Value: "first"}},
+					Headers: map[string]string{"X-Rule": "first"},
 				},
 				{
 					Match:   RuleMatch{Hosts: []string{"smtp.example.com"}},
-					Headers: []RuleHeader{{Name: "X-Rule", Value: "second"}},
+					Headers: map[string]string{"X-Rule": "second"},
 				},
 				{
-					Headers: []RuleHeader{{Name: "X-Rule", Value: "third"}},
+					Headers: map[string]string{"X-Rule": "third"},
 				},
 			},
 			config: defaultProvider,
@@ -335,21 +342,37 @@ func TestRules_Match(t *testing.T) {
 					SenderDomains: []string{"example.com"},
 				},
 				RestrictCustomHTML: true,
-				Headers: []RuleHeader{
-					{Name: "X-Instance-ID", Value: "{{.InstanceID}}"},
-					{Name: "X-Org-ID", Value: "{{.OrgID}}"},
-					{Name: "X-Tag", Value: "{{.InstanceID}}-{{.OrgID}}-{{.InstanceID}}"},
-					{Name: "X-Static", Value: "static"},
+				Headers: map[string]string{
+					"X-Instance-ID": "{{.InstanceID}}",
+					"X-Org-ID":      "{{.OrgID}}",
+					"X-Tag":         "{{.InstanceID}}-{{.OrgID}}-{{.InstanceID}}",
+					"X-Static":      "static",
 				},
 			}},
 			config: defaultProvider,
 			want: Rule{
 				RestrictCustomHTML: true,
 				Headers: map[string]string{
-					"X-Instance-ID": "instance1",
-					"X-Org-ID":      "org1",
+					"X-Instance-Id": "instance1",
+					"X-Org-Id":      "org1",
 					"X-Tag":         "instance1-org1-instance1",
 					"X-Static":      "static",
+				},
+			},
+		},
+		{
+			name: "header names are canonicalized",
+			configs: []RuleConfig{{
+				Headers: map[string]string{
+					"x-pm-metadata-instance-id": "{{.InstanceID}}",
+					"X-PM-METADATA-ORG_ID":      "{{.OrgID}}",
+				},
+			}},
+			config: defaultProvider,
+			want: Rule{
+				Headers: map[string]string{
+					"X-Pm-Metadata-Instance-Id": "instance1",
+					"X-Pm-Metadata-Org_id":      "org1",
 				},
 			},
 		},
