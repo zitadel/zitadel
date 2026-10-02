@@ -416,6 +416,10 @@ Errors:
       NotFound: "Domyślna polityka powiadomień nie znaleziona"
       NotChanged: "Domyślna polityka powiadomień nie zmieniona"
       AlreadyExists: "Domyślna polityka powiadomień już istnieje"
+    SecurityPolicy:
+      ClientIDMetadataDocumentAllowedURL:
+        Invalid: "Adres URL dokumentu metadanych identyfikatora klienta jest nieprawidłowy"
+        AlreadyExists: "Adres URL dokumentu metadanych identyfikatora klienta jest już dozwolony"
   Policy:
     AlreadyExists: "Polityka już istnieje"
     Label:

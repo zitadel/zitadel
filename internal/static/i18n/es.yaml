@@ -416,6 +416,10 @@ Errors:
       NotFound: "Política de notificación por defecto no encontrada"
       NotChanged: "La política de notificación por defecto no ha cambiado"
       AlreadyExists: "La política de notificación por defecto ya existe"
+    SecurityPolicy:
+      ClientIDMetadataDocumentAllowedURL:
+        Invalid: "La URL del documento de metadatos del ID de cliente no es válida"
+        AlreadyExists: "La URL del documento de metadatos del ID de cliente ya está permitida"
   Policy:
     AlreadyExists: "La política ya existe"
     Label:

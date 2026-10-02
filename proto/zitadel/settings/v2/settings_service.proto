@@ -430,6 +430,42 @@ service SettingsService {
     };
   }
 
+  // Add Client ID Metadata Document Allowed URL
+  //
+  // Adds a client_id URL the instance resolves as a Client ID Metadata Document, without
+  // replacing the other security settings. An entry ending with a slash allows every client_id
+  // it is a prefix of. The URL must be an https URL with a path, and without userinfo, fragment
+  // or dot path segments. Adding a URL that is already allowed returns an error.
+  //
+  // A client_id is only resolved within the URLs the system allows in its runtime
+  // configuration (OIDC.ClientIDMetadataDocument), and only while client ID metadata documents
+  // are enabled in the security settings.
+  //
+  // Required permissions:
+  //   - `iam.policy.write`
+  rpc AddClientIDMetadataDocumentAllowedURL(AddClientIDMetadataDocumentAllowedURLRequest) returns (AddClientIDMetadataDocumentAllowedURLResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.write"
+      }
+    };
+  }
+
+  // Remove Client ID Metadata Document Allowed URL
+  //
+  // Removes a client_id URL the instance resolves as a Client ID Metadata Document, without
+  // replacing the other security settings. Removing a URL that is not allowed is not an error.
+  //
+  // Required permissions:
+  //   - `iam.policy.write`
+  rpc RemoveClientIDMetadataDocumentAllowedURL(RemoveClientIDMetadataDocumentAllowedURLRequest) returns (RemoveClientIDMetadataDocumentAllowedURLResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.write"
+      }
+    };
+  }
+
   // Set Organization Settings
   //
   // Sets the settings specific to an organization.
@@ -814,12 +850,59 @@ message SetSecuritySettingsRequest{
   // DynamicClientRegistrationSettings defines if OAuth 2.0 clients may register
   // themselves at runtime (RFC 7591) and whether they may do so without a token.
   DynamicClientRegistrationSettings dynamic_client_registration = 3;
+
+  // ClientIDMetadataDocumentSettings defines if a client_id that is an HTTPS URL is
+  // resolved as a Client ID Metadata Document instead of being looked up in the database.
+  ClientIDMetadataDocumentSettings client_id_metadata_document = 4;
 }
 
 message SetSecuritySettingsResponse{
   zitadel.object.v2.Details details = 1;
 }
 
+
+message AddClientIDMetadataDocumentAllowedURLRequest {
+  // The client_id URL to allow. An entry ending with a slash allows every client_id it is a
+  // prefix of.
+  string url = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 2048},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 2048;
+      example: "\"https://clients.example.com/connectors/\"";
+    }
+  ];
+}
+
+message AddClientIDMetadataDocumentAllowedURLResponse {
+  // CreationDate is the timestamp when the URL was allowed.
+  google.protobuf.Timestamp creation_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message RemoveClientIDMetadataDocumentAllowedURLRequest {
+  // The client_id URL to no longer allow, exactly as it was added.
+  string url = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 2048},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 2048;
+      example: "\"https://clients.example.com/connectors/\"";
+    }
+  ];
+}
+
+message RemoveClientIDMetadataDocumentAllowedURLResponse {
+  // DeletionDate is the timestamp when the URL was no longer allowed.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
 
 message SetOrganizationSettingsRequest {
   // Organization ID in which this settings are set.

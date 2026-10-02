@@ -199,6 +199,7 @@ type Steps struct {
 	s77StampEventPositionAtInsert           *StampEventPositionAtInsert
 	s78UniqueConstraintOwners               *UniqueConstraintOwners
 	s80Users14InstanceResourceOwnerIndex    *Users14InstanceResourceOwnerIndex
+	s81SecurityPolicies3AddCIMD             *SecurityPolicies3AddClientIDMetadataDocument
 	BackfillUniqueConstraintOwners          *BackfillUniqueConstraintOwners
 	RelationalTables                        *TransactionalTables
 }

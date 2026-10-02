@@ -250,6 +250,11 @@ func securityPolicyToSettingsPb(policy *query.SecurityPolicy) *settings.Security
 			Enabled:              policy.EnableDynamicClientRegistration,
 			AllowUnauthenticated: policy.AllowUnauthenticatedDynamicClientRegistration,
 		},
+		ClientIdMetadataDocument: &settings.ClientIDMetadataDocumentSettings{
+			Enabled:     policy.EnableClientIDMetadataDocument,
+			AllowedUrls: policy.ClientIDMetadataDocumentAllowedURLs,
+			AllowAnyUrl: policy.ClientIDMetadataDocumentAllowAnyURL,
+		},
 	}
 }
 
@@ -261,6 +266,10 @@ func securitySettingsToCommand(req *settings.SetSecuritySettingsRequest) *comman
 
 		EnableDynamicClientRegistration:               req.GetDynamicClientRegistration().GetEnabled(),
 		AllowUnauthenticatedDynamicClientRegistration: req.GetDynamicClientRegistration().GetAllowUnauthenticated(),
+
+		EnableClientIDMetadataDocument:      req.GetClientIdMetadataDocument().GetEnabled(),
+		ClientIDMetadataDocumentAllowedURLs: req.GetClientIdMetadataDocument().GetAllowedUrls(),
+		ClientIDMetadataDocumentAllowAnyURL: req.GetClientIdMetadataDocument().GetAllowAnyUrl(),
 	}
 }
 

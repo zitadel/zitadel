@@ -3,12 +3,14 @@ package projection
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"net/url"
 	"time"
 
 	"github.com/muhlemmer/gu"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	legacy_domain "github.com/zitadel/zitadel/internal/domain"
@@ -1372,6 +1374,10 @@ func (p *relationalTablesProjection) reduceSecurityPolicySet(event eventstore.Ev
 		if policyEvent.AllowedOrigins != nil {
 			allowedOrigins = *policyEvent.AllowedOrigins
 		}
+		var clientIDMetadataDocumentAllowedURLs []string
+		if policyEvent.ClientIDMetadataDocumentAllowedURLs != nil {
+			clientIDMetadataDocumentAllowedURLs = *policyEvent.ClientIDMetadataDocumentAllowedURLs
+		}
 
 		settingsRepo := repository.SecuritySettingsRepository()
 		settings := domain.SecuritySettings{
@@ -1388,10 +1394,60 @@ func (p *relationalTablesProjection) reduceSecurityPolicySet(event eventstore.Ev
 
 				EnableDynamicClientRegistration:               policyEvent.EnableDynamicClientRegistration,
 				AllowUnauthenticatedDynamicClientRegistration: policyEvent.AllowUnauthenticatedDynamicClientRegistration,
+
+				EnableClientIDMetadataDocument:      policyEvent.EnableClientIDMetadataDocument,
+				ClientIDMetadataDocumentAllowedURLs: clientIDMetadataDocumentAllowedURLs,
+				ClientIDMetadataDocumentAllowAnyURL: policyEvent.ClientIDMetadataDocumentAllowAnyURL,
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
 	}), nil
+}
+
+func (p *relationalTablesProjection) reduceSecurityPolicyClientIDMetadataDocumentAllowedURLAdded(event eventstore.Event) (*handler.Statement, error) {
+	policyEvent, err := assertEvent[*instance.SecurityPolicyClientIDMetadataDocumentAllowedURLAddedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	return reduceSecuritySettingsClientIDMetadataDocumentAllowedURL(policyEvent, []string{policyEvent.URL}, func(repo domain.SecuritySettingsRepository) database.Change {
+		return repo.AddClientIDMetadataDocumentAllowedURL(policyEvent.URL)
+	}), nil
+}
+
+func (p *relationalTablesProjection) reduceSecurityPolicyClientIDMetadataDocumentAllowedURLRemoved(event eventstore.Event) (*handler.Statement, error) {
+	policyEvent, err := assertEvent[*instance.SecurityPolicyClientIDMetadataDocumentAllowedURLRemovedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	return reduceSecuritySettingsClientIDMetadataDocumentAllowedURL(policyEvent, nil, func(repo domain.SecuritySettingsRepository) database.Change {
+		return repo.RemoveClientIDMetadataDocumentAllowedURL(policyEvent.URL)
+	}), nil
+}
+
+// reduceSecuritySettingsClientIDMetadataDocumentAllowedURL applies an array change to the
+// allowed client_id URLs of the instance security settings. The settings only exist once the
+// policy was set, so insertURLs is what a newly created row starts with.
+func reduceSecuritySettingsClientIDMetadataDocumentAllowedURL(event eventstore.Event, insertURLs []string, change func(repo domain.SecuritySettingsRepository) database.Change) *handler.Statement {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, _ string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-Wm3sX", "reduce.wrong.db.pool %T", ex)
+		}
+		insertSettings, err := json.Marshal(domain.SecuritySettingsAttributes{ClientIDMetadataDocumentAllowedURLs: insertURLs})
+		if err != nil {
+			return err
+		}
+		settingsRepo := repository.SecuritySettingsRepository()
+		return settingsRepo.SetColumns(ctx, v3_sql.SQLTx(tx),
+			&domain.Settings{
+				InstanceID: event.Aggregate().InstanceID,
+				CreatedAt:  event.CreatedAt(),
+				UpdatedAt:  event.CreatedAt(),
+				Settings:   insertSettings,
+			},
+			change(settingsRepo),
+		)
+	})
 }
 
 func (p *relationalTablesProjection) reduceOrganizationSettingsSet(event eventstore.Event) (*handler.Statement, error) {

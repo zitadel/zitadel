@@ -419,6 +419,10 @@ Errors:
       NotFound: "Default Notification Policy not found"
       NotChanged: "Default Notification Policy not changed"
       AlreadyExists: "Default Notification Policy already exists"
+    SecurityPolicy:
+      ClientIDMetadataDocumentAllowedURL:
+        Invalid: "The client ID metadata document URL is invalid"
+        AlreadyExists: "The client ID metadata document URL is already allowed"
   Policy:
     AlreadyExists: "Policy already exists"
     Label:

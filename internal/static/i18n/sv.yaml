@@ -416,6 +416,10 @@ Errors:
       NotFound: "Standardnotifikationspolicy hittades inte"
       NotChanged: "Standardnotifikationspolicy har inte ändrats"
       AlreadyExists: "Standardnotifikationspolicy finns redan"
+    SecurityPolicy:
+      ClientIDMetadataDocumentAllowedURL:
+        Invalid: "URL:en för klient-ID-metadatadokumentet är ogiltig"
+        AlreadyExists: "URL:en för klient-ID-metadatadokumentet är redan tillåten"
   Policy:
     AlreadyExists: "Policyn finns redan"
     Label:
