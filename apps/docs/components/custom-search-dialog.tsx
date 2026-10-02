@@ -22,12 +22,10 @@ type SearchResultItem = {
     type: 'page';
 };
 
-// --- RegExp Escape Utility ---
 function escapeRegExp(string: string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-// --- POLISHED HIGHLIGHT COMPONENT ---
 const HighlightMatch = ({ text, query }: { text: string; query: string }) => {
     if (!query || !text) {
         return <span className="text-xs text-muted-foreground line-clamp-2">{text}</span>;
@@ -61,6 +59,9 @@ export default function CustomSearchDialog(props: SharedProps) {
     const [results, setResults] = useState<SearchResultItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
+    // New error state to track backend failures
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
     const params = useParams();
     const slug = params?.slug as string[] | undefined;
     const currentVersion = getVersionFromSlug(slug);
@@ -76,10 +77,12 @@ export default function CustomSearchDialog(props: SharedProps) {
         if (!debouncedQuery.trim()) {
             setResults([]);
             setIsLoading(false);
+            setErrorMsg(null);
             return;
         }
 
         setIsLoading(true);
+        setErrorMsg(null);
         const abortController = new AbortController();
 
         async function fetchResults() {
@@ -87,10 +90,12 @@ export default function CustomSearchDialog(props: SharedProps) {
                 const searchUrl = `/docs/api/search?q=${encodeURIComponent(debouncedQuery)}&type=${searchType}&tag=${encodeURIComponent(currentVersion)}`;
                 const res = await fetch(searchUrl, { signal: abortController.signal });
 
-                if (!res.ok) throw new Error('Search failed');
+                if (!res.ok) {
+                    if (res.status === 429) throw new Error('Too many requests. Please slow down.');
+                    throw new Error('Search service is currently unavailable.');
+                }
 
                 const data = await res.json();
-
                 const seenUrls = new Set<string>();
                 const formattedResults: SearchResultItem[] = [];
 
@@ -107,7 +112,6 @@ export default function CustomSearchDialog(props: SharedProps) {
                                     <span className="font-medium text-foreground">
                                         {item.title || 'Documentation Page'}
                                     </span>
-                                    {/* Text is now pre-cleaned by the backend ingestion! */}
                                     <HighlightMatch text={item.description || ''} query={debouncedQuery} />
                                 </div>
                             ),
@@ -124,10 +128,14 @@ export default function CustomSearchDialog(props: SharedProps) {
             } catch (err: any) {
                 if (err.name !== 'AbortError') {
                     console.error('Search error:', err);
+                    setErrorMsg(err.message);
                     setResults([]);
                 }
             } finally {
-                setIsLoading(false);
+                // Fix: Only clear loading if this specific request wasn't superseded/aborted
+                if (!abortController.signal.aborted) {
+                    setIsLoading(false);
+                }
             }
         }
 
@@ -184,13 +192,20 @@ export default function CustomSearchDialog(props: SharedProps) {
 
                 {results.length > 0 && <SearchDialogList items={results} />}
 
-                {!debouncedQuery && (
+                {/* Explicit Error State */}
+                {errorMsg && !isLoading && (
+                    <div className="p-6 text-center text-sm text-red-500 font-medium">
+                        {errorMsg}
+                    </div>
+                )}
+
+                {!debouncedQuery && !errorMsg && (
                     <div className="p-6 text-center text-sm text-muted-foreground">
                         Type a query to search {searchType === 'docs' ? 'Guides & Docs' : 'API Endpoints'}.
                     </div>
                 )}
 
-                {!isLoading && debouncedQuery && results.length === 0 && (
+                {!isLoading && debouncedQuery && results.length === 0 && !errorMsg && (
                     <div className="p-6 text-center text-sm text-muted-foreground">
                         No results found in {searchType === 'docs' ? 'Docs' : 'API Endpoints'} for "<span className="font-semibold text-foreground">{debouncedQuery}</span>".
                     </div>
