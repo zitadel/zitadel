@@ -9,6 +9,7 @@
     "fetch:remote-content": "node scripts/fetch-remote-content.mjs",
     "generate:proto-docs": "node scripts/generate-proto-docs.mjs",
     "generate:api-reference": "node scripts/generate-api-reference.ts --only-generate",
+    "generate:rag-endpoints": "tsx scripts/generate-rag-endpoints.ts",
     "fix:api-links": "node scripts/generate-api-reference.ts --only-fix",
     "build:mdx-source": "fumadocs-mdx",
     "build": "next build",
