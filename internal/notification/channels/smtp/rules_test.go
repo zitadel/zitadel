@@ -63,6 +63,34 @@ func TestCompileRules(t *testing.T) {
 			wantErr: "value must not contain line breaks",
 		},
 		{
+			name: "empty host",
+			configs: []RuleConfig{{
+				Match: RuleMatch{Hosts: []string{"smtp.example.com", " "}},
+			}},
+			wantErr: "smtp rule 0: match host 1: must not be empty",
+		},
+		{
+			name: "empty user",
+			configs: []RuleConfig{{
+				Match: RuleMatch{Users: []string{""}},
+			}},
+			wantErr: "smtp rule 0: match user 0: must not be empty",
+		},
+		{
+			name: "empty sender domain",
+			configs: []RuleConfig{{
+				Match: RuleMatch{SenderDomains: []string{"example.com", ""}},
+			}},
+			wantErr: "smtp rule 0: match sender domain 1: must not be empty",
+		},
+		{
+			name: "header name with non token characters",
+			configs: []RuleConfig{{
+				Headers: map[string]string{"X-(Meta)": "value"},
+			}},
+			wantErr: `smtp rule 0: header "X-(Meta)": invalid name`,
+		},
+		{
 			name: "header names differing in case only",
 			configs: []RuleConfig{{
 				Headers: map[string]string{"X-Header": "first", "x-header": "second"},

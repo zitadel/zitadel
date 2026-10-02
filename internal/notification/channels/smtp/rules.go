@@ -29,6 +29,7 @@ type RuleConfig struct {
 
 // RuleMatch defines the criteria a SMTP provider must fulfill for the rule to be applied.
 // Every defined criterion must match. If none is defined, the rule matches all SMTP providers.
+// Empty entries are rejected, as a criterion without entries would match all providers.
 type RuleMatch struct {
 	// Hosts of the SMTP provider. An entry without port matches any port.
 	Hosts []string
@@ -84,19 +85,39 @@ type hostPort struct {
 func CompileRules(configs []RuleConfig) (Rules, error) {
 	rules := make(Rules, len(configs))
 	for i, config := range configs {
-		headers, err := compileHeaders(config.Headers)
+		rule, err := compileRule(config)
 		if err != nil {
 			return nil, fmt.Errorf("smtp rule %d: %w", i, err)
 		}
-		rules[i] = &compiledRule{
-			hosts:              normalizeHosts(config.Match.Hosts),
-			users:              normalizeUsers(config.Match.Users),
-			senderDomains:      normalizeDomains(config.Match.SenderDomains),
-			restrictCustomHTML: config.RestrictCustomHTML,
-			headers:            headers,
-		}
+		rules[i] = rule
 	}
 	return rules, nil
+}
+
+func compileRule(config RuleConfig) (*compiledRule, error) {
+	hosts, err := normalizeHosts(config.Match.Hosts)
+	if err != nil {
+		return nil, err
+	}
+	users, err := normalizeUsers(config.Match.Users)
+	if err != nil {
+		return nil, err
+	}
+	senderDomains, err := normalizeDomains(config.Match.SenderDomains)
+	if err != nil {
+		return nil, err
+	}
+	headers, err := compileHeaders(config.Headers)
+	if err != nil {
+		return nil, err
+	}
+	return &compiledRule{
+		hosts:              hosts,
+		users:              users,
+		senderDomains:      senderDomains,
+		restrictCustomHTML: config.RestrictCustomHTML,
+		headers:            headers,
+	}, nil
 }
 
 var errUnsupportedHeaderValue = errors.New("value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}")
@@ -216,32 +237,37 @@ func parseHostPort(value string) hostPort {
 	return hostPort{host: strings.TrimSuffix(strings.TrimPrefix(value, "["), "]")}
 }
 
-func normalizeHosts(values []string) []hostPort {
-	hosts := make([]hostPort, 0, len(values))
-	for _, value := range values {
-		if host := parseHostPort(value); host.host != "" {
-			hosts = append(hosts, host)
+var errEmptyMatchEntry = errors.New("must not be empty")
+
+func normalizeHosts(values []string) ([]hostPort, error) {
+	hosts := make([]hostPort, len(values))
+	for i, value := range values {
+		hosts[i] = parseHostPort(value)
+		if hosts[i].host == "" {
+			return nil, fmt.Errorf("match host %d: %w", i, errEmptyMatchEntry)
 		}
 	}
-	return hosts
+	return hosts, nil
 }
 
-func normalizeUsers(values []string) []string {
-	users := make([]string, 0, len(values))
-	for _, value := range values {
-		if value = strings.TrimSpace(value); value != "" {
-			users = append(users, value)
+func normalizeUsers(values []string) ([]string, error) {
+	users := make([]string, len(values))
+	for i, value := range values {
+		users[i] = strings.TrimSpace(value)
+		if users[i] == "" {
+			return nil, fmt.Errorf("match user %d: %w", i, errEmptyMatchEntry)
 		}
 	}
-	return users
+	return users, nil
 }
 
-func normalizeDomains(values []string) []string {
-	domains := make([]string, 0, len(values))
-	for _, value := range values {
-		if value = strings.ToLower(strings.TrimSpace(value)); value != "" {
-			domains = append(domains, value)
+func normalizeDomains(values []string) ([]string, error) {
+	domains := make([]string, len(values))
+	for i, value := range values {
+		domains[i] = strings.ToLower(strings.TrimSpace(value))
+		if domains[i] == "" {
+			return nil, fmt.Errorf("match sender domain %d: %w", i, errEmptyMatchEntry)
 		}
 	}
-	return domains
+	return domains, nil
 }

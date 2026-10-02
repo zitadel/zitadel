@@ -3,6 +3,8 @@ package messages
 import (
 	"net/textproto"
 	"strings"
+
+	"golang.org/x/net/http/httpguts"
 )
 
 // reservedEmailHeaders are set by [Email.GetContent] itself
@@ -27,18 +29,11 @@ func IsReservedEmailHeader(name string) bool {
 	return ok
 }
 
-// IsValidEmailHeaderName reports whether the name is a valid header field name
-// according to RFC 5322: printable US-ASCII characters except the colon.
+// IsValidEmailHeaderName reports whether the name is a valid header field name.
+// It is restricted to the token characters of RFC 7230 (a subset of RFC 5322),
+// as only these names are canonicalized by [textproto.CanonicalMIMEHeaderKey].
 func IsValidEmailHeaderName(name string) bool {
-	if name == "" {
-		return false
-	}
-	for _, r := range name {
-		if r < 33 || r > 126 || r == ':' {
-			return false
-		}
-	}
-	return true
+	return httpguts.ValidHeaderFieldName(name)
 }
 
 // IsValidEmailHeaderValue reports whether the value can safely be written into a header.
