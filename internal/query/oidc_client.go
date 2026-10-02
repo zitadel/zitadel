@@ -54,6 +54,15 @@ func (c *URL) URL() *url.URL {
 	return (*url.URL)(c)
 }
 
+// MarshalJSON writes the URL as a JSON string, the form UnmarshalJSON reads, so a client
+// survives a round trip through a serializing cache.
+func (c *URL) MarshalJSON() ([]byte, error) {
+	if c == nil {
+		return []byte("null"), nil
+	}
+	return json.Marshal(c.URL().String())
+}
+
 func (c *URL) UnmarshalJSON(src []byte) error {
 	var s string
 	err := json.Unmarshal(src, &s)

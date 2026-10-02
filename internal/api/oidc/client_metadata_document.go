@@ -251,6 +251,9 @@ func newClientIDMetadataResolver(
 // allowed by both the system and the instance. Discovery advertises support only then, so a
 // client is not steered towards a mechanism that cannot resolve it.
 func (r *clientIDMetadataResolver) Supported(ctx context.Context) bool {
+	if r == nil {
+		return false
+	}
 	instance := authz.GetInstance(ctx)
 	return instance.EnableClientIDMetadataDocument() &&
 		r.allowlist.overlaps(instance.ClientIDMetadataDocumentAllowedURLs(), instance.ClientIDMetadataDocumentAllowAnyURL())
@@ -260,6 +263,9 @@ func (r *clientIDMetadataResolver) Supported(ctx context.Context) bool {
 // enabled for the instance in ctx and clientID must be a valid client_id URL that both the system
 // and the instance allow. Any other client_id goes through the regular client lookup.
 func (r *clientIDMetadataResolver) Handles(ctx context.Context, clientID string) bool {
+	if r == nil {
+		return false
+	}
 	return authz.GetInstance(ctx).EnableClientIDMetadataDocument() && r.allowed(ctx, clientID)
 }
 

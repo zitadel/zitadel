@@ -6,6 +6,8 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -108,4 +110,51 @@ func TestNewHTTPTransport_MalformedAddressHandling(t *testing.T) {
 	// Ensure it didn't crash and returns a clean, standard connection framework error context
 	var netErr net.Error
 	assert.True(t, errors.As(err, &netErr))
+}
+
+// TestNewHTTPTransport_BlockedThroughProxy pins that a proxy cannot be used to reach a
+// denied target: the dial only sees the proxy address, so the target is checked by URL.
+func TestNewHTTPTransport_BlockedThroughProxy(t *testing.T) {
+	t.Parallel()
+
+	var proxyHits atomic.Int32
+	proxy := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		proxyHits.Add(1)
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer proxy.Close()
+	proxyURL, err := url.Parse(proxy.URL)
+	assert.NoError(t, err)
+
+	// The proxy itself is reachable; only the target is denied. The base transport stands in
+	// for http.DefaultTransport with HTTP_PROXY set.
+	base := http.DefaultTransport.(*http.Transport).Clone()
+	base.Proxy = http.ProxyURL(proxyURL)
+	client := &http.Client{Transport: newHTTPTransport([]AddressChecker{NewHostChecker("10.0.0.0/8")}, base)}
+
+	resp, err := client.Get("http://10.1.2.3/metadata")
+	if resp != nil {
+		_ = resp.Body.Close()
+	}
+	assert.Error(t, err)
+	var denied *AddressDeniedError
+	assert.True(t, errors.As(err, &denied), "expected an AddressDeniedError, got %v", err)
+	assert.Equal(t, int32(0), proxyHits.Load(), "a denied target must not be sent to the proxy")
+
+	// An allowed target still goes through the proxy.
+	resp, err = client.Get("http://203.0.113.10/metadata")
+	assert.NoError(t, err)
+	if resp != nil {
+		_ = resp.Body.Close()
+	}
+	assert.Equal(t, int32(1), proxyHits.Load())
+}
+
+// TestNewHTTPTransport_KeepsEnvironmentProxy pins that the denylist does not disable
+// proxies: deployments that need one for egress keep using it.
+func TestNewHTTPTransport_KeepsEnvironmentProxy(t *testing.T) {
+	t.Parallel()
+
+	transport := NewHTTPTransport([]AddressChecker{NewHostChecker("10.0.0.0/8")}).(*http.Transport)
+	assert.NotNil(t, transport.Proxy)
 }

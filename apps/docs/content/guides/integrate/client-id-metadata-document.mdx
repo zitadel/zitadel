@@ -109,6 +109,7 @@ curl --request POST \
   --url ${CUSTOM_DOMAIN}/zitadel.settings.v2.SettingsService/AddClientIDMetadataDocumentAllowedURL \
   --header 'Authorization: Bearer <token of an IAM_OWNER>' \
   --header 'Content-Type: application/json' \
+  --header 'Connect-Protocol-Version: 1' \
   --data '{ "url": "https://clients.example.com/connectors/" }'
 ```
 
