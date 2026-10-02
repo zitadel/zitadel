@@ -17,14 +17,20 @@ import (
 // Rules are part of the runtime configuration and can therefore not be changed through the API.
 type RuleConfig struct {
 	Match RuleMatch
-	// RestrictCustomHTML removes HTML from custom message texts.
-	// Simple formatting (line breaks, bold, italic, underline, paragraphs) is kept,
-	// all other elements like links, images or styles are removed, their text is kept.
-	RestrictCustomHTML bool
+	// squash flattens the options into the rule in the configuration
+	RuleOptions `mapstructure:",squash"`
 	// Headers are added to every email sent through the matching provider.
 	// The names are canonicalized (e.g. x-instance-id becomes X-Instance-Id),
 	// the values can contain text and the placeholders {{.InstanceID}} and {{.OrgID}}.
 	Headers map[string]string
+}
+
+// RuleOptions are the restrictions applied to the emails sent through a matching SMTP provider.
+type RuleOptions struct {
+	// RestrictCustomHTML removes HTML from custom message texts.
+	// Simple formatting (line breaks, bold, italic, underline, paragraphs) is kept,
+	// all other elements like links, images or styles are removed, their text is kept.
+	RestrictCustomHTML bool
 }
 
 // RuleMatch defines the criteria a SMTP provider must fulfill for the rule to be applied.
@@ -58,18 +64,18 @@ var headerPlaceholders = map[string]func(RuleData) string{
 // Rule is the result of the first matching [RuleConfig].
 // The zero value is returned if no rule matches.
 type Rule struct {
-	RestrictCustomHTML bool
-	Headers            map[string]string
+	RuleOptions
+	Headers map[string]string
 }
 
 // Rules are the compiled [RuleConfig]s in the order they were defined.
 type Rules []*compiledRule
 
 type compiledRule struct {
-	hosts              []hostPort
-	users              []string
-	senderDomains      []string
-	restrictCustomHTML bool
+	hosts         []hostPort
+	users         []string
+	senderDomains []string
+	options       RuleOptions
 	// headers with canonical names
 	headers map[string]string
 }
@@ -112,11 +118,11 @@ func compileRule(config RuleConfig) (*compiledRule, error) {
 		return nil, err
 	}
 	return &compiledRule{
-		hosts:              hosts,
-		users:              users,
-		senderDomains:      senderDomains,
-		restrictCustomHTML: config.RestrictCustomHTML,
-		headers:            headers,
+		hosts:         hosts,
+		users:         users,
+		senderDomains: senderDomains,
+		options:       config.RuleOptions,
+		headers:       headers,
 	}, nil
 }
 
@@ -177,8 +183,8 @@ func (r Rules) Match(config *Config, data RuleData) Rule {
 			continue
 		}
 		return Rule{
-			RestrictCustomHTML: rule.restrictCustomHTML,
-			Headers:            rule.renderHeaders(data),
+			RuleOptions: rule.options,
+			Headers:     rule.renderHeaders(data),
 		}
 	}
 	return Rule{}
