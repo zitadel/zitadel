@@ -3,7 +3,13 @@ import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { Translated } from "@/components/translated";
 import { UsernameForm } from "@/components/username-form";
 import { getServiceConfig } from "@/lib/service-url";
-import { getActiveIdentityProviders, getBrandingSettings, getDefaultOrg, getLoginSettings } from "@/lib/zitadel";
+import {
+  getActiveIdentityProviders,
+  getAuthRequest,
+  getBrandingSettings,
+  getDefaultOrg,
+  getLoginSettings,
+} from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -28,9 +34,23 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({ serviceConfig });
-    if (org) {
-      defaultOrganization = org.id;
+    // For an OIDC auth request, honor the project's private labeling org so the configured
+    // organization branding is shown even before the user is known (see the OIDC AuthRequest's
+    // resolved private_labeling_org_id). Falls back to the instance default organization.
+    if (requestId?.startsWith("oidc_")) {
+      const { authRequest } = await getAuthRequest({
+        serviceConfig,
+        authRequestId: requestId.replace("oidc_", ""),
+      });
+      if (authRequest?.privateLabelingOrgId) {
+        defaultOrganization = authRequest.privateLabelingOrgId;
+      }
+    }
+    if (!defaultOrganization) {
+      const org: Organization | null = await getDefaultOrg({ serviceConfig });
+      if (org) {
+        defaultOrganization = org.id;
+      }
     }
   }
 

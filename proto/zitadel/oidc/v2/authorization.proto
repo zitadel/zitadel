@@ -53,6 +53,14 @@ message AuthRequest{
 
   // User ID taken from a ID Token Hint if it was present and valid.
   optional string hint_user_id = 10;
+
+  // The organization whose branding (private labeling) should be applied to the login
+  // for this authorization request. It is resolved server-side using the same rule as the
+  // legacy login: an explicit organization scope wins, otherwise the project's private
+  // labeling setting decides (EnforceProjectResourceOwnerPolicy -> the project's organization),
+  // otherwise the instance default organization. This lets the login render the configured
+  // organization branding before the user is known. Empty if it could not be resolved.
+  string private_labeling_org_id = 11;
 }
 
 enum Prompt {
