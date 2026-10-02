@@ -13,7 +13,9 @@ import (
 //
 // When a request goes through a proxy, the dial only reaches the proxy, so the dial-time
 // check never sees the target. Such requests are checked against the denylist by URL,
-// before the proxy is contacted.
+// before the proxy is contacted. That check resolves the hostname locally while the proxy
+// resolves it again, so it cannot rule out a name that resolves differently at the proxy:
+// a proxy in front of ZITADEL has to enforce the same deny rules itself.
 func NewHTTPTransport(denyList []AddressChecker) http.RoundTripper {
 	return newHTTPTransport(denyList, http.DefaultTransport.(*http.Transport).Clone())
 }
