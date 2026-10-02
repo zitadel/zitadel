@@ -29,8 +29,10 @@ func assertSMTPRules(t *testing.T, configs []smtp.RuleConfig) {
 	require.NoError(t, err)
 	provider := &smtp.Config{SMTP: smtp.SMTP{Host: "smtp.example.com:587"}}
 	assert.Equal(t, smtp.Rule{
-		RestrictCustomHTML: true,
-		Headers:            map[string]string{"X-Instance-Id": "instance1"},
+		RuleOptions: smtp.RuleOptions{
+			RestrictCustomHTML: true,
+		},
+		Headers: map[string]string{"X-Instance-Id": "instance1"},
 	}, rules.Match(provider, smtp.RuleData{InstanceID: "instance1"}))
 }
 
