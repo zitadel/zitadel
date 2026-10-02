@@ -15,12 +15,15 @@ export class CountryCallingCodesService {
 
   public getCountryCallingCodes(): CountryPhoneCode[] {
     const currentLang = this.translateService.currentLang ?? 'en';
+    const displayNames = new Intl.DisplayNames([currentLang], { type: 'region' });
+    const getCountryName = (code: CountryCode): string | undefined =>
+      i18nIsoCountries.getName(code, currentLang) || displayNames.of(code);
     const countryPhoneCodes = getCountries()
-      .filter((code: CountryCode) => i18nIsoCountries.getName(code.toString(), currentLang))
+      .filter((code: CountryCode) => getCountryName(code))
       .map((code: CountryCode) => {
         return <CountryPhoneCode>{
           countryCode: code,
-          countryName: i18nIsoCountries.getName(code.toString(), currentLang),
+          countryName: getCountryName(code),
           countryCallingCode: getCountryCallingCode(code),
         };
       })

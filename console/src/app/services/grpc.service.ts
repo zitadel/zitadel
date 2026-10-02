@@ -7,7 +7,7 @@ import { catchError, firstValueFrom, switchMap, tap } from 'rxjs';
 import { AdminServiceClient } from '../proto/generated/zitadel/AdminServiceClientPb';
 import { AuthServiceClient } from '../proto/generated/zitadel/AuthServiceClientPb';
 import { ManagementServiceClient } from '../proto/generated/zitadel/ManagementServiceClientPb';
-import { fallbackLanguage, supportedLanguagesRegexp } from '../utils/language';
+import { resolveSupportedLanguage } from '../utils/language';
 import { AuthenticationService } from './authentication.service';
 import { EnvironmentService } from './environment.service';
 import { ExhaustedService } from './exhausted.service';
@@ -72,8 +72,7 @@ export class GrpcService {
   public loadAppEnvironment(): Promise<any> {
     // We use the browser language until we can make API requests to get the users configured language.
 
-    const browserLanguage = this.translate.getBrowserLang();
-    const language = browserLanguage?.match(supportedLanguagesRegexp) ? browserLanguage : fallbackLanguage;
+    const language = resolveSupportedLanguage(this.translate.getBrowserCultureLang());
     const init = this.translate.use(language).pipe(
       switchMap(() => this.envService.env),
       tap((env) => {
