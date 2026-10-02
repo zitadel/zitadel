@@ -146,3 +146,23 @@ func TestRenderConfirmURLTemplate(t *testing.T) {
 		})
 	}
 }
+
+func TestEmailAddress_Domain(t *testing.T) {
+	tests := []struct {
+		address string
+		want    string
+	}{
+		{address: "user@example.com", want: "example.com"},
+		{address: " user@example.com ", want: "example.com"},
+		{address: "user@EXAMPLE.com", want: "EXAMPLE.com"},
+		{address: "us@er@example.com", want: "example.com"},
+		{address: "user", want: ""},
+		{address: "user@", want: ""},
+		{address: "", want: ""},
+	}
+	for _, tt := range tests {
+		t.Run(tt.address, func(t *testing.T) {
+			assert.Equal(t, tt.want, EmailAddress(tt.address).Domain())
+		})
+	}
+}

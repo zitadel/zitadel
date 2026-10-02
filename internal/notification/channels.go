@@ -6,9 +6,11 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/notification/channels/email"
 	"github.com/zitadel/zitadel/internal/notification/channels/set"
 	"github.com/zitadel/zitadel/internal/notification/channels/sms"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/notification/senders"
@@ -29,13 +31,15 @@ type deliveryMetrics struct {
 }
 
 type channels struct {
-	q        *handlers.NotificationQueries
-	counters counters
+	q         *handlers.NotificationQueries
+	counters  counters
+	smtpRules smtp.Rules
 }
 
-func newChannels(q *handlers.NotificationQueries) *channels {
+func newChannels(q *handlers.NotificationQueries, smtpRules smtp.Rules) *channels {
 	c := &channels{
-		q: q,
+		q:         q,
+		smtpRules: smtpRules,
 		counters: counters{
 			success: deliveryMetrics{
 				email: "successful_deliveries_email",
@@ -63,20 +67,26 @@ func registerCounter(counter, desc string) {
 	logging.WithFields("metric", counter).OnError(err).Panic("unable to register counter")
 }
 
-func (c *channels) Email(ctx context.Context) (*senders.Chain, *email.Config, error) {
-	emailCfg, err := c.q.GetActiveEmailConfig(ctx)
-	if err != nil {
-		return nil, nil, err
-	}
-	chain, err := senders.EmailChannels(
+func (c *channels) EmailConfig(ctx context.Context) (*email.Config, error) {
+	return c.q.GetActiveEmailConfig(ctx)
+}
+
+func (c *channels) Email(ctx context.Context, config *email.Config) (*senders.Chain, error) {
+	return senders.EmailChannels(
 		ctx,
-		emailCfg,
+		config,
 		c.q.GetFileSystemProvider,
 		c.q.GetLogProvider,
 		c.counters.success.email,
 		c.counters.failed.email,
 	)
-	return chain, emailCfg, err
+}
+
+func (c *channels) SMTPRule(ctx context.Context, config *smtp.Config, orgID string) smtp.Rule {
+	return c.smtpRules.Match(config, smtp.RuleData{
+		InstanceID: authz.GetInstance(ctx).InstanceID(),
+		OrgID:      orgID,
+	})
 }
 
 func (c *channels) SMS(ctx context.Context) (*senders.Chain, *sms.Config, error) {

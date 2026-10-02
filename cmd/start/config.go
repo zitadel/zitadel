@@ -37,6 +37,7 @@ import (
 	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/logstore"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/serviceping"
@@ -156,6 +157,7 @@ func readConfig(v *viper.Viper) (*Config, error) {
 			hook.EnumHookFunc(authz.MemberTypeString),
 			hooks.MapTypeStringDecode[domain.Feature, any],
 			hooks.SliceTypeStringDecode[*command.SetQuota],
+			hooks.SliceTypeStringDecode[smtp.RuleConfig],
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
 			hook.StringToURLHookFunc(),
