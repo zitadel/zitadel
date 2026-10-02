@@ -28,13 +28,23 @@ function readSecretFile(path: string): string | undefined {
   return fileCache.get(path);
 }
 
-function deriveKey(secret: string): Buffer {
-  let key = derivedKeyCache.get(secret);
+function deriveKey(secret: string, info: string): Buffer {
+  const cacheKey = JSON.stringify([info, secret]);
+  let key = derivedKeyCache.get(cacheKey);
   if (!key) {
-    key = Buffer.from(hkdfSync("sha256", secret, "", HKDF_INFO, DERIVED_KEY_LENGTH));
-    derivedKeyCache.set(secret, key);
+    key = Buffer.from(hkdfSync("sha256", secret, "", info, DERIVED_KEY_LENGTH));
+    derivedKeyCache.set(cacheKey, key);
   }
   return key;
+}
+
+/**
+ * HMAC-SHA256 (base64url) over `payload` with a key derived from `secret` via HKDF-SHA256 with the given
+ * `info`. Every use of the signing secrets must pass its own `info` so the derived keys are separated by
+ * purpose and a signature made for one purpose never verifies for another.
+ */
+export function hmacWithDerivedKey(secret: string, info: string, payload: string): string {
+  return createHmac("sha256", deriveKey(secret, info)).update(payload).digest("base64url");
 }
 
 /**
@@ -154,10 +164,13 @@ function canonicalPayload(session: SignableSession): string {
 }
 
 function computeSignature(session: SignableSession, secret: string): string {
-  return createHmac("sha256", deriveKey(secret)).update(canonicalPayload(session)).digest("base64url");
+  return hmacWithDerivedKey(secret, HKDF_INFO, canonicalPayload(session));
 }
 
-function signaturesEqual(left: string, right: string): boolean {
+/**
+ * Constant-time comparison of two signatures.
+ */
+export function signaturesEqual(left: string, right: string): boolean {
   const leftBytes = Buffer.from(left);
   const rightBytes = Buffer.from(right);
   if (leftBytes.length !== rightBytes.length) {

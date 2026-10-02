@@ -1,3 +1,4 @@
+import { createHmac, hkdfSync } from "crypto";
 import { mkdtempSync, writeFileSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
@@ -8,9 +9,11 @@ import {
   getSessionCookieSecretStartupNotice,
   getSessionCookieSecrets,
   hasSessionCookieSecret,
+  hmacWithDerivedKey,
   isUsingCredentialFallback,
   parseAndVerifySessions,
   signSession,
+  signaturesEqual,
   stripSessionSignature,
   verifySession,
 } from "./session-cookie-signature";
@@ -58,6 +61,36 @@ describe("session-cookie-signature", () => {
     expect(signed.sig).toEqual(expect.any(String));
     expect(verifySession(signed)).toBe(true);
     expect(stripSessionSignature(signed)).toEqual(session);
+  });
+
+  test("signature is HMAC-SHA256 over the canonical entry with the HKDF-derived session cookie key", () => {
+    const key = Buffer.from(
+      hkdfSync("sha256", "test-session-cookie-secret-at-least-32-chars", "", "zitadel-login-session-cookie-v1", 32),
+    );
+    const canonical = JSON.stringify([
+      "v1",
+      Object.fromEntries(Object.entries(session).sort(([a], [b]) => (a < b ? -1 : 1))),
+    ]);
+
+    expect(signSession(session).sig).toBe(createHmac("sha256", key).update(canonical).digest("base64url"));
+  });
+
+  test("hmacWithDerivedKey separates keys by info", () => {
+    const secret = "test-session-cookie-secret-at-least-32-chars";
+
+    expect(hmacWithDerivedKey(secret, "info-a", "payload")).toBe(hmacWithDerivedKey(secret, "info-a", "payload"));
+    expect(hmacWithDerivedKey(secret, "info-a", "payload")).not.toBe(hmacWithDerivedKey(secret, "info-b", "payload"));
+    expect(hmacWithDerivedKey(secret, "info-a", "payload")).toBe(
+      createHmac("sha256", Buffer.from(hkdfSync("sha256", secret, "", "info-a", 32)))
+        .update("payload")
+        .digest("base64url"),
+    );
+  });
+
+  test("signaturesEqual compares exactly", () => {
+    expect(signaturesEqual("abc", "abc")).toBe(true);
+    expect(signaturesEqual("abc", "abd")).toBe(false);
+    expect(signaturesEqual("abc", "abcd")).toBe(false);
   });
 
   test("rejects a missing signature", () => {
