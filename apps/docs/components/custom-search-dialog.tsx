@@ -27,13 +27,33 @@ function escapeRegExp(string: string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+// --- MARKDOWN STRIPPER ---
+// Converts raw MDX/Markdown syntax into clean prose
+function stripMarkdown(markdown: string): string {
+    if (!markdown) return '';
+    return markdown
+        .replace(/```[\s\S]*?```/g, '')             // Remove multi-line code blocks
+        .replace(/`([^`]+)`/g, '$1')                 // Remove inline code ticks
+        .replace(/#{1,6}\s+/g, '')                  // Remove headers (###)
+        .replace(/!\[.*?\]\(.*?\)/g, '')            // Remove images
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')     // Convert links [text](url) -> text
+        .replace(/[*_~]{1,3}([^*_~]+)[*_~]{1,3}/g, '$1') // Remove bold / italic / strikethrough
+        .replace(/^\s*>\s+/gm, '')                  // Remove blockquotes
+        .replace(/<[^>]*>/g, '')                    // Remove HTML / MDX tags
+        .replace(/\s+/g, ' ')                       // Collapse multiple whitespace/newlines
+        .trim();
+}
+
 // --- POLISHED HIGHLIGHT COMPONENT ---
 const HighlightMatch = ({ text, query }: { text: string; query: string }) => {
-    if (!query || !text) return <span className="text-muted-foreground">{text}</span>;
+    const cleanText = stripMarkdown(text);
 
-    // CRITICAL FIX: Escape user input before feeding it to RegExp to prevent crashes
+    if (!query || !cleanText) {
+        return <span className="text-xs text-muted-foreground line-clamp-2">{cleanText}</span>;
+    }
+
     const safeRegex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
-    const parts = text.split(safeRegex);
+    const parts = cleanText.split(safeRegex);
 
     return (
         <span className="text-xs text-muted-foreground line-clamp-2">
@@ -98,7 +118,6 @@ export default function CustomSearchDialog(props: SharedProps) {
                     if (!seenUrls.has(targetUrl)) {
                         seenUrls.add(targetUrl);
 
-                        // 2. Push the highest-scoring chunk for this URL
                         formattedResults.push({
                             id: targetUrl,
                             content: (
@@ -113,7 +132,6 @@ export default function CustomSearchDialog(props: SharedProps) {
                             type: 'page'
                         });
 
-                        // 3. NEW: Stop as soon as we have exactly 10 unique pages!
                         if (formattedResults.length >= 10) break;
                     }
                 }
