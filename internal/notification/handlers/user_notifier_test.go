@@ -1950,13 +1950,17 @@ var _ types.ChannelChains = (*notificationChannels)(nil)
 
 type notificationChannels struct {
 	senders.Chain
-	EmailConfig *email.Config
+	emailConfig *email.Config
 	SMSConfig   *sms.Config
 	SMTPRules   smtp.Rules
 }
 
-func (c *notificationChannels) Email(context.Context) (*senders.Chain, *email.Config, error) {
-	return &c.Chain, c.EmailConfig, nil
+func (c *notificationChannels) EmailConfig(context.Context) (*email.Config, error) {
+	return c.emailConfig, nil
+}
+
+func (c *notificationChannels) Email(context.Context, *email.Config) (*senders.Chain, error) {
+	return &c.Chain, nil
 }
 
 func (c *notificationChannels) SMS(context.Context) (*senders.Chain, *sms.Config, error) {

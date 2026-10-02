@@ -5,12 +5,12 @@ import (
 	"html"
 	"strings"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	zchannels "github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/channels/email"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/notification/messages"
-	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/templates"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -19,7 +19,6 @@ import (
 func generateEmail(
 	ctx context.Context,
 	channels ChannelChains,
-	emailChannels *senders.Chain,
 	config *email.Config,
 	rule smtp.Rule,
 	user *query.NotifyUser,
@@ -32,6 +31,15 @@ func generateEmail(
 	recipient := user.VerifiedEmail
 	if lastEmail {
 		recipient = user.LastEmail
+	}
+	// The channels connect to the provider and are closed when the message is handled.
+	// They are therefore only created once the email is ready to be sent.
+	emailChannels, err := channels.Email(ctx, config)
+	logging.OnError(ctx, err).Error("could not create email channel")
+	if emailChannels == nil || emailChannels.Len() == 0 {
+		return zchannels.NewCancelError(
+			zerrors.ThrowPreconditionFailed(nil, "MAIL-w8nfow", "Errors.Notification.Channels.NotPresent"),
+		)
 	}
 	if config.SMTPConfig != nil {
 		message := &messages.Email{

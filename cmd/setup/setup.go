@@ -628,7 +628,7 @@ func startCommandsQueries(
 	})
 	logging.OnError(ctx, err).Fatal("unable to init queue")
 
-	notify_handler.Register(
+	err = notify_handler.Register(
 		ctx,
 		config.Projections.Customizations["notifications"],
 		config.Projections.Customizations["notificationsquotas"],
@@ -651,6 +651,7 @@ func startCommandsQueries(
 		q,
 		httpClient,
 	)
+	logging.OnError(ctx, err).Fatal("unable to register notifications")
 
 	return commands, queries, adminView, authView
 }

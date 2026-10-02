@@ -1,6 +1,7 @@
 package types
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"os"
@@ -38,6 +39,8 @@ type testChannels struct {
 	rule        smtp.Rule
 
 	ruleRequested bool
+	// chainsCreated counts the connections to the provider
+	chainsCreated int
 	messages      []zchannels.Message
 }
 
@@ -48,11 +51,16 @@ func (c *testChannels) chain() *senders.Chain {
 	}))
 }
 
-func (c *testChannels) Email(context.Context) (*senders.Chain, *email.Config, error) {
+func (c *testChannels) EmailConfig(context.Context) (*email.Config, error) {
 	if c.noChannel {
-		return nil, nil, errors.New("no provider")
+		return nil, errors.New("no provider")
 	}
-	return c.chain(), c.emailConfig, nil
+	return c.emailConfig, nil
+}
+
+func (c *testChannels) Email(context.Context, *email.Config) (*senders.Chain, error) {
+	c.chainsCreated++
+	return c.chain(), nil
 }
 
 func (c *testChannels) SMS(context.Context) (*senders.Chain, *sms.Config, error) {
@@ -107,6 +115,7 @@ func TestSendEmail(t *testing.T) {
 		channels          *testChannels
 		text              string
 		displayName       string
+		urlTemplate       string
 		wantRuleRequested bool
 		wantErr           func(t *testing.T, err error)
 		wantMessage       zchannels.Message
@@ -116,6 +125,17 @@ func TestSendEmail(t *testing.T) {
 			channels: &testChannels{noChannel: true},
 			wantErr: func(t *testing.T, err error) {
 				assert.ErrorIs(t, err, new(zchannels.CancelError))
+			},
+		},
+		{
+			name:              "invalid url template, no connection to the provider",
+			channels:          &testChannels{emailConfig: smtpConfig},
+			text:              linkText,
+			urlTemplate:       "{{.Missing",
+			wantRuleRequested: true,
+			wantErr: func(t *testing.T, err error) {
+				assert.Error(t, err)
+				assert.NotErrorIs(t, err, new(zchannels.CancelError))
 			},
 		},
 		{
@@ -258,7 +278,7 @@ func TestSendEmail(t *testing.T) {
 
 			notify := SendEmail(t.Context(), tt.channels, mailTemplate, translator, user, &query.LabelPolicy{}, eventType)
 			err = notify(
-				urlTemplate,
+				cmp.Or(tt.urlTemplate, urlTemplate),
 				map[string]any{"Code": "code1", "ApplicationName": "App"},
 				domain.InviteUserMessageType,
 				true,
@@ -268,10 +288,13 @@ func TestSendEmail(t *testing.T) {
 			if tt.wantErr != nil {
 				tt.wantErr(t, err)
 				assert.Empty(t, tt.channels.messages)
+				// the channels connect to the provider, they must not be created if nothing is sent
+				assert.Zero(t, tt.channels.chainsCreated)
 				return
 			}
 			require.NoError(t, err)
 			require.Len(t, tt.channels.messages, 1)
+			assert.Equal(t, 1, tt.channels.chainsCreated)
 			if tt.wantMessage != nil {
 				assert.Equal(t, tt.wantMessage, tt.channels.messages[0])
 			}
