@@ -108,7 +108,7 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 				}
 				codeAlg, code := cryptoValue(t, ctrl, "testcode")
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-				commands.EXPECT().InviteCodeSent(gomock.Any(), userID, orgID).Return(nil)
+				commands.EXPECT().InviteCodeSent(gomock.Any(), userID, orgID, false).Return(nil)
 				return fieldsWorker{
 						queries:  queries,
 						commands: commands,
@@ -117,6 +117,55 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 						}),
 						userDataCrypto: codeAlg,
 						now:            testNow,
+					},
+					argsWorker{
+						job: &river.Job[*notification.Request]{
+							JobRow: &rivertype.JobRow{
+								CreatedAt: time.Now(),
+							},
+							Args: &notification.Request{
+								Aggregate: &eventstore.Aggregate{
+									InstanceID:    instanceID,
+									ID:            userID,
+									ResourceOwner: orgID,
+								},
+								UserID:                        userID,
+								UserResourceOwner:             orgID,
+								TriggeredAtOrigin:             eventOrigin,
+								EventType:                     user.HumanInviteCodeAddedType,
+								MessageType:                   domain.InviteUserMessageType,
+								NotificationType:              domain.NotificationTypeEmail,
+								URLTemplate:                   fmt.Sprintf("%s/ui/login/user/invite?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&authRequestID=%s", eventOrigin, userID, orgID, authRequestID),
+								CodeExpiry:                    1 * time.Hour,
+								Code:                          code,
+								UnverifiedNotificationChannel: true,
+								IsOTP:                         false,
+								RequiresPreviousDomain:        false,
+								Args: &domain.NotificationArguments{
+									ApplicationName: "APP",
+								},
+							},
+						},
+					},
+					w
+			},
+		},
+		{
+			name: "send suppressed (email, reserved recipient domain)",
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fieldsWorker, a argsWorker, w wantWorker) {
+				// no message is expected, but the notification is set to sent and flagged
+				codeAlg, code := cryptoValue(t, ctrl, "testcode")
+				expectTemplateWithReservedNotifyUserQueries(queries, "{{.LogoURL}}")
+				commands.EXPECT().InviteCodeSent(gomock.Any(), userID, orgID, true).Return(nil)
+				return fieldsWorker{
+						queries:  queries,
+						commands: commands,
+						es: eventstore.NewEventstore(&eventstore.Config{
+							Querier: es_repo_mock.NewRepo(t).MockQuerier,
+						}),
+						userDataCrypto: codeAlg,
+						now:            testNow,
+						smtpRules:      suppressReservedRecipientDomainsRules(t),
 					},
 					argsWorker{
 						job: &river.Job[*notification.Request]{
@@ -227,7 +276,7 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 					TriggeringEventType: user.UserDomainClaimedType,
 				}
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-				commands.EXPECT().UserDomainClaimedSent(gomock.Any(), orgID, userID).Return(nil)
+				commands.EXPECT().UserDomainClaimedSent(gomock.Any(), orgID, userID, false).Return(nil)
 				return fieldsWorker{
 						queries:  queries,
 						commands: commands,
@@ -436,7 +485,8 @@ func newNotificationWorker(t *testing.T, ctrl *gomock.Controller, queries *mock.
 			nil,
 		),
 		channels: &notificationChannels{
-			Chain: *senders.ChainChannels(channel),
+			Chain:     *senders.ChainChannels(channel),
+			SMTPRules: f.smtpRules,
 			emailConfig: &email.Config{
 				ProviderConfig: &email.Provider{
 					ID:          "emailProviderID",

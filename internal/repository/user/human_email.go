@@ -179,28 +179,35 @@ func HumanEmailCodeAddedEventMapper(event eventstore.Event) (eventstore.Event, e
 
 type HumanEmailCodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	// DeliverySuppressed is true if the notification was accepted, but the email was not sent to the provider,
+	// because the recipient domain is reserved and the operator rule of the provider suppresses them.
+	DeliverySuppressed bool `json:"deliverySuppressed,omitzero"`
 }
 
+// Payload returns nil if nothing is set, as the event had no payload before the flag was introduced.
 func (e *HumanEmailCodeSentEvent) Payload() interface{} {
-	return nil
+	if !e.DeliverySuppressed {
+		return nil
+	}
+	return e
 }
 
 func (e *HumanEmailCodeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func NewHumanEmailCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanEmailCodeSentEvent {
+func (e *HumanEmailCodeSentEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewHumanEmailCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate, deliverySuppressed bool) *HumanEmailCodeSentEvent {
 	return &HumanEmailCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			HumanEmailCodeSentType,
 		),
+		DeliverySuppressed: deliverySuppressed,
 	}
-}
-
-func HumanEmailCodeSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	return &HumanEmailCodeSentEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
 }

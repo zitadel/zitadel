@@ -307,30 +307,37 @@ func HumanInitialCodeAddedEventMapper(event eventstore.Event) (eventstore.Event,
 
 type HumanInitialCodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	// DeliverySuppressed is true if the notification was accepted, but the email was not sent to the provider,
+	// because the recipient domain is reserved and the operator rule of the provider suppresses them.
+	DeliverySuppressed bool `json:"deliverySuppressed,omitzero"`
 }
 
+// Payload returns nil if nothing is set, as the event had no payload before the flag was introduced.
 func (e *HumanInitialCodeSentEvent) Payload() interface{} {
-	return nil
+	if !e.DeliverySuppressed {
+		return nil
+	}
+	return e
 }
 
 func (e *HumanInitialCodeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func NewHumanInitialCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanInitialCodeSentEvent {
+func (e *HumanInitialCodeSentEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewHumanInitialCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate, deliverySuppressed bool) *HumanInitialCodeSentEvent {
 	return &HumanInitialCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			HumanInitialCodeSentType,
 		),
+		DeliverySuppressed: deliverySuppressed,
 	}
-}
-
-func HumanInitialCodeSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	return &HumanInitialCodeSentEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
 }
 
 type HumanInitializedCheckSucceededEvent struct {
@@ -444,27 +451,36 @@ func NewHumanInviteCodeAddedEvent(
 
 type HumanInviteCodeSentEvent struct {
 	*eventstore.BaseEvent `json:"-"`
+
+	// DeliverySuppressed is true if the notification was accepted, but the email was not sent to the provider,
+	// because the recipient domain is reserved and the operator rule of the provider suppresses them.
+	DeliverySuppressed bool `json:"deliverySuppressed,omitzero"`
 }
 
 func (e *HumanInviteCodeSentEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
+// Payload returns nil if nothing is set, as the event had no payload before the flag was introduced.
 func (e *HumanInviteCodeSentEvent) Payload() interface{} {
-	return nil
+	if !e.DeliverySuppressed {
+		return nil
+	}
+	return e
 }
 
 func (e *HumanInviteCodeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func NewHumanInviteCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanInviteCodeSentEvent {
+func NewHumanInviteCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate, deliverySuppressed bool) *HumanInviteCodeSentEvent {
 	return &HumanInviteCodeSentEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			HumanInviteCodeSentType,
 		),
+		DeliverySuppressed: deliverySuppressed,
 	}
 }
 

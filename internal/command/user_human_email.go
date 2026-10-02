@@ -145,7 +145,7 @@ func (c *Commands) CreateHumanEmailVerificationCode(ctx context.Context, userID,
 	return writeModelToObjectDetails(&existingEmail.WriteModel), nil
 }
 
-func (c *Commands) HumanEmailVerificationCodeSent(ctx context.Context, orgID, userID string) (err error) {
+func (c *Commands) HumanEmailVerificationCodeSent(ctx context.Context, orgID, userID string, deliverySuppressed bool) (err error) {
 	if userID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-4m9fs", "Errors.IDMissing")
 	}
@@ -157,7 +157,7 @@ func (c *Commands) HumanEmailVerificationCodeSent(ctx context.Context, orgID, us
 		return zerrors.ThrowNotFound(nil, "COMMAND-6n8uH", "Errors.User.Email.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
-	_, err = c.eventstore.Push(ctx, user.NewHumanEmailCodeSentEvent(ctx, userAgg))
+	_, err = c.eventstore.Push(ctx, user.NewHumanEmailCodeSentEvent(ctx, userAgg, deliverySuppressed))
 	return err
 }
 

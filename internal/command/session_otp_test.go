@@ -691,9 +691,10 @@ func TestCommands_OTPEmailSent(t *testing.T) {
 		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx           context.Context
-		sessionID     string
-		resourceOwner string
+		ctx                context.Context
+		sessionID          string
+		resourceOwner      string
+		deliverySuppressed bool
 	}
 	tests := []struct {
 		name    string
@@ -735,7 +736,7 @@ func TestCommands_OTPEmailSent(t *testing.T) {
 						),
 					),
 					expectPush(
-						session.NewOTPEmailSentEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate),
+						session.NewOTPEmailSentEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate, false),
 					),
 				),
 			},
@@ -746,13 +747,45 @@ func TestCommands_OTPEmailSent(t *testing.T) {
 			},
 			wantErr: nil,
 		},
+		{
+			name: "challenged and sent, delivery suppressed",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							session.NewOTPEmailChallengedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("1234567"),
+								},
+								5*time.Minute,
+								false,
+								"",
+							),
+						),
+					),
+					expectPush(
+						session.NewOTPEmailSentEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate, true),
+					),
+				),
+			},
+			args: args{
+				ctx:                context.Background(),
+				sessionID:          "sessionID",
+				resourceOwner:      "instanceID",
+				deliverySuppressed: true,
+			},
+			wantErr: nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			err := c.OTPEmailSent(tt.args.ctx, tt.args.sessionID, tt.args.resourceOwner)
+			err := c.OTPEmailSent(tt.args.ctx, tt.args.sessionID, tt.args.resourceOwner, tt.args.deliverySuppressed)
 			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}

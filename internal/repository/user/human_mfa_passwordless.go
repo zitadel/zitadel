@@ -374,6 +374,10 @@ func HumanPasswordlessInitCodeRequestedEventMapper(event eventstore.Event) (even
 type HumanPasswordlessInitCodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
+	// DeliverySuppressed is true if the notification was accepted, but the email was not sent to the provider,
+	// because the recipient domain is reserved and the operator rule of the provider suppresses them.
+	DeliverySuppressed bool `json:"deliverySuppressed,omitzero"`
+
 	ID string `json:"id"`
 }
 
@@ -385,10 +389,15 @@ func (e *HumanPasswordlessInitCodeSentEvent) UniqueConstraints() []*eventstore.U
 	return nil
 }
 
+func (e *HumanPasswordlessInitCodeSentEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
 func NewHumanPasswordlessInitCodeSentEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id string,
+	deliverySuppressed bool,
 ) *HumanPasswordlessInitCodeSentEvent {
 	return &HumanPasswordlessInitCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -396,19 +405,9 @@ func NewHumanPasswordlessInitCodeSentEvent(
 			aggregate,
 			HumanPasswordlessInitCodeSentType,
 		),
-		ID: id,
+		DeliverySuppressed: deliverySuppressed,
+		ID:                 id,
 	}
-}
-
-func HumanPasswordlessInitCodeSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	webAuthNAdded := &HumanPasswordlessInitCodeSentEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := event.Unmarshal(webAuthNAdded)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "USER-Gtg4j", "unable to unmarshal human passwordless code sent")
-	}
-	return webAuthNAdded, nil
 }
 
 type HumanPasswordlessInitCodeCheckFailedEvent struct {

@@ -39,8 +39,9 @@ func assertSMTPRules(t *testing.T, configs []smtp.RuleConfig) {
 		From: "noreply@example.com",
 	}
 	assert.Equal(t, smtp.Rule{
-		RestrictCustomHTML: true,
-		Headers:            map[string]string{"X-Instance-Id": "instance1"},
+		RestrictCustomHTML:               true,
+		SuppressReservedRecipientDomains: true,
+		Headers:                          map[string]string{"X-Instance-Id": "instance1"},
 	}, rules.Match(provider, smtp.RuleData{InstanceID: "instance1", OrgID: "org1"}))
 }
 
@@ -312,6 +313,7 @@ Notifications:
         SenderDomains:
           - example.com
       RestrictCustomHTML: true
+      SuppressReservedRecipientDomains: true
       Headers:
         X-Instance-ID: "{{.InstanceID}}"
 Log:
@@ -325,7 +327,7 @@ Log:
 		args: args{yaml: `
 Notifications:
   SMTPRules: >
-    [{"Match": {"Hosts": ["smtp.example.com"], "Users": ["token"], "SenderDomains": ["example.com"]}, "RestrictCustomHTML": true, "Headers": {"X-Instance-ID": "{{.InstanceID}}"}}]
+    [{"Match": {"Hosts": ["smtp.example.com"], "Users": ["token"], "SenderDomains": ["example.com"]}, "RestrictCustomHTML": true, "SuppressReservedRecipientDomains": true, "Headers": {"X-Instance-ID": "{{.InstanceID}}"}}]
 Log:
   Level: info
 `},

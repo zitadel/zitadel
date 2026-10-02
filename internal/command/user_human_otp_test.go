@@ -3095,6 +3095,7 @@ func TestCommandSide_HumanOTPEmailCodeSent(t *testing.T) {
 					expectPush(
 						user.NewHumanOTPEmailCodeSentEvent(ctx,
 							&user.NewAggregate("user1", "org1").Aggregate,
+							false,
 						),
 					),
 				),
@@ -3116,7 +3117,7 @@ func TestCommandSide_HumanOTPEmailCodeSent(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			err := r.HumanOTPEmailCodeSent(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
+			err := r.HumanOTPEmailCodeSent(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, false)
 			assert.ErrorIs(t, err, tt.res.err)
 		})
 	}

@@ -576,7 +576,7 @@ func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, res
 	return codeEvent, initCode, code, nil
 }
 
-func (c *Commands) HumanPasswordlessInitCodeSent(ctx context.Context, userID, resourceOwner, codeID string) error {
+func (c *Commands) HumanPasswordlessInitCodeSent(ctx context.Context, userID, resourceOwner, codeID string, deliverySuppressed bool) error {
 	if userID == "" || codeID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-ADggh", "Errors.IDMissing")
 	}
@@ -591,7 +591,7 @@ func (c *Commands) HumanPasswordlessInitCodeSent(ctx context.Context, userID, re
 	}
 
 	_, err = c.eventstore.Push(ctx,
-		usr_repo.NewHumanPasswordlessInitCodeSentEvent(ctx, UserAggregateFromWriteModel(&initCode.WriteModel), codeID),
+		usr_repo.NewHumanPasswordlessInitCodeSentEvent(ctx, UserAggregateFromWriteModelCtx(ctx, &initCode.WriteModel), codeID, deliverySuppressed),
 	)
 	return err
 }

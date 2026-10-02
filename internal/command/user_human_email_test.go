@@ -1277,6 +1277,7 @@ func TestCommandSide_EmailVerificationCodeSent(t *testing.T) {
 					expectPush(
 						user.NewHumanEmailCodeSentEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
+							false,
 						),
 					),
 				),
@@ -1294,7 +1295,7 @@ func TestCommandSide_EmailVerificationCodeSent(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			err := r.HumanEmailVerificationCodeSent(tt.args.ctx, tt.args.resourceOwner, tt.args.userID)
+			err := r.HumanEmailVerificationCodeSent(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, false)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

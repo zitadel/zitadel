@@ -1262,9 +1262,10 @@ func TestCommands_InviteCodeSent(t *testing.T) {
 		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		userID string
-		orgID  string
+		ctx                context.Context
+		userID             string
+		orgID              string
+		deliverySuppressed bool
 	}
 	tests := []struct {
 		name    string
@@ -1362,6 +1363,7 @@ func TestCommands_InviteCodeSent(t *testing.T) {
 						eventFromEventPusher(
 							user.NewHumanInviteCodeSentEvent(context.Background(),
 								&user.NewAggregate("userID", "org1").Aggregate,
+								false,
 							),
 						),
 					),
@@ -1373,6 +1375,58 @@ func TestCommands_InviteCodeSent(t *testing.T) {
 			},
 			nil,
 		},
+		{
+			"sent ok, delivery suppressed",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								"username", "firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.Afrikaans,
+								domain.GenderUnspecified,
+								"email",
+								false,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanInviteCodeAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code"),
+								},
+								time.Hour,
+								"",
+								false,
+								"",
+								"authRequestID",
+							),
+						),
+					),
+					expectPush(
+						eventFromEventPusher(
+							user.NewHumanInviteCodeSentEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								true,
+							),
+						),
+					),
+				),
+			},
+			args{
+				ctx:                context.Background(),
+				userID:             "userID",
+				deliverySuppressed: true,
+			},
+			nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1380,7 +1434,7 @@ func TestCommands_InviteCodeSent(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			err := c.InviteCodeSent(tt.args.ctx, tt.args.userID, tt.args.orgID)
+			err := c.InviteCodeSent(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.deliverySuppressed)
 			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}

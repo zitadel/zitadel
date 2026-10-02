@@ -48,7 +48,7 @@ func Test_userNotifierLegacy_reduceInitCodeAdded(t *testing.T) {
 			}
 			codeAlg, code := cryptoValue(t, ctrl, "testcode")
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			commands.EXPECT().HumanInitCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			commands.EXPECT().HumanInitCodeSent(gomock.Any(), orgID, userID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -56,6 +56,34 @@ func Test_userNotifierLegacy_reduceInitCodeAdded(t *testing.T) {
 						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 					}),
 					userDataCrypto: codeAlg,
+				}, args{
+					event: &user.HumanInitialCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:              code,
+						Expiry:            time.Hour,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
+		},
+	}, {
+		name: "reserved recipient domain, not sent but flagged",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
+			// no message is expected, but the notification is set to sent and flagged
+			codeAlg, code := cryptoValue(t, ctrl, "testcode")
+			expectTemplateWithReservedNotifyUserQueries(queries, "{{.LogoURL}}")
+			commands.EXPECT().HumanInitCodeSent(gomock.Any(), orgID, userID, true).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+					userDataCrypto: codeAlg,
+					smtpRules:      suppressReservedRecipientDomainsRules(t),
 				}, args{
 					event: &user.HumanInitialCodeAddedEvent{
 						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
@@ -89,7 +117,7 @@ func Test_userNotifierLegacy_reduceInitCodeAdded(t *testing.T) {
 				}},
 			}, nil)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			commands.EXPECT().HumanInitCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			commands.EXPECT().HumanInitCodeSent(gomock.Any(), orgID, userID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -124,7 +152,7 @@ func Test_userNotifierLegacy_reduceInitCodeAdded(t *testing.T) {
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			commands.EXPECT().HumanInitCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			commands.EXPECT().HumanInitCodeSent(gomock.Any(), orgID, userID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -166,7 +194,7 @@ func Test_userNotifierLegacy_reduceInitCodeAdded(t *testing.T) {
 				}},
 			}, nil)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			commands.EXPECT().HumanInitCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			commands.EXPECT().HumanInitCodeSent(gomock.Any(), orgID, userID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -207,7 +235,7 @@ func Test_userNotifierLegacy_reduceInitCodeAdded(t *testing.T) {
 				}},
 			}, nil)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			commands.EXPECT().HumanInitCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			commands.EXPECT().HumanInitCodeSent(gomock.Any(), orgID, userID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -313,7 +341,7 @@ func Test_userNotifierLegacy_reduceEmailCodeAdded(t *testing.T) {
 			}
 			codeAlg, code := cryptoValue(t, ctrl, "testcode")
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -356,7 +384,7 @@ func Test_userNotifierLegacy_reduceEmailCodeAdded(t *testing.T) {
 				}},
 			}, nil)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -393,7 +421,7 @@ func Test_userNotifierLegacy_reduceEmailCodeAdded(t *testing.T) {
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -438,7 +466,7 @@ func Test_userNotifierLegacy_reduceEmailCodeAdded(t *testing.T) {
 				}},
 			}, nil)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -481,7 +509,7 @@ func Test_userNotifierLegacy_reduceEmailCodeAdded(t *testing.T) {
 				}},
 			}, nil)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -520,7 +548,7 @@ func Test_userNotifierLegacy_reduceEmailCodeAdded(t *testing.T) {
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -627,7 +655,7 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 				}
 				codeAlg, code := cryptoValue(t, ctrl, "testcode")
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-				commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}).Return(nil)
+				commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}, false).Return(nil)
 				return fields{
 						queries:  queries,
 						commands: commands,
@@ -670,7 +698,7 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 					}},
 				}, nil)
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-				commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}).Return(nil)
+				commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}, false).Return(nil)
 				return fields{
 						queries:  queries,
 						commands: commands,
@@ -707,7 +735,7 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 				}
 				codeAlg, code := cryptoValue(t, ctrl, testCode)
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-				commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}).Return(nil)
+				commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}, false).Return(nil)
 				return fields{
 						queries:  queries,
 						commands: commands,
@@ -752,7 +780,7 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 					}},
 				}, nil)
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-				commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}).Return(nil)
+				commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}, false).Return(nil)
 				return fields{
 						queries:  queries,
 						commands: commands,
@@ -795,7 +823,7 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 					}},
 				}, nil)
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-				commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}).Return(nil)
+				commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}, false).Return(nil)
 				return fields{
 						queries:  queries,
 						commands: commands,
@@ -834,7 +862,7 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 				}
 				codeAlg, code := cryptoValue(t, ctrl, testCode)
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-				commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}).Return(nil)
+				commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}, false).Return(nil)
 				return fields{
 						queries:  queries,
 						commands: commands,
@@ -872,7 +900,7 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 					},
 				}
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-				commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{ID: smsProviderID, VerificationID: verificationID}).Return(nil)
+				commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{ID: smsProviderID, VerificationID: verificationID}, false).Return(nil)
 				return fields{
 						queries:  queries,
 						commands: commands,
@@ -978,7 +1006,7 @@ func Test_userNotifierLegacy_reduceDomainClaimed(t *testing.T) {
 				},
 			}
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			commands.EXPECT().UserDomainClaimedSent(gomock.Any(), orgID, userID).Return(nil)
+			commands.EXPECT().UserDomainClaimedSent(gomock.Any(), orgID, userID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -1015,7 +1043,7 @@ func Test_userNotifierLegacy_reduceDomainClaimed(t *testing.T) {
 				}},
 			}, nil)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			commands.EXPECT().UserDomainClaimedSent(gomock.Any(), orgID, userID).Return(nil)
+			commands.EXPECT().UserDomainClaimedSent(gomock.Any(), orgID, userID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -1110,7 +1138,7 @@ func Test_userNotifierLegacy_reducePasswordlessCodeRequested(t *testing.T) {
 			}
 			codeAlg, code := cryptoValue(t, ctrl, "testcode")
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			commands.EXPECT().HumanPasswordlessInitCodeSent(gomock.Any(), userID, orgID, codeID).Return(nil)
+			commands.EXPECT().HumanPasswordlessInitCodeSent(gomock.Any(), userID, orgID, codeID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -1154,7 +1182,7 @@ func Test_userNotifierLegacy_reducePasswordlessCodeRequested(t *testing.T) {
 				}},
 			}, nil)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			commands.EXPECT().HumanPasswordlessInitCodeSent(gomock.Any(), userID, orgID, codeID).Return(nil)
+			commands.EXPECT().HumanPasswordlessInitCodeSent(gomock.Any(), userID, orgID, codeID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -1192,7 +1220,7 @@ func Test_userNotifierLegacy_reducePasswordlessCodeRequested(t *testing.T) {
 				},
 			}
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			commands.EXPECT().HumanPasswordlessInitCodeSent(gomock.Any(), userID, orgID, codeID).Return(nil)
+			commands.EXPECT().HumanPasswordlessInitCodeSent(gomock.Any(), userID, orgID, codeID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -1238,7 +1266,7 @@ func Test_userNotifierLegacy_reducePasswordlessCodeRequested(t *testing.T) {
 				}},
 			}, nil)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			commands.EXPECT().HumanPasswordlessInitCodeSent(gomock.Any(), userID, orgID, codeID).Return(nil)
+			commands.EXPECT().HumanPasswordlessInitCodeSent(gomock.Any(), userID, orgID, codeID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -1277,7 +1305,7 @@ func Test_userNotifierLegacy_reducePasswordlessCodeRequested(t *testing.T) {
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			commands.EXPECT().HumanPasswordlessInitCodeSent(gomock.Any(), userID, orgID, codeID).Return(nil)
+			commands.EXPECT().HumanPasswordlessInitCodeSent(gomock.Any(), userID, orgID, codeID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -1387,7 +1415,7 @@ func Test_userNotifierLegacy_reducePasswordChanged(t *testing.T) {
 				PasswordChange: true,
 			}, nil)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			commands.EXPECT().PasswordChangeSent(gomock.Any(), orgID, userID).Return(nil)
+			commands.EXPECT().PasswordChangeSent(gomock.Any(), orgID, userID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -1427,7 +1455,7 @@ func Test_userNotifierLegacy_reducePasswordChanged(t *testing.T) {
 				}},
 			}, nil)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			commands.EXPECT().PasswordChangeSent(gomock.Any(), orgID, userID).Return(nil)
+			commands.EXPECT().PasswordChangeSent(gomock.Any(), orgID, userID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -1526,7 +1554,7 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 			codeAlg, code := cryptoValue(t, ctrl, "testcode")
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
-			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID).Return(nil)
+			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -1534,6 +1562,37 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 					}),
 					userDataCrypto: codeAlg,
+				}, args{
+					event: &session.OTPEmailChallengedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTmpl:           "",
+						ReturnCode:        false,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
+		},
+	}, {
+		name: "reserved recipient domain, not sent but flagged",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
+			// no message is expected, but the notification is set to sent and flagged
+			codeAlg, code := cryptoValue(t, ctrl, "testcode")
+			expectTemplateWithReservedNotifyUserQueries(queries, "{{.LogoURL}}")
+			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
+			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID, true).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+					userDataCrypto: codeAlg,
+					smtpRules:      suppressReservedRecipientDomainsRules(t),
 				}, args{
 					event: &session.OTPEmailChallengedEvent{
 						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
@@ -1570,7 +1629,7 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 					IsPrimary: true,
 				}},
 			}, nil)
-			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID).Return(nil)
+			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -1608,7 +1667,7 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
-			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID).Return(nil)
+			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -1654,7 +1713,7 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 			}, nil)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
-			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID).Return(nil)
+			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -1692,7 +1751,7 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
-			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID).Return(nil)
+			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID, false).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -1978,7 +2037,8 @@ func newUserNotifierLegacy(t *testing.T, ctrl *gomock.Controller, queries *mock.
 			return origin.String() + defaultOTPEmailTemplate
 		},
 		channels: &notificationChannels{
-			Chain: *senders.ChainChannels(channel),
+			Chain:     *senders.ChainChannels(channel),
+			SMTPRules: f.smtpRules,
 			emailConfig: &email.Config{
 				ProviderConfig: &email.Provider{
 					ID:          "emailProviderID",

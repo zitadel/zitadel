@@ -353,7 +353,7 @@ func (c *Commands) prepareUserDomainClaimed(ctx context.Context, filter preparat
 	), nil
 }
 
-func (c *Commands) UserDomainClaimedSent(ctx context.Context, orgID, userID string) (err error) {
+func (c *Commands) UserDomainClaimedSent(ctx context.Context, orgID, userID string, deliverySuppressed bool) (err error) {
 	if userID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-5m0fs", "Errors.IDMissing")
 	}
@@ -366,7 +366,7 @@ func (c *Commands) UserDomainClaimedSent(ctx context.Context, orgID, userID stri
 	}
 
 	_, err = c.eventstore.Push(ctx,
-		user.NewDomainClaimedSentEvent(ctx, UserAggregateFromWriteModel(&existingUser.WriteModel)))
+		user.NewDomainClaimedSentEvent(ctx, UserAggregateFromWriteModelCtx(ctx, &existingUser.WriteModel), deliverySuppressed))
 	return err
 }
 

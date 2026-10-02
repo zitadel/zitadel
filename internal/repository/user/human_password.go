@@ -170,6 +170,10 @@ func HumanPasswordCodeAddedEventMapper(event eventstore.Event) (eventstore.Event
 type HumanPasswordCodeSentEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
+	// DeliverySuppressed is true if the notification was accepted, but the email was not sent to the provider,
+	// because the recipient domain is reserved and the operator rule of the provider suppresses them.
+	DeliverySuppressed bool `json:"deliverySuppressed,omitzero"`
+
 	GeneratorInfo *senders.CodeGeneratorInfo `json:"generatorInfo,omitempty"`
 }
 
@@ -185,43 +189,51 @@ func (e *HumanPasswordCodeSentEvent) UniqueConstraints() []*eventstore.UniqueCon
 	return nil
 }
 
-func NewHumanPasswordCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate, generatorInfo *senders.CodeGeneratorInfo) *HumanPasswordCodeSentEvent {
+func NewHumanPasswordCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate, generatorInfo *senders.CodeGeneratorInfo, deliverySuppressed bool) *HumanPasswordCodeSentEvent {
 	return &HumanPasswordCodeSentEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			HumanPasswordCodeSentType,
 		),
-		GeneratorInfo: generatorInfo,
+		DeliverySuppressed: deliverySuppressed,
+		GeneratorInfo:      generatorInfo,
 	}
 }
 
 type HumanPasswordChangeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	// DeliverySuppressed is true if the notification was accepted, but the email was not sent to the provider,
+	// because the recipient domain is reserved and the operator rule of the provider suppresses them.
+	DeliverySuppressed bool `json:"deliverySuppressed,omitzero"`
 }
 
+// Payload returns nil if nothing is set, as the event had no payload before the flag was introduced.
 func (e *HumanPasswordChangeSentEvent) Payload() interface{} {
-	return nil
+	if !e.DeliverySuppressed {
+		return nil
+	}
+	return e
 }
 
 func (e *HumanPasswordChangeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func NewHumanPasswordChangeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPasswordChangeSentEvent {
+func (e *HumanPasswordChangeSentEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewHumanPasswordChangeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate, deliverySuppressed bool) *HumanPasswordChangeSentEvent {
 	return &HumanPasswordChangeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			HumanPasswordChangeSentType,
 		),
+		DeliverySuppressed: deliverySuppressed,
 	}
-}
-
-func HumanPasswordChangeSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	return &HumanPasswordChangeSentEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
 }
 
 type HumanPasswordCheckSucceededEvent struct {
