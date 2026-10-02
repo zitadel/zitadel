@@ -16,7 +16,9 @@ func Test_channels_SMTPRule(t *testing.T) {
 			Hosts:         []string{"smtp.example.com"},
 			SenderDomains: []string{"m.example.com"},
 		},
-		RestrictCustomHTML: true,
+		RuleOptions: smtp.RuleOptions{
+			RestrictCustomHTML: true,
+		},
 		Headers: map[string]string{
 			"X-Instance-Id": "{{.InstanceID}}",
 			"X-Org-Id":      "{{.OrgID}}",
@@ -47,7 +49,9 @@ func Test_channels_SMTPRule(t *testing.T) {
 			rules:  rules,
 			config: &smtp.Config{SMTP: smtp.SMTP{Host: "smtp.example.com:587"}, From: "noreply@m.example.com"},
 			want: smtp.Rule{
-				RestrictCustomHTML: true,
+				RuleOptions: smtp.RuleOptions{
+					RestrictCustomHTML: true,
+				},
 				Headers: map[string]string{
 					"X-Instance-Id": "instance1",
 					"X-Org-Id":      "org1",

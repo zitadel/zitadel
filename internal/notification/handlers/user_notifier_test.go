@@ -2029,7 +2029,7 @@ func expectTemplateWithReservedNotifyUserQueries(queries *mock.MockQueries, temp
 
 // suppressReservedRecipientDomainsRules returns a rule matching every SMTP provider.
 func suppressReservedRecipientDomainsRules(t *testing.T) smtp.Rules {
-	rules, err := smtp.CompileRules([]smtp.RuleConfig{{SuppressReservedRecipientDomains: true}})
+	rules, err := smtp.CompileRules([]smtp.RuleConfig{{RuleOptions: smtp.RuleOptions{SuppressReservedRecipientDomains: true}}})
 	require.NoError(t, err)
 	return rules
 }

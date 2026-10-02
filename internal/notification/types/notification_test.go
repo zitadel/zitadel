@@ -177,7 +177,7 @@ func TestSendEmail(t *testing.T) {
 			name: "HTML disabled, link is removed, arguments are still escaped",
 			channels: &testChannels{
 				emailConfig: smtpConfig,
-				rule:        smtp.Rule{RestrictCustomHTML: true},
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{RestrictCustomHTML: true}},
 			},
 			text:              linkText,
 			displayName:       "O'Brien <b>",
@@ -194,7 +194,7 @@ func TestSendEmail(t *testing.T) {
 			name: "HTML disabled, simple formatting is kept",
 			channels: &testChannels{
 				emailConfig: smtpConfig,
-				rule:        smtp.Rule{RestrictCustomHTML: true},
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{RestrictCustomHTML: true}},
 			},
 			text:              formattedText,
 			displayName:       "Bob",
@@ -211,7 +211,7 @@ func TestSendEmail(t *testing.T) {
 			name: "HTML disabled, display name with allowed tag is not rendered",
 			channels: &testChannels{
 				emailConfig: smtpConfig,
-				rule:        smtp.Rule{RestrictCustomHTML: true},
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{RestrictCustomHTML: true}},
 			},
 			text:              formattedText,
 			displayName:       "<b>Bob</b><br>",
@@ -242,7 +242,7 @@ func TestSendEmail(t *testing.T) {
 			name: "HTML disabled, German default text is identical",
 			channels: &testChannels{
 				emailConfig: smtpConfig,
-				rule:        smtp.Rule{RestrictCustomHTML: true},
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{RestrictCustomHTML: true}},
 			},
 			text:              germanText,
 			displayName:       "Bob",
@@ -278,7 +278,7 @@ func TestSendEmail(t *testing.T) {
 			name: "reserved recipient domain is suppressed",
 			channels: &testChannels{
 				emailConfig: smtpConfig,
-				rule:        smtp.Rule{SuppressReservedRecipientDomains: true},
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{SuppressReservedRecipientDomains: true}},
 			},
 			text:              linkText,
 			displayName:       "Bob",
@@ -290,7 +290,7 @@ func TestSendEmail(t *testing.T) {
 			name: "reserved recipient domain is suppressed before connecting to the provider",
 			channels: &testChannels{
 				emailConfig: smtpConfig,
-				rule:        smtp.Rule{SuppressReservedRecipientDomains: true},
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{SuppressReservedRecipientDomains: true}},
 				noChain:     true,
 			},
 			text:              linkText,
@@ -303,7 +303,7 @@ func TestSendEmail(t *testing.T) {
 			name: "reserved recipient domain is suppressed without out parameter",
 			channels: &testChannels{
 				emailConfig: smtpConfig,
-				rule:        smtp.Rule{SuppressReservedRecipientDomains: true},
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{SuppressReservedRecipientDomains: true}},
 			},
 			text:              linkText,
 			displayName:       "Bob",
@@ -315,7 +315,7 @@ func TestSendEmail(t *testing.T) {
 			name: "suppression rule, other recipient domain is sent",
 			channels: &testChannels{
 				emailConfig: smtpConfig,
-				rule:        smtp.Rule{SuppressReservedRecipientDomains: true},
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{SuppressReservedRecipientDomains: true}},
 			},
 			text:              linkText,
 			displayName:       "Bob",
@@ -347,7 +347,7 @@ func TestSendEmail(t *testing.T) {
 			name: "webhook provider, no rule requested",
 			channels: &testChannels{
 				emailConfig: webhookConfig,
-				rule:        smtp.Rule{RestrictCustomHTML: true},
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{RestrictCustomHTML: true}},
 			},
 			text:              linkText,
 			displayName:       "Bob",
