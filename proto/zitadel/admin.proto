@@ -9483,9 +9483,10 @@ message ExportDataResponse {
 
 message ListEventsRequest {
     uint64 sequence = 1 [
+        deprecated = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"2\"";
-            description: "Sequence represents the order of events. It's always counting. If asc is false, the sequence is used as lesser than filter. If asc is true sequence is used as greater than filter. If the sequence is 0 the field is ignored."
+            description: "Deprecated: the sequence is only counting per aggregate and not a global order of events, therefore it must not be used for pagination. Use from or range instead. If asc is false, the sequence is used as lesser than filter. If asc is true sequence is used as greater than filter. If the sequence is 0 the field is ignored."
         }
     ];
     uint32 limit = 2 [
