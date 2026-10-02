@@ -336,6 +336,11 @@ func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
 			require.NoError(t, err)
 			assertTokens(t, tokens, true)
 			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
+			// RFC 9068 §2.2.3: JWT access tokens should carry the granted scopes.
+			assert.ElementsMatch(t,
+				[]string{oidc.ScopeOpenID, oidc.ScopeOfflineAccess},
+				[]string(decodeJWTAccessToken(t, Instance, tokens.AccessToken).Scopes),
+			)
 
 			// test actual refresh grant
 			newTokens, err := refreshTokens(t, tt.clientID, tokens.RefreshToken)
@@ -343,6 +348,11 @@ func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
 			assertTokens(t, newTokens, true)
 			// auth time must still be the initial
 			assertIDTokenClaims(t, newTokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
+			// scope claim should persist across refresh.
+			assert.ElementsMatch(t,
+				[]string{oidc.ScopeOpenID, oidc.ScopeOfflineAccess},
+				[]string(decodeJWTAccessToken(t, Instance, newTokens.AccessToken).Scopes),
+			)
 
 			// refresh with an old refresh_token must fail
 			_, err = rp.RefreshTokens[*oidc.IDTokenClaims](CTX, provider, tokens.RefreshToken, "", "")
