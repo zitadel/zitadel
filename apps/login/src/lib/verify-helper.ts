@@ -36,6 +36,10 @@ export function checkPasswordChangeRequired(
       params.append("requestId", requestId);
     }
 
+    if (session.id) {
+      params.append("sessionId", session.id);
+    }
+
     return { redirect: "/password/change?" + params };
   }
 }

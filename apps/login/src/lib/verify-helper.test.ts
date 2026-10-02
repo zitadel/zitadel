@@ -396,6 +396,8 @@ describe("checkPasswordChangeRequired", () => {
     expect(result).toEqual({
       redirect: expect.stringContaining("/password/change"),
     });
+    expect(result?.redirect).toContain("sessionId=session-123");
+    expect(result?.redirect).toContain("loginName=user%40example.com");
   });
 
   it("should redirect if password is expired based on maxAgeDays", () => {
