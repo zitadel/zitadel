@@ -49,6 +49,7 @@ export async function GET(request: Request) {
 
     const backendUrl = new URL(`${cleanBaseUrl}/api/search/docs`);
     backendUrl.searchParams.set('q', safeQuery);
+    backendUrl.searchParams.set('limit', '15');
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);

@@ -132,7 +132,7 @@ export default function CustomSearchDialog(props: SharedProps) {
                             type: 'page'
                         });
 
-                        if (formattedResults.length >= 10) break;
+                        if (formattedResults.length >= 15) break;
                     }
                 }
 
