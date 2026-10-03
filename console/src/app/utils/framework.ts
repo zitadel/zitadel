@@ -1,5 +1,7 @@
 import { AddOIDCAppRequest } from '../proto/generated/zitadel/management_pb';
 import { OIDCAppType, OIDCAuthMethodType, OIDCGrantType, OIDCResponseType } from '../proto/generated/zitadel/app_pb';
+import FrameworkDefinitionList from "../../../../apps/docs/frameworks.json"
+import type { FrameworkDefinition } from '../components/oidc-configuration/oidc-configuration.component';
 
 type OidcAppConfigurations = {
   [framework: string]: AddOIDCAppRequest;
@@ -164,3 +166,13 @@ export const OIDC_CONFIGURATIONS: OidcAppConfigurations = {
     .setRedirectUrisList(['http://localhost:4444/auth.html', 'com.example.zitadelflutter'])
     .setPostLogoutRedirectUrisList(['http://localhost:4444', 'com.example.zitadelflutter']),
 };
+
+export const FRAMEWORK_DEFINITION: FrameworkDefinition[] = FrameworkDefinitionList
+  .filter((f) => f.id && OIDC_CONFIGURATIONS[f.id])
+  .map((f) => {
+    return {
+      ...f,
+      imgSrcDark: `assets${f.imgSrcDark}`,
+      imgSrcLight: `assets${f.imgSrcLight ? f.imgSrcLight : f.imgSrcDark}`,
+    };
+  });
