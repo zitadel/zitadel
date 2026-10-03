@@ -1148,7 +1148,7 @@ EventTypes:
       jwt:
         config:
           added: "JWT konfigūracija pridėta į tapatybės teikėją"
-          changed: "JWT konfigūracija pašalinta iš tapatybės teikėjo"
+          changed: "JWT tapatybės teikėjo konfigūracija pakeista"
     customtext:
       set: "Tekstas nustatytas"
       removed: "Tekstas pašalintas"
