@@ -124,8 +124,8 @@ Errors:
       NotChanged: "Adresas nepakeistas"
     Machine:
       Key:
-        NotFound: "Techninio naudotojo raktas nerastas"
-        AlreadyExisting: "Techninio naudotojo raktas jau egzistuoja"
+        NotFound: "Aptarnavimo paskyros raktas nerastas"
+        AlreadyExisting: "Aptarnavimo paskyros raktas jau egzistuoja"
         Invalid: "Viešasis raktas nėra galiojantis RSA viešasis raktas PKIX formatu su PEM kodavimu"
       Secret:
         NotExisting: "Paslaptis neegzistuoja"
@@ -136,7 +136,7 @@ Errors:
     Metadata:
       Conflicting: "Metaduomenys neturi būti nustatyti tiek naudotojo, tiek žmogaus laukuose"
     NotHuman: "Naudotojas turi būti asmeninis"
-    NotMachine: "Naudotojas turi būti techninis"
+    NotMachine: "Naudotojas turi būti aptarnavimo paskyra"
     WrongType: "Neleidžiama šiam naudotojo tipui"
     NotAllowedToLink: "Naudotojui neleidžiama susieti su išoriniu prisijungimo teikėju"
     Username:
@@ -687,8 +687,8 @@ EventTypes:
         added: "El. pašto adreso patvirtinimo kodas sugeneruotas"
         sent: "El. pašto adreso patvirtinimo kodas išsiųstas"
     machine:
-      added: "Techninis naudotojas pridėtas"
-      changed: "Techninis naudotojas pakeistas"
+      added: "Aptarnavimo paskyra pridėta"
+      changed: "Aptarnavimo paskyra pakeista"
       key:
         added: "Raktas pridėtas"
         removed: "Raktas pašalintas"

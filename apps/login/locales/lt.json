@@ -236,7 +236,7 @@
   "otp": {
     "verify": {
       "title": "Patvirtinti dviejų veiksnių autentifikavimą",
-      "totpDescription": "Įveskite kodą iš savo autentifikavimo programos.",
+      "totpDescription": "Įveskite kodą iš savo TOTP programos.",
       "smsDescription": "Įveskite kodą, kurį gavote SMS žinute.",
       "emailDescription": "Įveskite kodą, kurį gavote el. paštu.",
       "noCodeReceived": "Negavote kodo?",
@@ -250,8 +250,8 @@
       }
     },
     "set": {
-      "title": "Nustatyti dviejų veiksmų autentifikavimą",
-      "totpDescription": "Nuskenuokite QR kodą su savo autentifikavimo programa.",
+      "title": "Nustatyti dviejų veiksnių autentifikavimą",
+      "totpDescription": "Nuskenuokite QR kodą su savo TOTP programa.",
       "smsDescription": "Įveskite savo telefono numerį, kad gautumėte kodą SMS žinute.",
       "emailDescription": "Įveskite savo el. pašto adresą, kad gautumėte kodą el. paštu.",
       "totpRegisterDescription": "Nuskenuokite QR kodą arba nueikite į nuorodą rankiniu būdu.",
@@ -429,8 +429,8 @@
     "allSetup": "Jūs jau nustatėte autentifikatorių!",
     "linkWithIDP": "arba susiekite su tapatybės teikėju",
     "methods": {
-      "totp": "Autentifikavimo programa",
-      "u2f": "Universalus antrasis veiksnys",
+      "totp": "TOTP",
+      "u2f": "Prieigos raktas",
       "otpEmail": "Kodas el. paštu",
       "otpSms": "Kodas SMS žinute",
       "passkey": "Prieigos raktai",

@@ -46,15 +46,15 @@
     },
     "USERS": {
       "TITLE": "Naudotojai",
-      "DESCRIPTION": "Naudotojas yra žmogus arba techninė paskyra, galinti pasiekti jūsų programas.",
+      "DESCRIPTION": "Naudotojas yra žmogus arba aptarnavimo paskyra, galinti pasiekti jūsų programas.",
       "HUMANS": {
         "TITLE": "Naudotojai",
         "DESCRIPTION": "Naudotojai autentifikuojasi interaktyviai naršyklės sesijoje su prisijungimo langu.",
         "METADATA": "Pridėkite pasirinktinius atributus naudotojui, pvz., skyrių. Šią informaciją galite naudoti savo veiksmuose."
       },
       "MACHINES": {
-        "TITLE": "Techninės paskyros",
-        "DESCRIPTION": "Techninės paskyros autentifikuojasi neinteraktyviai naudodamos JWT bearer žetoną, pasirašytą privačiu raktu. Jos taip pat gali naudoti asmeninį prieigos žetoną.",
+        "TITLE": "Aptarnavimo paskyros",
+        "DESCRIPTION": "Aptarnavimo paskyros autentifikuojasi neinteraktyviai naudodamos JWT bearer žetoną, pasirašytą privačiu raktu. Jos taip pat gali naudoti asmeninį prieigos žetoną.",
         "METADATA": "Pridėkite pasirinktinius atributus paskyrai, pvz., autentifikuojančią sistemą. Šią informaciją galite naudoti savo veiksmuose."
       },
       "SELF": {
@@ -424,7 +424,7 @@
     "ROLES": "Vaidmenys",
     "GRANTEDPROJECT": "Suteikti projektai",
     "HUMANUSERS": "Naudotojai",
-    "MACHINEUSERS": "Techninės paskyros",
+    "MACHINEUSERS": "Aptarnavimo paskyros",
     "LOGOUT": "Atjungti visus naudotojus",
     "NEWORG": "Nauja organizacija",
     "IAMADMIN": "Jūs esate IAM administratorius. Atkreipkite dėmesį, kad turite išplėstines teises.",
@@ -993,7 +993,7 @@
       "COUNTRY": "Šalis"
     },
     "MACHINE": {
-      "TITLE": "Techninės paskyros informacija",
+      "TITLE": "Aptarnavimo paskyros informacija",
       "USERNAME": "Naudotojo vardas",
       "NAME": "Pavadinimas",
       "DESCRIPTION": "Aprašymas",
@@ -1155,7 +1155,7 @@
       "SELECTEDDEACTIVATED": "Pasirinkti naudotojai deaktyvuoti.",
       "SELECTEDKEYSDELETED": "Pasirinkti raktai pašalinti.",
       "KEYADDED": "Raktas pridėtas!",
-      "MACHINEADDED": "Techninė paskyra sukurta!",
+      "MACHINEADDED": "Aptarnavimo paskyra sukurta!",
       "DELETED": "Naudotojas sėkmingai pašalintas!",
       "UNLOCKED": "Naudotojas sėkmingai atblokuotas!",
       "PASSWORDLESSREGISTRATIONSENT": "Registracijos nuoroda sėkmingai išsiųsta.",

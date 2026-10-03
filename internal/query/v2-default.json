@@ -7346,7 +7346,7 @@
     "otp": {
       "verify": {
         "title": "Patvirtinti dviejų veiksnių autentifikavimą",
-        "totpDescription": "Įveskite kodą iš savo autentifikavimo programos.",
+        "totpDescription": "Įveskite kodą iš savo TOTP programos.",
         "smsDescription": "Įveskite kodą, kurį gavote SMS žinute.",
         "emailDescription": "Įveskite kodą, kurį gavote el. paštu.",
         "noCodeReceived": "Negavote kodo?",
