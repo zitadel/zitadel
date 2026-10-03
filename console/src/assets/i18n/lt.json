@@ -1,9 +1,9 @@
 {
-  "APP_NAME": "Zitadel",
+  "APP_NAME": "ZITADEL",
   "DESCRIPTIONS": {
     "METADATA_TITLE": "Metaduomenys",
     "HOME": {
-      "TITLE": "Pradėkite darbą su Zitadel",
+      "TITLE": "Pradėkite darbą su ZITADEL",
       "NEXT": {
         "TITLE": "Jūsų kiti žingsniai",
         "DESCRIPTION": "Atlikite šiuos žingsnius, kad apsaugotumėte savo programą.",
@@ -76,7 +76,7 @@
         "TITLE": "Eigos",
         "DESCRIPTION": "Pasirinkite autentifikavimo eigą ir paleiskite savo veiksmą konkrečiam šios eigos įvykiui."
       },
-      "ACTIONSTWO_NOTE": "Dabar galima naudoti Actions V2 – naują, patobulintą veiksmų versiją. Dabartinė versija vis dar prieinama, tačiau tolimesnė plėtra bus sutelkta į naująją versiją, kuri galiausiai pakeis dabartinę."
+      "ACTIONSTWO_NOTE": "Dabar galima naudoti Actions V2 - naują, patobulintą veiksmų versiją. Dabartinė versija vis dar prieinama, tačiau tolimesnė plėtra bus sutelkta į naująją versiją, kuri galiausiai pakeis dabartinę."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -166,7 +166,7 @@
       },
       "OIDC": {
         "TITLE": "OpenID Connect nustatymai",
-        "DESCRIPTION": "Sukonfigūruokite savo OIDC žetonų galiojimo trukmę. Naudokite trumpesnę trukmę naudotojų saugumui padidinti, ilgesnę trukmę – patogumui padidinti.",
+        "DESCRIPTION": "Sukonfigūruokite savo OIDC žetonų galiojimo trukmę. Naudokite trumpesnę trukmę naudotojų saugumui padidinti, ilgesnę trukmę - patogumui padidinti.",
         "LABEL_HOURS": "Maksimali galiojimo trukmė valandomis",
         "LABEL_DAYS": "Maksimali galiojimo trukmė dienomis",
         "ACCESS_TOKEN": {
@@ -560,7 +560,7 @@
           },
           "FUNCTIONS": {
             "TITLE": "Funkcijos",
-            "DESCRIPTION": "Funkcijos, kurias galite iškviesti Zitadel viduje. Tai gali būti bet kas – nuo el. laiško siuntimo iki naudotojo sukūrimo."
+            "DESCRIPTION": "Funkcijos, kurias galite iškviesti Zitadel viduje. Tai gali būti bet kas - nuo el. laiško siuntimo iki naudotojo sukūrimo."
           }
         },
         "CONDITION": {
@@ -611,7 +611,7 @@
     },
     "TARGET": {
       "TITLE": "Tikslai",
-      "DESCRIPTION": "Tikslas – tai kodo, kurį norite vykdyti iš veiksmo, paskirties vieta. Sukurkite tikslą čia ir pridėkite jį prie savo veiksmų.",
+      "DESCRIPTION": "Tikslas - tai kodo, kurį norite vykdyti iš veiksmo, paskirties vieta. Sukurkite tikslą čia ir pridėkite jį prie savo veiksmų.",
       "CREATE": {
         "TITLE": "Sukurkite savo tikslą",
         "DESCRIPTION": "Sukurkite savo tikslą už Zitadel ribų",
@@ -623,7 +623,7 @@
           "restCall": "REST iškvietimas",
           "restAsync": "REST asinchroninis"
         },
-        "TYPES_DESCRIPTION": "Webhook – iškvietimas apdoroja būsenos kodą, tačiau atsakymas nesvarbus\nCall – iškvietimas apdoroja tiek būsenos kodą, tiek atsakymą\nAsync – iškvietimas neapdoroja nei būsenos kodo, nei atsakymo, tačiau gali būti vykdomas lygiagrečiai su kitais tikslais",
+        "TYPES_DESCRIPTION": "Webhook - iškvietimas apdoroja būsenos kodą, tačiau atsakymas nesvarbus\nCall - iškvietimas apdoroja tiek būsenos kodą, tiek atsakymą\nAsync - iškvietimas neapdoroja nei būsenos kodo, nei atsakymo, tačiau gali būti vykdomas lygiagrečiai su kitais tikslais",
         "PAYLOAD_TYPE": "Krovinio tipas",
         "PAYLOAD_TYPES": {
           "UNSPECIFIED": "Nenurodyta",

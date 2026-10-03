@@ -47,10 +47,10 @@
       "userNotFound": "Naudotojas nerastas sistemoje",
       "couldNotCreateSession": "Nepavyko sukurti naudotojo sesijos",
       "initialUserNotSupported": "Pradinis naudotojas nepalaikomas",
-      "localAuthenticationNotAllowed": "Vietinis autentifikavimas neleidžiamas! Susisiekite su administratoriumi, jei reikia daugiau informacijos.",
-      "passkeysNotAllowed": "Prieigos raktai (passkeys) neleidžiami! Susisiekite su administratoriumi, jei reikia daugiau informacijos.",
+      "localAuthenticationNotAllowed": "Vietinis autentifikavimas neleidžiamas! Jei reikia daugiau informacijos, susisiekite su administratoriumi.",
+      "passkeysNotAllowed": "Prieigos raktai (passkeys) neleidžiami! Jei reikia daugiau informacijos, susisiekite su administratoriumi.",
       "couldNotFindIdentityProvider": "Nepavyko rasti tapatybės teikėjo.",
-      "userNotActive": "Naudotojas neaktyvus. Susisiekite su administratoriumi, jei reikia daugiau informacijos."
+      "userNotActive": "Naudotojas neaktyvus. Jei reikia daugiau informacijos, susisiekite su administratoriumi."
     }
   },
   "zitadel": {
@@ -153,7 +153,7 @@
       "sessionNotValid": "Sesija negalioja",
       "passwordVerificationMissing": "Trūksta slaptažodžio patvirtinimo.",
       "passwordVerificationTooOld": "Slaptažodžio patvirtinimas per senas. Patvirtinkite slaptažodį iš naujo.",
-      "passwordResetNotAllowed": "Slaptažodžio atstatymas neleidžiamas. Susisiekite su administratoriumi, jei reikia daugiau informacijos."
+      "passwordResetNotAllowed": "Slaptažodžio atstatymas neleidžiamas. Jei reikia daugiau informacijos, susisiekite su administratoriumi."
     }
   },
   "idp": {
@@ -181,13 +181,13 @@
     "accountNotFound": {
       "title": "Paskyra nerasta",
       "description": "Nepavyko rasti paskyros, susietos su jūsų tapatybės teikėjo duomenimis.",
-      "info": "Nerasta esamos paskyros. Prisijunkite su esama paskyra arba susisiekite su administratoriumi, kad gautumėte pagalbą.",
+      "info": "Nerasta esamos paskyros. Prisijunkite su esama paskyra arba susisiekite su administratoriumi, kad gautumėte pagalbos.",
       "backToLogin": "Atgal į prisijungimą"
     },
     "registrationFailed": {
       "title": "Registracija negalima",
       "description": "Nepavyko užbaigti registracijos proceso.",
-      "info": "Nepavyko nustatyti organizacijos registracijai. Susisiekite su administratoriumi, kad gautumėte pagalbą.",
+      "info": "Nepavyko nustatyti organizacijos registracijai. Susisiekite su administratoriumi, kad gautumėte pagalbos.",
       "backToLogin": "Atgal į prisijungimą"
     },
     "processing": {
@@ -250,7 +250,7 @@
       }
     },
     "set": {
-      "title": "Nustatyti dviejų veiksnių autentifikavimą",
+      "title": "Nustatyti dviejų veiksmų autentifikavimą",
       "totpDescription": "Nuskenuokite QR kodą su savo autentifikavimo programa.",
       "smsDescription": "Įveskite savo telefono numerį, kad gautumėte kodą SMS žinute.",
       "emailDescription": "Įveskite savo el. pašto adresą, kad gautumėte kodą el. paštu.",
@@ -324,7 +324,7 @@
       "description": "Nurodykite el. paštą, vardą ir pavardę registracijai."
     },
     "title": "Registruotis",
-    "description": "Susikurkite savo Zitadel paskyrą.",
+    "description": "Susikurkite savo ZITADEL paskyrą.",
     "noMethodAvailableWarning": "Nėra galimo autentifikavimo metodo. Susisiekite su administratoriumi.",
     "selectMethod": "Pasirinkite metodą, kuriuo norite autentifikuotis",
     "agreeTo": "Norėdami registruotis, turite sutikti su naudojimo sąlygomis",
@@ -452,7 +452,7 @@
     "request": {
       "title": "{appName} nori prisijungti",
       "description": "{appName} turės prieigą prie:",
-      "disclaimer": "Spustelėdami „Leisti“, jūs leidžiate {appName} ir Zitadel naudoti jūsų informaciją pagal jų naudojimo sąlygas ir privatumo politiką. Šią prieigą galite atšaukti bet kada.",
+      "disclaimer": "Spustelėdami „Leisti“, jūs leidžiate {appName} ir ZITADEL naudoti jūsų informaciją pagal jų naudojimo sąlygas ir privatumo politiką. Šią prieigą galite atšaukti bet kada.",
       "submit": "Leisti",
       "deny": "Atmesti"
     },
