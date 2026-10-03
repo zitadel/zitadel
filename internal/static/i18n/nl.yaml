@@ -1371,6 +1371,51 @@ EventTypes:
     activated: "Web Key geactiveerd"
     deactivated: "Web Key gedeactiveerd"
     removed: "Web Key verwijderd"
+  session:
+    added: "Sessie aangemaakt"
+    user:
+      checked: "Gebruiker van sessie gecontroleerd"
+    password:
+      checked: "Wachtwoord van sessie gecontroleerd"
+    intent:
+      checked: "IDP-intent van sessie gecontroleerd"
+    webAuthN:
+      challenged: "WebAuthN-challenge van sessie aangemaakt"
+      checked: "WebAuthN van sessie gecontroleerd"
+    totp:
+      checked: "TOTP van sessie gecontroleerd"
+    otp:
+      sms:
+        challenged: "OTP SMS-challenge van sessie aangemaakt"
+        sent: "OTP SMS-code van sessie verzonden"
+        checked: "OTP SMS van sessie gecontroleerd"
+      email:
+        challenged: "OTP Email-challenge van sessie aangemaakt"
+        sent: "OTP Email-code van sessie verzonden"
+        checked: "OTP Email van sessie gecontroleerd"
+    recoveryCode:
+      checked: "Herstelcode van sessie gecontroleerd"
+    token:
+      set: "Token van sessie ingesteld"
+    metadata:
+      set: "Metadata van sessie ingesteld"
+    lifetime:
+      set: "Levensduur van sessie ingesteld"
+    terminated: "Sessie beëindigd"
+  oidc_session:
+    added: "OIDC Sessie aangemaakt"
+    access_token:
+      added: "Toegangstoken van OIDC Sessie aangemaakt"
+      revoked: "Toegangstoken van OIDC Sessie ingetrokken"
+    refresh_token:
+      added: "Ververs Token van OIDC Sessie aangemaakt"
+      renewed: "Ververs Token van OIDC Sessie vernieuwd"
+      revoked: "Ververs Token van OIDC Sessie ingetrokken"
+  saml_session:
+    added: "SAML-sessie aangemaakt"
+    saml_response:
+      added: "SAML-respons van sessie aangemaakt"
+      revoked: "SAML-respons van sessie ingetrokken"
 Application:
   OIDC:
     UnsupportedVersion: "Uw OIDC-versie wordt niet ondersteund"
