@@ -6,6 +6,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { UNKNOWN_USER_ID } from "@/lib/constants";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
+import { getUserAvatarUrl } from "@/lib/user-avatar";
 import {
   getBrandingSettings,
   getDefaultOrg,
@@ -123,6 +124,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           <UserAvatar
             loginName={loginName ?? session.factors?.user?.loginName}
             displayName={session.factors?.user?.displayName}
+            imageUrl={await getUserAvatarUrl({ serviceConfig, userId: session.factors?.user?.id })}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>

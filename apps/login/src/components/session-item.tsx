@@ -32,7 +32,17 @@ export function isSessionPrimaryFactorAndLifetimeValid(session: Partial<Session>
   return { valid, verifiedAt };
 }
 
-export function SessionItem({ session, reload, requestId }: { session: Session; reload: () => void; requestId?: string }) {
+export function SessionItem({
+  session,
+  reload,
+  requestId,
+  imageUrl,
+}: {
+  session: Session;
+  reload: () => void;
+  requestId?: string;
+  imageUrl?: string;
+}) {
   const currentLocale = useLocale();
   moment.locale(currentLocale === "zh" ? "zh-cn" : currentLocale);
   const t = useTranslations("error");
@@ -105,6 +115,7 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
           >
             <div className="pr-4">
               <Avatar
+                imageUrl={imageUrl}
                 size="small"
                 loginName={session.factors?.user?.loginName as string}
                 name={session.factors?.user?.displayName ?? ""}

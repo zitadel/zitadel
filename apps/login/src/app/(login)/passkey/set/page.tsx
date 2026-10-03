@@ -5,6 +5,7 @@ import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
+import { getUserAvatarUrl } from "@/lib/user-avatar";
 import { getBrandingSettings, getUserByID } from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
@@ -65,6 +66,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           <UserAvatar
             loginName={loginName ?? session.factors?.user?.loginName}
             displayName={session.factors?.user?.displayName}
+            imageUrl={await getUserAvatarUrl({ serviceConfig, userId: session.factors?.user?.id })}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
@@ -72,6 +74,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           <UserAvatar
             loginName={user?.preferredLoginName}
             displayName={displayName}
+            imageUrl={user.type.case === "human" ? user.type.value.profile?.avatarUrl : undefined}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
