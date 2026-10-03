@@ -511,6 +511,9 @@ Machine:
 # Storage for assets like user avatar, organization logo, icon, font, ...
 AssetStorage:
   Type: db # ZITADEL_ASSET_STORAGE_TYPE
+  # Maximum size of uploaded fonts in bytes. Must be greater than zero.
+  # Defaults to 512 KiB. For larger fonts, set e.g. 33554432 (32 MiB).
+  MaxFontSize: 524288 # ZITADEL_ASSETSTORAGE_MAXFONTSIZE
   # HTTP cache control settings for serving assets in the assets API and login UI
   # the assets will also be served with an etag and last-modified header
   Cache:

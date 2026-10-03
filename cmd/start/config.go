@@ -142,7 +142,9 @@ func NewConfig(cmd *cobra.Command, v *viper.Viper) (*Config, instrumentation.Shu
 }
 
 func readConfig(v *viper.Viper) (*Config, error) {
-	config := new(Config)
+	config := &Config{
+		AssetStorage: static_config.AssetStorageConfig{MaxFontSize: 1 << 19},
+	}
 
 	err := v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
@@ -165,5 +167,11 @@ func readConfig(v *viper.Viper) (*Config, error) {
 			mapstructure.TextUnmarshallerHookFunc(),
 		)),
 	)
-	return config, err
+	if err != nil {
+		return nil, err
+	}
+	if config.AssetStorage.MaxFontSize <= 0 {
+		return nil, errors.New("AssetStorage.MaxFontSize must be greater than zero")
+	}
+	return config, nil
 }

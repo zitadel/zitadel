@@ -36,6 +36,7 @@ type Handler struct {
 	authInterceptor *http_mw.AuthInterceptor
 	idGenerator     id.Generator
 	query           *query.Queries
+	maxFontSize     int64
 }
 
 func (h *Handler) AuthInterceptor() *http_mw.AuthInterceptor {
@@ -103,6 +104,7 @@ func NewHandler(
 	queries *query.Queries,
 	callDurationInterceptor, instanceInterceptor, assetCacheInterceptor, accessInterceptor func(handler http.Handler) http.Handler,
 	translator *i18n.Translator,
+	maxFontSize int64,
 ) http.Handler {
 	h := &Handler{
 		commands:        commands,
@@ -111,6 +113,7 @@ func NewHandler(
 		idGenerator:     idGenerator,
 		storage:         storage,
 		query:           queries,
+		maxFontSize:     maxFontSize,
 	}
 
 	verifier.RegisterServer("Assets-API", "assets", AssetsService_AuthMethods)
