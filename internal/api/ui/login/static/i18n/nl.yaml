@@ -270,6 +270,7 @@ RegistrationUser:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Norwegian: Norsk bokmål
   GenderLabel: Geslacht
   Female: Vrouw
   Male: Man
@@ -317,6 +318,7 @@ ExternalRegistrationUserOverview:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Norwegian: Norsk bokmål
   TosAndPrivacyLabel: Algemene voorwaarden
   TosConfirm: Ik accepteer de
   TosLinkText: AV
@@ -398,6 +400,7 @@ ExternalNotFound:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Norwegian: Norsk bokmål
 DeviceAuth:
   Title: Apparaat Autorisatie
   UserCode:
