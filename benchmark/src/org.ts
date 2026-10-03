@@ -27,11 +27,16 @@ export function createOrg(accessToken: string): Promise<Org> {
     );
 
     response.then((res) => {
-      check(res, {
-        'org created': (r) => {
-          return r !== undefined && r.status >= 200 && r.status < 300;
-        },
-      }) || reject(`unable to create org status: ${res.status} || body: ${res.body}`);
+      if (
+        !check(res, {
+          'org created': (r) => {
+            return r !== undefined && r.status >= 200 && r.status < 300;
+          },
+        })
+      ) {
+        reject(`unable to create org status: ${res.status} || body: ${String(res.body).slice(0, 200)}`);
+        return;
+      }
 
       createOrgTrend.add(res.timings.duration);
 

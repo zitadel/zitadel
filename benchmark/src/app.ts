@@ -28,9 +28,14 @@ export function createAPI(name: string, projectId: string, org: Org, accessToken
       },
     );
     response.then((res) => {
-      check(res, {
-        'add api status ok': (r) => r.status >= 200 && r.status < 300,
-      }) || reject(`unable to add api project: ${projectId} status: ${res.status} body: ${res.body}`);
+      if (
+        !check(res, {
+          'add api status ok': (r) => r.status >= 200 && r.status < 300,
+        })
+      ) {
+        reject(`unable to add api project: ${projectId} status: ${res.status} body: ${String(res.body).slice(0, 200)}`);
+        return;
+      }
       resolve(res.json() as API);
 
       addAPITrend.add(res.timings.duration);
@@ -61,9 +66,16 @@ export function createAppKey(appId: string, projectId: string, org: Org, accessT
       },
     );
     response.then((res) => {
-      check(res, {
-        'add app key status ok': (r) => r.status >= 200 && r.status < 300,
-      }) || reject(`unable to add app key project: ${projectId} app: ${appId} status: ${res.status} body: ${res.body}`);
+      if (
+        !check(res, {
+          'add app key status ok': (r) => r.status >= 200 && r.status < 300,
+        })
+      ) {
+        reject(
+          `unable to add app key project: ${projectId} app: ${appId} status: ${res.status} body: ${String(res.body).slice(0, 200)}`,
+        );
+        return;
+      }
       resolve(res.json() as AppKey);
 
       addAppKeyTrend.add(res.timings.duration);
