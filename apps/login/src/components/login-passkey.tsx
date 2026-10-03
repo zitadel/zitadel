@@ -36,6 +36,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
   const router = useRouter();
 
   const initialized = useRef(false);
+  const passkeySessionId = useRef(sessionId);
 
   useEffect(() => {
     if (!initialized.current) {
@@ -80,7 +81,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
     setLoading(true);
     const sessionResponse = await updateOrCreateSession({
       loginName,
-      sessionId,
+      sessionId: passkeySessionId.current,
       organization,
       challenges: create(RequestChallengesSchema, {
         webAuthN: {
@@ -104,6 +105,10 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
       return;
     }
 
+    if (sessionResponse?.sessionId) {
+      passkeySessionId.current = sessionResponse.sessionId;
+    }
+
     return sessionResponse;
   }
 
@@ -112,7 +117,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
     try {
       const response = await sendPasskey({
         loginName,
-        sessionId,
+        sessionId: passkeySessionId.current,
         organization,
         checks: {
           webAuthN: { credentialAssertionData: data },
