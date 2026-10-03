@@ -206,7 +206,7 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
   if (!lifetime) {
     lifetime = checks?.webAuthN
       ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
-      : checks?.otpEmail || checks?.otpSms
+      : checks?.otpEmail || checks?.otpSms || checks?.totp
         ? loginSettings?.secondFactorCheckLifetime
         : undefined;
   }
