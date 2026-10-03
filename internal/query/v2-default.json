@@ -504,6 +504,7 @@
       "submit": "Continue",
       "labels": {
         "loginname": "Loginname",
+        "usernameEmailOrPhone": "Username, email or phone number",
         "username": "Username",
         "usernameOrPhoneNumber": "Username or phone number",
         "usernameOrEmail": "Username or email"
