@@ -349,7 +349,7 @@
       "DESCRIPTION": "Kom igång med Zitadel snabbt."
     },
     "QUICKSTARTS": {
-      "LABEL": "Första Steg",
+      "LABEL": "Första steg",
       "DESCRIPTION": "Kom igång med Zitadel snabbt."
     },
     "SHORTCUTS": {
@@ -410,25 +410,25 @@
   "MENU": {
     "INSTANCE": "Standardinställningar",
     "DASHBOARD": "Hem",
-    "PERSONAL_INFO": "Personlig Information",
+    "PERSONAL_INFO": "Personlig information",
     "DOCUMENTATION": "Dokumentation",
     "INSTANCEOVERVIEW": "Instans",
     "ORGS": "Organisationer",
     "VIEWS": "Vy",
     "EVENTS": "Händelser",
-    "FAILEDEVENTS": "Misslyckade Händelser",
+    "FAILEDEVENTS": "Misslyckade händelser",
     "ORGANIZATION": "Organisation",
     "PROJECT": "Projekt",
     "PROJECTOVERVIEW": "Översikt",
     "PROJECTGRANTS": "Projekttilldelningar",
     "ROLES": "Roller",
-    "GRANTEDPROJECT": "Beviljade Projekt",
+    "GRANTEDPROJECT": "Beviljade projekt",
     "HUMANUSERS": "Användare",
     "MACHINEUSERS": "Tjänstekonton",
     "LOGOUT": "Logga ut alla användare",
-    "NEWORG": "Ny Organisation",
+    "NEWORG": "Ny organisation",
     "IAMADMIN": "Du är en instans-administratör. Observera att du har utökade behörigheter.",
-    "SHOWORGS": "Visa Alla Organisationer",
+    "SHOWORGS": "Visa alla organisationer",
     "GRANTS": "Rolltilldelningar",
     "ACTIONS": "Åtgärder",
     "PRIVACY": "Integritet",
@@ -440,23 +440,23 @@
   "QUICKSTART": {
     "TITLE": "Integrera Zitadel i din applikation",
     "DESCRIPTION": "Integrera Zitadel i din applikation eller använd ett av våra exempel för att komma igång på några minuter.",
-    "BTN_START": "Skapa Applikation",
-    "BTN_LEARNMORE": "Läs Mer",
-    "CREATEPROJECTFORAPP": "Skapa Projekt {{value}}",
-    "SELECT_FRAMEWORK": "Välj Ramverk",
+    "BTN_START": "Skapa applikation",
+    "BTN_LEARNMORE": "Läs mer",
+    "CREATEPROJECTFORAPP": "Skapa projekt {{value}}",
+    "SELECT_FRAMEWORK": "Välj ramverk",
     "FRAMEWORK": "Ramverk",
     "FRAMEWORK_OTHER": "Annat (OIDC, SAML, API)",
     "ALMOSTDONE": "Du är nästan klar.",
-    "REVIEWCONFIGURATION": "Granska Konfiguration",
+    "REVIEWCONFIGURATION": "Granska konfiguration",
     "REVIEWCONFIGURATION_DESCRIPTION": "Vi har skapat en grundläggande konfiguration för {{value}} applikationer. Du kan anpassa denna konfiguration efter dina behov efter skapandet.",
     "REDIRECTS": "Konfigurera omdirigeringar",
     "DEVMODEWARN": "Utvecklingsläge är aktiverat som standard. Du kan uppdatera värden för produktion senare.",
     "GUIDE": "Guide",
-    "BROWSEEXAMPLES": "Bläddra bland Exempel och SDKs",
+    "BROWSEEXAMPLES": "Bläddra bland exempel och SDKs",
     "DUPLICATEAPPRENAME": "En applikation med samma namn finns redan. Vänligen välj ett annat namn.",
     "DIALOG": {
       "CHANGE": {
-        "TITLE": "Byt Ramverk",
+        "TITLE": "Byt ramverk",
         "DESCRIPTION": "Välj ett av de tillgängliga ramverken för snabb inställning av din applikation."
       }
     }
@@ -502,7 +502,7 @@
     "REFRESH": "Uppdatera",
     "LOGIN": "Logga in",
     "EDIT": "Redigera",
-    "PIN": "Fäst / Lossa",
+    "PIN": "Fäst / lossa",
     "CONFIGURE": "Konfigurera",
     "SEND": "Skicka",
     "NEWVALUE": "Nytt värde",
@@ -619,8 +619,8 @@
         "TYPE": "Typ",
         "TYPES": {
           "restWebhook": "REST Webhook",
-          "restCall": "REST Anrop",
-          "restAsync": "REST Asynkron"
+          "restCall": "REST-anrop",
+          "restAsync": "REST-asynkron"
         },
         "TYPES_DESCRIPTION": "Webhook, anropet hanterar statuskoden men svaret är irrelevant\nCall, anropet hanterar statuskoden och svaret\nAsync, anropet hanterar varken statuskod eller svar men kan anropas parallellt med andra mål",
         "PAYLOAD_TYPE": "Payload-typ",
@@ -719,13 +719,13 @@
       "HOME": "<strong>G</strong>å till <strong>H</strong>em",
       "INSTANCE": "<strong>G</strong>å till <strong>I</strong>nstans",
       "ORG": "<strong>G</strong>å till <strong>O</strong>rganisation",
-      "ORGSETTINGS": "<strong>G</strong>å till Organisations<strong>i</strong>nställningar",
-      "ORGSWITCHER": "Byt Organisation",
+      "ORGSETTINGS": "<strong>G</strong>å till organisations<strong>i</strong>nställningar",
+      "ORGSWITCHER": "Byt organisation",
       "ME": "Gå till egen profil",
       "PROJECTS": "<strong>G</strong>å till <strong>P</strong>rojekt",
       "USERS": "<strong>G</strong>å till <strong>A</strong>nvändare",
       "ROLEASSIGNMENTS": "<strong>G</strong>å till <strong>R</strong>olltilldelningar",
-      "ACTIONS": "<strong>G</strong>å till Åtgärder och <strong>F</strong>löden",
+      "ACTIONS": "<strong>G</strong>å till åtgärder och <strong>F</strong>löden",
       "DOMAINS": "<strong>G</strong>å till <strong>D</strong>omäner"
     }
   },
@@ -762,20 +762,20 @@
       "TITLE": "Inställningar",
       "GENERAL": "Allmänt",
       "IDP": "Identitetsleverantörer",
-      "SECURITY": "Lösenord och Säkerhet",
+      "SECURITY": "Lösenord och säkerhet",
       "KEYS": "Nycklar",
-      "PAT": "Personliga Åtkomsttoken",
+      "PAT": "Personliga åtkomsttoken",
       "ROLEASSIGNMENTS": "Rolltilldelningar",
       "MEMBERSHIPS": "Administratörsroller",
       "METADATA": "Metadata"
     },
-    "TITLE": "Personlig Information",
+    "TITLE": "Personlig information",
     "DESCRIPTION": "Hantera din information och säkerhetsinställningar.",
     "PAGES": {
       "TITLE": "Användare",
       "DETAIL": "Detalj",
       "CREATE": "Skapa",
-      "MY": "Min Information",
+      "MY": "Min information",
       "LOGINNAMES": "Inloggningsnamn",
       "LOGINMETHODS": "Inloggningsmetoder",
       "LOGINNAMESDESC": "Detta är dina inloggningsnamn:",
@@ -784,14 +784,14 @@
       "DEACTIVATE": "Inaktivera",
       "FILTER": "Filter",
       "STATE": "Status",
-      "DELETE": "Radera Användare",
-      "UNLOCK": "Lås Upp Användare",
-      "GENERATESECRET": "Generera Klienthemlighet",
-      "REMOVESECRET": "Ta Bort Klienthemlighet",
+      "DELETE": "Radera användare",
+      "UNLOCK": "Lås upp användare",
+      "GENERATESECRET": "Generera klienthemlighet",
+      "REMOVESECRET": "Ta bort klienthemlighet",
       "LOCKEDDESCRIPTION": "Denna användare har blivit låst på grund av att ha överskridit maximalt antal inloggningsförsök och måste låsas upp för att kunna användas igen.",
-      "DELETEACCOUNT": "Radera Konto",
+      "DELETEACCOUNT": "Radera konto",
       "DELETEACCOUNT_DESC": "Om du utför denna åtgärd kommer du att loggas ut och inte längre ha tillgång till ditt konto. Denna åtgärd är inte reversibel, så fortsätt med försiktighet.",
-      "DELETEACCOUNT_BTN": "Radera Konto",
+      "DELETEACCOUNT_BTN": "Radera konto",
       "DELETEACCOUNT_SUCCESS": "Konto raderat framgångsrikt!"
     },
     "DETAILS": {
@@ -799,8 +799,8 @@
       "DATECHANGED": "Ändrad"
     },
     "DIALOG": {
-      "DELETE_TITLE": "Radera Användare",
-      "DELETE_SELF_TITLE": "Radera Konto",
+      "DELETE_TITLE": "Radera användare",
+      "DELETE_SELF_TITLE": "Radera konto",
       "DELETE_DESCRIPTION": "Du är på väg att permanent radera en användare. Är du säker?",
       "DELETE_SELF_DESCRIPTION": "Du är på väg att permanent radera ditt personliga konto. Detta kommer att logga ut dig och radera din användare. Denna åtgärd kan inte ångras!",
       "DELETE_AUTH_DESCRIPTION": "Du är på väg att permanent radera ditt personliga konto. Är du säker?",
@@ -809,7 +809,7 @@
       "DELETE_BTN": "Radera permanent"
     },
     "SENDEMAILDIALOG": {
-      "TITLE": "Skicka E-postmeddelande",
+      "TITLE": "Skicka e-postmeddelande",
       "DESCRIPTION": "Klicka på knappen nedan för att skicka en notifikation till den aktuella e-postadressen eller ändra e-postadressen i fältet.",
       "NEWEMAIL": "Ny e-postadress"
     },
@@ -820,15 +820,15 @@
     "TABLE": {
       "DEACTIVATE": "Inaktivera",
       "ACTIVATE": "Aktivera",
-      "CHANGEDATE": "Senast Ändrad",
-      "CREATIONDATE": "Skapad Den",
+      "CHANGEDATE": "Senast ändrad",
+      "CREATIONDATE": "Skapad den",
       "FILTER": {
-        "0": "Filtrera efter Visningsnamn",
-        "1": "Filtrera efter Användarnamn",
-        "2": "Filtrera efter Visningsnamn",
-        "3": "Filtrera efter Användarnamn",
-        "4": "Filtrera efter E-post",
-        "5": "Filtrera efter Visningsnamn",
+        "0": "Filtrera efter visningsnamn",
+        "1": "Filtrera efter användarnamn",
+        "2": "Filtrera efter visningsnamn",
+        "3": "Filtrera efter användarnamn",
+        "4": "Filtrera efter e-post",
+        "5": "Filtrera efter visningsnamn",
         "10": "Filtrera efter organisationsnamn",
         "12": "Filtrera efter projektnamn"
       },
@@ -965,7 +965,7 @@
       "PHONE_HINT": "Använd + symbolen följt av landskoden, eller välj landet från rullgardinsmenyn och ange sedan telefonnumret",
       "PHONE_VERIFIED": "Telefonnummer verifierat",
       "SEND_SMS": "Skicka verifierings-SMS",
-      "SEND_EMAIL": "Skicka E-post",
+      "SEND_EMAIL": "Skicka e-post",
       "USERNAME": "Användarnamn",
       "CHANGEUSERNAME": "ändra",
       "CHANGEUSERNAME_TITLE": "Ändra användarnamn",
@@ -1267,7 +1267,7 @@
       "DESCRIPTION": "Hantera dina globala policyer och åtkomstinställningar."
     },
     "EVENTSTORE": {
-      "TITLE": "Instans Lagringsadministration",
+      "TITLE": "Instanslagringsadministration",
       "DESCRIPTION": "Hantera dina Zitadel-vyer och misslyckade händelser."
     },
     "MEMBER": {
@@ -1598,7 +1598,7 @@
         "TOKEN": "Token",
         "SENDERNUMBER": "Avsändarnummer",
         "VERIFYSERVICESID": "Verifieringstjänst-SID",
-        "VERIFYSERVICESID_DESCRIPTION": "Inställning av en Verifieringstjänst-SID gör det möjligt att använda Twilio Verify-tjänsten istället för Meddelandetjänsten för verifiering av telefonnummer och OTP-SMS.",
+        "VERIFYSERVICESID_DESCRIPTION": "Inställning av en Verifieringstjänst-SID gör det möjligt att använda Twilio Verify-tjänsten istället för Meddelandetjänsten för verifiering av telefonnummer och OTP-SMS",
         "ADDED": "Twilio tillagd framgångsrikt.",
         "UPDATED": "Twilio uppdaterad framgångsrikt.",
         "REMOVED": "Twilio borttagen",
@@ -1617,7 +1617,7 @@
         "5": "Passkey-initiering",
         "6": "Applikations-hemlighet",
         "7": "OTP - SMS",
-        "8": "OTP - E-post",
+        "8": "OTP - e-post",
         "9": "Inbjudningskod"
       },
       "EXPIRY": "Utgång (på minuter)",
@@ -1644,9 +1644,9 @@
       "USERSCHEMA_DESCRIPTION": "Användarscheman tillåter att hantera datascheman för användare. Om flaggan är aktiverad kommer du att kunna använda det nya API:et och dess funktioner.",
       "ACTIONS": "Åtgärder",
       "ACTIONS_DESCRIPTION": "Åtgärder v2 tillåter att hantera dataexekveringar och mål. Om flaggan är aktiverad kommer du att kunna använda det nya API:et och dess funktioner.",
-      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Session avslutning",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 sessionavslutning",
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Om flaggan är aktiverad, kan du avsluta en enskild session från inloggningsgränssnittet genom att ange en id_token med ett `sid`-krav som id_token_hint på slutpunkten end_session. Observera att för närvarande alla sessioner från samma användaragent (webbläsare) avslutas i inloggningsgränssnittet. Sessioner som hanteras via Session API tillåter redan avslutning av enskilda sessioner.",
-      "DEBUGOIDCPARENTERROR": "Debugga OIDC Föräldrafel",
+      "DEBUGOIDCPARENTERROR": "Debugga OIDC-föräldrafel",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Om flaggan är aktiverad kommer OIDC-föräldrafel att loggas i konsolen.",
       "PERMISSIONCHECKV2": "Behörighetskontroll V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Om flaggan är aktiverad kan du använda den nya API:n och dess funktioner.",
@@ -1738,7 +1738,7 @@
     },
     "PWD_AGE": {
       "TITLE": "Lösenordets utgång",
-      "DESCRIPTION": "Du kan ställa in en policy för utgångsdatum för lösenord.  Den här policyn tvingar användaren att byta lösenord vid nästa inloggning efter att lösenordet har löpt ut. Det finns inga automatiska varningar eller meddelanden."
+      "DESCRIPTION": "Du kan ställa in en policy för utgångsdatum för lösenord. Den här policyn tvingar användaren att byta lösenord vid nästa inloggning efter att lösenordet har löpt ut. Det finns inga automatiska varningar eller meddelanden."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Låsning av lösenordspolicy",
@@ -1765,9 +1765,9 @@
       "POLICYLINK": "Länk till integritetspolicy",
       "HELPLINK": "Länk till hjälp",
       "SUPPORTEMAIL": "Support-e-post",
-      "DOCSLINK": "Dokumentationslänk (Hanteringskonsol)",
-      "CUSTOMLINK": "Anpassad länk (Hanteringskonsol)",
-      "CUSTOMLINKTEXT": "Anpassad länktext (Hanteringskonsol)",
+      "DOCSLINK": "Dokumentationslänk (hanteringskonsol)",
+      "CUSTOMLINK": "Anpassad länk (hanteringskonsol)",
+      "CUSTOMLINKTEXT": "Anpassad länktext (hanteringskonsol)",
       "SAVED": "Sparat framgångsrikt!",
       "RESET_TITLE": "Återställ standardvärden",
       "RESET_DESCRIPTION": "Du håller på att återställa standardlänkarna för användarvillkor och integritetspolicy. Vill du verkligen fortsätta?"
@@ -1779,7 +1779,7 @@
       "NEWERVERSIONEXISTS": "Nyare version finns",
       "CURRENTDATE": "Nuvarande konfiguration",
       "CHANGEDATE": "Nyare version från",
-      "KEYNAME": "Inloggningsskärm / Gränssnitt",
+      "KEYNAME": "Inloggningsskärm / gränssnitt",
       "RESET_TITLE": "Återställ standardvärden",
       "RESET_DESCRIPTION": "Du håller på att återställa alla standardvärden. Alla ändringar du har gjort kommer att raderas permanent. Vill du verkligen fortsätta?",
       "UNSAVED_TITLE": "Fortsätt utan att spara?",
@@ -1852,11 +1852,11 @@
       "TYPE": "Notifikation",
       "TYPES": {
         "INIT": "Initialisering",
-        "VE": "Verifiera E-post",
-        "VP": "Verifiera Telefon",
+        "VE": "Verifiera e-post",
+        "VP": "Verifiera telefon",
         "VSO": "Verifiera OTP SMS",
-        "VEO": "Verifiera E-post OTP",
-        "PR": "Återställ Lösenord",
+        "VEO": "Verifiera e-post OTP",
+        "PR": "Återställ lösenord",
         "DC": "Domänkrav",
         "PL": "Passkey",
         "PC": "Lösenordsändring",
@@ -1866,7 +1866,7 @@
         "firstname": "Förnamn",
         "lastname": "Efternamn",
         "code": "Kod",
-        "preferredLoginName": "Föredraget Inloggningsnamn",
+        "preferredLoginName": "Föredraget inloggningsnamn",
         "displayName": "Visningsnamn",
         "nickName": "Smeknamn",
         "loginnames": "Inloggningsnamn",
@@ -1884,7 +1884,7 @@
         "applicationName": "Applikationsnamn"
       },
       "TOAST": {
-        "UPDATED": "Anpassade Texter sparade."
+        "UPDATED": "Anpassade texter sparade."
       }
     },
     "DEFAULTLABEL": "De nuvarande inställningarna motsvarar standarden för din instans.",
@@ -1905,7 +1905,7 @@
       "USERLOGINMUSTBEDOMAIN": "Lägg till organisationsdomän som suffix till inloggningsnamn",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Om du aktiverar denna inställning kommer alla inloggningsnamn att ha organisationsdomänen som suffix. Om denna inställning är inaktiverad måste du säkerställa att användarnamn är unika över alla organisationer.",
       "VALIDATEORGDOMAINS": "Organisationsdomänverifiering krävs (DNS eller HTTP-utmaning)",
-      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Avsändaradress matchar Instansdomän",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP-avsändaradress matchar instansdomän",
       "ALLOWUSERNAMEPASSWORD_DESC": "Den konventionella inloggningen med användarnamn och lösenord är tillåten.",
       "ALLOWEXTERNALIDP_DESC": "Inloggning är tillåten för de underliggande identitetsleverantörerna",
       "ALLOWREGISTER_DESC": "Om alternativet är valt visas ett ytterligare steg för att registrera en användare i inloggningen.",
@@ -1920,11 +1920,11 @@
       "DEFAULTREDIRECTURI": "Standard omdirigerings-URI",
       "DEFAULTREDIRECTURI_DESC": "Definierar vart användaren kommer att omdirigeras om inloggningen har startat utan en appkontext (t.ex. från e-post)",
       "ERRORMSGPOPUP": "Visa fel i dialog",
-      "DISABLEWATERMARK": "Dölj Vattenstämpel",
+      "DISABLEWATERMARK": "Dölj vattenstämpel",
       "DISABLEWATERMARK_DESC": "Dölj Powered by Zitadel vattenstämpel i inloggningsgränssnittet"
     },
     "RESET": "Återställ till instansstandard",
-    "CREATECUSTOM": "Skapa Anpassad Policy",
+    "CREATECUSTOM": "Skapa anpassad policy",
     "TOAST": {
       "SET": "Policy inställd framgångsrikt!",
       "RESETSUCCESS": "Policy återställd framgångsrikt!",
@@ -1969,16 +1969,16 @@
     "PAGES": {
       "TITLE": "Projekt",
       "DESCRIPTION": "Här kan du definiera applikationer, hantera roller och ge andra organisationer tillgång till ditt projekt.",
-      "DELETE": "Radera Projekt",
+      "DELETE": "Radera projekt",
       "DETAIL": "Detalj",
-      "CREATE": "Skapa Projekt",
+      "CREATE": "Skapa projekt",
       "CREATE_DESC": "Ange ditt projekts namn.",
       "ROLE": "Roll",
       "NOITEMS": "Inga projekt",
       "ZITADELPROJECT": "Detta tillhör Zitadel-projektet. Observera: Om du gör ändringar kan Zitadel inte fungera som avsett.",
       "TYPE": {
-        "OWNED": "Ägda Projekt",
-        "OWNED_SINGULAR": "Ägt Projekt",
+        "OWNED": "Ägda projekt",
+        "OWNED_SINGULAR": "Ägt projekt",
         "GRANTED_SINGULAR": "Projekt tilldelat {{name}}"
       },
       "PRIVATELABEL": {
@@ -2004,18 +2004,18 @@
       "ALL": "Alla",
       "CREATEDON": "Skapad den",
       "LASTMODIFIED": "Senast ändrad den",
-      "ADDNEW": "Skapa Nytt Projekt",
+      "ADDNEW": "Skapa nytt projekt",
       "DIALOG": {
         "REACTIVATE": {
-          "TITLE": "Återaktivera Projekt",
+          "TITLE": "Återaktivera projekt",
           "DESCRIPTION": "Vill du verkligen återaktivera ditt projekt?"
         },
         "DEACTIVATE": {
-          "TITLE": "Inaktivera Projekt",
+          "TITLE": "Inaktivera projekt",
           "DESCRIPTION": "Vill du verkligen inaktivera ditt projekt?"
         },
         "DELETE": {
-          "TITLE": "Radera Projekt",
+          "TITLE": "Radera projekt",
           "DESCRIPTION": "Vill du verkligen radera ditt projekt?",
           "TYPENAME": "Skriv namnet på projektet för att radera det permanent."
         }
@@ -2040,9 +2040,9 @@
     },
     "NAME": "Namn",
     "NAMEDIALOG": {
-      "TITLE": "Byt Namn på Projekt",
+      "TITLE": "Byt namn på projekt",
       "DESCRIPTION": "Ange det nya namnet för ditt projekt",
-      "NAME": "Nytt Namn"
+      "NAME": "Nytt namn"
     },
     "MEMBER": {
       "TITLE": "Administratörer",
@@ -2079,7 +2079,7 @@
         "MEMBERTITLE": "Administratörer",
         "MEMBERDESC": "Dessa är administratörerna för den beviljade organisationen. Lägg till användare här som ska få tillgång att redigera projektets data.",
         "PROJECTNAME": "Projektnamn",
-        "GRANTEDORG": "Beviljad Organisation",
+        "GRANTEDORG": "Beviljad organisation",
         "RESOURCEOWNER": "Resursägare"
       },
       "STATE": "Status",
@@ -2088,12 +2088,12 @@
         "2": "Inaktiv"
       },
       "ALL": "Alla",
-      "SHOWDETAIL": "Visa Detaljer",
+      "SHOWDETAIL": "Visa detaljer",
       "USER": "Användare",
       "MEMBERS": "Administratörer",
       "ORG": "Organisation",
       "PROJECTNAME": "Projektnamn",
-      "GRANTEDORG": "Beviljad Organisation",
+      "GRANTEDORG": "Beviljad organisation",
       "GRANTEDORGDOMAIN": "Domän",
       "RESOURCEOWNER": "Resursägare",
       "GRANTEDORGNAME": "Organisationsnamn",
@@ -2301,7 +2301,7 @@
     "NAMEHINT": "Om specificerat kommer det att visas i inloggningsgränssnittet.",
     "OPTIONAL": "valfritt",
     "LDAPATTRIBUTES": "LDAP-attribut",
-    "UPDATEBINDPASSWORD": "uppdatera Bind-lösenord",
+    "UPDATEBINDPASSWORD": "uppdatera bind-lösenord",
     "UPDATECLIENTSECRET": "uppdatera klienthemlighet",
     "ADD": "Lägg till identitetsleverantör",
     "TYPE": "Typ",
@@ -2352,7 +2352,7 @@
     "PREFERREDLANGUAGEATTRIBUTE": "Föredraget språk-attribut",
     "PREFERREDUSERNAMEATTRIBUTE": "Föredraget användarnamn-attribut",
     "PROFILEATTRIBUTE": "Profil-attribut",
-    "IDPDISPLAYNAMMAPPING": "IDP Visningsnamn-mappning",
+    "IDPDISPLAYNAMMAPPING": "IDP-visningsnamn-mappning",
     "USERNAMEMAPPING": "Användarnamn-mappning",
     "DATES": "Datum",
     "CREATIONDATE": "Skapad den",
@@ -2576,7 +2576,7 @@
           "DESC": "Lägg till nya användare i din organisation"
         },
         "2": {
-          "TITLE": "Hjälp & Support",
+          "TITLE": "Hjälp & support",
           "DESC": "Läs vår dokumentation om att skapa applikationer eller kontakta vår support"
         }
       }
@@ -2624,7 +2624,7 @@
       "DEVMODE": "Utvecklingsläge",
       "DEVMODE_ENABLED": "Aktiverad",
       "DEVMODE_DISABLED": "Inaktiverad",
-      "DEVMODEDESC": "Observera: Med utvecklingsläge aktiverat kommer omdirigerings-URI:er inte att valideras.",
+      "DEVMODEDESC": "Observera: med utvecklingsläge aktiverat kommer omdirigerings-URI:er inte att valideras.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Hoppa över inloggningsframgångssida",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Hoppa över framgångssidan efter en inloggning för denna inhemska app.",
       "APPLINKSSECTION": "Länkar för inbyggda appar",
@@ -2648,7 +2648,7 @@
       "FINGERPRINTSDESC": "Ett fingeravtryck per rad (64 hexadecimala tecken, kolon valfritt). Inkludera debug och release vid behov.",
       "REDIRECT": "Omdirigerings-URI:er",
       "REDIRECTSECTION": "Omdirigerings-URI:er",
-      "POSTLOGOUTREDIRECT": "Post Logout-URI:er",
+      "POSTLOGOUTREDIRECT": "Post logout-URI:er",
       "RESPONSESECTION": "Svarstyper",
       "GRANTSECTION": "Beviljningstyper",
       "GRANTTITLE": "Välj dina beviljningstyper. Obs: Implicit är endast tillgänglig för webbläsarbaserade applikationer.",
@@ -2678,7 +2678,7 @@
         "2": "Ingen",
         "3": "Privat nyckel JWT"
       },
-      "TOKENTYPE": "Auth Token-typ",
+      "TOKENTYPE": "Auth token-typ",
       "TOKENTYPE0": "Bärare-token",
       "TOKENTYPE1": "JWT",
       "UNSECUREREDIRECT": "Jag hoppas verkligen att du vet vad du gör.",
@@ -2760,7 +2760,7 @@
         "DESCRIPTION": "Skicka client_id och client_secret som en del av formuläret"
       },
       "PK_JWT": {
-        "TITLE": "Privat Nyckel JWT",
+        "TITLE": "Privat nyckel JWT",
         "DESCRIPTION": "Använd en privat nyckel för att auktorisera din applikation"
       },
       "BASIC": {
@@ -2832,8 +2832,8 @@
     "CREATIONTYPES": {
       "3": "Instans",
       "2": "Organisation",
-      "0": "Eget Projekt",
-      "1": "Beviljat Projekt",
+      "0": "Eget projekt",
+      "1": "Beviljat projekt",
       "4": "Projekt"
     },
     "EDITROLE": "Redigera roller",
