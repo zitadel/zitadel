@@ -282,6 +282,12 @@ func createCSRFInterceptor(cookieName string, csrfCookieKey []byte, externalSecu
 				// (regardless of the TLS / externalSecure settings)
 				secureOnly = externalSecure || http_utils.DomainContext(r.Context()).RequestedDomain() == "localhost"
 			}
+			// gorilla/csrf validates the Origin / Referer header against the request's
+			// scheme and assumes HTTPS unless the request is marked as plaintext.
+			// Without this, every POST on a plain-HTTP deployment fails with "origin invalid".
+			if !externalSecure {
+				r = csrf.PlaintextHTTPRequest(r)
+			}
 			csrf.Protect(csrfCookieKey,
 				csrf.Secure(secureOnly),
 				csrf.CookieName(http_utils.SetCookiePrefix(cookieName, externalSecure, http_utils.PrefixHost)),
