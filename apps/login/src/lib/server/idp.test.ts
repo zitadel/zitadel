@@ -269,6 +269,55 @@ describe("redirectToIdp", () => {
     });
   });
 
+  describe("loginHint parameter handling", () => {
+    test("should forward the loginHint to the IDP flow when provided", async () => {
+      const formData = new FormData();
+      formData.append("id", "idp123");
+      formData.append("provider", "google");
+      formData.append("loginHint", "user@example.com");
+
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
+
+      try {
+        await redirectToIdp(undefined, formData);
+      } catch (error: any) {
+        // Redirect throws in tests
+        expect(error.message).toContain("REDIRECT:");
+      }
+
+      expect(mockStartIdentityProviderFlow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          idpId: "idp123",
+          urls: expect.objectContaining({ loginHint: "user@example.com" }),
+        }),
+      );
+    });
+
+    test("should not set a loginHint when it is missing or empty", async () => {
+      for (const loginHint of [undefined, ""]) {
+        mockStartIdentityProviderFlow.mockReset();
+        mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
+
+        const formData = new FormData();
+        formData.append("id", "idp123");
+        formData.append("provider", "google");
+        if (loginHint !== undefined) {
+          formData.append("loginHint", loginHint);
+        }
+
+        try {
+          await redirectToIdp(undefined, formData);
+        } catch (error: any) {
+          // Redirect throws in tests
+          expect(error.message).toContain("REDIRECT:");
+        }
+
+        const callArgs = mockStartIdentityProviderFlow.mock.calls[0][0];
+        expect(callArgs.urls.loginHint).toBeUndefined();
+      }
+    });
+  });
+
   describe("General redirect behavior", () => {
     test("should return error when IDP flow returns null", async () => {
       const formData = new FormData();

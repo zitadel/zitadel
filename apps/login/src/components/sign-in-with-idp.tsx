@@ -23,6 +23,8 @@ export interface SignInWithIDPProps {
   organization?: string;
   sessionId?: string;
   postErrorRedirectUrl?: string;
+  /** Forwarded to the IdP as login_hint so the user does not have to type the identifier again. */
+  loginHint?: string;
   showLabel?: boolean;
 }
 
@@ -32,6 +34,7 @@ export function SignInWithIdp({
   organization,
   sessionId,
   postErrorRedirectUrl,
+  loginHint,
   showLabel = true,
 }: Readonly<SignInWithIDPProps>) {
   const [state, action, _isPending] = useActionState(redirectToIdp, {});
@@ -64,6 +67,7 @@ export function SignInWithIdp({
         <input type="hidden" name="organization" value={organization} />
         {sessionId && <input type="hidden" name="sessionId" value={sessionId} />}
         {postErrorRedirectUrl && <input type="hidden" name="postErrorRedirectUrl" value={postErrorRedirectUrl} />}
+        {loginHint && <input type="hidden" name="loginHint" value={loginHint} />}
         <Component key={id} name={name} />
       </form>
     ) : null;

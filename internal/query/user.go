@@ -12,6 +12,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -593,9 +594,8 @@ func (q *Queries) CountUsers(ctx context.Context, queries *UserSearchQueries) (c
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareCountUsersQuery()
-	eq := sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
-	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
+	query, scan := queries.prepareUsersCountQuery(ctx, false)
+	stmt, args, err := query.ToSql()
 	if err != nil {
 		return 0, zerrors.ThrowInternal(err, "QUERY-w3Dx", "Errors.Query.SQLStatement")
 	}
@@ -625,7 +625,7 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, p
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := queries.prepareUsersQuery(ctx, permissionCheckV2)
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := query.ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatement")
 	}
@@ -711,6 +711,40 @@ func (q *Queries) SearchClaimedUserIDsOfOrgDomain(ctx context.Context, domain, o
 	)
 
 	return userIDs, err
+}
+
+//go:embed user_is_admin.sql
+var userIsAdminQuery string
+
+// IsUserAdmin checks if the user has any memberships in instance, org, project or project_grant.
+// When at least 1 membership is found, true is returned. False otherwise.
+func (q *Queries) IsUserAdmin(ctx context.Context, userID string) (isAdmin bool, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	// If trigger fails, the membership projections might be outdated,
+	// As this is important for security, we return the error.
+	// Other trigger errors are typically only debug logged.
+	ctx, err = q.triggerMemberProjections(ctx)
+	if err != nil {
+		return false, zerrors.ThrowInternal(err, "QUERY-UTh3k", "Errors.Internal")
+	}
+
+	err = q.client.QueryRowContext(ctx,
+		func(row *sql.Row) error {
+			return row.Scan(&isAdmin)
+		},
+		userIsAdminQuery,
+		authz.GetInstance(ctx).InstanceID(), userID,
+	)
+	if errors.Is(err, sql.ErrNoRows) {
+		logging.WithError(ctx, err).Debug("user not admin", "userID", userID)
+		return false, nil
+	}
+	if err != nil {
+		return false, zerrors.ThrowInternal(err, "QUERY-Ao1re", "Errors.Internal")
+	}
+	return isAdmin, nil
 }
 
 func (r *UserSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
@@ -843,28 +877,34 @@ func newLoginNameExistsViewQuery(value string, comparison TextComparison) (Searc
 }
 
 func (q *UserSearchQueries) hasMetadataFilter() bool {
-	return searchQueriesHaveMetadataFilter(q.Queries)
+	return searchQueriesUse(q.Queries, func(col Column) bool {
+		return col.table.name == userMetadataTable.name
+	})
 }
 
-func searchQueriesHaveMetadataFilter(queries []SearchQuery) bool {
-	return slices.ContainsFunc(queries, searchQueryHasMetadataFilter)
+func searchQueriesUse(queries []SearchQuery, match func(Column) bool) bool {
+	return slices.ContainsFunc(queries, func(qry SearchQuery) bool {
+		return searchQueryUses(qry, match)
+	})
 }
 
-func searchQueryHasMetadataFilter(qry SearchQuery) bool {
+func searchQueryUses(qry SearchQuery, match func(Column) bool) bool {
 	switch v := qry.(type) {
 	case *OrQuery:
-		return searchQueriesHaveMetadataFilter(v.queries)
+		return searchQueriesUse(v.queries, match)
 	case *AndQuery:
-		return searchQueriesHaveMetadataFilter(v.queries)
+		return searchQueriesUse(v.queries, match)
 	case *NotQuery:
-		return searchQueryHasMetadataFilter(v.query)
+		return searchQueryUses(v.query, match)
 	default:
-		return qry.Col().table.name == userMetadataTable.name
+		return match(qry.Col())
 	}
 }
 
-func triggerUserProjections(ctx context.Context) {
-	triggerBatch(ctx, projection.UserProjection, projection.LoginNameProjection)
+func triggerUserProjections(ctx context.Context) context.Context {
+	ctx, err := triggerBatch(ctx, projection.UserProjection, projection.LoginNameProjection)
+	logging.OnError(ctx, err).Debug("could not trigger user projections")
+	return ctx
 }
 
 var joinLoginNames = `LEFT JOIN LATERAL (` +
@@ -1235,22 +1275,12 @@ func scanNotifyUser(row *sql.Row) (*NotifyUser, error) {
 	return u, nil
 }
 
-func prepareCountUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (uint64, error)) {
-	return sq.Select(countColumn.identifier()).
-			From(userTable.identifier()).
-			LeftJoin(join(HumanUserIDCol, UserIDCol)).
-			LeftJoin(join(MachineUserIDCol, UserIDCol)).
-			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (count uint64, err error) {
-			// the count is implemented as a windowing function,
-			// if it is zero, no row is returned at all.
-			if !rows.Next() {
-				return
-			}
-
-			err = rows.Scan(&count)
-			return
-		}
+func scanUsersCount(rows *sql.Rows) (count uint64, err error) {
+	if !rows.Next() {
+		return 0, nil
+	}
+	err = rows.Scan(&count)
+	return count, err
 }
 
 func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
@@ -1290,24 +1320,143 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 		}
 }
 
-// prepareUsersQuery creates the select query for searching users and returns a matching scan function.
-// Permissions, filters and sorting are applied in a `SELECT FROM` sub-select.
-// The count over window function and limit are applied in the outer query.
-// It is not possible to pass more filters to the returned query, as they need to be applied in the sub-select.
-//
-// Metadata JOIN and DISTINCT are only applied when a metadata filter is present.
-// Login-equality filters (username, email, phone, login name EQUALS /
-// EQUALS_IGNORE_CASE) become an indexed UNION of ID seeks.
-func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionCheckV2 bool) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+// userSearchPlan captures the joins and remaining filters needed to identify
+// matching users. Display joins (humans, machines, login_names) run after LIMIT
+// on the outer page. applyConstraints still joins them before LIMIT when a
+// remaining filter or the sort column needs them (for example sorting by first name).
+type userSearchPlan struct {
+	instanceID             string
+	filters                []SearchQuery
+	loginEqualitySeeks     []loginEqualitySeek
+	loginEqualityExtracted bool
+	needsMetadataJoin      bool
+	needsHumanJoin         bool
+	needsMachineJoin       bool
+	needsLoginNamesJoin    bool
+	sortTableName          string
+	permissionCheckV2      bool
+}
+
+func (q *UserSearchQueries) planUserSearch(ctx context.Context, permissionCheckV2 bool) userSearchPlan {
 	if q.SortingColumn.isZero() {
 		q.SortingColumn = UserIDCol
 	}
 
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	loginEqualitySeeks, filters, loginEqualityExtracted := extractLoginEqualitySeeks(instanceID, q.Queries)
-	needsMetadataJoin := q.hasMetadataFilter()
+	seeks, filters, extracted := extractLoginEqualitySeeks(instanceID, q.Queries)
+	return userSearchPlan{
+		instanceID:             instanceID,
+		filters:                filters,
+		loginEqualitySeeks:     seeks,
+		loginEqualityExtracted: extracted,
+		needsMetadataJoin:      q.hasMetadataFilter(),
+		needsHumanJoin: searchQueriesUse(filters, func(col Column) bool {
+			return col.table.name == humanTable.name
+		}),
+		needsMachineJoin: searchQueriesUse(filters, func(col Column) bool {
+			return col.table.name == machineTable.name
+		}),
+		// Display alias (preferred_login_name / aggregated login_names), not LoginNameQuery EQUALS.
+		needsLoginNamesJoin: searchQueriesUse(filters, func(col Column) bool {
+			return col.table.alias == userLoginNamesTable.alias
+		}),
+		sortTableName:     q.SortingColumn.table.name,
+		permissionCheckV2: permissionCheckV2,
+	}
+}
 
-	// start building the sub-select
+func (p userSearchPlan) applyConstraints(ctx context.Context, query sq.SelectBuilder, forPage bool) sq.SelectBuilder {
+	query = query.
+		From(userTable.identifier()).
+		Where(sq.Eq{UserInstanceIDCol.identifier(): p.instanceID})
+
+	if p.loginEqualityExtracted {
+		query = query.JoinClause(joinLoginEqualitySeeks(p.loginEqualitySeeks))
+	}
+	if p.needsMetadataJoin {
+		query = query.LeftJoin(join(UserMetadataUserIDCol, UserIDCol))
+	}
+	needsHumanJoin := p.needsHumanJoin || (forPage && p.sortTableName == humanTable.name)
+	needsMachineJoin := p.needsMachineJoin || (forPage && p.sortTableName == machineTable.name)
+	if needsHumanJoin {
+		query = query.LeftJoin(join(HumanUserIDCol, UserIDCol))
+	}
+	if needsMachineJoin {
+		query = query.LeftJoin(join(MachineUserIDCol, UserIDCol))
+	}
+	if p.needsLoginNamesJoin {
+		query = query.JoinClause(joinLoginNames)
+	}
+
+	query = userPermissionCheckV2(ctx, query, p.permissionCheckV2, p.filters)
+	for _, filter := range p.filters {
+		query = filter.toQuery(query)
+	}
+	return query
+}
+
+func (q *UserSearchQueries) pageOrderClause(sortExpr, idExpr string) string {
+	dir := ""
+	if !q.Asc {
+		dir = " DESC"
+	}
+	clause := sortExpr + dir
+	if q.SortingColumn.identifier() != UserIDCol.identifier() {
+		clause += ", " + idExpr + dir
+	}
+	return clause
+}
+
+// prepareUsersCountQuery counts matching users without selecting display columns.
+// Used by CountUsers (SCIM count=0). It can still add the login_names3 LATERAL
+// if a filter uses preferred_login_name or aggregated login_names (no API path
+// currently does).
+func (q *UserSearchQueries) prepareUsersCountQuery(ctx context.Context, permissionCheckV2 bool) (sq.SelectBuilder, func(*sql.Rows) (uint64, error)) {
+	plan := q.planUserSearch(ctx, permissionCheckV2)
+	query := plan.matchingCountSelect(ctx).PlaceholderFormat(sq.Dollar)
+	return query, scanUsersCount
+}
+
+func (p userSearchPlan) matchingCountSelect(ctx context.Context) sq.SelectBuilder {
+	countExpr := "COUNT(*)"
+	if p.needsMetadataJoin {
+		countExpr = "COUNT(DISTINCT " + UserIDCol.identifier() + ")"
+	}
+	return p.applyConstraints(ctx, sq.Select(countExpr), false)
+}
+
+// prepareUsersQuery creates the select query for searching users and returns a matching scan function.
+// Matching IDs are selected first with filters, permissions and LIMIT/OFFSET.
+// A scalar COUNT(*) (COUNT(DISTINCT id) with a metadata filter) supplies the total.
+// Humans, machines and login_names are joined afterwards so the login_names3 view
+// is expanded only for the returned page, except when a remaining filter or the
+// sort column needs those joins before LIMIT.
+// Login-equality filters (username, email, phone, login name EQUALS /
+// EQUALS_IGNORE_CASE) become an indexed UNION of ID seeks.
+func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionCheckV2 bool) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+	plan := q.planUserSearch(ctx, permissionCheckV2)
+	idCols := []string{
+		UserIDCol.identifier(),
+		q.SortingColumn.orderBy() + " AS sort_col",
+	}
+
+	pageQuery := plan.applyConstraints(ctx, sq.Select(idCols...), true)
+	idExpr := UserIDCol.identifier()
+	if plan.needsMetadataJoin {
+		pageQuery = sq.Select(
+			"id",
+			"sort_col",
+		).FromSelect(pageQuery.Distinct(), "ids")
+		idExpr = "id"
+	}
+	pageQuery = pageQuery.OrderByClause(q.pageOrderClause("sort_col", idExpr))
+	if q.Offset > 0 {
+		pageQuery = pageQuery.Offset(q.Offset)
+	}
+	if q.Limit > 0 {
+		pageQuery = pageQuery.Limit(q.Limit)
+	}
+
 	query := sq.Select(
 		UserIDCol.identifier(),
 		UserCreationDateCol.identifier(),
@@ -1339,136 +1488,113 @@ func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionChe
 		MachineDescriptionCol.identifier(),
 		MachineSecretCol.identifier(),
 		MachineAccessTokenTypeCol.identifier(),
-		q.SortingColumn.orderBy()).
-		From(userTable.identifier()).
+		"page.sort_col",
+	).Column(sq.ConcatExpr("(", plan.matchingCountSelect(ctx), ") AS total")).
+		FromSelect(pageQuery, "page").
+		Join(userTable.identifier()+" ON "+UserIDCol.identifier()+" = page.id AND "+UserInstanceIDCol.identifier()+" = ?", plan.instanceID).
 		LeftJoin(join(HumanUserIDCol, UserIDCol)).
 		LeftJoin(join(MachineUserIDCol, UserIDCol)).
 		JoinClause(joinLoginNames).
-		Where(sq.Eq{UserInstanceIDCol.identifier(): instanceID})
+		OrderByClause(q.pageOrderClause("page.sort_col", "page.id")).
+		PlaceholderFormat(sq.Dollar)
 
-	if loginEqualityExtracted {
-		query = query.JoinClause(joinLoginEqualitySeeks(loginEqualitySeeks))
-	}
+	return query, scanUsersPage
+}
 
-	if needsMetadataJoin {
-		query = query.Distinct().
-			LeftJoin(join(UserMetadataUserIDCol, UserIDCol))
-	}
+func scanUsersPage(rows *sql.Rows) (*Users, error) {
+	users := make([]*User, 0)
+	var count uint64
+	for rows.Next() {
+		u := new(User)
+		loginNames := database.TextArray[string]{}
+		preferredLoginName := sql.NullString{}
 
-	query = userPermissionCheckV2(ctx, query, permissionCheckV2, filters)
-	for _, filter := range filters {
-		query = filter.toQuery(query)
-	}
-	// apply sorting in the sub-select,because the identifier is fully qualified.
-	query = q.consumeSorting(query)
+		human, machine := sqlHuman{}, sqlMachine{}
+		var orderByValue any
 
-	// set the sub-select as source for the outer query
-	query = sq.Select(
-		"*",
-		countColumn.identifier(),
-	).FromSelect(query, "results")
+		err := rows.Scan(
+			&u.ID,
+			&u.CreationDate,
+			&u.ChangeDate,
+			&u.ResourceOwner,
+			&u.Sequence,
+			&u.State,
+			&u.Type,
+			&u.Username,
+			&loginNames,
+			&preferredLoginName,
 
-	// apply limit and offset in the outer query
-	query = q.toQuery(query)
-	query = query.PlaceholderFormat(sq.Dollar)
+			&human.humanID,
+			&human.firstName,
+			&human.lastName,
+			&human.nickName,
+			&human.displayName,
+			&human.preferredLanguage,
+			&human.gender,
+			&human.avatarKey,
+			&human.email,
+			&human.isEmailVerified,
+			&human.phone,
+			&human.isPhoneVerified,
+			&human.passwordChangeRequired,
+			&human.passwordChanged,
+			&human.mfaInitSkipped,
 
-	return query, func(rows *sql.Rows) (*Users, error) {
-		users := make([]*User, 0)
-		var count uint64
-		for rows.Next() {
-			u := new(User)
-			loginNames := database.TextArray[string]{}
-			preferredLoginName := sql.NullString{}
+			&machine.machineID,
+			&machine.name,
+			&machine.description,
+			&machine.encodedSecret,
+			&machine.accessTokenType,
 
-			human, machine := sqlHuman{}, sqlMachine{}
-			var orderByValue any
-
-			err := rows.Scan(
-				&u.ID,
-				&u.CreationDate,
-				&u.ChangeDate,
-				&u.ResourceOwner,
-				&u.Sequence,
-				&u.State,
-				&u.Type,
-				&u.Username,
-				&loginNames,
-				&preferredLoginName,
-
-				&human.humanID,
-				&human.firstName,
-				&human.lastName,
-				&human.nickName,
-				&human.displayName,
-				&human.preferredLanguage,
-				&human.gender,
-				&human.avatarKey,
-				&human.email,
-				&human.isEmailVerified,
-				&human.phone,
-				&human.isPhoneVerified,
-				&human.passwordChangeRequired,
-				&human.passwordChanged,
-				&human.mfaInitSkipped,
-
-				&machine.machineID,
-				&machine.name,
-				&machine.description,
-				&machine.encodedSecret,
-				&machine.accessTokenType,
-
-				&orderByValue,
-				&count,
-			)
-			if err != nil {
-				return nil, err
-			}
-
-			u.LoginNames = loginNames
-			if preferredLoginName.Valid {
-				u.PreferredLoginName = preferredLoginName.String
-			}
-
-			if human.humanID.Valid {
-				u.Human = &Human{
-					FirstName:              human.firstName.String,
-					LastName:               human.lastName.String,
-					NickName:               human.nickName.String,
-					DisplayName:            human.displayName.String,
-					AvatarKey:              human.avatarKey.String,
-					PreferredLanguage:      language.Make(human.preferredLanguage.String),
-					Gender:                 domain.Gender(human.gender.Int32),
-					Email:                  domain.EmailAddress(human.email.String),
-					IsEmailVerified:        human.isEmailVerified.Bool,
-					Phone:                  domain.PhoneNumber(human.phone.String),
-					IsPhoneVerified:        human.isPhoneVerified.Bool,
-					PasswordChangeRequired: human.passwordChangeRequired.Bool,
-					PasswordChanged:        human.passwordChanged.Time,
-					MFAInitSkipped:         human.mfaInitSkipped.Time,
-				}
-			} else if machine.machineID.Valid {
-				u.Machine = &Machine{
-					Name:            machine.name.String,
-					Description:     machine.description.String,
-					EncodedSecret:   machine.encodedSecret.String,
-					AccessTokenType: domain.OIDCTokenType(machine.accessTokenType.Int32),
-				}
-			}
-
-			users = append(users, u)
+			&orderByValue,
+			&count,
+		)
+		if err != nil {
+			return nil, err
 		}
 
-		if err := rows.Close(); err != nil {
-			return nil, zerrors.ThrowInternal(err, "QUERY-frhbd", "Errors.Query.CloseRows")
+		u.LoginNames = loginNames
+		if preferredLoginName.Valid {
+			u.PreferredLoginName = preferredLoginName.String
 		}
 
-		return &Users{
-			Users: users,
-			SearchResponse: SearchResponse{
-				Count: count,
-			},
-		}, nil
+		if human.humanID.Valid {
+			u.Human = &Human{
+				FirstName:              human.firstName.String,
+				LastName:               human.lastName.String,
+				NickName:               human.nickName.String,
+				DisplayName:            human.displayName.String,
+				AvatarKey:              human.avatarKey.String,
+				PreferredLanguage:      language.Make(human.preferredLanguage.String),
+				Gender:                 domain.Gender(human.gender.Int32),
+				Email:                  domain.EmailAddress(human.email.String),
+				IsEmailVerified:        human.isEmailVerified.Bool,
+				Phone:                  domain.PhoneNumber(human.phone.String),
+				IsPhoneVerified:        human.isPhoneVerified.Bool,
+				PasswordChangeRequired: human.passwordChangeRequired.Bool,
+				PasswordChanged:        human.passwordChanged.Time,
+				MFAInitSkipped:         human.mfaInitSkipped.Time,
+			}
+		} else if machine.machineID.Valid {
+			u.Machine = &Machine{
+				Name:            machine.name.String,
+				Description:     machine.description.String,
+				EncodedSecret:   machine.encodedSecret.String,
+				AccessTokenType: domain.OIDCTokenType(machine.accessTokenType.Int32),
+			}
+		}
+
+		users = append(users, u)
 	}
+
+	if err := rows.Close(); err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-frhbd", "Errors.Query.CloseRows")
+	}
+
+	return &Users{
+		SearchResponse: SearchResponse{Count: count},
+		Users:          users,
+	}, nil
 }
 
 type sqlHuman struct {
