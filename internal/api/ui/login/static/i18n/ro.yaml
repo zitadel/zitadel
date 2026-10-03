@@ -270,6 +270,7 @@ RegistrationUser:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: vietnamez
   GenderLabel: Gen
   Female: Femeie
   Male: Bărbat
@@ -284,7 +285,6 @@ RegistrationUser:
   ExternalLogin: sau înregistrează-te cu un utilizator extern
   BackButtonText: Autentificare
   NextButtonText: Următorul
-
 ExternalRegistrationUserOverview:
   Title: Înregistrare utilizator extern
   Description: Am preluat detaliile dvs. de utilizator de la furnizorul selectat. Acum le puteți schimba sau completa.
@@ -317,6 +317,7 @@ ExternalRegistrationUserOverview:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: vietnamez
   TosAndPrivacyLabel: Termeni și condiții
   TosConfirm: Accept
   TosLinkText: TOS
@@ -325,7 +326,6 @@ ExternalRegistrationUserOverview:
   ExternalLogin: sau înregistrează-te cu un utilizator extern
   BackButtonText: Înapoi
   NextButtonText: Salvează
-
 RegistrationOrg:
   Title: Înregistrare organizație
   Description: Introduceți numele organizației și datele de utilizator.
@@ -398,6 +398,7 @@ ExternalNotFound:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: vietnamez
 DeviceAuth:
   Title: Autorizare dispozitiv
   UserCode:

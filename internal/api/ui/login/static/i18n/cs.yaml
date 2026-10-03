@@ -270,6 +270,7 @@ RegistrationUser:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: vietnamština
   GenderLabel: Pohlaví
   Female: Žena
   Male: Muž
@@ -284,7 +285,6 @@ RegistrationUser:
   ExternalLogin: nebo se zaregistrujte s externím uživatelem
   BackButtonText: Přihlásit se
   NextButtonText: Další
-
 ExternalRegistrationUserOverview:
   Title: Registrace externího uživatele
   Description: Vaše uživatelské údaje byly převzaty z vybraného poskytovatele. Nyní je můžete změnit nebo doplnit.
@@ -317,6 +317,7 @@ ExternalRegistrationUserOverview:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: vietnamština
   TosAndPrivacyLabel: Obchodní podmínky
   TosConfirm: Souhlasím s
   TosLinkText: obchodními podmínkami
@@ -325,7 +326,6 @@ ExternalRegistrationUserOverview:
   ExternalLogin: nebo se zaregistrujte s externím uživatelem
   BackButtonText: Zpět
   NextButtonText: Uložit
-
 RegistrationOrg:
   Title: Registrace organizace
   Description: Zadejte název vaší organizace a uživatelské údaje.
@@ -398,6 +398,7 @@ ExternalNotFound:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: vietnamština
 DeviceAuth:
   Title: Autorizace zařízení
   UserCode:
