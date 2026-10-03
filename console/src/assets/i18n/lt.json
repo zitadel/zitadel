@@ -80,7 +80,7 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Egzemplioriaus nustatymai",
+        "TITLE": "Aplinkos nustatymai",
         "DESCRIPTION": "Numatytieji nustatymai visoms organizacijoms. Turint tinkamas teises, kai kuriuos iš jų galima pakeisti organizacijos nustatymuose."
       },
       "ORG": {
@@ -89,7 +89,7 @@
       },
       "FEATURES": {
         "TITLE": "Funkcijų nustatymai",
-        "DESCRIPTION": "Atrakinkite funkcijas savo egzemplioriui."
+        "DESCRIPTION": "Atrakinkite funkcijas savo aplinkai."
       },
       "IDPS": {
         "TITLE": "Tapatybės teikėjai",
@@ -142,11 +142,11 @@
       },
       "IAM_EVENTS": {
         "TITLE": "Įvykiai",
-        "DESCRIPTION": "Šiame puslapyje rodomi visi jūsų egzemplioriaus būsenos pakeitimai, kiek leidžia jūsų egzemplioriaus audito žurnalo saugojimo riba. Filtruokite sąrašą pagal laiko intervalą derinimo tikslais arba pagal agregatą audito tikslais."
+        "DESCRIPTION": "Šiame puslapyje rodomi visi jūsų aplinkos būsenos pakeitimai, kiek leidžia jūsų aplinkos audito žurnalo saugojimo riba. Filtruokite sąrašą pagal laiko intervalą derinimo tikslais arba pagal agregatą audito tikslais."
       },
       "IAM_FAILED_EVENTS": {
         "TITLE": "Nepavykę įvykiai",
-        "DESCRIPTION": "Šiame puslapyje rodomi visi nepavykę jūsų egzemplioriaus įvykiai. Jei Zitadel veikia ne taip, kaip tikėjotės, visada pirmiausia patikrinkite šį sąrašą."
+        "DESCRIPTION": "Šiame puslapyje rodomi visi nepavykę jūsų aplinkos įvykiai. Jei Zitadel veikia ne taip, kaip tikėjotės, visada pirmiausia patikrinkite šį sąrašą."
       },
       "IAM_VIEWS": {
         "TITLE": "Rodiniai",
@@ -187,7 +187,7 @@
         }
       },
       "WEB_KEYS": {
-        "DESCRIPTION": "Valdykite savo OIDC web raktus, kad saugiai pasirašytumėte ir tikrintumėte savo Zitadel egzemplioriaus žetonus.",
+        "DESCRIPTION": "Valdykite savo OIDC web raktus, kad saugiai pasirašytumėte ir tikrintumėte savo Zitadel aplinkos žetonus.",
         "TABLE": {
           "TITLE": "Aktyvūs ir būsimi web raktai",
           "DESCRIPTION": "Jūsų aktyvūs ir būsimi web raktai. Aktyvavus naują raktą, dabartinis bus deaktyvuotas.",
@@ -214,7 +214,7 @@
       },
       "MESSAGE_TEXTS": {
         "TITLE": "Žinučių tekstai",
-        "DESCRIPTION": "Pritaikykite savo pranešimų el. laiškų ar SMS žinučių tekstus. Jei norite išjungti kai kurias kalbas, apribokite jas egzemplioriaus kalbos nustatymuose.",
+        "DESCRIPTION": "Pritaikykite savo pranešimų el. laiškų ar SMS žinučių tekstus. Jei norite išjungti kai kurias kalbas, apribokite jas aplinkos kalbos nustatymuose.",
         "TYPE_DESCRIPTIONS": {
           "DC": "Kai pasisavinate domeną savo organizacijai, naudotojai, kurie nenaudoja šio domeno savo prisijungimo varde, bus paraginti pakeisti prisijungimo vardą, kad jis atitiktų pasisavintą domeną.",
           "INIT": "Sukūrus naudotoją, jis gaus el. laišką su nuoroda slaptažodžiui nustatyti.",
@@ -230,7 +230,7 @@
       },
       "LOGIN_TEXTS": {
         "TITLE": "Prisijungimo sąsajos tekstai",
-        "DESCRIPTION": "Pritaikykite savo prisijungimo formos tekstus. Jei tekstas tuščias, rodoma numatytoji reikšmė. Jei norite išjungti kai kurias kalbas, apribokite jas egzemplioriaus kalbos nustatymuose."
+        "DESCRIPTION": "Pritaikykite savo prisijungimo formos tekstus. Jei tekstas tuščias, rodoma numatytoji reikšmė. Jei norite išjungti kai kurias kalbas, apribokite jas aplinkos kalbos nustatymuose."
       },
       "DOMAINS": {
         "TITLE": "Domeno nustatymai",
@@ -249,7 +249,7 @@
         },
         "SMTP_SENDER_ADDRESS": {
           "TITLE": "SMTP siuntėjo adresas",
-          "DESCRIPTION": "Leiskite SMTP siuntėjo adresą tik jei jis atitinka vieną iš jūsų egzemplioriaus domenų."
+          "DESCRIPTION": "Leiskite SMTP siuntėjo adresą tik jei jis atitinka vieną iš jūsų aplinkos domenų."
         }
       },
       "LOGIN": {
@@ -367,7 +367,7 @@
     "DISMISS": "Ne, ačiū, aš profesionalas.",
     "CARD": {
       "TITLE": "Paleiskite savo Zitadel",
-      "DESCRIPTION": "Šis kontrolinis sąrašas padės sukonfigūruoti jūsų egzempliorių ir praves jus per svarbiausius žingsnius"
+      "DESCRIPTION": "Šis kontrolinis sąrašas padės sukonfigūruoti jūsų aplinką ir praves jus per svarbiausius žingsnius"
     },
     "MILESTONES": {
       "instance.policy.label.added": {
@@ -412,7 +412,7 @@
     "DASHBOARD": "Pradžia",
     "PERSONAL_INFO": "Asmeninė informacija",
     "DOCUMENTATION": "Dokumentacija",
-    "INSTANCEOVERVIEW": "Egzempliorius",
+    "INSTANCEOVERVIEW": "Aplinka",
     "ORGS": "Organizacijos",
     "VIEWS": "Rodiniai",
     "EVENTS": "Įvykiai",
@@ -651,8 +651,8 @@
     }
   },
   "MEMBERROLES": {
-    "IAM_OWNER": "Turi kontrolę visam egzemplioriui, įskaitant visas organizacijas",
-    "IAM_OWNER_VIEWER": "Turi teisę peržiūrėti visą egzempliorių, įskaitant visas organizacijas",
+    "IAM_OWNER": "Turi kontrolę visai aplinkai, įskaitant visas organizacijas",
+    "IAM_OWNER_VIEWER": "Turi teisę peržiūrėti visą aplinką, įskaitant visas organizacijas",
     "IAM_ORG_MANAGER": "Turi teisę kurti ir valdyti organizacijas",
     "IAM_USER_MANAGER": "Turi teisę kurti ir valdyti naudotojus",
     "IAM_ADMIN_IMPERSONATOR": "Turi teisę apsimesti administratoriais ir galutiniais naudotojais iš visų organizacijų",
@@ -687,13 +687,13 @@
       "TEXT": "Čia galite persijungti tarp savo naudotojo paskyrų bei valdyti savo sesijas ir profilį."
     },
     "NAV": {
-      "TEXT": "Ši navigacija keičiasi priklausomai nuo aukščiau pasirinktos organizacijos arba egzemplioriaus"
+      "TEXT": "Ši navigacija keičiasi priklausomai nuo aukščiau pasirinktos organizacijos arba aplinkos"
     },
     "CONTEXTCHANGED": {
       "TEXT": "Organizacijos kontekstas pasikeitė."
     },
     "SWITCHEDTOINSTANCE": {
-      "TEXT": "Rodinys ką tik buvo pakeistas į egzempliorių!"
+      "TEXT": "Rodinys ką tik buvo pakeistas į aplinką!"
     }
   },
   "FILTER": {
@@ -719,7 +719,7 @@
     "SIDEWIDE": "Viso tinklalapio spartieji klavišai",
     "SHORTCUTS": {
       "HOME": "Eiti į pradžią",
-      "INSTANCE": "Eiti į egzempliorių",
+      "INSTANCE": "Eiti į aplinką",
       "ORG": "Eiti į <strong>o</strong>rganizaciją",
       "ORGSETTINGS": "Eiti į organizacijos nustatymus",
       "ORGSWITCHER": "Keisti organizaciją",
@@ -731,7 +731,7 @@
       "DOMAINS": "Eiti į <strong>d</strong>omenus"
     }
   },
-  "INSTANCEID": "Egzemplioriaus ID",
+  "INSTANCEID": "Aplinkos ID",
   "RESOURCEID": "Ištekliaus ID",
   "NAME": "Pavadinimas",
   "VERSION": "Versija",
@@ -746,8 +746,8 @@
       "DESCRIPTION": "Spustelėkite žemiau esantį mygtuką, kad prisijungtumėte iš naujo."
     },
     "EXHAUSTED": {
-      "TITLE": "Jūsų egzempliorius užblokuotas.",
-      "DESCRIPTION": "Paprašykite savo Zitadel egzemplioriaus administratoriaus atnaujinti prenumeratą."
+      "TITLE": "Jūsų aplinka užblokuota.",
+      "DESCRIPTION": "Paprašykite savo Zitadel aplinkos administratoriaus atnaujinti prenumeratą."
     },
     "INVALID_FORMAT": "Formatavimas negalioja.",
     "NOTANEMAIL": "Nurodyta reikšmė nėra el. pašto adresas.",
@@ -1275,7 +1275,7 @@
     },
     "MEMBER": {
       "TITLE": "Administratoriai",
-      "DESCRIPTION": "Šie administratoriai gali atlikti pakeitimus jūsų egzemplioriuje."
+      "DESCRIPTION": "Šie administratoriai gali atlikti pakeitimus jūsų aplinkoje."
     },
     "PAGES": {
       "STATE": "Būsena",
@@ -1430,7 +1430,7 @@
     },
     "LIST": {
       "TITLE": "Organizacijos",
-      "DESCRIPTION": "Tai jūsų egzemplioriaus organizacijos"
+      "DESCRIPTION": "Tai jūsų aplinkos organizacijos"
     },
     "DOMAINS": {
       "NEW": "Pridėti domeną",
@@ -1642,7 +1642,7 @@
     },
     "FEATURES": {
       "LOGINDEFAULTORG": "Prisijungimo numatytoji organizacija",
-      "LOGINDEFAULTORG_DESCRIPTION": "Jei organizacijos kontekstas nenustatytas, prisijungimo sąsaja naudos numatytosios organizacijos (o ne egzemplioriaus) nustatymus",
+      "LOGINDEFAULTORG_DESCRIPTION": "Jei organizacijos kontekstas nenustatytas, prisijungimo sąsaja naudos numatytosios organizacijos (o ne aplinkos) nustatymus",
       "USERSCHEMA": "Naudotojo schema",
       "USERSCHEMA_DESCRIPTION": "Naudotojo schemos leidžia valdyti naudotojo duomenų schemas. Įjungus šią funkciją, galėsite naudoti naują API ir jo funkcijas.",
       "ACTIONS": "Veiksmai",
@@ -1675,8 +1675,8 @@
     "DIALOG": {
       "RESET": {
         "DEFAULTTITLE": "Atstatyti nustatymą",
-        "DEFAULTDESCRIPTION": "Ruošiatės atstatyti savo nustatymus į numatytuosius jūsų egzemplioriaus nustatymus. Ar tikrai norite tęsti?",
-        "LOGINPOLICY_DESCRIPTION": "Įspėjimas: jei tęsite, tapatybės teikėjo nustatymai taip pat bus atstatyti į egzemplioriaus nustatymus."
+        "DEFAULTDESCRIPTION": "Ruošiatės atstatyti savo nustatymus į numatytuosius jūsų aplinkos nustatymus. Ar tikrai norite tęsti?",
+        "LOGINPOLICY_DESCRIPTION": "Įspėjimas: jei tęsite, tapatybės teikėjo nustatymai taip pat bus atstatyti į aplinkos nustatymus."
       }
     }
   },
@@ -1787,7 +1787,7 @@
       "RESET_DESCRIPTION": "Ruošiatės atkurti visas numatytąsias reikšmes. Visi jūsų atlikti pakeitimai bus negrįžtamai pašalinti. Ar tikrai norite tęsti?",
       "UNSAVED_TITLE": "Tęsti neišsaugant?",
       "UNSAVED_DESCRIPTION": "Padarėte pakeitimų jų neišsaugoję. Ar norite išsaugoti dabar?",
-      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Pasirinkote neleidžiamą kalbą. Galite tęsti tekstų redagavimą. Tačiau jei norite, kad naudotojai galėtų iš tikrųjų naudoti šią kalbą, pakeiskite savo egzemplioriaus apribojimus.",
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Pasirinkote neleidžiamą kalbą. Galite tęsti tekstų redagavimą. Tačiau jei norite, kad naudotojai galėtų iš tikrųjų naudoti šią kalbą, pakeiskite savo aplinkos apribojimus.",
       "LANGUAGES_NOT_ALLOWED": "Neleidžiama:",
       "LANGUAGE": "Kalba",
       "LANGUAGES": {
@@ -1891,7 +1891,7 @@
         "UPDATED": "Pasirinktiniai tekstai išsaugoti."
       }
     },
-    "DEFAULTLABEL": "Dabartiniai nustatymai atitinka jūsų egzemplioriaus standartą.",
+    "DEFAULTLABEL": "Dabartiniai nustatymai atitinka jūsų aplinkos standartą.",
     "BTN_INSTALL": "Nustatyti",
     "BTN_EDIT": "Keisti",
     "DATA": {
@@ -1909,7 +1909,7 @@
       "USERLOGINMUSTBEDOMAIN": "Pridėti organizacijos domeną kaip priesagą prie prisijungimo vardų",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Įjungus šį nustatymą, visi prisijungimo vardai turės priesagą su organizacijos domenu. Jei šis nustatymas išjungtas, turite užtikrinti, kad naudotojų vardai būtų unikalūs visose organizacijose.",
       "VALIDATEORGDOMAINS": "Reikalingas organizacijos domeno patvirtinimas (DNS arba HTTP iššūkis)",
-      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP siuntėjo adresas atitinka egzemplioriaus domeną",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP siuntėjo adresas atitinka aplinkos domeną",
       "ALLOWUSERNAMEPASSWORD_DESC": "Leidžiamas įprastas prisijungimas naudotojo vardu ir slaptažodžiu.",
       "ALLOWEXTERNALIDP_DESC": "Prisijungimas leidžiamas per susijusius tapatybės teikėjus",
       "ALLOWREGISTER_DESC": "Pasirinkus šią parinktį, prisijungime bus rodomas papildomas naudotojo registracijos žingsnis.",
@@ -1927,7 +1927,7 @@
       "DISABLEWATERMARK": "Slėpti vandens ženklą",
       "DISABLEWATERMARK_DESC": "Paslėpti „Sukurta naudojant Zitadel“ vandens ženklą prisijungimo sąsajoje"
     },
-    "RESET": "Atstatyti į egzemplioriaus numatytąjį",
+    "RESET": "Atstatyti į aplinkos numatytąjį",
     "CREATECUSTOM": "Sukurti pasirinktinę politiką",
     "TOAST": {
       "SET": "Politika sėkmingai nustatyta!",
@@ -2259,7 +2259,7 @@
       },
       "ZITADEL": {
         "TITLE": "ZITADEL",
-        "DESCRIPTION": "Įveskite reikiamus duomenis, kad kito ZITADEL egzemplioriaus naudotojai galėtų autentifikuotis."
+        "DESCRIPTION": "Įveskite reikiamus duomenis, kad kitos ZITADEL aplinkos naudotojai galėtų autentifikuotis."
       }
     },
     "DETAIL": {
@@ -2286,7 +2286,7 @@
     },
     "OWNERTYPES": {
       "0": "nežinoma",
-      "1": "Egzempliorius",
+      "1": "Aplinka",
       "2": "Organizacija"
     },
     "STATES": {
@@ -2325,8 +2325,8 @@
     "STATE": "Būsena",
     "ISSUER": "Išdavėjas",
     "SCOPESLIST": "Apimčių sąrašas",
-    "INSTANCEROLESINFO": "Egzemplioriaus vaidmenų susiejimas",
-    "INSTANCEROLESINFO_DESC": "Naudotojams, autentifikuojamiems per šį teikėją, suteikiami egzemplioriaus narių vaidmenys (su IAM_ priešdėliu), kuriuos jie turi nurodytose nuotolinio ZITADEL egzemplioriaus organizacijose. Turi sutapti ir organizacijos ID, ir pagrindinis domenas.",
+    "INSTANCEROLESINFO": "Aplinkos vaidmenų susiejimas",
+    "INSTANCEROLESINFO_DESC": "Naudotojams, autentifikuojamiems per šį teikėją, suteikiami aplinkos narių vaidmenys (su IAM_ priešdėliu), kuriuos jie turi nurodytose nuotolinės ZITADEL aplinkos organizacijose. Turi sutapti ir organizacijos ID, ir pagrindinis domenas.",
     "ORGANIZATIONID": "Organizacijos ID",
     "ORGANIZATIONDOMAIN": "Organizacijos domenas",
     "CLIENTID": "Kliento ID",
@@ -2474,7 +2474,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTP teikėjas",
-      "DESCRIPTION": "Tai jūsų Zitadel egzemplioriaus SMTP teikėjai. Aktyvuokite tą, kurį norite naudoti pranešimams siųsti savo naudotojams.",
+      "DESCRIPTION": "Tai jūsų Zitadel aplinkos SMTP teikėjai. Aktyvuokite tą, kurį norite naudoti pranešimams siųsti savo naudotojams.",
       "EMPTY": "Nėra galimo SMTP teikėjo",
       "ACTIVATED": "Aktyvuota",
       "ACTIVATE": "Aktyvuoti teikėją",
@@ -2633,7 +2633,7 @@
       "SKIPNATIVEAPPSUCCESSPAGE": "Praleisti sėkmingo prisijungimo puslapį",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Praleiskite sėkmės puslapį po prisijungimo šiai native programai.",
       "APPLINKSSECTION": "Native programų nuorodos",
-      "APPLINKSDESC": "Sukonfigūruokite iOS ir Android susiejimą, kad šis egzempliorius galėtų pateikti prieigos raktų pasitikėjimo failus jūsų native programoms.",
+      "APPLINKSDESC": "Sukonfigūruokite iOS ir Android susiejimą, kad ši aplinka galėtų pateikti prieigos raktų pasitikėjimo failus jūsų native programoms.",
       "IOSTITLE": "iOS",
       "IOSDESC": "Pateikiama apple-app-site-association faile kaip webcredentials įrašas TEAMID.BUNDLEID.",
       "TEAMID": "Komandos ID",

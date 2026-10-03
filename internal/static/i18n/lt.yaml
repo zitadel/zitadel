@@ -33,7 +33,7 @@ Errors:
     NotFound: "Limitai nerasti"
     NoneSpecified: "Limitai nenurodyti"
     Instance:
-      Blocked: "Egzempliorius užblokuotas"
+      Blocked: "Aplinka užblokuota"
   Restrictions:
     NoneSpecified: "Apribojimai nenurodyti"
     DefaultLanguageMustBeAllowed: "Numatytoji kalba turi būti leidžiama"
@@ -71,7 +71,7 @@ Errors:
     NotFound: "SMTP konfigūracija nerasta"
     AlreadyExists: "SMTP konfigūracija jau egzistuoja"
     AlreadyDeactivated: "SMTP konfigūracija jau deaktyvuota"
-    SenderAdressNotCustomDomain: "Siuntėjo adresas turi būti sukonfigūruotas kaip pasirinktinis domenas egzemplioriuje."
+    SenderAdressNotCustomDomain: "Siuntėjo adresas turi būti sukonfigūruotas kaip pasirinktinis domenas aplinkoje."
     TestEmailNotFound: "Testinis el. pašto adresas nerastas"
   Notification:
     NoDomain: "Žinutei nerastas domenas"
@@ -344,9 +344,9 @@ Errors:
       NotActive: "Projekto suteikimas neaktyvus"
       NotInactive: "Projekto suteikimas nėra neaktyvus"
   Instance:
-    AlreadyExists: "Egzempliorius jau egzistuoja"
-    NotChanged: "Egzempliorius nepakeistas"
-    NotFound: "Egzempliorius nerastas. Įsitikinkite, kad domenas teisingas. Žr. https://zitadel.com/docs/apis/introduction#domains"
+    AlreadyExists: "Aplinka jau egzistuoja"
+    NotChanged: "Aplinka nepakeista"
+    NotFound: "Aplinka nerasta. Įsitikinkite, kad domenas teisingas. Žr. https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Vaidmenys nepakeisti"
     MemberInvalid: "Narys negalioja"
@@ -609,7 +609,7 @@ Errors:
       TypeNotSupported: "Žetono tipas nepalaikomas"
       NotForAPI: "Apsimetimo žetonai neleidžiami API"
     Impersonation:
-      PolicyDisabled: "Apsimetimas išjungtas egzemplioriaus saugumo politikoje"
+      PolicyDisabled: "Apsimetimas išjungtas aplinkos saugumo politikoje"
   WebKey:
     ActiveDelete: "Negalima pašalinti aktyvaus web rakto"
     Config: "Neteisinga web rakto konfigūracija"
@@ -626,7 +626,7 @@ Errors:
 
 AggregateTypes:
   action: "Veiksmas"
-  instance: "Egzempliorius"
+  instance: "Aplinka"
   key_pair: "Raktų pora"
   org: "Organizacija"
   project: "Projektas"
@@ -1223,8 +1223,8 @@ EventTypes:
     reactivated: "Veiksmas reaktyvuotas"
     removed: "Veiksmas pašalintas"
   instance:
-    added: "Egzempliorius pridėtas"
-    changed: "Egzempliorius pakeistas"
+    added: "Aplinka pridėta"
+    changed: "Aplinka pakeista"
     customtext:
       removed: "Tekstas pašalintas"
       set: "Tekstas nustatytas"
@@ -1253,11 +1253,11 @@ EventTypes:
         added: "El. pašto tekstas pridėtas"
         changed: "El. pašto tekstas pakeistas"
     member:
-      added: "Egzemplioriaus narys pridėtas"
-      changed: "Egzemplioriaus narys pakeistas"
-      removed: "Egzemplioriaus narys pašalintas"
+      added: "Aplinkos narys pridėtas"
+      changed: "Aplinkos narys pakeistas"
+      removed: "Aplinkos narys pašalintas"
       cascade:
-        removed: "Egzemplioriaus narys pašalintas kaskadiniu būdu"
+        removed: "Aplinkos narys pašalintas kaskadiniu būdu"
     notification:
       provider:
         debug:
@@ -1325,7 +1325,7 @@ EventTypes:
         changed: "Privatumo politika pakeista"
       security:
         set: "Saugumo politika nustatyta"
-    removed: "Egzempliorius pašalintas"
+    removed: "Aplinka pašalinta"
     secret:
       generator:
         added: "Paslapčių generatorius pridėtas"
