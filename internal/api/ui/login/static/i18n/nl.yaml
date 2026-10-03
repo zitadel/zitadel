@@ -73,7 +73,7 @@ InitPasswordDone:
 
 InitUser:
   Title: Activeer Gebruiker
-  Description: Verifieer uw e-mail met de onderstaande code en stel uw wachtwoord in.
+  Description: Verifieer uw e-mailadres hieronder met de code die u per e-mail heeft ontvangen.
   CodeLabel: Code
   NewPasswordLabel: Nieuw Wachtwoord
   NewPasswordConfirm: Bevestig Wachtwoord
