@@ -60,7 +60,7 @@ message AuthRequest{
   // labeling setting decides (EnforceProjectResourceOwnerPolicy -> the project's organization),
   // otherwise the instance default organization. This lets the login render the configured
   // organization branding before the user is known. Empty if it could not be resolved.
-  string private_labeling_org_id = 11;
+  string private_labeling_organization_id = 11;
 }
 
 enum Prompt {

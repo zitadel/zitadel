@@ -1,0 +1,8 @@
+# Managed by StageFreight — do not edit.
+# Everything here is ephemeral run output and ignored, EXCEPT the
+# durable set carved out below (allowlist — new outputs stay ignored).
+/*
+!/.gitignore
+!/scribe/
+!/preset-cache/
+!/toolchains.lock

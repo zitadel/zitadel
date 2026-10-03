@@ -52,12 +52,12 @@ func Test_authRequestToPb(t *testing.T) {
 			oidc_pb.Prompt_PROMPT_CREATE,
 			oidc_pb.Prompt_PROMPT_UNSPECIFIED,
 		},
-		UiLocales:            []string{"en", "fi"},
-		Scope:                []string{"a", "b", "c"},
-		LoginHint:            gu.Ptr("foo@bar.com"),
-		MaxAge:               durationpb.New(time.Minute),
-		HintUserId:           gu.Ptr("userID"),
-		PrivateLabelingOrgId: "labelingOrgID",
+		UiLocales:                     []string{"en", "fi"},
+		Scope:                         []string{"a", "b", "c"},
+		LoginHint:                     gu.Ptr("foo@bar.com"),
+		MaxAge:                        durationpb.New(time.Minute),
+		HintUserId:                    gu.Ptr("userID"),
+		PrivateLabelingOrganizationId: "labelingOrgID",
 	}
 	got := authRequestToPb(arg)
 	if !proto.Equal(want, got) {
