@@ -21,6 +21,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/integration/sink"
+	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/instance/v2"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
@@ -1140,4 +1141,71 @@ func Test_ZITADEL_API_session_expired(t *testing.T) {
 	sessionResp, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
 	require.Error(t, err)
 	require.Nil(t, sessionResp)
+}
+
+func Test_ZITADEL_API_session_invalidated(t *testing.T) {
+	tests := []struct {
+		name       string
+		invalidate func(t *testing.T, orgID, userID string)
+	}{
+		{
+			name: "user locked",
+			invalidate: func(t *testing.T, _, userID string) {
+				_, err := Instance.Client.UserV2.LockUser(IAMOwnerCTX, &user.LockUserRequest{UserId: userID})
+				require.NoError(t, err)
+			},
+		},
+		{
+			name: "user deactivated",
+			invalidate: func(t *testing.T, _, userID string) {
+				_, err := Instance.Client.UserV2.DeactivateUser(IAMOwnerCTX, &user.DeactivateUserRequest{UserId: userID})
+				require.NoError(t, err)
+			},
+		},
+		{
+			name: "user removed",
+			invalidate: func(t *testing.T, _, userID string) {
+				_, err := Instance.Client.UserV2.DeleteUser(IAMOwnerCTX, &user.DeleteUserRequest{UserId: userID})
+				require.NoError(t, err)
+			},
+		},
+		{
+			name: "organization deactivated",
+			invalidate: func(t *testing.T, orgID, _ string) {
+				Instance.DeactivateOrganization(IAMOwnerCTX, orgID)
+			},
+		},
+		{
+			name: "password changed",
+			invalidate: func(t *testing.T, _, userID string) {
+				Instance.SetUserPassword(IAMOwnerCTX, userID, integration.UserPassword+"2", false)
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			orgResp := Instance.CreateOrganization(IAMOwnerCTX, integration.OrganizationName(), integration.Email())
+			userID := Instance.CreateHumanUserVerified(IAMOwnerCTX, orgResp.GetOrganizationId(), integration.Email(), integration.Phone()).GetUserId()
+			Instance.SetUserPassword(IAMOwnerCTX, userID, integration.UserPassword, false)
+			_, token, _, _ := Instance.CreatePasswordSession(t, LoginCTX, userID, integration.UserPassword)
+			ctx := integration.WithAuthorizationToken(t.Context(), token)
+
+			// the session token authenticates the user
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+			require.EventuallyWithT(t, func(tt *assert.CollectT) {
+				resp, err := Instance.Client.Auth.GetMyUser(ctx, &auth.GetMyUserRequest{})
+				if !assert.NoError(tt, err) {
+					return
+				}
+				assert.Equal(tt, userID, resp.GetUser().GetId())
+			}, retryDuration, tick)
+
+			tt.invalidate(t, orgResp.GetOrganizationId(), userID)
+
+			// and is rejected as soon as the invalidating event is written, without waiting for any projection
+			resp, err := Instance.Client.Auth.GetMyUser(ctx, &auth.GetMyUserRequest{})
+			require.Error(t, err)
+			require.Nil(t, resp)
+		})
+	}
 }
