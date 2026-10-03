@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { Timestamp } from 'src/app/proto/generated/google/protobuf/timestamp_pb';
 import { Timestamp as ConnectTimestamp } from '@bufbuild/protobuf/wkt';
+import { PaginationPreferenceService } from 'src/app/services/pagination-preference.service';
 
 export interface PageEvent {
   length: number;
@@ -24,8 +25,13 @@ export class PaginatorComponent {
   @Input() public hidePagination: boolean = false;
   @Input() public showMoreButton: boolean = false;
   @Input() public disableShowMore: boolean | null = false;
+  /** The hosting table has to read the same key for its initial page size. */
+  @Input() public persistKey?: string;
   @Output() public moreRequested: EventEmitter<void> = new EventEmitter();
   @Output() public page: EventEmitter<PageEvent> = new EventEmitter();
+
+  private readonly paginationPreference = inject(PaginationPreferenceService);
+
   constructor() {}
 
   public previous(): void {
@@ -48,12 +54,17 @@ export class PaginatorComponent {
   }
 
   get nextPossible(): boolean {
-    const temp = this.pageIndex + 1;
-    return temp <= this.length / this.pageSize;
+    return (this.pageIndex + 1) * this.pageSize < this.length;
   }
 
+  /** Zero based, used for request offsets. */
   get startIndex(): number {
     return this.pageIndex * this.pageSize;
+  }
+
+  /** One based, used for the "x - y" label. */
+  get displayStartIndex(): number {
+    return this.length === 0 ? 0 : this.startIndex + 1;
   }
 
   get endIndex(): number {
@@ -73,6 +84,9 @@ export class PaginatorComponent {
   public updatePageSize(newSize: number): void {
     this.pageSize = newSize;
     this.pageIndex = 0;
+    if (this.persistKey) {
+      this.paginationPreference.set(this.persistKey, newSize);
+    }
     this.emitChange();
   }
 }

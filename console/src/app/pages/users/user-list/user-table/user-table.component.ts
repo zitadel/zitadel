@@ -4,6 +4,7 @@ import {
   DestroyRef,
   effect,
   EventEmitter,
+  inject,
   Input,
   OnInit,
   Output,
@@ -23,10 +24,12 @@ import {
   distinctUntilChanged,
   EMPTY,
   from,
+  merge,
   Observable,
   of,
   ReplaySubject,
   shareReplay,
+  Subject,
   switchMap,
 } from 'rxjs';
 import { catchError, filter, finalize, map, startWith, take } from 'rxjs/operators';
@@ -38,6 +41,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { UserService } from 'src/app/services/user.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { Type, UserFieldName } from '@zitadel/proto/zitadel/user/v2/query_pb';
+import { TextQueryMethod } from '@zitadel/proto/zitadel/object/v2/object_pb';
 import { UserState, User } from '@zitadel/proto/zitadel/user/v2/user_pb';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { ListUsersRequestSchema, ListUsersResponse } from '@zitadel/proto/zitadel/user/v2/user_service_pb';
@@ -45,6 +49,7 @@ import { UserState as UserStateV1, SearchQuery as UserSearchQuery } from 'src/ap
 import { NewOrganizationService } from 'src/app/services/new-organization.service';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { PaginationPreferenceService } from 'src/app/services/pagination-preference.service';
 
 type ListUsersRequest = MessageInitShape<typeof ListUsersRequestSchema>;
 type QueriesArray = NonNullable<ListUsersRequest['queries']>;
@@ -82,7 +87,14 @@ export class UserTableComponent implements OnInit {
     }
   }
 
-  protected readonly INITIAL_PAGE_SIZE = 20;
+  private readonly paginationPreference = inject(PaginationPreferenceService);
+  protected readonly PAGE_SIZE_OPTIONS = [10, 25, 50, 100, 250];
+  protected readonly PAGE_SIZE_KEY = 'user-list';
+  protected readonly INITIAL_PAGE_SIZE = this.paginationPreference.get(this.PAGE_SIZE_KEY, 25, this.PAGE_SIZE_OPTIONS);
+
+  /** Free text term from the search bar, OR'ed across the searchable columns. */
+  private readonly searchTerm$ = new ReplaySubject<string>(1);
+  private readonly resetPage$ = new Subject<void>();
 
   protected readonly dataSource: MatTableDataSource<User> = new MatTableDataSource<User>();
   protected readonly selection: SelectionModel<User> = new SelectionModel<User>(true, []);
@@ -165,6 +177,28 @@ export class UserTableComponent implements OnInit {
       .subscribe(() => this.refresh$.next(true));
   }
 
+  protected trackByUserId(_index: number, user: User): string {
+    return user.userId;
+  }
+
+  protected onSearchChanged(term: string): void {
+    this.goToFirstPage();
+    this.searchTerm$.next(term);
+  }
+
+  protected onFilterChanged(queries: UserSearchQuery[]): void {
+    this.goToFirstPage();
+    this.searchQueries$.next(queries);
+  }
+
+  private goToFirstPage(): void {
+    // keeps the paginator label in sync with the offset we are about to request
+    this.paginator$.pipe(take(1), takeUntilDestroyed(this.destroyRef)).subscribe((paginator) => {
+      paginator.pageIndex = 0;
+    });
+    this.resetPage$.next();
+  }
+
   setType(type: Type) {
     this.router
       .navigate([], {
@@ -215,9 +249,6 @@ export class UserTableComponent implements OnInit {
             return UserFieldName.DISPLAY_NAME;
           case 'username':
             return UserFieldName.USER_NAME;
-          case 'preferredLoginName':
-            // TODO: replace with preferred username sorting once implemented
-            return UserFieldName.USER_NAME;
           case 'email':
             return UserFieldName.EMAIL;
           case 'state':
@@ -234,19 +265,48 @@ export class UserTableComponent implements OnInit {
 
   private getQueries(type$: Observable<Type>): Observable<Query[]> {
     const orgId$ = this.getActiveOrgId().pipe(filter(Boolean));
+    const searchTerm$ = this.searchTerm$.pipe(startWith(''), distinctUntilChanged());
+
     return this.searchQueries$.pipe(
       startWith([]),
-      combineLatestWith(type$, orgId$),
-      map(([queries, type, organizationId]) => {
+      combineLatestWith(type$, orgId$, searchTerm$),
+      map(([queries, type, organizationId, searchTerm]) => {
         const mappedQueries = queries.map((q) => this.searchQueryToV2(q.toObject()));
 
         return [
           { case: 'typeQuery' as const, value: { type } },
           organizationId ? { case: 'organizationIdQuery' as const, value: { organizationId } } : undefined,
+          this.searchTermToQuery(searchTerm, type),
           ...mappedQueries,
         ].filter((q): q is NonNullable<typeof q> => !!q);
       }),
     );
+  }
+
+  /**
+   * Display name and email are human only columns in the query layer, so including them
+   * on the machine tab would produce conditions that can never match.
+   */
+  private searchTermToQuery(term: string, type: Type): Query | undefined {
+    const value = term.trim();
+    if (!value) {
+      return undefined;
+    }
+
+    const method = TextQueryMethod.CONTAINS_IGNORE_CASE;
+    const subQueries: Query[] = [
+      { case: 'userNameQuery' as const, value: { userName: value, method } },
+      { case: 'loginNameQuery' as const, value: { loginName: value, method } },
+    ];
+
+    if (type === Type.HUMAN) {
+      subQueries.push(
+        { case: 'displayNameQuery' as const, value: { displayName: value, method } },
+        { case: 'emailQuery' as const, value: { emailAddress: value, method } },
+      );
+    }
+
+    return { case: 'orQuery' as const, value: { queries: subQueries.map((query) => ({ query })) } };
   }
 
   private searchQueryToV2(query: UserSearchQuery.AsObject): Query | undefined {
@@ -314,8 +374,9 @@ export class UserTableComponent implements OnInit {
       startWith(this.INITIAL_PAGE_SIZE),
       distinctUntilChanged(),
     );
-    const pageIndex$ = page$.pipe(
-      map(({ pageIndex }) => pageIndex),
+    // Narrowing the result set has to send the user back to page one, otherwise a search
+    // that leaves three matches still requests offset 160 and renders an empty table.
+    const pageIndex$ = merge(page$.pipe(map(({ pageIndex }) => pageIndex)), this.resetPage$.pipe(map(() => 0))).pipe(
       startWith(0),
       distinctUntilChanged(),
     );
