@@ -47,13 +47,11 @@ ZITADEL does **not** require a specific metrics backend. Any system capable of s
 
 ## Settings
 
-Metrics are enabled by default in standard ZITADEL deployments.
-
-If metrics were explicitly disabled in your configuration, re-enable them before proceeding. The default configuration is defined in the project's `defaults.yaml` file:
+Metrics are configured through `Instrumentation.Metric.Exporter.Type` (`ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_TYPE`), which defaults to `none`. The `/debug/metrics` endpoint is only live today because a deprecated, legacy `Metrics.Type: otel` setting is still enabled in `defaults.yaml` and automatically promotes the new field to `prometheus` when it's left unset. Since this legacy fallback is scheduled for removal in ZITADEL v5, set `Instrumentation.Metric.Exporter.Type: prometheus` explicitly rather than relying on it. The default configuration is defined in the project's `defaults.yaml` file:
 
 - https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml
 
-Refer to the configuration documentation for details on enabling or adjusting metrics behavior.
+See [Instrumentation](/self-hosting/manage/instrumentation/overview) for details on the shared `Exporter` concept used by metrics, tracing, logging, and profiling.
 
 ## Next steps
 
