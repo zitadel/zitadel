@@ -9,6 +9,10 @@ export const LANGS: Lang[] = [
     code: "en",
   },
   {
+    name: "Dansk",
+    code: "da",
+  },
+  {
     name: "Deutsch",
     code: "de",
   },
