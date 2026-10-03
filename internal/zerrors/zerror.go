@@ -206,7 +206,8 @@ func (err *ZitadelError) WithDetails(details ErrorDetails) *ZitadelError {
 }
 
 func (err *ZitadelError) Is(target error) bool {
-	t, ok := target.(*ZitadelError)
+	var t *ZitadelError
+	ok := errors.As(target, &t)
 	if !ok {
 		return false
 	}
