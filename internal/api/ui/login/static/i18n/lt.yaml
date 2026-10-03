@@ -1,0 +1,541 @@
+Login:
+  Title: Sveiki sugrįžę!
+  Description: Įveskite savo prisijungimo duomenis.
+  TitleLinking: Prisijungimas naudotojo susiejimui
+  DescriptionLinking: Įveskite savo prisijungimo duomenis, kad susietumėte išorinį naudotoją.
+  LoginNameLabel: Prisijungimo vardas
+  UsernamePlaceHolder: naudotojo vardas
+  LoginnamePlaceHolder: naudotojovardas@domenas
+  ExternalUserDescription: Prisijungti su išoriniu naudotoju.
+  MustBeMemberOfOrg: Naudotojas turi būti {{.OrgName}} organizacijos narys.
+  RegisterButtonText: Registruotis
+  NextButtonText: Kitas
+
+LDAP:
+  Title: Prisijungti
+  Description: Įveskite savo prisijungimo duomenis.
+  LoginNameLabel: Prisijungimo vardas
+  PasswordLabel: Slaptažodis
+  NextButtonText: Kitas
+
+SelectAccount:
+  Title: Pasirinkti paskyrą
+  Description: Naudokite savo paskyrą
+  TitleLinking: Pasirinkite paskyrą naudotojo susiejimui
+  DescriptionLinking: Pasirinkite savo paskyrą, kurią susiesite su išoriniu naudotoju.
+  OtherUser: Kitas naudotojas
+  SessionState0: aktyvus
+  SessionState1: Atsijungęs
+  MustBeMemberOfOrg: Naudotojas turi būti {{.OrgName}} organizacijos narys.
+
+Password:
+  Title: Slaptažodis
+  Description: Įveskite savo prisijungimo duomenis.
+  PasswordLabel: Slaptažodis
+  MinLength: Turi būti bent
+  MinLengthp2: simbolių ilgio.
+  MaxLength: Turi būti mažiau nei 70 simbolių ilgio.
+  HasUppercase: Turi būti bent viena didžioji raidė.
+  HasLowercase: Turi būti bent viena mažoji raidė.
+  HasNumber: Turi būti bent vienas skaičius.
+  HasSymbol: Turi būti bent vienas simbolis.
+  Confirmation: Slaptažodžio patvirtinimas sutampa.
+  ResetLinkText: Atstatyti slaptažodį
+  BackButtonText: Atgal
+  NextButtonText: Kitas
+
+UsernameChange:
+  Title: Pakeisti naudotojo vardą
+  Description: Nustatykite naują naudotojo vardą
+  UsernameLabel: Naudotojo vardas
+  CancelButtonText: Atšaukti
+  NextButtonText: Kitas
+
+UsernameChangeDone:
+  Title: Naudotojo vardas pakeistas
+  Description: Jūsų naudotojo vardas sėkmingai pakeistas.
+  NextButtonText: Kitas
+
+InitPassword:
+  Title: Nustatyti slaptažodį
+  Description: Jūs gavote kodą, kurį turite įvesti žemiau esančioje formoje, kad nustatytumėte naują slaptažodį.
+  CodeLabel: Kodas
+  NewPasswordLabel: Naujas slaptažodis
+  NewPasswordConfirmLabel: Patvirtinkite slaptažodį
+  ResendButtonText: Siųsti kodą iš naujo
+  NextButtonText: Kitas
+
+InitPasswordDone:
+  Title: Slaptažodis nustatytas
+  Description: Slaptažodis sėkmingai nustatytas
+  NextButtonText: Kitas
+  CancelButtonText: Atšaukti
+
+InitUser:
+  Title: Aktyvuoti naudotoją
+  Description: Patvirtinkite savo el. paštą naudodami žemiau esantį kodą ir nustatykite slaptažodį.
+  CodeLabel: Kodas
+  NewPasswordLabel: Naujas slaptažodis
+  NewPasswordConfirm: Patvirtinkite slaptažodį
+  NextButtonText: Kitas
+  ResendButtonText: Siųsti kodą iš naujo
+
+InitUserDone:
+  Title: Naudotojas aktyvuotas
+  Description: El. paštas patvirtintas ir slaptažodis sėkmingai nustatytas
+  NextButtonText: Kitas
+  CancelButtonText: Atšaukti
+
+InviteUser:
+  Title: Aktyvuoti naudotoją
+  Description: Patvirtinkite savo el. paštą naudodami žemiau esantį kodą ir nustatykite slaptažodį.
+  CodeLabel: Kodas
+  NewPasswordLabel: Naujas slaptažodis
+  NewPasswordConfirm: Patvirtinkite slaptažodį
+  NextButtonText: Kitas
+  ResendButtonText: Siųsti kodą iš naujo
+
+InitMFAPrompt:
+  Title: Dviejų veiksnių autentifikavimo nustatymas
+  Description: Dviejų veiksnių autentifikavimas suteikia papildomą jūsų paskyros saugumą. Tai garantuoja, kad tik jūs turite prieigą prie savo paskyros.
+  Provider0: Autentifikavimo programa (pvz., Google/Microsoft Authenticator, Authy)
+  Provider1: Priklausantis nuo įrenginio (pvz., FaceID, Windows Hello, pirštų atspaudai)
+  Provider3: Vienkartinis kodas SMS žinute
+  Provider4: Vienkartinis kodas el. paštu
+  NextButtonText: Kitas
+  SkipButtonText: Praleisti
+
+InitMFAOTP:
+  Title: Dviejų veiksnių patvirtinimas
+  Description: Sukurkite savo dviejų veiksnių autentifikavimą. Atsisiųskite autentifikavimo programą, jei jos dar neturite.
+  OTPDescription: Nuskenuokite kodą su savo autentifikavimo programa (pvz., Google/Microsoft Authenticator, Authy) arba nukopijuokite slaptąjį kodą ir įveskite sugeneruotą kodą žemiau.
+  SecretLabel: Slaptasis kodas
+  CodeLabel: Kodas
+  NextButtonText: Kitas
+  CancelButtonText: Atšaukti
+
+InitMFAOTPSMS:
+  Title: Dviejų veiksnių patvirtinimas
+  DescriptionPhone: Sukurkite savo dviejų veiksnių autentifikavimą. Įveskite savo telefono numerį, kad jį patvirtintumėte.
+  DescriptionCode: Sukurkite savo dviejų veiksnių autentifikavimą. Įveskite gautą kodą, kad patvirtintumėte savo telefono numerį.
+  CountryCodeLabel: Šalis
+  PhoneLabel: Telefonas
+  CodeLabel: Kodas
+  EditButtonText: Redaguoti
+  ResendButtonText: Siųsti kodą iš naujo
+  NextButtonText: Kitas
+
+InitMFAU2F:
+  Title: Pridėti apsaugos raktą
+  Description: Apsaugos raktas yra patvirtinimo metodas, kuris gali būti integruotas jūsų telefone, naudoti Bluetooth arba būti prijungtas tiesiai į kompiuterio USB jungtį.
+  TokenNameLabel: Apsaugos rakto / įrenginio pavadinimas
+  NotSupported: Jūsų naršyklė nepalaiko WebAuthN. Įsitikinkite, kad ji atnaujinta, arba naudokite kitą naršyklę (pvz., Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Pridėti apsaugos raktą
+  ErrorRetry: Bandykite iš naujo, sukurkite naują iššūkį arba pasirinkite kitą metodą.
+
+InitMFADone:
+  Title: Dviejų veiksnių autentifikavimas patvirtintas
+  Description: Puiku! Jūs ką tik sėkmingai nustatėte dviejų veiksnių autentifikavimą ir padarėte savo paskyrą daug saugesnę. Šis veiksnys turi būti įvestas kiekvieną kartą prisijungiant.
+  NextButtonText: Kitas
+  CancelButtonText: Atšaukti
+
+MFAProvider:
+  Provider0: Autentifikavimo programa (pvz., Google/Microsoft Authenticator, Authy)
+  Provider1: Priklausantis nuo įrenginio (pvz., FaceID, Windows Hello, pirštų atspaudai)
+  Provider3: Vienkartinis kodas SMS žinute
+  Provider4: Vienkartinis kodas el. paštu
+  ChooseOther: arba pasirinkite kitą galimybę
+
+VerifyMFAOTP:
+  Title: Patvirtinti dviejų veiksnių autentifikavimą
+  Description: Patvirtinkite savo antrinį veiksnį
+  CodeLabel: Kodas
+  NextButtonText: Kitas
+
+VerifyOTP:
+  Title: Patvirtinti dviejų veiksnių autentifikavimą
+  Description: Patvirtinkite savo antrinį veiksnį
+  CodeLabel: Kodas
+  ResendButtonText: Siųsti kodą iš naujo
+  NextButtonText: Kitas
+
+VerifyMFAU2F:
+  Title: Dviejų veiksnių patvirtinimas
+  Description: Patvirtinkite savo dviejų veiksnių autentifikavimą su registruotu įrenginiu (pvz., FaceID, Windows Hello, pirštų atspaudai)
+  NotSupported: Jūsų naršyklė nepalaiko WebAuthN. Įsitikinkite, kad naudojate naujausią versiją, arba pakeiskite naršyklę į palaikomą (Chrome, Safari, Firefox)
+  ErrorRetry: Bandykite iš naujo, sukurkite naują užklausą arba pasirinkite kitą metodą.
+  ValidateTokenButtonText: Patvirtinti dviejų veiksnių autentifikavimą
+
+Passwordless:
+  Title: Prisijungimas be slaptažodžio
+  Description: Prisijunkite naudodami savo įrenginio autentifikavimo metodus, tokius kaip FaceID, Windows Hello ar pirštų atspaudai.
+  NotSupported: Jūsų naršyklė nepalaiko WebAuthN. Įsitikinkite, kad ji atnaujinta, arba naudokite kitą naršyklę (pvz., Chrome, Safari, Firefox)
+  ErrorRetry: Bandykite iš naujo, sukurkite naują iššūkį arba pasirinkite kitą metodą.
+  LoginWithPwButtonText: Prisijungti su slaptažodžiu
+  ValidateTokenButtonText: Prisijungti be slaptažodžio
+
+PasswordlessPrompt:
+  Title: Prisijungimo be slaptažodžio nustatymas
+  Description: Ar norite nustatyti prisijungimą be slaptažodžio? (Jūsų įrenginio autentifikavimo metodai, tokie kaip FaceID, Windows Hello ar pirštų atspaudai)
+  DescriptionInit: Turite nustatyti prisijungimą be slaptažodžio. Naudokite jums duotą nuorodą, kad registruotumėte savo įrenginį.
+  PasswordlessButtonText: Prisijungti be slaptažodžio
+  NextButtonText: Kitas
+  SkipButtonText: Praleisti
+
+PasswordlessRegistration:
+  Title: Prisijungimo be slaptažodžio nustatymas
+  Description: Pridėkite savo autentifikavimą, nurodydami pavadinimą (pvz., MyMobilePhone, MacBook ir t. t.) ir spustelėdami žemiau esantį mygtuką „Registruoti be slaptažodžio“.
+  TokenNameLabel: Įrenginio pavadinimas
+  NotSupported: Jūsų naršyklė nepalaiko WebAuthN. Įsitikinkite, kad ji atnaujinta, arba naudokite kitą naršyklę (pvz., Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Registruoti be slaptažodžio
+  ErrorRetry: Bandykite iš naujo, sukurkite naują iššūkį arba pasirinkite kitą metodą.
+
+PasswordlessRegistrationDone:
+  Title: Prisijungimas be slaptažodžio nustatytas
+  Description: Įrenginys prisijungimui be slaptažodžio sėkmingai pridėtas.
+  DescriptionClose: Dabar galite uždaryti šį langą.
+  NextButtonText: Kitas
+  CancelButtonText: Atšaukti
+
+PasswordChange:
+  Title: Pakeisti slaptažodį
+  Description: Pakeiskite savo slaptažodį. Įveskite seną ir naują slaptažodį.
+  ExpiredDescription: Jūsų slaptažodis pasibaigė ir turi būti pakeistas. Įveskite seną ir naują slaptažodį.
+  OldPasswordLabel: Senas slaptažodis
+  NewPasswordLabel: Naujas slaptažodis
+  NewPasswordConfirmLabel: Slaptažodžio patvirtinimas
+  CancelButtonText: Atšaukti
+  NextButtonText: Kitas
+  Footer: Poraštė
+
+PasswordChangeDone:
+  Title: Pakeisti slaptažodį
+  Description: Jūsų slaptažodis sėkmingai pakeistas.
+  NextButtonText: Kitas
+
+PasswordResetDone:
+  Title: Slaptažodžio atstatymo nuoroda išsiųsta
+  Description: Patikrinkite savo el. paštą, kad atstatytumėte slaptažodį.
+  NextButtonText: Kitas
+
+EmailVerification:
+  Title: El. pašto patvirtinimas
+  Description: Išsiuntėme jums el. laišką, kad patvirtintumėte savo adresą. Įveskite kodą žemiau esančioje formoje.
+  CodeLabel: Kodas
+  NextButtonText: Kitas
+  ResendButtonText: Siųsti kodą iš naujo
+
+EmailVerificationDone:
+  Title: El. pašto patvirtinimas
+  Description: Jūsų el. pašto adresas sėkmingai patvirtintas.
+  NextButtonText: Kitas
+  CancelButtonText: Atšaukti
+  LoginButtonText: Prisijungti
+
+RegisterOption:
+  Title: Registracijos parinktys
+  Description: Pasirinkite, kaip norite registruotis
+  RegisterUsernamePasswordButtonText: Su naudotojo vardu ir slaptažodžiu
+  ExternalLoginDescription: arba registruokitės su išoriniu naudotoju
+  LoginButtonText: Prisijungti
+
+RegistrationUser:
+  Title: Registracija
+  Description: Įveskite savo naudotojo duomenis. Jūsų el. pašto adresas bus naudojamas kaip prisijungimo vardas.
+  DescriptionOrgRegister: Įveskite savo naudotojo duomenis.
+  EmailLabel: El. paštas
+  UsernameLabel: Naudotojo vardas
+  FirstnameLabel: Vardas
+  LastnameLabel: Pavardė
+  LanguageLabel: Kalba
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Lithuanian: Lietuvių
+  GenderLabel: Lytis
+  Female: Moteris
+  Male: Vyras
+  Diverse: kita / X
+  PasswordLabel: Slaptažodis
+  PasswordConfirmLabel: Slaptažodžio patvirtinimas
+  TosAndPrivacyLabel: Naudojimo sąlygos
+  TosConfirm: Sutinku su
+  TosLinkText: Naudojimo sąlygomis
+  PrivacyConfirm: Sutinku su
+  PrivacyLinkText: privatumo politika
+  ExternalLogin: arba registruokitės su išoriniu naudotoju
+  BackButtonText: Prisijungti
+  NextButtonText: Kitas
+
+ExternalRegistrationUserOverview:
+  Title: Išorinio naudotojo registracija
+  Description: Jūsų duomenis paėmėme iš pasirinkto teikėjo. Dabar galite juos pakeisti arba papildyti.
+  EmailLabel: El. paštas
+  UsernameLabel: Naudotojo vardas
+  FirstnameLabel: Vardas
+  LastnameLabel: Pavardė
+  NicknameLabel: Slapyvardis
+  PhoneLabel: Telefono numeris
+  LanguageLabel: Kalba
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Lithuanian: Lietuvių
+  TosAndPrivacyLabel: Naudojimo sąlygos
+  TosConfirm: Sutinku su
+  TosLinkText: Naudojimo sąlygomis
+  PrivacyConfirm: Sutinku su
+  PrivacyLinkText: privatumo politika
+  ExternalLogin: arba registruokitės su išoriniu naudotoju
+  BackButtonText: Atgal
+  NextButtonText: Išsaugoti
+
+RegistrationOrg:
+  Title: Organizacijos registracija
+  Description: Įveskite savo organizacijos pavadinimą ir naudotojo duomenis.
+  OrgNameLabel: Organizacijos pavadinimas
+  EmailLabel: El. paštas
+  UsernameLabel: Naudotojo vardas
+  FirstnameLabel: Vardas
+  LastnameLabel: Pavardė
+  PasswordLabel: Slaptažodis
+  PasswordConfirmLabel: Slaptažodžio patvirtinimas
+  TosAndPrivacyLabel: Naudojimo sąlygos
+  TosConfirm: Sutinku su
+  TosLinkText: Naudojimo sąlygomis
+  PrivacyConfirm: Sutinku su
+  PrivacyLinkText: privatumo politika
+  SaveButtonText: Sukurti organizaciją
+
+LoginSuccess:
+  Title: Prisijungimas sėkmingas
+  AutoRedirectDescription: Jūs automatiškai būsite nukreipti atgal į savo programą. Jei ne, spustelėkite žemiau esantį mygtuką. Po to galite uždaryti langą.
+  RedirectedDescription: Dabar galite uždaryti šį langą.
+  NextButtonText: Kitas
+
+LogoutDone:
+  Title: Atsijungta
+  Description: Jūs sėkmingai atsijungėte.
+  LoginButtonText: Prisijungti
+
+LinkingUserPrompt:
+  Title: Rastas esamas naudotojas
+  Description: "Ar norite susieti savo esamą paskyrą:"
+  LinkButtonText: Susieti
+  OtherButtonText: Kitos parinktys
+
+LinkingUsersDone:
+  Title: Naudotojo susiejimas
+  Description: Naudotojas susietas.
+  CancelButtonText: Atšaukti
+  NextButtonText: Kitas
+
+ExternalNotFound:
+  Title: Išorinis naudotojas nerastas
+  Description: Išorinis naudotojas nerastas. Ar norite susieti savo naudotoją, ar automatiškai registruoti naują?
+  LinkButtonText: Susieti
+  AutoRegisterButtonText: Registruotis
+  TosAndPrivacyLabel: Naudojimo sąlygos
+  TosConfirm: Sutinku su
+  TosLinkText: Naudojimo sąlygomis
+  PrivacyConfirm: Sutinku su
+  PrivacyLinkText: privatumo politika
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Lithuanian: Lietuvių
+DeviceAuth:
+  Title: Įrenginio autorizacija
+  UserCode:
+    Label: Naudotojo kodas
+    Description: Įveskite naudotojo kodą, rodomą įrenginyje.
+    ButtonNext: Kitas
+  Action:
+    Description: Suteikti prieigą įrenginiui.
+    GrantDevice: jūs ruošiatės suteikti prieigą įrenginiui
+    AccessToScopes: prieiga prie šių apimčių
+    Button:
+      Allow: Leisti
+      Deny: Atmesti
+  Done:
+    Description: Atlikta.
+    Approved: Įrenginio autorizacija patvirtinta. Dabar galite grįžti į įrenginį.
+    Denied: Įrenginio autorizacija atmesta. Dabar galite grįžti į įrenginį.
+
+Footer:
+  PoweredBy: Sukurta naudojant
+  Tos: Naudojimo sąlygomis
+  PrivacyPolicy: Privatumo politika
+  Help: Pagalba
+  SupportEmail: Pagalbos el. paštas
+
+SignIn: Prisijungti su {{.Provider}}
+
+Errors:
+  Internal: Įvyko vidinė klaida
+  AuthRequest:
+    NotFound: Nepavyko rasti prisijungimo užklausos
+    UserAgentNotCorresponding: Naudotojo agentas neatitinka
+    UserAgentNotFound: Naudotojo agento ID nerastas
+    TokenNotFound: Žetonas nerastas
+    RequestTypeNotSupported: Užklausos tipas nepalaikomas
+    MissingParameters: Trūksta būtinų parametrų
+  User:
+    NotFound: Naudotojas nerastas
+    AlreadyExists: Naudotojas jau egzistuoja
+    Inactive: Naudotojas neaktyvus
+    NotFoundOnOrg: Naudotojas nerastas pasirinktoje organizacijoje
+    NotAllowedOrg: Naudotojas nėra reikalingos organizacijos narys
+    NotMatchingUserID: Naudotojas ir naudotojas prisijungimo užklausoje nesutampa
+    UserIDMissing: Naudotojo ID tuščias
+    Invalid: Neteisingi naudotojo duomenys
+    DomainNotAllowedAsUsername: Domenas jau užimtas ir negali būti naudojamas
+    NotAllowedToLink: Naudotojui neleidžiama susieti su išoriniu prisijungimo teikėju
+    Profile:
+      NotFound: Profilis nerastas
+      NotChanged: Profilis nepakeistas
+      Empty: Profilis tuščias
+      FirstNameEmpty: Vardas profilyje tuščias
+      LastNameEmpty: Pavardė profilyje tuščia
+      IDMissing: Trūksta profilio ID
+    Email:
+      NotFound: El. paštas nerastas
+      Invalid: El. paštas neteisingas
+      AlreadyVerified: El. paštas jau patvirtintas
+      NotChanged: El. paštas nepakeistas
+      Empty: El. paštas tuščias
+      IDMissing: Trūksta el. pašto ID
+    Phone:
+      NotFound: Telefonas nerastas
+      Invalid: Telefonas neteisingas
+      AlreadyVerified: Telefonas jau patvirtintas
+      Empty: Telefonas tuščias
+      NotChanged: Telefonas nepakeistas
+    Address:
+      NotFound: Adresas nerastas
+      NotChanged: Adresas nepakeistas
+    Username:
+      AlreadyExists: Naudotojo vardas jau užimtas
+      Reserved: Naudotojo vardas jau užimtas
+      Empty: Naudotojo vardas tuščias
+    Password:
+      ConfirmationWrong: Slaptažodžio patvirtinimas neteisingas
+      Empty: Slaptažodis tuščias
+      Invalid: Slaptažodis neteisingas
+      InvalidAndLocked: Slaptažodis neteisingas ir naudotojas užblokuotas, susisiekite su administratoriumi.
+      NotChanged: Naujas slaptažodis negali būti tas pats, kaip dabartinis slaptažodis
+    UsernameOrPassword:
+      Invalid: Naudotojo vardas arba slaptažodis neteisingi
+    PasswordComplexityPolicy:
+      NotFound: Slaptažodžio politika nerasta
+      MinLength: Slaptažodis per trumpas
+      HasLower: Slaptažodyje turi būti mažoji raidė
+      HasUpper: Slaptažodyje turi būti didžioji raidė
+      HasNumber: Slaptažodyje turi būti skaičius
+      HasSymbol: Slaptažodyje turi būti simbolis
+    Code:
+      Expired: Kodas nebegalioja
+      Invalid: Kodas neteisingas
+      Empty: Kodas tuščias
+      CryptoCodeNil: Kriptografinis kodas nenustatytas
+      NotFound: Nepavyko rasti kodo
+      GeneratorAlgNotSupported: Nepalaikomas generavimo algoritmas
+    EmailVerify:
+      UserIDEmpty: Naudotojo ID tuščias
+    ExternalData:
+      CouldNotRead: Nepavyko teisingai nuskaityti išorinių duomenų
+    MFA:
+      NoProviders: Nėra galimų daugiafaktorinio autentifikavimo teikėjų
+      OTP:
+        AlreadyReady: Daugiafaktorinis vienkartinis slaptažodis (OTP) jau nustatytas
+        NotExisting: Daugiafaktorinis vienkartinis slaptažodis (OTP) neegzistuoja
+        InvalidCode: Neteisingas kodas
+        NotReady: Daugiafaktorinis vienkartinis slaptažodis (OTP) neparuoštas
+    Locked: Naudotojas užblokuotas
+    SomethingWentWrong: Kažkas nutiko ne taip
+    NotActive: Naudotojas neaktyvus
+    ExternalIDP:
+      IDPTypeNotImplemented: IDP tipas neįgyvendintas
+      NotAllowed: Išorinis prisijungimo teikėjas neleidžiamas
+      IDPConfigIDEmpty: Tapatybės teikėjo ID tuščias
+      ExternalUserIDEmpty: Išorinio naudotojo ID tuščias
+      UserDisplayNameEmpty: Naudotojo rodomas vardas tuščias
+      NoExternalUserData: Nebuvo gauta išorinių naudotojo duomenų
+      CreationNotAllowed: Šiam teikėjui neleidžiama sukurti naujo naudotojo
+      LinkingNotAllowed: Šiam teikėjui neleidžiama susieti naudotojo
+      NoOptionAllowed: Šiam teikėjui neleidžiama nei sukurti, nei susieti naudotojo. Susisiekite su administratoriumi.
+      LoginFailedSwitchLocal: |
+        Prisijungimas per išorinį IDP nepavyko. Grįžtama į vietinį prisijungimą.
+
+        Klaidos informacija: {{.Details}}
+    GrantRequired: Prisijungti nepavyksta. Naudotojas turi turėti bent vieną leidimą programai. Susisiekite su administratoriumi.
+    ProjectRequired: Prisijungti nepavyksta. Naudotojo organizacijai turi būti suteiktas leidimas projektui. Susisiekite su administratoriumi.
+  IdentityProvider:
+    InvalidConfig: Tapatybės teikėjo konfigūracija neteisinga
+  IAM:
+    LockoutPolicy:
+      NotExisting: Blokavimo politika neegzistuoja
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Registracija neleidžiama
+  DeviceAuth:
+    NotExisting: Naudotojo kodas neegzistuoja
+
+optional: (nebūtina)

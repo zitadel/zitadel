@@ -1,0 +1,1419 @@
+Errors:
+  Internal: "Įvyko vidinė klaida"
+  NoChangesFound: "Nėra pakeitimų"
+  OriginNotAllowed: "Šis \"Origin\" neleidžiamas"
+  IDMissing: "Trūksta ID"
+  ResourceOwnerMissing: "Trūksta ištekliaus savininko organizacijos"
+  RemoveFailed: "Nepavyko pašalinti"
+  ProjectionName:
+    Invalid: "Neteisingas projekcijos pavadinimas"
+  Assets:
+    EmptyKey: "Turinio raktas tuščias"
+    Store:
+      NotInitialized: "Turinio saugykla neinicializuota"
+      NotConfigured: "Turinio saugykla nesukonfigūruota"
+    Bucket:
+      Internal: "Vidinė klaida kuriant talpyklą"
+      AlreadyExists: "Talpykla jau egzistuoja"
+      CreateFailed: "Talpykla nesukurta"
+      ListFailed: "Nepavyko nuskaityti talpyklų"
+      RemoveFailed: "Talpykla nepašalinta"
+      SetPublicFailed: "Nepavyko padaryti talpyklos viešos"
+    Object:
+      PutFailed: "Objektas nesukurtas"
+      GetFailed: "Nepavyko nuskaityti objekto"
+      NotFound: "Nepavyko rasti objekto"
+      PresignedTokenFailed: "Nepavyko sukurti pasirašyto žetono"
+      ListFailed: "Nepavyko nuskaityti objektų sąrašo"
+      RemoveFailed: "Nepavyko pašalinti objekto"
+  Limit:
+    ExceedsDefault: "Limitas viršija numatytąjį limitą"
+  Limits:
+    NotFound: "Limitai nerasti"
+    NoneSpecified: "Limitai nenurodyti"
+    Instance:
+      Blocked: "Egzempliorius užblokuotas"
+  Restrictions:
+    NoneSpecified: "Apribojimai nenurodyti"
+    DefaultLanguageMustBeAllowed: "Numatytoji kalba turi būti leidžiama"
+  Language:
+    NotParsed: "Nepavyko nuskaityti kalbos"
+    NotSupported: "Kalba nepalaikoma"
+    NotAllowed: "Kalba neleidžiama"
+    Undefined: "Kalba nenurodyta"
+    Duplicate: "Kalbos turi dublikatų"
+  OIDCSettings:
+    NotFound: "OIDC konfigūracija nerasta"
+    AlreadyExists: "OIDC konfigūracija jau egzistuoja"
+  SecretGenerator:
+    AlreadyExists: "Paslapčių generatorius jau egzistuoja"
+    TypeMissing: "Trūksta paslapčių generatoriaus tipo"
+    NotFound: "Paslapčių generatorius nerastas"
+  SMSConfig:
+    NotFound: "SMS konfigūracija nerasta"
+    AlreadyActive: "SMS konfigūracija jau aktyvi"
+    AlreadyDeactivated: "SMS konfigūracija jau deaktyvuota"
+    NotExternalVerification: "SMS konfigūracija nepalaiko kodo patvirtinimo"
+  SMTP:
+    NotEmailMessage: "žinutė nėra EmailMessage"
+    RequiredAttributes: "tema, gavėjai ir turinys turi būti nustatyti, tačiau kai kurie ar visi jų yra tušti"
+    CouldNotSplit: "nepavyko atskirti serverio ir prievado prisijungimui prie smtp"
+    CouldNotDial: "nepavyko susisiekti su SMTP serveriu, patikrinkite prievadą, ugniasienės problemas..."
+    CouldNotDialTLS: "nepavyko susisiekti su SMTP serveriu naudojant TLS, patikrinkite prievadą, ugniasienės problemas..."
+    CouldNotCreateClient: "nepavyko sukurti smtp kliento"
+    CouldNotStartTLS: "nepavyko paleisti tls"
+    CouldNotAuth: "nepavyko pridėti smtp autentifikavimo, patikrinkite, ar naudotojas ir slaptažodis teisingi; jei jie teisingi, galbūt jūsų teikėjas reikalauja autentifikavimo metodo, kurio Zitadel nepalaiko"
+    CouldNotSetSender: "nepavyko nustatyti siuntėjo"
+    CouldNotSetRecipient: "nepavyko nustatyti gavėjo"
+  SMTPConfig:
+    TestPassword: "Testinis slaptažodis nerastas"
+    NotFound: "SMTP konfigūracija nerasta"
+    AlreadyExists: "SMTP konfigūracija jau egzistuoja"
+    AlreadyDeactivated: "SMTP konfigūracija jau deaktyvuota"
+    SenderAdressNotCustomDomain: "Siuntėjo adresas turi būti sukonfigūruotas kaip pasirinktinis domenas egzemplioriuje."
+    TestEmailNotFound: "Testinis el. pašto adresas nerastas"
+  Notification:
+    NoDomain: "Žinutei nerastas domenas"
+  User:
+    NotFound: "Naudotojas nerastas"
+    AlreadyExists: "Naudotojas jau egzistuoja"
+    NotFoundOnOrg: "Naudotojas nerastas pasirinktoje organizacijoje"
+    NotAllowedOrg: "Naudotojas nėra reikalingos organizacijos narys"
+    UserIDMissing: "Trūksta naudotojo ID"
+    UserIDWrong: "Užklausos naudotojas nesutampa su autentifikuotu naudotoju"
+    DomainPolicyNil: "Organizacijos politika tuščia"
+    EmailAsUsernameNotAllowed: "El. paštas neleidžiamas kaip naudotojo vardas"
+    Invalid: "Naudotojo duomenys negalioja"
+    DomainNotAllowedAsUsername: "Domenas jau rezervuotas ir negali būti naudojamas"
+    AlreadyInactive: "Naudotojas jau neaktyvus"
+    NotInactive: "Naudotojas nėra neaktyvus"
+    CantDeactivateInitial: "Naudotojas su pradine būsena gali būti tik pašalintas, ne deaktyvuotas"
+    ShouldBeActiveOrInitial: "Naudotojas neaktyvus arba nepradinis"
+    AlreadyInitialised: "Naudotojas jau aktyvuotas"
+    NotInitialised: "Naudotojas dar neaktyvuotas"
+    NotLocked: "Naudotojas neužblokuotas"
+    NoChanges: "Pakeitimų nerasta"
+    InitCodeNotFound: "Aktyvavimo kodas nerastas"
+    UsernameNotChanged: "Naudotojo vardas nepakeistas"
+    InvalidURLTemplate: "URL šablonas negalioja"
+    Locked: "Naudotojas užblokuotas"
+    Profile:
+      NotFound: "Profilis nerastas"
+      NotChanged: "Profilis nepakeistas"
+      Empty: "Profilis tuščias"
+      FirstNameEmpty: "Vardas profilyje tuščias"
+      LastNameEmpty: "Pavardė profilyje tuščia"
+      IDMissing: "Trūksta profilio ID"
+    Email:
+      NotFound: "El. paštas nerastas"
+      Invalid: "El. paštas neteisingas"
+      AlreadyVerified: "El. paštas jau patvirtintas"
+      NotChanged: "El. paštas nepakeistas"
+      Empty: "El. paštas tuščias"
+      IDMissing: "Trūksta el. pašto ID"
+    Phone:
+      NotFound: "Telefonas nerastas"
+      Invalid: "Telefonas neteisingas"
+      AlreadyVerified: "Telefonas jau patvirtintas"
+      Empty: "Telefonas tuščias"
+      NotChanged: "Telefonas nepakeistas"
+      VerifyingRemovalIsNotSupported: "Telefono patvirtinimo pašalinimas nepalaikomas"
+    Address:
+      NotFound: "Adresas nerastas"
+      NotChanged: "Adresas nepakeistas"
+    Machine:
+      Key:
+        NotFound: "Techninio naudotojo raktas nerastas"
+        AlreadyExisting: "Techninio naudotojo raktas jau egzistuoja"
+        Invalid: "Viešasis raktas nėra galiojantis RSA viešasis raktas PKIX formatu su PEM kodavimu"
+      Secret:
+        NotExisting: "Paslaptis neegzistuoja"
+        Invalid: "Paslaptis negalioja"
+        CouldNotGenerate: "Nepavyko sugeneruoti paslapties"
+    PAT:
+      NotFound: "Asmeninis prieigos žetonas nerastas"
+    Metadata:
+      Conflicting: "Metaduomenys neturi būti nustatyti tiek naudotojo, tiek žmogaus laukuose"
+    NotHuman: "Naudotojas turi būti asmeninis"
+    NotMachine: "Naudotojas turi būti techninis"
+    WrongType: "Neleidžiama šiam naudotojo tipui"
+    NotAllowedToLink: "Naudotojui neleidžiama susieti su išoriniu prisijungimo teikėju"
+    Username:
+      AlreadyExists: "Naudotojo vardas jau užimtas"
+      Reserved: "Naudotojo vardas jau užimtas"
+      Empty: "Naudotojo vardas tuščias"
+    Code:
+      Empty: "Kodas tuščias"
+      NotFound: "Kodas nerastas"
+      Expired: "Kodas nebegalioja"
+      GeneratorAlgNotSupported: "Nepalaikomas generavimo algoritmas"
+      Invalid: "Kodas neteisingas"
+    Password:
+      NotFound: "Slaptažodis nerastas"
+      Empty: "Slaptažodis tuščias"
+      Invalid: "Slaptažodis neteisingas"
+      NotSet: "Naudotojas nenustatė slaptažodžio"
+      NotChanged: "Naujas slaptažodis negali būti tas pats, kaip dabartinis slaptažodis"
+      NotSupported: "Slaptažodžio maišos kodavimas nepalaikomas. Žr. https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets"
+    PasswordComplexityPolicy:
+      NotFound: "Slaptažodžio politika nerasta"
+      MinLength: "Slaptažodis per trumpas"
+      MinLengthNotAllowed: "Nurodytas minimalus ilgis neleidžiamas"
+      HasLower: "Slaptažodyje turi būti mažoji raidė"
+      HasUpper: "Slaptažodyje turi būti didžioji raidė"
+      HasNumber: "Slaptažodyje turi būti skaičius"
+      HasSymbol: "Slaptažodyje turi būti simbolis"
+    ExternalIDP:
+      Invalid: "Išorinis tapatybės teikėjas negalioja"
+      IDPConfigNotExisting: "Tapatybės teikėjas negalioja šiai organizacijai"
+      NotAllowed: "Išorinis tapatybės teikėjas neleidžiamas"
+      MinimumExternalIDPNeeded: "Turi būti pridėtas bent vienas tapatybės teikėjas"
+      AlreadyExists: "Išorinis tapatybės teikėjas jau užimtas"
+      NotFound: "Išorinis tapatybės teikėjas nerastas"
+      LoginFailed: "Prisijungimas per išorinį tapatybės teikėją nepavyko"
+    MFA:
+      OTP:
+        AlreadyReady: "Kelių veiksnių vienkartinis slaptažodis (OTP) jau nustatytas"
+        NotExisting: "Kelių veiksnių vienkartinis slaptažodis (OTP) neegzistuoja"
+        NotReady: "Kelių veiksnių vienkartinis slaptažodis (OTP) neparuoštas"
+        InvalidCode: "Neteisingas kodas"
+      U2F:
+        NotExisting: "U2F neegzistuoja"
+      Passwordless:
+        NotExisting: "Prieigos raktas neegzistuoja"
+      RecoveryCodes:
+        InvalidCode: "Nurodytas neteisingas atkūrimo kodas"
+        MaxCountExceeded: "Viršytas maksimalus atkūrimo kodų skaičius"
+        NotReady: "Atkūrimo kodai neparuošti naudoti"
+        ConfigInvalid: "Atkūrimo kodų konfigūracija negalioja"
+    WebAuthN:
+      NotFound: "Nepavyko rasti WebAuthN žetono"
+      BeginRegisterFailed: "Nepavyko pradėti WebAuthN registracijos"
+      MarshalError: "Klaida serializuojant duomenis"
+      ErrorOnParseCredential: "Klaida analizuojant kredencialų duomenis"
+      CreateCredentialFailed: "Klaida kuriant kredencialus"
+      BeginLoginFailed: "Nepavyko pradėti WebAuthN prisijungimo"
+      ValidateLoginFailed: "Klaida tikrinant prisijungimo kredencialus"
+      CloneWarning: "Kredencialai gali būti klonuoti"
+    RefreshToken:
+      Invalid: "Atnaujinimo žetonas negalioja"
+      NotFound: "Atnaujinimo žetonas nerastas"
+  Instance:
+    NotFound: "Instance not found"
+    AlreadyExists: "Instance already exists"
+    NotChanged: "Instance not changed"
+  Org:
+    AlreadyExists: "Organizacijos pavadinimas arba ID jau užimtas"
+    Invalid: "Organizacija negalioja"
+    AlreadyDeactivated: "Organizacija jau deaktyvuota"
+    AlreadyActive: "Organizacija jau aktyvi"
+    Empty: "Organizacija tuščia"
+    NotFound: "Organizacija nerasta"
+    NotChanged: "Organizacija nepakeista"
+    DefaultOrgNotDeletable: "Numatytoji organizacija negali būti pašalinta"
+    ZitadelOrgNotDeletable: "Organizacija su Zitadel projektu negali būti pašalinta"
+    InvalidDomain: "Neteisingas domenas"
+    DomainMissing: "Trūksta domeno"
+    DomainNotOnOrg: "Domenas neegzistuoja šioje organizacijoje"
+    DomainNotVerified: "Domenas nepatvirtintas"
+    DomainAlreadyVerified: "Domenas jau patvirtintas"
+    DomainVerificationTypeInvalid: "Domeno patvirtinimo tipas negalioja"
+    DomainVerificationMissing: "Domeno patvirtinimas dar nepradėtas"
+    DomainVerificationFailed: "Domeno patvirtinimas nepavyko"
+    DomainVerificationTXTNotFound: "Jūsų domenui nerastas _zitadel-challenge TXT įrašas. Patikrinkite, ar pridėjote jį savo DNS serveryje, arba palaukite, kol naujas įrašas išplis"
+    DomainVerificationTXTNoMatch: "Jūsų domenui rastas _zitadel-challenge TXT įrašas, tačiau jame nėra teisingo žetono teksto. Patikrinkite, ar pridėjote teisingą žetoną savo DNS serveryje, arba palaukite, kol naujas įrašas išplis"
+    DomainVerificationHTTPNotFound: "Failas, turintis iššūkį, nerastas tikimoje vietoje. Patikrinkite, ar įkėlėte failą į teisingą vietą su skaitymo teisėmis"
+    DomainVerificationHTTPNoMatch: "Failas, turintis iššūkį, rastas tikimoje vietoje, tačiau jame nėra teisingo žetono teksto. Patikrinkite jo turinį"
+    DomainVerificationTimeout: "Baigėsi laikas užklausiant DNS serverį"
+    PrimaryDomainNotDeletable: "Organizacijos domenas negali būti pašalintas"
+    DomainNotFound: "Domenas nerastas"
+    MemberIDMissing: "Trūksta nario ID"
+    MemberNotFound: "Organizacijos narys nerastas"
+    InvalidMember: "Organizacijos narys negalioja"
+    UserIDMissing: "Trūksta naudotojo ID"
+    PolicyAlreadyExists: "Politika jau egzistuoja"
+    PolicyNotExisting: "Politika neegzistuoja"
+    IdpInvalid: "Tapatybės teikėjo konfigūracija negalioja"
+    IdpNotExisting: "Tapatybės teikėjo konfigūracija neegzistuoja"
+    OIDCConfigInvalid: "OIDC tapatybės teikėjo konfigūracija negalioja"
+    IdpIsNotOIDC: "Tapatybės teikėjo konfigūracija nėra oidc tipo"
+    Domain:
+      AlreadyExists: "Domenas jau egzistuoja"
+      InvalidCharacter: "Domenui leidžiami tik raidiniai-skaitmeniniai simboliai, . ir -"
+      EmptyString: "Neteisingi ne skaitmeniniai ir ne raidiniai simboliai buvo pakeisti tarpais, o gautas domenas yra tuščia eilutė"
+    LoginPolicy:
+      NotFound: "Prisijungimo politika nerasta"
+      Invalid: "Prisijungimo politika negalioja"
+      RedirectURIInvalid: "Numatytasis nukreipimo URI negalioja"
+      NotExisting: "Prisijungimo politika neegzistuoja"
+      AlreadyExists: "Prisijungimo politika jau egzistuoja"
+      IdpProviderAlreadyExisting: "Tapatybės teikėjas jau egzistuoja"
+      IdpProviderNotExisting: "Tapatybės teikėjas neegzistuoja"
+      RegistrationNotAllowed: "Registracija neleidžiama"
+      UsernamePasswordNotAllowed: "Prisijungimas naudotojo vardu / slaptažodžiu neleidžiamas"
+      MFA:
+        AlreadyExists: "Kelių veiksnių autentifikavimas jau egzistuoja"
+        NotExisting: "Kelių veiksnių autentifikavimas neegzistuoja"
+        Unspecified: "Kelių veiksnių autentifikavimas negalioja"
+    MailTemplate:
+      NotFound: "Numatytasis pašto šablonas nerastas"
+      NotChanged: "Numatytasis pašto šablonas nepakeistas"
+      AlreadyExists: "Numatytasis pašto šablonas jau egzistuoja"
+      Invalid: "Numatytasis pašto šablonas negalioja"
+    CustomMessageText:
+      NotFound: "Numatytasis žinutės tekstas nerastas"
+      NotChanged: "Numatytasis žinutės tekstas nepakeistas"
+      AlreadyExists: "Numatytasis žinutės tekstas jau egzistuoja"
+      Invalid: "Numatytasis žinutės tekstas negalioja"
+    PasswordComplexityPolicy:
+      NotFound: "Slaptažodžio sudėtingumo politika nerasta"
+      Empty: "Slaptažodžio sudėtingumo politika tuščia"
+      NotExisting: "Slaptažodžio sudėtingumo politika neegzistuoja"
+      AlreadyExists: "Slaptažodžio sudėtingumo politika jau egzistuoja"
+    PasswordLockoutPolicy:
+      NotFound: "Slaptažodžio blokavimo politika nerasta"
+      Empty: "Slaptažodžio blokavimo politika tuščia"
+      NotExisting: "Slaptažodžio blokavimo politika neegzistuoja"
+      AlreadyExists: "Slaptažodžio blokavimo politika jau egzistuoja"
+    PasswordAgePolicy:
+      NotFound: "Slaptažodžio galiojimo politika nerasta"
+      Empty: "Slaptažodžio galiojimo politika tuščia"
+      NotExisting: "Slaptažodžio galiojimo politika neegzistuoja"
+      AlreadyExists: "Slaptažodžio galiojimo politika jau egzistuoja"
+    NotificationPolicy:
+      NotFound: "Pranešimų politika nerasta"
+      NotChanged: "Pranešimų politika nepakeista"
+      AlreadyExists: "Pranešimų politika jau egzistuoja"
+    LabelPolicy:
+      NotFound: "Privati ženklinimo politika nerasta"
+      NotChanged: "Privati ženklinimo politika nepakeista"
+  Project:
+    ProjectIDMissing: "Trūksta projekto ID"
+    AlreadyExists: "Projektas jau egzistuoja šioje organizacijoje"
+    OrgNotExisting: "Organizacija neegzistuoja"
+    UserNotExisting: "Naudotojas neegzistuoja"
+    CouldNotGenerateClientSecret: "Nepavyko sugeneruoti kliento paslapties"
+    Invalid: "Projektas negalioja"
+    NotActive: "Projektas neaktyvus"
+    NotInactive: "Projektas nėra deaktyvuotas"
+    NotFound: "Projektas nerastas"
+    UserIDMissing: "Trūksta naudotojo ID"
+    Member:
+      NotFound: "Projekto narys nerastas"
+      Invalid: "Projekto narys negalioja"
+      AlreadyExists: "Projekto narys jau egzistuoja"
+      NotExisting: "Projekto narys neegzistuoja"
+    MinimumOneRoleNeeded: "Turi būti pridėtas bent vienas vaidmuo"
+    Role:
+      AlreadyExists: "Vaidmuo jau egzistuoja"
+      Invalid: "Vaidmuo negalioja"
+      NotExisting: "Vaidmuo neegzistuoja"
+    IDMissing: "Trūksta ID"
+    App:
+      AlreadyExists: "Programa jau egzistuoja"
+      NotFound: "Programa nerasta"
+      Invalid: "Programa negalioja"
+      NotExisting: "Programa neegzistuoja"
+      NotActive: "Programa neaktyvi"
+      NotInactive: "Programa nėra neaktyvi"
+      OIDCConfigInvalid: "OIDC konfigūracija negalioja"
+      APIConfigInvalid: "API konfigūracija negalioja"
+      SAMLConfigInvalid: "SAML konfigūracija negalioja"
+      IsNotOIDC: "Programa nėra OIDC tipo"
+      IsNotAPI: "Programa nėra API tipo"
+      IsNotSAML: "Programa nėra SAML tipo"
+      SAMLMetadataMissing: "Trūksta SAML metaduomenų"
+      SAMLMetadataFormat: "SAML metaduomenų formato klaida"
+      SAMLEntityIDAlreadyExisting: "SAML EntityID jau egzistuoja"
+      OIDCAuthMethodNoSecret: "Pasirinktas OIDC autentifikavimo metodas nereikalauja paslapties"
+      APIAuthMethodNoSecret: "Pasirinktas API autentifikavimo metodas nereikalauja paslapties"
+      AuthMethodNoPrivateKeyJWT: "Pasirinktas autentifikavimo metodas nereikalauja rakto"
+      ClientSecretInvalid: "Kliento paslaptis negalioja"
+      ClientSecretNotSet: "Kliento paslaptis nenustatyta"
+      Key:
+        AlreadyExisting: "Programos raktas jau egzistuoja"
+        NotFound: "Programos raktas nerastas"
+    RequiredFieldsMissing: "Trūksta kai kurių būtinų laukų"
+    Grant:
+      AlreadyExists: "Projekto suteikimas jau egzistuoja"
+      NotFound: "Projekto suteikimas nerastas"
+      Invalid: "Projekto suteikimas negalioja"
+      NotExisting: "Projekto suteikimas neegzistuoja"
+      HasNotExistingRole: "Vienas vaidmuo neegzistuoja projekte"
+      NotActive: "Projekto suteikimas neaktyvus"
+      NotInactive: "Projekto suteikimas nėra neaktyvus"
+  Instance:
+    NotFound: "Egzempliorius nerastas. Įsitikinkite, kad domenas teisingas. Žr. https://zitadel.com/docs/apis/introduction#domains"
+    Member:
+      RolesNotChanged: "Vaidmenys nepakeisti"
+    MemberInvalid: "Narys negalioja"
+    MemberAlreadyExisting: "Narys jau egzistuoja"
+    MemberNotExisting: "Narys neegzistuoja"
+    IDMissing: "Trūksta ID"
+    IdpInvalid: "Tapatybės teikėjo konfigūracija negalioja"
+    IdpNotExisting: "Tapatybės teikėjo konfigūracija neegzistuoja"
+    OIDCConfigInvalid: "OIDC tapatybės teikėjo konfigūracija negalioja"
+    IdpIsNotOIDC: "Tapatybės teikėjo konfigūracija nėra oidc tipo"
+    LoginPolicyInvalid: "Prisijungimo politika negalioja"
+    LoginPolicyNotExisting: "Prisijungimo politika neegzistuoja"
+    IdpProviderInvalid: "Tapatybės teikėjas negalioja"
+    LoginPolicy:
+      NotFound: "Numatytoji prisijungimo politika nerasta"
+      NotChanged: "Numatytoji prisijungimo politika nepakeista"
+      NotExisting: "Numatytoji prisijungimo politika neegzistuoja"
+      AlreadyExists: "Numatytoji prisijungimo politika jau egzistuoja"
+      RedirectURIInvalid: "Numatytasis nukreipimo URI negalioja"
+      MFA:
+        AlreadyExists: "Kelių veiksnių autentifikavimas jau egzistuoja"
+        NotExisting: "Kelių veiksnių autentifikavimas neegzistuoja"
+        Unspecified: "Kelių veiksnių autentifikavimas negalioja"
+      IDP:
+        AlreadyExists: "Tapatybės teikėjas jau egzistuoja"
+        NotExisting: "Tapatybės teikėjas neegzistuoja"
+        Invalid: "Tapatybės teikėjas negalioja"
+      IDPConfig:
+        AlreadyExists: "Tapatybės teikėjo konfigūracija jau egzistuoja"
+        NotInactive: "Tapatybės teikėjo konfigūracija nėra neaktyvi"
+        NotActive: "Tapatybės teikėjo konfigūracija neaktyvi"
+    LabelPolicy:
+      NotFound: "Numatytoji privati ženklinimo politika nerasta"
+      NotChanged: "Numatytoji privati ženklinimo politika nepakeista"
+    MailTemplate:
+      NotFound: "Numatytasis pašto šablonas nerastas"
+      NotChanged: "Numatytasis pašto šablonas nepakeistas"
+      AlreadyExists: "Numatytasis pašto šablonas jau egzistuoja"
+      Invalid: "Numatytasis pašto šablonas negalioja"
+    CustomMessageText:
+      NotFound: "Numatytasis žinutės tekstas nerastas"
+      NotChanged: "Numatytasis žinutės tekstas nepakeistas"
+      AlreadyExists: "Numatytasis žinutės tekstas jau egzistuoja"
+      Invalid: "Numatytasis žinutės tekstas negalioja"
+    PasswordComplexityPolicy:
+      NotFound: "Numatytoji slaptažodžio sudėtingumo politika nerasta"
+      NotExisting: "Numatytoji slaptažodžio sudėtingumo politika neegzistuoja"
+      AlreadyExists: "Numatytoji slaptažodžio sudėtingumo politika jau egzistuoja"
+      Empty: "Numatytoji slaptažodžio sudėtingumo politika tuščia"
+      NotChanged: "Numatytoji slaptažodžio sudėtingumo politika nepakeista"
+    PasswordAgePolicy:
+      NotFound: "Numatytoji slaptažodžio galiojimo politika nerasta"
+      NotExisting: "Numatytoji slaptažodžio galiojimo politika neegzistuoja"
+      AlreadyExists: "Numatytoji slaptažodžio galiojimo politika jau egzistuoja"
+      Empty: "Numatytoji slaptažodžio galiojimo politika tuščia"
+      NotChanged: "Numatytoji slaptažodžio galiojimo politika nepakeista"
+    PasswordLockoutPolicy:
+      NotFound: "Numatytoji slaptažodžio blokavimo politika nerasta"
+      NotExisting: "Numatytoji slaptažodžio blokavimo politika neegzistuoja"
+      AlreadyExists: "Numatytoji slaptažodžio blokavimo politika jau egzistuoja"
+      Empty: "Numatytoji slaptažodžio blokavimo politika tuščia"
+      NotChanged: "Numatytoji slaptažodžio blokavimo politika nepakeista"
+    DomainPolicy:
+      NotFound: "Organizacijos domeno politika nerasta"
+      Empty: "Organizacijos domeno politika tuščia"
+      NotExisting: "Organizacijos domeno politika neegzistuoja"
+      AlreadyExists: "Organizacijos domeno politika jau egzistuoja"
+      NotChanged: "Organizacijos domeno politika nepakeista"
+    NotificationPolicy:
+      NotFound: "Numatytoji pranešimų politika nerasta"
+      NotChanged: "Numatytoji pranešimų politika nepakeista"
+      AlreadyExists: "Numatytoji pranešimų politika jau egzistuoja"
+  Policy:
+    AlreadyExists: "Politika jau egzistuoja"
+    Label:
+      Invalid:
+        PrimaryColor: "Pagrindinė spalva nėra galiojanti šešioliktainė spalvos reikšmė"
+        BackgroundColor: "Fono spalva nėra galiojanti šešioliktainė spalvos reikšmė"
+        WarnColor: "Įspėjimo spalva nėra galiojanti šešioliktainė spalvos reikšmė"
+        FontColor: "Šrifto spalva nėra galiojanti šešioliktainė spalvos reikšmė"
+        PrimaryColorDark: "Pagrindinė spalva (tamsi tema) nėra galiojanti šešioliktainė spalvos reikšmė"
+        BackgroundColorDark: "Fono spalva (tamsi tema) nėra galiojanti šešioliktainė spalvos reikšmė"
+        WarnColorDark: "Įspėjimo spalva (tamsi tema) nėra galiojanti šešioliktainė spalvos reikšmė"
+        FontColorDark: "Šrifto spalva (tamsi tema) nėra galiojanti šešioliktainė spalvos reikšmė"
+  UserGrant:
+    AlreadyExists: "Naudotojo teisių priskyrimas jau egzistuoja"
+    NotFound: "Naudotojo teisių priskyrimas nerastas"
+    Invalid: "Naudotojo teisių priskyrimas negalioja"
+    NotChanged: "Naudotojo teisių priskyrimas nepakeistas"
+    IDMissing: "Trūksta ID"
+    NoPermissionForProject: "Naudotojas neturi teisių šiam projektui"
+    RoleKeyNotFound: "Vaidmuo nerastas"
+  Member:
+    AlreadyExists: "Narys jau egzistuoja"
+  IDPConfig:
+    AlreadyExists: "Tapatybės teikėjo konfigūracija tokiu pavadinimu jau egzistuoja"
+    NotExisting: "Tapatybės teikėjo konfigūracija neegzistuoja"
+  Changes:
+    NotFound: "Istorija nerasta"
+    AuditRetention: "Istorija yra už audito žurnalo saugojimo laikotarpio ribų"
+  Token:
+    NotFound: "Žetonas nerastas"
+    Invalid: "Žetonas negalioja"
+  UserSession:
+    NotFound: "Naudotojo sesija nerasta"
+  Key:
+    NotFound: "Raktas nerastas"
+    ExpireBeforeNow: "Galiojimo data yra praeityje"
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: "Kelių veiksnių autentifikavimas sukonfigūruotas kaip būtinas, tačiau nesukonfigūruotas joks galimas teikėjas. Susisiekite su sistemos administratoriumi."
+  Step:
+    Started:
+      AlreadyExists: "Pradėtas žingsnis jau egzistuoja"
+    Done:
+      AlreadyExists: "Įvykdytas žingsnis jau egzistuoja"
+  CustomText:
+    AlreadyExists: "Tekstas jau egzistuoja"
+    Invalid: "Tekstas negalioja"
+    NotFound: "Tekstas nerastas"
+  TranslationFile:
+    ReadError: "Klaida skaitant vertimo failą"
+    MergeError: "Nepavyko sujungti vertimo failo su pasirinktiniais vertimais"
+    NotFound: "Vertimo failas neegzistuoja"
+  Metadata:
+    NotFound: "Metaduomenys nerasti"
+    NoData: "Metaduomenų sąrašas tuščias"
+    Invalid: "Metaduomenys negalioja"
+    KeyNotExisting: "Vienas ar keli raktai neegzistuoja"
+  Action:
+    Invalid: "Veiksmas negalioja"
+    NotFound: "Veiksmas nerastas"
+    NotActive: "Veiksmas neaktyvus"
+    NotInactive: "Veiksmas nėra neaktyvus"
+    MaxAllowed: "Papildomi aktyvūs veiksmai neleidžiami"
+    NotEnabled: "Funkcija \"Veiksmas\" neįjungta"
+  Flow:
+    FlowTypeMissing: "Trūksta eigos tipo"
+    Empty: "Eiga jau tuščia"
+    WrongTriggerType: "Trigerio tipas negalioja"
+    NoChanges: "Nėra pakeitimų"
+    ActionIDsNotExist: "Veiksmų ID neegzistuoja"
+  Query:
+    CloseRows: "Nepavyko baigti SQL sakinio"
+    SQLStatement: "Nepavyko sukurti SQL sakinio"
+    InvalidRequest: "Užklausa negalioja"
+    TooManyNestingLevels: "Per daug užklausos lizdinimo lygių (Maks. 20)"
+    LimitExceeded: "Limitas viršytas"
+  Quota:
+    AlreadyExists: "Šiam vienetui kvota jau egzistuoja"
+    NotFound: "Šiam vienetui kvota nerasta"
+    Invalid:
+      CallURL: "Kvotos iškvietimo URL negalioja"
+      Percent: "Kvotos procentas mažesnis nei 1"
+      Unimplemented: "Šiam vienetui kvotos neįgyvendintos"
+      Amount: "Kvotos kiekis mažesnis nei 1"
+      ResetInterval: "Kvotos atstatymo intervalas trumpesnis nei minutė"
+      Noop: "Neribota kvota be pranešimų neturi poveikio"
+    Access:
+      Exhausted: "Autentifikuotų užklausų kvota išnaudota"
+    Execution:
+      Exhausted: "Vykdymo sekundžių kvota išnaudota"
+  LogStore:
+    Access:
+      StorageFailed: "Nepavyko įrašyti prieigos žurnalo į duomenų bazę"
+      ScanFailed: "Nepavyko užklausti autentifikuotų užklausų naudojimo"
+    Execution:
+      StorageFailed: "Nepavyko įrašyti veiksmo vykdymo žurnalo į duomenų bazę"
+      ScanFailed: "Nepavyko užklausti veiksmų vykdymo sekundžių naudojimo"
+  Session:
+    NotExisting: "Sesija neegzistuoja"
+    Terminated: "Sesija jau nutraukta"
+    Expired: "Sesija baigėsi"
+    PositiveLifetime: "Sesijos trukmė negali būti mažesnė nei 0"
+    Token:
+      Invalid: "Sesijos žetonas negalioja"
+    WebAuthN:
+      NoChallenge: "Sesija be WebAuthN iššūkio"
+  Intent:
+    IDPMissing: "Užklausoje trūksta tapatybės teikėjo ID"
+    IDPInvalid: "Tapatybės teikėjas negalioja šiai užklausai"
+    ResponseInvalid: "Tapatybės teikėjo atsakymas negalioja"
+    MissingSingleMappingAttribute: "Tapatybės teikėjo atsakyme nėra susiejimo atributo arba jis turi daugiau nei vieną reikšmę"
+    SuccessURLMissing: "Užklausoje trūksta sėkmės URL"
+    FailureURLMissing: "Užklausoje trūksta klaidos URL"
+    StateMissing: "Užklausoje trūksta būsenos parametro"
+    NotStarted: "Ketinimas nepradėtas arba jau nutrauktas"
+    NotSucceeded: "Ketinimas nepavyko"
+    Expired: "Ketinimas nebegalioja"
+    TokenCreationFailed: "Nepavyko sukurti žetono"
+    InvalidToken: "Ketinimo žetonas negalioja"
+    OtherUser: "Ketinimas skirtas kitam naudotojui"
+  AuthRequest:
+    AlreadyExists: "Autentifikavimo užklausa jau egzistuoja"
+    NotExisting: "Autentifikavimo užklausa neegzistuoja"
+    WrongLoginClient: "Autentifikavimo užklausą sukūrė kita prisijungimo programa"
+    AlreadyHandled: "Autentifikavimo užklausa jau apdorota"
+  OIDCSession:
+    RefreshTokenInvalid: "Atnaujinimo žetonas negalioja"
+    Token:
+      Invalid: "Žetonas negalioja"
+      Expired: "Žetonas nebegalioja"
+    InvalidClient: "Žetonas nebuvo išduotas šiai programai"
+  SAMLRequest:
+    AlreadyExists: "SAML užklausa jau egzistuoja"
+    NotExisting: "SAML užklausa neegzistuoja"
+    WrongLoginClient: "SAML užklausą sukūrė kita prisijungimo programa"
+    AlreadyHandled: "SAML užklausa jau apdorota"
+  SAMLSession:
+    InvalidClient: "SAML atsakymas nebuvo išduotas šiai programai"
+  DeviceAuth:
+    NotFound: "Įrenginio autorizacijos užklausa neegzistuoja"
+    AlreadyHandled: "Įrenginio autorizacijos užklausa jau apdorota"
+  Feature:
+    NotExisting: "Funkcija neegzistuoja"
+    TypeNotSupported: "Funkcijos tipas nepalaikomas"
+    InvalidValue: "Neteisinga šios funkcijos reikšmė"
+  Target:
+    Invalid: "Tikslas negalioja"
+    NoTimeout: "Tikslas neturi laiko limito"
+    InvalidURL: "Tikslas turi negaliojantį URL"
+    NotFound: "Tikslas nerastas"
+    InvalidExpirationDate: "Rakto galiojimo data turi būti ateityje"
+    PublicKeyExpired: "Tikslo viešasis raktas nebegalioja"
+    PublicKeyActive: "Negalima pašalinti aktyvaus paskirties vietos viešojo rakto"
+    InvalidPublicKey: "Viešasis raktas negalioja. Turi būti PEM kodavimo RSA arba ECDSA viešasis raktas PKCS#8 formatu"
+  Execution:
+    ConditionInvalid: "Vykdymo sąlyga negalioja"
+    Invalid: "Vykdymas negalioja"
+    NotFound: "Vykdymas nerastas"
+    IncludeNotFound: "Įtraukimas nerastas"
+    NoTargets: "Paskirties vietos nenurodytos"
+    Failed: "Vykdymas nepavyko"
+    ResponseIsNotValidJSON: "Atsakymas nėra galiojantis JSON"
+    MissingEncryptionKey: "Nerastas šifravimo raktas paskirties vietai"
+  UserSchema:
+    NotEnabled: "Funkcija \"Naudotojo schema\" neįjungta"
+    Type:
+      Missing: "Trūksta naudotojo schemos tipo"
+      AlreadyExists: "Naudotojo schemos tipas jau egzistuoja"
+    Authenticator:
+      Invalid: "Neteisingas autentifikatoriaus tipas"
+    NotActive: "Naudotojo schema neaktyvi"
+    NotInactive: "Naudotojo schema nėra neaktyvi"
+    NotExists: "Naudotojo schema neegzistuoja"
+    ID:
+      Missing: "Trūksta naudotojo schemos ID"
+    Invalid: "Naudotojo schema negalioja"
+    Data:
+      Invalid: "Duomenys negalioja naudotojo schemai"
+  TokenExchange:
+    Token:
+      Missing: "Trūksta žetono"
+      Invalid: "Žetonas negalioja"
+      TypeMissing: "Trūksta žetono tipo"
+      TypeNotAllowed: "Žetono tipas neleidžiamas"
+      TypeNotSupported: "Žetono tipas nepalaikomas"
+      NotForAPI: "Apsimetimo žetonai neleidžiami API"
+    Impersonation:
+      PolicyDisabled: "Apsimetimas išjungtas egzemplioriaus saugumo politikoje"
+  WebKey:
+    ActiveDelete: "Negalima pašalinti aktyvaus web rakto"
+    Config: "Neteisinga web rakto konfigūracija"
+    Duplicate: "Web rakto ID nėra unikalus"
+    NoActive: "Nerastas aktyvus web raktas"
+    NotFound: "Web raktas nerastas"
+  IDP:
+    InvalidSearchQuery: "Neteisinga paieškos užklausa"
+    ClientIDMissing: "Trūksta kliento ID"
+    TeamIDMissing: "Trūksta komandos ID"
+    KeyIDMissing: "Trūksta rakto ID"
+    PrivateKeyMissing: "Trūksta privataus rakto"
+    InvalidPrivateKey: "Neteisingas privataus rakto formatas"
+
+AggregateTypes:
+  action: "Veiksmas"
+  instance: "Egzempliorius"
+  key_pair: "Raktų pora"
+  org: "Organizacija"
+  project: "Projektas"
+  user: "Naudotojas"
+  usergrant: "Naudotojo teisių priskyrimas"
+  quota: "Kvota"
+  feature: "Funkcija"
+  target: "Tikslas"
+  execution: "Vykdymas"
+  user_schema: "Naudotojo schema"
+  auth_request: "Autentifikavimo užklausa"
+  device_auth: "Įrenginio autentifikavimas"
+  idpintent: "Tapatybės teikėjo ketinimas"
+  limits: "Limitai"
+  milestone: "Etapas"
+  oidc_session: "OIDC sesija"
+  restrictions: "Apribojimai"
+  system: "Sistema"
+  session: "Sesija"
+  web_key: "Web raktas"
+  saml_request: "SAML užklausa"
+  saml_session: "SAML sesija"
+EventTypes:
+  execution:
+    set: "Vykdymas nustatytas"
+    removed: "Vykdymas pašalintas"
+  target:
+    added: "Tikslas sukurtas"
+    changed: "Tikslas pakeistas"
+    removed: "Tikslas pašalintas"
+  user:
+    added: "Naudotojas pridėtas"
+    selfregistered: "Naudotojas užsiregistravo pats"
+    initialization:
+      code:
+        added: "Aktyvavimo kodas sugeneruotas"
+        sent: "Aktyvavimo kodas išsiųstas"
+      check:
+        succeeded: "Aktyvavimo patikra pavyko"
+        failed: "Aktyvavimo patikra nepavyko"
+    token:
+      added: "Prieigos žetonas sukurtas"
+      v2.added: "Prieigos žetonas sukurtas"
+      removed: "Prieigos žetonas pašalintas"
+    impersonated: "Naudotojas apsimestas"
+    username:
+      reserved: "Naudotojo vardas rezervuotas"
+      released: "Naudotojo vardas atlaisvintas"
+      changed: "Naudotojo vardas pakeistas"
+    email:
+      reserved: "El. pašto adresas rezervuotas"
+      released: "El. pašto adresas atlaisvintas"
+      changed: "El. pašto adresas pakeistas"
+      verified: "El. pašto adresas patvirtintas"
+      verification:
+        failed: "El. pašto adreso patvirtinimas nepavyko"
+      code:
+        added: "El. pašto adreso patvirtinimo kodas sugeneruotas"
+        sent: "El. pašto adreso patvirtinimo kodas išsiųstas"
+    machine:
+      added: "Techninis naudotojas pridėtas"
+      changed: "Techninis naudotojas pakeistas"
+      key:
+        added: "Raktas pridėtas"
+        removed: "Raktas pašalintas"
+      secret:
+        set: "Paslaptis nustatyta"
+        updated: "Paslapties maiša atnaujinta"
+        removed: "Paslaptis pašalinta"
+        check:
+          succeeded: "Paslapties patikra pavyko"
+          failed: "Paslapties patikra nepavyko"
+    human:
+      added: "Asmuo pridėtas"
+      selfregistered: "Asmuo užsiregistravo pats"
+      avatar:
+        added: "Avataras pridėtas"
+        removed: "Avataras pašalintas"
+      initialization:
+        code:
+          added: "Aktyvavimo kodas sugeneruotas"
+          sent: "Aktyvavimo kodas išsiųstas"
+        check:
+          succeeded: "Aktyvavimo patikra pavyko"
+          failed: "Aktyvavimo patikra nepavyko"
+      invite:
+        code:
+          added: "Kvietimo kodas sugeneruotas"
+          sent: "Kvietimo kodas išsiųstas"
+        check:
+          succeeded: "Kvietimo patikra pavyko"
+          failed: "Kvietimo patikra nepavyko"
+      username:
+        reserved: "Naudotojo vardas rezervuotas"
+        released: "Naudotojo vardas atlaisvintas"
+      email:
+        changed: "El. pašto adresas pakeistas"
+        verified: "El. pašto adresas patvirtintas"
+        verification:
+          failed: "El. pašto adreso patvirtinimas nepavyko"
+        code:
+          added: "El. pašto adreso patvirtinimo kodas sugeneruotas"
+          sent: "El. pašto adreso patvirtinimo kodas išsiųstas"
+      password:
+        changed: "Slaptažodis pakeistas"
+        code:
+          added: "Slaptažodžio kodas sugeneruotas"
+          sent: "Slaptažodžio kodas išsiųstas"
+        check:
+          succeeded: "Slaptažodžio patikra pavyko"
+          failed: "Slaptažodžio patikra nepavyko"
+        change:
+          sent: "Slaptažodžio pakeitimas išsiųstas"
+        hash:
+          updated: "Slaptažodžio maiša atnaujinta"
+      externallogin:
+        check:
+          succeeded: "Išorinis prisijungimas pavyko"
+      externalidp:
+        added: "Išorinis tapatybės teikėjas pridėtas"
+        removed: "Išorinis tapatybės teikėjas pašalintas"
+        cascade:
+          removed: "Išorinis tapatybės teikėjas pašalintas kaskadiniu būdu"
+        id:
+          migrated: "Išorinio tapatybės teikėjo naudotojo ID buvo perkeltas"
+      phone:
+        changed: "Telefono numeris pakeistas"
+        verified: "Telefono numeris patvirtintas"
+        verification:
+          failed: "Telefono numerio patvirtinimas nepavyko"
+        code:
+          added: "Telefono numerio kodas sugeneruotas"
+          sent: "Telefono numerio kodas išsiųstas"
+        removed: "Telefono numeris pašalintas"
+      profile:
+        changed: "Naudotojo profilis pakeistas"
+      address:
+        changed: "Naudotojo adresas pakeistas"
+      mfa:
+        otp:
+          added: "Kelių veiksnių OTP pridėtas"
+          verified: "Kelių veiksnių OTP patvirtintas"
+          removed: "Kelių veiksnių OTP pašalintas"
+          check:
+            succeeded: "Kelių veiksnių OTP patikra pavyko"
+            failed: "Kelių veiksnių OTP patikra nepavyko"
+          sms:
+            added: "Kelių veiksnių OTP SMS žinute pridėtas"
+            removed: "Kelių veiksnių OTP SMS žinute pašalintas"
+            code:
+              added: "Kelių veiksnių OTP SMS žinute kodas pridėtas"
+              sent: "Kelių veiksnių OTP SMS žinute kodas išsiųstas"
+            check:
+              succeeded: "Kelių veiksnių OTP SMS žinute patikra pavyko"
+              failed: "Kelių veiksnių OTP SMS žinute patikra nepavyko"
+          email:
+            added: "Kelių veiksnių OTP el. paštu pridėtas"
+            removed: "Kelių veiksnių OTP el. paštu pašalintas"
+            code:
+              added: "Kelių veiksnių OTP el. paštu kodas pridėtas"
+              sent: "Kelių veiksnių OTP el. paštu kodas išsiųstas"
+            check:
+              succeeded: "Kelių veiksnių OTP el. paštu patikra pavyko"
+              failed: "Kelių veiksnių OTP el. paštu patikra nepavyko"
+        u2f:
+          token:
+            added: "Kelių veiksnių U2F žetonas pridėtas"
+            verified: "Kelių veiksnių U2F žetonas patvirtintas"
+            removed: "Kelių veiksnių U2F žetonas pašalintas"
+            begin:
+              login: "Kelių veiksnių U2F patikra pradėta"
+            check:
+              succeeded: "Kelių veiksnių U2F patikra pavyko"
+              failed: "Kelių veiksnių U2F patikra nepavyko"
+            signcount:
+              changed: "Kelių veiksnių U2F žetono kontrolinė suma pakeista"
+        init:
+          skipped: "Kelių veiksnių autentifikavimo aktyvavimas praleistas"
+      passwordless:
+        token:
+          added: "Žetonas prisijungimui prieigos raktu pridėtas"
+          verified: "Žetonas prisijungimui prieigos raktu patvirtintas"
+          removed: "Žetonas prisijungimui prieigos raktu pašalintas"
+          begin:
+            login: "Prisijungimo prieigos raktu patikra pradėta"
+          check:
+            succeeded: "Prisijungimo prieigos raktu patikra pavyko"
+            failed: "Prisijungimo prieigos raktu patikra nepavyko"
+          signcount:
+            changed: "Prieigos rakto prisijungimo žetono kontrolinė suma pakeista"
+        initialization:
+          code:
+            added: "Prieigos rakto aktyvavimo kodas pridėtas"
+            sent: "Prieigos rakto aktyvavimo kodas išsiųstas"
+            requested: "Prieigos rakto aktyvavimo kodas užklaustas"
+            check:
+              succeeded: "Prieigos rakto aktyvavimo kodas sėkmingai patikrintas"
+              failed: "Prieigos rakto aktyvavimo kodo patikra nepavyko"
+      signed:
+        out: "Naudotojas atsijungė"
+      refresh:
+        token:
+          added: "Atnaujinimo žetonas sukurtas"
+          renewed: "Atnaujinimo žetonas atnaujintas"
+          removed: "Atnaujinimo žetonas pašalintas"
+    locked: "Naudotojas užblokuotas"
+    unlocked: "Naudotojas atblokuotas"
+    deactivated: "Naudotojas deaktyvuotas"
+    reactivated: "Naudotojas reaktyvuotas"
+    removed: "Naudotojas pašalintas"
+    password:
+      changed: "Slaptažodis pakeistas"
+      code:
+        added: "Slaptažodžio kodas sugeneruotas"
+        sent: "Slaptažodžio kodas išsiųstas"
+      check:
+        succeeded: "Slaptažodžio patikra pavyko"
+        failed: "Slaptažodžio patikra nepavyko"
+    phone:
+      changed: "Telefono numeris pakeistas"
+      verified: "Telefono numeris patvirtintas"
+      verification:
+        failed: "Telefono numerio patvirtinimas nepavyko"
+      code:
+        added: "Telefono numerio kodas sugeneruotas"
+        sent: "Telefono numerio kodas išsiųstas"
+    profile:
+      changed: "Naudotojo profilis pakeistas"
+    address:
+      changed: "Naudotojo adresas pakeistas"
+    mfa:
+      otp:
+        added: "Kelių veiksnių OTP pridėtas"
+        verified: "Kelių veiksnių OTP patvirtintas"
+        removed: "Kelių veiksnių OTP pašalintas"
+        check:
+          succeeded: "Kelių veiksnių OTP patikra pavyko"
+          failed: "Kelių veiksnių OTP patikra nepavyko"
+        init:
+          skipped: "Kelių veiksnių OTP aktyvavimas praleistas"
+      init:
+        skipped: "Kelių veiksnių autentifikavimo aktyvavimas praleistas"
+    signed:
+      out: "Naudotojas atsijungė"
+    grant:
+      added: "Autorizacija pridėta"
+      changed: "Autorizacija pakeista"
+      removed: "Autorizacija pašalinta"
+      deactivated: "Autorizacija deaktyvuota"
+      reactivated: "Autorizacija reaktyvuota"
+      reserved: "Autorizacija rezervuota"
+      released: "Autorizacija atlaisvinta"
+      cascade:
+        removed: "Autorizacija pašalinta"
+        changed: "Autorizacija pakeista"
+    metadata:
+      set: "Naudotojo metaduomenys nustatyti"
+      removed: "Naudotojo metaduomenys pašalinti"
+      removed.all: "Visi naudotojo metaduomenys pašalinti"
+    domain:
+      claimed: "Domenas pasisavintas"
+      claimed.sent: "Pranešimas apie domeno pasisavinimą išsiųstas"
+    pat:
+      added: "Asmeninis prieigos žetonas pridėtas"
+      removed: "Asmeninis prieigos žetonas pašalintas"
+  org:
+    added: "Organizacija pridėta"
+    changed: "Organizacija pakeista"
+    deactivated: "Organizacija deaktyvuota"
+    reactivated: "Organizacija reaktyvuota"
+    removed: "Organizacija pašalinta"
+    domain:
+      added: "Domenas pridėtas"
+      verification:
+        added: "Domeno patvirtinimas pridėtas"
+        failed: "Domeno patvirtinimas nepavyko"
+      verified: "Domenas patvirtintas"
+      removed: "Domenas pašalintas"
+      primary:
+        set: "Organizacijos domenas nustatytas"
+      reserved: "Domenas rezervuotas"
+      released: "Domenas atlaisvintas"
+    name:
+      reserved: "Organizacijos pavadinimas rezervuotas"
+      released: "Organizacijos pavadinimas atlaisvintas"
+    member:
+      added: "Organizacijos narys pridėtas"
+      changed: "Organizacijos narys pakeistas"
+      removed: "Organizacijos narys pašalintas"
+      cascade:
+        removed: "Organizacijos narys pašalintas kaskadiniu būdu"
+    iam:
+      policy:
+        added: "Sistemos politika pridėta"
+        changed: "Sistemos politika pakeista"
+        removed: "Sistemos politika pašalinta"
+    idp:
+      config:
+        added: "Tapatybės teikėjo konfigūracija pridėta"
+        changed: "Tapatybės teikėjo konfigūracija pakeista"
+        removed: "Tapatybės teikėjo konfigūracija pašalinta"
+        deactivated: "Tapatybės teikėjo konfigūracija deaktyvuota"
+        reactivated: "Tapatybės teikėjo konfigūracija reaktyvuota"
+      oidc:
+        config:
+          added: "OIDC tapatybės teikėjo konfigūracija pridėta"
+          changed: "OIDC tapatybės teikėjo konfigūracija pakeista"
+      saml:
+        config:
+          added: "SAML tapatybės teikėjo konfigūracija pridėta"
+          changed: "SAML tapatybės teikėjo konfigūracija pakeista"
+      jwt:
+        config:
+          added: "JWT tapatybės teikėjo konfigūracija pridėta"
+          changed: "JWT tapatybės teikėjo konfigūracija pakeista"
+    customtext:
+      set: "Tekstas nustatytas"
+      removed: "Tekstas pašalintas"
+      template:
+        removed: "Teksto šablonas pašalintas"
+    policy:
+      login:
+        added: "Prisijungimo politika pridėta"
+        changed: "Prisijungimo politika pakeista"
+        removed: "Prisijungimo politika pašalinta"
+        idpprovider:
+          added: "Tapatybės teikėjas pridėtas į prisijungimo politiką"
+          removed: "Tapatybės teikėjas pašalintas iš prisijungimo politikos"
+          cascade:
+            removed: "Tapatybės teikėjas pašalintas kaskadiniu būdu iš prisijungimo politikos"
+        secondfactor:
+          added: "Antrasis veiksnys pridėtas į prisijungimo politiką"
+          removed: "Antrasis veiksnys pašalintas iš prisijungimo politikos"
+        multifactor:
+          added: "Kelių veiksnių autentifikavimas pridėtas į prisijungimo politiką"
+          removed: "Kelių veiksnių autentifikavimas pašalintas iš prisijungimo politikos"
+      password:
+        complexity:
+          added: "Slaptažodžio sudėtingumo politika pridėta"
+          changed: "Slaptažodžio sudėtingumo politika pakeista"
+          removed: "Slaptažodžio sudėtingumo politika pašalinta"
+        age:
+          added: "Slaptažodžio galiojimo politika pridėta"
+          changed: "Slaptažodžio galiojimo politika pakeista"
+          removed: "Slaptažodžio galiojimo politika pašalinta"
+        lockout:
+          added: "Slaptažodžio blokavimo politika pridėta"
+          changed: "Slaptažodžio blokavimo politika pakeista"
+          removed: "Slaptažodžio blokavimo politika pašalinta"
+      label:
+        added: "Ženklinimo politika pridėta"
+        changed: "Ženklinimo politika pakeista"
+        activated: "Ženklinimo politika aktyvuota"
+        removed: "Ženklinimo politika pašalinta"
+        logo:
+          added: "Logotipas pridėtas į ženklinimo politiką"
+          removed: "Logotipas pašalintas iš ženklinimo politikos"
+          dark:
+            added: "Logotipas (tamsi tema) pridėtas į ženklinimo politiką"
+            removed: "Logotipas (tamsi tema) pašalintas iš ženklinimo politikos"
+        icon:
+          added: "Piktograma pridėta į ženklinimo politiką"
+          removed: "Piktograma pašalinta iš ženklinimo politikos"
+          dark:
+            added: "Piktograma (tamsi tema) pridėta į ženklinimo politiką"
+            removed: "Piktograma (tamsi tema) pašalinta iš ženklinimo politikos"
+        font:
+          added: "Šriftas pridėtas į ženklinimo politiką"
+          removed: "Šriftas pašalintas iš ženklinimo politikos"
+        assets:
+          removed: "Turinys pašalintas iš ženklinimo politikos"
+      privacy:
+        added: "Privatumo politika ir naudojimo sąlygos pridėtos"
+        changed: "Privatumo politika ir naudojimo sąlygos pakeistos"
+        removed: "Privatumo politika ir naudojimo sąlygos pašalintos"
+      domain:
+        added: "Domeno politika pridėta"
+        changed: "Domeno politika pakeista"
+        removed: "Domeno politika pašalinta"
+      lockout:
+        added: "Blokavimo politika pridėta"
+        changed: "Blokavimo politika pakeista"
+        removed: "Blokavimo politika pašalinta"
+      notification:
+        added: "Pranešimų politika pridėta"
+        changed: "Pranešimų politika pakeista"
+        removed: "Pranešimų politika pašalinta"
+    flow:
+      trigger_actions:
+        set: "Veiksmas nustatytas"
+        cascade:
+          removed: "Veiksmai pašalinti kaskadiniu būdu"
+        removed: "Veiksmai pašalinti"
+      cleared: "Eiga išvalyta"
+    mail:
+      template:
+        added: "El. pašto šablonas pridėtas"
+        changed: "El. pašto šablonas pakeistas"
+        removed: "El. pašto šablonas pašalintas"
+      text:
+        added: "El. pašto tekstas pridėtas"
+        changed: "El. pašto tekstas pakeistas"
+        removed: "El. pašto tekstas pašalintas"
+    metadata:
+      removed: "Metaduomenys pašalinti"
+      removed.all: "Visi metaduomenys pašalinti"
+      set: "Metaduomenys nustatyti"
+  project:
+    added: "Projektas pridėtas"
+    changed: "Projektas pakeistas"
+    deactivated: "Projektas deaktyvuotas"
+    reactivated: "Projektas reaktyvuotas"
+    removed: "Projektas pašalintas"
+    member:
+      added: "Projekto narys pridėtas"
+      changed: "Projekto narys pakeistas"
+      removed: "Projekto narys pašalintas"
+      cascade:
+        removed: "Projekto narys pašalintas kaskadiniu būdu"
+    role:
+      added: "Projekto vaidmuo pridėtas"
+      changed: "Projekto vaidmuo pakeistas"
+      removed: "Projekto vaidmuo pašalintas"
+    grant:
+      added: "Valdymo prieiga pridėta"
+      changed: "Valdymo prieiga pakeista"
+      removed: "Valdymo prieiga pašalinta"
+      deactivated: "Valdymo prieiga deaktyvuota"
+      reactivated: "Valdymo prieiga reaktyvuota"
+      cascade:
+        changed: "Valdymo prieiga pakeista"
+      member:
+        added: "Valdymo prieigos narys pridėtas"
+        changed: "Valdymo prieigos narys pakeistas"
+        removed: "Valdymo prieigos narys pašalintas"
+        cascade:
+          removed: "Valdymo prieiga pašalinta kaskadiniu būdu"
+    application:
+      added: "Programa pridėta"
+      changed: "Programa pakeista"
+      removed: "Programa pašalinta"
+      deactivated: "Programa deaktyvuota"
+      reactivated: "Programa reaktyvuota"
+      oidc:
+        secret:
+          check:
+            succeeded: "OIDC kliento paslapties patikra pavyko"
+            failed: "OIDC kliento paslapties patikra nepavyko"
+        key:
+          added: "OIDC programos raktas pridėtas"
+          removed: "OIDC programos raktas pašalintas"
+      api:
+        secret:
+          check:
+            succeeded: "API paslapties tikrinimas pavyko"
+            failed: "API paslapties tikrinimas nepavyko"
+        key:
+          added: "Programos raktas pridėtas"
+          removed: "Programos raktas pašalintas"
+      config:
+        saml:
+          added: "SAML konfigūracija pridėta"
+          changed: "SAML konfigūracija pakeista"
+        oidc:
+          added: "OIDC konfigūracija pridėta"
+          changed: "OIDC konfigūracija pakeista"
+          secret:
+            changed: "OIDC paslaptis pakeista"
+            updated: "OIDC paslapties maiša atnaujinta"
+        api:
+          added: "API konfigūracija pridėta"
+          changed: "API konfigūracija pakeista"
+          secret:
+            changed: "API paslaptis pakeista"
+            updated: "API paslapties maiša atnaujinta"
+  policy:
+    password:
+      complexity:
+        added: "Slaptažodžio sudėtingumo politika pridėta"
+        changed: "Slaptažodžio sudėtingumo politika pakeista"
+      age:
+        added: "Slaptažodžio galiojimo politika pridėta"
+        changed: "Slaptažodžio galiojimo politika pakeista"
+      lockout:
+        added: "Slaptažodžio blokavimo politika pridėta"
+        changed: "Slaptažodžio blokavimo politika pakeista"
+  iam:
+    setup:
+      started: "Zitadel diegimas pradėtas"
+      done: "Zitadel diegimas baigtas"
+    global:
+      org:
+        set: "Pagrindinė organizacija nustatyta"
+    project:
+      iam:
+        set: "Zitadel projektas nustatytas"
+    member:
+      added: "Zitadel narys pridėtas"
+      changed: "Zitadel narys pakeistas"
+      removed: "Zitadel narys pašalintas"
+      cascade:
+        removed: "Zitadel narys pašalintas kaskadiniu būdu"
+    idp:
+      config:
+        added: "Tapatybės teikėjo konfigūracija pridėta"
+        changed: "Tapatybės teikėjo konfigūracija pakeista"
+        removed: "Tapatybės teikėjo konfigūracija pašalinta"
+        deactivated: "Tapatybės teikėjo konfigūracija deaktyvuota"
+        reactivated: "Tapatybės teikėjo konfigūracija reaktyvuota"
+      oidc:
+        config:
+          added: "OIDC tapatybės teikėjo konfigūracija pridėta"
+          changed: "OIDC tapatybės teikėjo konfigūracija pakeista"
+      saml:
+        config:
+          added: "SAML tapatybės teikėjo konfigūracija pridėta"
+          changed: "SAML tapatybės teikėjo konfigūracija pakeista"
+      jwt:
+        config:
+          added: "JWT konfigūracija pridėta į tapatybės teikėją"
+          changed: "JWT konfigūracija pašalinta iš tapatybės teikėjo"
+    customtext:
+      set: "Tekstas nustatytas"
+      removed: "Tekstas pašalintas"
+    policy:
+      login:
+        added: "Numatytoji prisijungimo politika pridėta"
+        changed: "Numatytoji prisijungimo politika pakeista"
+        idpprovider:
+          added: "Tapatybės teikėjas pridėtas į numatytąją prisijungimo politiką"
+          removed: "Tapatybės teikėjas pašalintas iš numatytosios prisijungimo politikos"
+      label:
+        added: "Ženklinimo politika pridėta"
+        changed: "Ženklinimo politika pakeista"
+        activated: "Ženklinimo politika aktyvuota"
+        logo:
+          added: "Logotipas pridėtas į ženklinimo politiką"
+          removed: "Logotipas pašalintas iš ženklinimo politikos"
+          dark:
+            added: "Logotipas (tamsi tema) pridėtas į ženklinimo politiką"
+            removed: "Logotipas (tamsi tema) pašalintas iš ženklinimo politikos"
+        icon:
+          added: "Piktograma pridėta į ženklinimo politiką"
+          removed: "Piktograma pašalinta iš ženklinimo politikos"
+          dark:
+            added: "Piktograma (tamsi tema) pridėta į ženklinimo politiką"
+            removed: "Piktograma (tamsi tema) pašalinta iš ženklinimo politikos"
+        font:
+          added: "Šriftas pridėtas į ženklinimo politiką"
+          removed: "Šriftas pašalintas iš ženklinimo politikos"
+        assets:
+          removed: "Turinys pašalintas iš ženklinimo politikos"
+    default:
+      language:
+        set: "Numatytoji kalba nustatyta"
+    oidc:
+      settings:
+        added: "OIDC konfigūracija pridėta"
+        changed: "OIDC konfigūracija pakeista"
+        removed: "OIDC konfigūracija pašalinta"
+    secret:
+      generator:
+        added: "Paslapčių generatorius pridėtas"
+        changed: "Paslapčių generatorius pakeistas"
+        removed: "Paslapčių generatorius pašalintas"
+    smtp:
+      config:
+        added: "SMTP konfigūracija pridėta"
+        changed: "SMTP konfigūracija pakeista"
+        activated: "SMTP konfigūracija aktyvuota"
+        deactivated: "SMTP konfigūracija deaktyvuota"
+        removed: "SMTP konfigūracija pašalinta"
+        password:
+          changed: "SMTP konfigūracijos paslaptis pakeista"
+    sms:
+      config:
+        twilio:
+          added: "Twilio SMS teikėjas pridėtas"
+          changed: "Twilio SMS teikėjas pakeistas"
+          token:
+            changed: "Twilio SMS teikėjo žetonas pakeistas"
+          removed: "Twilio SMS teikėjas pašalintas"
+          activated: "Twilio SMS teikėjas aktyvuotas"
+          deactivated: "Twilio SMS teikėjas deaktyvuotas"
+  key_pair:
+    added: "Raktų pora pridėta"
+    certificate:
+      added: "Sertifikatas pridėtas"
+  action:
+    added: "Veiksmas pridėtas"
+    changed: "Veiksmas pakeistas"
+    deactivated: "Veiksmas deaktyvuotas"
+    reactivated: "Veiksmas reaktyvuotas"
+    removed: "Veiksmas pašalintas"
+  instance:
+    added: "Egzempliorius pridėtas"
+    changed: "Egzempliorius pakeistas"
+    customtext:
+      removed: "Tekstas pašalintas"
+      set: "Tekstas nustatytas"
+      template:
+        removed: "Teksto šablonas pašalintas"
+    default:
+      language:
+        set: "Numatytoji kalba nustatyta"
+      org:
+        set: "Numatytoji organizacija nustatyta"
+    domain:
+      added: "Domenas pridėtas"
+      primary:
+        set: "Pagrindinis domenas nustatytas"
+      removed: "Domenas pašalintas"
+    iam:
+      console:
+        set: "Zitadel valdymo konsolės programa nustatyta"
+      project:
+        set: "Zitadel projektas nustatytas"
+    mail:
+      template:
+        added: "El. pašto šablonas pridėtas"
+        changed: "El. pašto šablonas pakeistas"
+      text:
+        added: "El. pašto tekstas pridėtas"
+        changed: "El. pašto tekstas pakeistas"
+    member:
+      added: "Egzemplioriaus narys pridėtas"
+      changed: "Egzemplioriaus narys pakeistas"
+      removed: "Egzemplioriaus narys pašalintas"
+      cascade:
+        removed: "Egzemplioriaus narys pašalintas kaskadiniu būdu"
+    notification:
+      provider:
+        debug:
+          fileadded: "Failų derinimo pranešimų teikėjas pridėtas"
+          filechanged: "Failų derinimo pranešimų teikėjas pakeistas"
+          fileremoved: "Failų derinimo pranešimų teikėjas pašalintas"
+          logadded: "Žurnalo derinimo pranešimų teikėjas pridėtas"
+          logchanged: "Žurnalo derinimo pranešimų teikėjas pakeistas"
+          logremoved: "Žurnalo derinimo pranešimų teikėjas pašalintas"
+    oidc:
+      settings:
+        added: "OIDC nustatymai pridėti"
+        changed: "OIDC nustatymai pakeisti"
+    policy:
+      domain:
+        added: "Domeno politika pridėta"
+        changed: "Domeno politika pakeista"
+      label:
+        activated: "Ženklinimo politika aktyvuota"
+        added: "Ženklinimo politika pridėta"
+        assets:
+          removed: "Turinys pašalintas iš ženklinimo politikos"
+        changed: "Ženklinimo politika pakeista"
+        font:
+          added: "Šriftas pridėtas į ženklinimo politiką"
+          removed: "Šriftas pašalintas iš ženklinimo politikos"
+        icon:
+          added: "Piktograma pridėta į ženklinimo politiką"
+          removed: "Piktograma pašalinta iš ženklinimo politikos"
+          dark:
+            added: "Piktograma pridėta į tamsios temos ženklinimo politiką"
+            removed: "Piktograma pašalinta iš tamsios temos ženklinimo politikos"
+        logo:
+          added: "Logotipas pridėtas į ženklinimo politiką"
+          removed: "Logotipas pašalintas iš ženklinimo politikos"
+          dark:
+            added: "Logotipas pridėtas į tamsios temos ženklinimo politiką"
+            removed: "Logotipas pašalintas iš tamsios temos ženklinimo politikos"
+      lockout:
+        added: "Blokavimo politika pridėta"
+        changed: "Blokavimo politika pakeista"
+      login:
+        added: "Prisijungimo politika pridėta"
+        changed: "Prisijungimo politika pakeista"
+        idpprovider:
+          added: "Tapatybės teikėjas pridėtas į prisijungimo politiką"
+          cascade:
+            removed: "Tapatybės teikėjas pašalintas kaskadiniu būdu iš prisijungimo politikos"
+          removed: "Tapatybės teikėjas pašalintas iš prisijungimo politikos"
+        multifactor:
+          added: "Kelių veiksnių autentifikavimas pridėtas į prisijungimo politiką"
+          removed: "Kelių veiksnių autentifikavimas pašalintas iš prisijungimo politikos"
+        secondfactor:
+          added: "Antrasis veiksnys pridėtas į prisijungimo politiką"
+          removed: "Antrasis veiksnys pašalintas iš prisijungimo politikos"
+      password:
+        age:
+          added: "Slaptažodžio galiojimo politika pridėta"
+          changed: "Slaptažodžio galiojimo politika pakeista"
+        complexity:
+          added: "Slaptažodžio sudėtingumo politika pridėta"
+          changed: "Slaptažodžio sudėtingumo politika pašalinta"
+      privacy:
+        added: "Privatumo politika pridėta"
+        changed: "Privatumo politika pakeista"
+      security:
+        set: "Saugumo politika nustatyta"
+    removed: "Egzempliorius pašalintas"
+    secret:
+      generator:
+        added: "Paslapčių generatorius pridėtas"
+        changed: "Paslapčių generatorius pakeistas"
+        removed: "Paslapčių generatorius pašalintas"
+    sms:
+      configtwilio:
+        activated: "Twilio SMS konfigūracija aktyvuota"
+        added: "Twilio SMS konfigūracija pridėta"
+        changed: "Twilio SMS konfigūracija pakeista"
+        deactivated: "Twilio SMS konfigūracija deaktyvuota"
+        removed: "Twilio SMS konfigūracija pašalinta"
+        token:
+          changed: "Twilio SMS konfigūracijos žetonas pakeistas"
+    smtp:
+      config:
+        added: "SMTP konfigūracija pridėta"
+        changed: "SMTP konfigūracija pakeista"
+        activated: "SMTP konfigūracija aktyvuota"
+        deactivated: "SMTP konfigūracija deaktyvuota"
+        password:
+          changed: "SMTP konfigūracijos slaptažodis pakeistas"
+        removed: "SMTP konfigūracija pašalinta"
+  user_schema:
+    created: "Naudotojo schema sukurta"
+    updated: "Naudotojo schema atnaujinta"
+    deactivated: "Naudotojo schema deaktyvuota"
+    reactivated: "Naudotojo schema reaktyvuota"
+    deleted: "Naudotojo schema pašalinta"
+    user:
+      created: "Naudotojas sukurtas"
+      updated: "Naudotojas atnaujintas"
+      deleted: "Naudotojas pašalintas"
+      email:
+        updated: "El. pašto adresas pakeistas"
+        verified: "El. pašto adresas patvirtintas"
+        verification:
+          failed: "El. pašto adreso patvirtinimas nepavyko"
+        code:
+          added: "El. pašto adreso patvirtinimo kodas sugeneruotas"
+          sent: "El. pašto adreso patvirtinimo kodas išsiųstas"
+      phone:
+        updated: "Telefono numeris pakeistas"
+        verified: "Telefono numeris patvirtintas"
+        verification:
+          failed: "Telefono numerio patvirtinimas nepavyko"
+        code:
+          added: "Telefono numerio patvirtinimo kodas sugeneruotas"
+          sent: "Telefono numerio patvirtinimo kodas išsiųstas"
+  web_key:
+    added: "Web raktas pridėtas"
+    activated: "Web raktas aktyvuotas"
+    deactivated: "Web raktas deaktyvuotas"
+    removed: "Web raktas pašalintas"
+Application:
+  OIDC:
+    UnsupportedVersion: "Jūsų OIDC versija nepalaikoma"
+    V1:
+      NotCompliant: "Jūsų konfigūracija netinkama ir skiriasi nuo OIDC 1.0 standarto."
+      NoRedirectUris: "Turi būti registruotas bent vienas nukreipimo URI."
+      NotAllCombinationsAreAllowed: "Konfigūracija tinkama, tačiau ne visos galimos kombinacijos yra leidžiamos."
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: "Suteikimo tipas \"code\" leidžia tik http nukreipimo URI programos tipui \"web\"."
+          CustomOnlyForNative: "Suteikimo tipas \"code\" leidžia tik pasirinktinius nukreipimo URI programos tipui \"native\" (pvz., appname:// )"
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: "Suteikimo tipas „implicit“ neleidžia pasirinktinių nukreipimo URI"
+          HttpNotAllowed: "Suteikimo tipas „implicit“ neleidžia http nukreipimo URI"
+          HttpLocalhostOnlyForNative: "Http://localhost nukreipimo URI leidžiamas tik native programoms."
+      Native:
+        AuthMethodType:
+          NotNone: "Native programos turi turėti autmethodtype „none“."
+        RedirectUris:
+          MustBeHttpLocalhost: "Nukreipimo URI turi pradėti jūsų pačių protokolu, http://127.0.0.1, http://[::1] arba http://localhost."
+      UserAgent:
+        AuthMethodType:
+          NotNone: "Naudotojo agento programa turi turėti authmethodtype „none“."
+      GrantType:
+        Refresh:
+          NoAuthCode: "Atnaujinimo žetonas leidžiamas tik kartu su autorizacijos kodu."
+Action:
+  Flow:
+    Type:
+      Unspecified: "Nenurodyta"
+      ExternalAuthentication: "Išorinis autentifikavimas"
+      CustomiseToken: "Papildyti žetoną"
+      InternalAuthentication: "Vidinis autentifikavimas"
+      CustomizeSAMLResponse: "Papildyti SAML atsaką"
+  TriggerType:
+    Unspecified: "Nenurodyta"
+    PostAuthentication: "Po autentifikavimo"
+    PreCreation: "Prieš sukūrimą"
+    PostCreation: "Po sukūrimo"
+    PreUserinfoCreation: "Prieš naudotojo informacijos sukūrimą"
+    PreAccessTokenCreation: "Prieš prieigos žetono sukūrimą"
+    PreSAMLResponseCreation: "Prieš SAML atsako sukūrimą"

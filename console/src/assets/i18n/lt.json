@@ -1,0 +1,2880 @@
+{
+  "APP_NAME": "Zitadel",
+  "DESCRIPTIONS": {
+    "METADATA_TITLE": "Metaduomenys",
+    "HOME": {
+      "TITLE": "Pradėkite darbą su Zitadel",
+      "NEXT": {
+        "TITLE": "Jūsų kiti žingsniai",
+        "DESCRIPTION": "Atlikite šiuos žingsnius, kad apsaugotumėte savo programą.",
+        "CREATE_PROJECT": {
+          "TITLE": "Sukurti projektą",
+          "DESCRIPTION": "Pridėkite projektą ir nustatykite jo vaidmenis bei vaidmenų priskyrimus."
+        }
+      },
+      "MORE_SHORTCUTS": {
+        "GET_STARTED": {
+          "TITLE": "Pradėti",
+          "DESCRIPTION": "Sekite greito starto vadovą žingsnis po žingsnio ir iškart pradėkite kurti."
+        },
+        "DOCS": {
+          "TITLE": "Dokumentacija",
+          "DESCRIPTION": "Susipažinkite su Zitadel žinių baze, kad suprastumėte pagrindines koncepcijas ir idėjas. Sužinokite, kaip veikia Zitadel ir kaip juo naudotis."
+        },
+        "EXAMPLES": {
+          "TITLE": "Pavyzdžiai ir programinės įrangos kūrimo rinkiniai",
+          "DESCRIPTION": "Naršykite mūsų pavyzdžius ir SDK, kad naudotumėte Zitadel su mėgstamomis programavimo kalbomis ir įrankiais."
+        }
+      }
+    },
+    "ORG": {
+      "TITLE": "Organizacija",
+      "DESCRIPTION": "Organizacija talpina naudotojus, projektus su programomis, tapatybės teikėjus ir nustatymus, tokius kaip įmonės prekės ženklas. Norite dalintis nustatymais tarp kelių organizacijų? Sukonfigūruokite numatytuosius nustatymus.",
+      "METADATA": "Pridėkite pasirinktinius atributus organizacijai, pvz., jos vietą ar identifikatorių kitoje sistemoje. Šią informaciją galite naudoti savo veiksmuose."
+    },
+    "PROJECTS": {
+      "TITLE": "Projektai",
+      "DESCRIPTION": "Projektas talpina vieną ar daugiau programų, kurias galite naudoti naudotojų autentifikavimui. Pavyzdžiui, galite turėti vieną projektą su 3 programomis: vieną web sąsajai, vieną mobiliajai programai ir vieną galinėms paslaugoms. Taip pat galite autorizuoti naudotojus projektais. Norėdami leisti kitų organizacijų naudotojams prisijungti prie jūsų programų, suteikite jiems prieigą prie savo projekto.<br/><br/>Jei nerandate projekto, susisiekite su projekto savininku ar asmeniu, turinčiu atitinkamas teises, kad gautumėte prieigą.",
+      "OWNED": {
+        "TITLE": "Nuosavi projektai",
+        "DESCRIPTION": "Tai jūsų nuosavi projektai. Galite valdyti šių projektų nustatymus, vaidmenų priskyrimus ir programas."
+      },
+      "GRANTED": {
+        "TITLE": "Suteikti projektai",
+        "DESCRIPTION": "Tai projektai, kuriuos jums suteikė kitos organizacijos. Suteiktais projektais galite leisti savo naudotojams pasiekti kitų organizacijų programas."
+      }
+    },
+    "USERS": {
+      "TITLE": "Naudotojai",
+      "DESCRIPTION": "Naudotojas yra žmogus arba techninė paskyra, galinti pasiekti jūsų programas.",
+      "HUMANS": {
+        "TITLE": "Naudotojai",
+        "DESCRIPTION": "Naudotojai autentifikuojasi interaktyviai naršyklės sesijoje su prisijungimo langu.",
+        "METADATA": "Pridėkite pasirinktinius atributus naudotojui, pvz., skyrių. Šią informaciją galite naudoti savo veiksmuose."
+      },
+      "MACHINES": {
+        "TITLE": "Techninės paskyros",
+        "DESCRIPTION": "Techninės paskyros autentifikuojasi neinteraktyviai naudodamos JWT bearer žetoną, pasirašytą privačiu raktu. Jos taip pat gali naudoti asmeninį prieigos žetoną.",
+        "METADATA": "Pridėkite pasirinktinius atributus paskyrai, pvz., autentifikuojančią sistemą. Šią informaciją galite naudoti savo veiksmuose."
+      },
+      "SELF": {
+        "METADATA": "Pridėkite pasirinktinius atributus savo naudotojui, pvz., savo skyrių. Šią informaciją galite naudoti savo organizacijos veiksmuose."
+      }
+    },
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "Vaidmenų priskyrimai",
+      "DESCRIPTION": "Vaidmenų priskyrimai apibrėžia naudotojo prieigos teises prie projekto. Galite suteikti naudotojui prieigą prie projekto ir apibrėžti jo vaidmenis tame projekte."
+    },
+    "ACTIONS": {
+      "TITLE": "Veiksmai",
+      "DESCRIPTION": "Vykdykite pasirinktinį kodą reaguojant į įvykius, vykstančius jūsų naudotojams autentifikuojantis Zitadel. Automatizuokite savo procesus, papildykite naudotojų metaduomenis bei jų žetonus arba informuokite išorines sistemas.",
+      "SCRIPTS": {
+        "TITLE": "Skriptai",
+        "DESCRIPTION": "Parašykite JavaScript kodą vieną kartą ir paleiskite jį keliose eigose."
+      },
+      "FLOWS": {
+        "TITLE": "Eigos",
+        "DESCRIPTION": "Pasirinkite autentifikavimo eigą ir paleiskite savo veiksmą konkrečiam šios eigos įvykiui."
+      },
+      "ACTIONSTWO_NOTE": "Dabar galima naudoti Actions V2 – naują, patobulintą veiksmų versiją. Dabartinė versija vis dar prieinama, tačiau tolimesnė plėtra bus sutelkta į naująją versiją, kuri galiausiai pakeis dabartinę."
+    },
+    "SETTINGS": {
+      "INSTANCE": {
+        "TITLE": "Egzemplioriaus nustatymai",
+        "DESCRIPTION": "Numatytieji nustatymai visoms organizacijoms. Turint tinkamas teises, kai kuriuos iš jų galima pakeisti organizacijos nustatymuose."
+      },
+      "ORG": {
+        "TITLE": "Organizacijos nustatymai",
+        "DESCRIPTION": "Pritaikykite savo organizacijos nustatymus."
+      },
+      "FEATURES": {
+        "TITLE": "Funkcijų nustatymai",
+        "DESCRIPTION": "Atrakinkite funkcijas savo egzemplioriui."
+      },
+      "IDPS": {
+        "TITLE": "Tapatybės teikėjai",
+        "DESCRIPTION": "Sukurkite ir aktyvuokite išorinius tapatybės teikėjus. Pasirinkite gerai žinomą teikėją arba sukonfigūruokite bet kurį kitą OIDC, OAuth ar SAML suderinamą teikėją savo nuožiūra. Netgi galite naudoti esamus JWT žetonus kaip federuotas tapatybes, sukonfigūravę JWT tapatybės teikėją.",
+        "NEXT": "Kas dabar?",
+        "SAML": {
+          "TITLE": "Sukonfigūruokite savo SAML tapatybės teikėją",
+          "DESCRIPTION": "Zitadel sukonfigūruotas. Dabar reikia sukonfigūruoti jūsų SAML tapatybės teikėją. Dauguma teikėjų leidžia tiesiog įkelti visą Zitadel metaduomenų XML. Kiti teikėjai prašo nurodyti tik tam tikrus URL, pvz., entity ID (metaduomenų URL), Assertion Consumer Service (ACS) URL arba Single Logout URL."
+        },
+        "CALLBACK": {
+          "TITLE": "Sukonfigūruokite savo {{ provider }} tapatybės teikėją",
+          "DESCRIPTION": "Prieš sukonfigūruodami Zitadel, perduokite šį URL savo tapatybės teikėjui, kad įjungtumėte naršyklės nukreipimą atgal į Zitadel po autentifikavimo."
+        },
+        "JWT": {
+          "TITLE": "Naudokite JWT kaip federuotas tapatybes",
+          "DESCRIPTION": "JWT tapatybės teikėjas leidžia naudoti esamus JWT žetonus kaip federuotas tapatybes. Ši funkcija naudinga, jei jau turite JWT išdavėją. Su JWT tapatybės teikėju galite naudoti šiuos JWT naudotojams kurti ir atnaujinti Zitadel realiu laiku."
+        },
+        "LDAP": {
+          "TITLE": "Sukonfigūruokite Zitadel prisijungimui prie jūsų LDAP tapatybės teikėjo",
+          "DESCRIPTION": "Nurodykite prisijungimo prie LDAP serverio duomenis ir sukonfigūruokite savo LDAP atributų susiejimą su Zitadel atributais."
+        },
+        "AUTOFILL": {
+          "TITLE": "Automatinis naudotojo duomenų pildymas",
+          "DESCRIPTION": "Naudokite veiksmą, kad pagerintumėte naudotojų patirtį. Galite iš anksto užpildyti Zitadel registracijos formą reikšmėmis iš tapatybės teikėjo."
+        },
+        "ACTIVATE": {
+          "TITLE": "Aktyvuokite tapatybės teikėją",
+          "DESCRIPTION": "Jūsų tapatybės teikėjas dar neaktyvus. Aktyvuokite jį, kad naudotojai galėtų prisijungti."
+        }
+      },
+      "PW_COMPLEXITY": {
+        "TITLE": "Slaptažodžio sudėtingumas",
+        "DESCRIPTION": "Užtikrinkite, kad naudotojai naudotų stiprius slaptažodžius, nustatydami sudėtingumo taisykles."
+      },
+      "BRANDING": {
+        "TITLE": "Prekės ženklas",
+        "DESCRIPTION": "Pritaikykite savo prisijungimo formos išvaizdą. Nepamirškite pritaikyti nustatymų, kai baigsite."
+      },
+      "PRIVACY_POLICY": {
+        "TITLE": "Išorinės nuorodos",
+        "DESCRIPTION": "Nukreipkite naudotojus į pasirinktinius išorinius išteklius, rodomus prisijungimo puslapyje. Prieš registruodamiesi naudotojai turi sutikti su naudojimo sąlygomis ir privatumo politika. Pakeiskite nuorodą į savo dokumentaciją arba palikite tuščią eilutę, kad paslėptumėte dokumentacijos mygtuką valdymo konsolėje. Pridėkite pasirinktinę išorinę nuorodą ir pasirinktinį tos nuorodos tekstą valdymo konsolėje, arba palikite juos tuščius, kad paslėptumėte tą mygtuką."
+      },
+      "SMTP_PROVIDER": {
+        "TITLE": "SMTP nustatymai",
+        "DESCRIPTION": "Sukonfigūruokite savo SMTP serverį, kad naudotų domeną siuntėjo adresui, kurį jūsų naudotojai žino ir kuriuo pasitiki."
+      },
+      "SMS_PROVIDER": {
+        "TITLE": "SMS nustatymai",
+        "DESCRIPTION": "Norėdami atrakinti visas Zitadel funkcijas, sukonfigūruokite Twilio SMS žinučių siuntimui naudotojams."
+      },
+      "IAM_EVENTS": {
+        "TITLE": "Įvykiai",
+        "DESCRIPTION": "Šiame puslapyje rodomi visi jūsų egzemplioriaus būsenos pakeitimai, kiek leidžia jūsų egzemplioriaus audito žurnalo saugojimo riba. Filtruokite sąrašą pagal laiko intervalą derinimo tikslais arba pagal agregatą audito tikslais."
+      },
+      "IAM_FAILED_EVENTS": {
+        "TITLE": "Nepavykę įvykiai",
+        "DESCRIPTION": "Šiame puslapyje rodomi visi nepavykę jūsų egzemplioriaus įvykiai. Jei Zitadel veikia ne taip, kaip tikėjotės, visada pirmiausia patikrinkite šį sąrašą."
+      },
+      "IAM_VIEWS": {
+        "TITLE": "Rodiniai",
+        "DESCRIPTION": "Šiame puslapyje rodomi visi jūsų duomenų bazės rodiniai ir kada jie apdorojo paskutinį įvykį. Jei trūksta duomenų, patikrinkite, ar rodinys atnaujintas."
+      },
+      "LANGUAGES": {
+        "TITLE": "Kalbos",
+        "DESCRIPTION": "Apribokite kalbas, į kurias verčiama prisijungimo forma ir pranešimų žinutės. Jei norite išjungti kai kurias kalbas, nutempkite jas į skiltį „Neleidžiamos kalbos“. Leidžiamą kalbą galite nurodyti kaip numatytąją. Jei naudotojo pageidaujama kalba neleidžiama, naudojama numatytoji kalba."
+      },
+      "SECRET_GENERATORS": {
+        "TITLE": "Paslapčių generatoriai",
+        "DESCRIPTION": "Nustatykite savo paslapčių sudėtingumą ir galiojimo trukmę. Didesnis sudėtingumas ir ilgesnė trukmė pagerina saugumą, mažesnis sudėtingumas ir trumpesnė trukmė pagerina iššifravimo našumą."
+      },
+      "SECURITY": {
+        "TITLE": "Saugumo nustatymai",
+        "DESCRIPTION": "Įjunkite Zitadel funkcijas, kurios gali turėti įtakos saugumui. Prieš keisdami šiuos nustatymus, gerai apsvarstykite savo veiksmus."
+      },
+      "OIDC": {
+        "TITLE": "OpenID Connect nustatymai",
+        "DESCRIPTION": "Sukonfigūruokite savo OIDC žetonų galiojimo trukmę. Naudokite trumpesnę trukmę naudotojų saugumui padidinti, ilgesnę trukmę – patogumui padidinti.",
+        "LABEL_HOURS": "Maksimali galiojimo trukmė valandomis",
+        "LABEL_DAYS": "Maksimali galiojimo trukmė dienomis",
+        "ACCESS_TOKEN": {
+          "TITLE": "Prieigos žetonas",
+          "DESCRIPTION": "Prieigos žetonas naudojamas naudotojui autentifikuoti. Tai trumpai galiojantis žetonas, naudojamas naudotojo duomenims pasiekti. Naudokite trumpą galiojimo trukmę, kad sumažintumėte neteisėtos prieigos riziką. Prieigos žetonai gali būti automatiškai atnaujinami naudojant atnaujinimo žetoną."
+        },
+        "ID_TOKEN": {
+          "TITLE": "ID žetonas",
+          "DESCRIPTION": "ID žetonas yra JSON Web Token (JWT), kuriame yra teiginiai apie naudotoją. ID žetono galiojimo trukmė neturėtų viršyti prieigos žetono galiojimo trukmės."
+        },
+        "REFRESH_TOKEN": {
+          "TITLE": "Atnaujinimo žetonas",
+          "DESCRIPTION": "Atnaujinimo žetonas naudojamas naujam prieigos žetonui gauti. Tai ilgai galiojantis žetonas, naudojamas prieigos žetonui atnaujinti. Kai atnaujinimo žetonas nebegalioja, naudotojas turi iš naujo autentifikuotis rankiniu būdu."
+        },
+        "REFRESH_TOKEN_IDLE": {
+          "TITLE": "Neaktyvus atnaujinimo žetonas",
+          "DESCRIPTION": "Neaktyvaus atnaujinimo žetono galiojimo trukmė yra maksimalus laikas, per kurį atnaujinimo žetonas gali būti nenaudojamas."
+        }
+      },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Valdykite savo OIDC web raktus, kad saugiai pasirašytumėte ir tikrintumėte savo Zitadel egzemplioriaus žetonus.",
+        "TABLE": {
+          "TITLE": "Aktyvūs ir būsimi web raktai",
+          "DESCRIPTION": "Jūsų aktyvūs ir būsimi web raktai. Aktyvavus naują raktą, dabartinis bus deaktyvuotas.",
+          "NOTE": "Pastaba: JWKs OIDC galutinis taškas grąžina talpyklinamą atsakymą (numatyta 5 min.). Venkite per anksti aktyvuoti raktą, nes jis gali būti dar nepasiekiamas talpykloms ir programoms.",
+          "ACTIVATE": "Aktyvuoti kitą web raktą",
+          "ACTIVE": "Šiuo metu aktyvus",
+          "NEXT": "Kitas eilėje",
+          "FUTURE": "Būsimas",
+          "WARNING": "Web raktas jaunesnis nei 5 min."
+        },
+        "CREATE": {
+          "TITLE": "Sukurti naują web raktą",
+          "DESCRIPTION": "Sukūrus naują web raktą, jis pridedamas į jūsų sąrašą. Zitadel numatytai naudoja RSA2048 raktus su SHA256 maišos funkcija.",
+          "KEY_TYPE": "Rakto tipas",
+          "BITS": "Bitai",
+          "HASHER": "Maišos funkcija",
+          "CURVE": "Kreivė"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Ankstesni web raktai",
+          "DESCRIPTION": "Tai jūsų ankstesni web raktai, kurie nebėra aktyvūs.",
+          "DEACTIVATED_ON": "Deaktyvuota"
+        }
+      },
+      "MESSAGE_TEXTS": {
+        "TITLE": "Žinučių tekstai",
+        "DESCRIPTION": "Pritaikykite savo pranešimų el. laiškų ar SMS žinučių tekstus. Jei norite išjungti kai kurias kalbas, apribokite jas egzemplioriaus kalbos nustatymuose.",
+        "TYPE_DESCRIPTIONS": {
+          "DC": "Kai pasisavinate domeną savo organizacijai, naudotojai, kurie nenaudoja šio domeno savo prisijungimo varde, bus paraginti pakeisti prisijungimo vardą, kad jis atitiktų pasisavintą domeną.",
+          "INIT": "Sukūrus naudotoją, jis gaus el. laišką su nuoroda slaptažodžiui nustatyti.",
+          "PC": "Kai naudotojas pakeičia slaptažodį, jis gaus pranešimą apie pakeitimą, jei tai įjungta pranešimų nustatymuose.",
+          "PL": "Kai naudotojas prideda prieigos rakto autentifikavimo metodą, jis turi jį aktyvuoti spustelėdamas nuorodą el. laiške.",
+          "PR": "Kai naudotojas atstato slaptažodį, jis gaus el. laišką su nuoroda naujam slaptažodžiui nustatyti.",
+          "VE": "Kai naudotojas pakeičia el. pašto adresą, jis gaus el. laišką su nuoroda naujam adresui patvirtinti.",
+          "VP": "Kai naudotojas pakeičia telefono numerį, jis gaus SMS su kodu naujam numeriui patvirtinti.",
+          "VEO": "Kai naudotojas prideda OTP el. paštu metodą, jis turi jį aktyvuoti įvesdamas kodą, išsiųstą jo el. paštu.",
+          "VSO": "Kai naudotojas prideda OTP SMS metodą, jis turi jį aktyvuoti įvesdamas kodą, išsiųstą jo telefono numeriu.",
+          "IU": "Sukūrus naudotojo kvietimo kodą, jis gaus el. laišką su nuoroda autentifikavimo metodui nustatyti."
+        }
+      },
+      "LOGIN_TEXTS": {
+        "TITLE": "Prisijungimo sąsajos tekstai",
+        "DESCRIPTION": "Pritaikykite savo prisijungimo formos tekstus. Jei tekstas tuščias, rodoma numatytoji reikšmė. Jei norite išjungti kai kurias kalbas, apribokite jas egzemplioriaus kalbos nustatymuose."
+      },
+      "DOMAINS": {
+        "TITLE": "Domeno nustatymai",
+        "DESCRIPTION": "Nustatykite savo domenų apribojimus ir sukonfigūruokite prisijungimo vardų šablonus.",
+        "REQUIRE_VERIFICATION": {
+          "TITLE": "Reikalauti, kad pasirinktiniai domenai būtų patvirtinti",
+          "DESCRIPTION": "Jei tai aktyvuota, organizacijos domenai turi būti patvirtinti prieš juos naudojant domeno paieškai ar naudotojo vardo priesagai."
+        },
+        "LOGIN_NAME_PATTERN": {
+          "TITLE": "Prisijungimo vardo šablonas",
+          "DESCRIPTION": "Valdykite naudotojų prisijungimo vardų šabloną. Zitadel nustato naudotojo organizaciją, kai tik jis įveda prisijungimo vardą. Todėl prisijungimo vardai turi būti unikalūs visose organizacijose. Jei turite naudotojų su paskyromis keliuose domenuose, unikalumą galite užtikrinti pridėdami organizacijos domeną kaip priesagą prie prisijungimo vardų."
+        },
+        "DOMAIN_VERIFICATION": {
+          "TITLE": "Domeno patvirtinimas",
+          "DESCRIPTION": "Leiskite organizacijai naudoti tik tuos domenus, kuriuos ji iš tikrųjų valdo. Jei aktyvuota, organizacijos domenai periodiškai tikrinami DNS arba HTTP iššūkiu prieš juos naudojant. Tai saugumo funkcija, sauganti nuo domeno užgrobimo."
+        },
+        "SMTP_SENDER_ADDRESS": {
+          "TITLE": "SMTP siuntėjo adresas",
+          "DESCRIPTION": "Leiskite SMTP siuntėjo adresą tik jei jis atitinka vieną iš jūsų egzemplioriaus domenų."
+        }
+      },
+      "LOGIN": {
+        "LIFETIMES": {
+          "TITLE": "Prisijungimo galiojimo trukmės",
+          "DESCRIPTION": "Sustiprinkite saugumą sumažindami tam tikras su prisijungimu susijusias maksimalias galiojimo trukmes.",
+          "LABEL": "Maksimali galiojimo trukmė valandomis",
+          "PW_CHECK": {
+            "TITLE": "Slaptažodžio patikra",
+            "DESCRIPTION": "Praėjus šiam laikotarpiui, naudotojai turės iš naujo autentifikuotis slaptažodžiu."
+          },
+          "EXT_LOGIN_CHECK": {
+            "TITLE": "Išorinio prisijungimo patikra",
+            "DESCRIPTION": "Praėjus šiam laikotarpiui, naudotojai nukreipiami į savo išorinius tapatybės teikėjus."
+          },
+          "MULTI_FACTOR_INIT": {
+            "TITLE": "Kelių veiksnių inicijavimo patikra",
+            "DESCRIPTION": "Praėjus šiam laikotarpiui, naudotojai bus paraginti nustatyti antrąjį veiksnį ar kelių veiksnių autentifikavimą, jei jie to dar nepadarė. Trukmė 0 išjungia šį raginimą."
+          },
+          "SECOND_FACTOR_CHECK": {
+            "TITLE": "Antrojo veiksnio patikra",
+            "DESCRIPTION": "Šiais laikotarpiais naudotojai turi iš naujo patvirtinti savo antrąjį veiksnį."
+          },
+          "MULTI_FACTOR_CHECK": {
+            "TITLE": "Kelių veiksnių patikra",
+            "DESCRIPTION": "Šiais laikotarpiais naudotojai turi iš naujo patvirtinti savo kelių veiksnių autentifikavimą."
+          }
+        },
+        "FORM": {
+          "TITLE": "Prisijungimo forma",
+          "DESCRIPTION": "Pritaikykite prisijungimo formą.",
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Leidžiamas vietinis autentifikavimas",
+            "DESCRIPTION": "Leiskite naudotojams prisijungti naudotojo vardu ir slaptažodžiu arba prieigos raktu. Jei tai išjungta, naudotojai galės prisijungti tik naudodami išorinį tapatybės teikėją."
+          },
+          "USER_REGISTRATION_ALLOWED": {
+            "TITLE": "Leidžiama naudotojų registracija",
+            "DESCRIPTION": "Leiskite anoniminiams naudotojams susikurti paskyrą."
+          },
+          "ORG_REGISTRATION_ALLOWED": {
+            "TITLE": "Leidžiama organizacijos registracija",
+            "DESCRIPTION": "Leiskite anoniminiams naudotojams sukurti organizaciją."
+          },
+          "EXTERNAL_LOGIN_ALLOWED": {
+            "TITLE": "Leidžiamas išorinis prisijungimas",
+            "DESCRIPTION": "Leiskite naudotojams prisijungti su išoriniu tapatybės teikėju vietoj Zitadel naudotojo."
+          },
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Slaptažodžio atstatymas paslėptas",
+            "DESCRIPTION": "Neleiskite naudotojams atstatyti slaptažodžio."
+          },
+          "DOMAIN_DISCOVERY_ALLOWED": {
+            "TITLE": "Leidžiama domeno paieška",
+            "DESCRIPTION": "Suraskite naudotojų organizacijas pagal jų prisijungimo vardo domeną, pvz., el. pašto adresą."
+          },
+          "IGNORE_UNKNOWN_USERNAMES": {
+            "TITLE": "Ignoruoti nežinomus naudotojo vardus",
+            "DESCRIPTION": "Jei tai aktyvuota, prisijungimo forma nerodys klaidos pranešimo, jei naudotojo vardas nežinomas. Tai padeda apsisaugoti nuo naudotojo vardo spėjimo."
+          },
+          "DISABLE_EMAIL_LOGIN": {
+            "TITLE": "Išjungti prisijungimą el. paštu",
+            "DESCRIPTION": "Jei tai aktyvuota, naudotojai negalės prisijungti savo el. pašto adresu. Atkreipkite dėmesį, kad jei tai išjungsite, naudotojų el. pašto adresai turi būti unikalūs visose organizacijose, kad galėtų prisijungti."
+          },
+          "DISABLE_PHONE_LOGIN": {
+            "TITLE": "Išjungti prisijungimą telefonu",
+            "DESCRIPTION": "Jei tai aktyvuota, naudotojai negalės prisijungti savo telefono numeriu. Atkreipkite dėmesį, kad jei tai išjungsite, naudotojų telefono numeriai turi būti unikalūs visose organizacijose, kad galėtų prisijungti."
+          }
+        }
+      }
+    }
+  },
+  "PAGINATOR": {
+    "PREVIOUS": "Ankstesnis",
+    "NEXT": "Kitas",
+    "COUNT": "Iš viso rezultatų",
+    "MORE": "Daugiau"
+  },
+  "FOOTER": {
+    "LINKS": {
+      "CONTACT": "Kontaktai",
+      "TOS": "Naudojimo sąlygos",
+      "PP": "Privatumo politika"
+    },
+    "THEME": {
+      "DARK": "Tamsi",
+      "LIGHT": "Šviesi"
+    }
+  },
+  "HOME": {
+    "WELCOME": "Pradėkite darbą su Zitadel",
+    "DISCLAIMER": "Zitadel tvarko jūsų duomenis konfidencialiai ir saugiai.",
+    "DISCLAIMERLINK": "Daugiau informacijos",
+    "DOCUMENTATION": {
+      "DESCRIPTION": "Greitai pradėkite darbą su Zitadel."
+    },
+    "GETSTARTED": {
+      "DESCRIPTION": "Greitai pradėkite darbą su Zitadel."
+    },
+    "QUICKSTARTS": {
+      "LABEL": "Pirmieji žingsniai",
+      "DESCRIPTION": "Greitai pradėkite darbą su Zitadel."
+    },
+    "SHORTCUTS": {
+      "SHORTCUTS": "Spartieji klavišai",
+      "SETTINGS": "Galimi spartieji klavišai",
+      "PROJECTS": "Projektai",
+      "REORDER": "Palaikykite ir tempkite plytelę, kad ją perkeltumėte",
+      "ADD": "Palaikykite ir tempkite plytelę, kad pridėtumėte"
+    }
+  },
+  "ONBOARDING": {
+    "DESCRIPTION": "Jūsų kiti žingsniai",
+    "MOREDESCRIPTION": "daugiau sparčiųjų klavišų",
+    "COMPLETED": "baigta",
+    "DISMISS": "Ne, ačiū, aš profesionalas.",
+    "CARD": {
+      "TITLE": "Paleiskite savo Zitadel",
+      "DESCRIPTION": "Šis kontrolinis sąrašas padės sukonfigūruoti jūsų egzempliorių ir pravedą jus per svarbiausius žingsnius"
+    },
+    "MILESTONES": {
+      "instance.policy.label.added": {
+        "title": "Nustatykite savo prekės ženklą",
+        "description": "Nustatykite prisijungimo lango spalvas ir formą bei įkelkite savo logotipą ir piktogramas.",
+        "action": "Nustatyti prekės ženklą"
+      },
+      "instance.smtp.config.added": {
+        "title": "Sukonfigūruokite savo SMTP nustatymus",
+        "description": "Nustatykite savo pašto serverio nustatymus.",
+        "action": "Konfigūruoti SMTP"
+      },
+      "PROJECT_CREATED": {
+        "title": "Sukurti projektą",
+        "description": "Pridėkite projektą ir nustatykite jo vaidmenis bei vaidmenų priskyrimus.",
+        "action": "Sukurti projektą"
+      },
+      "APPLICATION_CREATED": {
+        "title": "Registruokite savo programą",
+        "description": "Registruokite savo web, native, api arba saml programą ir sukonfigūruokite autentifikavimo eigą.",
+        "action": "Registruoti programą"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Prisijunkite prie savo programos",
+        "description": "Integruokite savo programą su Zitadel autentifikavimui ir išbandykite ją prisijungdami savo administratoriaus naudotoju.",
+        "action": "Prisijungti"
+      },
+      "user.human.added": {
+        "title": "Pridėti naudotojus",
+        "description": "Pridėkite savo programos naudotojus",
+        "action": "Pridėti naudotoją"
+      },
+      "user.grant.added": {
+        "title": "Priskirti vaidmenis naudotojams",
+        "description": "Leiskite naudotojams pasiekti jūsų programą ir nustatykite jų vaidmenį.",
+        "action": "Priskirti vaidmenis naudotojams"
+      }
+    }
+  },
+  "MENU": {
+    "INSTANCE": "Numatytieji nustatymai",
+    "DASHBOARD": "Pradžia",
+    "PERSONAL_INFO": "Asmeninė informacija",
+    "DOCUMENTATION": "Dokumentacija",
+    "INSTANCEOVERVIEW": "Egzempliorius",
+    "ORGS": "Organizacijos",
+    "VIEWS": "Rodiniai",
+    "EVENTS": "Įvykiai",
+    "FAILEDEVENTS": "Nepavykę įvykiai",
+    "ORGANIZATION": "Organizacija",
+    "PROJECT": "Projektai",
+    "PROJECTOVERVIEW": "Apžvalga",
+    "PROJECTGRANTS": "Projekto suteikimai",
+    "ROLES": "Vaidmenys",
+    "GRANTEDPROJECT": "Suteikti projektai",
+    "HUMANUSERS": "Naudotojai",
+    "MACHINEUSERS": "Techninės paskyros",
+    "LOGOUT": "Atjungti visus naudotojus",
+    "NEWORG": "Nauja organizacija",
+    "IAMADMIN": "Jūs esate IAM administratorius. Atkreipkite dėmesį, kad turite išplėstines teises.",
+    "SHOWORGS": "Rodyti visas organizacijas",
+    "GRANTS": "Vaidmenų priskyrimai",
+    "ACTIONS": "Veiksmai",
+    "TARGETS": "Tikslai",
+    "PRIVACY": "Privatumas",
+    "TOS": "Naudojimo sąlygos",
+    "OPENSHORTCUTSTOOLTIP": "Spauskite ? spartiesiems klavišams parodyti",
+    "SETTINGS": "Nustatymai",
+    "CUSTOMERPORTAL": "Klientų portalas"
+  },
+  "QUICKSTART": {
+    "TITLE": "Integruokite Zitadel į savo programą",
+    "DESCRIPTION": "Integruokite Zitadel į savo programą arba naudokite vieną iš mūsų pavyzdžių, kad pradėtumėte per kelias minutes.",
+    "BTN_START": "Sukurti programą",
+    "BTN_LEARNMORE": "Sužinoti daugiau",
+    "CREATEPROJECTFORAPP": "Sukurti projektą {{value}}",
+    "SELECT_FRAMEWORK": "Pasirinkite karkasą",
+    "FRAMEWORK": "Karkasas",
+    "FRAMEWORK_OTHER": "Kita (OIDC, SAML, API)",
+    "ALMOSTDONE": "Jūs beveik baigėte.",
+    "REVIEWCONFIGURATION": "Peržiūrėti nustatymus",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Sukūrėme bazinę konfigūraciją {{value}} programoms. Šiuos nustatymus galite pritaikyti pagal savo poreikius po sukūrimo.",
+    "REDIRECTS": "Konfigūruoti nukreipimus",
+    "DEVMODEWARN": "Kūrimo režimas įjungtas numatytai. Vėliau galite atnaujinti reikšmes eksploatacijai.",
+    "GUIDE": "Vadovas",
+    "BROWSEEXAMPLES": "Naršyti pavyzdžius ir SDK",
+    "DUPLICATEAPPRENAME": "Programa tokiu pačiu pavadinimu jau egzistuoja. Pasirinkite kitą pavadinimą.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Keisti karkasą",
+        "DESCRIPTION": "Pasirinkite vieną iš galimų karkasų greitam programos sukonfigūravimui."
+      }
+    }
+  },
+  "ACTIONS": {
+    "ACTIONS": "Veiksmai",
+    "FILTER": "Filtras",
+    "RENAME": "Pervadinti",
+    "SET": "Nustatyti",
+    "COPY": "Kopijuoti į iškarpinę",
+    "COPIED": "Nukopijuota į iškarpinę.",
+    "RESET": "Atstatyti",
+    "RESETDEFAULT": "Atstatyti į numatytąjį",
+    "RESETTO": "Atstatyti į: ",
+    "RESETCURRENT": "Atstatyti į dabartinį",
+    "SHOW": "Rodyti",
+    "HIDE": "Slėpti",
+    "SAVE": "Išsaugoti",
+    "SAVENOW": "Išsaugoti dabar",
+    "NEW": "Naujas",
+    "ADD": "Pridėti",
+    "CREATE": "Sukurti",
+    "CONTINUE": "Tęsti",
+    "CONTINUEWITH": "Tęsti su {{value}}",
+    "BACK": "Atgal",
+    "CLOSE": "Uždaryti",
+    "CLEAR": "Išvalyti",
+    "CANCEL": "Atšaukti",
+    "INFO": "Informacija",
+    "OK": "Gerai",
+    "SELECT": "Pasirinkti",
+    "VIEW": "Rodyti",
+    "SELECTIONDELETE": "Pašalinti pasirinkimą",
+    "DELETE": "Pašalinti",
+    "REMOVE": "Pašalinti",
+    "VERIFY": "Patvirtinti",
+    "FINISH": "Baigti",
+    "FINISHED": "Uždaryti",
+    "CHANGE": "Keisti",
+    "REACTIVATE": "Reaktyvuoti",
+    "ACTIVATE": "Aktyvuoti",
+    "DEACTIVATE": "Deaktyvuoti",
+    "REFRESH": "Atnaujinti",
+    "LOGIN": "Prisijungti",
+    "EDIT": "Redaguoti",
+    "PIN": "Prisegti / Atsegti",
+    "CONFIGURE": "Konfigūruoti",
+    "SEND": "Siųsti",
+    "NEWVALUE": "Nauja reikšmė",
+    "RESTORE": "Atkurti",
+    "CONTINUEWITHOUTSAVE": "Tęsti neišsaugant",
+    "OF": "iš",
+    "PREVIOUS": "Ankstesnis",
+    "NEXT": "Kitas",
+    "MORE": "daugiau",
+    "STEP": "Žingsnis",
+    "SETUP": "Nustatyti",
+    "TEST": "Testuoti",
+    "UNSAVEDCHANGES": "Neišsaugoti pakeitimai",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Ar tikrai norite atmesti šį naują veiksmą? Jūsų veiksmas bus prarastas",
+        "CANCEL": "Atšaukti",
+        "DISCARD": "Atmesti"
+      }
+    },
+    "TABLE": {
+      "SHOWUSER": "Rodyti naudotoją {{value}}"
+    },
+    "DOWNLOAD": "Atsisiųsti",
+    "APPLY": "Taikyti"
+  },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "Šiuo metu naudojate naują Actions V2, kuris yra beta versijoje. Ankstesnė versija 1 vis dar prieinama, tačiau ateityje bus nutraukta. Praneškite apie bet kokias problemas ar atsiliepimus.",
+    "EXECUTION": {
+      "TITLE": "Veiksmai",
+      "DESCRIPTION": "Veiksmai leidžia vykdyti pasirinktinį kodą reaguojant į API užklausas, įvykius ar konkrečias funkcijas. Naudokite juos Zitadel plėtimui, darbo eigų automatizavimui ir integracijai su kitomis sistemomis.",
+      "TYPES": {
+        "request": "Užklausa",
+        "response": "Atsakymas",
+        "event": "Įvykiai",
+        "function": "Funkcija"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Sukurti veiksmą",
+        "UPDATE_TITLE": "Atnaujinti veiksmą",
+        "TYPE": {
+          "DESCRIPTION": "Pasirinkite, kada šis veiksmas turi vykti",
+          "REQUEST": {
+            "TITLE": "Užklausa",
+            "DESCRIPTION": "Užklausos, vykstančios Zitadel viduje. Tai gali būti, pavyzdžiui, prisijungimo užklausos iškvietimas."
+          },
+          "RESPONSE": {
+            "TITLE": "Atsakymas",
+            "DESCRIPTION": "Atsakymas į užklausą Zitadel viduje. Pavyzdžiui, atsakymas, kurį gaunate gaudami naudotojo duomenis."
+          },
+          "EVENTS": {
+            "TITLE": "Įvykiai",
+            "DESCRIPTION": "Įvykiai, vykstantys Zitadel viduje. Tai gali būti bet kas, pvz., naudotojo paskyros sukūrimas, sėkmingas prisijungimas ir t. t."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Funkcijos",
+            "DESCRIPTION": "Funkcijos, kurias galite iškviesti Zitadel viduje. Tai gali būti bet kas – nuo el. laiško siuntimo iki naudotojo sukūrimo."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Pasirinkite, ar šis veiksmas taikomas visoms užklausoms, konkrečiai paslaugai (pvz., naudotojų valdymui), ar vienai konkrečiai užklausai (pvz., sukurti naudotoją).",
+          "ALL": {
+            "TITLE": "Visi",
+            "DESCRIPTION": "Pasirinkite tai, jei norite vykdyti veiksmą kiekvienai užklausai"
+          },
+          "ALL_EVENTS": "Pasirinkite tai, jei norite vykdyti veiksmą kiekvienam įvykiui",
+          "SELECT_SERVICE": {
+            "TITLE": "Pasirinkti paslaugą",
+            "DESCRIPTION": "Pasirinkite Zitadel paslaugą savo veiksmui."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Pasirinkti metodą",
+            "DESCRIPTION": "Jei norite vykdyti tik konkrečią užklausą, pasirinkite ją čia",
+            "NOTE": "Jei nepasirinksite metodo, jūsų veiksmas vyks kiekvienai užklausai pasirinktoje paslaugoje."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Funkcijos pavadinimas",
+            "DESCRIPTION": "Pasirinkite funkciją, kurią norite vykdyti"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Nustatyti grupę",
+            "DESCRIPTION": "Jei norite vykdyti tik tam tikrai įvykių grupei, nustatykite grupę čia"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Pasirinkti įvykį",
+            "DESCRIPTION": "Jei norite vykdyti tik konkrečiam įvykiui, nurodykite jį čia"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Galite pasirinkti vykdyti tikslą arba vykdyti jį tomis pačiomis sąlygomis kaip ir kitus tikslus.",
+          "TARGET": {
+            "DESCRIPTION": "Tikslas, kurį norite vykdyti šiam veiksmui"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Vykdymo sąlygos"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Sąlyga",
+        "TYPE": "Tipas",
+        "TARGET": "Tikslas",
+        "CREATIONDATE": "Sukūrimo data"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Tikslai",
+      "DESCRIPTION": "Tikslas – tai kodo, kurį norite vykdyti iš veiksmo, paskirties vieta. Sukurkite tikslą čia ir pridėkite jį prie savo veiksmų.",
+      "CREATE": {
+        "TITLE": "Sukurkite savo tikslą",
+        "DESCRIPTION": "Sukurkite savo tikslą už Zitadel ribų",
+        "NAME": "Pavadinimas",
+        "NAME_DESCRIPTION": "Suteikite savo tikslui aiškų, aprašomąjį pavadinimą, kad vėliau būtų lengva jį atpažinti",
+        "TYPE": "Tipas",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST iškvietimas",
+          "restAsync": "REST asinchroninis"
+        },
+        "TYPES_DESCRIPTION": "Webhook – iškvietimas apdoroja būsenos kodą, tačiau atsakymas nesvarbus\nCall – iškvietimas apdoroja tiek būsenos kodą, tiek atsakymą\nAsync – iškvietimas neapdoroja nei būsenos kodo, nei atsakymo, tačiau gali būti vykdomas lygiagrečiai su kitais tikslais",
+        "PAYLOAD_TYPE": "Krovinio tipas",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "Nenurodyta",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "Šifruotas JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: standartinis JSON krovinys su parašo antrašte tikrinimui.\nJWT: krovinys siunčiamas kaip pasirašytas JWT. Tikrinimas atliekamas naudojant JWT parašą.\nJWE: JWT papildomai šifruojamas, kad būtų apsaugota nuo neteisėtos prieigos prie krovinio informacijos.",
+        "ENDPOINT": "Galutinis taškas",
+        "ENDPOINT_DESCRIPTION": "Įveskite galutinį tašką, kuriame talpinamas jūsų kodas. Įsitikinkite, kad jis mums pasiekiamas!",
+        "TIMEOUT": "Laiko limitas",
+        "TIMEOUT_DESCRIPTION": "Nustatykite maksimalų laiką, per kurį jūsų tikslas turi atsakyti. Jei užtrunka ilgiau, mes sustabdysime užklausą.",
+        "INTERRUPT_ON_ERROR": "Nutraukti klaidos atveju",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Sustabdyti visus vykdymus, kai tikslas grąžina klaidą",
+        "INTERRUPT_ON_ERROR_WARNING": "Dėmesio: „Nutraukti klaidos atveju“ sustabdo veiksmus įvykus klaidai, rizikuojant užsiblokuoti. Prieš tai išbandykite šią funkciją išjungę, kad neužblokuotumėte prisijungimo ar kūrimo.",
+        "AWAIT_RESPONSE": "Laukti atsakymo",
+        "AWAIT_RESPONSE_DESCRIPTION": "Prieš atlikdami bet ką kitą, palauksime atsakymo. Naudinga, jei ketinate naudoti kelis tikslus vienam veiksmui"
+      },
+      "TABLE": {
+        "NAME": "Pavadinimas",
+        "ENDPOINT": "Galutinis taškas",
+        "CREATIONDATE": "Sukūrimo data",
+        "REORDER": "Pertvarkyti"
+      }
+    }
+  },
+  "MEMBERROLES": {
+    "IAM_OWNER": "Turi kontrolę visam egzemplioriui, įskaitant visas organizacijas",
+    "IAM_OWNER_VIEWER": "Turi teisę peržiūrėti visą egzempliorių, įskaitant visas organizacijas",
+    "IAM_ORG_MANAGER": "Turi teisę kurti ir valdyti organizacijas",
+    "IAM_USER_MANAGER": "Turi teisę kurti ir valdyti naudotojus",
+    "IAM_ADMIN_IMPERSONATOR": "Turi teisę apsimesti administratoriais ir galutiniais naudotojais iš visų organizacijų",
+    "IAM_END_USER_IMPERSONATOR": "Turi teisę apsimesti galutiniais naudotojais iš visų organizacijų",
+    "IAM_LOGIN_CLIENT": "Turi teisę valdyti prisijungimo programas",
+    "ORG_OWNER": "Turi teises visai organizacijai",
+    "ORG_USER_MANAGER": "Turi teisę kurti ir valdyti organizacijos naudotojus",
+    "ORG_OWNER_VIEWER": "Turi teisę peržiūrėti visą organizaciją",
+    "ORG_SETTINGS_MANAGER": "Turi teisę valdyti organizacijos nustatymus",
+    "ORG_USER_PERMISSION_EDITOR": "Turi teisę valdyti vaidmenų priskyrimus",
+    "ORG_PROJECT_PERMISSION_EDITOR": "Turi teisę valdyti projekto suteikimus",
+    "ORG_PROJECT_CREATOR": "Turi teisę kurti savo projektus ir jų nustatymus",
+    "ORG_ADMIN_IMPERSONATOR": "Turi teisę apsimesti administratoriais ir galutiniais naudotojais iš organizacijos",
+    "ORG_END_USER_IMPERSONATOR": "Turi teisę apsimesti galutiniais naudotojais iš organizacijos",
+    "ORG_USER_SELF_MANAGER": "Turi teisę valdyti savo paties naudotoją",
+    "PROJECT_OWNER": "Turi teises visam projektui",
+    "PROJECT_OWNER_VIEWER": "Turi teisę peržiūrėti visą projektą",
+    "PROJECT_OWNER_GLOBAL": "Turi teises visam projektui",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "Turi teisę peržiūrėti visą projektą",
+    "PROJECT_GRANT_OWNER": "Turi teisę valdyti projekto suteikimą",
+    "PROJECT_GRANT_OWNER_VIEWER": "Turi teisę peržiūrėti projekto suteikimą"
+  },
+  "OVERLAYS": {
+    "ORGSWITCHER": {
+      "TEXT": "Visi organizacijos nustatymai ir lentelės Valdymo konsolėje priklauso nuo pasirinktos organizacijos. Spustelėkite šį mygtuką, kad pakeistumėte organizaciją arba sukurtumėte naują."
+    },
+    "INSTANCE": {
+      "TEXT": "Spustelėkite čia, kad pereitumėte prie numatytųjų nustatymų. Atkreipkite dėmesį, kad šį mygtuką matysite tik turėdami išplėstines teises."
+    },
+    "PROFILE": {
+      "TEXT": "Čia galite persijungti tarp savo naudotojo paskyrų bei valdyti savo sesijas ir profilį."
+    },
+    "NAV": {
+      "TEXT": "Ši navigacija keičiasi priklausomai nuo aukščiau pasirinktos organizacijos arba egzemplioriaus"
+    },
+    "CONTEXTCHANGED": {
+      "TEXT": "Organizacijos kontekstas pasikeitė."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "Rodinys ką tik buvo pakeistas į egzempliorių!"
+    }
+  },
+  "FILTER": {
+    "TITLE": "Filtras",
+    "ORGNAME": "Organizacijos pavadinimas",
+    "ORGID": "Organizacijos ID",
+    "STATE": "Būsena",
+    "PRIMARYDOMAIN": "Organizacijos domenas",
+    "DISPLAYNAME": "Naudotojo rodomas vardas",
+    "EMAIL": "El. paštas",
+    "USERNAME": "Naudotojo vardas",
+    "PROJECTNAME": "Projekto pavadinimas",
+    "RESOURCEOWNER": "Ištekliaus savininkas",
+    "METHODS": {
+      "5": "yra",
+      "7": "baigiasi",
+      "1": "lygu"
+    }
+  },
+  "KEYBOARDSHORTCUTS": {
+    "TITLE": "Spartieji klavišai",
+    "UNDERORGCONTEXT": "Organizacijos puslapiuose",
+    "SIDEWIDE": "Viso tinklalapio spartieji klavišai",
+    "SHORTCUTS": {
+      "HOME": "Eiti į pradžią",
+      "INSTANCE": "Eiti į egzempliorių",
+      "ORG": "Eiti į <strong>o</strong>rganizaciją",
+      "ORGSETTINGS": "Eiti į organizacijos nustatymus",
+      "ORGSWITCHER": "Keisti organizaciją",
+      "ME": "Eiti į savo profilį",
+      "PROJECTS": "Eiti į <strong>p</strong>rojektus",
+      "USERS": "Eiti į naudotojus",
+      "ROLEASSIGNMENTS": "Eiti į vaidmenų priskyrimus",
+      "ACTIONS": "Eiti į veiksmus ir eigas",
+      "DOMAINS": "Eiti į <strong>d</strong>omenus"
+    }
+  },
+  "INSTANCEID": "Egzemplioriaus ID",
+  "RESOURCEID": "Ištekliaus ID",
+  "NAME": "Pavadinimas",
+  "VERSION": "Versija",
+  "TABLE": {
+    "NOROWS": "Nėra duomenų"
+  },
+  "ERRORS": {
+    "REQUIRED": "Užpildykite šį lauką.",
+    "ATLEASTONE": "Nurodykite bent vieną reikšmę.",
+    "TOKENINVALID": {
+      "TITLE": "Jūsų autorizacijos žetonas nebegalioja.",
+      "DESCRIPTION": "Spustelėkite žemiau esantį mygtuką, kad prisijungtumėte iš naujo."
+    },
+    "EXHAUSTED": {
+      "TITLE": "Jūsų egzempliorius užblokuotas.",
+      "DESCRIPTION": "Paprašykite savo Zitadel egzemplioriaus administratoriaus atnaujinti prenumeratą."
+    },
+    "INVALID_FORMAT": "Formatavimas negalioja.",
+    "NOTANEMAIL": "Nurodyta reikšmė nėra el. pašto adresas.",
+    "MINLENGTH": "Turi būti bent {{requiredLength}} simbolių ilgio.",
+    "MAXLENGTH": "Turi būti mažiau nei {{requiredLength}} simbolių.",
+    "UPPERCASEMISSING": "Turi būti bent viena didžioji raidė.",
+    "LOWERCASEMISSING": "Turi būti bent viena mažoji raidė.",
+    "SYMBOLERROR": "Turi būti bent vienas simbolis ar skyrybos ženklas.",
+    "NUMBERERROR": "Turi būti bent vienas skaičius.",
+    "PWNOTEQUAL": "Nurodyti slaptažodžiai nesutampa.",
+    "PHONE": "Telefono numeris turi prasidėti +."
+  },
+  "USER": {
+    "SETTINGS": {
+      "TITLE": "Nustatymai",
+      "GENERAL": "Bendra",
+      "IDP": "Tapatybės teikėjai",
+      "SECURITY": "Slaptažodis ir saugumas",
+      "KEYS": "Raktai",
+      "PAT": "Asmeniniai prieigos žetonai",
+      "ROLEASSIGNMENTS": "Vaidmenų priskyrimai",
+      "MEMBERSHIPS": "Administratoriaus vaidmenys",
+      "METADATA": "Metaduomenys"
+    },
+    "TITLE": "Asmeninė informacija",
+    "DESCRIPTION": "Valdykite savo informaciją ir saugumo nustatymus.",
+    "PAGES": {
+      "TITLE": "Naudotojas",
+      "DETAIL": "Informacija",
+      "CREATE": "Sukurti",
+      "MY": "Mano informacija",
+      "LOGINNAMES": "Prisijungimo vardai",
+      "LOGINMETHODS": "Prisijungimo metodai",
+      "LOGINNAMESDESC": "Tai jūsų prisijungimo vardai:",
+      "NOUSER": "Nėra susieto naudotojo.",
+      "REACTIVATE": "Reaktyvuoti",
+      "DEACTIVATE": "Deaktyvuoti",
+      "FILTER": "Filtras",
+      "STATE": "Būsena",
+      "DELETE": "Pašalinti naudotoją",
+      "UNLOCK": "Atblokuoti naudotoją",
+      "GENERATESECRET": "Sugeneruoti kliento paslaptį",
+      "REMOVESECRET": "Pašalinti kliento paslaptį",
+      "LOCKEDDESCRIPTION": "Šis naudotojas užblokuotas, nes viršijo maksimalų prisijungimo bandymų skaičių, ir turi būti atblokuotas, kad būtų galima naudoti vėl.",
+      "DELETEACCOUNT": "Pašalinti paskyrą",
+      "DELETEACCOUNT_DESC": "Atlikę šį veiksmą, būsite atjungti ir nebeturėsite prieigos prie savo paskyros. Šio veiksmo negalima atšaukti, todėl tęskite atsargiai.",
+      "DELETEACCOUNT_BTN": "Pašalinti paskyrą",
+      "DELETEACCOUNT_SUCCESS": "Paskyra sėkmingai pašalinta!"
+    },
+    "DETAILS": {
+      "DATECREATED": "Sukurta",
+      "DATECHANGED": "Pakeista"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Pašalinti naudotoją",
+      "DELETE_SELF_TITLE": "Pašalinti paskyrą",
+      "DELETE_DESCRIPTION": "Ruošiatės negrįžtamai pašalinti naudotoją. Ar tikrai norite tęsti?",
+      "DELETE_SELF_DESCRIPTION": "Ruošiatės negrįžtamai pašalinti savo asmeninę paskyrą. Tai jus atjungs ir pašalins jūsų naudotoją. Šio veiksmo negalima atšaukti!",
+      "DELETE_AUTH_DESCRIPTION": "Ruošiatės negrįžtamai pašalinti savo asmeninę paskyrą. Ar tikrai norite tęsti?",
+      "TYPEUSERNAME": "Įveskite „{{value}}“, kad patvirtintumėte ir pašalintumėte naudotoją.",
+      "USERNAME": "Prisijungimo vardas",
+      "DELETE_BTN": "Pašalinti negrįžtamai"
+    },
+    "SENDEMAILDIALOG": {
+      "TITLE": "Siųsti el. pašto pranešimą",
+      "DESCRIPTION": "Spustelėkite žemiau esantį mygtuką, kad išsiųstumėte pranešimą dabartiniu el. pašto adresu, arba pakeiskite el. pašto adresą lauke.",
+      "NEWEMAIL": "Naujas el. pašto adresas"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Kliento paslaptis",
+      "CLIENTSECRET_DESCRIPTION": "Saugokite savo kliento paslaptį saugioje vietoje, nes ji išnyks uždarius šį langą."
+    },
+    "TABLE": {
+      "DEACTIVATE": "Deaktyvuoti",
+      "ACTIVATE": "Aktyvuoti",
+      "CHANGEDATE": "Paskutinį kartą keista",
+      "CREATIONDATE": "Sukurta",
+      "FILTER": {
+        "0": "Filtruoti pagal rodomą vardą",
+        "1": "Filtruoti pagal naudotojo vardą",
+        "2": "filtruoti pagal rodomą vardą",
+        "3": "filtruoti pagal naudotojo vardą",
+        "4": "filtruoti pagal el. paštą",
+        "5": "filtruoti pagal rodomą vardą",
+        "10": "filtruoti pagal organizacijos pavadinimą",
+        "12": "filtruoti pagal projekto pavadinimą"
+      },
+      "EMPTY": "Nėra įrašų"
+    },
+    "PASSWORDLESS": {
+      "SEND": "Siųsti registracijos nuorodą",
+      "TABLETYPE": "Tipas",
+      "TABLESTATE": "Būsena",
+      "NAME": "Pavadinimas",
+      "EMPTY": "Nenustatytas įrenginys",
+      "TITLE": "Autentifikavimas prieigos raktu",
+      "DESCRIPTION": "Pridėkite WebAuthn pagrindu veikiančius autentifikavimo metodus, kad prisijungtumėte prie Zitadel prieigos raktu.",
+      "MANAGE_DESCRIPTION": "Valdykite savo naudotojų antrojo veiksnio metodus.",
+      "U2F": "Pridėti metodą",
+      "U2F_DIALOG_TITLE": "Patvirtinti autentifikatorių",
+      "U2F_DIALOG_DESCRIPTION": "Įveskite savo naudojamo prieigos rakto prisijungimo pavadinimą",
+      "U2F_SUCCESS": "Prieigos rakto autentifikavimas sėkmingai sukurtas!",
+      "U2F_ERROR": "Nustatymo metu įvyko klaida!",
+      "U2F_NAME": "Autentifikatoriaus pavadinimas",
+      "TYPE": {
+        "0": "Nenustatytas MFA",
+        "1": "OTP",
+        "2": "Prieigos raktas"
+      },
+      "STATE": {
+        "0": "Nėra būsenos",
+        "1": "Neparuošta",
+        "2": "Paruošta",
+        "3": "Pašalinta"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Pašalinti prieigos raktą",
+        "DELETE_DESCRIPTION": "Ruošiatės pašalinti prieigos raktą. Ar tikrai norite tęsti?",
+        "ADD_TITLE": "Autentifikavimas prieigos raktu",
+        "ADD_DESCRIPTION": "Pasirinkite vieną iš galimų parinkčių prieigos raktui sukurti.",
+        "SEND_DESCRIPTION": "Išsiųskite sau registracijos nuorodą savo el. paštu.",
+        "SEND": "Siųsti registracijos nuorodą",
+        "SENT": "El. laiškas sėkmingai pristatytas. Patikrinkite savo pašto dėžutę, kad tęstumėte nustatymą.",
+        "QRCODE_DESCRIPTION": "Sugeneruokite QR kodą skenavimui kitu įrenginiu.",
+        "QRCODE": "Generuoti QR kodą",
+        "QRCODE_SCAN": "Nuskenuokite šį QR kodą, kad tęstumėte nustatymą savo įrenginyje.",
+        "NEW_DESCRIPTION": "Naudokite šį įrenginį prieigos raktui nustatyti.",
+        "NEW": "Pridėti naują"
+      }
+    },
+    "MFA": {
+      "TABLETYPE": "Tipas",
+      "TABLESTATE": "Būsena",
+      "NAME": "Pavadinimas",
+      "EMPTY": "Nėra papildomų veiksnių",
+      "TITLE": "Kelių veiksnių autentifikavimas",
+      "DESCRIPTION": "Pridėkite antrąjį veiksnį, kad užtikrintumėte optimalų savo paskyros saugumą.",
+      "MANAGE_DESCRIPTION": "Valdykite savo naudotojų antrojo veiksnio metodus.",
+      "ADD": "Pridėti veiksnį",
+      "OTP": "Autentifikavimo programa TOTP",
+      "OTP_DIALOG_TITLE": "Pridėti OTP",
+      "OTP_DIALOG_DESCRIPTION": "Nuskenuokite QR kodą su autentifikavimo programa ir įveskite žemiau esantį kodą, kad patvirtintumėte ir aktyvuotumėte TOTP metodą.",
+      "U2F": "Prieigos raktas",
+      "U2F_DIALOG_TITLE": "Patvirtinti veiksnį",
+      "U2F_DIALOG_DESCRIPTION": "Įveskite savo naudojamo universalaus kelių veiksnių autentifikavimo pavadinimą.",
+      "U2F_SUCCESS": "Veiksnys sėkmingai pridėtas!",
+      "U2F_ERROR": "Nustatymo metu įvyko klaida!",
+      "U2F_NAME": "Autentifikatoriaus pavadinimas",
+      "OTPSMS": "OTP SMS žinute",
+      "OTPEMAIL": "OTP el. paštu",
+      "SETUPOTPSMSDESCRIPTION": "Ar norite nustatyti šį telefono numerį kaip OTP antrąjį veiksnį?",
+      "OTPSMSSUCCESS": "OTP veiksnys sėkmingai nustatytas.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Jūsų telefonas turi būti patvirtintas, kad galėtumėte naudoti šį metodą.",
+      "OTPEMAILSUCCESS": "OTP veiksnys sėkmingai nustatytas.",
+      "TYPE": {
+        "0": "Nenustatytas MFA",
+        "1": "OTP",
+        "2": "Prieigos raktas"
+      },
+      "STATE": {
+        "0": "Nėra būsenos",
+        "1": "Neparuošta",
+        "2": "Paruošta",
+        "3": "Pašalinta"
+      },
+      "DIALOG": {
+        "MFA_DELETE_TITLE": "Pašalinti antrąjį veiksnį",
+        "MFA_DELETE_DESCRIPTION": "Ruošiatės pašalinti antrąjį veiksnį. Ar tikrai norite tęsti?",
+        "ADD_MFA_TITLE": "Pridėti antrąjį veiksnį",
+        "ADD_MFA_DESCRIPTION": "Pasirinkite vieną iš šių parinkčių."
+      }
+    },
+    "EXTERNALIDP": {
+      "TITLE": "Išoriniai tapatybės teikėjai",
+      "DESC": "",
+      "IDPCONFIGID": "Tapatybės teikėjo konfigūracijos ID",
+      "IDPNAME": "Tapatybės teikėjo pavadinimas",
+      "USERDISPLAYNAME": "Išorinis vardas",
+      "EXTERNALUSERID": "Išorinio naudotojo ID",
+      "EMPTY": "Nerastas išorinis tapatybės teikėjas",
+      "DIALOG": {
+        "DELETE_TITLE": "Pašalinti tapatybės teikėją",
+        "DELETE_DESCRIPTION": "Ruošiatės pašalinti tapatybės teikėją iš naudotojo. Ar tikrai norite tęsti?"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Sukurti naują naudotoją",
+      "DESCRIPTION": "Pateikite reikiamą informaciją.",
+      "NAMEANDEMAILSECTION": "Vardas ir el. paštas",
+      "GENDERLANGSECTION": "Lytis ir kalba",
+      "PHONESECTION": "Telefono numeriai",
+      "PASSWORDSECTION": "Pradinis slaptažodis",
+      "ADDRESSANDPHONESECTION": "Telefono numeris",
+      "INITMAILDESCRIPTION": "Jei pasirinktos abi parinktys, aktyvavimo laiškas nebus siunčiamas. Jei pasirinkta tik viena parinktis, bus išsiųstas laiškas duomenims pateikti / patvirtinti.",
+      "SETUPAUTHENTICATIONLATER": "Nustatyti šio naudotojo autentifikavimą vėliau.",
+      "INVITATION": "Siųsti kvietimo el. laišką autentifikavimo nustatymui ir el. pašto patvirtinimui.",
+      "INITIALPASSWORD": "Nustatyti naudotojui pradinį slaptažodį."
+    },
+    "CODEDIALOG": {
+      "TITLE": "Patvirtinti telefono numerį",
+      "DESCRIPTION": "Įveskite kodą, gautą SMS žinute, kad patvirtintumėte savo telefono numerį.",
+      "CODE": "Kodas"
+    },
+    "DATA": {
+      "STATE": "Būsena",
+      "STATE0": "Nežinoma",
+      "STATE1": "Aktyvus",
+      "STATE2": "Neaktyvus",
+      "STATE3": "Pašalinta",
+      "STATE4": "Užblokuotas",
+      "STATE5": "Sustabdytas",
+      "STATE6": "Pradinis"
+    },
+    "PROFILE": {
+      "TITLE": "Profilis",
+      "EMAIL": "El. paštas",
+      "PHONE": "Telefono numeris",
+      "PHONE_HINT": "Naudokite + simbolį, po kurio seka šalies kodas, arba pasirinkite šalį iš išskleidžiamojo sąrašo ir tuomet įveskite telefono numerį",
+      "PHONE_VERIFIED": "Telefono numeris patvirtintas",
+      "SEND_SMS": "Siųsti patvirtinimo SMS",
+      "SEND_EMAIL": "Siųsti el. laišką",
+      "USERNAME": "Naudotojo vardas",
+      "CHANGEUSERNAME": "keisti",
+      "CHANGEUSERNAME_TITLE": "Keisti naudotojo vardą",
+      "CHANGEUSERNAME_DESC": "Įveskite naują vardą žemiau esančiame lauke.",
+      "FIRSTNAME": "Vardas",
+      "LASTNAME": "Pavardė",
+      "NICKNAME": "Slapyvardis",
+      "DISPLAYNAME": "Rodomas vardas",
+      "PREFERREDLOGINNAME": "Pageidaujamas prisijungimo vardas",
+      "PREFERRED_LANGUAGE": "Kalba",
+      "GENDER": "Lytis",
+      "PASSWORD": "Slaptažodis",
+      "AVATAR": {
+        "UPLOADTITLE": "Įkelkite savo profilio nuotrauką",
+        "UPLOADBTN": "Pasirinkti failą",
+        "UPLOAD": "Įkelti",
+        "CURRENT": "Dabartinė nuotrauka",
+        "PREVIEW": "Peržiūra",
+        "DELETESUCCESS": "Sėkmingai pašalinta!",
+        "CROPPERERROR": "Įkeliant failą įvyko klaida. Jei reikia, pabandykite kitą formatą ir dydį."
+      },
+      "COUNTRY": "Šalis"
+    },
+    "MACHINE": {
+      "TITLE": "Techninės paskyros informacija",
+      "USERNAME": "Naudotojo vardas",
+      "NAME": "Pavadinimas",
+      "DESCRIPTION": "Aprašymas",
+      "KEYSTITLE": "Raktai",
+      "KEYSDESC": "Nustatykite savo raktus ir pridėkite pasirinktinę galiojimo datą.",
+      "TOKENSTITLE": "Asmeniniai prieigos žetonai",
+      "TOKENSDESC": "Asmeniniai prieigos žetonai veikia kaip įprasti OAuth prieigos žetonai.",
+      "ID": "Rakto ID",
+      "TYPE": "Tipas",
+      "EXPIRATIONDATE": "Galiojimo data",
+      "CHOOSEDATEAFTER": "Įveskite galiojantį galiojimo laiką po",
+      "CHOOSEEXPIRY": "Pasirinkite galiojimo datą",
+      "CREATIONDATE": "Sukūrimo data",
+      "KEYDETAILS": "Rakto informacija",
+      "ACCESSTOKENTYPE": "Prieigos žetono tipas",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
+      "ADD": {
+        "TITLE": "Pridėti raktą",
+        "DESCRIPTION": "Pasirinkite savo rakto tipą ir pasirinkite pasirinktinę galiojimo datą."
+      },
+      "ADDED": {
+        "TITLE": "Raktas sukurtas",
+        "DESCRIPTION": "Atsisiųskite raktą, nes jis nebus matomas uždarius šį langą!"
+      },
+      "KEYTYPES": {
+        "1": "JSON"
+      },
+      "DIALOG": {
+        "DELETE_KEY": {
+          "TITLE": "Pašalinti raktą",
+          "DESCRIPTION": "Ar norite pašalinti pasirinktą raktą? Šio veiksmo negalima atšaukti."
+        }
+      }
+    },
+    "PASSWORD": {
+      "TITLE": "Slaptažodis",
+      "LABEL": "Saugus slaptažodis padeda apsaugoti paskyrą",
+      "DESCRIPTION": "Įveskite naują slaptažodį pagal žemiau esančią politiką.",
+      "OLD": "Dabartinis slaptažodis",
+      "NEW": "Naujas slaptažodis",
+      "CONFIRM": "Patvirtinkite naują slaptažodį",
+      "NEWINITIAL": "Slaptažodis",
+      "CONFIRMINITIAL": "Patvirtinkite slaptažodį",
+      "RESET": "Atstatyti dabartinį slaptažodį",
+      "SET": "Nustatyti naują slaptažodį",
+      "RESENDNOTIFICATION": "Siųsti slaptažodžio atstatymo nuorodą",
+      "REQUIRED": "Trūksta kai kurių būtinų laukų.",
+      "MINLENGTHERROR": "Turi būti bent {{value}} simbolių ilgio.",
+      "MAXLENGTHERROR": "Turi būti mažiau nei {{value}} simbolių."
+    },
+    "ID": "Naudotojo ID",
+    "EMAIL": "El. paštas",
+    "PHONE": "Telefono numeris",
+    "PHONEEMPTY": "Nenustatytas telefono numeris",
+    "PHONEVERIFIED": "Telefono numeris patvirtintas.",
+    "EMAILVERIFIED": "El. paštas patvirtintas",
+    "NOTVERIFIED": "nepatvirtinta",
+    "PREFERRED_LOGINNAME": "Pageidaujamas prisijungimo vardas",
+    "ISINITIAL": "Naudotojas dar neaktyvus.",
+    "LOGINMETHODS": {
+      "TITLE": "Kontaktinė informacija",
+      "DESCRIPTION": "Pateikta informacija naudojama svarbiai informacijai siųsti, pvz., slaptažodžio atstatymo el. laiškams.",
+      "EMAIL": {
+        "TITLE": "El. paštas",
+        "VALID": "patvirtinta",
+        "ISVERIFIED": "El. paštas patvirtintas",
+        "ISVERIFIEDDESC": "Jei el. paštas nurodytas kaip patvirtintas, patvirtinimo užklausa nebus siunčiama.",
+        "RESEND": "Iš naujo siųsti patvirtinimo el. laišką",
+        "EDITTITLE": "Keisti el. paštą",
+        "EDITDESC": "Įveskite naują el. paštą žemiau esančiame lauke."
+      },
+      "PHONE": {
+        "TITLE": "Telefonas",
+        "VALID": "patvirtinta",
+        "RESEND": "Iš naujo siųsti patvirtinimo SMS",
+        "EDITTITLE": "Keisti numerį",
+        "EDITVALUE": "Telefono numeris",
+        "EDITDESC": "Įveskite naują telefono numerį žemiau esančiame lauke.",
+        "DELETETITLE": "Pašalinti telefono numerį",
+        "DELETEDESC": "Ar tikrai norite pašalinti telefono numerį",
+        "OTPSMSREMOVALWARNING": "Ši paskyra naudoja šį telefono numerį kaip antrąjį veiksnį. Tęsdami nebegalėsite jo naudoti."
+      },
+      "RESENDCODE": "Siųsti kodą iš naujo",
+      "ENTERCODE": "Patvirtinti",
+      "ENTERCODE_DESC": "Patvirtinti kodą"
+    },
+    "GRANTS": {
+      "TITLE": "Vaidmenų priskyrimai",
+      "DESCRIPTION": "Suteikite šiam naudotojui prieigą prie tam tikrų projektų",
+      "CREATE": {
+        "TITLE": "Sukurti vaidmens priskyrimą",
+        "DESCRIPTION": "Ieškokite organizacijos, projekto ir atitinkamų projekto vaidmenų."
+      },
+      "PROJECTNAME": "Projekto pavadinimas",
+      "PROJECT-OWNED": "Projektas",
+      "PROJECT-GRANTED": "Suteiktas projektas",
+      "FILTER": {
+        "0": "filtruoti pagal naudotoją",
+        "1": "filtruoti pagal domeną",
+        "2": "filtruoti pagal projekto pavadinimą",
+        "3": "filtruoti pagal vaidmens pavadinimą"
+      }
+    },
+    "STATE": {
+      "0": "Nežinoma",
+      "1": "Aktyvus",
+      "2": "Neaktyvus",
+      "3": "Pašalinta",
+      "4": "Užblokuotas",
+      "5": "Sustabdytas",
+      "6": "Pradinis"
+    },
+    "STATEV2": {
+      "0": "Nežinoma",
+      "1": "Aktyvus",
+      "2": "Neaktyvus",
+      "3": "Pašalinta",
+      "4": "Užblokuotas",
+      "5": "Pradinis"
+    },
+    "SEARCH": {
+      "ADDITIONAL": "Prisijungimo vardas (dabartinė organizacija)",
+      "ADDITIONAL-EXTERNAL": "Prisijungimo vardas (išorinė organizacija)"
+    },
+    "TARGET": {
+      "SELF": "Jei norite priskirti vaidmenį naudotojui iš kitos organizacijos",
+      "EXTERNAL": "Norėdami priskirti vaidmenį naudotojui iš savo organizacijos",
+      "CLICKHERE": "spustelėkite čia"
+    },
+    "SIGNEDOUT": "Jūs esate atsijungę. Spustelėkite mygtuką „Prisijungti“, kad prisijungtumėte iš naujo.",
+    "SIGNEDOUT_BTN": "Prisijungti",
+    "EDITACCOUNT": "Redaguoti paskyrą",
+    "ADDACCOUNT": "Prisijungti kita paskyra",
+    "RESENDINITIALEMAIL": "Iš naujo siųsti aktyvavimo laišką",
+    "RESENDEMAILNOTIFICATION": "Iš naujo siųsti el. pašto pranešimą",
+    "TOAST": {
+      "CREATED": "Naudotojas sėkmingai sukurtas.",
+      "SAVED": "Profilis sėkmingai išsaugotas.",
+      "USERNAMECHANGED": "Naudotojo vardas pakeistas.",
+      "EMAILSAVED": "El. paštas sėkmingai išsaugotas.",
+      "INITEMAILSENT": "Aktyvavimo laiškas išsiųstas.",
+      "PHONESAVED": "Telefonas sėkmingai išsaugotas.",
+      "PHONEREMOVED": "Telefonas pašalintas.",
+      "PHONEVERIFIED": "Telefonas sėkmingai patvirtintas.",
+      "PHONEVERIFICATIONSENT": "Telefono patvirtinimo kodas išsiųstas.",
+      "EMAILVERIFICATIONSENT": "El. pašto patvirtinimo kodas išsiųstas.",
+      "OTPREMOVED": "OTP pašalintas.",
+      "U2FREMOVED": "Veiksnys pašalintas.",
+      "PASSWORDLESSREMOVED": "Prieigos raktas pašalintas.",
+      "INITIALPASSWORDSET": "Pradinis slaptažodis nustatytas.",
+      "PASSWORDNOTIFICATIONSENT": "Slaptažodžio pakeitimo pranešimas išsiųstas.",
+      "PASSWORDCHANGED": "Slaptažodis sėkmingai pakeistas.",
+      "REACTIVATED": "Naudotojas reaktyvuotas.",
+      "DEACTIVATED": "Naudotojas deaktyvuotas.",
+      "SELECTEDREACTIVATED": "Pasirinkti naudotojai reaktyvuoti.",
+      "SELECTEDDEACTIVATED": "Pasirinkti naudotojai deaktyvuoti.",
+      "SELECTEDKEYSDELETED": "Pasirinkti raktai pašalinti.",
+      "KEYADDED": "Raktas pridėtas!",
+      "MACHINEADDED": "Techninė paskyra sukurta!",
+      "DELETED": "Naudotojas sėkmingai pašalintas!",
+      "UNLOCKED": "Naudotojas sėkmingai atblokuotas!",
+      "PASSWORDLESSREGISTRATIONSENT": "Registracijos nuoroda sėkmingai išsiųsta.",
+      "SECRETGENERATED": "Paslaptis sėkmingai sugeneruota!",
+      "SECRETREMOVED": "Paslaptis sėkmingai pašalinta!"
+    },
+    "MEMBERSHIPS": {
+      "TITLE": "Zitadel administratoriaus vaidmenys",
+      "DESCRIPTION": "Tai visi naudotojo administratoriaus vaidmenys. Juos taip pat galite keisti organizacijos, projekto ar IAM informacijos puslapiuose.",
+      "ORGCONTEXT": "Matote visas organizacijas ir projektus, susijusius su šiuo metu pasirinkta organizacija.",
+      "USERCONTEXT": "Matote visas organizacijas ir projektus, kuriems esate autorizuoti. Įskaitant kitas organizacijas.",
+      "CREATIONDATE": "Sukūrimo data",
+      "CHANGEDATE": "Paskutinį kartą keista",
+      "DISPLAYNAME": "Rodomas vardas",
+      "REMOVE": "Pašalinti",
+      "TYPE": "Tipas",
+      "ORGID": "Organizacijos ID",
+      "UPDATED": "Administratoriaus vaidmuo atnaujintas.",
+      "NOPERMISSIONTOEDIT": "Jums trūksta reikiamų teisių vaidmenims redaguoti!",
+      "TYPES": {
+        "UNKNOWN": "Nežinoma",
+        "ORG": "Organizacija",
+        "PROJECT": "Projektas",
+        "GRANTEDPROJECT": "Suteiktas projektas"
+      }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "ID",
+      "TOKEN": "Žetonas",
+      "ADD": {
+        "TITLE": "Sugeneruoti naują asmeninį prieigos žetoną",
+        "DESCRIPTION": "Nustatykite pasirinktinį žetono galiojimą.",
+        "CHOOSEEXPIRY": "Pasirinkite galiojimo datą",
+        "CHOOSEDATEAFTER": "Įveskite galiojantį galiojimo laiką po"
+      },
+      "ADDED": {
+        "TITLE": "Asmeninis prieigos žetonas",
+        "DESCRIPTION": "Būtinai nukopijuokite savo asmeninį prieigos žetoną. Jūs nebegalėsite jo pamatyti dar kartą!"
+      },
+      "DELETE": {
+        "TITLE": "Pašalinti žetoną",
+        "DESCRIPTION": "Ruošiatės pašalinti asmeninį prieigos žetoną. Ar tikrai norite tęsti?"
+      },
+      "DELETED": "Žetonas sėkmingai pašalintas."
+    }
+  },
+  "METADATA": {
+    "TITLE": "Metaduomenys",
+    "KEY": "Raktas",
+    "VALUE": "Reikšmė",
+    "ADD": "Naujas įrašas",
+    "SAVE": "Išsaugoti",
+    "EMPTY": "Nėra metaduomenų",
+    "SETSUCCESS": "Elementas sėkmingai išsaugotas",
+    "REMOVESUCCESS": "Elementas sėkmingai pašalintas"
+  },
+  "FLOWS": {
+    "ID": "ID",
+    "NAME": "Pavadinimas",
+    "STATE": "Būsena",
+    "STATES": {
+      "0": "nėra būsenos",
+      "1": "neaktyvus",
+      "2": "aktyvus"
+    },
+    "ADDTRIGGER": "Pridėti trigerį",
+    "FLOWCHANGED": "Eiga sėkmingai pakeista",
+    "FLOWCLEARED": "Eiga sėkmingai atstatyta",
+    "TIMEOUT": "Laiko limitas",
+    "TIMEOUTINSEC": "Laiko limitas sekundėmis",
+    "ALLOWEDTOFAIL": "Leidžiama nesėkmė",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Įspėjimas",
+      "DESCRIPTION": "Išjungus šį nustatymą, jūsų organizacijos naudotojai gali negalėti prisijungti. Be to, nebegalėsite pasiekti valdymo konsolės, kad išjungtumėte veiksmą. Rekomenduojame sukurti administratoriaus naudotoją atskiroje organizacijoje arba pirma išbandyti skriptus kūrimo aplinkoje ar kūrimo organizacijoje."
+    },
+    "SCRIPT": "Skriptas",
+    "FLOWTYPE": "Eigos tipas",
+    "TRIGGERTYPE": "Trigerio tipas",
+    "ACTIONS": "Veiksmai",
+    "ACTIONSMAX": "Pagal jūsų planą turite ribotą veiksmų skaičių ({{value}}). Deaktyvuokite tuos, kurių jums nereikia, arba apsvarstykite plano atnaujinimą.",
+    "DIALOG": {
+      "ADD": {
+        "TITLE": "Sukurti veiksmą"
+      },
+      "UPDATE": {
+        "TITLE": "Atnaujinti veiksmą"
+      },
+      "DELETEACTION": {
+        "TITLE": "Pašalinti veiksmą?",
+        "DESCRIPTION": "Ruošiatės pašalinti veiksmą. Šio veiksmo negalima atšaukti. Ar tikrai norite tęsti?",
+        "DELETE_SUCCESS": "Veiksmas sėkmingai pašalintas."
+      },
+      "CLEAR": {
+        "TITLE": "Išvalyti eigą?",
+        "DESCRIPTION": "Ruošiatės atstatyti eigą kartu su jos trigeriais ir veiksmais. Šio pakeitimo negalima atkurti. Ar tikrai norite tęsti?"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Pašalinti pasirinktus veiksmus?",
+        "DESCRIPTION": "Ar tikrai norite pašalinti pasirinktus veiksmus iš eigos?"
+      },
+      "ABOUTNAME": "Veiksmo pavadinimas ir funkcijos pavadinimas javascript kode turi sutapti"
+    },
+    "TOAST": {
+      "ACTIONSSET": "Veiksmai nustatyti",
+      "ACTIONREACTIVATED": "Veiksmai sėkmingai reaktyvuoti",
+      "ACTIONDEACTIVATED": "Veiksmai sėkmingai deaktyvuoti"
+    }
+  },
+  "IAM": {
+    "POLICIES": {
+      "TITLE": "Sistemos politikos ir prieigos nustatymai",
+      "DESCRIPTION": "Valdykite savo globalias politikas ir valdymo prieigos nustatymus."
+    },
+    "EVENTSTORE": {
+      "TITLE": "IAM saugyklos administravimas",
+      "DESCRIPTION": "Valdykite savo Zitadel rodinius ir nepavykusius įvykius."
+    },
+    "MEMBER": {
+      "TITLE": "Administratoriai",
+      "DESCRIPTION": "Šie administratoriai gali atlikti pakeitimus jūsų egzemplioriuje."
+    },
+    "PAGES": {
+      "STATE": "Būsena",
+      "DOMAINLIST": "Pasirinktiniai domenai"
+    },
+    "STATE": {
+      "0": "Nenurodyta",
+      "1": "Kuriama",
+      "2": "Veikia",
+      "3": "Stabdoma",
+      "4": "Sustabdyta"
+    },
+    "VIEWS": {
+      "VIEWNAME": "Pavadinimas",
+      "DATABASE": "Duomenų bazė",
+      "SEQUENCE": "Seka",
+      "EVENTTIMESTAMP": "Laiko žyma",
+      "LASTSPOOL": "Sėkmingas apdorojimas",
+      "ACTIONS": "Veiksmai",
+      "CLEAR": "Išvalyti",
+      "CLEARED": "Rodinys sėkmingai išvalytas!",
+      "DIALOG": {
+        "VIEW_CLEAR_TITLE": "Išvalyti rodinį",
+        "VIEW_CLEAR_DESCRIPTION": "Ruošiatės išvalyti rodinį. Rodinio valymas sukuria procesą, kurio metu duomenys galutiniams naudotojams gali būti nepasiekiami. Ar tikrai norite tęsti?"
+      }
+    },
+    "FAILEDEVENTS": {
+      "VIEWNAME": "Pavadinimas",
+      "DATABASE": "Duomenų bazė",
+      "FAILEDSEQUENCE": "Nepavykusi seka",
+      "FAILURECOUNT": "Nesėkmių skaičius",
+      "LASTFAILED": "Paskutinį kartą nepavyko",
+      "ERRORMESSAGE": "Klaidos pranešimas",
+      "ACTIONS": "Veiksmai",
+      "DELETE": "Pašalinti",
+      "DELETESUCCESS": "Nepavykę įvykiai pašalinti."
+    },
+    "EVENTS": {
+      "EDITOR": "Redaktorius",
+      "EDITORID": "Redaktoriaus ID",
+      "AGGREGATE": "Agregatas",
+      "AGGREGATEID": "Agregato ID",
+      "AGGREGATETYPE": "Agregato tipas",
+      "RESOURCEOWNER": "Ištekliaus savininkas",
+      "SEQUENCE": "Seka",
+      "CREATIONDATE": "Sukurta",
+      "TYPE": "Tipas",
+      "PAYLOAD": "Krovinys",
+      "FILTERS": {
+        "BTN": "Filtras",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtruoti pagal redaktorių"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Agregato tipas",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtruoti pagal agregatą"
+        },
+        "TYPE": {
+          "TYPELABEL": "Tipas",
+          "CHECKBOX": "Filtruoti pagal tipą"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Filtruoti pagal ištekliaus savininką"
+        },
+        "SEQUENCE": {
+          "LABEL": "Seka",
+          "CHECKBOX": "Filtruoti pagal seką"
+        },
+        "SORT": "Rūšiuoti",
+        "ASC": "Didėjančiai",
+        "DESC": "Mažėjančiai",
+        "CREATIONDATE": {
+          "RADIO_FROM": "Nuo",
+          "RADIO_RANGE": "Intervalas",
+          "LABEL_SINCE": "Nuo",
+          "LABEL_UNTIL": "Iki"
+        },
+        "OTHER": "kitas",
+        "OTHERS": "kiti"
+      },
+      "DIALOG": {
+        "TITLE": "Įvykio informacija"
+      }
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Administratorius pašalintas.",
+      "MEMBERSADDED": "Administratoriai pridėti.",
+      "MEMBERADDED": "Administratorius pridėtas.",
+      "MEMBERCHANGED": "Administratorius pakeistas.",
+      "ROLEREMOVED": "Vaidmuo pašalintas.",
+      "ROLECHANGED": "Vaidmuo pakeistas.",
+      "REACTIVATED": "Reaktyvuota",
+      "DEACTIVATED": "Deaktyvuota"
+    }
+  },
+  "ORG": {
+    "PAGES": {
+      "NAME": "Pavadinimas",
+      "ID": "Organizacijos ID",
+      "CREATIONDATE": "Sukūrimo data",
+      "DATECHANGED": "Pakeista",
+      "FILTER": "Filtras",
+      "FILTERPLACEHOLDER": "Filtruoti pagal pavadinimą",
+      "LIST": "Organizacijos",
+      "LISTDESCRIPTION": "Pasirinkite organizaciją.",
+      "ACTIVE": "Aktyvus",
+      "CREATE": "Sukurti organizaciją",
+      "DEACTIVATE": "Deaktyvuoti organizaciją",
+      "REACTIVATE": "Reaktyvuoti organizaciją",
+      "NOPERMISSION": "Neturite teisės pasiekti organizacijos nustatymų.",
+      "USERSELFACCOUNT": "Naudokite savo asmeninę paskyrą kaip organizacijos savininką",
+      "ORGDETAIL_TITLE": "Įveskite naujos organizacijos pavadinimą ir domeną.",
+      "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Įveskite naujos organizacijos pavadinimą.",
+      "ORGDETAILUSER_TITLE": "Sukonfigūruokite organizacijos savininką",
+      "DELETE": "Pašalinti organizaciją",
+      "DEFAULTLABEL": "Numatytoji",
+      "SETASDEFAULT": "Nustatyti kaip numatytąją organizaciją",
+      "DEFAULTORGSET": "Numatytoji organizacija sėkmingai pakeista",
+      "RENAME": {
+        "ACTION": "Pervadinti",
+        "TITLE": "Pervadinti organizaciją",
+        "DESCRIPTION": "Įveskite naują savo organizacijos pavadinimą",
+        "BTN": "Pervadinti"
+      },
+      "ORGDOMAIN": {
+        "TITLE": "Patvirtinkite {{value}} nuosavybę",
+        "VERIFICATION": "Siūlome du būdus rankiniu būdu patvirtinti jūsų domeną:",
+        "VERIFICATION_HTML": "- HTTP. Patalpinkite laikiną patvirtinimo failą savo svetainėje",
+        "VERIFICATION_DNS": "- DNS. Sukurkite TXT įrašo DNS įrašą",
+        "VERIFICATION_DNS_DESC": "Jei valdote {{ value }} ir turite prieigą prie savo DNS įrašų, galite sukurti naują TXT įrašą su šiomis reikšmėmis:",
+        "VERIFICATION_DNS_HOST_LABEL": "Serveris:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Naudokite šį kodą kaip TXT įrašo reikšmę:",
+        "VERIFICATION_HTTP_DESC": "Jei turite prieigą prie savo svetainės talpinimo, tiesiog atsisiųskite patvirtinimo failą ir įkelkite jį nurodytu URL",
+        "VERIFICATION_HTTP_URL_LABEL": "Tikimasi URL:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Patvirtinimo failas:",
+        "VERIFICATION_SKIP": "Kol kas galite praleisti patvirtinimą ir tęsti organizacijos kūrimą, tačiau norint naudoti savo domeną, šis žingsnis turi būti atliktas!",
+        "VERIFICATION_VALIDATION_DESC": "Neištrinkite patvirtinimo kodo, nes Zitadel periodiškai iš naujo tikrins jūsų domeno nuosavybę.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Užklausti naują žetoną",
+        "VERIFICATION_VALIDATION_ONGOING": "Buvo pasirinktas {{ value }} metodas jūsų organizacijos domenui patvirtinti. Spustelėkite mygtuką, kad paleistumėte patvirtinimo patikrą arba atstatytumėte patvirtinimo procesą.",
+        "VERIFICATION_SUCCESSFUL": "Domenas sėkmingai patvirtintas!",
+        "RESETMETHOD": "Atstatyti patvirtinimo metodą"
+      },
+      "DOWNLOAD_FILE": "Atsisiųsti failą",
+      "SELECTORGTOOLTIP": "Pasirinkti šią organizaciją.",
+      "PRIMARYDOMAIN": "Organizacijos domenas",
+      "STATE": "Būsena",
+      "USEPASSWORD": "Nustatyti pradinį slaptažodį",
+      "USEPASSWORDDESC": "Naudotojui nereikia nustatyti slaptažodžio inicijavimo metu."
+    },
+    "LIST": {
+      "TITLE": "Organizacijos",
+      "DESCRIPTION": "Tai jūsų egzemplioriaus organizacijos"
+    },
+    "DOMAINS": {
+      "NEW": "Pridėti domeną",
+      "TITLE": "Organizacijos domenai",
+      "DESCRIPTION": "Sukonfigūruokite savo organizacijos domenus. Šis domenas gali būti naudojamas domeno paieškai ir naudotojo vardo priesagai.",
+      "SETPRIMARY": "Nustatyti kaip organizacijos domeną",
+      "DELETE": {
+        "TITLE": "Pašalinti domeną",
+        "DESCRIPTION": "Ruošiatės pašalinti vieną iš savo domenų."
+      },
+      "ADD": {
+        "TITLE": "Pridėti domeną",
+        "DESCRIPTION": "Ruošiatės pridėti domeną savo organizacijai. Sėkmingai atlikus procesą, domenas galės būti naudojamas domeno paieškai ir kaip priesaga naudotojams."
+      }
+    },
+    "STATE": {
+      "0": "Nenurodyta",
+      "1": "Aktyvus",
+      "2": "Deaktyvuota"
+    },
+    "MEMBER": {
+      "TITLE": "Organizacijos administratoriai",
+      "DESCRIPTION": "Nustatykite naudotojus, galinčius keisti jūsų organizacijos nustatymus."
+    },
+    "TOAST": {
+      "UPDATED": "Organizacija sėkmingai atnaujinta.",
+      "DEACTIVATED": "Organizacija deaktyvuota.",
+      "REACTIVATED": "Organizacija reaktyvuota.",
+      "DOMAINADDED": "Domenas pridėtas.",
+      "DOMAINREMOVED": "Domenas pašalintas.",
+      "MEMBERADDED": "Administratorius pridėtas.",
+      "MEMBERREMOVED": "Administratorius pašalintas.",
+      "MEMBERCHANGED": "Administratorius pakeistas.",
+      "SETPRIMARY": "Organizacijos domenas sėkmingai nustatytas.",
+      "DELETED": "Organizacija sėkmingai pašalinta",
+      "DEFAULTORGNOTFOUND": "Numatytoji organizacija nerasta",
+      "ORG_WAS_DELETED": "Organizacija pašalinta."
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Deaktyvuoti organizaciją",
+        "DESCRIPTION": "Ruošiatės deaktyvuoti savo organizaciją. Po to naudotojai negalės prisijungti. Ar tikrai norite tęsti?"
+      },
+      "REACTIVATE": {
+        "TITLE": "Reaktyvuoti organizaciją",
+        "DESCRIPTION": "Ruošiatės reaktyvuoti savo organizaciją. Naudotojai vėl galės prisijungti. Ar tikrai norite tęsti?"
+      },
+      "DELETE": {
+        "TITLE": "Pašalinti organizaciją",
+        "DESCRIPTION": "Ruošiatės pašalinti savo organizaciją. Tai pradės procesą, kurio metu bus pašalinti visi su organizacija susiję duomenys. Kol kas šio veiksmo atšaukti negalima.",
+        "TYPENAME": "Įveskite „{{value}}“, kad pašalintumėte savo organizaciją.",
+        "ORGNAME": "Pavadinimas",
+        "BTN": "Pašalinti"
+      }
+    }
+  },
+  "SETTINGS": {
+    "LIST": {
+      "ORGS": "Organizacijos",
+      "FEATURESETTINGS": "Funkcijos",
+      "LANGUAGES": "Kalbos",
+      "LOGIN": "Prisijungimo elgsena ir saugumas",
+      "LOCKOUT": "Blokavimas",
+      "AGE": "Slaptažodžio galiojimas",
+      "COMPLEXITY": "Slaptažodžio sudėtingumas",
+      "NOTIFICATIONS": "Pranešimai",
+      "SMTP_PROVIDER": "SMTP teikėjas",
+      "SMS_PROVIDER": "SMS/telefono teikėjas",
+      "NOTIFICATIONS_DESC": "SMTP ir SMS nustatymai",
+      "MESSAGETEXTS": "Žinučių tekstai",
+      "IDP": "Tapatybės teikėjai",
+      "VERIFIED_DOMAINS": "Organizacijos domenai",
+      "DOMAIN": "Domeno nustatymai",
+      "LOGINTEXTS": "Prisijungimo sąsajos tekstai",
+      "BRANDING": "Prekės ženklas",
+      "PRIVACYPOLICY": "Išorinės nuorodos",
+      "OIDC": "OIDC žetono galiojimo trukmė",
+      "WEB_KEYS": "OIDC web raktai",
+      "SECRETS": "Paslapčių generatorius",
+      "SECURITY": "Saugumo nustatymai",
+      "EVENTS": "Įvykiai",
+      "FAILEDEVENTS": "Nepavykę įvykiai",
+      "VIEWS": "Rodiniai",
+      "ACTIONS": "Veiksmai",
+      "TARGETS": "Tikslai"
+    },
+    "GROUPS": {
+      "GENERAL": "Bendra informacija",
+      "NOTIFICATIONS": "Pranešimai",
+      "LOGIN": "Prisijungimas ir prieiga",
+      "DOMAIN": "Domenas",
+      "TEXTS": "Tekstai ir kalbos",
+      "APPEARANCE": "Išvaizda",
+      "OTHER": "Kita",
+      "STORAGE": "Saugykla",
+      "ACTIONS": "Veiksmai"
+    },
+    "BETA": "BETA"
+  },
+  "SETTING": {
+    "LANGUAGES": {
+      "DEFAULT": "Numatytoji kalba",
+      "ALLOWED": "Leidžiamos kalbos",
+      "NOT_ALLOWED": "Neleidžiamos kalbos",
+      "ALLOW_ALL": "Leisti visas",
+      "DISALLOW_ALL": "Neleisti nė vienos",
+      "SETASDEFAULT": "Nustatyti kaip numatytąją kalbą",
+      "DEFAULT_SAVED": "Numatytoji kalba išsaugota",
+      "ALLOWED_SAVED": "Leidžiamos kalbos išsaugotos",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands",
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Türkçe",
+        "uk": "Українська",
+        "ar": "العربية",
+        "lt": "Lietuvių"
+      }
+    },
+    "SMTP": {
+      "TITLE": "SMTP teikėjas",
+      "DESCRIPTION": "Aprašymas",
+      "SENDERADDRESS": "Siuntėjo el. pašto adresas",
+      "SENDERNAME": "Siuntėjo vardas",
+      "REPLYTOADDRESS": "Atsakymo adresas",
+      "HOSTANDPORT": "Serveris ir prievadas",
+      "USER": "Naudotojas",
+      "PASSWORD": "Slaptažodis",
+      "SETPASSWORD": "Nustatyti SMTP slaptažodį",
+      "PASSWORDSET": "SMTP slaptažodis sėkmingai nustatytas.",
+      "TLS": "Transporto lygmens saugumas (TLS)",
+      "SAVED": "Sėkmingai išsaugota!",
+      "NOCHANGES": "Nėra pakeitimų!",
+      "REQUIREDWARN": "Norėdami siųsti pranešimus iš savo domeno, turite įvesti savo SMTP duomenis."
+    },
+    "SMS": {
+      "PROVIDERS": "Teikėjai",
+      "PROVIDER": "SMS teikėjas",
+      "ADDPROVIDER": "Pridėti SMS teikėją",
+      "ADDPROVIDERDESCRIPTION": "Pasirinkite vieną iš galimų teikėjų ir įveskite reikiamus duomenis.",
+      "REMOVEPROVIDER": "Pašalinti teikėją",
+      "REMOVEPROVIDER_DESC": "Ruošiatės pašalinti teikėją. Ar norite tęsti?",
+      "SMSPROVIDERSTATE": {
+        "0": "Nenurodyta",
+        "1": "Aktyvus",
+        "2": "Neaktyvus"
+      },
+      "ACTIVATED": "Teikėjas aktyvuotas.",
+      "DEACTIVATED": "Teikėjas deaktyvuotas.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Žetonas",
+        "SENDERNUMBER": "Siuntėjo numeris",
+        "VERIFYSERVICESID": "Patvirtinimo paslaugos Sid",
+        "VERIFYSERVICESID_DESCRIPTION": "Nustačius patvirtinimo paslaugos Sid, galima naudoti Twilio Verify paslaugą vietoj Messages paslaugos telefono numerių ir OTP SMS patvirtinimui",
+        "ADDED": "Twilio sėkmingai pridėtas.",
+        "UPDATED": "Twilio sėkmingai atnaujintas.",
+        "REMOVED": "Twilio pašalintas",
+        "CHANGETOKEN": "Keisti žetoną",
+        "SETTOKEN": "Nustatyti žetoną",
+        "TOKENSET": "Žetonas sėkmingai nustatytas."
+      }
+    },
+    "SECRETS": {
+      "TYPES": "Paslapčių tipai",
+      "TYPE": {
+        "1": "Aktyvavimo laiškas",
+        "2": "El. pašto patvirtinimas",
+        "3": "Telefono patvirtinimas",
+        "4": "Slaptažodžio atstatymas",
+        "5": "Prieigos rakto aktyvavimas",
+        "6": "Programos paslaptis",
+        "7": "OTP - SMS",
+        "8": "OTP - el. paštas",
+        "9": "Kvietimo kodas"
+      },
+      "EXPIRY": "Galiojimas (minutėmis)",
+      "INCLUDEDIGITS": "Įtraukti skaičius",
+      "INCLUDESYMBOLS": "Įtraukti simbolius",
+      "INCLUDELOWERLETTERS": "Įtraukti mažąsias raides",
+      "INCLUDEUPPERLETTERS": "Įtraukti didžiąsias raides",
+      "LENGTH": "Ilgis",
+      "UPDATED": "Nustatymai atnaujinti."
+    },
+    "SECURITY": {
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Šis nustatymas nustato CSP, kad būtų leidžiama įkelti rėmelius iš leidžiamų domenų sąrašo. Atkreipkite dėmesį, kad įjungę iFrame naudojimą rizikuojate leisti clickjacking atakas.",
+      "IFRAMEENABLED": "Leisti iFrame",
+      "ALLOWEDORIGINS": "Leidžiami URL",
+      "IMPERSONATIONTITLE": "Apsimetimas",
+      "IMPERSONATIONENABLED": "Leisti apsimetimą",
+      "IMPERSONATIONDESCRIPTION": "Šis nustatymas iš principo leidžia naudoti apsimetimą. Atkreipkite dėmesį, kad apsimetančiajam taip pat turi būti priskirti atitinkami `*_IMPERSONATOR` vaidmenys."
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "Prisijungimo numatytoji organizacija",
+      "LOGINDEFAULTORG_DESCRIPTION": "Jei organizacijos kontekstas nenustatytas, prisijungimo sąsaja naudos numatytosios organizacijos (o ne egzemplioriaus) nustatymus",
+      "USERSCHEMA": "Naudotojo schema",
+      "USERSCHEMA_DESCRIPTION": "Naudotojo schemos leidžia valdyti naudotojo duomenų schemas. Įjungus šią funkciją, galėsite naudoti naują API ir jo funkcijas.",
+      "ACTIONS": "Veiksmai",
+      "ACTIONS_DESCRIPTION": "Actions v2 leidžia valdyti duomenų vykdymus ir tikslus. Įjungus šią funkciją, galėsite naudoti naują API ir jo funkcijas.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC vienos V1 sesijos nutraukimas",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Įjungus šią funkciją, galėsite nutraukti vieną sesiją iš prisijungimo sąsajos, pateikdami id_token su `sid` teiginiu kaip id_token_hint end_session galutiniame taške. Atkreipkite dėmesį, kad šiuo metu prisijungimo sąsajoje nutraukiamos visos to paties naršyklės sesijos. Per Session API valdomos sesijos jau leidžia nutraukti pavienes sesijas.",
+      "DEBUGOIDCPARENTERROR": "OIDC tėvinės klaidos derinimas",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Įjungus šią funkciją, OIDC tėvinė klaida bus registruojama konsolėje.",
+      "PERMISSIONCHECKV2": "Teisių tikrinimas V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Įjungus šią funkciją, galėsite naudoti naują API ir jo funkcijas.",
+      "STATES": {
+        "INHERITED": "Paveldėti",
+        "ENABLED": "Įjungta",
+        "DISABLED": "Išjungta"
+      },
+      "INHERITED_DESCRIPTION": "Tai nustato reikšmę į numatytąją sistemos reikšmę.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "„Įjungta“ paveldėta",
+        "DISABLED": "„Išjungta“ paveldėta"
+      },
+      "RESET": "Nustatyti visus paveldėti",
+      "CONSOLEUSEV2USERAPI": "Naudoti V2 API valdymo konsolėje naudotojų kūrimui",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Įjungus šią funkciją, valdymo konsolė naudoja V2 naudotojų API naujiems naudotojams kurti. Naudojant V2 API, naujai sukurti naudotojai pradeda be pradinės būsenos.",
+      "LOGINV2": "Prisijungimas V2",
+      "LOGINV2_DESCRIPTION": "Įjungus šią funkciją, aktyvuojama nauja TypeScript pagrindu sukurta prisijungimo sąsaja su pagerintu saugumu, našumu ir pritaikymo galimybėmis.",
+      "LOGINV2_BASEURI": "Bazinis URI",
+      "ENABLERELATIONALTABLES": "Reliacinės lentelės",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Įjunkite tai, kad duomenims saugoti naudotumėte reliacines lenteles vietoj projekcijų. Šiuo metu šis perjungiklis nieko nedaro."
+    },
+    "DIALOG": {
+      "RESET": {
+        "DEFAULTTITLE": "Atstatyti nustatymą",
+        "DEFAULTDESCRIPTION": "Ruošiatės atstatyti savo nustatymus į numatytuosius jūsų egzemplioriaus nustatymus. Ar tikrai norite tęsti?",
+        "LOGINPOLICY_DESCRIPTION": "Įspėjimas: jei tęsite, tapatybės teikėjo nustatymai taip pat bus atstatyti į egzemplioriaus nustatymus."
+      }
+    }
+  },
+  "POLICY": {
+    "APPLIEDTO": "Taikoma",
+    "PWD_COMPLEXITY": {
+      "TITLE": "Slaptažodžio sudėtingumas",
+      "DESCRIPTION": "Užtikrina, kad visi nustatyti slaptažodžiai atitiktų konkretų šabloną",
+      "SYMBOLANDNUMBERERROR": "Turi būti bent vienas skaičius ir simbolis/skyrybos ženklas.",
+      "SYMBOLERROR": "Turi būti bent vienas simbolis ar skyrybos ženklas.",
+      "NUMBERERROR": "Turi būti bent vienas skaičius.",
+      "PATTERNERROR": "Slaptažodis neatitinka reikalaujamo šablono."
+    },
+    "NOTIFICATION": {
+      "TITLE": "Pranešimas",
+      "DESCRIPTION": "Nustato, kokiems pakeitimams bus siunčiami pranešimai.",
+      "PASSWORDCHANGE": "Slaptažodis pakeistas"
+    },
+    "PRIVATELABELING": {
+      "DESCRIPTION": "Suteikite prisijungimui savo asmenišką stilių ir pakeiskite jo elgseną.",
+      "PREVIEW_DESCRIPTION": "Politikos pakeitimai bus automatiškai pritaikyti peržiūros aplinkoje.",
+      "BTN": "Pasirinkti failą",
+      "ACTIVATEPREVIEW": "Taikyti nustatymus",
+      "DARK": "Tamsi tema",
+      "LIGHT": "Šviesi tema",
+      "CHANGEVIEW": "Keisti rodinį",
+      "ACTIVATED": "Politikos pakeitimai dabar VEIKIA",
+      "THEME": "Tema",
+      "COLORS": "Spalvos",
+      "FONT": "Šriftas",
+      "ADVANCEDBEHAVIOR": "Išplėstinė elgsena",
+      "DROP": "Įkelkite paveikslėlį čia arba",
+      "RELEASE": "Paleisti",
+      "DROPFONT": "Įkelkite šrifto failą čia",
+      "RELEASEFONT": "Paleisti",
+      "USEOFLOGO": "Jūsų logotipas bus naudojamas prisijungime bei el. laiškuose, o piktograma naudojama mažesniems sąsajos elementams, pvz., organizacijos keitiklyje valdymo konsolėje",
+      "MAXSIZE": "Maksimalus dydis ribojamas iki 524kB",
+      "EMAILNOSVG": "SVG failo formatas nepalaikomas el. laiškuose. Todėl įkelkite savo logotipą PNG ar kitu palaikomu formatu.",
+      "MAXSIZEEXCEEDED": "Viršytas maksimalus 524kB dydis.",
+      "NOSVGSUPPORTED": "SVG nepalaikomi!",
+      "FONTINLOGINONLY": "Šiuo metu šriftas rodomas tik prisijungimo sąsajoje.",
+      "BACKGROUNDCOLOR": "Fono spalva",
+      "PRIMARYCOLOR": "Pagrindinė spalva",
+      "WARNCOLOR": "Įspėjimo spalva",
+      "FONTCOLOR": "Šrifto spalva",
+      "VIEWS": {
+        "PREVIEW": "Peržiūra",
+        "CURRENT": "Dabartiniai nustatymai"
+      },
+      "PREVIEW": {
+        "TITLE": "Prisijungti",
+        "SECOND": "prisijunkite su savo Zitadel paskyra.",
+        "ERROR": "Naudotojas nerastas!",
+        "PRIMARYBUTTON": "kitas",
+        "SECONDARYBUTTON": "registruotis"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Automatinis režimas",
+        "THEME_MODE_LIGHT": "Tik šviesi tema",
+        "THEME_MODE_DARK": "Tik tamsi tema"
+      }
+    },
+    "PWD_AGE": {
+      "TITLE": "Slaptažodžio galiojimas",
+      "DESCRIPTION": "Galite nustatyti slaptažodžių galiojimo politiką. Ši politika priverčia naudotoją pakeisti slaptažodį kito prisijungimo metu po galiojimo pabaigos. Automatinių įspėjimų ir pranešimų nėra."
+    },
+    "PWD_LOCKOUT": {
+      "TITLE": "Blokavimo politika",
+      "DESCRIPTION": "Nustatykite maksimalų slaptažodžio bandymų skaičių, po kurio paskyros bus užblokuotos."
+    },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "Prekės ženklas",
+      "BTN": "Pasirinkti failą",
+      "DESCRIPTION": "Pritaikykite prisijungimo išvaizdą",
+      "ACTIVATEPREVIEW": "Aktyvuoti nustatymus"
+    },
+    "LOGIN_POLICY": {
+      "TITLE": "Prisijungimo nustatymai",
+      "DESCRIPTION": "Nustatykite, kaip naudotojai gali autentifikuotis, ir sukonfigūruokite tapatybės teikėjus",
+      "DESCRIPTIONCREATEADMIN": "Naudotojai gali pasirinkti iš žemiau esančių galimų tapatybės teikėjų.",
+      "DESCRIPTIONCREATEMGMT": "Naudotojai gali pasirinkti iš žemiau esančių galimų tapatybės teikėjų. Pastaba: galite naudoti tiek sistemos nustatytus teikėjus, tiek teikėjus, nustatytus tik jūsų organizacijai.",
+      "LIFETIME_INVALID": "Formoje yra neteisingų reikšmių.",
+      "SAVED": "Sėkmingai išsaugota!",
+      "PROVIDER_ADDED": "Tapatybės teikėjas aktyvuotas."
+    },
+    "PRIVACY_POLICY": {
+      "DESCRIPTION": "Nustatykite privatumo politikos ir naudojimo sąlygų nuorodas",
+      "TOSLINK": "Nuoroda į naudojimo sąlygas",
+      "POLICYLINK": "Nuoroda į privatumo politiką",
+      "HELPLINK": "Nuoroda į pagalbą",
+      "SUPPORTEMAIL": "Pagalbos el. paštas",
+      "DOCSLINK": "Dokumentacijos nuoroda (valdymo konsolė)",
+      "CUSTOMLINK": "Pasirinktinė nuoroda (valdymo konsolė)",
+      "CUSTOMLINKTEXT": "Pasirinktinės nuorodos tekstas (valdymo konsolė)",
+      "SAVED": "Sėkmingai išsaugota!",
+      "RESET_TITLE": "Atkurti numatytąsias reikšmes",
+      "RESET_DESCRIPTION": "Ruošiatės atkurti numatytąsias naudojimo sąlygų ir privatumo politikos nuorodas. Ar tikrai norite tęsti?"
+    },
+    "LOGIN_TEXTS": {
+      "TITLE": "Prisijungimo sąsajos tekstai",
+      "DESCRIPTION": "Nustatykite savo prisijungimo sąsajos tekstus. Jei tekstai tušti, bus naudojama numatytoji reikšmė, rodoma kaip vietaženklis.",
+      "DESCRIPTION_SHORT": "Nustatykite savo prisijungimo sąsajos tekstus.",
+      "NEWERVERSIONEXISTS": "Egzistuoja naujesnė versija",
+      "CURRENTDATE": "Dabartiniai nustatymai",
+      "CHANGEDATE": "Naujesnė versija nuo",
+      "KEYNAME": "Prisijungimo langas / sąsaja",
+      "RESET_TITLE": "Atkurti numatytąsias reikšmes",
+      "RESET_DESCRIPTION": "Ruošiatės atkurti visas numatytąsias reikšmes. Visi jūsų atlikti pakeitimai bus negrįžtamai pašalinti. Ar tikrai norite tęsti?",
+      "UNSAVED_TITLE": "Tęsti neišsaugant?",
+      "UNSAVED_DESCRIPTION": "Padarėte pakeitimų jų neišsaugoję. Ar norite išsaugoti dabar?",
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Pasirinkote neleidžiamą kalbą. Galite tęsti tekstų redagavimą. Tačiau jei norite, kad naudotojai galėtų iš tikrųjų naudoti šią kalbą, pakeiskite savo egzemplioriaus apribojimus.",
+      "LANGUAGES_NOT_ALLOWED": "Neleidžiama:",
+      "LANGUAGE": "Kalba",
+      "LANGUAGES": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands",
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Türkçe",
+        "uk": "Українська",
+        "ar": "العربية",
+        "lt": "Lietuvių"
+      },
+      "KEYS": {
+        "emailVerificationDoneText": "El. pašto patvirtinimas atliktas",
+        "emailVerificationText": "El. pašto patvirtinimas",
+        "externalUserNotFoundText": "Išorinis naudotojas nerastas",
+        "footerText": "Poraštė",
+        "initMfaDoneText": "MFA aktyvavimas baigtas",
+        "initMfaOtpText": "Aktyvuoti MFA",
+        "initMfaPromptText": "MFA aktyvavimo langas",
+        "initMfaU2fText": "Aktyvuoti universalų antrąjį veiksnį",
+        "initPasswordDoneText": "Slaptažodžio aktyvavimas baigtas",
+        "initPasswordText": "Aktyvuoti slaptažodį",
+        "initializeDoneText": "Naudotojo aktyvavimas baigtas",
+        "initializeUserText": "Aktyvuoti naudotoją",
+        "linkingUserDoneText": "Naudotojo susiejimas baigtas",
+        "loginText": "Prisijungti",
+        "logoutText": "Atsijungti",
+        "mfaProvidersText": "MFA teikėjai",
+        "passwordChangeDoneText": "Slaptažodžio keitimas baigtas",
+        "passwordChangeText": "Slaptažodžio keitimas",
+        "passwordResetDoneText": "Slaptažodžio atstatymas baigtas",
+        "passwordText": "Slaptažodis",
+        "registrationOptionText": "Registracijos parinktys",
+        "registrationOrgText": "Registruoti organizaciją",
+        "registrationUserText": "Registruoti naudotoją",
+        "selectAccountText": "Pasirinkti paskyrą",
+        "successLoginText": "Sėkmingas prisijungimas",
+        "usernameChangeDoneText": "Naudotojo vardo keitimas baigtas",
+        "usernameChangeText": "Naudotojo vardo keitimas",
+        "verifyMfaOtpText": "Patvirtinti OTP",
+        "verifyMfaU2fText": "Patvirtinti universalų antrąjį veiksnį",
+        "passwordlessPromptText": "Prieigos rakto langas",
+        "passwordlessRegistrationDoneText": "Prieigos rakto registracija baigta",
+        "passwordlessRegistrationText": "Prieigos rakto registracija",
+        "passwordlessText": "Prieigos raktas",
+        "externalRegistrationUserOverviewText": "Išorinės registracijos naudotojo apžvalga"
+      }
+    },
+    "MESSAGE_TEXTS": {
+      "TYPE": "Pranešimas",
+      "TYPES": {
+        "INIT": "Aktyvavimas",
+        "VE": "Patvirtinti el. paštą",
+        "VP": "Patvirtinti telefoną",
+        "VSO": "Patvirtinti OTP SMS",
+        "VEO": "Patvirtinti OTP el. paštu",
+        "PR": "Slaptažodžio atstatymas",
+        "DC": "Domeno pasisavinimas",
+        "PL": "Prieigos raktas",
+        "PC": "Slaptažodžio keitimas",
+        "IU": "Pakviesti naudotoją"
+      },
+      "CHIPS": {
+        "firstname": "Vardas",
+        "lastname": "Pavardė",
+        "code": "Kodas",
+        "preferredLoginName": "Pageidaujamas prisijungimo vardas",
+        "displayName": "Rodomas vardas",
+        "nickName": "Slapyvardis",
+        "loginnames": "Prisijungimo vardai",
+        "domain": "Domenas",
+        "lastEmail": "Paskutinis el. paštas",
+        "lastPhone": "Paskutinis telefonas",
+        "verifiedEmail": "Patvirtintas el. paštas",
+        "verifiedPhone": "Patvirtintas telefonas",
+        "changedate": "Pakeitimo data",
+        "username": "Naudotojo vardas",
+        "tempUsername": "Laikinas naudotojo vardas",
+        "otp": "OTP",
+        "verifyUrl": "OTP patvirtinimo URL",
+        "expiry": "Galiojimas",
+        "applicationName": "Programos pavadinimas"
+      },
+      "TOAST": {
+        "UPDATED": "Pasirinktiniai tekstai išsaugoti."
+      }
+    },
+    "DEFAULTLABEL": "Dabartiniai nustatymai atitinka jūsų egzemplioriaus standartą.",
+    "BTN_INSTALL": "Nustatyti",
+    "BTN_EDIT": "Keisti",
+    "DATA": {
+      "DESCRIPTION": "Aprašymas",
+      "MINLENGTH": "turi būti minimalaus ilgio",
+      "HASNUMBER": "turi būti bent vienas skaičius",
+      "HASSYMBOL": "turi būti bent vienas simbolis",
+      "HASLOWERCASE": "turi būti bent viena mažoji raidė",
+      "HASUPPERCASE": "turi būti bent viena didžioji raidė",
+      "SHOWLOCKOUTFAILURES": "rodyti blokavimo nesėkmes",
+      "MAXPASSWORDATTEMPTS": "Maksimalus slaptažodžio bandymų skaičius",
+      "MAXOTPATTEMPTS": "Maksimalus OTP bandymų skaičius",
+      "EXPIREWARNDAYS": "Įspėjimas apie galiojimo pabaigą po dienų",
+      "MAXAGEDAYS": "Maksimalus galiojimas dienomis",
+      "USERLOGINMUSTBEDOMAIN": "Pridėti organizacijos domeną kaip priesagą prie prisijungimo vardų",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Įjungus šį nustatymą, visi prisijungimo vardai turės priesagą su organizacijos domenu. Jei šis nustatymas išjungtas, turite užtikrinti, kad naudotojų vardai būtų unikalūs visose organizacijose.",
+      "VALIDATEORGDOMAINS": "Reikalingas organizacijos domeno patvirtinimas (DNS arba HTTP iššūkis)",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP siuntėjo adresas atitinka egzemplioriaus domeną",
+      "ALLOWUSERNAMEPASSWORD_DESC": "Leidžiamas įprastas prisijungimas naudotojo vardu ir slaptažodžiu.",
+      "ALLOWEXTERNALIDP_DESC": "Prisijungimas leidžiamas per susijusius tapatybės teikėjus",
+      "ALLOWREGISTER_DESC": "Pasirinkus šią parinktį, prisijungime bus rodomas papildomas naudotojo registracijos žingsnis.",
+      "FORCEMFA": "Priversti visus naudotojus naudoti MFA",
+      "FORCEMFALOCALONLY": "Priversti MFA tik vietiniu būdu autentifikuotus naudotojus",
+      "FORCEMFALOCALONLY_DESC": "Pasirinkus šią parinktį, vietiniu būdu autentifikuoti naudotojai turi sukonfigūruoti antrąjį veiksnį prisijungimui.",
+      "HIDEPASSWORDRESET_DESC": "Pasirinkus šią parinktį, naudotojas negalės atstatyti slaptažodžio prisijungimo proceso metu.",
+      "HIDELOGINNAMESUFFIX": "Slėpti prisijungimo vardo priesagą",
+      "HIDELOGINNAMESUFFIX_DESC": "Paslepia prisijungimo vardo priesagą prisijungimo sąsajoje",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "Pasirinkus šią parinktį, slaptažodžio langas bus rodomas prisijungimo proceso metu, net jei naudotojas nerastas. Slaptažodžio tikrinimo klaida neatskleis, ar buvo neteisingas naudotojo vardas, ar slaptažodis.",
+      "ALLOWDOMAINDISCOVERY_DESC": "Pasirinkus šią parinktį, nežinomo naudotojo vardo priesaga (@domain.com), įvesta prisijungimo lange, bus lyginama su organizacijų domenais, ir sėkmės atveju bus nukreipiama į tos organizacijos registraciją.",
+      "DEFAULTREDIRECTURI": "Numatytasis nukreipimo URI",
+      "DEFAULTREDIRECTURI_DESC": "Nustato, kur naudotojas bus nukreiptas, jei prisijungimas prasidėjo be programos konteksto (pvz., iš el. laiško)",
+      "ERRORMSGPOPUP": "Rodyti klaidą dialogo lange",
+      "DISABLEWATERMARK": "Slėpti vandens ženklą",
+      "DISABLEWATERMARK_DESC": "Paslėpti „Sukurta naudojant Zitadel“ vandens ženklą prisijungimo sąsajoje"
+    },
+    "RESET": "Atstatyti į egzemplioriaus numatytąjį",
+    "CREATECUSTOM": "Sukurti pasirinktinę politiką",
+    "TOAST": {
+      "SET": "Politika sėkmingai nustatyta!",
+      "RESETSUCCESS": "Politika sėkmingai atstatyta!",
+      "UPLOADSUCCESS": "Sėkmingai įkelta!",
+      "DELETESUCCESS": "Sėkmingai pašalinta!",
+      "UPLOADFAILED": "Įkėlimas nepavyko!"
+    }
+  },
+  "ORG_DETAIL": {
+    "TITLE": "Organizacija",
+    "DESCRIPTION": "Čia galite redaguoti savo organizacijos nustatymus ir valdyti narius.",
+    "DETAIL": {
+      "TITLE": "Informacija",
+      "NAME": "Pavadinimas",
+      "DOMAIN": "Domenas",
+      "STATE": {
+        "0": "Nenurodyta",
+        "1": "Aktyvus",
+        "2": "Neaktyvus"
+      }
+    },
+    "MEMBER": {
+      "TITLE": "Administratoriai",
+      "USERNAME": "Naudotojo vardas",
+      "DISPLAYNAME": "Rodomas vardas",
+      "LOGINNAME": "Prisijungimo vardas",
+      "EMAIL": "El. paštas",
+      "ROLES": "Vaidmenys",
+      "ADD": "Pridėti administratorių",
+      "ADDDESCRIPTION": "Įveskite pridedamų naudotojų vardus."
+    },
+    "TABLE": {
+      "TOTAL": "Iš viso įrašų",
+      "SELECTION": "Pasirinkti elementai",
+      "DEACTIVATE": "Deaktyvuoti naudotoją",
+      "ACTIVATE": "Aktyvuoti naudotoją",
+      "DELETE": "Pašalinti naudotoją",
+      "CLEAR": "Išvalyti pasirinkimą"
+    }
+  },
+  "PROJECT": {
+    "PAGES": {
+      "ID": "Projekto ID",
+      "TITLE": "Projektas",
+      "DESCRIPTION": "Čia galite apibrėžti programas, valdyti vaidmenis ir suteikti kitoms organizacijoms galimybę naudotis jūsų projektu.",
+      "DELETE": "Pašalinti projektą",
+      "DETAIL": "Informacija",
+      "CREATE": "Sukurti projektą",
+      "CREATE_DESC": "Įveskite savo projekto pavadinimą.",
+      "ROLE": "Vaidmuo",
+      "NOITEMS": "Nėra projektų",
+      "ZITADELPROJECT": "Tai priklauso Zitadel projektui. Atsargiai: atlikus pakeitimus, Zitadel gali veikti ne taip, kaip numatyta.",
+      "TYPE": {
+        "OWNED": "Nuosavi projektai",
+        "OWNED_SINGULAR": "Nuosavas projektas",
+        "GRANTED_SINGULAR": "{{name}} suteiktas projektas"
+      },
+      "PRIVATELABEL": {
+        "TITLE": "Prekės ženklo nustatymas",
+        "0": {
+          "TITLE": "Nenurodyta",
+          "DESC": "Kai tik naudotojas identifikuojamas, prieš rodant sistemos numatytąjį prekės ženklą, bus rodomas identifikuoto naudotojo organizacijos prekės ženklas."
+        },
+        "1": {
+          "TITLE": "Naudoti projekto nustatymą",
+          "DESC": "Bus rodomas projektą valdančios organizacijos prekės ženklas"
+        },
+        "2": {
+          "TITLE": "Naudoti naudotojo organizacijos nustatymą",
+          "DESC": "Bus rodomas projekto organizacijos prekės ženklas, tačiau kai tik naudotojas identifikuojamas, bus rodomas identifikuoto naudotojo organizacijos nustatymas."
+        },
+        "DIALOG": {
+          "TITLE": "Prekės ženklo nustatymas",
+          "DESCRIPTION": "Pasirinkite prisijungimo elgseną, naudojant projektą."
+        }
+      },
+      "PINNED": "Prisegta",
+      "ALL": "Visi",
+      "CREATEDON": "Sukurta",
+      "LASTMODIFIED": "Paskutinį kartą keista",
+      "ADDNEW": "Sukurti naują projektą",
+      "DIALOG": {
+        "REACTIVATE": {
+          "TITLE": "Reaktyvuoti projektą",
+          "DESCRIPTION": "Ar tikrai norite reaktyvuoti savo projektą?"
+        },
+        "DEACTIVATE": {
+          "TITLE": "Deaktyvuoti projektą",
+          "DESCRIPTION": "Ar tikrai norite deaktyvuoti savo projektą?"
+        },
+        "DELETE": {
+          "TITLE": "Pašalinti projektą",
+          "DESCRIPTION": "Ar tikrai norite pašalinti savo projektą?",
+          "TYPENAME": "Įveskite projekto pavadinimą, kad negrįžtamai jį pašalintumėte."
+        }
+      }
+    },
+    "SETTINGS": {
+      "TITLE": "Nustatymai",
+      "DESCRIPTION": ""
+    },
+    "STATE": {
+      "TITLE": "Būsena",
+      "0": "Nenurodyta",
+      "1": "Aktyvus",
+      "2": "Neaktyvus"
+    },
+    "TYPE": {
+      "TITLE": "Tipas",
+      "0": "Nežinomas tipas",
+      "1": "Nuosavas",
+      "2": "Suteiktas"
+    },
+    "NAME": "Pavadinimas",
+    "NAMEDIALOG": {
+      "TITLE": "Pervadinti projektą",
+      "DESCRIPTION": "Įveskite naują savo projekto pavadinimą",
+      "NAME": "Naujas pavadinimas"
+    },
+    "MEMBER": {
+      "TITLE": "Administratoriai",
+      "TITLEDESC": "Administratoriai gali atlikti šio projekto pakeitimus pagal savo vaidmenį.",
+      "DESCRIPTION": "Šie administratoriai gali redaguoti jūsų projektą.",
+      "USERNAME": "Naudotojo vardas",
+      "DISPLAYNAME": "Rodomas vardas",
+      "LOGINNAME": "Prisijungimo vardas",
+      "EMAIL": "El. paštas",
+      "ROLES": "Vaidmenys",
+      "USERID": "Naudotojo ID"
+    },
+    "GRANT": {
+      "EMPTY": "Nėra suteiktos organizacijos.",
+      "TITLE": "Projekto suteikimai",
+      "DESCRIPTION": "Leiskite kitai organizacijai naudotis jūsų projektu.",
+      "EDITTITLE": "Redaguoti vaidmenis",
+      "CREATE": {
+        "TITLE": "Sukurti projekto suteikimą",
+        "SEL_USERS": "Pasirinkite naudotojus, kuriems norite suteikti prieigą",
+        "SEL_PROJECT": "Ieškoti projekto",
+        "SEL_ROLES": "Pasirinkite vaidmenis, kuriuos norite pridėti prie projekto suteikimo",
+        "SEL_USER": "Pasirinkti naudotojus",
+        "SEL_ORG": "Ieškoti organizacijos",
+        "SEL_ORG_DESC": "Ieškokite organizacijos, kuriai norite suteikti.",
+        "ORG_DESCRIPTION": "Ruošiatės suteikti naudotojui prieigą organizacijai {{name}}.",
+        "ORG_DESCRIPTION_DESC": "Pakeiskite kontekstą viršuje esančioje antraštėje, kad suteiktumėte naudotojui prieigą kitai organizacijai.",
+        "SEL_ORG_FORMFIELD": "Organizacija",
+        "FOR_ORG": "Projekto suteikimas sukurtas:"
+      },
+      "DETAIL": {
+        "TITLE": "Projekto suteikimas",
+        "DESC": "Galite pasirinkti, kuriuos vaidmenis gali naudoti nurodyta organizacija, ir paskirti administratorius",
+        "MEMBERTITLE": "Administratoriai",
+        "MEMBERDESC": "Tai suteiktos organizacijos administratoriai. Čia pridėkite naudotojus, kurie turėtų gauti prieigą redaguoti projekto duomenis.",
+        "PROJECTNAME": "Projekto pavadinimas",
+        "GRANTEDORG": "Suteikta organizacija",
+        "RESOURCEOWNER": "Ištekliaus savininkas"
+      },
+      "STATE": "Būsena",
+      "STATES": {
+        "1": "Aktyvus",
+        "2": "Neaktyvus"
+      },
+      "ALL": "Visi",
+      "SHOWDETAIL": "Rodyti išsamią informaciją",
+      "USER": "Naudotojas",
+      "MEMBERS": "Administratoriai",
+      "ORG": "Organizacija",
+      "PROJECTNAME": "Projekto pavadinimas",
+      "GRANTEDORG": "Suteikta organizacija",
+      "GRANTEDORGDOMAIN": "Domenas",
+      "RESOURCEOWNER": "Ištekliaus savininkas",
+      "GRANTEDORGNAME": "Organizacijos pavadinimas",
+      "GRANTID": "Suteikimo ID",
+      "CREATIONDATE": "Sukūrimo data",
+      "CHANGEDATE": "Paskutinį kartą keista",
+      "DATES": "Datos",
+      "ROLENAMESLIST": "Vaidmenys",
+      "NOROLES": "Nėra vaidmenų",
+      "TYPE": "Tipas",
+      "TOAST": {
+        "PROJECTGRANTUSERGRANTADDED": "Projekto suteikimas sukurtas.",
+        "PROJECTGRANTADDED": "Projekto suteikimas sukurtas.",
+        "PROJECTGRANTCHANGED": "Projekto suteikimas pakeistas.",
+        "PROJECTGRANTMEMBERADDED": "Suteikimo administratorius pridėtas.",
+        "PROJECTGRANTMEMBERCHANGED": "Suteikimo administratorius pakeistas.",
+        "PROJECTGRANTMEMBERREMOVED": "Suteikimo administratorius pašalintas.",
+        "PROJECTGRANTUPDATED": "Projekto suteikimas atnaujintas"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Pašalinti projekto suteikimą",
+        "DELETE_DESCRIPTION": "Ruošiatės pašalinti projekto suteikimą. Ar tikrai norite tęsti?"
+      },
+      "ROLES": "Projekto vaidmenys"
+    },
+    "APP": {
+      "TITLE": "Programos",
+      "NAME": "Pavadinimas",
+      "NAMEREQUIRED": "Pavadinimas yra būtinas."
+    },
+    "ROLE": {
+      "EMPTY": "Dar nesukurta jokio vaidmens.",
+      "ADDNEWLINE": "Pridėti papildomą vaidmenį",
+      "KEY": "Raktas",
+      "TITLE": "Vaidmenys",
+      "DESCRIPTION": "Nustatykite vaidmenis, kurie gali būti naudojami projekto suteikimams kurti.",
+      "NAME": "Pavadinimas",
+      "DISPLAY_NAME": "Rodomas vardas",
+      "GROUP": "Grupė",
+      "ACTIONS": "Veiksmai",
+      "ADDTITLE": "Sukurti vaidmenį",
+      "ADDDESCRIPTION": "Įveskite naujo vaidmens duomenis.",
+      "EDITTITLE": "Redaguoti vaidmenį",
+      "EDITDESCRIPTION": "Įveskite naujus vaidmens duomenis.",
+      "DELETE": "Pašalinti vaidmenį",
+      "CREATIONDATE": "Sukurta",
+      "CHANGEDATE": "Paskutinį kartą keista",
+      "SELECTGROUPTOOLTIP": "Pasirinkite visus grupės {{group}} vaidmenis.",
+      "OPTIONS": "Parinktys",
+      "ASSERTION": "Grąžinti naudotojo vaidmenis autentifikavimo metu",
+      "ASSERTION_DESCRIPTION": "Kai naudotojas autentifikuojasi, jo vaidmens informacija pateikiama jūsų programai. OpenID Connect atveju vaidmenų galima paklausti iš UserInfo galutinio taško arba jie siunčiami ID ar prieigos žetone, priklausomai nuo jūsų programos nustatymų.",
+      "CHECK": "Autentifikuotis gali tik autorizuoti naudotojai",
+      "CHECK_DESCRIPTION": "Atsisakyti autentifikavimo, jei naudotojui nepriskirtas joks šio projekto vaidmuo. Prieiga prie projekto be konkretaus naudotojui priskirto vaidmens yra leidžiama.",
+      "DIALOG": {
+        "DELETE_TITLE": "Pašalinti vaidmenį",
+        "DELETE_DESCRIPTION": "Ruošiatės pašalinti projekto vaidmenį. Ar tikrai norite tęsti?"
+      }
+    },
+    "HAS_PROJECT": "Autentifikavimas ribojamas tik naudotojams iš organizacijų, kurioms suteikta prieiga prie šio projekto",
+    "HAS_PROJECT_DESCRIPTION": "Prieš naudotojui autentifikuojantis, patikrinama, ar jo priklausomai organizacijai suteikta prieiga prie šio projekto. Neautorizuotų organizacijų naudotojams autentifikavimas neleidžiamas.",
+    "TABLE": {
+      "TOTAL": "Iš viso įrašų:",
+      "SELECTION": "Pasirinkti elementai",
+      "DEACTIVATE": "Deaktyvuoti projektą",
+      "ACTIVATE": "Aktyvuoti projektą",
+      "DELETE": "Pašalinti projektą",
+      "ORGNAME": "Organizacijos pavadinimas",
+      "ORGID": "Organizacijos ID",
+      "ORGDOMAIN": "Organizacijos domenas",
+      "STATE": "Būsena",
+      "TYPE": "Tipas",
+      "CREATIONDATE": "Sukurta",
+      "CHANGEDATE": "Paskutinį kartą keista",
+      "RESOURCEOWNER": "Savininkas",
+      "SHOWTABLE": "Rodyti lentelę",
+      "SHOWGRID": "Rodyti tinklelį",
+      "EMPTY": "Projektų nerasta"
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Administratorius pašalintas.",
+      "MEMBERSADDED": "Administratoriai pridėti.",
+      "MEMBERADDED": "Administratorius pridėtas.",
+      "MEMBERCHANGED": "Administratorius pakeistas.",
+      "ROLESCREATED": "Vaidmenys sukurti.",
+      "ROLEREMOVED": "Vaidmuo pašalintas.",
+      "ROLECHANGED": "Vaidmuo pakeistas.",
+      "REACTIVATED": "Reaktyvuota.",
+      "DEACTIVATED": "Deaktyvuota.",
+      "CREATED": "Projektas sukurtas.",
+      "UPDATED": "Projektas pakeistas.",
+      "GRANTUPDATED": "Projekto suteikimas pakeistas.",
+      "DELETED": "Projektas pašalintas."
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Pašalinti vaidmenį",
+      "DELETE_DESCRIPTION": "Ruošiatės pašalinti vaidmenį. Ar tikrai norite tęsti?"
+    }
+  },
+  "NEXTSTEPS": {
+    "TITLE": "Kiti žingsniai"
+  },
+  "IDP": {
+    "LIST": {
+      "ACTIVETITLE": "Aktyvūs tapatybės teikėjai"
+    },
+    "CREATE": {
+      "TITLE": "Pridėti teikėją",
+      "DESCRIPTION": "Pasirinkite vieną ar daugiau iš šių teikėjų.",
+      "STEPPERTITLE": "Sukurti teikėją",
+      "OIDC": {
+        "TITLE": "OIDC teikėjas",
+        "DESCRIPTION": "Įveskite reikiamus duomenis savo OIDC teikėjui."
+      },
+      "OAUTH": {
+        "TITLE": "OAuth teikėjas",
+        "DESCRIPTION": "Įveskite reikiamus duomenis savo OAuth teikėjui."
+      },
+      "JWT": {
+        "TITLE": "JWT teikėjas",
+        "DESCRIPTION": "Įveskite reikiamus duomenis savo JWT teikėjui."
+      },
+      "GOOGLE": {
+        "TITLE": "Google teikėjas",
+        "DESCRIPTION": "Įveskite savo Google tapatybės teikėjo duomenis"
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab teikėjas",
+        "DESCRIPTION": "Įveskite savo Gitlab tapatybės teikėjo duomenis"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Savarankiškai talpinamas Gitlab teikėjas",
+        "DESCRIPTION": "Įveskite savo savarankiškai talpinamo Gitlab tapatybės teikėjo duomenis"
+      },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server teikėjas",
+        "DESCRIPTION": "Įveskite savo GitHub Enterprise Server tapatybės teikėjo duomenis"
+      },
+      "GITHUB": {
+        "TITLE": "Github teikėjas",
+        "DESCRIPTION": "Įveskite savo Github tapatybės teikėjo duomenis"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft teikėjas",
+        "DESCRIPTION": "Įveskite savo Microsoft tapatybės teikėjo duomenis"
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Įveskite savo LDAP teikėjo duomenis"
+      },
+      "APPLE": {
+        "TITLE": "Prisijungti su Apple",
+        "DESCRIPTION": "Įveskite savo Apple teikėjo duomenis"
+      },
+      "SAML": {
+        "TITLE": "Prisijungti su SAML",
+        "DESCRIPTION": "Įveskite savo SAML teikėjo duomenis"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Tapatybės teikėjas",
+      "DESCRIPTION": "Atnaujinkite savo teikėjo nustatymus",
+      "DATECREATED": "Sukurta",
+      "DATECHANGED": "Pakeista"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Automatinis sukūrimas",
+      "ISAUTOCREATION_DESC": "Jei pasirinkta, paskyra bus sukurta, jei ji dar neegzistuoja.",
+      "ISAUTOUPDATE": "Automatinis atnaujinimas",
+      "ISAUTOUPDATE_DESC": "Jei pasirinkta, paskyros atnaujinamos pakartotinio autentifikavimo metu.",
+      "ISCREATIONALLOWED": "Leidžiamas paskyros kūrimas (rankiniu būdu)",
+      "ISCREATIONALLOWED_DESC": "Nustato, ar paskyras galima kurti naudojant išorinę paskyrą. Išjunkite, jei naudotojai neturėtų galėti redaguoti paskyros informacijos, kai įjungtas auto_creation.",
+      "ISLINKINGALLOWED": "Leidžiamas paskyros susiejimas (rankiniu būdu)",
+      "ISLINKINGALLOWED_DESC": "Nustato, ar tapatybę galima rankiniu būdu susieti su esama paskyra. Išjunkite, jei naudotojams turėtų būti leidžiama susieti tik siūlomą paskyrą, kai aktyvus auto_linking.",
+      "AUTOLINKING_DESC": "Nustato, ar bus siūloma susieti tapatybę su esama paskyra.",
+      "AUTOLINKINGTYPE": {
+        "0": "Išjungta",
+        "1": "Tikrinti esamą naudotojo vardą",
+        "2": "Tikrinti esamą el. paštą"
+      }
+    },
+    "OWNERTYPES": {
+      "0": "nežinoma",
+      "1": "Egzempliorius",
+      "2": "Organizacija"
+    },
+    "STATES": {
+      "1": "aktyvus",
+      "2": "neaktyvus"
+    },
+    "AZUREADTENANTTYPES": {
+      "3": "Nuomininko ID",
+      "0": "Bendras",
+      "1": "Organizacijos",
+      "2": "Vartotojai"
+    },
+    "AZUREADTENANTTYPE": "Nuomininko tipas",
+    "AZUREADTENANTID": "Nuomininko ID",
+    "EMAILVERIFIED": "El. paštas patvirtintas",
+    "NAMEHINT": "Jei nurodyta, bus rodoma prisijungimo sąsajoje.",
+    "OPTIONAL": "nebūtina",
+    "LDAPATTRIBUTES": "LDAP atributai",
+    "UPDATEBINDPASSWORD": "atnaujinti Bind slaptažodį",
+    "UPDATECLIENTSECRET": "atnaujinti kliento paslaptį",
+    "ADD": "Pridėti tapatybės teikėją",
+    "TYPE": "Tipas",
+    "OWNER": "Savininkas",
+    "ID": "Tapatybės teikėjo ID",
+    "NAME": "Pavadinimas",
+    "AUTHORIZATIONENDPOINT": "Autorizacijos galutinis taškas",
+    "TOKENENDPOINT": "Žetono galutinis taškas",
+    "USERENDPOINT": "Naudotojo galutinis taškas",
+    "IDATTRIBUTE": "ID atributas",
+    "AVAILABILITY": "Prieinamumas",
+    "AVAILABLE": "prieinamas",
+    "AVAILABLEBUTINACTIVE": "prieinamas, bet neaktyvus",
+    "SETAVAILABLE": "nustatyti kaip prieinamą",
+    "SETUNAVAILABLE": "nustatyti kaip neprieinamą",
+    "CONFIG": "Nustatymai",
+    "STATE": "Būsena",
+    "ISSUER": "Išdavėjas",
+    "SCOPESLIST": "Apimčių sąrašas",
+    "CLIENTID": "Kliento ID",
+    "CLIENTSECRET": "Kliento paslaptis",
+    "LDAPCONNECTION": "Ryšys",
+    "LDAPUSERBINDING": "Naudotojo susiejimas",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind slaptažodis",
+    "SERVERS": "Serveriai",
+    "STARTTLS": "Pradėti TLS",
+    "TIMEOUT": "Laiko limitas sekundėmis",
+    "USERBASE": "Naudotojų bazė",
+    "USERFILTERS": "Naudotojų filtrai",
+    "USEROBJECTCLASSES": "Naudotojo objekto klasės",
+    "REQUIRED": "būtina",
+    "LDAPIDATTRIBUTE": "ID atributas",
+    "AVATARURLATTRIBUTE": "Avataro URL atributas",
+    "DISPLAYNAMEATTRIBUTE": "Rodomo vardo atributas",
+    "EMAILATTRIBUTEATTRIBUTE": "El. pašto atributas",
+    "EMAILVERIFIEDATTRIBUTE": "El. pašto patvirtinimo atributas",
+    "FIRSTNAMEATTRIBUTE": "Vardo atributas",
+    "LASTNAMEATTRIBUTE": "Pavardės atributas",
+    "NICKNAMEATTRIBUTE": "Slapyvardžio atributas",
+    "PHONEATTRIBUTE": "Telefono atributas",
+    "PHONEVERIFIEDATTRIBUTE": "Telefono patvirtinimo atributas",
+    "PREFERREDLANGUAGEATTRIBUTE": "Pageidaujamos kalbos atributas",
+    "PREFERREDUSERNAMEATTRIBUTE": "Pageidaujamo naudotojo vardo atributas",
+    "PROFILEATTRIBUTE": "Profilio atributas",
+    "IDPDISPLAYNAMMAPPING": "Tapatybės teikėjo rodomo vardo susiejimas",
+    "USERNAMEMAPPING": "Naudotojo vardo susiejimas",
+    "DATES": "Datos",
+    "CREATIONDATE": "Sukurta",
+    "CHANGEDATE": "Paskutinį kartą keista",
+    "DEACTIVATE": "Deaktyvuoti",
+    "ACTIVATE": "Aktyvuoti",
+    "DELETE": "Pašalinti",
+    "DELETE_TITLE": "Pašalinti tapatybės teikėją",
+    "DELETE_DESCRIPTION": "Ruošiatės pašalinti tapatybės teikėją. Šie pakeitimai negrįžtami. Ar tikrai norite tai padaryti?",
+    "REMOVE_WARN_TITLE": "Pašalinti tapatybės teikėją",
+    "REMOVE_WARN_DESCRIPTION": "Ruošiatės pašalinti tapatybės teikėją. Tai pašalins galimo tapatybės teikėjo pasirinkimą naudotojams, o jau užsiregistravę naudotojai nebegalės prisijungti. Ar tikrai norite tęsti?",
+    "DELETE_SELECTION_TITLE": "Pašalinti tapatybės teikėją",
+    "DELETE_SELECTION_DESCRIPTION": "Ruošiatės pašalinti tapatybės teikėją. Šie pakeitimai negrįžtami. Ar tikrai norite tai padaryti?",
+    "FEDERATEDLOGOUTENABLED": "Įjungtas federuotas atsijungimas",
+    "FEDERATEDLOGOUTENABLED_DESC": "Jei įjungta, naudotojui nutraukus sesiją Zitadel, jis taip pat bus atjungtas nuo tapatybės teikėjo.",
+    "EMPTY": "Nėra galimo tapatybės teikėjo",
+    "OIDC": {
+      "GENERAL": "Bendra informacija",
+      "TITLE": "OIDC nustatymai",
+      "DESCRIPTION": "Įveskite OIDC tapatybės teikėjo duomenis."
+    },
+    "JWT": {
+      "TITLE": "JWT nustatymai",
+      "DESCRIPTION": "Įveskite JWT tapatybės teikėjo duomenis.",
+      "HEADERNAME": "Antraštės pavadinimas",
+      "JWTENDPOINT": "JWT galutinis taškas",
+      "JWTKEYSENDPOINT": "JWT raktų galutinis taškas",
+      "AUDIENCE": "Auditorija"
+    },
+    "APPLE": {
+      "TEAMID": "Komandos ID",
+      "KEYID": "Rakto ID",
+      "PRIVATEKEY": "Privatus raktas",
+      "UPDATEPRIVATEKEY": "Atnaujinti privatų raktą",
+      "UPLOADPRIVATEKEY": "Įkelti privatų raktą",
+      "KEYMAXSIZEEXCEEDED": "Viršytas maksimalus 5kB dydis."
+    },
+    "SAML": {
+      "METADATAXML": "Metaduomenų XML",
+      "METADATAURL": "Metaduomenų URL",
+      "BINDING": "Susiejimas",
+      "SIGNEDREQUEST": "Pasirašyta užklausa",
+      "SIGNATUREALGORITHM": "Parašo algoritmas",
+      "NAMEIDFORMAT": "NameID formatas",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "Pasirinktinio susiejimo atributo pavadinimas",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternatyvus atributo pavadinimas naudotojui susieti, jei grąžinamas `nameid-format` yra `transient`, pvz., `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    },
+    "TOAST": {
+      "SAVED": "Sėkmingai išsaugota.",
+      "REACTIVATED": "Tapatybės teikėjas reaktyvuotas.",
+      "DEACTIVATED": "Tapatybės teikėjas deaktyvuotas.",
+      "SELECTEDREACTIVATED": "Pasirinkti tapatybės teikėjai reaktyvuoti.",
+      "SELECTEDDEACTIVATED": "Pasirinkti tapatybės teikėjai deaktyvuoti.",
+      "SELECTEDKEYSDELETED": "Pasirinkti tapatybės teikėjai pašalinti.",
+      "DELETED": "Tapatybės teikėjas sėkmingai pašalintas!",
+      "ADDED": "Sėkmingai pridėta.",
+      "REMOVED": "Sėkmingai pašalinta."
+    },
+    "ISIDTOKENMAPPING": "Susieti iš ID žetono",
+    "ISIDTOKENMAPPING_DESC": "Jei pasirinkta, teikėjo informacija susiejama iš ID žetono, o ne iš userinfo galutinio taško.",
+    "USEPKCE": "Naudoti PKCE",
+    "USEPKCE_DESC": "Nustato, ar autentifikavimo užklausoje įtraukiami code_challenge ir code_challenge_method parametrai"
+  },
+  "MFA": {
+    "LIST": {
+      "MULTIFACTORTITLE": "Prieigos raktas",
+      "MULTIFACTORDESCRIPTION": "Čia nustatykite kelių veiksnių autentifikavimą savo prieigos raktui.",
+      "SECONDFACTORTITLE": "Kelių veiksnių autentifikavimas",
+      "SECONDFACTORDESCRIPTION": "Nustatykite papildomus galimus veiksnius, kuriais galite apsaugoti slaptažodžio autentifikavimą."
+    },
+    "CREATE": {
+      "TITLE": "Naujas veiksnys",
+      "DESCRIPTION": "Pasirinkite naujo veiksnio tipą."
+    },
+    "DELETE": {
+      "TITLE": "Pašalinti veiksnį",
+      "DESCRIPTION": "Ruošiatės pašalinti veiksnį iš prisijungimo nustatymų. Ar tikrai norite tęsti?"
+    },
+    "TOAST": {
+      "ADDED": "Sėkmingai pridėta.",
+      "SAVED": "Sėkmingai išsaugota.",
+      "DELETED": "Sėkmingai pašalinta"
+    },
+    "TYPE": "Tipas",
+    "MULTIFACTORTYPES": {
+      "0": "Nežinoma",
+      "1": "Prieigos raktas"
+    },
+    "SECONDFACTORTYPES": {
+      "0": "Nežinoma",
+      "1": "TOTP (autentifikavimo programa)",
+      "2": "Prieigos raktas",
+      "3": "OTP el. paštu (OTP Email)",
+      "4": "OTP SMS žinute (OTP SMS)",
+      "5": "Atkūrimo kodai"
+    }
+  },
+  "LOGINPOLICY": {
+    "CREATE": {
+      "TITLE": "Prisijungimo nustatymai",
+      "DESCRIPTION": "Nustatykite, kaip jūsų naudotojai gali autentifikuotis jūsų organizacijoje."
+    },
+    "IDPS": "Tapatybės teikėjai",
+    "ADDIDP": {
+      "TITLE": "Pridėti tapatybės teikėją",
+      "DESCRIPTION": "Autentifikavimui galite pasirinkti iš anksto nustatytus arba savo sukurtus teikėjus.",
+      "SELECTIDPS": "Tapatybės teikėjai"
+    },
+    "PASSWORDLESS": "Prisijungimas prieigos raktu",
+    "PASSWORDLESSTYPE": {
+      "0": "Neleidžiama",
+      "1": "Leidžiama"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "SMTP teikėjas",
+      "DESCRIPTION": "Tai jūsų Zitadel egzemplioriaus SMTP teikėjai. Aktyvuokite tą, kurį norite naudoti pranešimams siųsti savo naudotojams.",
+      "EMPTY": "Nėra galimo SMTP teikėjo",
+      "ACTIVATED": "Aktyvuota",
+      "ACTIVATE": "Aktyvuoti teikėją",
+      "DEACTIVATE": "Deaktyvuoti teikėją",
+      "TEST": "Testuoti savo teikėją",
+      "TYPE": "Tipas",
+      "DIALOG": {
+        "ACTIVATED": "SMTP teikėjas aktyvuotas",
+        "ACTIVATE_WARN_TITLE": "Aktyvuoti SMTP nustatymus",
+        "ACTIVATE_WARN_DESCRIPTION": "Ruošiatės aktyvuoti SMTP teikėją. Pirmiausia deaktyvuosime dabartinį aktyvų teikėją, o tada aktyvuosime šį. Ar tikrai norite tęsti?",
+        "DEACTIVATE_WARN_TITLE": "Deaktyvuoti SMTP nustatymus",
+        "DEACTIVATE_WARN_DESCRIPTION": "Ruošiatės deaktyvuoti SMTP teikėją. Ar tikrai norite tęsti?",
+        "DEACTIVATED": "SMTP teikėjas deaktyvuotas",
+        "DELETE_TITLE": "Pašalinti SMTP teikėją",
+        "DELETE_DESCRIPTION": "Ruošiatės pašalinti teikėją. Patvirtinkite šį veiksmą įvesdami siuntėjo pavadinimą",
+        "DELETED": "SMTP teikėjas pašalintas",
+        "SENDER": "Įveskite {{value}}, kad pašalintumėte šį SMTP teikėją.",
+        "TEST_TITLE": "Testuokite savo SMTP nustatymus",
+        "TEST_DESCRIPTION": "Nurodykite el. pašto adresą, kad išbandytumėte savo SMTP nustatymus",
+        "TEST_EMAIL": "El. pašto adresas",
+        "TEST_RESULT": "Testo rezultatas"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Pridėti SMTP teikėją",
+      "DESCRIPTION": "Pasirinkite vieną ar daugiau iš šių teikėjų.",
+      "STEPS": {
+        "TITLE": "Pridėti {{ value }} SMTP teikėją",
+        "CREATE_DESC_TITLE": "Įveskite savo {{ value }} SMTP nustatymus žingsnis po žingsnio",
+        "CURRENT_DESC_TITLE": "Tai jūsų SMTP nustatymai",
+        "PROVIDER_SETTINGS": "SMTP teikėjo nustatymai",
+        "SENDER_SETTINGS": "Siuntėjo nustatymai",
+        "NEXT_STEPS": "Kiti žingsniai",
+        "ACTIVATE": {
+          "TITLE": "Aktyvuokite savo SMTP teikėją",
+          "DESCRIPTION": "Zitadel negali naudoti šio SMTP teikėjo pranešimams siųsti, kol jo neaktyvuosite. Aktyvavus šį teikėją, bet kuris kitas anksčiau aktyvus teikėjas bus deaktyvuotas."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Deaktyvuokite savo SMTP teikėją",
+          "DESCRIPTION": "Deaktyvavus šį SMTP teikėją, Zitadel negalės juo naudotis pranešimams siųsti, kol jo vėl neaktyvuosite."
+        },
+        "SAVE_SETTINGS": "Išsaugokite savo nustatymus",
+        "TEST": {
+          "TITLE": "Testuokite savo nustatymus",
+          "DESCRIPTION": "Prieš išsaugodami galite išbandyti savo SMTP teikėjo nustatymus ir patikrinti testo rezultatą",
+          "RESULT": "Jūsų el. laiškas sėkmingai išsiųstas"
+        }
+      }
+    },
+    "DETAIL": {
+      "TITLE": "SMTP teikėjo nustatymai"
+    },
+    "EMPTY": "Nėra galimo SMTP teikėjo",
+    "STEPS": {
+      "SENDGRID": {}
+    }
+  },
+  "APP": {
+    "LIST": "Programos",
+    "COMPLIANCE": "OIDC atitiktis",
+    "URLS": "URL",
+    "CONFIGURATION": "Nustatymai",
+    "TOKEN": "Žetono nustatymai",
+    "PAGES": {
+      "TITLE": "Programa",
+      "ID": "Programos ID",
+      "DESCRIPTION": "Čia galite redaguoti savo programos duomenis ir nustatymus.",
+      "CREATE": "Sukurti programą",
+      "CREATE_SELECT_PROJECT": "Pirmiausia pasirinkite savo projektą",
+      "CREATE_NEW_PROJECT": "arba įveskite naujo projekto pavadinimą",
+      "CREATE_DESC_TITLE": "Įveskite savo programos duomenis žingsnis po žingsnio",
+      "CREATE_DESC_SUB": "Rekomenduojama konfigūracija bus sugeneruota automatiškai.",
+      "STATE": "Būsena",
+      "DATECREATED": "Sukurta",
+      "DATECHANGED": "Pakeista",
+      "URLS": "URL",
+      "DELETE": "Pašalinti programą",
+      "JUMPTOPROJECT": "Norėdami sukonfigūruoti vaidmenis, vaidmenų priskyrimus ir kt., eikite į projektą.",
+      "DETAIL": {
+        "TITLE": "Informacija",
+        "STATE": {
+          "0": "Nenurodyta",
+          "1": "Aktyvus",
+          "2": "Neaktyvus"
+        }
+      },
+      "DIALOG": {
+        "CONFIG": {
+          "TITLE": "Keisti OIDC nustatymus"
+        },
+        "DELETE": {
+          "TITLE": "Pašalinti programą",
+          "DESCRIPTION": "Ar tikrai norite pašalinti šią programą?"
+        }
+      },
+      "NEXTSTEPS": {
+        "TITLE": "Kiti žingsniai",
+        "0": {
+          "TITLE": "Pridėti vaidmenis",
+          "DESC": "Įveskite savo projekto vaidmenis"
+        },
+        "1": {
+          "TITLE": "Pridėti naudotojus",
+          "DESC": "Pridėkite naujus savo organizacijos naudotojus"
+        },
+        "2": {
+          "TITLE": "Pagalba ir palaikymas",
+          "DESC": "Skaitykite mūsų dokumentaciją apie programų kūrimą arba susisiekite su mūsų palaikymo komanda"
+        }
+      }
+    },
+    "NAMEDIALOG": {
+      "TITLE": "Pervadinti programą",
+      "DESCRIPTION": "Įveskite naują savo programos pavadinimą",
+      "NAME": "Naujas pavadinimas"
+    },
+    "NAME": "Pavadinimas",
+    "TYPE": "Programos tipas",
+    "AUTHMETHOD": "Autentifikavimo metodas",
+    "AUTHMETHODSECTION": "Autentifikavimo metodas",
+    "GRANT": "Suteikimo tipai",
+    "ADDITIONALORIGINS": "Papildomi kilmės šaltiniai",
+    "ADDITIONALORIGINSDESC": "Jei norite pridėti savo programai papildomų kilmės šaltinių, kurie nenaudojami kaip nukreipimas, galite tai padaryti čia.",
+    "ORIGINS": "Kilmės šaltiniai",
+    "NOTANORIGIN": "Įvesta reikšmė nėra kilmės šaltinis",
+    "PROSWITCH": "Aš profesionalas. Praleisti šį vedlį.",
+    "NAMEANDTYPESECTION": "Pavadinimas ir tipas",
+    "TITLEFIRST": "Programos pavadinimas",
+    "TYPETITLE": "Programos tipas",
+    "OIDC": {
+      "WELLKNOWN": "Daugiau nuorodų galite gauti iš <a href='{{url}}' title='Discovery endpoint' target='_blank'>discovery galutinio taško</a>.",
+      "INFO": {
+        "ISSUER": "Išdavėjas",
+        "CLIENTID": "Kliento ID"
+      },
+      "CURRENT": "Dabartinė konfigūracija",
+      "TOKENSECTIONTITLE": "AuthToken parinktys",
+      "REDIRECTSECTIONTITLE": "Nukreipimo nustatymai",
+      "REDIRECTTITLE": "Nurodykite URI, į kuriuos bus nukreipiama po prisijungimo.",
+      "POSTREDIRECTTITLE": "Tai nukreipimo URI po atsijungimo.",
+      "REDIRECTDESCRIPTIONWEB": "Nukreipimo URI turi prasidėti https://. http:// galioja tik įjungus kūrimo režimą.",
+      "REDIRECTDESCRIPTIONNATIVE": "Nukreipimo URI turi prasidėti jūsų pačių protokolu, http://127.0.0.1, http://[::1] arba http://localhost.",
+      "REDIRECTNOTVALID": "Šis nukreipimo URI negalioja.",
+      "COMMAORENTERSEPERATION": "atskirkite su ↵",
+      "TYPEREQUIRED": "Tipas yra būtinas.",
+      "TITLE": "OIDC nustatymai",
+      "CLIENTID": "Kliento ID",
+      "CLIENTDETAILS": "Kliento duomenys",
+      "CLIENTSECRET_NOSECRET": "Su jūsų pasirinkta autentifikavimo eiga paslaptis nereikalinga, todėl ji neprieinama.",
+      "CLIENTSECRET_DESCRIPTION": "Saugokite savo kliento paslaptį saugioje vietoje, nes ji išnyks uždarius šį langą.",
+      "REGENERATESECRET": "Iš naujo sugeneruoti kliento paslaptį",
+      "DEVMODE": "Kūrimo režimas",
+      "DEVMODE_ENABLED": "Įjungta",
+      "DEVMODE_DISABLED": "Išjungta",
+      "DEVMODEDESC": "Atsargiai: įjungus kūrimo režimą, nukreipimo URI nebus tikrinami.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Praleisti sėkmingo prisijungimo puslapį",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Praleiskite sėkmės puslapį po prisijungimo šiai native programai.",
+      "REDIRECT": "Nukreipimo URI",
+      "REDIRECTSECTION": "Nukreipimo URI",
+      "POSTLOGOUTREDIRECT": "Atsijungimo nukreipimo URI",
+      "RESPONSESECTION": "Atsakymo tipai",
+      "GRANTSECTION": "Suteikimo tipai",
+      "GRANTTITLE": "Pasirinkite suteikimo tipus. Pastaba: Implicit galimas tik naršyklės pagrindu veikiančioms programoms.",
+      "APPTYPE": {
+        "0": "Web",
+        "1": "Naudotojo agentas",
+        "2": "Native"
+      },
+      "RESPONSETYPE": "Atsakymo tipai",
+      "RESPONSE": {
+        "0": "Kodas",
+        "1": "ID žetonas",
+        "2": "Token-ID Token"
+      },
+      "REFRESHTOKEN": "Atnaujinimo žetonas",
+      "GRANTTYPE": "Suteikimo tipai",
+      "GRANT": {
+        "0": "Autorizacijos kodas",
+        "1": "Implicit",
+        "2": "Atnaujinimo žetonas",
+        "3": "Įrenginio kodas",
+        "4": "Žetono keitimas"
+      },
+      "AUTHMETHOD": {
+        "0": "Basic",
+        "1": "Post",
+        "2": "Nėra",
+        "3": "Privataus rakto JWT"
+      },
+      "TOKENTYPE": "Autentifikavimo žetono tipas",
+      "TOKENTYPE0": "Bearer žetonas",
+      "TOKENTYPE1": "JWT",
+      "UNSECUREREDIRECT": "Tikimės, kad žinote, ką darote.",
+      "OVERVIEWSECTION": "Apžvalga",
+      "OVERVIEWTITLE": "Baigėte. Peržiūrėkite savo nustatymus.",
+      "ACCESSTOKENROLEASSERTION": "Pridėti naudotojo vaidmenis į prieigos žetoną",
+      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Jei pasirinkta, prašomi autentifikuoto naudotojo vaidmenys pridedami į prieigos žetoną.",
+      "IDTOKENROLEASSERTION": "Naudotojo vaidmenys ID žetone",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "Įjungus šią parinktį, autentifikuoto naudotojo priskirti vaidmenys bus tiesiogiai pridedami į jo ID žetoną. Įsitikinkite, kad įjungtas projekto nustatymas „Priskirti naudotojo vaidmenis autentifikavimo metu“, arba užklauskite per pasirinktinę apimtį.",
+      "IDTOKENUSERINFOASSERTION": "Įtraukti naudotojo profilio informaciją į ID žetoną",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Leidžia programoms gauti profilio, el. pašto, telefono ir adreso teiginius iš ID žetono.",
+      "CLOCKSKEW": "Leidžia programoms valdyti OP ir programos laikrodžių paklaidą. Trukmė (0-5s) bus pridėta prie exp teiginio ir atimta iš iat, auth_time ir nbf.",
+      "RECOMMENDED": "rekomenduojama",
+      "NOTRECOMMENDED": "nerekomenduojama",
+      "SELECTION": {
+        "APPTYPE": {
+          "WEB": {
+            "TITLE": "Web",
+            "DESCRIPTION": "Įprastos web programos, tokios kaip .net, PHP, Node.js, Java ir kt."
+          },
+          "NATIVE": {
+            "TITLE": "Native",
+            "DESCRIPTION": "Mobiliosios programos, darbalaukio programos, išmanieji įrenginiai ir kt."
+          },
+          "USERAGENT": {
+            "TITLE": "Naudotojo agentas",
+            "DESCRIPTION": "Vieno puslapio programos (SPA) ir apskritai visi JS karkasai, vykdomi naršyklėse"
+          }
+        }
+      },
+      "BACKCHANNELLOOGOUTURI": "Galinio kanalo atsijungimo URI"
+    },
+    "API": {
+      "INFO": {
+        "CLIENTID": "Kliento ID"
+      },
+      "REGENERATESECRET": "Iš naujo sugeneruoti kliento paslaptį",
+      "SELECTION": {
+        "TITLE": "API",
+        "DESCRIPTION": "API apskritai"
+      },
+      "AUTHMETHOD": {
+        "0": "Basic",
+        "1": "Privataus rakto JWT"
+      }
+    },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "SAML programos"
+      },
+      "CONFIGSECTION": "SAML nustatymai",
+      "CHOOSEMETADATASOURCE": "Nurodykite savo SAML nustatymus naudodami vieną iš šių parinkčių:",
+      "METADATAOPT1": "1 parinktis. Nurodykite URL, kur yra metaduomenų failas",
+      "METADATAOPT2": "2 parinktis. Įkelkite failą su savo metaduomenų XML",
+      "METADATAOPT3": "3 parinktis. Sukurkite minimalų metaduomenų failą realiu laiku, nurodydami ENTITYID ir ACS URL",
+      "UPLOAD": "Įkelti XML failą",
+      "METADATA": "Metaduomenys",
+      "METADATAFROMFILE": "Metaduomenys iš failo",
+      "CERTIFICATE": "SAML sertifikatas",
+      "DOWNLOADCERT": "Atsisiųsti SAML sertifikatą",
+      "CREATEMETADATA": "Sukurti metaduomenis",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS galutinio taško URL"
+    },
+    "AUTHMETHODS": {
+      "CODE": {
+        "TITLE": "Kodas",
+        "DESCRIPTION": "Iškeisti autorizacijos kodą į žetonus"
+      },
+      "PKCE": {
+        "TITLE": "PKCE",
+        "DESCRIPTION": "Naudokite atsitiktinę maišą vietoj statinės kliento paslapties didesniam saugumui"
+      },
+      "POST": {
+        "TITLE": "POST",
+        "DESCRIPTION": "Siųsti client_id ir client_secret kaip formos dalį"
+      },
+      "PK_JWT": {
+        "TITLE": "Privataus rakto JWT",
+        "DESCRIPTION": "Naudokite privatų raktą savo programai autorizuoti"
+      },
+      "BASIC": {
+        "TITLE": "Basic",
+        "DESCRIPTION": "Autentifikavimas naudotojo vardu ir slaptažodžiu"
+      },
+      "IMPLICIT": {
+        "TITLE": "Implicit",
+        "DESCRIPTION": "Gauti žetonus tiesiai iš autorizacijos galutinio taško"
+      },
+      "DEVICECODE": {
+        "TITLE": "Įrenginio kodas",
+        "DESCRIPTION": "Autorizuokite įrenginį kompiuteriu ar išmaniuoju telefonu."
+      },
+      "CUSTOM": {
+        "TITLE": "Pasirinktinis",
+        "DESCRIPTION": "Jūsų nustatymas neatitinka jokios kitos parinkties."
+      }
+    },
+    "TOAST": {
+      "REACTIVATED": "Programa reaktyvuota.",
+      "DEACTIVATED": "Programa deaktyvuota.",
+      "OIDCUPDATED": "Programa atnaujinta.",
+      "APIUPDATED": "Programa atnaujinta",
+      "UPDATED": "Programa atnaujinta.",
+      "CREATED": "Programa sukurta.",
+      "CLIENTSECRETREGENERATED": "kliento paslaptis sugeneruota.",
+      "DELETED": "Programa pašalinta.",
+      "CONFIGCHANGED": "Aptikti pakeitimai!"
+    },
+    "LOGINV2": {
+      "USEV2": "Naudoti naują prisijungimo sąsają",
+      "BASEURL": "Pasirinktinis bazinis URL naujai prisijungimo sąsajai"
+    }
+  },
+  "GENDERS": {
+    "0": "Nežinoma",
+    "1": "Moteris",
+    "2": "Vyras",
+    "3": "Kita"
+  },
+  "LANGUAGES": {
+    "de": "Deutsch",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文",
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский",
+    "nl": "Nederlands",
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia",
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română",
+    "tr": "Türkçe",
+    "uk": "Українська",
+    "ar": "العربية",
+    "lt": "Lietuvių"
+  },
+  "MEMBER": {
+    "ADD": "Pridėti administratorių",
+    "CREATIONTYPE": "Sukūrimo tipas",
+    "CREATIONTYPES": {
+      "3": "IAM",
+      "2": "Organizacija",
+      "0": "Nuosavas projektas",
+      "1": "Suteiktas projektas",
+      "4": "Projektas"
+    },
+    "EDITROLE": "Redaguoti vaidmenis",
+    "EDITFOR": "Redaguoti naudotojo {{value}} vaidmenis",
+    "DIALOG": {
+      "DELETE_TITLE": "Pašalinti administratorių",
+      "DELETE_DESCRIPTION": "Ruošiatės pašalinti administratorių. Ar tikrai norite tęsti?"
+    },
+    "SHOWDETAILS": "Spustelėkite, kad peržiūrėtumėte išsamią informaciją."
+  },
+  "ROLESLABEL": "Vaidmenys",
+  "GRANTS": {
+    "TITLE": "Vaidmenų priskyrimai",
+    "DESC": "Tai visi jūsų organizacijos vaidmenų priskyrimai.",
+    "DELETE": "Pašalinti vaidmens priskyrimą",
+    "EMPTY": "Vaidmens priskyrimų nerasta",
+    "ADD": "Sukurti vaidmens priskyrimą",
+    "ADD_BTN": "Naujas",
+    "PROJECT": {
+      "TITLE": "Vaidmens priskyrimas",
+      "DESCRIPTION": "Nustatykite nurodyto projekto vaidmenų priskyrimus. Atkreipkite dėmesį, kad matote tik tų projektų ir naudotojų įrašus, kuriems turite teises."
+    },
+    "USER": {
+      "TITLE": "Vaidmens priskyrimas",
+      "DESCRIPTION": "Nustatykite nurodyto naudotojo vaidmenų priskyrimus. Atkreipkite dėmesį, kad matote tik tų projektų ir naudotojų įrašus, kuriems turite teises."
+    },
+    "CREATE": {
+      "TITLE": "Sukurti vaidmens priskyrimą",
+      "DESCRIPTION": "Ieškokite organizacijos, projekto ir atitinkamų vaidmenų."
+    },
+    "EDIT": {
+      "TITLE": "Keisti vaidmens priskyrimą"
+    },
+    "DETAIL": {
+      "TITLE": "Vaidmens priskyrimo informacija",
+      "DESCRIPTION": "Čia matote visą vaidmens priskyrimo informaciją."
+    },
+    "TOAST": {
+      "UPDATED": "Vaidmens priskyrimas atnaujintas.",
+      "REMOVED": "Vaidmens priskyrimas pašalintas",
+      "BULKREMOVED": "Vaidmenų priskyrimai pašalinti.",
+      "CANTSHOWINFO": "Negalite peržiūrėti šio naudotojo profilio, nes nesate organizacijos, kuriai šis naudotojas priklauso, administratorius"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Pašalinti vaidmens priskyrimą",
+      "DELETE_DESCRIPTION": "Ruošiatės pašalinti vaidmens priskyrimą. Ar norite tęsti?",
+      "BULK_DELETE_TITLE": "Pašalinti vaidmenų priskyrimus",
+      "BULK_DELETE_DESCRIPTION": "Ruošiatės pašalinti kelis vaidmenų priskyrimus. Ar norite tęsti?"
+    }
+  },
+  "CHANGES": {
+    "LISTTITLE": "Paskutiniai pakeitimai",
+    "BOTTOM": "Pasiekėte sąrašo pabaigą.",
+    "LOADMORE": "Įkelti daugiau",
+    "ORG": {
+      "TITLE": "Veikla",
+      "DESCRIPTION": "Čia matote naujausius įvykius, sukėlusius organizacijos pakeitimą."
+    },
+    "PROJECT": {
+      "TITLE": "Veikla",
+      "DESCRIPTION": "Čia matote naujausius įvykius, sukėlusius projekto pakeitimą."
+    },
+    "USER": {
+      "TITLE": "Veikla",
+      "DESCRIPTION": "Čia matote naujausius įvykius, sukėlusius naudotojo pakeitimą."
+    }
+  }
+}
