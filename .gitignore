@@ -68,6 +68,14 @@ internal/api/ui/console/static
 !internal/api/ui/console/static/gitkeep
 apps/docs/content/apis/assets/assets.mdx
 apps/docs/content/reference/api/
+# Per-category tracer output lands here one PR at a time (see
+# apps/docs/scripts/trace-endpoint-errors.ts). Ignoring the directory keeps
+# a freshly-traced-but-not-yet-landed category from showing up as an
+# untracked file and permanently failing endpoint-error-tables-watch.yml's
+# drift check on every unrelated backend PR. Once a category's data is
+# actually committed (git add -f), it's tracked and this has no effect on
+# detecting further drift in it.
+apps/docs/scripts/endpoint-error-tracing/
 /internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css
 /internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css.map
 /zitadel-*-*
