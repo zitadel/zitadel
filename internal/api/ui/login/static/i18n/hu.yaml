@@ -332,6 +332,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Külső felhasználó nem található
   Description: Külső felhasználó nem található. Szeretnéd összekapcsolni a felhasználódat vagy automatikusan regisztrálni egy újat?
+  NoOptionAvailable: Nem található a külső felhasználódhoz tartozó fiók, és új fiók sem hozható létre. Kérjük, lépj kapcsolatba az adminisztrátoroddal vagy a támogatással.
   LinkButtonText: Összekapcsolás
   AutoRegisterButtonText: Regisztráció
   TosAndPrivacyLabel: Felhasználási feltételek

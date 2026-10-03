@@ -369,6 +369,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Harici Kullanıcı Bulunamadı
   Description: Harici kullanıcı bulunamadı. Kullanıcınızı bağlamak mı yoksa yeni bir kullanıcı otomatik kaydetmek mi istiyorsunuz?
+  NoOptionAvailable: Harici kullanıcınızla eşleşen bir hesap bulunamadı ve yeni bir hesap oluşturulamıyor. Lütfen yöneticinizle veya destek ekibiyle iletişime geçin.
   LinkButtonText: Bağla
   AutoRegisterButtonText: Kayıt Ol
   TosAndPrivacyLabel: Şartlar ve koşullar
