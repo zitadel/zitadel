@@ -1,0 +1,68 @@
+InitCode:
+  Title: "初始化使用者"
+  PreHeader: "初始化使用者"
+  Subject: "初始化使用者"
+  Greeting: "您好 {{.DisplayName}}，"
+  Text: "此使用者已建立。請使用使用者名稱 {{.PreferredLoginName}} 登入，並點選下方按鈕完成初始化程序。（驗證碼 {{.Code}}）如果您並未要求這封郵件，請直接忽略。"
+  ButtonText: "完成初始化"
+PasswordReset:
+  Title: "重設密碼"
+  PreHeader: "重設密碼"
+  Subject: "重設密碼"
+  Greeting: "您好 {{.DisplayName}}，"
+  Text: "我們收到了重設密碼的要求。請點選下方按鈕重設您的密碼。（驗證碼 {{.Code}}）如果您並未要求這封郵件，請直接忽略。"
+  ButtonText: "重設密碼"
+VerifyEmail:
+  Title: "驗證電子郵件"
+  PreHeader: "驗證電子郵件"
+  Subject: "驗證電子郵件"
+  Greeting: "您好 {{.DisplayName}}，"
+  Text: "系統新增了一個電子郵件地址。請點選下方按鈕驗證您的電子郵件。（驗證碼 {{.Code}}）如果您並未新增電子郵件，請直接忽略這封郵件。"
+  ButtonText: "驗證電子郵件"
+VerifyPhone:
+  Title: "驗證手機號碼"
+  PreHeader: "驗證手機號碼"
+  Subject: "驗證手機號碼"
+  Greeting: "您好 {{.DisplayName}}，"
+  Text: "系統新增了一組新的手機號碼。請使用以下驗證碼完成驗證 {{.Code}}"
+  ButtonText: "驗證手機號碼"
+VerifyEmailOTP:
+  Title: "驗證一次性密碼"
+  PreHeader: "驗證一次性密碼"
+  Subject: "驗證一次性密碼"
+  Greeting: "您好 {{.DisplayName}}，"
+  Text: "請在五分鐘內使用一次性密碼 {{.OTP}} 完成驗證，或點選「驗證」按鈕。"
+  ButtonText: "驗證"
+VerifySMSOTP:
+  Text: >-
+    {{.OTP}} 是您在 {{ .Domain }} 的一次性密碼，請於 {{.Expiry}} 內使用。
+
+    @{{.Domain}} #{{.OTP}}
+DomainClaimed:
+  Title: "網域已被宣告使用"
+  PreHeader: "變更電子郵件／使用者名稱"
+  Subject: "網域已被宣告使用"
+  Greeting: "您好 {{.DisplayName}}，"
+  Text: "網域 {{.Domain}} 已被某個組織宣告使用，而您目前的使用者 {{.Username}} 並不屬於該組織，因此您必須在登入時變更電子郵件。我們已為這次登入建立一組暫時的使用者名稱（{{.TempUsername}}）。"
+  ButtonText: "登入"
+PasswordlessRegistration:
+  Title: "新增密碼金鑰登入"
+  PreHeader: "新增密碼金鑰登入"
+  Subject: "新增密碼金鑰登入"
+  Greeting: "您好 {{.DisplayName}}，"
+  Text: "我們收到了新增密碼金鑰登入權杖的要求。請點選下方按鈕新增您用於密碼金鑰登入的權杖或裝置。"
+  ButtonText: "新增密碼金鑰登入"
+PasswordChange:
+  Title: "使用者密碼已變更"
+  PreHeader: "變更密碼"
+  Subject: "使用者密碼已變更"
+  Greeting: "您好 {{.DisplayName}}，"
+  Text: "您的使用者密碼已變更。如果這項變更不是由您本人執行，請立即重設您的密碼。"
+  ButtonText: "登入"
+InviteUser:
+  Title: "{{.ApplicationName}} 邀請"
+  PreHeader: "{{.ApplicationName}} 邀請"
+  Subject: "{{.ApplicationName}} 邀請"
+  Greeting: "您好 {{.DisplayName}}，"
+  Text: "您的使用者已受邀加入 {{.ApplicationName}}。請點選下方按鈕完成邀請程序。如果您並未要求這封郵件，請直接忽略。"
+  ButtonText: "接受邀請"
