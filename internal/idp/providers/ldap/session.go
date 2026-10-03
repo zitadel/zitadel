@@ -107,12 +107,12 @@ func getConnection(
 		return nil, err
 	}
 
-	if u.Scheme == "ldaps" && len(rootCA) > 0 {
-		rootCAs := x509.NewCertPool()
-		if ok := rootCAs.AppendCertsFromPEM(rootCA); !ok {
-			return nil, ErrUnableToAppendRootCA
-		}
+	rootCAs, err := rootCAPool(rootCA)
+	if err != nil {
+		return nil, err
+	}
 
+	if u.Scheme == "ldaps" && rootCAs != nil {
 		dialer = append(dialer, ldap.DialWithTLSConfig(&tls.Config{
 			RootCAs: rootCAs,
 		}))
@@ -124,12 +124,28 @@ func getConnection(
 	}
 
 	if u.Scheme == "ldap" && startTLS {
-		err = conn.StartTLS(&tls.Config{ServerName: u.Host})
+		err = conn.StartTLS(&tls.Config{
+			ServerName: u.Hostname(),
+			RootCAs:    rootCAs,
+		})
 		if err != nil {
 			return nil, err
 		}
 	}
 	return conn, nil
+}
+
+// rootCAPool builds a certificate pool from a PEM-encoded root CA.
+// Returns nil when rootCA is empty so callers keep the system trust store.
+func rootCAPool(rootCA []byte) (*x509.CertPool, error) {
+	if len(rootCA) == 0 {
+		return nil, nil
+	}
+	rootCAs := x509.NewCertPool()
+	if ok := rootCAs.AppendCertsFromPEM(rootCA); !ok {
+		return nil, ErrUnableToAppendRootCA
+	}
+	return rootCAs, nil
 }
 
 func trySearchAndUserBind(
