@@ -2,11 +2,11 @@ import { timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { PasswordExpirySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { HumanUser } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import crypto from "crypto";
 import moment from "moment";
 import { cookies } from "next/headers";
 import { getFingerprintIdCookie } from "./fingerprint";
 import { trySendVerification } from "./server/verify";
+import { computeUserVerificationCheck } from "./verification-check";
 
 export function checkPasswordChangeRequired(
   expirySettings: PasswordExpirySettings | undefined,
@@ -121,7 +121,7 @@ export async function checkUserVerification(userId: string): Promise<boolean> {
     return false;
   }
 
-  const verificationCheck = crypto.createHash("sha256").update(`${userId}:${fingerPrintCookie.value}`).digest("hex");
+  const verificationCheck = computeUserVerificationCheck(userId, fingerPrintCookie.value);
 
   const cookieValue = await cookiesList.get("verificationCheck")?.value;
 
