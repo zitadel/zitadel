@@ -167,6 +167,7 @@ const REQUESTMAP = {
       getDefault: new GetDefaultVerifyEmailOTPMessageTextRequest(),
       setFcn: (map: Partial<MessageCustomText.AsObject>): SetCustomVerifyEmailOTPMessageTextRequest => {
         const req = new SetCustomVerifyEmailOTPMessageTextRequest();
+        req.setButtonText(map.buttonText ?? '');
         req.setFooterText(map.footerText ?? '');
         req.setGreeting(map.greeting ?? '');
         req.setPreHeader(map.preHeader ?? '');
@@ -332,6 +333,7 @@ const REQUESTMAP = {
       set: new SetDefaultVerifyEmailOTPMessageTextRequest(),
       setFcn: (map: Partial<MessageCustomText.AsObject>): SetDefaultVerifyEmailOTPMessageTextRequest => {
         const req = new SetDefaultVerifyEmailOTPMessageTextRequest();
+        req.setButtonText(map.buttonText ?? '');
         req.setFooterText(map.footerText ?? '');
         req.setGreeting(map.greeting ?? '');
         req.setPreHeader(map.preHeader ?? '');
