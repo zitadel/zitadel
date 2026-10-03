@@ -1,0 +1,539 @@
+Login:
+  Title: Қайта қош келдіңіз!
+  Description: Кіру деректеріңізді енгізіңіз.
+  TitleLinking: Аккаунттарды байланыстыру үшін кіру
+  DescriptionLinking: Сыртқы аккаунтыңызды байланыстыру үшін кіру деректеріңізді енгізіңіз.
+  LoginNameLabel: Логин
+  UsernamePlaceHolder: пайдаланушы_аты
+  LoginnamePlaceHolder: пайдаланушы_аты@домен
+  ExternalUserDescription: Сыртқы аккаунт арқылы кіріңіз.
+  MustBeMemberOfOrg: Пайдаланушы {{.OrgName}} ұйымының мүшесі болуы керек.
+  RegisterButtonText: Тіркелу
+  NextButtonText: Жалғастыру
+
+LDAP:
+  Title: Кіру
+  Description: Кіру деректеріңізді енгізіңіз.
+  LoginNameLabel: Логин
+  PasswordLabel: Құпиясөз
+  NextButtonText: Жалғастыру
+
+SelectAccount:
+  Title: Аккаунтты таңдау
+  Description: Аккаунтыңызды пайдаланыңыз
+  TitleLinking: Байланыстыру үшін аккаунтты таңдау
+  DescriptionLinking: Сыртқы аккаунтыңызбен байланыстыру үшін аккаунтыңызды таңдаңыз.
+  OtherUser: Басқа пайдаланушы
+  SessionState0: белсенді
+  SessionState1: Жүйеден шыққан
+  MustBeMemberOfOrg: Пайдаланушы {{.OrgName}} ұйымының мүшесі болуы керек.
+
+Password:
+  Title: Құпиясөз
+  Description: Кіру деректеріңізді енгізіңіз.
+  PasswordLabel: Құпиясөз
+  MinLength: Кемінде
+  MinLengthp2: таңбадан тұруы керек.
+  MaxLength: 70 таңбадан аз болуы керек.
+  HasUppercase: Бас әріп болуы керек.
+  HasLowercase: Кіші әріп болуы керек.
+  HasNumber: Сан болуы керек.
+  HasSymbol: Арнайы таңба болуы керек.
+  Confirmation: Құпиясөздер сәйкес келеді.
+  ResetLinkText: Құпиясөзді қалпына келтіру
+  BackButtonText: Артқа
+  NextButtonText: Жалғастыру
+
+UsernameChange:
+  Title: Пайдаланушы атын өзгерту
+  Description: Жаңа пайдаланушы атыңызды орнатыңыз
+  UsernameLabel: Пайдаланушы аты
+  CancelButtonText: Бас тарту
+  NextButtonText: Жалғастыру
+
+UsernameChangeDone:
+  Title: Пайдаланушы аты өзгертілді
+  Description: Пайдаланушы атыңыз сәтті өзгертілді.
+  NextButtonText: Жалғастыру
+
+InitPassword:
+  Title: Құпиясөз орнату
+  Description: Жаңа құпиясөз орнату үшін Сізге жіберілген кодты төмендегі өріске енгізіңіз.
+  CodeLabel: Код
+  NewPasswordLabel: Жаңа құпиясөз
+  NewPasswordConfirmLabel: Құпиясөзді растаңыз
+  ResendButtonText: Кодты қайта жіберу
+  NextButtonText: Жалғастыру
+
+InitPasswordDone:
+  Title: Құпиясөз орнатылды
+  Description: Құпиясөз сәтті орнатылды
+  NextButtonText: Жалғастыру
+  CancelButtonText: Бас тарту
+
+InitUser:
+  Title: Пайдаланушыны белсендіру
+  Description: Төмендегі код арқылы электрондық поштаңызды растап, құпиясөзіңізді орнатыңыз.
+  CodeLabel: Код
+  NewPasswordLabel: Жаңа құпиясөз
+  NewPasswordConfirm: Құпиясөзді растаңыз
+  NextButtonText: Жалғастыру
+  ResendButtonText: Кодты қайта жіберу
+
+InitUserDone:
+  Title: Пайдаланушы белсендірілді
+  Description: Электрондық пошта расталып, құпиясөз сәтті орнатылды
+  NextButtonText: Жалғастыру
+  CancelButtonText: Бас тарту
+
+InviteUser:
+  Title: Пайдаланушыны белсендіру
+  Description: Төмендегі код арқылы электрондық поштаңызды растап, құпиясөзіңізді орнатыңыз.
+  CodeLabel: Код
+  NewPasswordLabel: Жаңа құпиясөз
+  NewPasswordConfirm: Құпиясөзді растаңыз
+  NextButtonText: Жалғастыру
+  ResendButtonText: Кодты қайта жіберу
+
+InitMFAPrompt:
+  Title: Екі факторды баптау
+  Description: Екі факторлы аутентификация аккаунтыңызды қосымша қорғайды. Осылайша аккаунтыңызға тек Сіз ғана кіре аласыз.
+  Provider0: Аутентификатор қолданбасы (мысалы, Google/Microsoft Authenticator, Authy)
+  Provider1: Құрылғы арқылы (мысалы, FaceID, Windows Hello, саусақ ізі)
+  Provider3: SMS арқылы OTP
+  Provider4: Электрондық пошта арқылы OTP
+  NextButtonText: Жалғастыру
+  SkipButtonText: Өткізу
+
+InitMFAOTP:
+  Title: Екі факторды растау
+  Description: Екі факторлы аутентификацияны баптаңыз. Аутентификатор қолданбасы болмаса, оны жүктеп алыңыз.
+  OTPDescription: Кодты аутентификатор қолданбасымен (мысалы, Google/Microsoft Authenticator, Authy) сканерлеңіз немесе құпия кілтті көшіріп, қолданбаға енгізіңіз. Содан кейін қолданба жасаған кодты төмендегі өріске енгізіңіз.
+  SecretLabel: Құпия кілт
+  CodeLabel: Код
+  NextButtonText: Жалғастыру
+  CancelButtonText: Бас тарту
+
+InitMFAOTPSMS:
+  Title: Екі факторды растау
+  DescriptionPhone: Екі факторлы аутентификацияны баптаңыз. Растау үшін телефон нөміріңізді енгізіңіз.
+  DescriptionCode: Екі факторлы аутентификацияны баптаңыз. Телефон нөміріңізді растау үшін келген кодты енгізіңіз.
+  CountryCodeLabel: Ел
+  PhoneLabel: Телефон
+  CodeLabel: Код
+  EditButtonText: Өңдеу
+  ResendButtonText: Кодты қайта жіберу
+  NextButtonText: Жалғастыру
+
+InitMFAU2F:
+  Title: Қауіпсіздік кілтін қосу
+  Description: Қауіпсіздік кілті — телефонға кіріктірілген, Bluetooth арқылы немесе компьютердің USB портына тікелей қосылатын растау құралы.
+  TokenNameLabel: Қауіпсіздік кілтінің / құрылғының атауы
+  NotSupported: Браузеріңіз WebAuthN технологиясын қолдамайды. Оны жаңартыңыз немесе басқа браузерді (мысалы, Chrome, Safari, Firefox) пайдаланыңыз.
+  RegisterTokenButtonText: Қауіпсіздік кілтін қосу
+  ErrorRetry: Қайта көріңіз, жаңа растау сұрауын жасаңыз немесе басқа әдісті таңдаңыз.
+
+InitMFADone:
+  Title: Екі фактор расталды
+  Description: Екі факторлы аутентификацияны сәтті баптадыңыз! Енді аккаунтыңыз әлдеқайда жақсы қорғалған. Жүйеге кірген сайын екінші факторды растау қажет болады.
+  NextButtonText: Жалғастыру
+  CancelButtonText: Бас тарту
+
+MFAProvider:
+  Provider0: Аутентификатор қолданбасы (мысалы, Google/Microsoft Authenticator, Authy)
+  Provider1: Құрылғы арқылы (мысалы, FaceID, Windows Hello, саусақ ізі)
+  Provider3: SMS арқылы OTP
+  Provider4: Электрондық пошта арқылы OTP
+  ChooseOther: немесе басқа нұсқаны таңдаңыз
+
+VerifyMFAOTP:
+  Title: Екі факторды растау
+  Description: Екінші факторды растаңыз
+  CodeLabel: Код
+  NextButtonText: Жалғастыру
+
+VerifyOTP:
+  Title: Екі факторды растау
+  Description: Екінші факторды растаңыз
+  CodeLabel: Код
+  ResendButtonText: Кодты қайта жіберу
+  NextButtonText: Жалғастыру
+
+VerifyMFAU2F:
+  Title: Екі факторды растау
+  Description: Тіркелген құрылғы арқылы (мысалы, FaceID, Windows Hello, саусақ ізі) екінші факторды растаңыз.
+  NotSupported: Браузеріңіз WebAuthN технологиясын қолдамайды. Браузерді соңғы нұсқасына жаңартыңыз немесе осы технологияны қолдайтын браузерді (Chrome, Safari, Firefox) пайдаланыңыз.
+  ErrorRetry: Қайта көріңіз, жаңа сұрау жасаңыз немесе басқа әдісті таңдаңыз.
+  ValidateTokenButtonText: Екі факторды растау
+
+Passwordless:
+  Title: Құпиясөзсіз кіру
+  Description: Құрылғыңыздағы FaceID, Windows Hello немесе саусақ ізі сияқты аутентификация әдістері арқылы кіріңіз.
+  NotSupported: Браузеріңіз WebAuthN технологиясын қолдамайды. Оны жаңартыңыз немесе басқа браузерді (мысалы, Chrome, Safari, Firefox) пайдаланыңыз.
+  ErrorRetry: Қайта көріңіз, жаңа растау сұрауын жасаңыз немесе басқа әдісті таңдаңыз.
+  LoginWithPwButtonText: Құпиясөзбен кіру
+  ValidateTokenButtonText: Құпиясөзсіз кіру
+
+PasswordlessPrompt:
+  Title: Құпиясөзсіз кіруді баптау
+  Description: Құпиясөзсіз кіруді баптағыңыз келе ме? (Құрылғыңыздағы FaceID, Windows Hello немесе саусақ ізі сияқты аутентификация әдістері арқылы)
+  DescriptionInit: Құпиясөзсіз кіруді баптау қажет. Құрылғыңызды тіркеу үшін Сізге берілген сілтемені пайдаланыңыз.
+  PasswordlessButtonText: Құпиясөзсіз кіруге көшу
+  NextButtonText: Жалғастыру
+  SkipButtonText: Өткізу
+
+PasswordlessRegistration:
+  Title: Құпиясөзсіз кіруді баптау
+  Description: Аутентификация әдісін қосу үшін құрылғы атауын (мысалы, MyMobilePhone, MacBook және т.б.) енгізіп, төмендегі «Құпиясөзсіз кіруді тіркеу» түймесін басыңыз.
+  TokenNameLabel: Құрылғы атауы
+  NotSupported: Браузеріңіз WebAuthN технологиясын қолдамайды. Оны жаңартыңыз немесе басқа браузерді (мысалы, Chrome, Safari, Firefox) пайдаланыңыз.
+  RegisterTokenButtonText: Құпиясөзсіз кіруді тіркеу
+  ErrorRetry: Қайта көріңіз, жаңа растау сұрауын жасаңыз немесе басқа әдісті таңдаңыз.
+
+PasswordlessRegistrationDone:
+  Title: Құпиясөзсіз кіру бапталды
+  Description: Құпиясөзсіз кіруге арналған құрылғы сәтті қосылды.
+  DescriptionClose: Енді бұл терезені жаба аласыз.
+  NextButtonText: Жалғастыру
+  CancelButtonText: Бас тарту
+
+PasswordChange:
+  Title: Құпиясөзді өзгерту
+  Description: Құпиясөзіңізді өзгертіңіз. Ағымдағы және жаңа құпиясөздеріңізді енгізіңіз.
+  ExpiredDescription: Құпиясөзіңіздің мерзімі аяқталды, оны өзгерту қажет. Ағымдағы және жаңа құпиясөздеріңізді енгізіңіз.
+  OldPasswordLabel: Ағымдағы құпиясөз
+  NewPasswordLabel: Жаңа құпиясөз
+  NewPasswordConfirmLabel: Құпиясөзді растау
+  CancelButtonText: Бас тарту
+  NextButtonText: Жалғастыру
+  Footer: Беттің төменгі бөлігі
+
+PasswordChangeDone:
+  Title: Құпиясөзді өзгерту
+  Description: Құпиясөзіңіз сәтті өзгертілді.
+  NextButtonText: Жалғастыру
+
+PasswordResetDone:
+  Title: Құпиясөзді қалпына келтіру сілтемесі жіберілді
+  Description: Құпиясөзіңізді қалпына келтіру үшін электрондық поштаңызды тексеріңіз.
+  NextButtonText: Жалғастыру
+
+EmailVerification:
+  Title: Электрондық поштаны растау
+  Description: Мекенжайыңызды растау үшін Сізге электрондық хат жібердік. Төмендегі өріске кодты енгізіңіз.
+  CodeLabel: Код
+  NextButtonText: Жалғастыру
+  ResendButtonText: Кодты қайта жіберу
+
+EmailVerificationDone:
+  Title: Электрондық поштаны растау
+  Description: Электрондық пошта мекенжайыңыз сәтті расталды.
+  NextButtonText: Жалғастыру
+  CancelButtonText: Бас тарту
+  LoginButtonText: Кіру
+
+RegisterOption:
+  Title: Тіркелу тәсілдері
+  Description: Тіркелу тәсілін таңдаңыз
+  RegisterUsernamePasswordButtonText: Пайдаланушы аты және құпиясөз арқылы
+  ExternalLoginDescription: немесе сыртқы аккаунт арқылы тіркеліңіз
+  LoginButtonText: Кіру
+
+RegistrationUser:
+  Title: Тіркелу
+  Description: Деректеріңізді енгізіңіз. Электрондық пошта мекенжайыңыз логин ретінде пайдаланылады.
+  DescriptionOrgRegister: Деректеріңізді енгізіңіз.
+  EmailLabel: Электрондық пошта
+  UsernameLabel: Пайдаланушы аты
+  FirstnameLabel: Аты
+  LastnameLabel: Тегі
+  LanguageLabel: Тіл
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  GenderLabel: Жынысы
+  Female: Әйел
+  Male: Ер
+  Diverse: Басқа / X
+  PasswordLabel: Құпиясөз
+  PasswordConfirmLabel: Құпиясөзді растау
+  TosAndPrivacyLabel: Пайдалану шарттары
+  TosConfirm: "Мына құжатпен келісемін:"
+  TosLinkText: Пайдалану шарттары
+  PrivacyConfirm: "Мына құжатпен келісемін:"
+  PrivacyLinkText: Құпиялылық саясаты
+  ExternalLogin: немесе сыртқы аккаунт арқылы тіркеліңіз
+  BackButtonText: Кіру
+  NextButtonText: Жалғастыру
+
+ExternalRegistrationUserOverview:
+  Title: Сыртқы аккаунт арқылы тіркелу
+  Description: Деректеріңізді таңдалған провайдерден алдық. Оларды өзгертуге немесе толықтыруға болады.
+  EmailLabel: Электрондық пошта
+  UsernameLabel: Пайдаланушы аты
+  FirstnameLabel: Аты
+  LastnameLabel: Тегі
+  NicknameLabel: Лақап аты
+  PhoneLabel: Телефон нөмірі
+  LanguageLabel: Тіл
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  TosAndPrivacyLabel: Пайдалану шарттары
+  TosConfirm: "Мына құжатпен келісемін:"
+  TosLinkText: Пайдалану шарттары
+  PrivacyConfirm: "Мына құжатпен келісемін:"
+  PrivacyLinkText: Құпиялылық саясаты
+  ExternalLogin: немесе сыртқы аккаунт арқылы тіркеліңіз
+  BackButtonText: Артқа
+  NextButtonText: Сақтау
+
+RegistrationOrg:
+  Title: Ұйымды тіркеу
+  Description: Ұйымыңыздың атауы мен пайдаланушы деректерін енгізіңіз.
+  OrgNameLabel: Ұйым атауы
+  EmailLabel: Электрондық пошта
+  UsernameLabel: Пайдаланушы аты
+  FirstnameLabel: Аты
+  LastnameLabel: Тегі
+  PasswordLabel: Құпиясөз
+  PasswordConfirmLabel: Құпиясөзді растау
+  TosAndPrivacyLabel: Пайдалану шарттары
+  TosConfirm: "Мына құжатпен келісемін:"
+  TosLinkText: Пайдалану шарттары
+  PrivacyConfirm: "Мына құжатпен келісемін:"
+  PrivacyLinkText: Құпиялылық саясаты
+  SaveButtonText: Ұйым жасау
+
+LoginSuccess:
+  Title: Кіру сәтті орындалды
+  AutoRedirectDescription: Қолданбаңызға автоматты түрде ораласыз. Олай болмаса, төмендегі түймені басыңыз. Содан кейін бұл терезені жаба аласыз.
+  RedirectedDescription: Енді бұл терезені жаба аласыз.
+  NextButtonText: Жалғастыру
+
+LogoutDone:
+  Title: Жүйеден шықтыңыз
+  Description: Сіз жүйеден сәтті шықтыңыз.
+  LoginButtonText: Кіру
+
+LinkingUserPrompt:
+  Title: Бар пайдаланушы табылды
+  Description: "Бар аккаунтыңызды байланыстырғыңыз келе ме:"
+  LinkButtonText: Байланыстыру
+  OtherButtonText: Басқа нұсқалар
+
+LinkingUsersDone:
+  Title: Пайдаланушыны байланыстыру
+  Description: Пайдаланушы байланыстырылды.
+  CancelButtonText: Бас тарту
+  NextButtonText: Жалғастыру
+
+ExternalNotFound:
+  Title: Сыртқы пайдаланушы табылмады
+  Description: Сыртқы пайдаланушы табылмады. Бар аккаунтыңызды байланыстырғыңыз келе ме, әлде жаңа пайдаланушыны автоматты түрде тіркегіңіз келе ме?
+  LinkButtonText: Байланыстыру
+  AutoRegisterButtonText: Тіркелу
+  TosAndPrivacyLabel: Пайдалану шарттары
+  TosConfirm: "Мына құжатпен келісемін:"
+  TosLinkText: Пайдалану шарттары
+  PrivacyConfirm: "Мына құжатпен келісемін:"
+  PrivacyLinkText: Құпиялылық саясаты
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+DeviceAuth:
+  Title: Құрылғыны авторизациялау
+  UserCode:
+    Label: Пайдаланушы коды
+    Description: Құрылғыда көрсетілген пайдаланушы кодын енгізіңіз.
+    ButtonNext: Жалғастыру
+  Action:
+    Description: Құрылғыға қол жеткізуге рұқсат беріңіз.
+    GrantDevice: Сіз
+    AccessToScopes: құрылғысына мына рұқсаттарды бергелі отырсыз
+    Button:
+      Allow: Рұқсат ету
+      Deny: Тыйым салу
+  Done:
+    Description: Дайын.
+    Approved: Құрылғыны авторизациялау мақұлданды. Енді құрылғыңызға орала аласыз.
+    Denied: Құрылғыны авторизациялаудан бас тартылды. Енді құрылғыңызға орала аласыз.
+
+Footer:
+  PoweredBy: Технологиялық негізі
+  Tos: Пайдалану шарттары
+  PrivacyPolicy: Құпиялылық саясаты
+  Help: Көмек
+  SupportEmail: Қолдау қызметінің электрондық поштасы
+
+SignIn: '{{.Provider}} арқылы кіру'
+
+Errors:
+  Internal: Ішкі қате орын алды
+  AuthRequest:
+    NotFound: Аутентификация сұрауы табылмады
+    UserAgentNotCorresponding: Пайдаланушы агенті сәйкес келмейді
+    UserAgentNotFound: Пайдаланушы агентінің идентификаторы табылмады
+    TokenNotFound: Токен табылмады
+    RequestTypeNotSupported: Сұрау түріне қолдау көрсетілмейді
+    MissingParameters: Міндетті параметрлер көрсетілмеген
+  User:
+    NotFound: Пайдаланушы табылмады
+    AlreadyExists: Пайдаланушы бұрыннан бар
+    Inactive: Пайдаланушы белсенді емес
+    NotFoundOnOrg: Таңдалған ұйымнан пайдаланушы табылмады
+    NotAllowedOrg: Пайдаланушы қажетті ұйымның мүшесі емес
+    NotMatchingUserID: Пайдаланушы аутентификация сұрауындағы пайдаланушыға сәйкес келмейді
+    UserIDMissing: Пайдаланушы идентификаторы көрсетілмеген
+    Invalid: Пайдаланушы деректері жарамсыз
+    DomainNotAllowedAsUsername: Домен бұрыннан резервтелген, оны пайдалануға болмайды
+    NotAllowedToLink: Пайдаланушыны сыртқы сәйкестендіру провайдерімен байланыстыруға рұқсат етілмейді
+    Profile:
+      NotFound: Профиль табылмады
+      NotChanged: Профиль өзгертілмеген
+      Empty: Профиль бос
+      FirstNameEmpty: Профильдегі аты бос
+      LastNameEmpty: Профильдегі тегі бос
+      IDMissing: Профиль идентификаторы көрсетілмеген
+    Email:
+      NotFound: Электрондық пошта табылмады
+      Invalid: Электрондық пошта мекенжайы жарамсыз
+      AlreadyVerified: Электрондық пошта расталып қойған
+      NotChanged: Электрондық пошта өзгертілмеген
+      Empty: Электрондық пошта бос
+      IDMissing: Электрондық пошта идентификаторы көрсетілмеген
+    Phone:
+      NotFound: Телефон нөмірі табылмады
+      Invalid: Телефон нөмірі жарамсыз
+      AlreadyVerified: Телефон нөмірі расталып қойған
+      Empty: Телефон нөмірі бос
+      NotChanged: Телефон нөмірі өзгертілмеген
+    Address:
+      NotFound: Мекенжай табылмады
+      NotChanged: Мекенжай өзгертілмеген
+    Username:
+      AlreadyExists: Пайдаланушы аты қолданыста
+      Reserved: Пайдаланушы аты қолданыста
+      Empty: Пайдаланушы аты бос
+    Password:
+      ConfirmationWrong: Құпиясөздер сәйкес келмейді
+      Empty: Құпиясөз бос
+      Invalid: Құпиясөз жарамсыз
+      InvalidAndLocked: Құпиясөз жарамсыз, пайдаланушы бұғатталған. Әкімшіге хабарласыңыз.
+      NotChanged: Жаңа құпиясөз ағымдағы құпиясөзбен бірдей болмауы керек
+    UsernameOrPassword:
+      Invalid: Пайдаланушы аты немесе құпиясөз жарамсыз
+    PasswordComplexityPolicy:
+      NotFound: Құпиясөз саясаты табылмады
+      MinLength: Құпиясөз тым қысқа
+      HasLower: Құпиясөзде кіші әріп болуы керек
+      HasUpper: Құпиясөзде бас әріп болуы керек
+      HasNumber: Құпиясөзде сан болуы керек
+      HasSymbol: Құпиясөзде таңба болуы керек
+    Code:
+      Expired: Кодтың мерзімі аяқталды
+      Invalid: Код жарамсыз
+      Empty: Код бос
+      CryptoCodeNil: Криптографиялық кодтың мәні nil
+      NotFound: Код табылмады
+      GeneratorAlgNotSupported: Код жасау алгоритміне қолдау көрсетілмейді
+    EmailVerify:
+      UserIDEmpty: Пайдаланушы идентификаторы көрсетілмеген
+    ExternalData:
+      CouldNotRead: Сыртқы деректерді дұрыс оқу мүмкін болмады
+    MFA:
+      NoProviders: Қолжетімді көп факторлы аутентификация провайдерлері жоқ
+      OTP:
+        AlreadyReady: Көп факторлы аутентификацияға арналған бір реттік құпиякод (OTP, OneTimePassword) бұрыннан бапталған
+        NotExisting: Көп факторлы аутентификацияға арналған бір реттік құпиякод (OTP, OneTimePassword) жоқ
+        InvalidCode: Код жарамсыз
+        Reused: Бұл код бұрын пайдаланылған. Жаңа кодты күтіңіз
+        NotReady: Көп факторлы аутентификацияға арналған бір реттік құпиякод (OTP, OneTimePassword) дайын емес
+    Locked: Пайдаланушы бұғатталған
+    SomethingWentWrong: Қате орын алды
+    NotActive: Пайдаланушы белсенді емес
+    ExternalIDP:
+      IDPTypeNotImplemented: IDP түрі іске асырылмаған
+      NotAllowed: Сыртқы сәйкестендіру провайдеріне рұқсат етілмейді
+      IDPConfigIDEmpty: Сәйкестендіру провайдерінің идентификаторы көрсетілмеген
+      ExternalUserIDEmpty: Сыртқы пайдаланушы идентификаторы көрсетілмеген
+      UserDisplayNameEmpty: Пайдаланушының көрсетілетін аты берілмеген
+      NoExternalUserData: Сыртқы пайдаланушы деректері алынбады
+      CreationNotAllowed: Бұл провайдерде жаңа пайдаланушы жасауға рұқсат етілмейді
+      LinkingNotAllowed: Бұл провайдерде пайдаланушыны байланыстыруға рұқсат етілмейді
+      NoOptionAllowed: Бұл провайдерде пайдаланушы жасауға да, байланыстыруға да рұқсат етілмейді. Әкімшіге хабарласыңыз.
+      LoginFailedSwitchLocal: |
+        Сыртқы сәйкестендіру провайдері (IDP) арқылы кіру сәтсіз аяқталды. Жергілікті кіруге ауысуда.
+
+        Қате туралы мәліметтер: {{.Details}}
+    GrantRequired: Кіру мүмкін емес. Пайдаланушыға қолданбада кемінде бір рұқсат берілуі керек. Әкімшіге хабарласыңыз.
+    ProjectRequired: Кіру мүмкін емес. Пайдаланушының ұйымына жобаға рұқсат берілуі керек. Әкімшіге хабарласыңыз.
+  IdentityProvider:
+    InvalidConfig: Сәйкестендіру провайдерінің конфигурациясы жарамсыз
+  IAM:
+    LockoutPolicy:
+      NotExisting: Бұғаттау саясаты жоқ
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Тіркелуге рұқсат етілмейді
+  DeviceAuth:
+    NotExisting: Пайдаланушы коды жоқ
+
+optional: (міндетті емес)
