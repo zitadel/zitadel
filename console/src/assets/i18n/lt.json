@@ -367,7 +367,7 @@
     "DISMISS": "Ne, ačiū, aš profesionalas.",
     "CARD": {
       "TITLE": "Paleiskite savo Zitadel",
-      "DESCRIPTION": "Šis kontrolinis sąrašas padės sukonfigūruoti jūsų egzempliorių ir pravedą jus per svarbiausius žingsnius"
+      "DESCRIPTION": "Šis kontrolinis sąrašas padės sukonfigūruoti jūsų egzempliorių ir praves jus per svarbiausius žingsnius"
     },
     "MILESTONES": {
       "instance.policy.label.added": {
@@ -665,6 +665,7 @@
     "ORG_USER_PERMISSION_EDITOR": "Turi teisę valdyti vaidmenų priskyrimus",
     "ORG_PROJECT_PERMISSION_EDITOR": "Turi teisę valdyti projekto suteikimus",
     "ORG_PROJECT_CREATOR": "Turi teisę kurti savo projektus ir jų nustatymus",
+    "ORG_DYNAMIC_CLIENT_REGISTRAR": "Turi teisę dinamiškai registruoti OAuth 2.0 klientus",
     "ORG_ADMIN_IMPERSONATOR": "Turi teisę apsimesti administratoriais ir galutiniais naudotojais iš organizacijos",
     "ORG_END_USER_IMPERSONATOR": "Turi teisę apsimesti galutiniais naudotojais iš organizacijos",
     "ORG_USER_SELF_MANAGER": "Turi teisę valdyti savo paties naudotoją",
@@ -707,7 +708,7 @@
     "PROJECTNAME": "Projekto pavadinimas",
     "RESOURCEOWNER": "Ištekliaus savininkas",
     "METHODS": {
-      "5": "yra",
+      "5": "turi",
       "7": "baigiasi",
       "1": "lygu"
     }
@@ -2074,7 +2075,7 @@
         "ORG_DESCRIPTION": "Ruošiatės suteikti naudotojui prieigą organizacijai {{name}}.",
         "ORG_DESCRIPTION_DESC": "Pakeiskite kontekstą viršuje esančioje antraštėje, kad suteiktumėte naudotojui prieigą kitai organizacijai.",
         "SEL_ORG_FORMFIELD": "Organizacija",
-        "FOR_ORG": "Projekto suteikimas sukurtas:"
+        "FOR_ORG": "Projekto suteikimas sukurtas organizacijai:"
       },
       "DETAIL": {
         "TITLE": "Projekto suteikimas",
@@ -2255,6 +2256,10 @@
       "SAML": {
         "TITLE": "Prisijungti su SAML",
         "DESCRIPTION": "Įveskite savo SAML teikėjo duomenis"
+      },
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "Įveskite reikiamus duomenis, kad kito ZITADEL egzemplioriaus naudotojai galėtų autentifikuotis."
       }
     },
     "DETAIL": {
@@ -2320,6 +2325,10 @@
     "STATE": "Būsena",
     "ISSUER": "Išdavėjas",
     "SCOPESLIST": "Apimčių sąrašas",
+    "INSTANCEROLESINFO": "Egzemplioriaus vaidmenų susiejimas",
+    "INSTANCEROLESINFO_DESC": "Naudotojams, autentifikuojamiems per šį teikėją, suteikiami egzemplioriaus narių vaidmenys (su IAM_ priešdėliu), kuriuos jie turi nurodytose nuotolinio ZITADEL egzemplioriaus organizacijose. Turi sutapti ir organizacijos ID, ir pagrindinis domenas.",
+    "ORGANIZATIONID": "Organizacijos ID",
+    "ORGANIZATIONDOMAIN": "Organizacijos domenas",
     "CLIENTID": "Kliento ID",
     "CLIENTSECRET": "Kliento paslaptis",
     "LDAPCONNECTION": "Ryšys",
@@ -2623,6 +2632,27 @@
       "DEVMODEDESC": "Atsargiai: įjungus kūrimo režimą, nukreipimo URI nebus tikrinami.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Praleisti sėkmingo prisijungimo puslapį",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Praleiskite sėkmės puslapį po prisijungimo šiai native programai.",
+      "APPLINKSSECTION": "Native programų nuorodos",
+      "APPLINKSDESC": "Sukonfigūruokite iOS ir Android susiejimą, kad šis egzempliorius galėtų pateikti prieigos raktų pasitikėjimo failus jūsų native programoms.",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "Pateikiama apple-app-site-association faile kaip webcredentials įrašas TEAMID.BUNDLEID.",
+      "TEAMID": "Komandos ID",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "Apple komandos ID turi būti sudarytas lygiai iš 10 raidinių-skaitmeninių simbolių, pvz., ABCDE12345.",
+      "TEAMIDLENGTH": "Komandos ID turi būti sudarytas lygiai iš 10 raidinių-skaitmeninių simbolių.",
+      "BUNDLEID": "Bundle ID",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "iOS Bundle identifikatorius (CFBundleIdentifier), pvz., com.example.app. Neįtraukite komandos ID priešdėlio.",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "Pateikiama assetlinks.json faile Digital Asset Links / prieigos raktų kredencialams.",
+      "PACKAGENAME": "Paketo pavadinimas",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "Android applicationId / paketo pavadinimas, pvz., com.example.app.",
+      "FINGERPRINTS": "SHA-256 sertifikato atspaudai",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "Po vieną atspaudą eilutėje (64 šešioliktainiai simboliai, dvitaškiai neprivalomi). Prireikus įtraukite debug ir release atspaudus.",
+      "IOSAPPLINKINCOMPLETE": "iOS komandos ID ir Bundle ID turi būti abu nurodyti arba abu palikti tušti.",
+      "ANDROIDPACKAGEREQUIRED": "Nurodžius sertifikato atspaudus, būtina nurodyti Android paketo pavadinimą.",
       "REDIRECT": "Nukreipimo URI",
       "REDIRECTSECTION": "Nukreipimo URI",
       "POSTLOGOUTREDIRECT": "Atsijungimo nukreipimo URI",

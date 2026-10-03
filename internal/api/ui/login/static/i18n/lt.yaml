@@ -421,7 +421,7 @@ DeviceAuth:
 
 Footer:
   PoweredBy: Sukurta naudojant
-  Tos: Naudojimo sąlygomis
+  Tos: Naudojimo sąlygos
   PrivacyPolicy: Privatumo politika
   Help: Pagalba
   SupportEmail: Pagalbos el. paštas
@@ -502,12 +502,13 @@ Errors:
     ExternalData:
       CouldNotRead: Nepavyko teisingai nuskaityti išorinių duomenų
     MFA:
-      NoProviders: Nėra galimų daugiafaktorinio autentifikavimo teikėjų
+      NoProviders: Nėra galimų kelių veiksnių autentifikavimo teikėjų
       OTP:
-        AlreadyReady: Daugiafaktorinis vienkartinis slaptažodis (OTP) jau nustatytas
-        NotExisting: Daugiafaktorinis vienkartinis slaptažodis (OTP) neegzistuoja
+        AlreadyReady: Kelių veiksnių vienkartinis slaptažodis (OTP) jau nustatytas
+        NotExisting: Kelių veiksnių vienkartinis slaptažodis (OTP) neegzistuoja
         InvalidCode: Neteisingas kodas
-        NotReady: Daugiafaktorinis vienkartinis slaptažodis (OTP) neparuoštas
+        Reused: Šis kodas jau buvo panaudotas. Palaukite naujo kodo
+        NotReady: Kelių veiksnių vienkartinis slaptažodis (OTP) neparuoštas
     Locked: Naudotojas užblokuotas
     SomethingWentWrong: Kažkas nutiko ne taip
     NotActive: Naudotojas neaktyvus

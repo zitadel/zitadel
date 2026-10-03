@@ -5,6 +5,7 @@ Errors:
   IDMissing: "Trūksta ID"
   ResourceOwnerMissing: "Trūksta ištekliaus savininko organizacijos"
   RemoveFailed: "Nepavyko pašalinti"
+  PermissionDenied: "Nepakanka teisių"
   ProjectionName:
     Invalid: "Neteisingas projekcijos pavadinimas"
   Assets:
@@ -177,11 +178,13 @@ Errors:
         NotExisting: "Kelių veiksnių vienkartinis slaptažodis (OTP) neegzistuoja"
         NotReady: "Kelių veiksnių vienkartinis slaptažodis (OTP) neparuoštas"
         InvalidCode: "Neteisingas kodas"
+        Reused: "Šis kodas jau buvo panaudotas. Palaukite naujo kodo"
       U2F:
         NotExisting: "U2F neegzistuoja"
       Passwordless:
         NotExisting: "Prieigos raktas neegzistuoja"
       RecoveryCodes:
+        Empty: "Atkūrimo kodas tuščias"
         InvalidCode: "Nurodytas neteisingas atkūrimo kodas"
         MaxCountExceeded: "Viršytas maksimalus atkūrimo kodų skaičius"
         NotReady: "Atkūrimo kodai neparuošti naudoti"
@@ -198,10 +201,6 @@ Errors:
     RefreshToken:
       Invalid: "Atnaujinimo žetonas negalioja"
       NotFound: "Atnaujinimo žetonas nerastas"
-  Instance:
-    NotFound: "Instance not found"
-    AlreadyExists: "Instance already exists"
-    NotChanged: "Instance not changed"
   Org:
     AlreadyExists: "Organizacijos pavadinimas arba ID jau užimtas"
     Invalid: "Organizacija negalioja"
@@ -209,6 +208,7 @@ Errors:
     AlreadyActive: "Organizacija jau aktyvi"
     Empty: "Organizacija tuščia"
     NotFound: "Organizacija nerasta"
+    NotActive: "Organizacija neaktyvi"
     NotChanged: "Organizacija nepakeista"
     DefaultOrgNotDeletable: "Numatytoji organizacija negali būti pašalinta"
     ZitadelOrgNotDeletable: "Organizacija su Zitadel projektu negali būti pašalinta"
@@ -287,6 +287,8 @@ Errors:
     LabelPolicy:
       NotFound: "Privati ženklinimo politika nerasta"
       NotChanged: "Privati ženklinimo politika nepakeista"
+    IDPConfig:
+      NotExisting: "Tapatybės teikėjo konfigūracija neegzistuoja"
   Project:
     ProjectIDMissing: "Trūksta projekto ID"
     AlreadyExists: "Projektas jau egzistuoja šioje organizacijoje"
@@ -329,7 +331,6 @@ Errors:
       APIAuthMethodNoSecret: "Pasirinktas API autentifikavimo metodas nereikalauja paslapties"
       AuthMethodNoPrivateKeyJWT: "Pasirinktas autentifikavimo metodas nereikalauja rakto"
       ClientSecretInvalid: "Kliento paslaptis negalioja"
-      ClientSecretNotSet: "Kliento paslaptis nenustatyta"
       Key:
         AlreadyExisting: "Programos raktas jau egzistuoja"
         NotFound: "Programos raktas nerastas"
@@ -343,6 +344,8 @@ Errors:
       NotActive: "Projekto suteikimas neaktyvus"
       NotInactive: "Projekto suteikimas nėra neaktyvus"
   Instance:
+    AlreadyExists: "Egzempliorius jau egzistuoja"
+    NotChanged: "Egzempliorius nepakeistas"
     NotFound: "Egzempliorius nerastas. Įsitikinkite, kad domenas teisingas. Žr. https://zitadel.com/docs/apis/introduction#domains"
     Member:
       RolesNotChanged: "Vaidmenys nepakeisti"
@@ -515,6 +518,8 @@ Errors:
       StorageFailed: "Nepavyko įrašyti veiksmo vykdymo žurnalo į duomenų bazę"
       ScanFailed: "Nepavyko užklausti veiksmų vykdymo sekundžių naudojimo"
   Session:
+    IDMissing: "Trūksta sesijos ID"
+    NotFound: "Sesija nerasta"
     NotExisting: "Sesija neegzistuoja"
     Terminated: "Sesija jau nutraukta"
     Expired: "Sesija baigėsi"
@@ -569,17 +574,17 @@ Errors:
     NotFound: "Tikslas nerastas"
     InvalidExpirationDate: "Rakto galiojimo data turi būti ateityje"
     PublicKeyExpired: "Tikslo viešasis raktas nebegalioja"
-    PublicKeyActive: "Negalima pašalinti aktyvaus paskirties vietos viešojo rakto"
+    PublicKeyActive: "Negalima pašalinti aktyvaus tikslo viešojo rakto"
     InvalidPublicKey: "Viešasis raktas negalioja. Turi būti PEM kodavimo RSA arba ECDSA viešasis raktas PKCS#8 formatu"
   Execution:
     ConditionInvalid: "Vykdymo sąlyga negalioja"
     Invalid: "Vykdymas negalioja"
     NotFound: "Vykdymas nerastas"
     IncludeNotFound: "Įtraukimas nerastas"
-    NoTargets: "Paskirties vietos nenurodytos"
+    NoTargets: "Tikslai nenurodyti"
     Failed: "Vykdymas nepavyko"
     ResponseIsNotValidJSON: "Atsakymas nėra galiojantis JSON"
-    MissingEncryptionKey: "Nerastas šifravimo raktas paskirties vietai"
+    MissingEncryptionKey: "Nerastas šifravimo raktas tikslui"
   UserSchema:
     NotEnabled: "Funkcija \"Naudotojo schema\" neįjungta"
     Type:
@@ -666,7 +671,7 @@ EventTypes:
       added: "Prieigos žetonas sukurtas"
       v2.added: "Prieigos žetonas sukurtas"
       removed: "Prieigos žetonas pašalintas"
-    impersonated: "Naudotojas apsimestas"
+    impersonated: "Apsimesta naudotoju"
     username:
       reserved: "Naudotojo vardas rezervuotas"
       released: "Naudotojo vardas atlaisvintas"
@@ -768,6 +773,7 @@ EventTypes:
           check:
             succeeded: "Kelių veiksnių OTP patikra pavyko"
             failed: "Kelių veiksnių OTP patikra nepavyko"
+            reused: "Kelių veiksnių OTP kodas panaudotas pakartotinai"
           sms:
             added: "Kelių veiksnių OTP SMS žinute pridėtas"
             removed: "Kelių veiksnių OTP SMS žinute pašalintas"
@@ -1392,9 +1398,9 @@ Application:
           HttpLocalhostOnlyForNative: "Http://localhost nukreipimo URI leidžiamas tik native programoms."
       Native:
         AuthMethodType:
-          NotNone: "Native programos turi turėti autmethodtype „none“."
+          NotNone: "Native programos turi turėti authmethodtype „none“."
         RedirectUris:
-          MustBeHttpLocalhost: "Nukreipimo URI turi pradėti jūsų pačių protokolu, http://127.0.0.1, http://[::1] arba http://localhost."
+          MustBeHttpLocalhost: "Nukreipimo URI turi prasidėti jūsų pačių protokolu, http://127.0.0.1, http://[::1] arba http://localhost."
       UserAgent:
         AuthMethodType:
           NotNone: "Naudotojo agento programa turi turėti authmethodtype „none“."

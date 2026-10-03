@@ -7263,7 +7263,8 @@
         "failedPrecondition": "Nepatenkinta prielaida",
         "sessionNotValid": "Sesija negalioja",
         "passwordVerificationMissing": "Trūksta slaptažodžio patvirtinimo.",
-        "passwordVerificationTooOld": "Slaptažodžio patvirtinimas per senas. Patvirtinkite slaptažodį iš naujo."
+        "passwordVerificationTooOld": "Slaptažodžio patvirtinimas per senas. Patvirtinkite slaptažodį iš naujo.",
+        "passwordResetNotAllowed": "Slaptažodžio atstatymas neleidžiamas. Susisiekite su administratoriumi, jei reikia daugiau informacijos."
       }
     },
     "idp": {
@@ -7371,6 +7372,10 @@
         "required": {
           "code": "Šis laukas yra būtinas"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "Nepavyko užklausti OTP iššūkio",
+        "couldNotVerifyCode": "Nepavyko patikrinti OTP kodo"
       }
     },
     "passkey": {
@@ -7532,7 +7537,15 @@
       "description": "Pasirinkite metodą, kuriuo norite autentifikuotis",
       "noMethodsAvailable": "Nėra galimų autentifikavimo metodų",
       "allSetup": "Jūs jau nustatėte autentifikatorių!",
-      "linkWithIDP": "arba susiekite su tapatybės teikėju"
+      "linkWithIDP": "arba susiekite su tapatybės teikėju",
+      "methods": {
+        "totp": "Autentifikavimo programa",
+        "u2f": "Universalus antrasis veiksnys",
+        "otpEmail": "Kodas el. paštu",
+        "otpSms": "Kodas SMS žinute",
+        "passkey": "Prieigos raktai",
+        "password": "Slaptažodis"
+      }
     },
     "device": {
       "usercode": {
@@ -7564,7 +7577,7 @@
       "noUserCode": "Nenurodytas naudotojo kodas!",
       "noDeviceRequest": "Nerasta įrenginio užklausa.",
       "unknownContext": "Nepavyko gauti naudotojo konteksto. Įsitikinkite, kad pirmiausia įvedėte naudotojo vardą arba nurodėte loginName kaip searchParam.",
-      "sessionExpired": "Jūsų dabartinė sesija baigėsi. Prisijunkite iš naujo.",
+      "sessionExpired": "Jūsų sesija nebegalioja arba reikalauja pakartotinio autentifikavimo. Prisijunkite iš naujo.",
       "failedLoading": "Nepavyko įkelti duomenų. Bandykite dar kartą.",
       "tryagain": "Bandyti dar kartą",
       "couldNotContinueSession": "Nepavyko tęsti sesijos - trūksta naudotojo informacijos"
