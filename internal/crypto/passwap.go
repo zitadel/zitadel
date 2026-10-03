@@ -21,6 +21,7 @@ import (
 	"github.com/zitadel/passwap/sha2"
 	"github.com/zitadel/passwap/verifier"
 
+	"github.com/zitadel/zitadel/internal/crypto/firebasescrypt"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -70,18 +71,19 @@ func (h *Hasher) ValidateEncodedHash(encoded string) error {
 type HashName string
 
 const (
-	HashNameArgon2    HashName = "argon2"    // used for the common argon2 verifier
-	HashNameArgon2i   HashName = "argon2i"   // hash only
-	HashNameArgon2id  HashName = "argon2id"  // hash only
-	HashNameBcrypt    HashName = "bcrypt"    // hash and verify
-	HashNameMd5       HashName = "md5"       // verify only, as hashing with md5 is insecure and deprecated
-	HashNameMd5Plain  HashName = "md5plain"  // verify only, as hashing with md5 is insecure and deprecated
-	HashNameMd5Salted HashName = "md5salted" // verify only, as hashing with md5 is insecure and deprecated
-	HashNamePHPass    HashName = "phpass"    // verify only, as hashing with md5 is insecure and deprecated
-	HashNameSha2      HashName = "sha2"      // hash and verify
-	HashNameScrypt    HashName = "scrypt"    // hash and verify
-	HashNamePBKDF2    HashName = "pbkdf2"    // hash and verify
-	HashNameDrupal7   HashName = "drupal7"   // verify only, Drupal 7 legacy hashes
+	HashNameArgon2         HashName = "argon2"         // used for the common argon2 verifier
+	HashNameArgon2i        HashName = "argon2i"        // hash only
+	HashNameArgon2id       HashName = "argon2id"       // hash only
+	HashNameBcrypt         HashName = "bcrypt"         // hash and verify
+	HashNameMd5            HashName = "md5"            // verify only, as hashing with md5 is insecure and deprecated
+	HashNameMd5Plain       HashName = "md5plain"       // verify only, as hashing with md5 is insecure and deprecated
+	HashNameMd5Salted      HashName = "md5salted"      // verify only, as hashing with md5 is insecure and deprecated
+	HashNamePHPass         HashName = "phpass"         // verify only, as hashing with md5 is insecure and deprecated
+	HashNameSha2           HashName = "sha2"           // hash and verify
+	HashNameScrypt         HashName = "scrypt"         // hash and verify
+	HashNamePBKDF2         HashName = "pbkdf2"         // hash and verify
+	HashNameDrupal7        HashName = "drupal7"        // verify only, Drupal 7 legacy hashes
+	HashNameFirebaseScrypt HashName = "firebasescrypt" // verify only, Firebase Authentication modified scrypt
 )
 
 type HashMode string
@@ -103,13 +105,14 @@ type HashConfig struct {
 }
 
 type HashLimitsConfig struct {
-	Bcrypt  BcryptLimitsConfig
-	Argon2  Argon2LimitsConfig
-	Scrypt  ScryptLimitsConfig
-	PBKDF2  PBKDF2LimitsConfig
-	Sha2    Sha2LimitsConfig
-	PHPass  PHPassLimitsConfig
-	Drupal7 Drupal7LimitsConfig
+	Bcrypt         BcryptLimitsConfig
+	Argon2         Argon2LimitsConfig
+	Scrypt         ScryptLimitsConfig
+	PBKDF2         PBKDF2LimitsConfig
+	Sha2           Sha2LimitsConfig
+	PHPass         PHPassLimitsConfig
+	Drupal7        Drupal7LimitsConfig
+	FirebaseScrypt FirebaseScryptLimitsConfig
 }
 
 type BcryptLimitsConfig struct {
@@ -216,6 +219,22 @@ func (l Drupal7LimitsConfig) validationOpts() *drupal7.ValidationOpts {
 	}
 }
 
+type FirebaseScryptLimitsConfig struct {
+	MinLN int
+	MaxLN int
+	MinR  int
+	MaxR  int
+}
+
+func (l FirebaseScryptLimitsConfig) validationOpts() *firebasescrypt.ValidationOpts {
+	return &firebasescrypt.ValidationOpts{
+		MinLN: l.MinLN,
+		MaxLN: l.MaxLN,
+		MinR:  l.MinR,
+		MaxR:  l.MaxR,
+	}
+}
+
 func (c *HashConfig) NewHasher() (*Hasher, error) {
 	if err := c.validateFIPS140(); err != nil {
 		return nil, err
@@ -305,6 +324,12 @@ var knowVerifiers = map[HashName]verifierFactory{
 			verifier: drupal7.NewVerifier(l.Drupal7.validationOpts()),
 		}
 	},
+	HashNameFirebaseScrypt: func(l HashLimitsConfig) prefixVerifier {
+		return prefixVerifier{
+			prefixes: []string{firebasescrypt.Prefix},
+			verifier: firebasescrypt.NewVerifier(l.FirebaseScrypt.validationOpts()),
+		}
+	},
 }
 
 func (c *HashConfig) buildVerifiers() (verifiers []verifier.Verifier, prefixes []string, err error) {
@@ -343,7 +368,7 @@ func (c *HasherConfig) buildHasher(limits HashLimitsConfig) (hasher passwap.Hash
 		return c.sha2(limits)
 	case "":
 		return nil, nil, fmt.Errorf("missing hasher algorithm")
-	case HashNameArgon2, HashNameMd5, HashNameMd5Plain, HashNameMd5Salted, HashNamePHPass, HashNameDrupal7:
+	case HashNameArgon2, HashNameMd5, HashNameMd5Plain, HashNameMd5Salted, HashNamePHPass, HashNameDrupal7, HashNameFirebaseScrypt:
 		fallthrough
 	default:
 		return nil, nil, fmt.Errorf("invalid algorithm %q", c.Algorithm)
