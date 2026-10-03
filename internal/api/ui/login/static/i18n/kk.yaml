@@ -270,6 +270,7 @@ RegistrationUser:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Kazakh: Қазақша
   GenderLabel: Жынысы
   Female: Әйел
   Male: Ер
@@ -317,6 +318,7 @@ ExternalRegistrationUserOverview:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Kazakh: Қазақша
   TosAndPrivacyLabel: Пайдалану шарттары
   TosConfirm: "Мына құжатпен келісемін:"
   TosLinkText: Пайдалану шарттары
@@ -398,6 +400,7 @@ ExternalNotFound:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Kazakh: Қазақша
 DeviceAuth:
   Title: Құрылғыны авторизациялау
   UserCode:
