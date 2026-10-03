@@ -98,6 +98,8 @@ func projectFilterToModel(filter *project_pb.ProjectSearchFilter) (query.SearchQ
 		return projectInIDsFilterToQuery(q.InProjectIdsFilter)
 	case *project_pb.ProjectSearchFilter_OrganizationIdFilter:
 		return projectOrganizationIDFilterToQuery(q.OrganizationIdFilter)
+	case *project_pb.ProjectSearchFilter_StateFilter:
+		return projectStateFilterToQuery(q.StateFilter)
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-vR9nC", "List.Query.Invalid")
 	}
@@ -109,6 +111,10 @@ func projectNameFilterToQuery(q *project_pb.ProjectNameFilter) (query.SearchQuer
 
 func projectInIDsFilterToQuery(q *filter_pb.InIDsFilter) (query.SearchQuery, error) {
 	return query.NewGrantedProjectIDSearchQuery(q.Ids)
+}
+
+func projectStateFilterToQuery(state project_pb.ProjectState) (query.SearchQuery, error) {
+	return query.NewGrantedProjectStateSearchQuery(projectStateToDomain(state))
 }
 
 func projectOrganizationIDFilterToQuery(q *project_pb.ProjectOrganizationIDFilter) (query.SearchQuery, error) {
@@ -187,6 +193,20 @@ func projectStateToPb(state domain.ProjectState) project_pb.ProjectState {
 		return project_pb.ProjectState_PROJECT_STATE_UNSPECIFIED
 	}
 }
+
+func projectStateToDomain(state project_pb.ProjectState) domain.ProjectState {
+	switch state {
+	case project_pb.ProjectState_PROJECT_STATE_ACTIVE:
+		return domain.ProjectStateActive
+	case project_pb.ProjectState_PROJECT_STATE_INACTIVE:
+		return domain.ProjectStateInactive
+	case project_pb.ProjectState_PROJECT_STATE_UNSPECIFIED:
+		fallthrough
+	default:
+		return domain.ProjectStateUnspecified
+	}
+}
+
 func grantedProjectStateToPb(state domain.ProjectGrantState) project_pb.GrantedProjectState {
 	switch state {
 	case domain.ProjectGrantStateActive:
