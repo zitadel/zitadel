@@ -24,7 +24,7 @@ export default function Layout({ children }: any) {
     <html lang="en" suppressHydrationWarning>
       <body className="flex flex-col min-h-screen font-sans bg-fd-background text-fd-foreground">
         <Providers>{children}</Providers>
-        <DocsChat />
+        {process.env.CHAT_AGENT_URL && <DocsChat />}
       </body>
     </html>
   );
