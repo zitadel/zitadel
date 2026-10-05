@@ -1,7 +1,7 @@
 import './global.css';
 import type { Metadata } from 'next';
 import { Providers } from './providers';
-import { DocsChat } from '../components/docs-chat'; // Adjust the import path if necessary based on your folder structure
+import { DocsChat } from '../components/docs-chat';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),

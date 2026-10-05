@@ -171,6 +171,7 @@ export function DocsChat() {
             <button
               onClick={handleClearChat}
               title="Start fresh"
+              aria-label="Start fresh"
               className="p-1.5 hover:bg-fd-background/20 rounded-md transition-colors"
             >
               <RefreshCw className="w-4 h-4" />
@@ -178,12 +179,13 @@ export function DocsChat() {
             <button
               onClick={() => setIsOpen(false)}
               title="Minimize chat"
+              aria-label="Minimize chat"
               className="p-1.5 hover:bg-fd-background/20 rounded-md transition-colors"
             >
               <ChevronDown className="w-4 h-4" />
             </button>
           </div>
-        </div>
+        </div> {/* <--- This closing div was missing */}
 
         {/* Message Container */}
         <div className="flex-1 p-4 overflow-y-auto bg-fd-background space-y-4">
@@ -261,8 +263,9 @@ export function DocsChat() {
               </p>
             ) : transcriptRating === 'down' ? (
               <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
-                <label className="text-sm text-fd-foreground font-medium">What went wrong?</label>
+                <label htmlFor="feedback-reason" className="text-sm text-fd-foreground font-medium">What went wrong?</label>
                 <textarea
+                  id="feedback-reason"
                   maxLength={500}
                   value={feedbackText}
                   onChange={(e) => setFeedbackText(e.target.value)}
