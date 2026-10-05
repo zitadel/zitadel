@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"maps"
+	"math"
 	"net"
 	"net/textproto"
 	"slices"
@@ -66,6 +67,9 @@ func (l *RuleLimit) validate() error {
 	}
 	if l.Count == 0 {
 		return errors.New("limit: count must be greater than 0")
+	}
+	if l.Count > math.MaxUint32 {
+		return errors.New("limit: count must not be greater than 4294967295")
 	}
 	if l.Window <= 0 {
 		return errors.New("limit: window must be greater than 0")
@@ -213,22 +217,48 @@ func (r Rules) Match(config *Config, data RuleData) Rule {
 	if config == nil {
 		return Rule{}
 	}
-	for _, rule := range r {
-		if !rule.matches(config) {
-			continue
-		}
-		return Rule{
-			RuleOptions: rule.options,
-			Headers:     rule.renderHeaders(data),
-		}
+	rule := r.find(config.SMTP.Host, smtpUser(config.SMTP), config.From)
+	if rule == nil {
+		return Rule{}
 	}
-	return Rule{}
+	return Rule{
+		RuleOptions: rule.options,
+		Headers:     rule.renderHeaders(data),
+	}
 }
 
-func (r *compiledRule) matches(config *Config) bool {
-	return matchesHost(r.hosts, config.SMTP.Host) &&
-		matchesUser(r.users, config.SMTP) &&
-		matchesSenderDomain(r.senderDomains, config.From)
+// Options returns the options of the first rule matching the SMTP provider
+// identified by its host, the username of the authentication and the sender address.
+// If no rule matches, the zero value is returned.
+func (r Rules) Options(host, user, sender string) RuleOptions {
+	rule := r.find(host, user, sender)
+	if rule == nil {
+		return RuleOptions{}
+	}
+	return rule.options
+}
+
+// find returns the first rule matching the SMTP provider.
+func (r Rules) find(host, user, sender string) *compiledRule {
+	for _, rule := range r {
+		if matchesHost(rule.hosts, host) &&
+			matchesUser(rule.users, user) &&
+			matchesSenderDomain(rule.senderDomains, sender) {
+			return rule
+		}
+	}
+	return nil
+}
+
+// smtpUser returns the username of the authentication of the provider.
+func smtpUser(config SMTP) string {
+	switch {
+	case config.PlainAuth != nil:
+		return config.PlainAuth.User
+	case config.XOAuth2Auth != nil:
+		return config.XOAuth2Auth.User
+	}
+	return ""
 }
 
 func (r *compiledRule) renderHeaders(data RuleData) map[string]string {
@@ -255,16 +285,9 @@ func matchesHost(hosts []hostPort, hostAndPort string) bool {
 	})
 }
 
-func matchesUser(users []string, config SMTP) bool {
+func matchesUser(users []string, user string) bool {
 	if len(users) == 0 {
 		return true
-	}
-	var user string
-	switch {
-	case config.PlainAuth != nil:
-		user = config.PlainAuth.User
-	case config.XOAuth2Auth != nil:
-		user = config.XOAuth2Auth.User
 	}
 	return user != "" && slices.Contains(users, strings.TrimSpace(user))
 }

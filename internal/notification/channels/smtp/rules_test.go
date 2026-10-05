@@ -1,6 +1,7 @@
 package smtp
 
 import (
+	"math"
 	"testing"
 	"time"
 
@@ -103,6 +104,13 @@ func TestCompileRules(t *testing.T) {
 				RuleOptions: RuleOptions{Limit: &RuleLimit{Window: RuleDuration(24 * time.Hour)}},
 			}},
 			wantErr: "smtp rule 0: limit: count must be greater than 0",
+		},
+		{
+			name: "limit with too large count",
+			configs: []RuleConfig{{
+				RuleOptions: RuleOptions{Limit: &RuleLimit{Count: math.MaxUint32 + 1, Window: RuleDuration(24 * time.Hour)}},
+			}},
+			wantErr: "smtp rule 0: limit: count must not be greater than 4294967295",
 		},
 		{
 			name: "limit without window",
@@ -502,6 +510,47 @@ func TestRuleDuration_UnmarshalText(t *testing.T) {
 			}
 			require.NoError(t, err)
 			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestRules_Options(t *testing.T) {
+	limit := &RuleLimit{Count: 100, Window: RuleDuration(24 * time.Hour)}
+	rules, err := CompileRules([]RuleConfig{
+		{
+			Match:       RuleMatch{Hosts: []string{"smtp.example.com"}, Users: []string{"token"}, SenderDomains: []string{"example.com"}},
+			RuleOptions: RuleOptions{RestrictCustomHTML: true, Limit: limit},
+		},
+		{
+			Match:       RuleMatch{Hosts: []string{"smtp.example.com"}},
+			RuleOptions: RuleOptions{SuppressReservedRecipientDomains: true},
+		},
+	})
+	require.NoError(t, err)
+
+	tests := []struct {
+		name   string
+		rules  Rules
+		host   string
+		user   string
+		sender string
+		want   RuleOptions
+	}{
+		{name: "no rules", rules: nil, host: "smtp.example.com:587", user: "token", sender: "noreply@example.com", want: RuleOptions{}},
+		{name: "first rule", rules: rules, host: "smtp.example.com:587", user: "token", sender: "noreply@example.com", want: RuleOptions{RestrictCustomHTML: true, Limit: limit}},
+		{name: "other user, second rule", rules: rules, host: "smtp.example.com:587", user: "other", sender: "noreply@example.com", want: RuleOptions{SuppressReservedRecipientDomains: true}},
+		{name: "no user, second rule", rules: rules, host: "smtp.example.com:587", user: "", sender: "noreply@example.com", want: RuleOptions{SuppressReservedRecipientDomains: true}},
+		{name: "other host, no rule", rules: rules, host: "smtp.other.example:587", user: "token", sender: "noreply@example.com", want: RuleOptions{}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, tt.rules.Options(tt.host, tt.user, tt.sender))
+			// the options are the ones applied to the emails of the provider
+			applied := tt.rules.Match(&Config{
+				SMTP: SMTP{Host: tt.host, PlainAuth: &PlainAuthConfig{User: tt.user}},
+				From: tt.sender,
+			}, RuleData{})
+			assert.Equal(t, tt.want, applied.RuleOptions)
 		})
 	}
 }

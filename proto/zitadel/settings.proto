@@ -106,6 +106,38 @@ message EmailProvider {
     EmailProviderSMTP smtp = 4;
     EmailProviderHTTP http = 5;
   }
+  // restrictions are defined by the operator of the system for the provider.
+  // They are read-only and cannot be changed through the API. The field is not set if the provider is not restricted.
+  EmailProviderRestrictions restrictions = 7;
+}
+
+// EmailProviderRestrictions state how the operator of the system restricts the emails sent through a provider,
+// e.g. a default provider shared by multiple instances.
+message EmailProviderRestrictions {
+  // custom_html_restricted states that HTML in custom message texts is reduced to simple formatting.
+  // Links, images and styles are removed.
+  bool custom_html_restricted = 1;
+  // reserved_recipient_domains_suppressed states that emails to recipients of reserved domains,
+  // like example.com or .test, are accepted but not sent.
+  bool reserved_recipient_domains_suppressed = 2;
+  // sending_limit is the amount of emails the instance can send through the provider within a rolling time window.
+  // Notifications exceeding it are not sent. The field is not set if the amount is not limited.
+  EmailProviderSendingLimit sending_limit = 3;
+}
+
+message EmailProviderSendingLimit {
+  // count is the maximum amount of emails sent within the window.
+  uint32 count = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "100";
+    }
+  ];
+  // window is the rolling time window the emails are counted in.
+  google.protobuf.Duration window = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"86400s\"";
+    }
+  ];
 }
 
 enum EmailProviderState {
