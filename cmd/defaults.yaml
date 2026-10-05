@@ -765,6 +765,8 @@ Login:
     PasswordSetPath: "password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}" # ZITADEL_LOGIN_DEFAULTPATHS_PASSWORDSETPATH
     # EmailCodePath is used to create the link for verifying the user's email address
     EmailCodePath: "verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}"
+    # InviteCodePath is used to create the link for accepting an invitation, if no URL template is passed when the invite code is created
+    InviteCodePath: "verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true" # ZITADEL_LOGIN_DEFAULTPATHS_INVITECODEPATH
     # OTPEmailPath is used to create the link for verifying the user's OTP during login
     OTPEmailPath: "otp/email?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}"
     # PasskeySetPath is used to create the link for adding a passkey to the user's account though the login UI
