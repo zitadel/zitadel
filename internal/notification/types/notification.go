@@ -43,6 +43,10 @@ type ChannelChains interface {
 	SMTPRule(ctx context.Context, config *smtp.Config, orgID string) smtp.Rule
 }
 
+// RejectedNotificationsCounter counts the notifications, which were intentionally not sent,
+// e.g. because a limit of the provider was exceeded.
+const RejectedNotificationsCounter = "rejected_notifications"
+
 // SendEmail returns a [Notify] function, which sends the notification as email.
 // deliveryInfo is optional and states the provider the email was sent through.
 func SendEmail(
