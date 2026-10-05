@@ -48,7 +48,7 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Cl
 		span.EndWithError(err)
 	}()
 	if o.clientIDMetadataResolver.Handles(ctx, id) {
-		client, err := o.clientIDMetadataResolver.ResolveClient(ctx, authz.GetInstance(ctx).InstanceID(), id)
+		client, err := o.clientIDMetadataResolver.ResolveClient(ctx, id)
 		if err != nil {
 			return nil, err
 		}
@@ -206,7 +206,7 @@ func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCreden
 		return nil, err
 	}
 	if s.clientIDMetadataResolver.Handles(ctx, clientID) {
-		client, err := s.clientIDMetadataResolver.ResolveClient(ctx, authz.GetInstance(ctx).InstanceID(), clientID)
+		client, err := s.clientIDMetadataResolver.ResolveClient(ctx, clientID)
 		if err != nil {
 			return nil, err
 		}

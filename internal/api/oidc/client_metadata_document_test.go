@@ -288,7 +288,7 @@ func TestClientIDMetadataResolver_ResolveClient(t *testing.T) {
 		})
 		resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-		client, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		client, err := resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 		require.NoError(t, err)
 		assert.Equal(t, server.URL+testClientIDPath, client.ClientID)
 		assert.Equal(t, "instance", client.InstanceID)
@@ -311,7 +311,7 @@ func TestClientIDMetadataResolver_ResolveClient(t *testing.T) {
 		})
 		resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-		client, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		client, err := resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 		require.NoError(t, err)
 		assert.Equal(t, []string{server.URL + "/callback"}, client.RedirectURIs)
 	})
@@ -325,7 +325,7 @@ func TestClientIDMetadataResolver_ResolveClient(t *testing.T) {
 		})
 		resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-		_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		_, err := resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 		assertInvalidClient(t, err)
 	})
 
@@ -342,7 +342,7 @@ func TestClientIDMetadataResolver_ResolveClient(t *testing.T) {
 			})
 			resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-			_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+			_, err := resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 			assertInvalidClient(t, err)
 		})
 	}
@@ -358,7 +358,7 @@ func TestClientIDMetadataResolver_ResolveClient(t *testing.T) {
 		})
 		resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-		_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		_, err := resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 		assertInvalidClient(t, err)
 	})
 
@@ -371,7 +371,7 @@ func TestClientIDMetadataResolver_ResolveClient(t *testing.T) {
 		})
 		resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-		_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		_, err := resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 		assertInvalidClient(t, err)
 	})
 
@@ -384,7 +384,7 @@ func TestClientIDMetadataResolver_ResolveClient(t *testing.T) {
 		})
 		resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-		_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		_, err := resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 		assertInvalidClient(t, err)
 	})
 
@@ -392,7 +392,7 @@ func TestClientIDMetadataResolver_ResolveClient(t *testing.T) {
 		server := newMetadataServer(t, http.StatusNotFound, "", nil)
 		resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-		_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		_, err := resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 		assertInvalidClient(t, err)
 	})
 
@@ -404,7 +404,7 @@ func TestClientIDMetadataResolver_ResolveClient(t *testing.T) {
 		t.Cleanup(server.Close)
 		resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-		_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		_, err := resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 		assertInvalidClient(t, err)
 	})
 
@@ -415,7 +415,7 @@ func TestClientIDMetadataResolver_ResolveClient(t *testing.T) {
 		t.Cleanup(server.Close)
 		resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-		_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		_, err := resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 		assertInvalidClient(t, err)
 	})
 }
@@ -434,9 +434,9 @@ func TestClientIDMetadataResolver_Cache(t *testing.T) {
 		})
 		resolver := newTestResolver(server.URL, server.Client(), documentCache)
 
-		_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		_, err := resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 		require.NoError(t, err)
-		_, err = resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		_, err = resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 		require.NoError(t, err)
 		assert.Equal(t, int32(1), server.hits.Load())
 	})
@@ -447,9 +447,9 @@ func TestClientIDMetadataResolver_Cache(t *testing.T) {
 		})
 		resolver := newTestResolver(server.URL, server.Client(), documentCache)
 
-		_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		_, err := resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 		require.NoError(t, err)
-		_, err = resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		_, err = resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 		require.NoError(t, err)
 		assert.Equal(t, int32(2), server.hits.Load())
 	})
@@ -458,9 +458,9 @@ func TestClientIDMetadataResolver_Cache(t *testing.T) {
 		server := newMetadataServer(t, http.StatusNotFound, "", nil)
 		resolver := newTestResolver(server.URL, server.Client(), documentCache)
 
-		_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		_, err := resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 		assertInvalidClient(t, err)
-		_, err = resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		_, err = resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 		assertInvalidClient(t, err)
 		assert.Equal(t, int32(1), server.hits.Load(), "an unresolvable client_id must not be fetched again within the negative cache window")
 	})
@@ -471,7 +471,7 @@ func TestClientIDMetadataResolver_Cache(t *testing.T) {
 		})
 		resolver := newTestResolver(server.URL, server.Client(), documentCache)
 
-		client, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		client, err := resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 		require.NoError(t, err)
 		require.Equal(t, int32(1), server.hits.Load())
 
@@ -481,7 +481,7 @@ func TestClientIDMetadataResolver_Cache(t *testing.T) {
 			Client: client,
 			Expiry: time.Now().Add(-time.Hour),
 		})
-		_, err = resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		_, err = resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 		require.NoError(t, err)
 		assert.Equal(t, int32(2), server.hits.Load())
 	})
@@ -505,7 +505,7 @@ func TestClientIDMetadataResolver_SSRFDenylist(t *testing.T) {
 	}
 	resolver := newTestResolver(server.URL, config.NewClient(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-	_, err = resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+	_, err = resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 	assertInvalidClient(t, err)
 	assert.Equal(t, int32(0), server.hits.Load(), "the denylist should block the dial before the request reaches the server")
 }
@@ -532,7 +532,7 @@ func TestClientIDMetadataResolver_Allowlist(t *testing.T) {
 	} {
 		t.Run(strings.Join(allowlist.urls, ","), func(t *testing.T) {
 			resolver := newClientIDMetadataResolver(server.Client(), allowlist, documentCache, time.Hour, time.Hour, nil)
-			_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+			_, err := resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 			assertInvalidClient(t, err)
 			assert.Equal(t, int32(0), server.hits.Load(), "a client_id that is not allowed must not be fetched")
 			_, found := documentCache.Get(ctx, clientIDMetadataCacheIndexURL, clientIDMetadataCacheKey("instance", server.URL+testClientIDPath))
@@ -542,7 +542,7 @@ func TestClientIDMetadataResolver_Allowlist(t *testing.T) {
 
 	t.Run("exact entry", func(t *testing.T) {
 		resolver := newClientIDMetadataResolver(server.Client(), clientIDMetadataAllowlist{urls: []string{server.URL + testClientIDPath}}, documentCache, time.Hour, time.Hour, nil)
-		client, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		client, err := resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 		require.NoError(t, err)
 		assert.Equal(t, server.URL+testClientIDPath, client.ClientID)
 	})
@@ -570,7 +570,7 @@ func TestClientIDMetadataResolver_InstanceAllowlist(t *testing.T) {
 	} {
 		t.Run(name, func(t *testing.T) {
 			ctx := authz.NewMockContext("instance", "org", "", instance...)
-			_, err := resolver.ResolveClient(ctx, "instance", clientID)
+			_, err := resolver.ResolveClient(ctx, clientID)
 			assertInvalidClient(t, err)
 			assert.Equal(t, int32(0), server.hits.Load(), "a client_id the instance does not allow must not be fetched")
 			_, found := documentCache.Get(ctx, clientIDMetadataCacheIndexURL, clientIDMetadataCacheKey("instance", clientID))
@@ -580,7 +580,7 @@ func TestClientIDMetadataResolver_InstanceAllowlist(t *testing.T) {
 
 	t.Run("instance allows the url", func(t *testing.T) {
 		ctx := authz.NewMockContext("instance", "org", "", authz.WithMockClientIDMetadataDocumentAllowedURLs(server.URL+"/"))
-		client, err := resolver.ResolveClient(ctx, "instance", clientID)
+		client, err := resolver.ResolveClient(ctx, clientID)
 		require.NoError(t, err)
 		assert.Equal(t, clientID, client.ClientID)
 	})
@@ -600,14 +600,14 @@ func TestClientIDMetadataResolver_LoginV2BaseURI(t *testing.T) {
 			authz.WithMockClientIDMetadataDocumentAllowAnyURL(true),
 			authz.WithMockFeatures(feature.Features{LoginV2: feature.LoginV2{Required: true, BaseURI: baseURI}}),
 		)
-		client, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		client, err := resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 		require.NoError(t, err)
 		assert.Equal(t, domain.LoginVersion2, client.LoginVersion)
 		require.NotNil(t, client.LoginBaseURI)
 		assert.Equal(t, baseURI.String(), (*url.URL)(client.LoginBaseURI).String())
 	})
 	t.Run("login v2 not required", func(t *testing.T) {
-		client, err := resolver.ResolveClient(testResolverContext(), "instance", server.URL+testClientIDPath)
+		client, err := resolver.ResolveClient(testResolverContext(), server.URL+testClientIDPath)
 		require.NoError(t, err)
 		assert.Equal(t, domain.LoginVersion2, client.LoginVersion)
 		assert.Nil(t, client.LoginBaseURI)
@@ -627,15 +627,15 @@ func TestClientIDMetadataResolver_LoginV2BaseURI(t *testing.T) {
 			authz.WithMockFeatures(feature.Features{LoginV2: feature.LoginV2{Required: true, BaseURI: baseURI}}),
 		)
 
-		client, err := cachingResolver.ResolveClient(required, "instance", cachingServer.URL+testClientIDPath)
+		client, err := cachingResolver.ResolveClient(required, cachingServer.URL+testClientIDPath)
 		require.NoError(t, err)
 		require.NotNil(t, client.LoginBaseURI)
 
-		client, err = cachingResolver.ResolveClient(testResolverContext(), "instance", cachingServer.URL+testClientIDPath)
+		client, err = cachingResolver.ResolveClient(testResolverContext(), cachingServer.URL+testClientIDPath)
 		require.NoError(t, err)
 		assert.Nil(t, client.LoginBaseURI, "the base URI of an earlier request must not stick to the cached client")
 
-		client, err = cachingResolver.ResolveClient(required, "instance", cachingServer.URL+testClientIDPath)
+		client, err = cachingResolver.ResolveClient(required, cachingServer.URL+testClientIDPath)
 		require.NoError(t, err)
 		require.NotNil(t, client.LoginBaseURI)
 		assert.Equal(t, baseURI.String(), (*url.URL)(client.LoginBaseURI).String())
@@ -663,17 +663,18 @@ func TestClientIDMetadataResolver_FetchRateLimit(t *testing.T) {
 	clientID := server.URL + testClientIDPath
 
 	for range 2 {
-		_, err := resolver.ResolveClient(ctx, "instance", clientID)
+		_, err := resolver.ResolveClient(ctx, clientID)
 		require.NoError(t, err)
 	}
-	_, err := resolver.ResolveClient(ctx, "instance", clientID)
+	_, err := resolver.ResolveClient(ctx, clientID)
 	assertInvalidClient(t, err)
 	assert.Equal(t, int32(2), server.hits.Load(), "a fetch over the limit must not reach the server")
 
 	_, negative, ok := resolver.cached(ctx, clientIDMetadataCacheKey("instance", clientID))
 	assert.False(t, ok && negative, "a refused fetch must not be cached as a failure")
 
-	_, err = resolver.ResolveClient(ctx, "other-instance", clientID)
+	otherCtx := authz.NewMockContext("other-instance", "org", "", authz.WithMockClientIDMetadataDocumentAllowAnyURL(true))
+	_, err = resolver.ResolveClient(otherCtx, clientID)
 	require.NoError(t, err, "another instance has its own bucket")
 	assert.Equal(t, int32(3), server.hits.Load())
 }
@@ -745,7 +746,7 @@ func TestClientIDMetadataResolver_ResolveTimeout(t *testing.T) {
 
 	resolved := make(chan error, 1)
 	go func() {
-		_, err := resolver.ResolveClient(testResolverContext(), "instance", server.URL+testClientIDPath)
+		_, err := resolver.ResolveClient(testResolverContext(), server.URL+testClientIDPath)
 		resolved <- err
 	}()
 	select {
@@ -788,7 +789,7 @@ func TestClientIDMetadataResolver_ClientIDMismatch(t *testing.T) {
 			defer server.Close()
 			resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-			_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+			_, err := resolver.ResolveClient(ctx, server.URL+testClientIDPath)
 			assertInvalidClient(t, err)
 		})
 	}
@@ -810,7 +811,7 @@ func TestClientIDMetadataResolver_NoRedirects(t *testing.T) {
 			defer redirector.Close()
 			resolver := newTestResolver(redirector.URL, redirector.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
 
-			_, err := resolver.ResolveClient(ctx, "instance", redirector.URL+testClientIDPath)
+			_, err := resolver.ResolveClient(ctx, redirector.URL+testClientIDPath)
 			assertInvalidClient(t, err)
 			assert.Equal(t, int32(0), target.hits.Load(), "the redirect must not be followed")
 		})
@@ -854,7 +855,7 @@ func TestClientIDMetadataResolver_CallerCancellation(t *testing.T) {
 	cancelCtx, cancel := context.WithCancel(testResolverContext())
 	cancelled := make(chan error, 1)
 	go func() {
-		_, err := resolver.ResolveClient(cancelCtx, "instance", server.URL+testClientIDPath)
+		_, err := resolver.ResolveClient(cancelCtx, server.URL+testClientIDPath)
 		cancelled <- err
 	}()
 
@@ -873,7 +874,7 @@ func TestClientIDMetadataResolver_CallerCancellation(t *testing.T) {
 
 	// The resolution survived the cancellation, so a later caller resolves normally instead of
 	// hitting a negatively cached failure.
-	client, err := resolver.ResolveClient(testResolverContext(), "instance", server.URL+testClientIDPath)
+	client, err := resolver.ResolveClient(testResolverContext(), server.URL+testClientIDPath)
 	require.NoError(t, err)
 	assert.Equal(t, server.URL+testClientIDPath, client.ClientID)
 }

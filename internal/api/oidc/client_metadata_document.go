@@ -310,10 +310,12 @@ func (r *clientIDMetadataResolver) allowed(ctx context.Context, clientID string)
 }
 
 // ResolveClient returns the synthetic public OIDC client described by the Client ID Metadata
-// Document located at clientID, which must be an absolute HTTPS URL. A valid cache entry
-// (positive or negative) is served without a fetch; otherwise the document is fetched,
-// validated and cached. Concurrent resolutions of the same client_id share a single fetch.
-// Any fetch or validation failure is reported as an invalid_client error.
+// Document located at clientID, which must be an absolute HTTPS URL, for the instance in ctx.
+// The instance comes from ctx alone, so the allowlist, the cache key, the fetch limit and the
+// returned client always agree on it. A valid cache entry (positive or negative) is served
+// without a fetch; otherwise the document is fetched, validated and cached. Concurrent
+// resolutions of the same client_id share a single fetch. Any fetch or validation failure is
+// reported as an invalid_client error.
 //
 // The shared resolution deliberately does not inherit the caller's cancellation. It is started
 // by whichever request happens to miss the cache first, but its result is shared, so binding it
@@ -324,7 +326,8 @@ func (r *clientIDMetadataResolver) allowed(ctx context.Context, clientID string)
 // the resolve timeout, so detaching cannot leak a call that runs forever. Each caller still
 // waits on its own context, so a disconnected caller returns immediately instead of blocking on
 // the shared work.
-func (r *clientIDMetadataResolver) ResolveClient(ctx context.Context, instanceID, clientID string) (*query.OIDCClient, error) {
+func (r *clientIDMetadataResolver) ResolveClient(ctx context.Context, clientID string) (*query.OIDCClient, error) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
 	if !r.allowed(ctx, clientID) {
 		return nil, r.invalidClient(ctx, nil, "client_id is not an allowed client id metadata document url")
 	}
