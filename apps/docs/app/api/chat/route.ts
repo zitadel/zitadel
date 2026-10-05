@@ -20,8 +20,12 @@ export async function POST(req: Request) {
     }
 
     // Fix: Parse x-forwarded-for to extract the actual client IP (first in the list)
-    const rawIp = req.headers.get('x-forwarded-for') || 'anonymous';
+    const rawIp = req.headers.get('x-real-ip') || req.headers.get('x-forwarded-for') || 'anonymous';
     const ip = rawIp.split(',')[0].trim();
+    
+    // TEMPORARY DEBUG LOG: To verify the IP in the Vercel preview logs
+    console.log('[DEBUG] Resolved Client IP:', ip, '| x-real-ip:', req.headers.get('x-real-ip'), '| x-forwarded-for:', req.headers.get('x-forwarded-for'));
+
     const now = Date.now();
 
     // Fix: Request-time garbage collection (replaces setInterval)
