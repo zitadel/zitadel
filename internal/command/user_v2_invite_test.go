@@ -27,6 +27,8 @@ func TestCommands_CreateInviteCode(t *testing.T) {
 		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 		eventstore                  func(*testing.T) *eventstore.Eventstore
 		defaultSecretGenerators     *SecretGenerators
+		// loginPaths defaults to a mock which expects no call
+		loginPaths func(*testing.T) LoginPaths
 	}
 	type args struct {
 		ctx    context.Context
@@ -125,6 +127,193 @@ func TestCommands_CreateInviteCode(t *testing.T) {
 								},
 								time.Hour,
 								"",
+								false,
+								"",
+								"",
+							),
+						),
+					),
+				),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("code", time.Hour),
+				defaultSecretGenerators:     &SecretGenerators{},
+				loginPaths:                  expectLoginPathsDefaultInviteCodeURLTemplate(""),
+			},
+			args{
+				ctx: context.Background(),
+				invite: &CreateUserInvite{
+					UserID: "userID",
+				},
+			},
+			want{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+					ID:            "userID",
+				},
+				returnCode: nil,
+			},
+		},
+		{
+			"create ok, default url template of the login is used",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								"username", "firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.Afrikaans,
+								domain.GenderUnspecified,
+								"email",
+								false,
+							),
+						),
+					),
+					expectPush(
+						eventFromEventPusher(
+							user.NewHumanInviteCodeAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code"),
+								},
+								time.Hour,
+								"https://login.example.com/ui/v2/login/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true",
+								false,
+								"",
+								"",
+							),
+						),
+					),
+				),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("code", time.Hour),
+				defaultSecretGenerators:     &SecretGenerators{},
+				loginPaths:                  expectLoginPathsDefaultInviteCodeURLTemplate("https://login.example.com/ui/v2/login/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true"),
+			},
+			args{
+				ctx: context.Background(),
+				invite: &CreateUserInvite{
+					UserID: "userID",
+				},
+			},
+			want{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+					ID:            "userID",
+				},
+				returnCode: nil,
+			},
+		},
+		{
+			"create ok, url template of the request is used",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								"username", "firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.Afrikaans,
+								domain.GenderUnspecified,
+								"email",
+								false,
+							),
+						),
+					),
+					expectPush(
+						eventFromEventPusher(
+							user.NewHumanInviteCodeAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code"),
+								},
+								time.Hour,
+								"https://app.example.com/invite?userID={{.UserID}}&code={{.Code}}",
+								false,
+								"",
+								"",
+							),
+						),
+					),
+				),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("code", time.Hour),
+				defaultSecretGenerators:     &SecretGenerators{},
+			},
+			args{
+				ctx: context.Background(),
+				invite: &CreateUserInvite{
+					UserID:      "userID",
+					URLTemplate: "https://app.example.com/invite?userID={{.UserID}}&code={{.Code}}",
+				},
+			},
+			want{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+					ID:            "userID",
+				},
+				returnCode: nil,
+			},
+		},
+		{
+			"create ok, url template of the previous code is used",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								"username", "firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.Afrikaans,
+								domain.GenderUnspecified,
+								"email",
+								false,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanInviteCodeAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code1"),
+								},
+								time.Hour,
+								"https://app.example.com/invite?userID={{.UserID}}&code={{.Code}}",
+								false,
+								"",
+								"",
+							),
+						),
+					),
+					expectPush(
+						eventFromEventPusher(
+							user.NewHumanInviteCodeAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code"),
+								},
+								time.Hour,
+								"https://app.example.com/invite?userID={{.UserID}}&code={{.Code}}",
 								false,
 								"",
 								"",
@@ -398,6 +587,7 @@ func TestCommands_CreateInviteCode(t *testing.T) {
 				checkPermission:             newMockPermissionCheckAllowed(),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("code2", time.Hour),
 				defaultSecretGenerators:     &SecretGenerators{},
+				loginPaths:                  expectLoginPathsDefaultInviteCodeURLTemplate(""),
 			},
 			args{
 				ctx: context.Background(),
@@ -567,6 +757,7 @@ func TestCommands_CreateInviteCode(t *testing.T) {
 				checkPermission:             newMockPermissionCheckAllowed(),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("code2", time.Hour),
 				defaultSecretGenerators:     &SecretGenerators{},
+				loginPaths:                  expectLoginPathsDefaultInviteCodeURLTemplate(""),
 			},
 			args{
 				ctx: context.Background(),
@@ -835,6 +1026,7 @@ func TestCommands_CreateInviteCode(t *testing.T) {
 				checkPermission:             newMockPermissionCheckAllowed(),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("code", time.Hour),
 				defaultSecretGenerators:     &SecretGenerators{},
+				loginPaths:                  expectLoginPathsDefaultInviteCodeURLTemplate(""),
 			},
 			args{
 				ctx: context.Background(),
@@ -854,11 +1046,16 @@ func TestCommands_CreateInviteCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+			loginPaths := expectLoginPathsNoCall
+			if tt.fields.loginPaths != nil {
+				loginPaths = tt.fields.loginPaths
+			}
 			c := &Commands{
 				checkPermission:             tt.fields.checkPermission,
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 				eventstore:                  tt.fields.eventstore(t),
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
+				loginPaths:                  loginPaths(t),
 			}
 			gotDetails, gotReturnCode, err := c.CreateInviteCode(tt.args.ctx, tt.args.invite)
 
@@ -876,6 +1073,8 @@ func TestCommands_ResendInviteCode(t *testing.T) {
 		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 		eventstore                  func(*testing.T) *eventstore.Eventstore
 		defaultSecretGenerators     *SecretGenerators
+		// loginPaths defaults to a mock which expects no call
+		loginPaths func(*testing.T) LoginPaths
 	}
 	type args struct {
 		ctx           context.Context
@@ -1086,6 +1285,7 @@ func TestCommands_ResendInviteCode(t *testing.T) {
 				checkPermission:             newMockPermissionCheckAllowed(),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("code", time.Hour),
 				defaultSecretGenerators:     &SecretGenerators{},
+				loginPaths:                  expectLoginPathsDefaultInviteCodeURLTemplate(""),
 			},
 			args{
 				ctx:    context.Background(),
@@ -1156,6 +1356,7 @@ func TestCommands_ResendInviteCode(t *testing.T) {
 				checkPermission:             nil,
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("code", time.Hour),
 				defaultSecretGenerators:     &SecretGenerators{},
+				loginPaths:                  expectLoginPathsDefaultInviteCodeURLTemplate(""),
 			},
 			args{
 				// ctx:    context.Background(),
@@ -1226,6 +1427,7 @@ func TestCommands_ResendInviteCode(t *testing.T) {
 				checkPermission:             newMockPermissionCheckAllowed(),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("code", time.Hour),
 				defaultSecretGenerators:     &SecretGenerators{},
+				loginPaths:                  expectLoginPathsDefaultInviteCodeURLTemplate(""),
 			},
 			args{
 				ctx:           context.Background(),
@@ -1243,11 +1445,16 @@ func TestCommands_ResendInviteCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+			loginPaths := expectLoginPathsNoCall
+			if tt.fields.loginPaths != nil {
+				loginPaths = tt.fields.loginPaths
+			}
 			c := &Commands{
 				checkPermission:             tt.fields.checkPermission,
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 				eventstore:                  tt.fields.eventstore(t),
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
+				loginPaths:                  loginPaths(t),
 			}
 			details, err := c.ResendInviteCode(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.authRequestID)
 			assert.ErrorIs(t, err, tt.want.err)
