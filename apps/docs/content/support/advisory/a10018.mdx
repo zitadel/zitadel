@@ -52,8 +52,12 @@ The `Auth.SearchLimit` and `Admin.SearchLimit` configuration options are removed
 
 ### Who is affected
 
-Clients that call one of the endpoints above **without** a `limit` and expect to receive all results.
-They now silently receive only the first page of results.
+Clients that call one of the endpoints above:
+
+- **without** a `limit` and expect to receive all results.
+  They now silently receive only the first page of results.
+- **with** a `limit` greater than `MaxQueryLimit` (1000).
+  Their requests now fail with an `InvalidArgument` error instead of returning the requested number of results.
 
 ## Mitigation
 
@@ -63,11 +67,18 @@ Paginate the requests:
 2. Increase the `offset` by the page size for each subsequent request.
 3. Stop when the number of received results reaches the `total_result` in the `details` of the response.
 
-To detect affected requests, compare the number of returned results with the `total_result` in the `details` of the response.
+To detect requests without a `limit` that are affected, compare the number of returned results with the `total_result` in the `details` of the response.
+Requests with a `limit` that is too high fail with an `InvalidArgument` error with the message `Limit exceeded` (ID `QUERY-4M0fs`).
 
-If you are running ZITADEL self-hosted and need time to update your clients, you can restore the previous behavior by setting `DefaultQueryLimit` and / or `MaxQueryLimit` to `0`
-(`ZITADEL_SYSTEMDEFAULTS_DEFAULTQUERYLIMIT` / `ZITADEL_SYSTEMDEFAULTS_MAXQUERYLIMIT`).
-Note that this disables the limits for **all** list endpoints, including the ones that enforced them already, and is not recommended for production.
+If you are running ZITADEL self-hosted and need time to update your clients, you can adjust the limits:
+
+- Raise `MaxQueryLimit` (`ZITADEL_SYSTEMDEFAULTS_MAXQUERYLIMIT`) to the highest `limit` your clients request.
+  On the v1 APIs, this also raises the number of results returned to requests without a `limit`.
+- Restore the previous behavior by setting `DefaultQueryLimit` and / or `MaxQueryLimit` to `0`
+  (`ZITADEL_SYSTEMDEFAULTS_DEFAULTQUERYLIMIT` / `ZITADEL_SYSTEMDEFAULTS_MAXQUERYLIMIT`).
+
+Note that these settings apply to **all** list endpoints, including the ones that enforced the limits already.
+Disabling the limits is not recommended for production.
 
 ### No action needed if
 

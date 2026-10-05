@@ -273,7 +273,8 @@ We understand that these advisories may include breaking changes, and we aim to 
     <td>
       List endpoints of the v1 and v2 APIs enforce the configured default and
       maximum query limit. Requests without a limit no longer return all
-      results and need to paginate.
+      results and need to paginate. Requests with a limit above the maximum
+      are rejected.
     </td>
     <td>&gt;= v4.20.0</td>
     <td>2026-10-XX</td>
