@@ -16,7 +16,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	v2beta "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
@@ -184,13 +183,6 @@ func ListOrgDomainsRequestToModel(systemDefaults systemdefaults.SystemDefaults, 
 		// SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil
-}
-
-func ListQueryToModel(query *v2beta.ListQuery) (offset, limit uint64, asc bool) {
-	if query == nil {
-		return 0, 0, false
-	}
-	return query.Offset, uint64(query.Limit), query.Asc
 }
 
 func DomainQueriesToModel(queries []*v2beta_org.DomainSearchFilter) (_ []query.SearchQuery, err error) {

@@ -1,11 +1,8 @@
 package filter
 
 import (
-	"fmt"
-
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/zerrors"
 	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
 )
 
@@ -50,19 +47,11 @@ func TimestampMethodPbToQuery(method filter.TimestampFilterMethod) query.Timesta
 }
 
 func PaginationPbToQuery(defaults systemdefaults.SystemDefaults, query *filter.PaginationRequest) (offset, limit uint64, asc bool, err error) {
-	limit = defaults.DefaultQueryLimit
-	if query == nil {
-		return 0, limit, asc, nil
+	limit, err = defaults.QueryLimit(uint64(query.GetLimit()))
+	if err != nil {
+		return 0, 0, false, err
 	}
-	offset = query.Offset
-	asc = query.Asc
-	if defaults.MaxQueryLimit > 0 && uint64(query.Limit) > defaults.MaxQueryLimit {
-		return 0, 0, false, zerrors.ThrowInvalidArgumentf(fmt.Errorf("given: %d, allowed: %d", query.Limit, defaults.MaxQueryLimit), "QUERY-4M0fs", "Errors.Query.LimitExceeded")
-	}
-	if query.Limit > 0 {
-		limit = uint64(query.Limit)
-	}
-	return offset, limit, asc, nil
+	return query.GetOffset(), limit, query.GetAsc(), nil
 }
 
 func QueryToPaginationPb(request query.SearchRequest, response query.SearchResponse) *filter.PaginationResponse {
