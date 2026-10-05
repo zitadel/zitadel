@@ -24,14 +24,12 @@ export function DocsChat() {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Chat State
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [lastExecutionId, setLastExecutionId] = useState<string | null>(null);
 
-  // Transcript Feedback State
   const [transcriptRating, setTranscriptRating] = useState<'up' | 'down' | null>(null);
   const [isFeedbackSubmitted, setIsFeedbackSubmitted] = useState(false);
 
@@ -42,7 +40,6 @@ export function DocsChat() {
     };
   }, []);
 
-  // Initialize intro message
   useEffect(() => {
     if (messages.length === 0) {
       setMessages([getIntroMessage()]);
@@ -59,7 +56,6 @@ export function DocsChat() {
     if (isOpen) messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isOpen, isLoading, transcriptRating]);
 
-  // Handle click outside & escape
   useEffect(() => {
     if (!isOpen) return;
 
@@ -153,7 +149,6 @@ export function DocsChat() {
             : "opacity-0 scale-[0.85] translate-y-8 pointer-events-none"
         )}
       >
-        {/* Header */}
         <div className="bg-fd-accent text-fd-accent-foreground p-4 flex justify-between items-center border-b border-fd-border">
           <div className="flex items-center gap-2.5">
             <img
@@ -182,9 +177,8 @@ export function DocsChat() {
               <ChevronDown className="w-4 h-4" />
             </button>
           </div>
-        </div> {/* <--- This closing div was missing */}
+        </div>
 
-        {/* Message Container */}
         <div className="flex-1 p-4 overflow-y-auto bg-fd-background space-y-4">
           {messages.map((msg, idx) => (
             <div key={idx} className={cn("flex", msg.role === 'user' ? "justify-end" : "justify-start")}>
@@ -206,7 +200,6 @@ export function DocsChat() {
                       remarkPlugins={[remarkGfm]}
                       components={{
                         img: () => null,
-                        // FIX: Correctly destructure `node` instead of `_node` so it isn't spread onto the DOM element
                         a({ node, children, ...props }: any) {
                           return (
                             <a
@@ -219,8 +212,6 @@ export function DocsChat() {
                             </a>
                           );
                         },
-                        // FIX: Removed the buggy `code` override entirely as `inline` is no longer supported in v10. 
-                        // Code styling is now handled by the prose-code:* Tailwind classes in the wrapper div.
                       }}
                     >
                       {msg.content}
@@ -242,9 +233,6 @@ export function DocsChat() {
           )}
           <div ref={messagesEndRef} />
         </div>
-
-        {/* Feedback Section */}
-        {/* Feedback Section */}
         {messages.length > 1 && (
           <div className="bg-fd-background border-t border-fd-border px-4 py-3 shrink-0">
             {isFeedbackSubmitted ? (
@@ -275,7 +263,6 @@ export function DocsChat() {
           </div>
         )}
 
-        {/* Input area */}
         <form onSubmit={handleSend} className="p-3 bg-fd-background border-t border-fd-border">
           <div className="relative flex items-center">
             <input

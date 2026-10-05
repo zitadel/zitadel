@@ -8,7 +8,7 @@ export type ChatMessage = {
 
 const rateLimitMap = new Map<string, { timestamps: number[] }>();
 const RATE_LIMIT_MAX = 10;
-const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+const RATE_LIMIT_WINDOW_MS = 60000;
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
@@ -20,7 +20,6 @@ export async function POST(req: Request) {
       throw new Error('Chat agent configuration is missing');
     }
 
-    // Fix: Parse x-forwarded-for to extract the actual client IP (first in the list)
     const rawIp = req.headers.get('x-real-ip') || req.headers.get('x-forwarded-for') || 'anonymous';
     const ip = rawIp.split(',')[0].trim();
 
@@ -29,7 +28,6 @@ export async function POST(req: Request) {
 
     const now = Date.now();
 
-    // Fix: Request-time garbage collection (replaces setInterval)
     const userRateData = rateLimitMap.get(ip) || { timestamps: [] };
     const validTimestamps = userRateData.timestamps.filter((ts) => now - ts < RATE_LIMIT_WINDOW_MS);
 
@@ -43,7 +41,6 @@ export async function POST(req: Request) {
     validTimestamps.push(now);
     rateLimitMap.set(ip, { timestamps: validTimestamps });
 
-    // Opportunistic cleanup of other IPs (1% chance per request) to prevent long-term memory leaks
     if (Math.random() < 0.01) {
       for (const [key, data] of rateLimitMap.entries()) {
         const valid = data.timestamps.filter((ts) => now - ts < RATE_LIMIT_WINDOW_MS);
@@ -55,8 +52,6 @@ export async function POST(req: Request) {
 
     if (!Array.isArray(messages)) throw new Error('Invalid payload structure');
 
-    // Note: We retain the 'assistant' role to maintain conversation history statelessly. 
-    // Since this is a public docs bot querying public data, client-side transcript spoofing is an acceptable low-risk tradeoff.
     const sanitizedMessages = messages
       .filter((m: ChatMessage) => m.role === 'user' || m.role === 'assistant')
       .map((m: ChatMessage) => ({
@@ -73,7 +68,6 @@ export async function POST(req: Request) {
         ? recentHistory.map((m) => `${m.role.toUpperCase()}: ${m.content}`).join('\n\n')
         : undefined;
 
-    // Create an AbortController with a 25-second timeout (leaving a 5-second buffer before Vercel's 30s limit)
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 25000);
 
