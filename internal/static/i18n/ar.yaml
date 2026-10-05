@@ -650,6 +650,8 @@ EventTypes:
     removed: "تم حذف الهدف"
   user:
     added: "تمت إضافة المستخدم"
+    notification:
+      rejected: "تم رفض الإشعار"
     selfregistered: "قام المستخدم بالتسجيل بنفسه"
     initialization:
       code:

@@ -13,6 +13,8 @@ import (
 	context "context"
 	reflect "reflect"
 
+	eventstore "github.com/zitadel/zitadel/internal/eventstore"
+	channels "github.com/zitadel/zitadel/internal/notification/channels"
 	senders "github.com/zitadel/zitadel/internal/notification/senders"
 	milestone "github.com/zitadel/zitadel/internal/repository/milestone"
 	quota "github.com/zitadel/zitadel/internal/repository/quota"
@@ -167,6 +169,20 @@ func (m *MockCommands) MilestonePushed(ctx context.Context, instanceID string, m
 func (mr *MockCommandsMockRecorder) MilestonePushed(ctx, instanceID, msType, endpoints any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MilestonePushed", reflect.TypeOf((*MockCommands)(nil).MilestonePushed), ctx, instanceID, msType, endpoints)
+}
+
+// NotificationRejected mocks base method.
+func (m *MockCommands) NotificationRejected(ctx context.Context, aggregate *eventstore.Aggregate, rejection channels.Rejection) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NotificationRejected", ctx, aggregate, rejection)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// NotificationRejected indicates an expected call of NotificationRejected.
+func (mr *MockCommandsMockRecorder) NotificationRejected(ctx, aggregate, rejection any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NotificationRejected", reflect.TypeOf((*MockCommands)(nil).NotificationRejected), ctx, aggregate, rejection)
 }
 
 // OTPEmailSent mocks base method.

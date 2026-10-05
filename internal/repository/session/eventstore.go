@@ -21,4 +21,5 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, MetadataSetType, MetadataSetEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, LifetimeSetType, eventstore.GenericEventMapper[LifetimeSetEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, TerminateType, TerminateEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, NotificationRejectedType, eventstore.GenericEventMapper[NotificationRejectedEvent])
 }

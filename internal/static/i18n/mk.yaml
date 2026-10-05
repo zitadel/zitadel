@@ -653,6 +653,8 @@ EventTypes:
     removed: "Целта е избришана"
   user:
     added: "Додаден корисник"
+    notification:
+      rejected: "Известувањето е одбиено"
     selfregistered: "Корисникот се регистрираше сам"
     initialization:
       code:

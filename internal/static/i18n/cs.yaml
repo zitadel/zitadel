@@ -652,6 +652,8 @@ EventTypes:
     removed: "Cíl smazán"
   user:
     added: "Uživatel přidán"
+    notification:
+      rejected: "Oznámení zamítnuto"
     selfregistered: "Uživatel se zaregistroval sám"
     initialization:
       code:
