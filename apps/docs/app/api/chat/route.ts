@@ -9,6 +9,7 @@ export type ChatMessage = {
 const rateLimitMap = new Map<string, { timestamps: number[] }>();
 const RATE_LIMIT_MAX = 10;
 const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+export const maxDuration = 30;
 
 export async function POST(req: Request) {
   try {
@@ -22,7 +23,7 @@ export async function POST(req: Request) {
     // Fix: Parse x-forwarded-for to extract the actual client IP (first in the list)
     const rawIp = req.headers.get('x-real-ip') || req.headers.get('x-forwarded-for') || 'anonymous';
     const ip = rawIp.split(',')[0].trim();
-    
+
     // TEMPORARY DEBUG LOG: To verify the IP in the Vercel preview logs
     console.log('[DEBUG] Resolved Client IP:', ip, '| x-real-ip:', req.headers.get('x-real-ip'), '| x-forwarded-for:', req.headers.get('x-forwarded-for'));
 
@@ -72,6 +73,10 @@ export async function POST(req: Request) {
         ? recentHistory.map((m) => `${m.role.toUpperCase()}: ${m.content}`).join('\n\n')
         : undefined;
 
+    // Create an AbortController with a 25-second timeout (leaving a 5-second buffer before Vercel's 30s limit)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
+
     const response = await fetch(endpointUrl, {
       method: 'POST',
       headers: {
@@ -88,7 +93,15 @@ export async function POST(req: Request) {
         verbose: true,
         background: false,
       }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
+
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      throw new Error(`Upstream returned non-JSON response: HTTP ${response.status}`);
+    }
 
     if (!response.ok) {
       throw new Error(`AI Agent service returned HTTP ${response.status}`);
@@ -118,7 +131,14 @@ export async function POST(req: Request) {
     const executionId = jsonResponse.execution?.executionId;
 
     return NextResponse.json({ success: true, reply: finalReply, executionId });
-  } catch (error) {
+  } catch (error: any) {
+    if (error.name === 'AbortError') {
+      return NextResponse.json(
+        { success: false, error: 'The assistant took too long to respond. Please try again.' },
+        { status: 504 }
+      );
+    }
+
     console.error('Docs Chat API Error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to process message' },
