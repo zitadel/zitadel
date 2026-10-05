@@ -2,6 +2,7 @@ package smtp
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -89,6 +90,26 @@ func TestCompileRules(t *testing.T) {
 				Headers: map[string]string{"X-(Meta)": "value"},
 			}},
 			wantErr: `smtp rule 0: header "X-(Meta)": invalid name`,
+		},
+		{
+			name: "limit",
+			configs: []RuleConfig{{
+				RuleOptions: RuleOptions{Limit: &RuleLimit{Count: 100, Window: RuleDuration(24 * time.Hour)}},
+			}},
+		},
+		{
+			name: "limit without count",
+			configs: []RuleConfig{{
+				RuleOptions: RuleOptions{Limit: &RuleLimit{Window: RuleDuration(24 * time.Hour)}},
+			}},
+			wantErr: "smtp rule 0: limit: count must be greater than 0",
+		},
+		{
+			name: "limit without window",
+			configs: []RuleConfig{{
+				RuleOptions: RuleOptions{Limit: &RuleLimit{Count: 100}},
+			}},
+			wantErr: "smtp rule 0: limit: window must be greater than 0",
 		},
 		{
 			name: "header names differing in case only",
@@ -408,6 +429,7 @@ func TestRules_Match(t *testing.T) {
 				RuleOptions: RuleOptions{
 					RestrictCustomHTML:               true,
 					SuppressReservedRecipientDomains: true,
+					Limit:                            &RuleLimit{Count: 100, Window: RuleDuration(24 * time.Hour)},
 				},
 				Headers: map[string]string{
 					"X-Instance-ID": "{{.InstanceID}}",
@@ -421,6 +443,7 @@ func TestRules_Match(t *testing.T) {
 				RuleOptions: RuleOptions{
 					RestrictCustomHTML:               true,
 					SuppressReservedRecipientDomains: true,
+					Limit:                            &RuleLimit{Count: 100, Window: RuleDuration(24 * time.Hour)},
 				},
 				Headers: map[string]string{
 					"X-Instance-Id": "instance1",
@@ -452,6 +475,33 @@ func TestRules_Match(t *testing.T) {
 			rules, err := CompileRules(tt.configs)
 			require.NoError(t, err)
 			assert.Equal(t, tt.want, rules.Match(tt.config, data))
+		})
+	}
+}
+
+func TestRuleDuration_UnmarshalText(t *testing.T) {
+	tests := []struct {
+		text    string
+		want    RuleDuration
+		wantErr bool
+	}{
+		{text: "24h", want: RuleDuration(24 * time.Hour)},
+		{text: "90m", want: RuleDuration(90 * time.Minute)},
+		{text: "1h30m", want: RuleDuration(90 * time.Minute)},
+		{text: "24", wantErr: true},
+		{text: "one day", wantErr: true},
+		{text: "", wantErr: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.text, func(t *testing.T) {
+			var got RuleDuration
+			err := got.UnmarshalText([]byte(tt.text))
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

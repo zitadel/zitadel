@@ -8,6 +8,7 @@ import (
 	"net/textproto"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/notification/messages"
@@ -34,6 +35,42 @@ type RuleOptions struct {
 	// SuppressReservedRecipientDomains accepts notifications to recipients of reserved domains (RFC 2606, RFC 6761)
 	// like example.com or .test, but does not send them to the provider.
 	SuppressReservedRecipientDomains bool
+	// Limit restricts the amount of emails an instance can send through the provider.
+	// Notifications exceeding it are rejected. Suppressed emails are not counted.
+	Limit *RuleLimit
+}
+
+// RuleLimit restricts the amount of emails sent through a provider per instance within a rolling time window.
+type RuleLimit struct {
+	// Count is the maximum amount of emails sent within the window.
+	Count uint64
+	// Window is the rolling time window the emails are counted in, e.g. 24h.
+	Window RuleDuration
+}
+
+// RuleDuration is a duration, which is read as text (e.g. 24h) from the YAML and the JSON form of the configuration.
+type RuleDuration time.Duration
+
+func (d *RuleDuration) UnmarshalText(text []byte) error {
+	duration, err := time.ParseDuration(string(text))
+	if err != nil {
+		return err
+	}
+	*d = RuleDuration(duration)
+	return nil
+}
+
+func (l *RuleLimit) validate() error {
+	if l == nil {
+		return nil
+	}
+	if l.Count == 0 {
+		return errors.New("limit: count must be greater than 0")
+	}
+	if l.Window <= 0 {
+		return errors.New("limit: window must be greater than 0")
+	}
+	return nil
 }
 
 // RuleMatch defines the criteria a SMTP provider must fulfill for the rule to be applied.
@@ -118,6 +155,9 @@ func compileRule(config RuleConfig) (*compiledRule, error) {
 	}
 	headers, err := compileHeaders(config.Headers)
 	if err != nil {
+		return nil, err
+	}
+	if err := config.Limit.validate(); err != nil {
 		return nil, err
 	}
 	return &compiledRule{

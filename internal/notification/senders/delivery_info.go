@@ -10,3 +10,9 @@ type DeliveryInfo struct {
 	// because the recipient domain is reserved and the operator rule of the provider suppresses them.
 	DeliverySuppressed bool `json:"deliverySuppressed,omitzero"`
 }
+
+// DeliveredBy returns the filter for the payload of sent events
+// of emails that were sent through the given provider.
+func DeliveredBy(providerID string) map[string]any {
+	return map[string]any{"providerId": providerID}
+}

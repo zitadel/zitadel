@@ -456,6 +456,78 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 			},
 		},
 		{
+			name: "limit exceeded, nothing sent, stated on the aggregate and canceled",
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fieldsWorker, a argsWorker, w wantWorker) {
+				givenTemplate := "{{.LogoURL}}"
+				w.err = func(tt assert.TestingT, err error, i ...interface{}) bool {
+					// the job is canceled, so it is not retried
+					return errors.Is(err, new(river.JobCancelError))
+				}
+				// no sent event, the rejection is stated instead
+				commands.EXPECT().NotificationRejected(gomock.Any(),
+					&eventstore.Aggregate{
+						InstanceID:    instanceID,
+						ID:            userID,
+						Type:          user.AggregateType,
+						ResourceOwner: orgID,
+					},
+					channels.Rejection{
+						TriggeringEventType: user.HumanInviteCodeAddedType,
+						Reason:              channels.RejectionReasonLimitExceeded,
+						ProviderID:          "emailProviderID",
+					},
+				).Return(nil)
+				codeAlg, code := cryptoValue(t, ctrl, "testcode")
+				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
+				return fieldsWorker{
+						queries:  queries,
+						commands: commands,
+						es: eventstore.NewEventstore(&eventstore.Config{
+							Querier: es_repo_mock.NewRepo(t).MockQuerier,
+						}),
+						userDataCrypto: codeAlg,
+						now:            testNow,
+						backOff:        testBackOff,
+						// the instance already sent as many emails as the rule allows
+						smtpRules:  limitRules(t),
+						sentEmails: 10,
+					},
+					argsWorker{
+						job: &river.Job[*notification.Request]{
+							JobRow: &rivertype.JobRow{
+								ID:        1,
+								CreatedAt: time.Now(),
+							},
+							Args: &notification.Request{
+								// like the reducers, the request states the aggregate of the triggering event
+								Aggregate: &eventstore.Aggregate{
+									InstanceID:    instanceID,
+									ID:            userID,
+									Type:          user.AggregateType,
+									ResourceOwner: orgID,
+								},
+								UserID:                        userID,
+								UserResourceOwner:             orgID,
+								TriggeredAtOrigin:             eventOrigin,
+								EventType:                     user.HumanInviteCodeAddedType,
+								MessageType:                   domain.InviteUserMessageType,
+								NotificationType:              domain.NotificationTypeEmail,
+								URLTemplate:                   fmt.Sprintf("%s/ui/login/user/invite?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&authRequestID=%s", eventOrigin, userID, orgID, authRequestID),
+								CodeExpiry:                    1 * time.Hour,
+								Code:                          code,
+								UnverifiedNotificationChannel: true,
+								IsOTP:                         false,
+								RequiresPreviousDomain:        false,
+								Args: &domain.NotificationArguments{
+									ApplicationName: "APP",
+								},
+							},
+						},
+					},
+					w
+			},
+		},
+		{
 			name: "send failed (max attempts), cancel",
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fieldsWorker, a argsWorker, w wantWorker) {
 				givenTemplate := "{{.LogoURL}}"
@@ -563,8 +635,9 @@ func newNotificationWorker(t *testing.T, ctrl *gomock.Controller, queries *mock.
 			nil,
 		),
 		channels: &notificationChannels{
-			Chain:     *senders.ChainChannels(channel),
-			SMTPRules: f.smtpRules,
+			Chain:      *senders.ChainChannels(channel),
+			SMTPRules:  f.smtpRules,
+			sentEmails: f.sentEmails,
 			emailConfig: &email.Config{
 				ProviderConfig: &email.Provider{
 					ID:          "emailProviderID",
