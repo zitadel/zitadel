@@ -47,6 +47,10 @@ type ChannelChains interface {
 // because the recipient domain is reserved and the operator rule of the provider suppresses them.
 const SuppressedEmailsCounter = "suppressed_deliveries_email"
 
+// RejectedNotificationsCounter counts the notifications, which were intentionally not sent,
+// e.g. because a limit of the provider was exceeded.
+const RejectedNotificationsCounter = "rejected_notifications"
+
 // SendEmail returns a [Notify] function, which sends the notification as email.
 // deliveryInfo is optional and states the provider the email was sent through,
 // or that the email was accepted but not sent to the provider,

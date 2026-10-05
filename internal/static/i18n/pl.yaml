@@ -654,6 +654,8 @@ EventTypes:
     removed: "Cel usunięty"
   user:
     added: "Użytkownik dodany"
+    notification:
+      rejected: "Powiadomienie odrzucone"
     selfregistered: "Użytkownik zarejestrował się"
     initialization:
       code:

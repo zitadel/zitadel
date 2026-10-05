@@ -654,6 +654,8 @@ EventTypes:
     removed: "Целта е изтрита"
   user:
     added: "Добавен потребител"
+    notification:
+      rejected: "Известието е отхвърлено"
     selfregistered: "Потребителят се регистрира сам"
     initialization:
       code:

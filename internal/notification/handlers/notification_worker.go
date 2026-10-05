@@ -181,7 +181,8 @@ func (w *NotificationWorker) sendNotificationQueue(ctx context.Context, request 
 	}
 
 	if err = notify(request.URLTemplate, args, request.MessageType, request.UnverifiedNotificationChannel); err != nil {
-		return err
+		// a rejected notification is stated on the aggregate and canceled
+		return stateRejection(authz.WithInstanceID(ctx, request.Aggregate.InstanceID), w.commands, request.Aggregate, request.EventType, err)
 	}
 
 	err = sentHandler(authz.WithInstanceID(ctx, request.Aggregate.InstanceID), w.commands, request.Aggregate.ID, request.Aggregate.ResourceOwner, generatorInfo, *deliveryInfo, args)

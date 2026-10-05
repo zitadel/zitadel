@@ -446,6 +446,52 @@ func Test_userNotifierLegacy_reduceEmailCodeAdded(t *testing.T) {
 				}, w
 		},
 	}, {
+		name: "send rejected, stated on the aggregate and not retried",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
+			givenTemplate := "{{.URL}}"
+			testCode := "testcode"
+			expectContent := fmt.Sprintf("%s/ui/login/mail/verification?authRequestID=%s&code=%s&orgID=%s&userID=%s", eventOrigin, "", testCode, orgID, userID)
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
+				err: channels.NewRejectedError(channels.RejectionReasonLimitExceeded, "emailProviderID"),
+			}
+			codeAlg, code := cryptoValue(t, ctrl, testCode)
+			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
+			// no sent event, the rejection is stated instead
+			commands.EXPECT().NotificationRejected(gomock.Any(), gomock.Any(), channels.Rejection{
+				TriggeringEventType: user.HumanEmailCodeAddedType,
+				Reason:              channels.RejectionReasonLimitExceeded,
+				ProviderID:          "emailProviderID",
+			}).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+					userDataCrypto: codeAlg,
+					SMSTokenCrypto: nil,
+				}, args{
+					event: &user.HumanEmailCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanEmailCodeAddedType,
+						}),
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTemplate:       "",
+						CodeReturned:      false,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
+		},
+	}, {
 		name: "button url without event trigger url",
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 			givenTemplate := "{{.URL}}"

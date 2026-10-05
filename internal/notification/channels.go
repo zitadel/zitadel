@@ -56,6 +56,7 @@ func newChannels(q *handlers.NotificationQueries, smtpRules smtp.Rules) *channel
 	registerCounter(c.counters.success.email, "Successfully delivered emails")
 	registerCounter(c.counters.failed.email, "Failed email deliveries")
 	registerCounter(types.SuppressedEmailsCounter, "Emails not sent to the provider because the recipient domain is reserved")
+	registerCounter(types.RejectedNotificationsCounter, "Notifications intentionally not sent, e.g. because a limit of the provider was exceeded")
 	registerCounter(c.counters.success.sms, "Successfully delivered SMS")
 	registerCounter(c.counters.failed.sms, "Failed SMS deliveries")
 	registerCounter(c.counters.success.json, "Successfully delivered JSON messages")

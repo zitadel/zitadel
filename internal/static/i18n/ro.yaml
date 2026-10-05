@@ -650,6 +650,8 @@ Errors:
         removed: "Țintă ștearsă"
       user:
         added: "Utilizator adăugat"
+        notification:
+          rejected: "Notificare respinsă"
         selfregistered: "Utilizator s-a înregistrat singur"
         initialization:
           code:
