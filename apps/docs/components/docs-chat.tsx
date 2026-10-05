@@ -262,7 +262,6 @@ export function DocsChat() {
             )}
           </div>
         )}
-
         <form onSubmit={handleSend} className="p-3 bg-fd-background border-t border-fd-border">
           <div className="relative flex items-center">
             <input
@@ -281,6 +280,11 @@ export function DocsChat() {
             >
               <Send className="w-4 h-4" />
             </button>
+          </div>
+          <div className="text-center mt-2.5 px-2">
+            <p className="text-[11px] leading-tight text-fd-muted-foreground/80">
+              AI answers can be wrong. Please don't share secrets, credentials or personal data.
+            </p>
           </div>
         </form>
       </div>
