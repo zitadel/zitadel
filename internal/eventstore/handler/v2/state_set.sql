@@ -1,3 +1,6 @@
+WITH guc AS (
+    SELECT set_config('zitadel.keep_in_tx_order', 'true', true)
+)
 INSERT INTO projections.current_states (
     projection_name
     , instance_id
@@ -8,7 +11,8 @@ INSERT INTO projections.current_states (
     , "position"
     , last_updated
     , filter_offset
-) VALUES (
+    , in_tx_order
+) SELECT
     $1
     , $2
     , $3
@@ -18,7 +22,9 @@ INSERT INTO projections.current_states (
     , $7
     , now()
     , $8
-) ON CONFLICT (
+    , $9
+FROM guc
+ON CONFLICT (
     projection_name
     , instance_id
 ) DO UPDATE SET
@@ -29,4 +35,5 @@ INSERT INTO projections.current_states (
     , "position" = $7
     , last_updated = statement_timestamp()
     , filter_offset = $8
+    , in_tx_order = $9
 ;

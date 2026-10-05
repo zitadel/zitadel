@@ -39,9 +39,15 @@ func (s *executionError) Unwrap() error {
 	return s.parent
 }
 
-func (h *Handler) eventsToStatements(ctx context.Context, tx *sql.Tx, events []eventstore.Event) (statements []*Statement, err error) {
+func (h *Handler) eventsToStatements(ctx context.Context, tx *sql.Tx, events []eventstore.Event, currentState *state) (statements []*Statement, err error) {
 	statements = make([]*Statement, 0, len(events))
 
+	previousPosition := decimal.Decimal{}
+	offset := uint32(0)
+	if currentState != nil {
+		previousPosition = currentState.cursor.Position
+		offset = currentState.offset
+	}
 	for _, event := range events {
 		statement, err := h.reduce(event)
 		if err != nil {
@@ -50,6 +56,14 @@ func (h *Handler) eventsToStatements(ctx context.Context, tx *sql.Tx, events []e
 				continue
 			}
 			return statements, &executionError{err}
+		}
+		if !h.filterOffsetIsCursor {
+			offset++
+			if !previousPosition.Equal(event.Position()) {
+				offset = 1
+			}
+			statement.offset = offset
+			previousPosition = event.Position()
 		}
 		statements = append(statements, statement)
 	}
@@ -78,6 +92,7 @@ type Statement struct {
 	CreationDate time.Time
 
 	inTxOrder uint32
+	offset    uint32
 
 	Execute Exec
 }

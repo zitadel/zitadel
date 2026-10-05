@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	handler2 "github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/static"
 )
 
@@ -84,13 +85,14 @@ func ProjectInstance(ctx context.Context) error {
 
 func (config Config) overwrite(viewModel string) handler2.Config {
 	c := handler2.Config{
-		Client:              config.Client,
-		Eventstore:          config.Eventstore,
-		BulkLimit:           uint16(config.BulkLimit),
-		RequeueEvery:        3 * time.Minute,
-		MaxFailureCount:     uint8(config.FailureCountUntilSkip),
-		TransactionDuration: config.TransactionDuration,
-		ActiveInstancer:     config.ActiveInstancer,
+		Client:               config.Client,
+		Eventstore:           config.Eventstore,
+		BulkLimit:            uint16(config.BulkLimit),
+		RequeueEvery:         3 * time.Minute,
+		MaxFailureCount:      uint8(config.FailureCountUntilSkip),
+		TransactionDuration:  config.TransactionDuration,
+		ActiveInstancer:      config.ActiveInstancer,
+		FilterOffsetIsCursor: projection.FilterOffsetIsCursor(),
 	}
 	overwrite, ok := config.Handlers[viewModel]
 	if !ok {

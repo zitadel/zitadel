@@ -54,6 +54,7 @@ func NewFieldHandler(config *Config, name string, eventTypes map[eventstore.Aggr
 			triggeredInstancesSync: sync.Map{},
 			triggerWithoutEvents:   config.TriggerWithoutEvents,
 			txDuration:             config.TransactionDuration,
+			filterOffsetIsCursor:   config.FilterOffsetIsCursor,
 		},
 	}
 }
@@ -171,6 +172,18 @@ func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState
 		return nil, false, err
 	}
 
+	if !h.filterOffsetIsCursor {
+		previousPosition := currentState.cursor.Position
+		offset := currentState.offset
+		for _, event := range events {
+			offset++
+			if !previousPosition.Equal(event.Position()) {
+				offset = 1
+			}
+			previousPosition = event.Position()
+		}
+		currentState.offset = offset
+	}
 	currentState.applyEvent(events[len(events)-1])
 	additionalIteration = len(events) == int(h.bulkLimit)
 
