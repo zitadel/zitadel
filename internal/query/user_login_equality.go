@@ -163,9 +163,10 @@ func loginEqualitySeeksFromQuery(instanceID string, qry SearchQuery) ([]loginEqu
 }
 
 // extractLoginEqualitySeeks pulls one login-equality filter from queries.
-// A match may be a top-level equals leaf, a flat OrQuery of those leaves, or
-// the same nested under AndQuery. Remaining AND conjuncts stay as WHERE.
-// Equality nested under OrQuery or NotQuery is not extracted.
+// A match may be a top-level equals leaf, a flat OrQuery of those leaves
+// (extracted as UNION), or the same nested under AndQuery. Remaining AND
+// conjuncts stay as WHERE. Mixed OR (a non-equality arm) and NotQuery are
+// not extracted.
 func extractLoginEqualitySeeks(instanceID string, queries []SearchQuery) ([]loginEqualitySeek, []SearchQuery, bool) {
 	for i, qry := range queries {
 		if and, ok := qry.(*AndQuery); ok {
@@ -191,11 +192,7 @@ func remainingAndQuery(rest []SearchQuery) SearchQuery {
 	case 1:
 		return rest[0]
 	default:
-		and, err := NewAndQuery(rest...)
-		if err != nil {
-			return nil
-		}
-		return and
+		return &AndQuery{queries: rest}
 	}
 }
 

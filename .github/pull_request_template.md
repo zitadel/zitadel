@@ -3,6 +3,9 @@ Please inform yourself about the contribution guidelines on submitting a PR here
 Important: By submitting a contribution you agree to the terms from our Licensing Policy as described here: https://github.com/zitadel/zitadel/blob/main/LICENSING.md#community-contributions.
 -->
 
+> [!IMPORTANT]
+> Our engineering team is currently focused on the [next generation of ZITADEL](https://github.com/zitadel/nextgen), so our capacity to review community pull requests is limited. We cannot guarantee that your pull request will be reviewed or merged. For larger changes, please open an issue or discussion before you begin. Thank you for contributing and for your understanding.
+
 # Which Problems Are Solved
 
 Replace this example text with a concise list of problems that this PR solves.

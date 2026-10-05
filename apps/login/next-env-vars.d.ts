@@ -25,6 +25,19 @@ declare namespace NodeJS {
     ZITADEL_SERVICE_USER_TOKEN: string;
 
     /**
+     * Secret used to sign LoginV2 `sessions` cookie entries (a signing key is derived via HKDF).
+     * Recommended configuration; will become required in a future major release.
+     * Every value must be at least 32 characters long (e.g. `openssl rand -base64 32`); a shorter value
+     * disables signing and makes /ready fail instead of falling back to the API credential.
+     * Deprecated fallback if unset: the configured API credential is used (ZITADEL_SERVICE_USER_TOKEN,
+     * SYSTEM_USER_PRIVATE_KEY(_FILE) or ZITADEL_LOGINCLIENT_KEYFILE) and a warning is logged at startup.
+     * A comma-separated list is supported for rotation: the first value signs, all values verify.
+     * Unsigned or tampered cookie entries are ignored so a client cannot patch an arbitrary session.
+     * All replicas of a deployment must resolve the same secret.
+     */
+    ZITADEL_SESSION_COOKIE_SECRET?: string;
+
+    /**
      * Path to a private key file for login client JWT authentication.
      * When set, the login service reads this key and signs JWTs with a
      * hardcoded subject of "login-client".
