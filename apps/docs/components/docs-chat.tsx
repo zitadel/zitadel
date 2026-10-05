@@ -33,7 +33,6 @@ export function DocsChat() {
 
   // Transcript Feedback State
   const [transcriptRating, setTranscriptRating] = useState<'up' | 'down' | null>(null);
-  const [feedbackText, setFeedbackText] = useState('');
   const [isFeedbackSubmitted, setIsFeedbackSubmitted] = useState(false);
 
   const getIntroMessage = useCallback((): ChatMessage => {
@@ -84,7 +83,6 @@ export function DocsChat() {
   const handleClearChat = () => {
     setMessages([getIntroMessage()]);
     setTranscriptRating(null);
-    setFeedbackText('');
     setIsFeedbackSubmitted(false);
     setLastExecutionId(null);
   };
@@ -125,11 +123,10 @@ export function DocsChat() {
     }
   };
 
-  const submitTranscriptFeedback = (rating: 'up' | 'down', reason: string = '') => {
+  const submitTranscriptFeedback = (rating: 'up' | 'down') => {
     mixpanelClient.track('submitted_chat_feedback', {
       flow: 'docs_support',
       rating,
-      reason,
       execution_id: lastExecutionId,
       message_count: messages.length,
     });
@@ -138,15 +135,15 @@ export function DocsChat() {
 
   const handleInitialRating = (rating: 'up' | 'down') => {
     setTranscriptRating(rating);
-    if (rating === 'up') {
-      submitTranscriptFeedback('up');
-    }
+    submitTranscriptFeedback(rating);
   };
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end font-sans">
       <div
         ref={chatContainerRef}
+        aria-hidden={!isOpen}
+        inert={!isOpen ? true : undefined}
         className={cn(
           "absolute bottom-16 right-0 mb-2 flex flex-col w-[360px] sm:w-[400px] h-[600px] max-h-[80vh]",
           "bg-fd-background border border-fd-border rounded-2xl shadow-2xl overflow-hidden",
@@ -247,44 +244,13 @@ export function DocsChat() {
         </div>
 
         {/* Feedback Section */}
+        {/* Feedback Section */}
         {messages.length > 1 && (
           <div className="bg-fd-background border-t border-fd-border px-4 py-3 shrink-0">
             {isFeedbackSubmitted ? (
               <p className="text-sm text-center font-medium text-green-600 dark:text-green-400">
                 Thank you for your feedback!
               </p>
-            ) : transcriptRating === 'down' ? (
-              <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
-                <label htmlFor="feedback-reason" className="text-sm text-fd-foreground font-medium">What went wrong?</label>
-                <textarea
-                  id="feedback-reason"
-                  maxLength={500}
-                  value={feedbackText}
-                  onChange={(e) => setFeedbackText(e.target.value)}
-                  placeholder="The assistant didn't answer my question..."
-                  className="w-full p-2 bg-transparent border border-fd-border rounded-lg text-sm outline-none focus:border-[#187aff] resize-none h-20 transition-colors text-fd-foreground"
-                />
-                <div className="flex justify-between items-center text-xs">
-                  <span className={cn("font-medium", feedbackText.length === 500 ? 'text-red-500' : 'text-fd-muted-foreground')}>
-                    {feedbackText.length}/500
-                  </span>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setTranscriptRating(null)}
-                      className="px-3 py-1.5 text-fd-muted-foreground hover:bg-fd-accent/20 rounded-md transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={() => submitTranscriptFeedback('down', feedbackText)}
-                      disabled={!feedbackText.trim()}
-                      className="px-3 py-1.5 bg-[#187aff] text-white rounded-md hover:bg-[#0f6ee6] disabled:opacity-50 transition-colors font-medium"
-                    >
-                      Submit
-                    </button>
-                  </div>
-                </div>
-              </div>
             ) : (
               <div className="flex items-center justify-between">
                 <span className="text-sm text-fd-muted-foreground font-medium">How is this conversation going?</span>
