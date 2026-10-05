@@ -49,8 +49,9 @@ func newHTTPTransport(denyList []AddressChecker, base *http.Transport) http.Roun
 }
 
 // denyProxiedTargets wraps proxy so that a request which would be sent through a proxy is
-// refused when its target is on the denyList. A request without a proxy is left to the
-// dial-time check.
+// refused when its target is on the denyList. The target is resolved with the request
+// context, so a stalled lookup cannot outlive the request. A request without a proxy is left
+// to the dial-time check.
 func denyProxiedTargets(denyList []AddressChecker, proxy func(*http.Request) (*url.URL, error)) func(*http.Request) (*url.URL, error) {
 	if proxy == nil {
 		return nil
@@ -60,7 +61,10 @@ func denyProxiedTargets(denyList []AddressChecker, proxy func(*http.Request) (*u
 		if err != nil || proxyURL == nil {
 			return proxyURL, err
 		}
-		if err := IsURLBlocked(denyList, req.URL, nil); err != nil {
+		lookup := func(host string) ([]net.IP, error) {
+			return net.DefaultResolver.LookupIP(req.Context(), "ip", host)
+		}
+		if err := IsURLBlocked(denyList, req.URL, lookup); err != nil {
 			return nil, err
 		}
 		return proxyURL, nil

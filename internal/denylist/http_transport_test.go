@@ -217,3 +217,31 @@ func TestNewHTTPTransport_TLSRejectsProxyRedirectedTarget(t *testing.T) {
 	assert.True(t, errors.As(err, &hostnameErr), "expected a certificate hostname error, got %v", err)
 	assert.Equal(t, int32(0), internalHits.Load(), "the redirected host must not receive the request")
 }
+
+// TestNewHTTPTransport_ProxiedLookupUsesRequestContext pins that the denylist lookup of a
+// proxied target ends with the request: a cancelled request is not resolved and never reaches
+// the proxy.
+func TestNewHTTPTransport_ProxiedLookupUsesRequestContext(t *testing.T) {
+	t.Parallel()
+
+	var proxyHits atomic.Int32
+	proxy := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		proxyHits.Add(1)
+	}))
+	defer proxy.Close()
+	proxyURL, err := url.Parse(proxy.URL)
+	require.NoError(t, err)
+
+	base := http.DefaultTransport.(*http.Transport).Clone()
+	base.Proxy = http.ProxyURL(proxyURL)
+	transport := newHTTPTransport([]AddressChecker{NewHostChecker("10.0.0.0/8")}, base).(*http.Transport)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://metadata.example.com/client", nil)
+	require.NoError(t, err)
+
+	_, err = transport.Proxy(req)
+	assert.ErrorIs(t, err, context.Canceled)
+	assert.Equal(t, int32(0), proxyHits.Load())
+}
