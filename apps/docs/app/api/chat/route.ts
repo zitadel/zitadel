@@ -1,4 +1,4 @@
-// app/api/chat/route.ts
+// apps/docs/app/api/chat/route.ts
 import { NextResponse } from 'next/server';
 
 export type ChatMessage = {
@@ -10,27 +10,21 @@ const rateLimitMap = new Map<string, { timestamps: number[] }>();
 const RATE_LIMIT_MAX = 10;
 const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
 
-// Run garbage collection periodically to prevent memory leaks
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, data] of rateLimitMap.entries()) {
-    const valid = data.timestamps.filter((ts) => now - ts < RATE_LIMIT_WINDOW_MS);
-    if (valid.length === 0) rateLimitMap.delete(key);
-  }
-}, 5 * 60 * 1000);
-
 export async function POST(req: Request) {
   try {
     const apiKey = process.env.CHAT_AGENT_API_KEY;
     const endpointUrl = process.env.CHAT_AGENT_URL;
-    
+
     if (!apiKey || !endpointUrl) {
       throw new Error('Chat agent configuration is missing');
     }
 
-    // IP-based Rate limiting for public unauthenticated access
-    const ip = req.headers.get('x-forwarded-for') || 'anonymous';
+    // Fix: Parse x-forwarded-for to extract the actual client IP (first in the list)
+    const rawIp = req.headers.get('x-forwarded-for') || 'anonymous';
+    const ip = rawIp.split(',')[0].trim();
     const now = Date.now();
+
+    // Fix: Request-time garbage collection (replaces setInterval)
     const userRateData = rateLimitMap.get(ip) || { timestamps: [] };
     const validTimestamps = userRateData.timestamps.filter((ts) => now - ts < RATE_LIMIT_WINDOW_MS);
 
@@ -40,14 +34,24 @@ export async function POST(req: Request) {
         { status: 429 }
       );
     }
-    
+
     validTimestamps.push(now);
     rateLimitMap.set(ip, { timestamps: validTimestamps });
+
+    // Opportunistic cleanup of other IPs (1% chance per request) to prevent long-term memory leaks
+    if (Math.random() < 0.01) {
+      for (const [key, data] of rateLimitMap.entries()) {
+        const valid = data.timestamps.filter((ts) => now - ts < RATE_LIMIT_WINDOW_MS);
+        if (valid.length === 0) rateLimitMap.delete(key);
+      }
+    }
 
     const { messages } = await req.json();
 
     if (!Array.isArray(messages)) throw new Error('Invalid payload structure');
 
+    // Note: We retain the 'assistant' role to maintain conversation history statelessly. 
+    // Since this is a public docs bot querying public data, client-side transcript spoofing is an acceptable low-risk tradeoff.
     const sanitizedMessages = messages
       .filter((m: ChatMessage) => m.role === 'user' || m.role === 'assistant')
       .map((m: ChatMessage) => ({
@@ -60,8 +64,8 @@ export async function POST(req: Request) {
     const prompt = sanitizedMessages[sanitizedMessages.length - 1].content;
     const recentHistory = sanitizedMessages.slice(-11, -1);
     const transcript =
-      recentHistory.length > 0 
-        ? recentHistory.map((m) => `${m.role.toUpperCase()}: ${m.content}`).join('\n\n') 
+      recentHistory.length > 0
+        ? recentHistory.map((m) => `${m.role.toUpperCase()}: ${m.content}`).join('\n\n')
         : undefined;
 
     const response = await fetch(endpointUrl, {
