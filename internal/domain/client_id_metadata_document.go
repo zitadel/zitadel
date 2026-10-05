@@ -6,8 +6,8 @@ import (
 )
 
 // IsClientIDMetadataDocumentURL reports whether clientID is a Client Identifier URL as defined
-// in section 3 of draft-ietf-oauth-client-id-metadata-document: an https URL with a host and a
-// path, without userinfo, fragment or dot path segments. A regular ZITADEL client_id is a
+// in section 3 of draft-ietf-oauth-client-id-metadata-document: an https URL with a hostname
+// (not only a port) and a path, without userinfo, fragment or dot path segments. A regular ZITADEL client_id is a
 // numeric snowflake (optionally suffixed) and is never such a URL.
 //
 // Percent-encoded dots, slashes and backslashes in the path are rejected too. They are not dot
@@ -15,7 +15,7 @@ import (
 // them as one, which would let a client_id escape the path of an allowed prefix.
 func IsClientIDMetadataDocumentURL(clientID string) bool {
 	u, err := url.Parse(clientID)
-	if err != nil || !u.IsAbs() || !strings.EqualFold(u.Scheme, "https") || u.Host == "" {
+	if err != nil || !u.IsAbs() || !strings.EqualFold(u.Scheme, "https") || u.Hostname() == "" {
 		return false
 	}
 	if u.User != nil || u.Fragment != "" || strings.Contains(clientID, "#") {

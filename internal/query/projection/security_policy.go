@@ -174,13 +174,14 @@ func (p *securityPolicyProjection) reduceClientIDMetadataDocumentAllowedURLs(e e
 }
 
 // newArrayAppendUniqueCol appends value to the array column unless it is already in it, so two
-// concurrent additions of the same value leave it in the array once.
+// concurrent additions of the same value leave it in the array once. A NULL column, as on a
+// policy row whose URLs were never set, starts from an empty array.
 func newArrayAppendUniqueCol(column string, value any) handler.Column {
 	return handler.Column{
 		Name:  column,
 		Value: value,
 		ParameterOpt: func(placeholder string) string {
-			return "array_append(array_remove(" + column + ", " + placeholder + "), " + placeholder + ")"
+			return "array_append(array_remove(COALESCE(" + column + ", '{}'), " + placeholder + "), " + placeholder + ")"
 		},
 	}
 }

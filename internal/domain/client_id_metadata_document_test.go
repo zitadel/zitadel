@@ -19,6 +19,8 @@ func TestIsClientIDMetadataDocumentURL(t *testing.T) {
 		{"https://app.example.com/.well-known/client", true},
 		{"https://app.example.com/client...json", true},
 		{"https://app.example.com", false},
+		{"https://:443/client", false},
+		{"https://:8443/", false},
 		{"https://user@app.example.com/client", false},
 		{"https://user:password@app.example.com/client", false},
 		{"https://app.example.com/client#fragment", false},

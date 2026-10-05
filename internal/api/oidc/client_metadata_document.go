@@ -9,11 +9,13 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/net/idna"
 	"golang.org/x/sync/singleflight"
+	"golang.org/x/time/rate"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/cache"
@@ -60,6 +62,10 @@ const (
 	// writes that follow it. The resolution is detached from the caller's cancellation, so this
 	// is what keeps a blocked cache connector from holding the shared call open.
 	clientIDMetadataResolveTimeout = 2 * clientIDMetadataFetchTimeout
+	// clientIDMetadataFetchesPerSecond and clientIDMetadataFetchBurst are the per-instance fetch
+	// bound when the configuration sets none.
+	clientIDMetadataFetchesPerSecond = 5
+	clientIDMetadataFetchBurst       = 20
 	// clientIDMetadataMaxCacheTTL caps how long a fetched document is cached, regardless of
 	// the Cache-Control or Expires headers the document is served with. It is the authoritative
 	// upper bound; the Caches.ClientIDMetadataDocuments.MaxAge config is a second, independent
@@ -78,21 +84,30 @@ type ClientIDMetadataDocumentConfig struct {
 	AllowedURLs []string
 	// AllowAnyURL allows every valid client_id URL, regardless of AllowedURLs.
 	AllowAnyURL bool
+	// FetchesPerSecond and FetchBurst bound the outbound document fetches per instance. The
+	// authorize and token endpoints are public, so without a bound a caller could have ZITADEL
+	// fetch, and cache, one document per made-up client_id under an allowed prefix.
+	FetchesPerSecond float64
+	FetchBurst       int
 }
 
 // clientIDMetadataAllowlist is the validated system configuration: the client_id URLs the
 // system allows, within which every instance chooses its own.
 type clientIDMetadataAllowlist struct {
-	urls     []string
-	allowAny bool
+	urls             []string
+	allowAny         bool
+	fetchesPerSecond float64
+	fetchBurst       int
 }
 
 // newClientIDMetadataAllowlist validates the configured entries. Every entry must itself be a
 // valid client_id URL, so that a prefix entry cannot be widened by a client_id that is not one.
 func newClientIDMetadataAllowlist(config ClientIDMetadataDocumentConfig) (clientIDMetadataAllowlist, error) {
 	allowlist := clientIDMetadataAllowlist{
-		urls:     make([]string, 0, len(config.AllowedURLs)),
-		allowAny: config.AllowAnyURL,
+		urls:             make([]string, 0, len(config.AllowedURLs)),
+		allowAny:         config.AllowAnyURL,
+		fetchesPerSecond: config.FetchesPerSecond,
+		fetchBurst:       config.FetchBurst,
 	}
 	for _, entry := range config.AllowedURLs {
 		entry = strings.TrimSpace(entry)
@@ -200,6 +215,9 @@ type clientIDMetadataResolver struct {
 	accessTokenLifetime time.Duration
 	idTokenLifetime     time.Duration
 	resolveTimeout      time.Duration
+	fetchesPerSecond    rate.Limit
+	fetchBurst          int
+	fetchLimiters       sync.Map // instance ID -> *rate.Limiter
 	logger              *slog.Logger
 }
 
@@ -221,15 +239,44 @@ func newClientIDMetadataResolver(
 	documentClient.CheckRedirect = func(*http.Request, []*http.Request) error {
 		return http.ErrUseLastResponse
 	}
-	return &clientIDMetadataResolver{
+	resolver := &clientIDMetadataResolver{
 		httpClient:          &documentClient,
 		allowlist:           allowlist,
 		cache:               documentCache,
 		accessTokenLifetime: accessTokenLifetime,
 		idTokenLifetime:     idTokenLifetime,
 		resolveTimeout:      clientIDMetadataResolveTimeout,
+		fetchesPerSecond:    rate.Limit(clientIDMetadataFetchesPerSecond),
+		fetchBurst:          clientIDMetadataFetchBurst,
 		logger:              logger,
 	}
+	if allowlist.fetchesPerSecond > 0 {
+		resolver.fetchesPerSecond = rate.Limit(allowlist.fetchesPerSecond)
+	}
+	if allowlist.fetchBurst > 0 {
+		resolver.fetchBurst = allowlist.fetchBurst
+	}
+	return resolver
+}
+
+// fetchAllowed reports whether the instance may fetch another document now. Each instance has
+// its own bucket, so one instance cannot use up another's fetches.
+func (r *clientIDMetadataResolver) fetchAllowed(instanceID string) bool {
+	limiter, _ := r.fetchLimiters.LoadOrStore(instanceID, rate.NewLimiter(r.fetchesPerSecond, r.fetchBurst))
+	return limiter.(*rate.Limiter).Allow()
+}
+
+// forRequest returns a copy of the cached client with the instance's current login settings
+// applied. The cache holds only what the document says, so a change to the required Login V2
+// base URI applies to the next request rather than when the cached document expires.
+func forRequest(ctx context.Context, cached *query.OIDCClient) *query.OIDCClient {
+	client := *cached
+	client.LoginVersion = domain.LoginVersion2
+	client.LoginBaseURI = nil
+	if loginV2 := authz.GetFeatures(ctx).LoginV2; loginV2.Required {
+		client.LoginBaseURI = (*query.URL)(loginV2.BaseURI)
+	}
+	return &client
 }
 
 // ResolveClient returns the synthetic public OIDC client described by the Client ID Metadata
@@ -284,12 +331,12 @@ func (r *clientIDMetadataResolver) ResolveClient(ctx context.Context, instanceID
 		if negative {
 			return nil, r.invalidClient(ctx, nil, "client id metadata document could not be resolved")
 		}
-		return client, nil
+		return forRequest(ctx, client), nil
 	}
 	results := r.group.DoChan(key, func() (any, error) {
 		resolveCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), r.resolveTimeout)
 		defer cancel()
-		return r.resolveAndCache(resolveCtx, clientID, key)
+		return r.resolveAndCache(resolveCtx, instanceID, clientID, key)
 	})
 	select {
 	case <-ctx.Done():
@@ -298,11 +345,16 @@ func (r *clientIDMetadataResolver) ResolveClient(ctx context.Context, instanceID
 		if result.Err != nil {
 			return nil, result.Err
 		}
-		return result.Val.(*query.OIDCClient), nil
+		return forRequest(ctx, result.Val.(*query.OIDCClient)), nil
 	}
 }
 
-func (r *clientIDMetadataResolver) resolveAndCache(ctx context.Context, clientID, key string) (*query.OIDCClient, error) {
+func (r *clientIDMetadataResolver) resolveAndCache(ctx context.Context, instanceID, clientID, key string) (*query.OIDCClient, error) {
+	// A fetch that is not allowed now is not a property of the document, so it is not cached:
+	// a later request resolves normally once the bucket refills.
+	if !r.fetchAllowed(instanceID) {
+		return nil, r.invalidClient(ctx, nil, "too many client id metadata document fetches, retry later")
+	}
 	client, ttl, err := r.fetchAndValidate(ctx, clientID)
 	if err != nil {
 		// Negatively cache the failure for a short floor so a repeated unresolvable client_id
@@ -460,12 +512,8 @@ func (r *clientIDMetadataResolver) documentToClient(ctx context.Context, clientI
 			AccessTokenLifetime: r.accessTokenLifetime,
 			IdTokenLifetime:     r.idTokenLifetime,
 		},
-		// CIMD clients always use the v2 login.
+		// CIMD clients always use the v2 login; the base URI is applied per request.
 		LoginVersion: domain.LoginVersion2,
-	}
-	// Like a stored client, a CIMD client uses the login base URI the instance requires.
-	if loginV2 := authz.GetFeatures(ctx).LoginV2; loginV2.Required {
-		client.LoginBaseURI = (*query.URL)(loginV2.BaseURI)
 	}
 	return client, nil
 }

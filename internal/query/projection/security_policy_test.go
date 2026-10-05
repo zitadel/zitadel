@@ -47,7 +47,7 @@ func TestSecurityPolicyProjection_reducesClientIDMetadataDocumentAllowedURLs(t *
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.security_policies3 SET client_id_metadata_document_allowed_urls = array_append(array_remove(client_id_metadata_document_allowed_urls, $1), $1) WHERE (instance_id = $2)",
+							expectedStmt: "UPDATE projections.security_policies3 SET client_id_metadata_document_allowed_urls = array_append(array_remove(COALESCE(client_id_metadata_document_allowed_urls, '{}'), $1), $1) WHERE (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"https://clients.example.com/",
 								"instance-id",

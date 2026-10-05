@@ -576,6 +576,70 @@ func TestClientIDMetadataResolver_LoginV2BaseURI(t *testing.T) {
 		assert.Equal(t, domain.LoginVersion2, client.LoginVersion)
 		assert.Nil(t, client.LoginBaseURI)
 	})
+	t.Run("a cached client follows the current login settings", func(t *testing.T) {
+		cachingServer := newMetadataServer(t, http.StatusOK, "max-age=600", func(clientID string) clientRegistrationRequest {
+			return clientRegistrationRequest{RedirectURIs: []string{clientID + "/callback"}, TokenEndpointAuthMethod: "none"}
+		})
+		documentCache := gomap.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry](
+			context.Background(),
+			[]clientIDMetadataCacheIndex{clientIDMetadataCacheIndexURL},
+			cache.Config{MaxAge: time.Hour, LastUseAge: time.Hour},
+		)
+		cachingResolver := newTestResolver(cachingServer.URL, cachingServer.Client(), documentCache)
+		required := authz.NewMockContext("instance", "org", "",
+			authz.WithMockClientIDMetadataDocumentAllowAnyURL(true),
+			authz.WithMockFeatures(feature.Features{LoginV2: feature.LoginV2{Required: true, BaseURI: baseURI}}),
+		)
+
+		client, err := cachingResolver.ResolveClient(required, "instance", cachingServer.URL+testClientIDPath)
+		require.NoError(t, err)
+		require.NotNil(t, client.LoginBaseURI)
+
+		client, err = cachingResolver.ResolveClient(testResolverContext(), "instance", cachingServer.URL+testClientIDPath)
+		require.NoError(t, err)
+		assert.Nil(t, client.LoginBaseURI, "the base URI of an earlier request must not stick to the cached client")
+
+		client, err = cachingResolver.ResolveClient(required, "instance", cachingServer.URL+testClientIDPath)
+		require.NoError(t, err)
+		require.NotNil(t, client.LoginBaseURI)
+		assert.Equal(t, baseURI.String(), (*url.URL)(client.LoginBaseURI).String())
+		assert.Equal(t, int32(1), cachingServer.hits.Load(), "all three requests must be served from the cache")
+	})
+}
+
+// TestClientIDMetadataResolver_FetchRateLimit pins that each instance has its own bucket of
+// outbound fetches, and that a fetch refused by the limit is not cached as a failure.
+func TestClientIDMetadataResolver_FetchRateLimit(t *testing.T) {
+	server := newMetadataServer(t, http.StatusOK, "no-store", func(clientID string) clientRegistrationRequest {
+		return clientRegistrationRequest{RedirectURIs: []string{clientID + "/callback"}, TokenEndpointAuthMethod: "none"}
+	})
+	documentCache := gomap.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry](
+		context.Background(),
+		[]clientIDMetadataCacheIndex{clientIDMetadataCacheIndexURL},
+		cache.Config{MaxAge: time.Hour, LastUseAge: time.Hour},
+	)
+	resolver := newClientIDMetadataResolver(server.Client(), clientIDMetadataAllowlist{
+		urls:             []string{server.URL + "/"},
+		fetchesPerSecond: 0.001,
+		fetchBurst:       2,
+	}, documentCache, time.Hour, time.Hour, nil)
+	ctx := testResolverContext()
+	clientID := server.URL + testClientIDPath
+
+	for range 2 {
+		_, err := resolver.ResolveClient(ctx, "instance", clientID)
+		require.NoError(t, err)
+	}
+	_, err := resolver.ResolveClient(ctx, "instance", clientID)
+	assertInvalidClient(t, err)
+	assert.Equal(t, int32(2), server.hits.Load(), "a fetch over the limit must not reach the server")
+
+	_, negative, ok := resolver.cached(ctx, clientIDMetadataCacheKey("instance", clientID))
+	assert.False(t, ok && negative, "a refused fetch must not be cached as a failure")
+
+	_, err = resolver.ResolveClient(ctx, "other-instance", clientID)
+	require.NoError(t, err, "another instance has its own bucket")
+	assert.Equal(t, int32(3), server.hits.Load())
 }
 
 // TestClientIDMetadataCacheEntry_JSONRoundTrip pins that a resolved client survives the JSON

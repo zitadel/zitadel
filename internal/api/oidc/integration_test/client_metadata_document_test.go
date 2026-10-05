@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -215,6 +216,25 @@ func TestServer_ClientIDMetadataDocument_instanceAllowedURLs(t *testing.T) {
 		assert.Nil(t, resp.GetDeletionDate())
 	})
 
+	t.Run("concurrent adds of the same url allow it once", func(t *testing.T) {
+		const concurrentURL = "https://127.0.0.1:8091/concurrent"
+		const adds = 5
+		codesByAdd := make([]codes.Code, adds)
+		var wg sync.WaitGroup
+		for i := range adds {
+			wg.Go(func() {
+				_, err := instance.Client.SettingsV2.AddClientIDMetadataDocumentAllowedURL(iamCTX, &settings.AddClientIDMetadataDocumentAllowedURLRequest{Url: concurrentURL})
+				codesByAdd[i] = status.Code(err)
+			})
+		}
+		wg.Wait()
+		assert.Equal(t, 1, countCode(codesByAdd, codes.OK), "exactly one add succeeds")
+		assert.Equal(t, adds-1, countCode(codesByAdd, codes.AlreadyExists), "every other add reports the url as already allowed")
+
+		_, err := instance.Client.SettingsV2.RemoveClientIDMetadataDocumentAllowedURL(iamCTX, &settings.RemoveClientIDMetadataDocumentAllowedURLRequest{Url: concurrentURL})
+		require.NoError(t, err)
+	})
+
 	t.Run("allow any url fetches every url the system allows", func(t *testing.T) {
 		setClientIDMetadataDocumentSettings(t, iamCTX, instance, &settings.ClientIDMetadataDocumentSettings{Enabled: true, AllowAnyUrl: true})
 		waitForClientIDMetadataDocumentSupport(t, ctx, issuer, true)
@@ -360,4 +380,15 @@ func fetchDiscoveryRaw(t testing.TB, issuer string) map[string]any {
 	var discovery map[string]any
 	require.NoError(t, json.NewDecoder(resp.Body).Decode(&discovery))
 	return discovery
+}
+
+// countCode returns how many of got equal want.
+func countCode(got []codes.Code, want codes.Code) int {
+	n := 0
+	for _, code := range got {
+		if code == want {
+			n++
+		}
+	}
+	return n
 }
