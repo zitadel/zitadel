@@ -265,6 +265,7 @@ func TestCacheTTLFromResponse(t *testing.T) {
 		{"no-store wins over max-age", http.Header{"Cache-Control": {"no-store, max-age=600"}}, 0},
 		{"no-store on a later header line", http.Header{"Cache-Control": {"public, max-age=600", "no-store"}}, 0},
 		{"max-age on a later header line", http.Header{"Cache-Control": {"public", "max-age=60"}}, time.Minute},
+		{"quoted max-age", http.Header{"Cache-Control": {`max-age="60"`}}, time.Minute},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

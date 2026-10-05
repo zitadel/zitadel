@@ -646,7 +646,8 @@ func maxAgeFromCacheControl(cacheControl string) (time.Duration, bool) {
 		if !ok {
 			continue
 		}
-		seconds, err := strconv.Atoi(strings.TrimSpace(value))
+		// delta-seconds may be sent as a quoted string (RFC 9111 section 5.2).
+		seconds, err := strconv.Atoi(strings.Trim(strings.TrimSpace(value), `"`))
 		if err != nil {
 			return 0, false
 		}

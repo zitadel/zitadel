@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -19,6 +20,8 @@ func TestIsClientIDMetadataDocumentURL(t *testing.T) {
 		{"https://app.example.com/.well-known/client", true},
 		{"https://app.example.com/client...json", true},
 		{"https://app.example.com", false},
+		{"https://app.example.com/" + strings.Repeat("a", MaxClientIDMetadataDocumentURLLength-len("https://app.example.com/")), true},
+		{"https://app.example.com/" + strings.Repeat("a", MaxClientIDMetadataDocumentURLLength-len("https://app.example.com/")+1), false},
 		{"https://:443/client", false},
 		{"https://:8443/", false},
 		{"https://user@app.example.com/client", false},

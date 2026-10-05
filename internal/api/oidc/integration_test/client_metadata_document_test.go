@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"slices"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -254,12 +255,18 @@ func TestServer_ClientIDMetadataDocument_instanceAllowedURLs(t *testing.T) {
 			})
 		}
 		wg.Wait()
+		// Under this much contention on one instance the eventstore may give up retrying a push;
+		// such a replacement stores nothing and must not leave a constraint behind either.
+		succeeded := 0
 		for _, err := range setErrs {
-			require.NoError(t, err)
+			if err == nil {
+				succeeded++
+			}
 		}
+		require.Positive(t, succeeded, "at least one replacement must succeed: %v", setErrs)
 
-		// Exactly the url of the replacement stored last is still taken; every other url can be
-		// added again, so no replacement left a constraint behind.
+		// Exactly the url of the replacement stored last is still taken, and it was stored by a
+		// replacement that succeeded; every other url can be added again.
 		addCodes := make([]codes.Code, sets)
 		for i, replacementURL := range replacementURLs {
 			_, err := instance.Client.SettingsV2.AddClientIDMetadataDocumentAllowedURL(iamCTX, &settings.AddClientIDMetadataDocumentAllowedURLRequest{Url: replacementURL})
@@ -267,6 +274,9 @@ func TestServer_ClientIDMetadataDocument_instanceAllowedURLs(t *testing.T) {
 		}
 		assert.Equal(t, 1, countCode(addCodes, codes.AlreadyExists), "only the stored url is still taken: %v", addCodes)
 		assert.Equal(t, sets-1, countCode(addCodes, codes.OK), "every replaced url is released: %v", addCodes)
+		if taken := slices.Index(addCodes, codes.AlreadyExists); taken >= 0 {
+			assert.NoError(t, setErrs[taken], "the stored url must come from a replacement that succeeded")
+		}
 
 		setClientIDMetadataDocumentSettings(t, iamCTX, instance, &settings.ClientIDMetadataDocumentSettings{Enabled: true, AllowedUrls: []string{}})
 	})

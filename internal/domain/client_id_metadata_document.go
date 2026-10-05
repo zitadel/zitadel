@@ -5,15 +5,24 @@ import (
 	"strings"
 )
 
+// MaxClientIDMetadataDocumentURLLength bounds a client_id URL, both as an allowlist entry and
+// as a client_id resolved at runtime, so an unauthenticated caller cannot make ZITADEL fetch or
+// cache arbitrarily long URLs under an allowed prefix.
+const MaxClientIDMetadataDocumentURLLength = 2048
+
 // IsClientIDMetadataDocumentURL reports whether clientID is a Client Identifier URL as defined
 // in section 3 of draft-ietf-oauth-client-id-metadata-document: an https URL with a hostname
-// (not only a port) and a path, without userinfo, fragment or dot path segments. A regular ZITADEL client_id is a
+// (not only a port) and a path, without userinfo, fragment or dot path segments, and at most
+// MaxClientIDMetadataDocumentURLLength long. A regular ZITADEL client_id is a
 // numeric snowflake (optionally suffixed) and is never such a URL.
 //
 // Percent-encoded dots, slashes and backslashes in the path are rejected too. They are not dot
 // segments as written, but a server that decodes them before resolving the path would treat
 // them as one, which would let a client_id escape the path of an allowed prefix.
 func IsClientIDMetadataDocumentURL(clientID string) bool {
+	if len(clientID) > MaxClientIDMetadataDocumentURLLength {
+		return false
+	}
 	u, err := url.Parse(clientID)
 	if err != nil || !u.IsAbs() || !strings.EqualFold(u.Scheme, "https") || u.Hostname() == "" {
 		return false
