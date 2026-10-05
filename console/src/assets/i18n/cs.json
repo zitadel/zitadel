@@ -2452,6 +2452,17 @@
     }
   },
   "SMTP": {
+    "RESTRICTIONS": {
+      "MANAGED": "Aktivního poskytovatele e-mailu spravuje provozovatel tohoto systému a je určen pro začátek.",
+      "LIMIT_HOURS": "Odešle nejvýše {{count}} e-mailů během {{duration}} hodin. Další e-maily se neodesílají.",
+      "LIMIT_MINUTES": "Odešle nejvýše {{count}} e-mailů během {{duration}} minut. Další e-maily se neodesílají.",
+      "RESERVED_DOMAINS": "E-maily na testovací domény jako example.com nebo .test se nedoručují.",
+      "HTML": "HTML ve vlastních textech zpráv je omezeno na jednoduché formátování. Odkazy, obrázky a styly jsou odstraněny.",
+      "OWN_PROVIDER": "Pro produkční použití nakonfigurujte vlastního poskytovatele.",
+      "HTML_HINT": "Aktivní poskytovatel e-mailu povoluje v textech zpráv pouze jednoduché formátování. Odkazy, obrázky a styly jsou odstraněny.",
+      "HTML_HINT_LINK": "Nakonfigurovat vlastního poskytovatele",
+      "ROW_TOOLTIP": "Spravuje provozovatel tohoto systému. Dokud je tento poskytovatel aktivní, platí omezení."
+    },
     "LIST": {
       "TITLE": "Poskytovatel SMTP",
       "DESCRIPTION": "Toto jsou poskytovatelé SMTP pro vaši instanci Zitadel. Aktivujte ten, který chcete používat k odesílání upozornění svým uživatelům.",

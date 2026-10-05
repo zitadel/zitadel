@@ -2460,6 +2460,17 @@
     }
   },
   "SMTP": {
+    "RESTRICTIONS": {
+      "MANAGED": "Furnizorul de e-mail activ este gestionat de operatorul acestui sistem și este destinat începutului.",
+      "LIMIT_HOURS": "Trimite cel mult {{count}} e-mailuri în {{duration}} ore. E-mailurile următoare nu sunt trimise.",
+      "LIMIT_MINUTES": "Trimite cel mult {{count}} e-mailuri în {{duration}} minute. E-mailurile următoare nu sunt trimise.",
+      "RESERVED_DOMAINS": "E-mailurile către domenii de test precum example.com sau .test nu sunt livrate.",
+      "HTML": "HTML-ul din textele personalizate ale mesajelor este redus la formatare simplă. Linkurile, imaginile și stilurile sunt eliminate.",
+      "OWN_PROVIDER": "Configurați propriul furnizor pentru utilizarea în producție.",
+      "HTML_HINT": "Furnizorul de e-mail activ permite doar formatare simplă în textele mesajelor. Linkurile, imaginile și stilurile sunt eliminate.",
+      "HTML_HINT_LINK": "Configurați propriul furnizor",
+      "ROW_TOOLTIP": "Gestionat de operatorul acestui sistem. Se aplică restricții cât timp acest furnizor este activ."
+    },
     "LIST": {
       "TITLE": "Furnizor SMTP",
       "DESCRIPTION": "Aceștia sunt furnizorii SMTP pentru instanța dvs. Zitadel. Activați-l pe cel pe care doriți să-l utilizați pentru a trimite notificări utilizatorilor dvs.",

@@ -2462,6 +2462,17 @@
     }
   },
   "SMTP": {
+    "RESTRICTIONS": {
+      "MANAGED": "De actieve e-mailprovider wordt beheerd door de beheerder van dit systeem en is bedoeld om mee te starten.",
+      "LIMIT_HOURS": "Er worden maximaal {{count}} e-mails binnen {{duration}} uur verzonden. Verdere e-mails worden niet verzonden.",
+      "LIMIT_MINUTES": "Er worden maximaal {{count}} e-mails binnen {{duration}} minuten verzonden. Verdere e-mails worden niet verzonden.",
+      "RESERVED_DOMAINS": "E-mails naar testdomeinen zoals example.com of .test worden niet afgeleverd.",
+      "HTML": "HTML in aangepaste berichtteksten wordt teruggebracht tot eenvoudige opmaak. Links, afbeeldingen en stijlen worden verwijderd.",
+      "OWN_PROVIDER": "Configureer een eigen provider voor productiegebruik.",
+      "HTML_HINT": "De actieve e-mailprovider staat alleen eenvoudige opmaak toe in berichtteksten. Links, afbeeldingen en stijlen worden verwijderd.",
+      "HTML_HINT_LINK": "Eigen provider configureren",
+      "ROW_TOOLTIP": "Beheerd door de beheerder van dit systeem. Zolang deze provider actief is, gelden er beperkingen."
+    },
     "LIST": {
       "TITLE": "SMTP-provider",
       "DESCRIPTION": "Dit zijn de SMTP-providers voor uw Zitadel-instantie. Activeer degene die u wilt gebruiken om meldingen naar uw gebruikers te sturen.",
