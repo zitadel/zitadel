@@ -326,6 +326,21 @@ func TestClientIDMetadataResolver_ResolveClient(t *testing.T) {
 		assertInvalidClient(t, err)
 	})
 
+	t.Run("response type without its grant type is rejected", func(t *testing.T) {
+		server := newMetadataServer(t, http.StatusOK, "", func(clientID string) clientRegistrationRequest {
+			return clientRegistrationRequest{
+				RedirectURIs:            []string{clientID + "/callback"},
+				GrantTypes:              []string{"authorization_code"},
+				ResponseTypes:           []string{"id_token"},
+				TokenEndpointAuthMethod: "none",
+			}
+		})
+		resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
+
+		_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+		assertInvalidClient(t, err)
+	})
+
 	t.Run("confidential auth method is rejected", func(t *testing.T) {
 		server := newMetadataServer(t, http.StatusOK, "", func(clientID string) clientRegistrationRequest {
 			return clientRegistrationRequest{

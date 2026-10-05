@@ -479,6 +479,9 @@ func (r *clientIDMetadataResolver) documentToClient(ctx context.Context, clientI
 	if regErr != nil {
 		return nil, r.invalidClient(ctx, regErr, regErr.ErrorDescription)
 	}
+	if !domain.ContainsRequiredGrantTypes(responseTypes, grantTypes) {
+		return nil, r.invalidClient(ctx, nil, "the requested grant and response type combination is not supported")
+	}
 
 	redirectURIs := originMatchedURIs(clientURL, doc.RedirectURIs)
 	if len(redirectURIs) == 0 {
