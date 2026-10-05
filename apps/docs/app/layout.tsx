@@ -1,6 +1,7 @@
 import './global.css';
 import type { Metadata } from 'next';
 import { Providers } from './providers';
+import { DocsChat } from '../components/docs-chat'; // Adjust the import path if necessary based on your folder structure
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
@@ -23,6 +24,7 @@ export default function Layout({ children }: any) {
     <html lang="en" suppressHydrationWarning>
       <body className="flex flex-col min-h-screen font-sans bg-fd-background text-fd-foreground">
         <Providers>{children}</Providers>
+        <DocsChat />
       </body>
     </html>
   );
