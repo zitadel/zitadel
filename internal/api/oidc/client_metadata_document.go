@@ -280,20 +280,6 @@ func forRequest(ctx context.Context, cached *query.OIDCClient) *query.OIDCClient
 	return &client
 }
 
-// ResolveClient returns the synthetic public OIDC client described by the Client ID Metadata
-// Document located at clientID, which must be an absolute HTTPS URL. A valid cache entry
-// (positive or negative) is served without a fetch; otherwise the document is fetched,
-// validated and cached. Concurrent resolutions of the same client_id share a single fetch.
-// Any fetch or validation failure is reported as an invalid_client error.
-//
-// The shared resolution deliberately does not inherit the caller's cancellation. It is started
-// by whichever request happens to miss the cache first, but its result is shared, so binding it
-// to that one request would let a single client disconnect abort the fetch for every waiter and,
-// worse, store the resulting failure as a negative cache entry that blocks the client_id for
-// everyone until it expires. context.WithoutCancel keeps the values (instance, features,
-// tracing) the resolution needs; the whole resolution, fetch and cache writes, stays bounded by
-// the resolve timeout, so detaching cannot leak a call that runs forever. Each caller still waits on its own
-// context, so a disconnected caller returns immediately instead of blocking on the shared work.
 // Supported reports whether Client ID Metadata Documents can be resolved for the instance in
 // ctx: the instance security settings must enable them, and at least one client_id URL must be
 // allowed by both the system and the instance. Discovery advertises support only then, so a
@@ -323,6 +309,21 @@ func (r *clientIDMetadataResolver) allowed(ctx context.Context, clientID string)
 	return domain.IsClientIDMetadataDocumentURL(clientID) && r.allowlist.allows(clientID) && instanceAllowsClientIDMetadataDocumentURL(ctx, clientID)
 }
 
+// ResolveClient returns the synthetic public OIDC client described by the Client ID Metadata
+// Document located at clientID, which must be an absolute HTTPS URL. A valid cache entry
+// (positive or negative) is served without a fetch; otherwise the document is fetched,
+// validated and cached. Concurrent resolutions of the same client_id share a single fetch.
+// Any fetch or validation failure is reported as an invalid_client error.
+//
+// The shared resolution deliberately does not inherit the caller's cancellation. It is started
+// by whichever request happens to miss the cache first, but its result is shared, so binding it
+// to that one request would let a single client disconnect abort the fetch for every waiter and,
+// worse, store the resulting failure as a negative cache entry that blocks the client_id for
+// everyone until it expires. context.WithoutCancel keeps the values (instance, features,
+// tracing) the resolution needs; the whole resolution, fetch and cache writes, stays bounded by
+// the resolve timeout, so detaching cannot leak a call that runs forever. Each caller still
+// waits on its own context, so a disconnected caller returns immediately instead of blocking on
+// the shared work.
 func (r *clientIDMetadataResolver) ResolveClient(ctx context.Context, instanceID, clientID string) (*query.OIDCClient, error) {
 	if !r.allowed(ctx, clientID) {
 		return nil, r.invalidClient(ctx, nil, "client_id is not an allowed client id metadata document url")
