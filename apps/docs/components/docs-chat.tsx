@@ -159,17 +159,10 @@ export function DocsChat() {
         {/* Header */}
         <div className="bg-fd-accent text-fd-accent-foreground p-4 flex justify-between items-center border-b border-fd-border">
           <div className="flex items-center gap-2.5">
-            {/* Light Mode Logo */}
             <img
-              src="/docs/zitadel-logo-solo-light.png"
+              src="/docs/zitadel-192x192.png"
               alt="Zitadel Logo"
-              className="w-6 h-6 object-contain block dark:hidden"
-            />
-            {/* Dark Mode Logo */}
-            <img
-              src="/docs/zitadel-logo-solo-darkdesign.svg"
-              alt="Zitadel Logo"
-              className="w-6 h-6 object-contain hidden dark:block"
+              className="w-6 h-6 object-contain"
             />
             {/* Swapped <h3> for <span> to bypass global typography styles */}
             <span className="font-semibold text-base tracking-tight">Zitadel AI Assistant</span>
@@ -354,14 +347,9 @@ export function DocsChat() {
         )}
       >
         <img
-          src="/docs/zitadel-logo-solo-light.png"
+          src="/docs/zitadel-192x192.png"
           alt="Zitadel Logo"
-          className="w-5 h-5 object-contain -ml-1 block dark:hidden"
-        />
-        <img
-          src="/docs/zitadel-logo-solo-darkdesign.svg"
-          alt="Zitadel Logo"
-          className="w-5 h-5 object-contain -ml-1 hidden dark:block"
+          className="w-5 h-5 object-contain -ml-1"
         />
         <span className="font-semibold text-sm whitespace-nowrap tracking-wide hidden sm:inline">Need Help?</span>
       </button>
