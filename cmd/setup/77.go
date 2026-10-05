@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/migration"
 )
 
 var (
@@ -17,6 +18,9 @@ var (
 	backfillCurrentStatesInTxOrder string
 )
 
+// StampEventPositionAtInsert is historical setup 77. It is no longer executed.
+// Existing Done events with this name remain the flag that filter_offset already
+// stores events2.in_tx_order. New installs never record this name.
 type StampEventPositionAtInsert struct {
 	dbClient *database.DB
 }
@@ -49,5 +53,5 @@ func (mig *StampEventPositionAtInsert) Execute(ctx context.Context, _ eventstore
 }
 
 func (mig *StampEventPositionAtInsert) String() string {
-	return "77_eventstore_position_clock_timestamp"
+	return migration.EventstorePositionClockTimestampStep
 }

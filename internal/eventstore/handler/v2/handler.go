@@ -49,6 +49,10 @@ type Config struct {
 		ActiveInstances() []string
 	}
 	SkipInstanceIDs []string
+
+	// FilterOffsetIsCursor is true when setup 77 is stored as done, so
+	// current_states.filter_offset already holds events2.in_tx_order.
+	FilterOffsetIsCursor bool
 }
 
 type Handler struct {
@@ -76,6 +80,8 @@ type Handler struct {
 	metrics *ProjectionMetrics
 
 	skipInstanceIDs []string
+
+	filterOffsetIsCursor bool
 }
 
 var _ migration.Migration = (*Handler)(nil)
@@ -195,8 +201,9 @@ func NewHandler(
 			}
 			return nil, nil
 		},
-		metrics:         metrics,
-		skipInstanceIDs: config.SkipInstanceIDs,
+		metrics:              metrics,
+		skipInstanceIDs:      config.SkipInstanceIDs,
+		filterOffsetIsCursor: config.FilterOffsetIsCursor,
 	}
 
 	if _, ok := projection.(GlobalProjection); ok {
@@ -648,7 +655,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	}
 	eventAmount := len(events)
 
-	statements, err := h.eventsToStatements(ctx, tx, events)
+	statements, err := h.eventsToStatements(ctx, tx, events, currentState)
 	if err != nil || len(statements) == 0 {
 		return nil, false, err
 	}
@@ -715,14 +722,25 @@ func (h *Handler) eventQuery(currentState *state, minPosition decimal.Decimal) *
 		OrderAsc().
 		InstanceID(currentState.instanceID)
 
+	resumeAfterSortKey := h.resumeAfterSortKey(currentState, minPosition)
 	if minPosition.GreaterThan(decimal.NewFromInt(0)) {
 		builder = builder.PositionAtLeast(minPosition)
-	} else if !currentState.cursor.IsZero() {
+	} else if resumeAfterSortKey {
 		builder = builder.AfterEventSortKey(currentState.cursor)
+	} else if currentState.cursor.Position.GreaterThan(decimal.Decimal{}) {
+		builder = builder.PositionAtLeast(currentState.cursor.Position)
+		if currentState.offset > 0 {
+			builder = builder.Offset(currentState.offset)
+		}
 	}
 
 	if h.queryGlobal {
 		return builder
+	}
+
+	// OFFSET resume cannot scan event types separately (repository requires Offset == 0).
+	if !resumeAfterSortKey && currentState.cursor.Position.GreaterThan(decimal.Decimal{}) {
+		return h.eventQuerySingle(builder)
 	}
 
 	// Reading each event type separately keeps the cost of a batch bounded by the bulk limit.
@@ -737,6 +755,10 @@ func (h *Handler) eventQuery(currentState *state, minPosition decimal.Decimal) *
 		return builder
 	}
 
+	return h.eventQuerySingle(builder)
+}
+
+func (h *Handler) eventQuerySingle(builder *eventstore.SearchQueryBuilder) *eventstore.SearchQueryBuilder {
 	aggregateTypes := make([]eventstore.AggregateType, 0, len(h.eventTypes))
 	eventTypes := make([]eventstore.EventType, 0, len(h.eventTypes))
 	for aggregate, events := range h.eventTypes {
@@ -744,6 +766,16 @@ func (h *Handler) eventQuery(currentState *state, minPosition decimal.Decimal) *
 		eventTypes = append(eventTypes, events...)
 	}
 	return builder.AddQuery().AggregateTypes(aggregateTypes...).EventTypes(eventTypes...).Builder()
+}
+
+func (h *Handler) resumeAfterSortKey(currentState *state, minPosition decimal.Decimal) bool {
+	if minPosition.GreaterThan(decimal.NewFromInt(0)) {
+		return false
+	}
+	if currentState.cursor.IsZero() {
+		return false
+	}
+	return h.filterOffsetIsCursor || currentState.inTxOrderSet
 }
 
 // ProjectionName returns the name of the underlying projection.

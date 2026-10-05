@@ -109,15 +109,21 @@ var (
 )
 
 func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm, systemUsers map[string]*internal_authz.SystemAPIUser) error {
+	filterOffsetIsCursor, err := filterOffsetIsCursorFromEventstore(ctx, es)
+	if err != nil {
+		return fmt.Errorf("unable to detect projection cursor compatibility: %w", err)
+	}
+
 	projectionConfig = handler.Config{
-		Client:              sqlClient,
-		Eventstore:          es,
-		BulkLimit:           uint16(config.BulkLimit),
-		RequeueEvery:        config.RequeueEvery,
-		MaxFailureCount:     config.MaxFailureCount,
-		RetryFailedAfter:    config.RetryFailedAfter,
-		TransactionDuration: config.TransactionDuration,
-		ActiveInstancer:     config.ActiveInstancer,
+		Client:               sqlClient,
+		Eventstore:           es,
+		BulkLimit:            uint16(config.BulkLimit),
+		RequeueEvery:         config.RequeueEvery,
+		MaxFailureCount:      config.MaxFailureCount,
+		RetryFailedAfter:     config.RetryFailedAfter,
+		TransactionDuration:  config.TransactionDuration,
+		ActiveInstancer:      config.ActiveInstancer,
+		FilterOffsetIsCursor: filterOffsetIsCursor,
 	}
 
 	if config.MaxParallelTriggers == 0 {
@@ -272,6 +278,16 @@ func ProjectInstanceFields(ctx context.Context) error {
 
 func ApplyCustomConfig(customConfig CustomConfig) handler.Config {
 	return applyCustomConfig(projectionConfig, customConfig)
+}
+
+// FilterOffsetIsCursor reports whether setup 77 is stored as done, so
+// current_states.filter_offset already holds events2.in_tx_order.
+func FilterOffsetIsCursor() bool {
+	return projectionConfig.FilterOffsetIsCursor
+}
+
+func filterOffsetIsCursorFromEventstore(ctx context.Context, es handler.EventStore) (bool, error) {
+	return migration.IsStepDone(ctx, es, migration.EventstorePositionClockTimestampStep)
 }
 
 func applyCustomConfig(config handler.Config, customConfig CustomConfig) handler.Config {
