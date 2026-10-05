@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, combineLatest, map } from 'rxjs';
+import { BehaviorSubject, combineLatest, switchMap } from 'rxjs';
 
 import { ManagementService } from './mgmt.service';
 
@@ -43,11 +43,12 @@ export class BreadcrumbService {
     this.mgmtService.ownedProjects,
     this.mgmtService.grantedProjects,
   ]).pipe(
-    map(([breadcrumbs, projects, grantedProjects]) => {
-      const newValues = breadcrumbs.map((b) => {
+    switchMap(([breadcrumbs, projects, grantedProjects]) => {
+      const newValues = breadcrumbs.map(async (b) => {
         if (!b.name && b.type === BreadcrumbType.PROJECT) {
           const project = projects.find((project) => b.param && project.id === b.param.value);
-          b.name = project?.name ?? '';
+          // only a part of the projects is preloaded, so the name might need to be loaded
+          b.name = project?.name ?? (b.param ? await this.projectName(b.param.value) : '');
           return b;
         } else if (!b.name && b.type === BreadcrumbType.GRANTEDPROJECT) {
           const grantedproject = grantedProjects.find(
@@ -59,11 +60,18 @@ export class BreadcrumbService {
           return b;
         }
       });
-      return newValues;
+      return Promise.all(newValues);
     }),
   );
 
   constructor(private mgmtService: ManagementService) {}
+
+  private projectName(projectId: string): Promise<string> {
+    return this.mgmtService
+      .getProjectByID(projectId)
+      .then((resp) => resp.project?.name ?? '')
+      .catch(() => '');
+  }
 
   public setBreadcrumb(breadcrumbs: Breadcrumb[]) {
     this.breadcrumbs$.next(breadcrumbs);

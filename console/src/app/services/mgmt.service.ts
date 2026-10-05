@@ -2239,10 +2239,10 @@ export class ManagementService {
     }
     return this.grpcService.mgmt.listProjects(req, null).then((value) => {
       const obj = value.toObject();
-      const count = obj.resultList.length;
-      if (count >= 0) {
+      // filtered results (e.g. of a search) don't represent the projects of the organization
+      if (!queryList?.length) {
         this.ownedProjects.next(obj.resultList);
-        this.ownedProjectsCount.next(count);
+        this.ownedProjectsCount.next(obj.details?.totalResult ?? obj.resultList.length);
       }
 
       return obj;
@@ -2270,8 +2270,11 @@ export class ManagementService {
     }
     return this.grpcService.mgmt.listGrantedProjects(req, null).then((value) => {
       const obj = value.toObject();
-      this.grantedProjects.next(obj.resultList);
-      this.grantedProjectsCount.next(obj.resultList.length);
+      // filtered results (e.g. of a search) don't represent the projects granted to the organization
+      if (!queryList?.length) {
+        this.grantedProjects.next(obj.resultList);
+        this.grantedProjectsCount.next(obj.details?.totalResult ?? obj.resultList.length);
+      }
       return obj;
     });
   }

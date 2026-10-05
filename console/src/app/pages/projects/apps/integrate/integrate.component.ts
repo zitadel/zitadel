@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit, effect, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, Subject, combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 import { OIDCAppType } from 'src/app/proto/generated/zitadel/app_pb';
 import { AddAPIAppResponse, AddOIDCAppRequest, AddOIDCAppResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -67,14 +67,21 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
   }
 
   public projectName$ = combineLatest([this.mgmtService.ownedProjects, this.mgmtService.grantedProjects]).pipe(
-    map(([projects, grantedProjects]) => {
-      const project = projects.find((project) => project.id === this.activatedRoute.snapshot.paramMap.get('projectid'));
+    switchMap(async ([projects, grantedProjects]) => {
+      const projectId = this.activatedRoute.snapshot.paramMap.get('projectid');
+      const project = projects.find((project) => project.id === projectId);
 
-      const grantedproject = grantedProjects.find(
-        (grantedproject) => grantedproject.projectId === this.activatedRoute.snapshot.paramMap.get('projectid'),
-      );
+      const grantedproject = grantedProjects.find((grantedproject) => grantedproject.projectId === projectId);
 
-      return project?.name ?? grantedproject?.projectName ?? '';
+      const name = project?.name ?? grantedproject?.projectName;
+      if (name || !projectId) {
+        return name ?? '';
+      }
+      // only a part of the projects is preloaded, so the name might need to be loaded
+      return this.mgmtService
+        .getProjectByID(projectId)
+        .then((resp) => resp.project?.name ?? '')
+        .catch(() => '');
     }),
   );
 

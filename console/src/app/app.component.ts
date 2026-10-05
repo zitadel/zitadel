@@ -24,6 +24,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NewOrganizationService } from './services/new-organization.service';
 import { NewAuthService } from './services/new-auth.service';
 
+const PROJECT_PRELOAD_LIMIT = 100;
+
 @Component({
   selector: 'cnsl-root',
   templateUrl: './app.component.html',
@@ -298,8 +300,9 @@ export class AppComponent {
   private getProjectCount(): void {
     this.authService.isAllowed(['project.read']).subscribe((allowed) => {
       if (allowed) {
-        this.mgmtService.listProjects(0, 0).then();
-        this.mgmtService.listGrantedProjects(0, 0).then();
+        // the counts are taken from the total result, the loaded projects are used for the shortcuts and breadcrumbs
+        this.mgmtService.listProjects(PROJECT_PRELOAD_LIMIT, 0).then();
+        this.mgmtService.listGrantedProjects(PROJECT_PRELOAD_LIMIT, 0).then();
       }
     });
   }
