@@ -164,8 +164,7 @@ export function DocsChat() {
               alt="Zitadel Logo"
               className="w-6 h-6 object-contain"
             />
-            {/* Swapped <h3> for <span> to bypass global typography styles */}
-            <span className="font-semibold text-base tracking-tight">Zitadel AI Assistant</span>
+            <span className="font-semibold text-lg tracking-tight text-black dark:text-white">Zitadel AI Assistant</span>
           </div>
 
           <div className="flex gap-1 items-center">
