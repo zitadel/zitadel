@@ -1,0 +1,74 @@
+---
+title: Technical Advisory 10018
+description: "A-10018: List endpoints of the v1 and v2 APIs enforce a default and maximum limit on the number of returned results"
+---
+
+## Date and Version
+
+Versions: >= v4.20.0
+
+Date: 2026-10-XX
+
+## Description
+
+The list endpoints of the ZITADEL APIs support pagination through the `limit` and `offset` of their query.
+The number of returned results is controlled by two runtime settings:
+
+- `SystemDefaults.DefaultQueryLimit` (default `100`): the limit applied if a request does not specify one.
+- `SystemDefaults.MaxQueryLimit` (default `1000`): the highest limit a request may specify.
+
+Several list endpoints did not apply these settings.
+A request without a `limit` returned **all** matching results, and a request with a higher `limit` than allowed was not rejected.
+This contradicts the API documentation and can cause expensive database queries on large instances.
+
+For the v1 APIs, this is a regression: they previously applied a default and maximum limit of 1000 (configured by `SearchLimit`), which was lost during a refactoring.
+
+With this release, the limits are enforced on all list endpoints.
+
+## Impact
+
+### v2 APIs
+
+The following endpoints now behave like all other v2 list endpoints:
+
+- `zitadel.user.v2.UserService.ListUsers` (and v2beta)
+- `zitadel.user.v2.UserService.ListIDPLinks`
+- `zitadel.org.v2.OrganizationService.ListOrganizations`
+- `zitadel.session.v2.SessionService.ListSessions` (and v2beta)
+
+Requests without a `limit` return at most `DefaultQueryLimit` (100) results.
+Requests with a `limit` greater than `MaxQueryLimit` (1000) fail with an `InvalidArgument` error.
+
+### v1 APIs
+
+All list endpoints of the Admin, Auth, Management and System APIs, including the change endpoints (e.g. `ListUserChanges`), are affected.
+
+Requests without a `limit` return at most `MaxQueryLimit` (1000) results, as they did before the regression.
+Requests with a `limit` greater than `MaxQueryLimit` fail with an `InvalidArgument` error.
+
+The `Auth.SearchLimit` and `Admin.SearchLimit` configuration options are removed.
+`Admin.SearchLimit` had no effect.
+`Auth.SearchLimit` only limited the refresh tokens returned by `ListMyRefreshTokens`, which are now limited by `MaxQueryLimit`.
+
+### Who is affected
+
+Clients that call one of the endpoints above **without** a `limit` and expect to receive all results.
+They now silently receive only the first page of results.
+
+## Mitigation
+
+Paginate the requests:
+
+1. Set the `limit` of the query to the page size (at most 1000).
+2. Increase the `offset` by the page size for each subsequent request.
+3. Stop when the number of received results reaches the `total_result` in the `details` of the response.
+
+To detect affected requests, compare the number of returned results with the `total_result` in the `details` of the response.
+
+If you are running ZITADEL self-hosted and need time to update your clients, you can restore the previous behavior by setting `DefaultQueryLimit` and / or `MaxQueryLimit` to `0`
+(`ZITADEL_SYSTEMDEFAULTS_DEFAULTQUERYLIMIT` / `ZITADEL_SYSTEMDEFAULTS_MAXQUERYLIMIT`).
+Note that this disables the limits for **all** list endpoints, including the ones that enforced them already, and is not recommended for production.
+
+### No action needed if
+
+- All your list requests specify a `limit` of at most 1000 and paginate using the `offset`.
