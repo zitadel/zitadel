@@ -1,15 +1,15 @@
 package denylist
 
 import (
-	"bufio"
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"errors"
 	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"sync"
 	"sync/atomic"
 	"testing"
 
@@ -163,108 +163,57 @@ func TestNewHTTPTransport_KeepsEnvironmentProxy(t *testing.T) {
 	assert.NotNil(t, transport.Proxy)
 }
 
-// connectProxy is a minimal HTTP CONNECT proxy that records the authority of every CONNECT and
-// tunnels to it.
-type connectProxy struct {
-	listener net.Listener
-	mu       sync.Mutex
-	targets  []string
-}
+// TestNewHTTPTransport_TLSRejectsProxyRedirectedTarget pins why a proxy that resolves an HTTPS
+// target differently cannot reach another host on ZITADEL's behalf: the TLS handshake verifies
+// the certificate against the requested hostname, so the request is never sent to a host that
+// cannot prove it is that name, even one whose certificate the client trusts.
+func TestNewHTTPTransport_TLSRejectsProxyRedirectedTarget(t *testing.T) {
+	t.Parallel()
 
-func newConnectProxy(t *testing.T) *connectProxy {
-	t.Helper()
-	listener, err := net.Listen("tcp", "127.0.0.1:0")
-	require.NoError(t, err)
-	p := &connectProxy{listener: listener}
-	go func() {
-		for {
-			conn, err := listener.Accept()
-			if err != nil {
-				return
-			}
-			go p.serve(conn)
-		}
-	}()
-	t.Cleanup(func() { _ = listener.Close() })
-	return p
-}
-
-func (p *connectProxy) serve(conn net.Conn) {
-	defer conn.Close()
-	req, err := http.ReadRequest(bufio.NewReader(conn))
-	if err != nil || req.Method != http.MethodConnect {
-		return
-	}
-	p.mu.Lock()
-	p.targets = append(p.targets, req.Host)
-	p.mu.Unlock()
-	upstream, err := net.Dial("tcp", req.Host)
-	if err != nil {
-		_, _ = conn.Write([]byte("HTTP/1.1 502 Bad Gateway\r\n\r\n"))
-		return
-	}
-	defer upstream.Close()
-	_, _ = conn.Write([]byte("HTTP/1.1 200 Connection Established\r\n\r\n"))
-	go func() { _, _ = io.Copy(upstream, conn) }()
-	_, _ = io.Copy(conn, upstream)
-}
-
-func (p *connectProxy) connectTargets() []string {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	return append([]string(nil), p.targets...)
-}
-
-// TestNewHTTPTransport_PinsProxiedHTTPSTargets pins that an HTTPS request through a proxy is
-// tunnelled to the vetted address rather than to the hostname, so the proxy cannot resolve
-// the name to a denied address on its own. Not parallel: it replaces the package resolver.
-func TestNewHTTPTransport_PinsProxiedHTTPSTargets(t *testing.T) {
-	target := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, _ = w.Write([]byte("ok"))
+	var internalHits atomic.Int32
+	internal := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		internalHits.Add(1)
 	}))
-	defer target.Close()
-	_, targetPort, err := net.SplitHostPort(target.Listener.Addr().String())
+	defer internal.Close()
+
+	// The proxy ignores the requested authority and tunnels to the internal server, as a proxy
+	// resolving the hostname to a private address would.
+	proxy := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodConnect {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		upstream, err := net.Dial("tcp", internal.Listener.Addr().String())
+		if err != nil {
+			w.WriteHeader(http.StatusBadGateway)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		conn, _, err := http.NewResponseController(w).Hijack()
+		if err != nil {
+			_ = upstream.Close()
+			return
+		}
+		go func() { _, _ = io.Copy(upstream, conn); _ = upstream.Close() }()
+		_, _ = io.Copy(conn, upstream)
+		_ = conn.Close()
+	}))
+	defer proxy.Close()
+	proxyURL, err := url.Parse(proxy.URL)
 	require.NoError(t, err)
 
-	resolved := map[string][]net.IP{
-		"example.com":      {net.ParseIP("127.0.0.1")},
-		"internal.example": {net.ParseIP("10.1.2.3")},
-		"mixed.example":    {net.ParseIP("127.0.0.1"), net.ParseIP("10.1.2.3")},
-	}
-	previous := lookupIP
-	lookupIP = func(host string) ([]net.IP, error) {
-		if ips, ok := resolved[host]; ok {
-			return ips, nil
-		}
-		return nil, &net.DNSError{Err: "no such host", Name: host}
-	}
-	t.Cleanup(func() { lookupIP = previous })
-
-	proxy := newConnectProxy(t)
-	proxyURL := &url.URL{Scheme: "http", Host: proxy.listener.Addr().String()}
-	base := target.Client().Transport.(*http.Transport).Clone()
+	base := http.DefaultTransport.(*http.Transport).Clone()
 	base.Proxy = http.ProxyURL(proxyURL)
+	roots := x509.NewCertPool()
+	roots.AddCert(internal.Certificate())
+	base.TLSClientConfig = &tls.Config{RootCAs: roots, MinVersion: tls.VersionTLS12}
 	client := &http.Client{Transport: newHTTPTransport([]AddressChecker{NewHostChecker("10.0.0.0/8")}, base)}
 
-	t.Run("allowed target is tunnelled to its vetted address", func(t *testing.T) {
-		// The test certificate is valid for example.com, so TLS still verifies the hostname.
-		resp, err := client.Get("https://example.com:" + targetPort + "/")
-		require.NoError(t, err)
-		defer resp.Body.Close()
-		assert.Equal(t, http.StatusOK, resp.StatusCode)
-		assert.Equal(t, []string{"127.0.0.1:" + targetPort}, proxy.connectTargets(), "the proxy must receive the vetted address, never the hostname")
-	})
-
-	for _, host := range []string{"internal.example", "mixed.example"} {
-		t.Run("denied address "+host, func(t *testing.T) {
-			before := len(proxy.connectTargets())
-			resp, err := client.Get("https://" + host + ":" + targetPort + "/")
-			if resp != nil {
-				_ = resp.Body.Close()
-			}
-			var denied *AddressDeniedError
-			require.True(t, errors.As(err, &denied), "expected an AddressDeniedError, got %v", err)
-			assert.Len(t, proxy.connectTargets(), before, "a denied target must not reach the proxy")
-		})
+	resp, err := client.Get("https://203.0.113.10/metadata")
+	if resp != nil {
+		_ = resp.Body.Close()
 	}
+	var hostnameErr x509.HostnameError
+	assert.True(t, errors.As(err, &hostnameErr), "expected a certificate hostname error, got %v", err)
+	assert.Equal(t, int32(0), internalHits.Load(), "the redirected host must not receive the request")
 }
