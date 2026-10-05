@@ -23,63 +23,63 @@ import (
 
 func init() {
 	RegisterSentHandler(user.HumanInitialCodeAddedType,
-		func(ctx context.Context, commands Commands, id, orgID string, _ *senders.CodeGeneratorInfo, deliverySuppressed bool, args map[string]any) error {
-			return commands.HumanInitCodeSent(ctx, orgID, id, deliverySuppressed)
+		func(ctx context.Context, commands Commands, id, orgID string, _ *senders.CodeGeneratorInfo, deliveryInfo senders.DeliveryInfo, args map[string]any) error {
+			return commands.HumanInitCodeSent(ctx, orgID, id, deliveryInfo)
 		},
 	)
 	RegisterSentHandler(user.HumanEmailCodeAddedType,
-		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, deliverySuppressed bool, args map[string]any) error {
-			return commands.HumanEmailVerificationCodeSent(ctx, orgID, id, deliverySuppressed)
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, deliveryInfo senders.DeliveryInfo, args map[string]any) error {
+			return commands.HumanEmailVerificationCodeSent(ctx, orgID, id, deliveryInfo)
 		},
 	)
 	RegisterSentHandler(user.HumanPasswordCodeAddedType,
-		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, deliverySuppressed bool, args map[string]any) error {
-			return commands.PasswordCodeSent(ctx, orgID, id, generatorInfo, deliverySuppressed)
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, deliveryInfo senders.DeliveryInfo, args map[string]any) error {
+			return commands.PasswordCodeSent(ctx, orgID, id, generatorInfo, deliveryInfo)
 		},
 	)
 	RegisterSentHandler(user.HumanOTPSMSCodeAddedType,
-		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, _ bool, args map[string]any) error {
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, _ senders.DeliveryInfo, args map[string]any) error {
 			return commands.HumanOTPSMSCodeSent(ctx, id, orgID, generatorInfo)
 		},
 	)
 	RegisterSentHandler(session.OTPSMSChallengedType,
-		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, _ bool, args map[string]any) error {
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, _ senders.DeliveryInfo, args map[string]any) error {
 			return commands.OTPSMSSent(ctx, id, orgID, generatorInfo)
 		},
 	)
 	RegisterSentHandler(user.HumanOTPEmailCodeAddedType,
-		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, deliverySuppressed bool, args map[string]any) error {
-			return commands.HumanOTPEmailCodeSent(ctx, id, orgID, deliverySuppressed)
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, deliveryInfo senders.DeliveryInfo, args map[string]any) error {
+			return commands.HumanOTPEmailCodeSent(ctx, id, orgID, deliveryInfo)
 		},
 	)
 	RegisterSentHandler(session.OTPEmailChallengedType,
-		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, deliverySuppressed bool, args map[string]any) error {
-			return commands.OTPEmailSent(ctx, id, orgID, deliverySuppressed)
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, deliveryInfo senders.DeliveryInfo, args map[string]any) error {
+			return commands.OTPEmailSent(ctx, id, orgID, deliveryInfo)
 		},
 	)
 	RegisterSentHandler(user.UserDomainClaimedType,
-		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, deliverySuppressed bool, args map[string]any) error {
-			return commands.UserDomainClaimedSent(ctx, orgID, id, deliverySuppressed)
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, deliveryInfo senders.DeliveryInfo, args map[string]any) error {
+			return commands.UserDomainClaimedSent(ctx, orgID, id, deliveryInfo)
 		},
 	)
 	RegisterSentHandler(user.HumanPasswordlessInitCodeRequestedType,
-		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, deliverySuppressed bool, args map[string]any) error {
-			return commands.HumanPasswordlessInitCodeSent(ctx, id, orgID, args["CodeID"].(string), deliverySuppressed)
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, deliveryInfo senders.DeliveryInfo, args map[string]any) error {
+			return commands.HumanPasswordlessInitCodeSent(ctx, id, orgID, args["CodeID"].(string), deliveryInfo)
 		},
 	)
 	RegisterSentHandler(user.HumanPasswordChangedType,
-		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, deliverySuppressed bool, args map[string]any) error {
-			return commands.PasswordChangeSent(ctx, orgID, id, deliverySuppressed)
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, deliveryInfo senders.DeliveryInfo, args map[string]any) error {
+			return commands.PasswordChangeSent(ctx, orgID, id, deliveryInfo)
 		},
 	)
 	RegisterSentHandler(user.HumanPhoneCodeAddedType,
-		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, _ bool, args map[string]any) error {
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, _ senders.DeliveryInfo, args map[string]any) error {
 			return commands.HumanPhoneVerificationCodeSent(ctx, orgID, id, generatorInfo)
 		},
 	)
 	RegisterSentHandler(user.HumanInviteCodeAddedType,
-		func(ctx context.Context, commands Commands, id, orgID string, _ *senders.CodeGeneratorInfo, deliverySuppressed bool, args map[string]any) error {
-			return commands.InviteCodeSent(ctx, id, orgID, deliverySuppressed)
+		func(ctx context.Context, commands Commands, id, orgID string, _ *senders.CodeGeneratorInfo, deliveryInfo senders.DeliveryInfo, args map[string]any) error {
+			return commands.InviteCodeSent(ctx, id, orgID, deliveryInfo)
 		},
 	)
 }

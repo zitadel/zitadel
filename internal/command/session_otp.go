@@ -99,7 +99,7 @@ func (c *Commands) createOTPEmailChallenge(returnCode bool, urlTmpl string, dst 
 	}
 }
 
-func (c *Commands) OTPEmailSent(ctx context.Context, sessionID, resourceOwner string, deliverySuppressed bool) error {
+func (c *Commands) OTPEmailSent(ctx context.Context, sessionID, resourceOwner string, deliveryInfo senders.DeliveryInfo) error {
 	sessionWriteModel := NewSessionWriteModel(sessionID, resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
 	if err != nil {
@@ -109,7 +109,7 @@ func (c *Commands) OTPEmailSent(ctx context.Context, sessionID, resourceOwner st
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-SLr02", "Errors.User.Code.NotFound")
 	}
 	return c.pushAppendAndReduce(ctx, sessionWriteModel,
-		session.NewOTPEmailSentEvent(ctx, &session.NewAggregate(sessionID, sessionWriteModel.ResourceOwner).Aggregate, deliverySuppressed),
+		session.NewOTPEmailSentEvent(ctx, &session.NewAggregate(sessionID, sessionWriteModel.ResourceOwner).Aggregate, deliveryInfo),
 	)
 }
 

@@ -97,13 +97,15 @@ func TestSendEmail(t *testing.T) {
 		germanText = `Dieser Benutzer wurde soeben im Zitadel erstellt. Mit dem Benutzernamen <br><strong>{{.PreferredLoginName}}</strong><br> kannst du dich anmelden. (Code <strong>{{.Code}}</strong>)`
 	)
 	smtpConfig := &email.Config{
+		ProviderConfig: &email.Provider{ID: "smtpProvider"},
 		SMTPConfig: &smtp.Config{
 			SMTP: smtp.SMTP{Host: "smtp.example.com:587"},
 			From: "noreply@example.com",
 		},
 	}
 	webhookConfig := &email.Config{
-		WebhookConfig: &webhook.Config{CallURL: "https://relay.example.com"},
+		ProviderConfig: &email.Provider{ID: "webhookProvider"},
+		WebhookConfig:  &webhook.Config{CallURL: "https://relay.example.com"},
 	}
 	expectMessage := func(recipient, content string, headers map[string]string) *messages.Email {
 		return &messages.Email{
@@ -371,11 +373,11 @@ func TestSendEmail(t *testing.T) {
 				PreferredLanguage:  language.English,
 			}
 
-			var deliverySuppressed *bool
+			var deliveryInfo *senders.DeliveryInfo
 			if !tt.nilSuppressed {
-				deliverySuppressed = new(bool)
+				deliveryInfo = new(senders.DeliveryInfo)
 			}
-			notify := SendEmail(t.Context(), tt.channels, mailTemplate, translator, user, &query.LabelPolicy{}, eventType, deliverySuppressed)
+			notify := SendEmail(t.Context(), tt.channels, mailTemplate, translator, user, &query.LabelPolicy{}, eventType, deliveryInfo)
 			err = notify(
 				cmp.Or(tt.urlTemplate, urlTemplate),
 				map[string]any{"Code": "code1", "ApplicationName": "App"},
@@ -392,8 +394,16 @@ func TestSendEmail(t *testing.T) {
 				return
 			}
 			require.NoError(t, err)
-			if deliverySuppressed != nil {
-				assert.Equal(t, tt.wantSuppressed, *deliverySuppressed)
+			if deliveryInfo != nil {
+				// the provider is only stated if the email was sent to it
+				wantProviderID := tt.channels.emailConfig.ProviderConfig.ID
+				if tt.wantSuppressed {
+					wantProviderID = ""
+				}
+				assert.Equal(t, senders.DeliveryInfo{
+					ProviderID:         wantProviderID,
+					DeliverySuppressed: tt.wantSuppressed,
+				}, *deliveryInfo)
 			}
 			if tt.wantMessage == nil && (tt.wantSuppressed || tt.nilSuppressed) {
 				assert.Empty(t, tt.channels.messages)

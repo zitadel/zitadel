@@ -691,10 +691,10 @@ func TestCommands_OTPEmailSent(t *testing.T) {
 		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx                context.Context
-		sessionID          string
-		resourceOwner      string
-		deliverySuppressed bool
+		ctx           context.Context
+		sessionID     string
+		resourceOwner string
+		deliveryInfo  senders.DeliveryInfo
 	}
 	tests := []struct {
 		name    string
@@ -736,7 +736,7 @@ func TestCommands_OTPEmailSent(t *testing.T) {
 						),
 					),
 					expectPush(
-						session.NewOTPEmailSentEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate, false),
+						session.NewOTPEmailSentEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate, senders.DeliveryInfo{}),
 					),
 				),
 			},
@@ -767,15 +767,15 @@ func TestCommands_OTPEmailSent(t *testing.T) {
 						),
 					),
 					expectPush(
-						session.NewOTPEmailSentEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate, true),
+						session.NewOTPEmailSentEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate, senders.DeliveryInfo{DeliverySuppressed: true}),
 					),
 				),
 			},
 			args: args{
-				ctx:                context.Background(),
-				sessionID:          "sessionID",
-				resourceOwner:      "instanceID",
-				deliverySuppressed: true,
+				ctx:           context.Background(),
+				sessionID:     "sessionID",
+				resourceOwner: "instanceID",
+				deliveryInfo:  senders.DeliveryInfo{DeliverySuppressed: true},
 			},
 			wantErr: nil,
 		},
@@ -785,7 +785,7 @@ func TestCommands_OTPEmailSent(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			err := c.OTPEmailSent(tt.args.ctx, tt.args.sessionID, tt.args.resourceOwner, tt.args.deliverySuppressed)
+			err := c.OTPEmailSent(tt.args.ctx, tt.args.sessionID, tt.args.resourceOwner, tt.args.deliveryInfo)
 			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}

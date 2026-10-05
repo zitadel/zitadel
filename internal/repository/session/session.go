@@ -484,9 +484,8 @@ func NewOTPEmailChallengedEvent(
 type OTPEmailSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	// DeliverySuppressed is true if the notification was accepted, but the email was not sent to the provider,
-	// because the recipient domain is reserved and the operator rule of the provider suppresses them.
-	DeliverySuppressed bool `json:"deliverySuppressed,omitzero"`
+	// DeliveryInfo states the provider the email was sent through or that the delivery was suppressed.
+	senders.DeliveryInfo
 }
 
 func (e *OTPEmailSentEvent) Payload() interface{} {
@@ -504,7 +503,7 @@ func (e *OTPEmailSentEvent) SetBaseEvent(base *eventstore.BaseEvent) {
 func NewOTPEmailSentEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	deliverySuppressed bool,
+	deliveryInfo senders.DeliveryInfo,
 ) *OTPEmailSentEvent {
 	return &OTPEmailSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -512,7 +511,7 @@ func NewOTPEmailSentEvent(
 			aggregate,
 			OTPEmailSentType,
 		),
-		DeliverySuppressed: deliverySuppressed,
+		DeliveryInfo: deliveryInfo,
 	}
 }
 

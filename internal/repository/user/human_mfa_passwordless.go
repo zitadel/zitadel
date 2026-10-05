@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -374,9 +375,8 @@ func HumanPasswordlessInitCodeRequestedEventMapper(event eventstore.Event) (even
 type HumanPasswordlessInitCodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	// DeliverySuppressed is true if the notification was accepted, but the email was not sent to the provider,
-	// because the recipient domain is reserved and the operator rule of the provider suppresses them.
-	DeliverySuppressed bool `json:"deliverySuppressed,omitzero"`
+	// DeliveryInfo states the provider the email was sent through or that the delivery was suppressed.
+	senders.DeliveryInfo
 
 	ID string `json:"id"`
 }
@@ -397,7 +397,7 @@ func NewHumanPasswordlessInitCodeSentEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id string,
-	deliverySuppressed bool,
+	deliveryInfo senders.DeliveryInfo,
 ) *HumanPasswordlessInitCodeSentEvent {
 	return &HumanPasswordlessInitCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -405,8 +405,8 @@ func NewHumanPasswordlessInitCodeSentEvent(
 			aggregate,
 			HumanPasswordlessInitCodeSentType,
 		),
-		DeliverySuppressed: deliverySuppressed,
-		ID:                 id,
+		DeliveryInfo: deliveryInfo,
+		ID:           id,
 	}
 }
 

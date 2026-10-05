@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels/email"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/notification/messages"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/templates"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -31,7 +32,7 @@ func generateEmail(
 	args map[string]interface{},
 	lastEmail bool,
 	triggeringEventType eventstore.EventType,
-	deliverySuppressed *bool,
+	deliveryInfo *senders.DeliveryInfo,
 ) error {
 	recipient := user.VerifiedEmail
 	if lastEmail {
@@ -41,11 +42,15 @@ func generateEmail(
 		// The notification is handled as sent, but the email is not sent to the provider,
 		// as the recipient domain can never receive it and the email would only bounce.
 		// This is checked before the channels are created, so no connection to the provider is made.
-		if deliverySuppressed != nil {
-			*deliverySuppressed = true
+		if deliveryInfo != nil {
+			deliveryInfo.DeliverySuppressed = true
 		}
 		countSuppressedEmail(ctx, recipient, triggeringEventType)
 		return nil
+	}
+	if deliveryInfo != nil && config.ProviderConfig != nil {
+		// The provider is stated on the sent event, which is only created if the email was handled successfully.
+		deliveryInfo.ProviderID = config.ProviderConfig.ID
 	}
 	// The channels connect to the provider and are closed when the message is handled.
 	// They are therefore only created once the email is ready to be sent.

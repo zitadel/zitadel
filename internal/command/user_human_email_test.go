@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -1277,7 +1278,7 @@ func TestCommandSide_EmailVerificationCodeSent(t *testing.T) {
 					expectPush(
 						user.NewHumanEmailCodeSentEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
-							false,
+							senders.DeliveryInfo{},
 						),
 					),
 				),
@@ -1295,7 +1296,7 @@ func TestCommandSide_EmailVerificationCodeSent(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			err := r.HumanEmailVerificationCodeSent(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, false)
+			err := r.HumanEmailVerificationCodeSent(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, senders.DeliveryInfo{})
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

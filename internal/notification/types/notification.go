@@ -48,7 +48,8 @@ type ChannelChains interface {
 const SuppressedEmailsCounter = "suppressed_deliveries_email"
 
 // SendEmail returns a [Notify] function, which sends the notification as email.
-// deliverySuppressed is optional and set to true if the email was accepted but not sent to the provider,
+// deliveryInfo is optional and states the provider the email was sent through,
+// or that the email was accepted but not sent to the provider,
 // because the recipient domain is reserved and the operator rule of the provider suppresses them.
 func SendEmail(
 	ctx context.Context,
@@ -58,7 +59,7 @@ func SendEmail(
 	user *query.NotifyUser,
 	colors *query.LabelPolicy,
 	triggeringEventType eventstore.EventType,
-	deliverySuppressed *bool,
+	deliveryInfo *senders.DeliveryInfo,
 ) Notify {
 	return func(
 		urlTmpl string,
@@ -104,7 +105,7 @@ func SendEmail(
 			args,
 			allowUnverifiedNotificationChannel,
 			triggeringEventType,
-			deliverySuppressed,
+			deliveryInfo,
 		)
 	}
 }

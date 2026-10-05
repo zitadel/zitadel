@@ -492,12 +492,12 @@ func (c *Commands) HumanSendOTPEmail(ctx context.Context, userID, resourceOwner 
 	)
 }
 
-func (c *Commands) HumanOTPEmailCodeSent(ctx context.Context, userID, resourceOwner string, deliverySuppressed bool) (err error) {
+func (c *Commands) HumanOTPEmailCodeSent(ctx context.Context, userID, resourceOwner string, deliveryInfo senders.DeliveryInfo) (err error) {
 	smsWriteModel := func(ctx context.Context, userID string, resourceOwner string) (OTPWriteModel, error) {
 		return c.otpEmailWriteModelByID(ctx, userID, resourceOwner)
 	}
 	codeSentEvent := func(ctx context.Context, aggregate *eventstore.Aggregate) eventstore.Command {
-		return user.NewHumanOTPEmailCodeSentEvent(ctx, aggregate, deliverySuppressed)
+		return user.NewHumanOTPEmailCodeSentEvent(ctx, aggregate, deliveryInfo)
 	}
 	return c.humanOTPSent(ctx, userID, resourceOwner, smsWriteModel, codeSentEvent)
 }

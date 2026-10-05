@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -145,7 +146,7 @@ func (c *Commands) CreateHumanEmailVerificationCode(ctx context.Context, userID,
 	return writeModelToObjectDetails(&existingEmail.WriteModel), nil
 }
 
-func (c *Commands) HumanEmailVerificationCodeSent(ctx context.Context, orgID, userID string, deliverySuppressed bool) (err error) {
+func (c *Commands) HumanEmailVerificationCodeSent(ctx context.Context, orgID, userID string, deliveryInfo senders.DeliveryInfo) (err error) {
 	if userID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-4m9fs", "Errors.IDMissing")
 	}
@@ -157,7 +158,7 @@ func (c *Commands) HumanEmailVerificationCodeSent(ctx context.Context, orgID, us
 		return zerrors.ThrowNotFound(nil, "COMMAND-6n8uH", "Errors.User.Email.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
-	_, err = c.eventstore.Push(ctx, user.NewHumanEmailCodeSentEvent(ctx, userAgg, deliverySuppressed))
+	_, err = c.eventstore.Push(ctx, user.NewHumanEmailCodeSentEvent(ctx, userAgg, deliveryInfo))
 	return err
 }
 

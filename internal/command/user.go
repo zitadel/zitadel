@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -353,7 +354,7 @@ func (c *Commands) prepareUserDomainClaimed(ctx context.Context, filter preparat
 	), nil
 }
 
-func (c *Commands) UserDomainClaimedSent(ctx context.Context, orgID, userID string, deliverySuppressed bool) (err error) {
+func (c *Commands) UserDomainClaimedSent(ctx context.Context, orgID, userID string, deliveryInfo senders.DeliveryInfo) (err error) {
 	if userID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-5m0fs", "Errors.IDMissing")
 	}
@@ -366,7 +367,7 @@ func (c *Commands) UserDomainClaimedSent(ctx context.Context, orgID, userID stri
 	}
 
 	_, err = c.eventstore.Push(ctx,
-		user.NewDomainClaimedSentEvent(ctx, UserAggregateFromWriteModelCtx(ctx, &existingUser.WriteModel), deliverySuppressed))
+		user.NewDomainClaimedSentEvent(ctx, UserAggregateFromWriteModelCtx(ctx, &existingUser.WriteModel), deliveryInfo))
 	return err
 }
 

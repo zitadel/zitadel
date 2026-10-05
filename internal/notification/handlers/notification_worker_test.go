@@ -108,7 +108,7 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 				}
 				codeAlg, code := cryptoValue(t, ctrl, "testcode")
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-				commands.EXPECT().InviteCodeSent(gomock.Any(), userID, orgID, false).Return(nil)
+				commands.EXPECT().InviteCodeSent(gomock.Any(), userID, orgID, senders.DeliveryInfo{ProviderID: "emailProviderID"}).Return(nil)
 				return fieldsWorker{
 						queries:  queries,
 						commands: commands,
@@ -156,7 +156,7 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 				// no message is expected, but the notification is set to sent and flagged
 				codeAlg, code := cryptoValue(t, ctrl, "testcode")
 				expectTemplateWithReservedNotifyUserQueries(queries, "{{.LogoURL}}")
-				commands.EXPECT().InviteCodeSent(gomock.Any(), userID, orgID, true).Return(nil)
+				commands.EXPECT().InviteCodeSent(gomock.Any(), userID, orgID, senders.DeliveryInfo{DeliverySuppressed: true}).Return(nil)
 				return fieldsWorker{
 						queries:  queries,
 						commands: commands,
@@ -276,7 +276,7 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 					TriggeringEventType: user.UserDomainClaimedType,
 				}
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-				commands.EXPECT().UserDomainClaimedSent(gomock.Any(), orgID, userID, false).Return(nil)
+				commands.EXPECT().UserDomainClaimedSent(gomock.Any(), orgID, userID, senders.DeliveryInfo{ProviderID: "emailProviderID"}).Return(nil)
 				return fieldsWorker{
 						queries:  queries,
 						commands: commands,

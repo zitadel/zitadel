@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -576,7 +577,7 @@ func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, res
 	return codeEvent, initCode, code, nil
 }
 
-func (c *Commands) HumanPasswordlessInitCodeSent(ctx context.Context, userID, resourceOwner, codeID string, deliverySuppressed bool) error {
+func (c *Commands) HumanPasswordlessInitCodeSent(ctx context.Context, userID, resourceOwner, codeID string, deliveryInfo senders.DeliveryInfo) error {
 	if userID == "" || codeID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-ADggh", "Errors.IDMissing")
 	}
@@ -591,7 +592,7 @@ func (c *Commands) HumanPasswordlessInitCodeSent(ctx context.Context, userID, re
 	}
 
 	_, err = c.eventstore.Push(ctx,
-		usr_repo.NewHumanPasswordlessInitCodeSentEvent(ctx, UserAggregateFromWriteModelCtx(ctx, &initCode.WriteModel), codeID, deliverySuppressed),
+		usr_repo.NewHumanPasswordlessInitCodeSentEvent(ctx, UserAggregateFromWriteModelCtx(ctx, &initCode.WriteModel), codeID, deliveryInfo),
 	)
 	return err
 }

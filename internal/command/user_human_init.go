@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -93,7 +94,7 @@ func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwne
 	return err
 }
 
-func (c *Commands) HumanInitCodeSent(ctx context.Context, orgID, userID string, deliverySuppressed bool) (err error) {
+func (c *Commands) HumanInitCodeSent(ctx context.Context, orgID, userID string, deliveryInfo senders.DeliveryInfo) (err error) {
 	if userID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-3M9fs", "Errors.IDMissing")
 	}
@@ -105,7 +106,7 @@ func (c *Commands) HumanInitCodeSent(ctx context.Context, orgID, userID string, 
 		return zerrors.ThrowNotFound(nil, "COMMAND-556zg", "Errors.User.Code.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingInitCode.WriteModel)
-	_, err = c.eventstore.Push(ctx, user.NewHumanInitialCodeSentEvent(ctx, userAgg, deliverySuppressed))
+	_, err = c.eventstore.Push(ctx, user.NewHumanInitialCodeSentEvent(ctx, userAgg, deliveryInfo))
 	return err
 }
 

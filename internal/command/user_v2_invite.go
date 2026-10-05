@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -97,7 +98,7 @@ func (c *Commands) sendInviteCode(ctx context.Context, invite *CreateUserInvite,
 	return writeModelToObjectDetails(&wm.WriteModel), returnCode, nil
 }
 
-func (c *Commands) InviteCodeSent(ctx context.Context, userID, orgID string, deliverySuppressed bool) (err error) {
+func (c *Commands) InviteCodeSent(ctx context.Context, userID, orgID string, deliveryInfo senders.DeliveryInfo) (err error) {
 	if userID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-Sgf31", "Errors.User.UserIDMissing")
 	}
@@ -112,7 +113,7 @@ func (c *Commands) InviteCodeSent(ctx context.Context, userID, orgID string, del
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Wr3gq", "Errors.User.Code.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModelCtx(ctx, &existingCode.WriteModel)
-	_, err = c.eventstore.Push(ctx, user.NewHumanInviteCodeSentEvent(ctx, userAgg, deliverySuppressed))
+	_, err = c.eventstore.Push(ctx, user.NewHumanInviteCodeSentEvent(ctx, userAgg, deliveryInfo))
 	return err
 }
 

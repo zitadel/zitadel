@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -67,7 +68,7 @@ func TestCommands_humanVerifyPasswordlessInitCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusherWithCreationDateNow(
-							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", false),
+							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", senders.DeliveryInfo{}),
 						),
 					),
 					expectPush(
@@ -94,7 +95,7 @@ func TestCommands_humanVerifyPasswordlessInitCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusherWithCreationDateNow(
-							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", false),
+							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", senders.DeliveryInfo{}),
 						),
 					),
 				),
@@ -118,7 +119,7 @@ func TestCommands_humanVerifyPasswordlessInitCode(t *testing.T) {
 							time.Now().Add(-2*time.Minute),
 						),
 						eventFromEventPusherWithCreationDate(
-							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", false),
+							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", senders.DeliveryInfo{}),
 							time.Now().Add(-2*time.Minute),
 						),
 					),
@@ -148,7 +149,7 @@ func TestCommands_humanVerifyPasswordlessInitCode(t *testing.T) {
 							time.Now().Add(-2*time.Minute),
 						),
 						eventFromEventPusherWithCreationDate(
-							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", false),
+							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", senders.DeliveryInfo{}),
 							time.Now().Add(-2*time.Minute),
 						),
 						eventFromEventPusherWithCreationDateNow(

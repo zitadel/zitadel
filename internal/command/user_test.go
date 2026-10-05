@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/repository/group"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -1854,7 +1855,7 @@ func TestCommandSide_UserDomainClaimedSent(t *testing.T) {
 					expectPush(
 						user.NewDomainClaimedSentEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
-							false,
+							senders.DeliveryInfo{},
 						),
 					),
 				),
@@ -1872,7 +1873,7 @@ func TestCommandSide_UserDomainClaimedSent(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			err := r.UserDomainClaimedSent(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, false)
+			err := r.UserDomainClaimedSent(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, senders.DeliveryInfo{})
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -308,14 +309,13 @@ func HumanInitialCodeAddedEventMapper(event eventstore.Event) (eventstore.Event,
 type HumanInitialCodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	// DeliverySuppressed is true if the notification was accepted, but the email was not sent to the provider,
-	// because the recipient domain is reserved and the operator rule of the provider suppresses them.
-	DeliverySuppressed bool `json:"deliverySuppressed,omitzero"`
+	// DeliveryInfo states the provider the email was sent through or that the delivery was suppressed.
+	senders.DeliveryInfo
 }
 
-// Payload returns nil if nothing is set, as the event had no payload before the flag was introduced.
+// Payload returns nil if no delivery information is set, as the event had no payload before it was introduced.
 func (e *HumanInitialCodeSentEvent) Payload() interface{} {
-	if !e.DeliverySuppressed {
+	if e.DeliveryInfo == (senders.DeliveryInfo{}) {
 		return nil
 	}
 	return e
@@ -329,14 +329,14 @@ func (e *HumanInitialCodeSentEvent) SetBaseEvent(base *eventstore.BaseEvent) {
 	e.BaseEvent = *base
 }
 
-func NewHumanInitialCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate, deliverySuppressed bool) *HumanInitialCodeSentEvent {
+func NewHumanInitialCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate, deliveryInfo senders.DeliveryInfo) *HumanInitialCodeSentEvent {
 	return &HumanInitialCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			HumanInitialCodeSentType,
 		),
-		DeliverySuppressed: deliverySuppressed,
+		DeliveryInfo: deliveryInfo,
 	}
 }
 
@@ -452,18 +452,17 @@ func NewHumanInviteCodeAddedEvent(
 type HumanInviteCodeSentEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	// DeliverySuppressed is true if the notification was accepted, but the email was not sent to the provider,
-	// because the recipient domain is reserved and the operator rule of the provider suppresses them.
-	DeliverySuppressed bool `json:"deliverySuppressed,omitzero"`
+	// DeliveryInfo states the provider the email was sent through or that the delivery was suppressed.
+	senders.DeliveryInfo
 }
 
 func (e *HumanInviteCodeSentEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
-// Payload returns nil if nothing is set, as the event had no payload before the flag was introduced.
+// Payload returns nil if no delivery information is set, as the event had no payload before it was introduced.
 func (e *HumanInviteCodeSentEvent) Payload() interface{} {
-	if !e.DeliverySuppressed {
+	if e.DeliveryInfo == (senders.DeliveryInfo{}) {
 		return nil
 	}
 	return e
@@ -473,14 +472,14 @@ func (e *HumanInviteCodeSentEvent) UniqueConstraints() []*eventstore.UniqueConst
 	return nil
 }
 
-func NewHumanInviteCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate, deliverySuppressed bool) *HumanInviteCodeSentEvent {
+func NewHumanInviteCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate, deliveryInfo senders.DeliveryInfo) *HumanInviteCodeSentEvent {
 	return &HumanInviteCodeSentEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			HumanInviteCodeSentType,
 		),
-		DeliverySuppressed: deliverySuppressed,
+		DeliveryInfo: deliveryInfo,
 	}
 }
 

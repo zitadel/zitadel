@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -1262,10 +1263,10 @@ func TestCommands_InviteCodeSent(t *testing.T) {
 		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx                context.Context
-		userID             string
-		orgID              string
-		deliverySuppressed bool
+		ctx          context.Context
+		userID       string
+		orgID        string
+		deliveryInfo senders.DeliveryInfo
 	}
 	tests := []struct {
 		name    string
@@ -1363,7 +1364,7 @@ func TestCommands_InviteCodeSent(t *testing.T) {
 						eventFromEventPusher(
 							user.NewHumanInviteCodeSentEvent(context.Background(),
 								&user.NewAggregate("userID", "org1").Aggregate,
-								false,
+								senders.DeliveryInfo{},
 							),
 						),
 					),
@@ -1414,16 +1415,16 @@ func TestCommands_InviteCodeSent(t *testing.T) {
 						eventFromEventPusher(
 							user.NewHumanInviteCodeSentEvent(context.Background(),
 								&user.NewAggregate("userID", "org1").Aggregate,
-								true,
+								senders.DeliveryInfo{DeliverySuppressed: true},
 							),
 						),
 					),
 				),
 			},
 			args{
-				ctx:                context.Background(),
-				userID:             "userID",
-				deliverySuppressed: true,
+				ctx:          context.Background(),
+				userID:       "userID",
+				deliveryInfo: senders.DeliveryInfo{DeliverySuppressed: true},
 			},
 			nil,
 		},
@@ -1434,7 +1435,7 @@ func TestCommands_InviteCodeSent(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			err := c.InviteCodeSent(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.deliverySuppressed)
+			err := c.InviteCodeSent(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.deliveryInfo)
 			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}

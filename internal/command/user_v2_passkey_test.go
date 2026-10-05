@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	webauthn_helper "github.com/zitadel/zitadel/internal/webauthn"
@@ -177,7 +178,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusherWithCreationDateNow(
-							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", false),
+							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", senders.DeliveryInfo{}),
 						),
 					),
 					expectPush(
@@ -205,7 +206,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusherWithCreationDateNow(
-							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", false),
+							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", senders.DeliveryInfo{}),
 						),
 					),
 					expectFilterError(io.ErrClosedPipe),
@@ -286,7 +287,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusherWithCreationDateNow(
-							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", false),
+							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", senders.DeliveryInfo{}),
 						),
 					),
 					expectPush(
@@ -313,7 +314,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 							),
 						),
 						eventFromEventPusherWithCreationDateNow(
-							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", false),
+							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", senders.DeliveryInfo{}),
 						),
 					),
 				),
@@ -338,7 +339,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 							time.Now().Add(-2*time.Minute),
 						),
 						eventFromEventPusherWithCreationDate(
-							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", false),
+							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", senders.DeliveryInfo{}),
 							time.Now().Add(-2*time.Minute),
 						),
 					),
@@ -368,7 +369,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 							time.Now().Add(-2*time.Minute),
 						),
 						eventFromEventPusherWithCreationDate(
-							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", false),
+							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123", senders.DeliveryInfo{}),
 							time.Now().Add(-2*time.Minute),
 						),
 						eventFromEventPusherWithCreationDateNow(

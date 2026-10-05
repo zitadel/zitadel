@@ -570,9 +570,8 @@ func NewHumanOTPEmailCodeAddedEvent(
 type HumanOTPEmailCodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	// DeliverySuppressed is true if the notification was accepted, but the email was not sent to the provider,
-	// because the recipient domain is reserved and the operator rule of the provider suppresses them.
-	DeliverySuppressed bool `json:"deliverySuppressed,omitzero"`
+	// DeliveryInfo states the provider the email was sent through or that the delivery was suppressed.
+	senders.DeliveryInfo
 
 	Code   *crypto.CryptoValue `json:"code,omitempty"`
 	Expiry time.Duration       `json:"expiry,omitempty"`
@@ -594,7 +593,7 @@ func (e *HumanOTPEmailCodeSentEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 func NewHumanOTPEmailCodeSentEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	deliverySuppressed bool,
+	deliveryInfo senders.DeliveryInfo,
 ) *HumanOTPEmailCodeSentEvent {
 	return &HumanOTPEmailCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -602,7 +601,7 @@ func NewHumanOTPEmailCodeSentEvent(
 			aggregate,
 			HumanOTPEmailCodeSentType,
 		),
-		DeliverySuppressed: deliverySuppressed,
+		DeliveryInfo: deliveryInfo,
 	}
 }
 

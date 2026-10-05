@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -469,14 +470,13 @@ func DomainClaimedEventMapper(event eventstore.Event) (eventstore.Event, error) 
 type DomainClaimedSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	// DeliverySuppressed is true if the notification was accepted, but the email was not sent to the provider,
-	// because the recipient domain is reserved and the operator rule of the provider suppresses them.
-	DeliverySuppressed bool `json:"deliverySuppressed,omitzero"`
+	// DeliveryInfo states the provider the email was sent through or that the delivery was suppressed.
+	senders.DeliveryInfo
 }
 
-// Payload returns nil if nothing is set, as the event had no payload before the flag was introduced.
+// Payload returns nil if no delivery information is set, as the event had no payload before it was introduced.
 func (e *DomainClaimedSentEvent) Payload() interface{} {
-	if !e.DeliverySuppressed {
+	if e.DeliveryInfo == (senders.DeliveryInfo{}) {
 		return nil
 	}
 	return e
@@ -493,7 +493,7 @@ func (e *DomainClaimedSentEvent) SetBaseEvent(base *eventstore.BaseEvent) {
 func NewDomainClaimedSentEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	deliverySuppressed bool,
+	deliveryInfo senders.DeliveryInfo,
 ) *DomainClaimedSentEvent {
 	return &DomainClaimedSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -501,7 +501,7 @@ func NewDomainClaimedSentEvent(
 			aggregate,
 			UserDomainClaimedSentType,
 		),
-		DeliverySuppressed: deliverySuppressed,
+		DeliveryInfo: deliveryInfo,
 	}
 }
 
