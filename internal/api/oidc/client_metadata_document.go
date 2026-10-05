@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -483,6 +484,11 @@ func (r *clientIDMetadataResolver) documentToClient(ctx context.Context, clientI
 		return nil, r.invalidClient(ctx, nil, "the requested grant and response type combination is not supported")
 	}
 
+	// RFC 6749 §3.1.2: a redirection endpoint URI must not include a fragment. Any "#" counts,
+	// since an empty fragment is not recorded by url.Parse.
+	if slices.ContainsFunc(doc.RedirectURIs, func(uri string) bool { return strings.Contains(uri, "#") }) {
+		return nil, r.invalidClient(ctx, nil, "redirect_uris must not contain a fragment")
+	}
 	redirectURIs := originMatchedURIs(clientURL, doc.RedirectURIs)
 	if len(redirectURIs) == 0 {
 		return nil, r.invalidClient(ctx, nil, "no redirect_uri matches the client_id origin")

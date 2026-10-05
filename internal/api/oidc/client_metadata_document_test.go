@@ -328,6 +328,24 @@ func TestClientIDMetadataResolver_ResolveClient(t *testing.T) {
 		assertInvalidClient(t, err)
 	})
 
+	for name, redirectURI := range map[string]string{
+		"redirect_uri with a fragment is rejected":        "/callback#fragment",
+		"redirect_uri with an empty fragment is rejected": "/callback#",
+	} {
+		t.Run(name, func(t *testing.T) {
+			server := newMetadataServer(t, http.StatusOK, "", func(clientID string) clientRegistrationRequest {
+				return clientRegistrationRequest{
+					RedirectURIs:            []string{clientID + "/callback", clientID + redirectURI},
+					TokenEndpointAuthMethod: "none",
+				}
+			})
+			resolver := newTestResolver(server.URL, server.Client(), noop.NewCache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry]())
+
+			_, err := resolver.ResolveClient(ctx, "instance", server.URL+testClientIDPath)
+			assertInvalidClient(t, err)
+		})
+	}
+
 	t.Run("response type without its grant type is rejected", func(t *testing.T) {
 		server := newMetadataServer(t, http.StatusOK, "", func(clientID string) clientRegistrationRequest {
 			return clientRegistrationRequest{
