@@ -7,6 +7,7 @@ import (
 	member_grpc "github.com/zitadel/zitadel/internal/api/grpc/member"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -14,8 +15,11 @@ import (
 	proj_pb "github.com/zitadel/zitadel/pkg/grpc/project"
 )
 
-func listProjectGrantsRequestToModel(req *mgmt_pb.ListProjectGrantsRequest) (*query.ProjectGrantSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func listProjectGrantsRequestToModel(defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListProjectGrantsRequest) (*query.ProjectGrantSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := ProjectGrantQueriesToModel(req)
 	if err != nil {
 		return nil, err
@@ -58,8 +62,11 @@ func ProjectGrantQueryToModel(apiQuery *proj_pb.ProjectGrantQuery) (query.Search
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-M099f", "List.Query.Invalid")
 	}
 }
-func listAllProjectGrantsRequestToModel(req *mgmt_pb.ListAllProjectGrantsRequest) (*query.ProjectGrantSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func listAllProjectGrantsRequestToModel(defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListAllProjectGrantsRequest) (*query.ProjectGrantSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := AllProjectGrantQueriesToModel(req)
 	if err != nil {
 		return nil, err
@@ -123,8 +130,11 @@ func UpdateProjectGrantRequestToCommand(req *mgmt_pb.UpdateProjectGrantRequest, 
 	}
 }
 
-func ListProjectGrantMembersRequestToModel(ctx context.Context, req *mgmt_pb.ListProjectGrantMembersRequest) (*query.ProjectGrantMembersQuery, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func ListProjectGrantMembersRequestToModel(defaults systemdefaults.SystemDefaults, ctx context.Context, req *mgmt_pb.ListProjectGrantMembersRequest) (*query.ProjectGrantMembersQuery, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := member_grpc.MemberQueriesToQuery(req.Queries)
 	if err != nil {
 		return nil, err

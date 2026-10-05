@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type UserSessionView struct {
@@ -61,14 +60,4 @@ type UserSessionSearchResponse struct {
 	Limit       uint64
 	TotalResult uint64
 	Result      []*UserSessionView
-}
-
-func (r *UserSessionSearchRequest) EnsureLimit(limit uint64) error {
-	if r.Limit > limit {
-		return zerrors.ThrowInvalidArgument(nil, "SEARCH-27ifs", "Errors.Limit.ExceedsDefault")
-	}
-	if r.Limit == 0 {
-		r.Limit = limit
-	}
-	return nil
 }

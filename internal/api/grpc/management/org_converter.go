@@ -9,14 +9,18 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	org_grpc "github.com/zitadel/zitadel/internal/api/grpc/org"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
-func ListOrgDomainsRequestToModel(req *mgmt_pb.ListOrgDomainsRequest) (*query.OrgDomainSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func ListOrgDomainsRequestToModel(defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListOrgDomainsRequest) (*query.OrgDomainSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := org_grpc.DomainQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
@@ -84,9 +88,12 @@ func UpdateOrgMemberRequestToCommand(req *mgmt_pb.UpdateOrgMemberRequest, orgID 
 	}
 }
 
-func ListOrgMembersRequestToModel(ctx context.Context, req *mgmt_pb.ListOrgMembersRequest) (*query.OrgMembersQuery, error) {
+func ListOrgMembersRequestToModel(defaults systemdefaults.SystemDefaults, ctx context.Context, req *mgmt_pb.ListOrgMembersRequest) (*query.OrgMembersQuery, error) {
 	ctxData := authz.GetCtxData(ctx)
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := member_grpc.MemberQueriesToQuery(req.Queries)
 	if err != nil {
 		return nil, err
@@ -121,8 +128,11 @@ func BulkSetOrgMetadataToDomain(req *mgmt_pb.BulkSetOrgMetadataRequest) []*domai
 	return metadata
 }
 
-func ListOrgMetadataToDomain(req *mgmt_pb.ListOrgMetadataRequest) (*query.OrgMetadataSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func ListOrgMetadataToDomain(defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListOrgMetadataRequest) (*query.OrgMetadataSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := metadata.OrgMetadataQueriesToQuery(req.Queries)
 	if err != nil {
 		return nil, err

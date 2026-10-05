@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Server) ListMyLinkedIDPs(ctx context.Context, req *auth_pb.ListMyLinkedIDPsRequest) (*auth_pb.ListMyLinkedIDPsResponse, error) {
-	q, err := ListMyLinkedIDPsRequestToQuery(ctx, req)
+	q, err := ListMyLinkedIDPsRequestToQuery(s.defaults, ctx, req)
 	if err != nil {
 		return nil, err
 	}

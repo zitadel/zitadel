@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
@@ -20,6 +21,7 @@ var _ system.SystemServiceServer = (*Server)(nil)
 type Server struct {
 	system.UnimplementedSystemServiceServer
 	database        string
+	systemDefaults  systemdefaults.SystemDefaults
 	command         *command.Commands
 	query           *query.Queries
 	defaultInstance command.InstanceSetup
@@ -31,6 +33,7 @@ type Config struct {
 }
 
 func CreateServer(
+	systemDefaults systemdefaults.SystemDefaults,
 	command *command.Commands,
 	query *query.Queries,
 	database string,
@@ -38,6 +41,7 @@ func CreateServer(
 	externalDomain string,
 ) *Server {
 	return &Server{
+		systemDefaults:  systemDefaults,
 		command:         command,
 		query:           query,
 		database:        database,

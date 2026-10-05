@@ -29,7 +29,7 @@ func (s *Server) GetAppByID(ctx context.Context, req *mgmt_pb.GetAppByIDRequest)
 }
 
 func (s *Server) ListApps(ctx context.Context, req *mgmt_pb.ListAppsRequest) (*mgmt_pb.ListAppsResponse, error) {
-	queries, err := ListAppsRequestToModel(ctx, req)
+	queries, err := ListAppsRequestToModel(s.systemDefaults, ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -53,6 +53,10 @@ func (s *Server) ListAppChanges(ctx context.Context, req *mgmt_pb.ListAppChanges
 		limit = uint64(req.Query.Limit)
 		sequence = req.Query.Sequence
 		asc = req.Query.Asc
+	}
+	limit, err := s.systemDefaults.V1QueryLimit(limit)
+	if err != nil {
+		return nil, err
 	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
@@ -271,7 +275,7 @@ func (s *Server) GetAppKey(ctx context.Context, req *mgmt_pb.GetAppKeyRequest) (
 }
 
 func (s *Server) ListAppKeys(ctx context.Context, req *mgmt_pb.ListAppKeysRequest) (*mgmt_pb.ListAppKeysResponse, error) {
-	queries, err := ListAPIClientKeysRequestToQuery(ctx, req)
+	queries, err := ListAPIClientKeysRequestToQuery(s.systemDefaults, ctx, req)
 	if err != nil {
 		return nil, err
 	}

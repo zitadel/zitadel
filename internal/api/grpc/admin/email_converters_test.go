@@ -12,6 +12,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/query"
@@ -51,7 +52,7 @@ func Test_listEmailProvidersToModel(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := listEmailProvidersToModel(tt.args.req)
+			got, err := listEmailProvidersToModel(systemdefaults.SystemDefaults{MaxQueryLimit: 1000}, tt.args.req)
 			require.NoError(t, err)
 			assert.Equal(t, tt.res, got)
 		})

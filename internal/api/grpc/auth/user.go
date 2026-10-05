@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/org"
 	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -71,6 +72,10 @@ func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserC
 		sequence = req.Query.Sequence
 		asc = req.Query.Asc
 	}
+	limit, err := s.defaults.V1QueryLimit(limit)
+	if err != nil {
+		return nil, err
+	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		Limit(limit).
@@ -97,7 +102,7 @@ func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserC
 }
 
 func (s *Server) ListMyMetadata(ctx context.Context, req *auth_pb.ListMyMetadataRequest) (*auth_pb.ListMyMetadataResponse, error) {
-	queries, err := ListUserMetadataToQuery(req)
+	queries, err := ListUserMetadataToQuery(s.defaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +156,7 @@ func ctxToObjectRoot(ctx context.Context) models.ObjectRoot {
 }
 
 func (s *Server) ListMyUserGrants(ctx context.Context, req *auth_pb.ListMyUserGrantsRequest) (*auth_pb.ListMyUserGrantsResponse, error) {
-	queries, err := ListMyUserGrantsRequestToQuery(ctx, req)
+	queries, err := ListMyUserGrantsRequestToQuery(s.defaults, ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +171,7 @@ func (s *Server) ListMyUserGrants(ctx context.Context, req *auth_pb.ListMyUserGr
 }
 
 func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProjectOrgsRequest) (*auth_pb.ListMyProjectOrgsResponse, error) {
-	queries, err := ListMyProjectOrgsRequestToQuery(req)
+	queries, err := ListMyProjectOrgsRequestToQuery(s.defaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -261,8 +266,11 @@ func appendIfNotExists(array []string, value string) []string {
 	return append(array, value)
 }
 
-func ListMyProjectOrgsRequestToQuery(req *auth_pb.ListMyProjectOrgsRequest) (*query.OrgSearchQueries, error) {
-	offset, limit, asc := obj_grpc.ListQueryToModel(req.Query)
+func ListMyProjectOrgsRequestToQuery(defaults systemdefaults.SystemDefaults, req *auth_pb.ListMyProjectOrgsRequest) (*query.OrgSearchQueries, error) {
+	offset, limit, asc, err := obj_grpc.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := org.OrgQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err

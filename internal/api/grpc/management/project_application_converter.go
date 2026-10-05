@@ -10,14 +10,18 @@ import (
 	authn_grpc "github.com/zitadel/zitadel/internal/api/grpc/authn"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	app_grpc "github.com/zitadel/zitadel/internal/api/grpc/project"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
-func ListAppsRequestToModel(ctx context.Context, req *mgmt_pb.ListAppsRequest) (*query.AppSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func ListAppsRequestToModel(defaults systemdefaults.SystemDefaults, ctx context.Context, req *mgmt_pb.ListAppsRequest) (*query.AppSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := app_grpc.AppQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
@@ -193,7 +197,7 @@ func AddAPIClientKeyRequestToDomain(key *mgmt_pb.AddAppKeyRequest) *domain.Appli
 	}
 }
 
-func ListAPIClientKeysRequestToQuery(ctx context.Context, req *mgmt_pb.ListAppKeysRequest) (*query.AuthNKeySearchQueries, error) {
+func ListAPIClientKeysRequestToQuery(defaults systemdefaults.SystemDefaults, ctx context.Context, req *mgmt_pb.ListAppKeysRequest) (*query.AuthNKeySearchQueries, error) {
 	resourceOwner, err := query.NewAuthNKeyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
@@ -206,7 +210,10 @@ func ListAPIClientKeysRequestToQuery(ctx context.Context, req *mgmt_pb.ListAppKe
 	if err != nil {
 		return nil, err
 	}
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	return &query.AuthNKeySearchQueries{
 		SearchRequest: query.SearchRequest{
 			Offset: offset,

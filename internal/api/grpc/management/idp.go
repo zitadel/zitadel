@@ -20,7 +20,7 @@ func (s *Server) GetOrgIDPByID(ctx context.Context, req *mgmt_pb.GetOrgIDPByIDRe
 }
 
 func (s *Server) ListOrgIDPs(ctx context.Context, req *mgmt_pb.ListOrgIDPsRequest) (*mgmt_pb.ListOrgIDPsResponse, error) {
-	queries, err := listIDPsToModel(ctx, req)
+	queries, err := listIDPsToModel(s.systemDefaults, ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +157,7 @@ func (s *Server) GetProviderByID(ctx context.Context, req *mgmt_pb.GetProviderBy
 }
 
 func (s *Server) ListProviders(ctx context.Context, req *mgmt_pb.ListProvidersRequest) (*mgmt_pb.ListProvidersResponse, error) {
-	queries, err := listProvidersToQuery(ctx, req)
+	queries, err := listProvidersToQuery(s.systemDefaults, ctx, req)
 	if err != nil {
 		return nil, err
 	}

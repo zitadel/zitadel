@@ -4,7 +4,6 @@ import (
 	"time"
 
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Metadata struct {
@@ -62,16 +61,6 @@ type MetadataSearchResponse struct {
 	Result      []*Metadata
 	Sequence    uint64
 	Timestamp   time.Time
-}
-
-func (r *MetadataSearchRequest) EnsureLimit(limit uint64) error {
-	if r.Limit > limit {
-		return zerrors.ThrowInvalidArgument(nil, "SEARCH-0ds32", "Errors.Limit.ExceedsDefault")
-	}
-	if r.Limit == 0 {
-		r.Limit = limit
-	}
-	return nil
 }
 
 func (r *MetadataSearchRequest) AppendAggregateIDQuery(aggregateID string) {

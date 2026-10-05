@@ -42,7 +42,7 @@ func (s *Server) GetGrantedProjectByID(ctx context.Context, req *mgmt_pb.GetGran
 }
 
 func (s *Server) ListProjects(ctx context.Context, req *mgmt_pb.ListProjectsRequest) (*mgmt_pb.ListProjectsResponse, error) {
-	queries, err := listProjectRequestToModel(req)
+	queries, err := listProjectRequestToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -75,6 +75,10 @@ func (s *Server) ListProjectGrantChanges(ctx context.Context, req *mgmt_pb.ListP
 		sequence = req.Query.Sequence
 		asc = req.Query.Asc
 	}
+	limit, err := s.systemDefaults.V1QueryLimit(limit)
+	if err != nil {
+		return nil, err
+	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		Limit(limit).
@@ -104,7 +108,7 @@ func (s *Server) ListProjectGrantChanges(ctx context.Context, req *mgmt_pb.ListP
 }
 
 func (s *Server) ListGrantedProjects(ctx context.Context, req *mgmt_pb.ListGrantedProjectsRequest) (*mgmt_pb.ListGrantedProjectsResponse, error) {
-	queries, err := listGrantedProjectsRequestToModel(req)
+	queries, err := listGrantedProjectsRequestToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +131,7 @@ func (s *Server) ListGrantedProjects(ctx context.Context, req *mgmt_pb.ListGrant
 }
 
 func (s *Server) ListGrantedProjectRoles(ctx context.Context, req *mgmt_pb.ListGrantedProjectRolesRequest) (*mgmt_pb.ListGrantedProjectRolesResponse, error) {
-	queries, err := listGrantedProjectRolesRequestToModel(req)
+	queries, err := listGrantedProjectRolesRequestToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -155,6 +159,10 @@ func (s *Server) ListProjectChanges(ctx context.Context, req *mgmt_pb.ListProjec
 		limit = uint64(req.Query.Limit)
 		sequence = req.Query.Sequence
 		asc = req.Query.Asc
+	}
+	limit, err := s.systemDefaults.V1QueryLimit(limit)
+	if err != nil {
+		return nil, err
 	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
@@ -248,7 +256,7 @@ func (s *Server) RemoveProject(ctx context.Context, req *mgmt_pb.RemoveProjectRe
 }
 
 func (s *Server) ListProjectRoles(ctx context.Context, req *mgmt_pb.ListProjectRolesRequest) (*mgmt_pb.ListProjectRolesResponse, error) {
-	queries, err := listProjectRolesRequestToModel(req)
+	queries, err := listProjectRolesRequestToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -346,7 +354,7 @@ func (s *Server) ListProjectMemberRoles(ctx context.Context, _ *mgmt_pb.ListProj
 }
 
 func (s *Server) ListProjectMembers(ctx context.Context, req *mgmt_pb.ListProjectMembersRequest) (*mgmt_pb.ListProjectMembersResponse, error) {
-	queries, err := ListProjectMembersRequestToModel(ctx, req)
+	queries, err := ListProjectMembersRequestToModel(s.systemDefaults, ctx, req)
 	if err != nil {
 		return nil, err
 	}
