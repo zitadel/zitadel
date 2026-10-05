@@ -204,12 +204,13 @@ export function DocsChat() {
                 {msg.role === 'user' || msg.role === 'system' ? (
                   msg.content
                 ) : (
-                  <div className="prose prose-sm dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-fd-muted prose-pre:p-3 prose-pre:rounded-lg">
+                  <div className="prose prose-sm dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-fd-muted prose-pre:p-3 prose-pre:rounded-lg prose-code:bg-fd-muted prose-code:rounded prose-code:px-1.5 prose-code:py-0.5 prose-code:text-xs prose-code:before:content-none prose-code:after:content-none">
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
                       components={{
                         img: () => null,
-                        a({ _node, children, ...props }: any) {
+                        // FIX: Correctly destructure `node` instead of `_node` so it isn't spread onto the DOM element
+                        a({ node, children, ...props }: any) {
                           return (
                             <a
                               {...props}
@@ -221,17 +222,8 @@ export function DocsChat() {
                             </a>
                           );
                         },
-                        code({ _node, inline, children, ...props }: any) {
-                          return inline ? (
-                            <code className="bg-fd-muted rounded px-1.5 py-0.5 font-mono text-xs text-fd-foreground" {...props}>
-                              {children}
-                            </code>
-                          ) : (
-                            <code className="block text-xs font-mono text-fd-foreground" {...props}>
-                              {children}
-                            </code>
-                          );
-                        },
+                        // FIX: Removed the buggy `code` override entirely as `inline` is no longer supported in v10. 
+                        // Code styling is now handled by the prose-code:* Tailwind classes in the wrapper div.
                       }}
                     >
                       {msg.content}

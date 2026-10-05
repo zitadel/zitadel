@@ -98,6 +98,13 @@ export async function POST(req: Request) {
 
     clearTimeout(timeoutId);
 
+    if (response.status === 429) {
+      return NextResponse.json(
+        { success: false, error: 'Rate limit exceeded. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const contentType = response.headers.get('content-type') || '';
     if (!contentType.includes('application/json')) {
       throw new Error(`Upstream returned non-JSON response: HTTP ${response.status}`);
