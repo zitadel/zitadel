@@ -145,7 +145,7 @@ export function DocsChat() {
         aria-hidden={!isOpen}
         inert={!isOpen ? true : undefined}
         className={cn(
-          "absolute bottom-16 right-0 mb-2 flex flex-col w-[360px] sm:w-[400px] h-[600px] max-h-[80vh]",
+          "absolute bottom-16 right-0 mb-2 flex flex-col w-[calc(100vw-3rem)] sm:w-[400px] h-[600px] max-h-[80vh]",
           "bg-fd-background border border-fd-border rounded-2xl shadow-2xl overflow-hidden",
           "transition-all duration-300 ease-in-out origin-bottom-right",
           isOpen
