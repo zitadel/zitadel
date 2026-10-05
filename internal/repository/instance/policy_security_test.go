@@ -31,6 +31,8 @@ func TestSecurityPolicyClientIDMetadataDocumentAllowedURLEvents_UniqueConstraint
 	assert.Equal(t, eventstore.UniqueConstraintAdd, added[0].Action)
 	assert.Equal(t, UniqueClientIDMetadataDocumentAllowedURL, added[0].UniqueType)
 	assert.Equal(t, clientIDMetadataDocumentAllowedURLField(allowedURL), added[0].UniqueField)
+	assert.Equal(t, []string{eventstore.OwnerTag(clientIDMetadataDocumentAllowedURLOwner, "instance")}, added[0].Owners,
+		"an added url must be tagged so that replacing the list releases it")
 
 	removed := NewSecurityPolicyClientIDMetadataDocumentAllowedURLRemovedEvent(context.Background(), agg, allowedURL).UniqueConstraints()
 	require.Len(t, removed, 1)
@@ -38,25 +40,29 @@ func TestSecurityPolicyClientIDMetadataDocumentAllowedURLEvents_UniqueConstraint
 	assert.Equal(t, added[0].UniqueField, removed[0].UniqueField)
 }
 
-// TestChangeSecurityPolicyClientIDMetadataDocumentAllowedURLConstraints pins that replacing the
-// list takes the constraint of every new URL and releases the one of every dropped URL, and
-// leaves URLs that stay untouched.
-func TestChangeSecurityPolicyClientIDMetadataDocumentAllowedURLConstraints(t *testing.T) {
+// TestSecurityPolicySetEvent_UniqueConstraints pins that replacing the list releases every
+// allowed URL constraint of the instance and takes one per URL in the new list. The constraints
+// depend only on the stored list, so a push retried after a concurrent change still leaves
+// exactly the constraints of the list it stores.
+func TestSecurityPolicySetEvent_UniqueConstraints(t *testing.T) {
 	event, err := NewSecurityPolicySetEvent(context.Background(), &NewAggregate("instance").Aggregate, []SecurityPolicyChanges{
-		ChangeSecurityPolicyClientIDMetadataDocumentAllowedURLs([]string{"https://kept.example.com/", "https://new.example.com/"}),
-		ChangeSecurityPolicyClientIDMetadataDocumentAllowedURLConstraints(
-			[]string{"https://kept.example.com/", "https://dropped.example.com/"},
-			[]string{"https://kept.example.com/", "https://new.example.com/"},
-		),
+		ChangeSecurityPolicyClientIDMetadataDocumentAllowedURLs([]string{"https://a.example.com/", "https://b.example.com/"}),
 	})
 	require.NoError(t, err)
 
 	constraints := event.UniqueConstraints()
-	require.Len(t, constraints, 2)
-	assert.Equal(t, eventstore.UniqueConstraintRemove, constraints[0].Action)
-	assert.Equal(t, clientIDMetadataDocumentAllowedURLField("https://dropped.example.com/"), constraints[0].UniqueField)
+	require.Len(t, constraints, 3)
+	assert.Equal(t, eventstore.UniqueConstraintRemoveByOwner, constraints[0].Action)
+	assert.Equal(t, []string{eventstore.OwnerTag(clientIDMetadataDocumentAllowedURLOwner, "instance")}, constraints[0].Owners)
 	assert.Equal(t, eventstore.UniqueConstraintAdd, constraints[1].Action)
-	assert.Equal(t, clientIDMetadataDocumentAllowedURLField("https://new.example.com/"), constraints[1].UniqueField)
+	assert.Equal(t, clientIDMetadataDocumentAllowedURLField("https://a.example.com/"), constraints[1].UniqueField)
+	assert.Equal(t, clientIDMetadataDocumentAllowedURLField("https://b.example.com/"), constraints[2].UniqueField)
+
+	cleared, err := NewSecurityPolicySetEvent(context.Background(), &NewAggregate("instance").Aggregate, []SecurityPolicyChanges{
+		ChangeSecurityPolicyClientIDMetadataDocumentAllowedURLs(nil),
+	})
+	require.NoError(t, err)
+	require.Len(t, cleared.UniqueConstraints(), 1, "clearing the list releases every constraint")
 
 	unchanged, err := NewSecurityPolicySetEvent(context.Background(), &NewAggregate("instance").Aggregate, []SecurityPolicyChanges{
 		ChangeSecurityPolicyEnableClientIDMetadataDocument(true),

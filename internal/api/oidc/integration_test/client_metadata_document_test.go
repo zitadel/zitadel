@@ -235,6 +235,42 @@ func TestServer_ClientIDMetadataDocument_instanceAllowedURLs(t *testing.T) {
 		require.NoError(t, err)
 	})
 
+	t.Run("concurrent replacements leave only the stored urls taken", func(t *testing.T) {
+		const sets = 8
+		current, err := instance.Client.SettingsV2.GetSecuritySettings(iamCTX, &settings.GetSecuritySettingsRequest{})
+		require.NoError(t, err)
+		replacementURLs := make([]string, sets)
+		setErrs := make([]error, sets)
+		var wg sync.WaitGroup
+		for i := range sets {
+			replacementURLs[i] = fmt.Sprintf("https://127.0.0.1:8091/replacement-%d", i)
+			wg.Go(func() {
+				_, setErrs[i] = instance.Client.SettingsV2.SetSecuritySettings(iamCTX, &settings.SetSecuritySettingsRequest{
+					EmbeddedIframe:            current.GetSettings().GetEmbeddedIframe(),
+					EnableImpersonation:       current.GetSettings().GetEnableImpersonation(),
+					DynamicClientRegistration: current.GetSettings().GetDynamicClientRegistration(),
+					ClientIdMetadataDocument:  &settings.ClientIDMetadataDocumentSettings{Enabled: true, AllowedUrls: []string{replacementURLs[i]}},
+				})
+			})
+		}
+		wg.Wait()
+		for _, err := range setErrs {
+			require.NoError(t, err)
+		}
+
+		// Exactly the url of the replacement stored last is still taken; every other url can be
+		// added again, so no replacement left a constraint behind.
+		addCodes := make([]codes.Code, sets)
+		for i, replacementURL := range replacementURLs {
+			_, err := instance.Client.SettingsV2.AddClientIDMetadataDocumentAllowedURL(iamCTX, &settings.AddClientIDMetadataDocumentAllowedURLRequest{Url: replacementURL})
+			addCodes[i] = status.Code(err)
+		}
+		assert.Equal(t, 1, countCode(addCodes, codes.AlreadyExists), "only the stored url is still taken: %v", addCodes)
+		assert.Equal(t, sets-1, countCode(addCodes, codes.OK), "every replaced url is released: %v", addCodes)
+
+		setClientIDMetadataDocumentSettings(t, iamCTX, instance, &settings.ClientIDMetadataDocumentSettings{Enabled: true, AllowedUrls: []string{}})
+	})
+
 	t.Run("allow any url fetches every url the system allows", func(t *testing.T) {
 		setClientIDMetadataDocumentSettings(t, iamCTX, instance, &settings.ClientIDMetadataDocumentSettings{Enabled: true, AllowAnyUrl: true})
 		waitForClientIDMetadataDocumentSupport(t, ctx, issuer, true)

@@ -111,7 +111,6 @@ func (wm *InstanceSecurityPolicyWriteModel) NewSetEvent(
 	if !slices.Equal(wm.ClientIDMetadataDocumentAllowedURLs, policy.ClientIDMetadataDocumentAllowedURLs) {
 		changes = append(changes,
 			instance.ChangeSecurityPolicyClientIDMetadataDocumentAllowedURLs(policy.ClientIDMetadataDocumentAllowedURLs),
-			instance.ChangeSecurityPolicyClientIDMetadataDocumentAllowedURLConstraints(wm.ClientIDMetadataDocumentAllowedURLs, policy.ClientIDMetadataDocumentAllowedURLs),
 		)
 	}
 	if wm.ClientIDMetadataDocumentAllowAnyURL != policy.ClientIDMetadataDocumentAllowAnyURL {

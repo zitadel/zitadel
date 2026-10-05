@@ -610,7 +610,8 @@ func defaultPortForScheme(scheme string) string {
 // headers, capped at max. A no-store or no-cache directive disables caching (returns 0). When
 // no caching information is present the lifetime defaults to max.
 func cacheTTLFromResponse(header http.Header, max time.Duration) time.Duration {
-	cacheControl := strings.ToLower(header.Get("Cache-Control"))
+	// A response may split Cache-Control over several header lines; they form one list.
+	cacheControl := strings.ToLower(strings.Join(header.Values("Cache-Control"), ","))
 	if strings.Contains(cacheControl, "no-store") || strings.Contains(cacheControl, "no-cache") {
 		return 0
 	}

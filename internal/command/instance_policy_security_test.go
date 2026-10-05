@@ -207,7 +207,6 @@ func TestCommands_SetSecurityPolicy_clientIDMetadataDocument(t *testing.T) {
 				expectPush(securityPolicySetEvent(t,
 					instance.ChangeSecurityPolicyEnableClientIDMetadataDocument(true),
 					instance.ChangeSecurityPolicyClientIDMetadataDocumentAllowedURLs([]string{"https://clients.example.com/"}),
-					instance.ChangeSecurityPolicyClientIDMetadataDocumentAllowedURLConstraints(nil, []string{"https://clients.example.com/"}),
 					instance.ChangeSecurityPolicyClientIDMetadataDocumentAllowAnyURL(true),
 				)),
 			)(t),
@@ -228,7 +227,6 @@ func TestCommands_SetSecurityPolicy_clientIDMetadataDocument(t *testing.T) {
 				),
 				expectPush(securityPolicySetEvent(t,
 					instance.ChangeSecurityPolicyClientIDMetadataDocumentAllowedURLs(nil),
-					instance.ChangeSecurityPolicyClientIDMetadataDocumentAllowedURLConstraints([]string{"https://app.example.com/client"}, nil),
 				)),
 			)(t),
 		}

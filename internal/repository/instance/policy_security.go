@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
-	"slices"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -19,6 +18,10 @@ const (
 	SecurityPolicyClientIDMetadataDocumentAllowedURLRemovedEventType = instanceEventTypePrefix + securityPolicyClientIDMetadataDocumentAllowedURLPrefix + "removed"
 
 	UniqueClientIDMetadataDocumentAllowedURL = "client_id_metadata_document_allowed_url"
+
+	// clientIDMetadataDocumentAllowedURLOwner tags the allowed URL constraints of an instance, so
+	// replacing the list can release all of them without knowing which URLs they belong to.
+	clientIDMetadataDocumentAllowedURLOwner = "client_id_metadata_document_allowed_urls"
 )
 
 // clientIDMetadataDocumentAllowedURLField is the unique field of an allowed client_id URL: the
@@ -29,11 +32,21 @@ func clientIDMetadataDocumentAllowedURLField(allowedURL string) string {
 	return hex.EncodeToString(sum[:])
 }
 
-func NewAddClientIDMetadataDocumentAllowedURLUniqueConstraint(allowedURL string) *eventstore.UniqueConstraint {
+// NewAddClientIDMetadataDocumentAllowedURLUniqueConstraint takes the constraint of allowedURL in
+// the instance, tagged so that NewRemoveClientIDMetadataDocumentAllowedURLUniqueConstraints
+// releases it.
+func NewAddClientIDMetadataDocumentAllowedURLUniqueConstraint(instanceID, allowedURL string) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueClientIDMetadataDocumentAllowedURL,
 		clientIDMetadataDocumentAllowedURLField(allowedURL),
-		"Errors.Instance.SecurityPolicy.ClientIDMetadataDocumentAllowedURL.AlreadyExists")
+		"Errors.Instance.SecurityPolicy.ClientIDMetadataDocumentAllowedURL.AlreadyExists",
+	).WithOwners(eventstore.OwnerTag(clientIDMetadataDocumentAllowedURLOwner, instanceID))
+}
+
+// NewRemoveClientIDMetadataDocumentAllowedURLUniqueConstraints releases the constraints of every
+// allowed URL of the instance.
+func NewRemoveClientIDMetadataDocumentAllowedURLUniqueConstraints(instanceID string) *eventstore.UniqueConstraint {
+	return eventstore.NewRemoveUniqueConstraintsByOwner(clientIDMetadataDocumentAllowedURLOwner, instanceID)
 }
 
 func NewRemoveClientIDMetadataDocumentAllowedURLUniqueConstraint(allowedURL string) *eventstore.UniqueConstraint {
@@ -68,9 +81,6 @@ type SecurityPolicySetEvent struct {
 	// ClientIDMetadataDocumentAllowAnyURL lets the instance resolve every client_id URL the
 	// system allows, regardless of ClientIDMetadataDocumentAllowedURLs.
 	ClientIDMetadataDocumentAllowAnyURL *bool `json:"client_id_metadata_document_allow_any_url,omitempty"`
-
-	// uniqueConstraints keeps the allowed URL constraints in step when the list is replaced.
-	uniqueConstraints []*eventstore.UniqueConstraint
 }
 
 func NewSecurityPolicySetEvent(
@@ -144,24 +154,6 @@ func ChangeSecurityPolicyClientIDMetadataDocumentAllowedURLs(allowedURLs []strin
 	}
 }
 
-// ChangeSecurityPolicyClientIDMetadataDocumentAllowedURLConstraints releases the unique
-// constraint of every URL in previous that is not in next, and takes it for every URL in next
-// that is not in previous.
-func ChangeSecurityPolicyClientIDMetadataDocumentAllowedURLConstraints(previous, next []string) func(event *SecurityPolicySetEvent) {
-	return func(e *SecurityPolicySetEvent) {
-		for _, allowedURL := range previous {
-			if !slices.Contains(next, allowedURL) {
-				e.uniqueConstraints = append(e.uniqueConstraints, NewRemoveClientIDMetadataDocumentAllowedURLUniqueConstraint(allowedURL))
-			}
-		}
-		for _, allowedURL := range next {
-			if !slices.Contains(previous, allowedURL) {
-				e.uniqueConstraints = append(e.uniqueConstraints, NewAddClientIDMetadataDocumentAllowedURLUniqueConstraint(allowedURL))
-			}
-		}
-	}
-}
-
 func ChangeSecurityPolicyClientIDMetadataDocumentAllowAnyURL(allow bool) func(event *SecurityPolicySetEvent) {
 	return func(e *SecurityPolicySetEvent) {
 		e.ClientIDMetadataDocumentAllowAnyURL = &allow
@@ -172,8 +164,21 @@ func (e *SecurityPolicySetEvent) Payload() interface{} {
 	return e
 }
 
+// UniqueConstraints replaces the allowed URL constraints of the instance when the event replaces
+// the list: it releases all of them and takes one per URL in the new list. They are derived from
+// the list alone, not from the list the command read before, so a push that is retried after a
+// concurrent change to the policy still leaves exactly the constraints of the list it stores.
 func (e *SecurityPolicySetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return e.uniqueConstraints
+	if e.ClientIDMetadataDocumentAllowedURLs == nil {
+		return nil
+	}
+	instanceID := e.Aggregate().InstanceID
+	constraints := make([]*eventstore.UniqueConstraint, 0, len(*e.ClientIDMetadataDocumentAllowedURLs)+1)
+	constraints = append(constraints, NewRemoveClientIDMetadataDocumentAllowedURLUniqueConstraints(instanceID))
+	for _, allowedURL := range *e.ClientIDMetadataDocumentAllowedURLs {
+		constraints = append(constraints, NewAddClientIDMetadataDocumentAllowedURLUniqueConstraint(instanceID, allowedURL))
+	}
+	return constraints
 }
 
 func SecurityPolicySetEventMapper(event eventstore.Event) (eventstore.Event, error) {
@@ -221,7 +226,7 @@ func (e *SecurityPolicyClientIDMetadataDocumentAllowedURLAddedEvent) Payload() i
 }
 
 func (e *SecurityPolicyClientIDMetadataDocumentAllowedURLAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddClientIDMetadataDocumentAllowedURLUniqueConstraint(e.URL)}
+	return []*eventstore.UniqueConstraint{NewAddClientIDMetadataDocumentAllowedURLUniqueConstraint(e.Aggregate().InstanceID, e.URL)}
 }
 
 // SecurityPolicyClientIDMetadataDocumentAllowedURLRemovedEvent removes a client_id URL the
