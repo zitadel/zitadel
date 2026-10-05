@@ -1158,9 +1158,10 @@ HTTPClient:
   # Do not remove the CIDR subnets even if a domain mapping exists.
   # When outgoing requests go through a proxy (HTTP_PROXY / HTTPS_PROXY), the dialer only reaches the proxy. ZITADEL then
   # checks each target against this list by resolving its hostname before contacting the proxy. The proxy resolves the
-  # hostname again on its own: for HTTPS targets the TLS handshake still verifies the certificate against the hostname,
-  # so a proxy that reaches a different host cannot complete the request. Plain HTTP targets rely on the proxy enforcing
-  # the same deny rules.
+  # hostname again on its own: for HTTPS targets tunnelled with CONNECT, the TLS handshake still verifies the certificate
+  # against the hostname, so a proxy that reaches a different host cannot complete the request. This does not hold for a
+  # proxy that intercepts TLS with a certificate authority the host trusts, nor for plain HTTP targets; those rely on the
+  # proxy enforcing the same deny rules.
   DenyList: # ZITADEL_HTTPCLIENT_DENYLIST (comma separated list)
     - localhost
     - "0.0.0.0/8"       # Unspecified IPv4 address range / Local network routing trick protection
