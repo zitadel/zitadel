@@ -19,10 +19,12 @@ import { FormFieldModule } from '../../form-field/form-field.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
 import { MessageTextsRoutingModule } from './message-texts-routing.module';
 import { MessageTextsComponent } from './message-texts.component';
+import { EmailProviderRestrictionsComponent } from '../../email-provider-restrictions/email-provider-restrictions.component';
 
 @NgModule({
   declarations: [MessageTextsComponent],
   imports: [
+    EmailProviderRestrictionsComponent,
     MessageTextsRoutingModule,
     CommonModule,
     InfoSectionModule,

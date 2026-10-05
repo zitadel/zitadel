@@ -9,7 +9,7 @@ import {
   TestEmailProviderSMTPRequestSchema,
   UpdateEmailProviderSMTPRequestSchema,
 } from '@zitadel/proto/zitadel/admin_pb';
-import { injectQuery, queryOptions, skipToken } from '@tanstack/angular-query-experimental';
+import { injectQuery, QueryClient, queryOptions, skipToken } from '@tanstack/angular-query-experimental';
 import { NewAuthService } from './new-auth.service';
 import { UserService } from './user.service';
 
@@ -21,6 +21,7 @@ export class NewAdminService {
     private readonly grpcService: GrpcService,
     private readonly authService: NewAuthService,
     private readonly userService: UserService,
+    private readonly queryClient: QueryClient,
   ) {}
 
   public setupOrg(req: MessageInitShape<typeof SetUpOrgRequestSchema>) {
@@ -52,6 +53,33 @@ export class NewAdminService {
     return this.grpcService.adminNew.getEmailProviderById({ id }, { signal });
   }
 
+  private getEmailProvider(signal: AbortSignal) {
+    return this.grpcService.adminNew.getEmailProvider({}, { signal });
+  }
+
+  // The active email provider. The query fails if no provider is active.
+  public getEmailProviderQueryOptions() {
+    return queryOptions({
+      queryKey: [this.userService.userId(), 'AdminService', 'emailProviders', 'active'],
+      queryFn: ({ signal }) => this.getEmailProvider(signal),
+      retry: false,
+    });
+  }
+
+  public listEmailProvidersQueryOptions() {
+    return queryOptions({
+      queryKey: [this.userService.userId(), 'AdminService', 'emailProviders', 'list'],
+      queryFn: ({ signal }) => this.grpcService.adminNew.listEmailProviders({}, { signal }),
+    });
+  }
+
+  // Reloads the email providers after one of them was activated, deactivated, changed or removed.
+  public invalidateEmailProviders() {
+    return this.queryClient.invalidateQueries({
+      queryKey: [this.userService.userId(), 'AdminService', 'emailProviders'],
+    });
+  }
+
   public getEmailProviderByIdQueryOptions(id?: string) {
     return queryOptions({
       queryKey: [this.userService.userId(), 'AdminService', 'getEmailProviderById', id],
@@ -60,18 +88,18 @@ export class NewAdminService {
   }
 
   public addEmailProviderSMTP(req: MessageInitShape<typeof AddEmailProviderSMTPRequestSchema>) {
-    return this.grpcService.adminNew.addEmailProviderSMTP(req);
+    return this.grpcService.adminNew.addEmailProviderSMTP(req).finally(() => this.invalidateEmailProviders());
   }
 
   public updateEmailProviderSMTP(req: MessageInitShape<typeof UpdateEmailProviderSMTPRequestSchema>) {
-    return this.grpcService.adminNew.updateEmailProviderSMTP(req);
+    return this.grpcService.adminNew.updateEmailProviderSMTP(req).finally(() => this.invalidateEmailProviders());
   }
 
   public activateSMTPConfig(id: string) {
-    return this.grpcService.adminNew.activateSMTPConfig({ id });
+    return this.grpcService.adminNew.activateSMTPConfig({ id }).finally(() => this.invalidateEmailProviders());
   }
 
   public deactivateSMTPConfig(id: string) {
-    return this.grpcService.adminNew.deactivateSMTPConfig({ id });
+    return this.grpcService.adminNew.deactivateSMTPConfig({ id }).finally(() => this.invalidateEmailProviders());
   }
 }
