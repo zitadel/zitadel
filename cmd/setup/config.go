@@ -197,6 +197,9 @@ type Steps struct {
 	s75Apps7OIDCConfigsAddAppLinkConfig     *Apps7OIDCConfigsAddAppLinkConfig
 	s76Users14LoginEqualityIndexes          *Users14LoginEqualityIndexes
 	s77StampEventPositionAtInsert           *StampEventPositionAtInsert
+	s78UniqueConstraintOwners               *UniqueConstraintOwners
+	s80Users14InstanceResourceOwnerIndex    *Users14InstanceResourceOwnerIndex
+	BackfillUniqueConstraintOwners          *BackfillUniqueConstraintOwners
 	RelationalTables                        *TransactionalTables
 }
 

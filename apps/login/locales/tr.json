@@ -467,7 +467,7 @@
     "noUserCode": "Kullanıcı kodu sağlanmadı!",
     "noDeviceRequest": "Cihaz isteği bulunamadı.",
     "unknownContext": "Kullanıcının bağlamı alınamadı. Önce kullanıcı adını girdiğinizden emin olun veya searchParam olarak bir loginName sağlayın.",
-    "sessionExpired": "Mevcut oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.",
+    "sessionExpired": "Oturumunuzun süresi doldu veya yeniden kimlik doğrulaması gerekiyor. Lütfen tekrar giriş yapın.",
     "failedLoading": "Veri yüklenemedi. Lütfen tekrar deneyin.",
     "tryagain": "Tekrar Dene",
     "couldNotContinueSession": "Oturuma devam edilemedi - kullanıcı bilgileri eksik",

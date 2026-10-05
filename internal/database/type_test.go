@@ -313,7 +313,7 @@ func TestTextArray_Value(t *testing.T) {
 			"set",
 			TextArray[string]{"a", "s", "d", "f"},
 			res{
-				want: driver.Value([]byte("{a,s,d,f}")),
+				want: driver.Value([]byte(`{"a","s","d","f"}`)),
 			},
 		},
 	}
@@ -329,6 +329,17 @@ func TestTextArray_Value(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestTextArray_ValueScanRoundTrip(t *testing.T) {
+	original := TextArray[string]{"a,b", `say "hi"`, `a\b`}
+
+	value, err := original.Value()
+	require.NoError(t, err)
+
+	var scanned TextArray[string]
+	require.NoError(t, scanned.Scan(value))
+	assert.Equal(t, original, scanned)
 }
 
 type typedByte byte

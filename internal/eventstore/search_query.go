@@ -18,6 +18,7 @@ type SearchQueryBuilder struct {
 	limit                 uint64
 	offset                uint32
 	desc                  bool
+	orderByCreationDate   bool
 	resourceOwner         string
 	instanceID            *string
 	instanceIDs           []string
@@ -28,6 +29,7 @@ type SearchQueryBuilder struct {
 	positionAtLeast       decimal.Decimal
 	eventSortKeyAfter     *EventSortKey
 	awaitOpenTransactions bool
+	scanEventTypes        bool
 	creationDateAfter     time.Time
 	creationDateBefore    time.Time
 	eventSequenceGreater  uint64
@@ -47,6 +49,10 @@ func (b *SearchQueryBuilder) GetOffset() uint32 {
 
 func (b *SearchQueryBuilder) GetDesc() bool {
 	return b.desc
+}
+
+func (b *SearchQueryBuilder) GetOrderByCreationDate() bool {
+	return b.orderByCreationDate
 }
 
 func (b *SearchQueryBuilder) GetResourceOwner() string {
@@ -87,6 +93,10 @@ func (b SearchQueryBuilder) GetEventSortKeyAfter() *EventSortKey {
 
 func (b SearchQueryBuilder) GetAwaitOpenTransactions() bool {
 	return b.awaitOpenTransactions
+}
+
+func (b SearchQueryBuilder) GetScanEventTypesSeparately() bool {
+	return b.scanEventTypes
 }
 
 func (q SearchQueryBuilder) GetEventSequenceGreater() uint64 {
@@ -274,6 +284,20 @@ func (builder *SearchQueryBuilder) OrderAsc() *SearchQueryBuilder {
 	return builder
 }
 
+// OrderByCreationDate sorts the returned events by their creation date first and falls back to the
+// event sort key (position, in_tx_order, ...) for events created in the same microsecond.
+// The direction is defined by [SearchQueryBuilder.OrderAsc] and [SearchQueryBuilder.OrderDesc].
+//
+// Use it for readers that page by creation date, e.g. the events API. It allows the database
+// to serve the query from an index on created_at instead of sorting all events of the instance.
+// Do not use it for readers that resume by position, e.g. projections, because created_at and
+// position are stamped by different clocks and may be ordered differently.
+// It has no effect when the query filters a single aggregate id, which is always ordered by sequence.
+func (builder *SearchQueryBuilder) OrderByCreationDate() *SearchQueryBuilder {
+	builder.orderByCreationDate = true
+	return builder
+}
+
 // SetTx ensures that the eventstore library uses the existing transaction
 func (builder *SearchQueryBuilder) SetTx(tx *sql.Tx) *SearchQueryBuilder {
 	builder.tx = tx
@@ -300,6 +324,19 @@ func (builder *SearchQueryBuilder) AfterEventSortKey(key EventSortKey) *SearchQu
 // AwaitOpenTransactions filters for events which are older than the oldest transaction of the database
 func (builder *SearchQueryBuilder) AwaitOpenTransactions() *SearchQueryBuilder {
 	builder.awaitOpenTransactions = true
+	return builder
+}
+
+// ScanEventTypesSeparately reads the events of each combination of aggregate type and event type of the sub queries
+// separately, in sort key order up to the limit, and merges the results.
+// Without it, a query for multiple types cannot stop reading at the limit:
+// it reads every matching event after the position and sorts them, so its cost grows with the number of matching events.
+// With it, the cost is bounded by the limit and the number of combinations.
+//
+// It is only applied to queries for events of a single instance, ordered ascending with a limit,
+// whose sub queries filter by aggregate types and event types only. Other queries ignore it.
+func (builder *SearchQueryBuilder) ScanEventTypesSeparately() *SearchQueryBuilder {
+	builder.scanEventTypes = true
 	return builder
 }
 

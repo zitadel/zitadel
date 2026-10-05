@@ -14,6 +14,9 @@ const (
 	ChangedEventType        = "member.changed"
 	RemovedEventType        = "member.removed"
 	CascadeRemovedEventType = "member.cascade.removed"
+
+	orgAggregateType     eventstore.AggregateType = "org"
+	projectAggregateType eventstore.AggregateType = "project"
 )
 
 // Field table and unique types
@@ -42,14 +45,38 @@ type MemberAddedEvent struct {
 
 	Roles  []string `json:"roles"`
 	UserID string   `json:"userId"`
+	// userResourceOwner is the user's home org. It is not persisted in the event payload.
+	userResourceOwner string
 }
 
 func (e *MemberAddedEvent) Payload() interface{} {
 	return e
 }
 
+func memberOwnerTags(agg *eventstore.Aggregate, userID, userResourceOwner string) []string {
+	tags := []string{
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerUser, userID),
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, userResourceOwner),
+	}
+	switch agg.Type {
+	case projectAggregateType:
+		tags = append(tags,
+			eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, agg.ResourceOwner),
+			eventstore.OwnerTag(eventstore.UniqueConstraintOwnerProject, agg.ID),
+		)
+	case orgAggregateType:
+		tags = append(tags, eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, agg.ID))
+	}
+	return tags
+}
+
 func (e *MemberAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddMemberUniqueConstraint(e.Aggregate().ID, e.UserID)}
+	return []*eventstore.UniqueConstraint{NewAddMemberUniqueConstraint(e.Aggregate().ID, e.UserID).WithOwners(memberOwnerTags(e.Aggregate(), e.UserID, e.userResourceOwner)...)}
+}
+
+func (e *MemberAddedEvent) WithUserResourceOwner(userResourceOwner string) *MemberAddedEvent {
+	e.userResourceOwner = userResourceOwner
+	return e
 }
 
 func (e *MemberAddedEvent) FieldOperations(prefix string) []*eventstore.FieldOperation {
@@ -226,7 +253,8 @@ func RemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 type MemberCascadeRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserID string `json:"userId"`
+	UserID                string `json:"userId"`
+	skipUniqueConstraints bool
 }
 
 func (e *MemberCascadeRemovedEvent) Payload() interface{} {
@@ -234,7 +262,14 @@ func (e *MemberCascadeRemovedEvent) Payload() interface{} {
 }
 
 func (e *MemberCascadeRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	if e.skipUniqueConstraints {
+		return nil
+	}
 	return []*eventstore.UniqueConstraint{NewRemoveMemberUniqueConstraint(e.Aggregate().ID, e.UserID)}
+}
+
+func (e *MemberCascadeRemovedEvent) SkipUniqueConstraints() {
+	e.skipUniqueConstraints = true
 }
 
 func (e *MemberCascadeRemovedEvent) FieldOperations(prefix string) []*eventstore.FieldOperation {
