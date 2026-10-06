@@ -23,9 +23,6 @@ export async function POST(req: Request) {
     const rawIp = req.headers.get('x-real-ip') || req.headers.get('x-forwarded-for') || 'anonymous';
     const ip = rawIp.split(',')[0].trim();
 
-    // TEMPORARY DEBUG LOG: To verify the IP in the Vercel preview logs
-    console.log('[DEBUG] Resolved Client IP:', ip, '| x-real-ip:', req.headers.get('x-real-ip'), '| x-forwarded-for:', req.headers.get('x-forwarded-for'));
-
     const now = Date.now();
 
     const userRateData = rateLimitMap.get(ip) || { timestamps: [] };
