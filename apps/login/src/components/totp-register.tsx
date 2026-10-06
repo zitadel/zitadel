@@ -32,7 +32,16 @@ type Props = {
   checkAfter?: boolean;
   loginSettings?: LoginSettings;
 };
-export function TotpRegister({ uri, loginName, sessionId, requestId, organization, checkAfter, loginSettings }: Props) {
+export function TotpRegister({
+  uri,
+  secret,
+  loginName,
+  sessionId,
+  requestId,
+  organization,
+  checkAfter,
+  loginSettings,
+}: Props) {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
@@ -106,6 +115,19 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
       {uri && (
         <>
           <QRCodeSVG className="my-4 h-40 w-40 rounded-md bg-white p-2" value={uri} />
+          {secret && (
+            <div className="my-2 flex w-96 flex-col">
+              <p className="ztdl-p mb-2 text-center text-sm">
+                <Translated i18nKey="set.manualSetupDescription" namespace="otp" />
+              </p>
+              <div className="border-divider-light dark:border-divider-dark flex rounded-lg border px-4 py-2 pr-2 text-sm">
+                <span className="flex-1 overflow-x-auto font-mono" data-testid="totp-secret">
+                  {secret}
+                </span>
+                <CopyToClipboard value={secret}></CopyToClipboard>
+              </div>
+            </div>
+          )}
           <div className="border-divider-light dark:border-divider-dark my-2 mb-4 flex w-96 rounded-lg border px-4 py-2 pr-2 text-sm">
             <Link href={uri} target="_blank" className="flex-1 overflow-x-auto">
               {uri}
