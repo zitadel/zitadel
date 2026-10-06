@@ -10,6 +10,7 @@ import (
 
 	"github.com/riverqueue/river"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
@@ -1896,6 +1897,7 @@ type fields struct {
 	es             *eventstore.Eventstore
 	userDataCrypto crypto.EncryptionAlgorithm
 	SMSTokenCrypto crypto.EncryptionAlgorithm
+	smtpRules      smtp.Rules
 }
 type fieldsWorker struct {
 	queries        *mock.MockQueries
@@ -1905,6 +1907,7 @@ type fieldsWorker struct {
 	SMSTokenCrypto crypto.EncryptionAlgorithm
 	now            nowFunc
 	backOff        func(current time.Duration) time.Duration
+	smtpRules      smtp.Rules
 }
 type args struct {
 	event eventstore.Event
@@ -2008,6 +2011,27 @@ func expectTemplateWithNotifyUserQueries(queries *mock.MockQueries, template str
 		VerifiedPhone:      verifiedPhone,
 	}, nil)
 	expectTemplateQueries(queries, template)
+}
+
+// expectTemplateWithReservedNotifyUserQueries returns a user with email addresses of a reserved domain.
+func expectTemplateWithReservedNotifyUserQueries(queries *mock.MockQueries, template string) {
+	queries.EXPECT().GetNotifyUserByID(gomock.Any(), gomock.Any(), gomock.Any()).Return(&query.NotifyUser{
+		ID:                 userID,
+		ResourceOwner:      orgID,
+		LastEmail:          "last@example.com",
+		VerifiedEmail:      "verified@example.com",
+		PreferredLoginName: preferredLoginName,
+		LastPhone:          lastPhone,
+		VerifiedPhone:      verifiedPhone,
+	}, nil)
+	expectTemplateQueries(queries, template)
+}
+
+// suppressReservedRecipientDomainsRules returns a rule matching every SMTP provider.
+func suppressReservedRecipientDomainsRules(t *testing.T) smtp.Rules {
+	rules, err := smtp.CompileRules([]smtp.RuleConfig{{SuppressReservedRecipientDomains: true}})
+	require.NoError(t, err)
+	return rules
 }
 
 func expectTemplateWithNotifyUserQueriesSMS(queries *mock.MockQueries) {

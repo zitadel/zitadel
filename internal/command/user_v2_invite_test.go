@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -1262,9 +1263,10 @@ func TestCommands_InviteCodeSent(t *testing.T) {
 		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		userID string
-		orgID  string
+		ctx          context.Context
+		userID       string
+		orgID        string
+		deliveryInfo senders.DeliveryInfo
 	}
 	tests := []struct {
 		name    string
@@ -1362,6 +1364,7 @@ func TestCommands_InviteCodeSent(t *testing.T) {
 						eventFromEventPusher(
 							user.NewHumanInviteCodeSentEvent(context.Background(),
 								&user.NewAggregate("userID", "org1").Aggregate,
+								senders.DeliveryInfo{},
 							),
 						),
 					),
@@ -1373,6 +1376,58 @@ func TestCommands_InviteCodeSent(t *testing.T) {
 			},
 			nil,
 		},
+		{
+			"sent ok, delivery suppressed",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								"username", "firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.Afrikaans,
+								domain.GenderUnspecified,
+								"email",
+								false,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanInviteCodeAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code"),
+								},
+								time.Hour,
+								"",
+								false,
+								"",
+								"authRequestID",
+							),
+						),
+					),
+					expectPush(
+						eventFromEventPusher(
+							user.NewHumanInviteCodeSentEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								senders.DeliveryInfo{DeliverySuppressed: true},
+							),
+						),
+					),
+				),
+			},
+			args{
+				ctx:          context.Background(),
+				userID:       "userID",
+				deliveryInfo: senders.DeliveryInfo{DeliverySuppressed: true},
+			},
+			nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1380,7 +1435,7 @@ func TestCommands_InviteCodeSent(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			err := c.InviteCodeSent(tt.args.ctx, tt.args.userID, tt.args.orgID)
+			err := c.InviteCodeSent(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.deliveryInfo)
 			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}

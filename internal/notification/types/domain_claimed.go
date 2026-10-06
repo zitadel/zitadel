@@ -11,8 +11,7 @@ import (
 )
 
 func (notify Notify) SendDomainClaimed(ctx context.Context, user *query.NotifyUser, username, urlTemplate string) error {
-	index := strings.LastIndex(user.LastEmail, "@")
-	domainSuffix := user.LastEmail[index+1:]
+	domainSuffix := domain.EmailAddress(user.LastEmail).Domain()
 	var url string
 	if urlTemplate == "" {
 		url = login.LoginLink(http_utils.DomainContext(ctx).Origin(), user.ResourceOwner)

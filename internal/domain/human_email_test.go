@@ -166,3 +166,39 @@ func TestEmailAddress_Domain(t *testing.T) {
 		})
 	}
 }
+
+func TestEmailAddress_IsReservedDomain(t *testing.T) {
+	tests := []struct {
+		address string
+		want    bool
+	}{
+		{address: "user@example.com", want: true},
+		{address: "user@example.net", want: true},
+		{address: "user@example.org", want: true},
+		{address: "user@EXAMPLE.COM", want: true},
+		{address: "user@mail.example.com", want: true},
+		{address: "user@example.com.", want: true},
+		{address: "user@localhost", want: true},
+		{address: "user@mail.localhost", want: true},
+		{address: "user@test", want: true},
+		{address: "user@invalid", want: true},
+		{address: "user@user.test", want: true},
+		{address: "user@user.example", want: true},
+		{address: "user@user.invalid", want: true},
+		{address: "user@user.test.", want: true},
+		{address: "user@example.ch", want: false},
+		{address: "user@examplecom", want: false},
+		{address: "user@example.com.ch", want: false},
+		{address: "user@test.other.example", want: true},
+		{address: "user@testing.ch", want: false},
+		{address: "user@other.example.ch", want: false},
+		{address: "user", want: false},
+		{address: "", want: false},
+		{address: " user@example.com ", want: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.address, func(t *testing.T) {
+			assert.Equal(t, tt.want, EmailAddress(tt.address).IsReservedDomain())
+		})
+	}
+}
