@@ -1,8 +1,8 @@
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Component, OnDestroy } from '@angular/core';
-import { merge, Subject, takeUntil } from 'rxjs';
+import { combineLatest, EMPTY, from, map, startWith, Subject, switchMap, takeUntil } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
-import { ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
+import { Project, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
@@ -27,6 +27,9 @@ export interface ShortcutItem {
   disabled?: boolean;
   state?: ProjectState;
 }
+
+const PROJECT_SHORTCUT_PREFIX = 'project-';
+const SHORTCUT_LISTS = ['main', 'secondary', 'third'];
 
 export enum ShortcutType {
   ROUTE,
@@ -98,67 +101,88 @@ export class ShortcutsComponent implements OnDestroy {
     private auth: GrpcAuthService,
     private mgmtService: ManagementService,
   ) {
-    const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
-    if (org && org.id) {
-      this.org = org;
-      this.loadProjectShortcuts();
-    }
-
-    merge(this.auth.activeOrgChanged, this.mgmtService.ownedProjects)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
-        if (org && org.id) {
-          this.org = org;
-          this.loadProjectShortcuts();
-        }
+    combineLatest([this.auth.activeOrgChanged.pipe(startWith(undefined)), this.mgmtService.ownedProjects])
+      .pipe(
+        switchMap(([, projects]) => {
+          const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
+          if (!org?.id) {
+            return EMPTY;
+          }
+          return from(this.withPinnedProjects(org, projects)).pipe(map((allProjects) => ({ org, allProjects })));
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe(({ org, allProjects }) => {
+        this.org = org;
+        this.loadProjectShortcuts(allProjects);
       });
   }
 
-  public loadProjectShortcuts(): void {
-    this.mgmtService.ownedProjects.pipe(takeUntil(this.destroy$)).subscribe((projects) => {
-      if (projects) {
-        const mapped: ShortcutItem[] = projects.map((p) => {
-          const policy: ShortcutItem = {
-            id: `project-${p.id}`,
-            type: ShortcutType.PROJECT,
-            title: p.name,
-            i18nDesc: 'PROJECT.PAGES.TYPE.OWNED',
-            routerLink: ['/projects', p.id],
-            withRole: ['project.read', `project.read:${p.id}`],
-            label: 'P',
-            disabled: false,
-            state: p.state,
-          };
-          return policy;
-        });
-
-        const routesShortcuts = [PROFILE_SHORTCUT, CREATE_ORG, CREATE_PROJECT, CREATE_USER];
-        const settingsShortcuts = SETTINGLINKS.map((p) => {
-          const policy: ShortcutItem = {
-            id: p.i18nTitle,
-            type: ShortcutType.POLICY,
-            i18nTitle: p.i18nTitle,
-            i18nDesc: p.i18nDesc,
-            routerLink: p.orgRouterLink ?? p.iamRouterLink,
-            queryParams: p.queryParams,
-            withRole: p.orgWithRole ?? p.iamWithRole,
-            icon: p.icon ?? '',
-            svgIcon: p.svgIcon ?? '',
-            color: p.color ?? '',
-            disabled: false,
-          };
-          return policy;
-        });
-
-        this.ALL_SHORTCUTS = [...routesShortcuts, ...settingsShortcuts, ...mapped];
-        this.loadShortcuts(this.org);
-      }
+  public loadProjectShortcuts(projects: Project.AsObject[]): void {
+    const mapped: ShortcutItem[] = projects.map((p) => {
+      const policy: ShortcutItem = {
+        id: `${PROJECT_SHORTCUT_PREFIX}${p.id}`,
+        type: ShortcutType.PROJECT,
+        title: p.name,
+        i18nDesc: 'PROJECT.PAGES.TYPE.OWNED',
+        routerLink: ['/projects', p.id],
+        withRole: ['project.read', `project.read:${p.id}`],
+        label: 'P',
+        disabled: false,
+        state: p.state,
+      };
+      return policy;
     });
+
+    const routesShortcuts = [PROFILE_SHORTCUT, CREATE_ORG, CREATE_PROJECT, CREATE_USER];
+    const settingsShortcuts = SETTINGLINKS.map((p) => {
+      const policy: ShortcutItem = {
+        id: p.i18nTitle,
+        type: ShortcutType.POLICY,
+        i18nTitle: p.i18nTitle,
+        i18nDesc: p.i18nDesc,
+        routerLink: p.orgRouterLink ?? p.iamRouterLink,
+        queryParams: p.queryParams,
+        withRole: p.orgWithRole ?? p.iamWithRole,
+        icon: p.icon ?? '',
+        svgIcon: p.svgIcon ?? '',
+        color: p.color ?? '',
+        disabled: false,
+      };
+      return policy;
+    });
+
+    this.ALL_SHORTCUTS = [...routesShortcuts, ...settingsShortcuts, ...mapped];
+    this.loadShortcuts(this.org);
+  }
+
+  // only a part of the projects is preloaded, so pinned projects might need to be loaded
+  private async withPinnedProjects(org: Org.AsObject, projects: Project.AsObject[]): Promise<Project.AsObject[]> {
+    const loadedIds = new Set(projects.map((p) => p.id));
+    const missingIds = SHORTCUT_LISTS.flatMap((listName) =>
+      (this.storageService.getItem(`shortcuts:${listName}:${org.id}`, StorageLocation.local) ?? '').split(','),
+    )
+      .filter((id: string) => id.startsWith(PROJECT_SHORTCUT_PREFIX))
+      .map((id: string) => id.slice(PROJECT_SHORTCUT_PREFIX.length))
+      .filter((id: string) => !loadedIds.has(id));
+    if (!missingIds.length) {
+      return projects;
+    }
+
+    const pinned = await Promise.all(
+      [...new Set(missingIds)].map((id) =>
+        this.mgmtService
+          .getProjectByID(id)
+          .then((resp) => resp.project)
+          // e.g. the project was removed
+          .catch(() => undefined),
+      ),
+    );
+    return [...projects, ...pinned.filter((p): p is Project.AsObject => !!p)];
   }
 
   public loadShortcuts(org: Org.AsObject): void {
-    ['main', 'secondary', 'third'].map((listName) => {
+    SHORTCUT_LISTS.map((listName) => {
       const joinedShortcuts = this.storageService.getItem(`shortcuts:${listName}:${org.id}`, StorageLocation.local);
       if (joinedShortcuts) {
         const parsedIds: string[] = joinedShortcuts.split(',');
@@ -260,7 +284,7 @@ export class ShortcutsComponent implements OnDestroy {
   public reset(): void {
     const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
     if (org && org.id) {
-      ['main', 'secondary', 'third'].map((listName) => {
+      SHORTCUT_LISTS.map((listName) => {
         this.storageService.removeItem(`shortcuts:${listName}:${org.id}`, StorageLocation.local);
       });
 

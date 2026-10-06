@@ -8,7 +8,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
-import { filter, map, startWith, switchMap } from 'rxjs/operators';
+import { distinctUntilChanged, filter, map, startWith, switchMap, take } from 'rxjs/operators';
 
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
@@ -202,13 +202,16 @@ export class AppComponent {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/arrow-decision-outline.svg'),
     );
 
-    this.getProjectCount();
-
-    this.authService.activeOrgChanged.pipe(takeUntilDestroyed()).subscribe((org) => {
-      if (org?.id) {
-        this.getProjectCount();
-      }
-    });
+    // the active org is (re)set by many components, so only (re)load the projects if it actually changed
+    this.authService.activeOrgChanged
+      .pipe(
+        map((org) => org?.id),
+        filter(Boolean),
+        distinctUntilChanged(),
+        switchMap(() => this.authService.isAllowed(['project.read']).pipe(filter(Boolean), take(1))),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => this.loadProjects());
 
     this.activatedRoute.queryParamMap
       .pipe(
@@ -297,14 +300,10 @@ export class AppComponent {
     });
   }
 
-  private getProjectCount(): void {
-    this.authService.isAllowed(['project.read']).subscribe((allowed) => {
-      if (allowed) {
-        // the counts are taken from the total result, the loaded projects are used for the shortcuts and breadcrumbs
-        this.mgmtService.listProjects(PROJECT_PRELOAD_LIMIT, 0).then();
-        this.mgmtService.listGrantedProjects(PROJECT_PRELOAD_LIMIT, 0).then();
-      }
-    });
+  private loadProjects(): void {
+    // the counts are taken from the total result, the loaded projects are used for the shortcuts and breadcrumbs
+    this.mgmtService.listProjects(PROJECT_PRELOAD_LIMIT, 0).then();
+    this.mgmtService.listGrantedProjects(PROJECT_PRELOAD_LIMIT, 0).then();
   }
 
   private setFavicon(theme: string): void {
