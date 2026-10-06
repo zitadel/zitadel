@@ -124,7 +124,7 @@ func (s *Server) userInfo(
 			Claims:          maps.Clone(rawUserInfo.Claims),
 		}
 		assertRoles(projectID, qu, roleAudience, requestedRoles, roleAssertion, userInfo)
-		return userInfo, s.userinfoFlows(ctx, qu, userInfo, triggerType, clientID, actor)
+		return userInfo, s.userinfoFlows(ctx, qu, userInfo, triggerType, clientID, projectID, actor)
 	}
 }
 
@@ -317,15 +317,16 @@ func (s *Server) userinfoFlows(
 	userInfo *oidc.UserInfo,
 	triggerType domain.TriggerType,
 	clientID string,
+	projectID string,
 	actor *domain.TokenActor,
 ) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if err := s.runUserinfoActionFlows(ctx, qu, userInfo, triggerType, clientID, actor); err != nil {
+	if err := s.runUserinfoActionFlows(ctx, qu, userInfo, triggerType, clientID, projectID, actor); err != nil {
 		return err
 	}
-	return s.runUserinfoExecutionFlow(ctx, qu, userInfo, triggerType, clientID, actor)
+	return s.runUserinfoExecutionFlow(ctx, qu, userInfo, triggerType, clientID, projectID, actor)
 }
 
 // runUserinfoActionFlows loads the legacy, DB-configured Actions for triggerType and runs them.
@@ -335,13 +336,14 @@ func (s *Server) runUserinfoActionFlows(
 	userInfo *oidc.UserInfo,
 	triggerType domain.TriggerType,
 	clientID string,
+	projectID string,
 	actor *domain.TokenActor,
 ) error {
 	queriedActions, err := s.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, triggerType, qu.User.ResourceOwner)
 	if err != nil {
 		return err
 	}
-	return s.runUserinfoActions(ctx, qu, userInfo, clientID, actor, queriedActions)
+	return s.runUserinfoActions(ctx, qu, userInfo, clientID, projectID, actor, queriedActions)
 }
 
 // runUserinfoActions runs the given, already queried Actions. It is kept separate from
@@ -351,6 +353,7 @@ func (s *Server) runUserinfoActions(
 	qu *query.OIDCUserInfo,
 	userInfo *oidc.UserInfo,
 	clientID string,
+	projectID string,
 	actor *domain.TokenActor,
 	queriedActions []*query.Action,
 ) error {
@@ -383,6 +386,11 @@ func (s *Server) runUserinfoActions(
 				actions.SetFields("getClientId", func(c *actions.FieldConfig) interface{} {
 					return func(goja.FunctionCall) goja.Value {
 						return c.Runtime.ToValue(clientID)
+					}
+				}),
+				actions.SetFields("getProjectId", func(c *actions.FieldConfig) interface{} {
+					return func(goja.FunctionCall) goja.Value {
+						return c.Runtime.ToValue(projectID)
 					}
 				}),
 			),
@@ -521,26 +529,26 @@ func functionForTriggerType(triggerType domain.TriggerType) string {
 }
 
 // runUserinfoExecutionFlow resolves and runs the new-style Executions (webhook targets) for triggerType.
-func (s *Server) runUserinfoExecutionFlow(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, triggerType domain.TriggerType, clientID string, actor *domain.TokenActor) error {
+func (s *Server) runUserinfoExecutionFlow(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, triggerType domain.TriggerType, clientID, projectID string, actor *domain.TokenActor) error {
 	function := functionForTriggerType(triggerType)
 	if function == "" {
 		return nil
 	}
 	executionTargets := execution.QueryExecutionTargetsForFunction(ctx, function)
-	return s.runUserinfoExecutionTargets(ctx, qu, userInfo, clientID, actor, function, executionTargets)
+	return s.runUserinfoExecutionTargets(ctx, qu, userInfo, clientID, projectID, actor, function, executionTargets)
 }
 
 // runUserinfoExecutionTargets calls the given, already resolved Execution targets. It is kept
 // separate from runUserinfoExecutionFlow so it can be unit tested without authz/DB access by
 // injecting executionTargets directly (e.g. pointing at httptest servers).
-func (s *Server) runUserinfoExecutionTargets(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, clientID string, actor *domain.TokenActor, function string, executionTargets []target_domain.Target) error {
+func (s *Server) runUserinfoExecutionTargets(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, clientID, projectID string, actor *domain.TokenActor, function string, executionTargets []target_domain.Target) error {
 	info := &ContextInfo{
 		Function:     function,
 		UserInfo:     userInfo,
 		User:         qu.User,
 		UserMetadata: qu.Metadata,
 		Org:          qu.Org,
-		Application:  &ContextInfoApplication{ClientID: clientID},
+		Application:  &ContextInfoApplication{ClientID: clientID, ProjectID: projectID},
 		UserGrants:   qu.UserGrants,
 		Actor:        actor,
 	}
@@ -588,7 +596,8 @@ type ContextInfo struct {
 	Response *ContextInfoResponse `json:"response,omitempty"`
 }
 type ContextInfoApplication struct {
-	ClientID string `json:"client_id,omitempty"`
+	ClientID  string `json:"client_id,omitempty"`
+	ProjectID string `json:"project_id,omitempty"`
 }
 
 type ContextInfoResponse struct {
