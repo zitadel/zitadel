@@ -1,6 +1,6 @@
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Component, OnDestroy } from '@angular/core';
-import { combineLatest, EMPTY, from, map, startWith, Subject, switchMap, takeUntil } from 'rxjs';
+import { distinctUntilChanged, EMPTY, from, map, startWith, Subject, switchMap, takeUntil } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { Project, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -29,6 +29,8 @@ export interface ShortcutItem {
 }
 
 const PROJECT_SHORTCUT_PREFIX = 'project-';
+// the number of projects offered as shortcuts, pinned projects are loaded additionally
+const SHORTCUT_PROJECTS_LIMIT = 100;
 const SHORTCUT_LISTS = ['main', 'secondary', 'third'];
 
 export enum ShortcutType {
@@ -101,21 +103,32 @@ export class ShortcutsComponent implements OnDestroy {
     private auth: GrpcAuthService,
     private mgmtService: ManagementService,
   ) {
-    combineLatest([this.auth.activeOrgChanged.pipe(startWith(undefined)), this.mgmtService.ownedProjects])
+    this.auth.activeOrgChanged
       .pipe(
-        switchMap(([, projects]) => {
-          const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
+        startWith(undefined),
+        map(() => this.storageService.getItem<Org.AsObject>('organization', StorageLocation.session)),
+        // the active org is (re)set by many components, so only (re)load the projects if it actually changed
+        distinctUntilChanged((a, b) => a?.id === b?.id),
+        switchMap((org) => {
           if (!org?.id) {
             return EMPTY;
           }
-          return from(this.withPinnedProjects(org, projects)).pipe(map((allProjects) => ({ org, allProjects })));
+          return from(this.loadProjects(org)).pipe(map((projects) => ({ org, projects })));
         }),
         takeUntil(this.destroy$),
       )
-      .subscribe(({ org, allProjects }) => {
+      .subscribe(({ org, projects }) => {
         this.org = org;
-        this.loadProjectShortcuts(allProjects);
+        this.loadProjectShortcuts(projects);
       });
+  }
+
+  private async loadProjects(org: Org.AsObject): Promise<Project.AsObject[]> {
+    const projects = await this.mgmtService
+      .listProjects(SHORTCUT_PROJECTS_LIMIT, 0)
+      .then((resp) => resp.resultList)
+      .catch(() => []);
+    return this.withPinnedProjects(org, projects);
   }
 
   public loadProjectShortcuts(projects: Project.AsObject[]): void {
@@ -156,7 +169,7 @@ export class ShortcutsComponent implements OnDestroy {
     this.loadShortcuts(this.org);
   }
 
-  // only a part of the projects is preloaded, so pinned projects might need to be loaded
+  // only a part of the projects is loaded, so pinned projects might need to be loaded additionally
   private async withPinnedProjects(org: Org.AsObject, projects: Project.AsObject[]): Promise<Project.AsObject[]> {
     const loadedIds = new Set(projects.map((p) => p.id));
     const missingIds = SHORTCUT_LISTS.flatMap((listName) =>

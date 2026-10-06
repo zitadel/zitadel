@@ -8,7 +8,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { combineLatest, Observable, of } from 'rxjs';
-import { distinctUntilChanged, filter, map, startWith, switchMap } from 'rxjs/operators';
+import { distinctUntilChanged, filter, map, startWith, switchMap, tap } from 'rxjs/operators';
 
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
@@ -23,8 +23,6 @@ import { PosthogService } from './services/posthog.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NewOrganizationService } from './services/new-organization.service';
 import { NewAuthService } from './services/new-auth.service';
-
-const PROJECT_PRELOAD_LIMIT = 100;
 
 @Component({
   selector: 'cnsl-root',
@@ -202,12 +200,15 @@ export class AppComponent {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/arrow-decision-outline.svg'),
     );
 
-    // the active org is (re)set by many components, so only (re)load the projects if it actually changed.
+    // the active org is (re)set by many components, so only (re)load the project counts if it actually changed.
     // The permissions need to be subscribed right away, since they're only loaded on a change of the active org.
     combineLatest([
       this.authService.activeOrgChanged.pipe(
         map((org) => org?.id),
         filter(Boolean),
+        distinctUntilChanged(),
+        // don't show the counts of the previous org
+        tap(() => this.mgmtService.resetProjectCounts()),
       ),
       this.authService.isAllowed(['project.read']),
     ])
@@ -217,7 +218,7 @@ export class AppComponent {
         distinctUntilChanged(),
         takeUntilDestroyed(),
       )
-      .subscribe(() => this.loadProjects());
+      .subscribe(() => this.mgmtService.loadProjectCounts());
 
     this.activatedRoute.queryParamMap
       .pipe(
@@ -304,12 +305,6 @@ export class AppComponent {
       this.translate.use(lang);
       this.document.documentElement.lang = lang;
     });
-  }
-
-  private loadProjects(): void {
-    // the counts are taken from the total result, the loaded projects are used for the shortcuts and breadcrumbs
-    this.mgmtService.listProjects(PROJECT_PRELOAD_LIMIT, 0).then();
-    this.mgmtService.listGrantedProjects(PROJECT_PRELOAD_LIMIT, 0).then();
   }
 
   private setFavicon(theme: string): void {
