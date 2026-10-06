@@ -34,6 +34,10 @@ VerifyEmailOTP:
   Text: "Utilisez le bouton 'Authentifier' ou copiez l'OTP {{.OTP}} et collez-le à l'écran d'authentification pour vous authentifier sur Zitadel dans les cinq prochaines minutes."
   ButtonText: "Authentifier"
 VerifySMSOTP:
+  Title: "Zitadel - Vérifier l'OTP"
+  PreHeader: "Vérifier l'OTP"
+  Subject: "Vérifier l'OTP"
+  Greeting: "Bonjour {{.DisplayName}},"
   Text: |-
     {{.OTP}} est votre OTP pour {{ .Domain }}. Utilisez-le dans les prochaines {{.Expiry}}.
     @{{.Domain}} #{{.OTP}}
