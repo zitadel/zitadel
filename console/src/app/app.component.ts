@@ -7,8 +7,8 @@ import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
-import { Observable, of } from 'rxjs';
-import { distinctUntilChanged, filter, map, startWith, switchMap, take } from 'rxjs/operators';
+import { combineLatest, Observable, of } from 'rxjs';
+import { distinctUntilChanged, filter, map, startWith, switchMap } from 'rxjs/operators';
 
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
@@ -202,13 +202,19 @@ export class AppComponent {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/arrow-decision-outline.svg'),
     );
 
-    // the active org is (re)set by many components, so only (re)load the projects if it actually changed
-    this.authService.activeOrgChanged
-      .pipe(
+    // the active org is (re)set by many components, so only (re)load the projects if it actually changed.
+    // The permissions need to be subscribed right away, since they're only loaded on a change of the active org.
+    combineLatest([
+      this.authService.activeOrgChanged.pipe(
         map((org) => org?.id),
         filter(Boolean),
+      ),
+      this.authService.isAllowed(['project.read']),
+    ])
+      .pipe(
+        filter(([, allowed]) => allowed),
+        map(([orgId]) => orgId),
         distinctUntilChanged(),
-        switchMap(() => this.authService.isAllowed(['project.read']).pipe(filter(Boolean), take(1))),
         takeUntilDestroyed(),
       )
       .subscribe(() => this.loadProjects());
