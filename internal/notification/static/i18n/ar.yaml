@@ -34,6 +34,10 @@ VerifyEmailOTP:
   Text: "يرجى استخدام الـ OTP التالي {{.OTP}} للمصادقة خلال الدقائق الخمس القادمة أو انقر على زر \"مصادقة\"."
   ButtonText: "مصادقة"
 VerifySMSOTP:
+  Title: "التحقق من OTP"
+  PreHeader: "التحقق من OTP"
+  Subject: "التحقق من OTP"
+  Greeting: "مرحباً {{.DisplayName}}،"
   Text: |-
     {{.OTP}} هو الـ OTP الخاص بك لـ {{ .Domain }}. استخدمه خلال {{.Expiry}}.
     @{{.Domain}} #{{.OTP}}

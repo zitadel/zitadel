@@ -34,6 +34,10 @@ VerifyEmailOTP:
   Text: "인증하려면 다음 OTP {{.OTP}}를 5분 이내에 사용하거나 \"인증\" 버튼을 클릭하세요."
   ButtonText: "인증"
 VerifySMSOTP:
+  Title: "OTP 인증"
+  PreHeader: "OTP 인증"
+  Subject: "OTP 인증"
+  Greeting: "안녕하세요, {{.DisplayName}}님,"
   Text: |-
     {{.OTP}}는 {{ .Domain }}의 OTP입니다. 다음 {{.Expiry}} 이내에 사용하세요.
     @{{.Domain}} #{{.OTP}}
