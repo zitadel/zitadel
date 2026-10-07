@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/gerrors"
 	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -55,7 +56,8 @@ func (a *instanceInterceptor) HandlerFunc(next http.Handler) http.HandlerFunc {
 		zErr := new(zerrors.ZitadelError)
 		if errors.As(err, &zErr) {
 			zErr.SetMessage(a.translator.LocalizeFromRequest(r, zErr.GetMessage(), nil))
-			http.Error(w, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s): %s", origin, a.externalDomain, zErr), statusCode)
+			_, message, id := gerrors.ExtractZITADELError(err)
+			http.Error(w, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s): ID=%s Message=%s", origin, a.externalDomain, id, message), statusCode)
 			return
 		}
 
