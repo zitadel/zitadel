@@ -1,13 +1,25 @@
+import { AutoSubmitForm } from "@/components/auto-submit-form";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { Translated } from "@/components/translated";
 import { UsernameForm } from "@/components/username-form";
+import { isSafeRedirectUri } from "@/lib/client-utils";
+import { idpTypeToSlug } from "@/lib/idp";
+import { getPublicHost } from "@/lib/server/host";
 import { getServiceConfig } from "@/lib/service-url";
-import { getActiveIdentityProviders, getBrandingSettings, getDefaultOrg, getLoginSettings } from "@/lib/zitadel";
+import {
+  getActiveIdentityProviders,
+  getBrandingSettings,
+  getDefaultOrg,
+  getLoginSettings,
+  startIdentityProviderFlow,
+} from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("loginname");
@@ -49,6 +61,50 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   });
 
   const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization });
+
+  // Like Login V1: with local authentication disabled and exactly one external IdP, there is nothing to choose, so start the IdP flow right away.
+  if (!loginSettings?.allowLocalAuthentication && loginSettings?.allowExternalIdp && identityProviders?.length === 1) {
+    const idp = identityProviders[0];
+    const provider = idpTypeToSlug(idp.type);
+
+    const params = new URLSearchParams();
+    if (requestId) params.set("requestId", requestId);
+    if (organization) params.set("organization", organization);
+    params.set("postErrorRedirectUrl", "/loginname");
+
+    // redirect to LDAP page where username and password is requested
+    if (idp.type === IdentityProviderType.LDAP) {
+      params.set("idpId", idp.id);
+      redirect("/idp/ldap?" + params.toString());
+    }
+
+    const host = getPublicHost(_headers);
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+    const origin = `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}`;
+
+    // on failure, fall through and render the page with the single IdP button
+    const response = await startIdentityProviderFlow({
+      serviceConfig,
+      idpId: idp.id,
+      urls: {
+        successUrl: `${origin}/idp/${provider}/process?${params.toString()}`,
+        failureUrl: `${origin}/idp/${provider}/failure?${params.toString()}`,
+        loginHint: idpLoginHint,
+      },
+    }).catch(() => null);
+
+    if (response?.url && isSafeRedirectUri(response.url)) {
+      if (response.fields) {
+        return (
+          <DynamicTheme branding={branding}>
+            <AutoSubmitForm url={response.url} fields={response.fields} />
+          </DynamicTheme>
+        );
+      }
+
+      redirect(response.url);
+    }
+  }
 
   return (
     <DynamicTheme branding={branding}>
