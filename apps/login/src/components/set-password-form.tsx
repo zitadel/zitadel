@@ -3,6 +3,7 @@
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from "@/helpers/validators";
 import { handleServerActionResponse } from "@/lib/client-utils";
 import { changePassword, resetPassword, sendPassword } from "@/lib/server/password";
+import { useResendCooldown } from "@/lib/use-resend-cooldown";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
@@ -62,6 +63,7 @@ export function SetPasswordForm({
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const router = useRouter();
+  const resendCooldown = useResendCooldown();
 
   async function resendCode() {
     setError("");
@@ -84,6 +86,10 @@ export function SetPasswordForm({
     if (response && "error" in response && typeof response.error === "string") {
       setError(response.error);
       return;
+    }
+
+    if (response) {
+      resendCooldown.start();
     }
   }
 
@@ -191,7 +197,7 @@ export function SetPasswordForm({
                 </span>
                 <button
                   aria-label={t("set.resend")}
-                  disabled={loading}
+                  disabled={loading || resendCooldown.isCoolingDown}
                   type="button"
                   className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
                   onClick={() => {
@@ -200,6 +206,7 @@ export function SetPasswordForm({
                   data-testid="resend-button"
                 >
                   <Translated i18nKey="set.resend" namespace="password" />
+                  {resendCooldown.isCoolingDown && <> ({resendCooldown.remaining}s)</>}
                 </button>
               </div>
             </Alert>

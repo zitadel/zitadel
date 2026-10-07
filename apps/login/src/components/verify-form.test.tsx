@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { VerifyForm } from "./verify-form";
 
@@ -61,6 +61,39 @@ describe("VerifyForm", () => {
       expect(submitButton).toBeInTheDocument();
 
       expect(mockSendVerification).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Resend cooldown", () => {
+    test("should disable the resend button and show the countdown after a successful resend", async () => {
+      const { resendVerification } = await import("@/lib/server/verify");
+      vi.mocked(resendVerification).mockResolvedValue({} as never);
+
+      render(<VerifyForm userId="user-1" code="" isInvite={false} submit={false} />);
+
+      const button = screen.getByTestId("resend-button");
+      expect(button).not.toBeDisabled();
+      expect(button).not.toHaveTextContent("(30s)");
+
+      fireEvent.click(button);
+
+      await waitFor(() => {
+        expect(screen.getByTestId("resend-button")).toBeDisabled();
+      });
+      expect(screen.getByTestId("resend-button")).toHaveTextContent("verify.resendCode (30s)");
+    });
+
+    test("should not start the cooldown when the resend fails", async () => {
+      const { resendVerification } = await import("@/lib/server/verify");
+      vi.mocked(resendVerification).mockResolvedValue({ error: "boom" });
+
+      render(<VerifyForm userId="user-1" code="" isInvite={false} submit={false} />);
+      fireEvent.click(screen.getByTestId("resend-button"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("error")).toBeInTheDocument();
+      });
+      expect(screen.getByTestId("resend-button")).not.toBeDisabled();
     });
   });
 });

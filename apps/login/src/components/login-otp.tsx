@@ -3,6 +3,7 @@
 import { completeFlowOrGetUrl } from "@/lib/client";
 import { handleServerActionResponse } from "@/lib/client-utils";
 import { updateOrCreateSession } from "@/lib/server/session";
+import { useResendCooldown } from "@/lib/use-resend-cooldown";
 import { create } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -40,6 +41,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
 
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const resendCooldown = useResendCooldown();
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const router = useRouter();
@@ -112,12 +114,15 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
         .then((response) => {
           if (response?.error) {
             setError(response.error);
+          } else {
+            resendCooldown.start();
           }
         })
         .finally(() => {
           setLoading(false);
         });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updateSessionForOTPChallenge, method, code]);
 
   async function submitCode(values: Inputs, organization?: string) {
@@ -221,7 +226,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
               </span>
               <button
                 aria-label={t("verify.resendCode")}
-                disabled={loading}
+                disabled={loading || resendCooldown.isCoolingDown}
                 type="button"
                 className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
                 onClick={async () => {
@@ -229,12 +234,15 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
                   const response = await updateSessionForOTPChallenge();
                   if (response?.error) {
                     setError(response.error);
+                  } else {
+                    resendCooldown.start();
                   }
                   setLoading(false);
                 }}
                 data-testid="resend-button"
               >
                 <Translated i18nKey="verify.resendCode" namespace="otp" />
+                {resendCooldown.isCoolingDown && <> ({resendCooldown.remaining}s)</>}
               </button>
             </div>
           </Alert>

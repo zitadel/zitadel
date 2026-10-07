@@ -4,6 +4,7 @@ import { Alert, AlertType } from "@/components/alert";
 import { handleServerActionResponse } from "@/lib/client-utils";
 import { UNKNOWN_USER_ID } from "@/lib/constants";
 import { resendVerification, sendVerification } from "@/lib/server/verify";
+import { useResendCooldown } from "@/lib/use-resend-cooldown";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -48,6 +49,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
+  const resendCooldown = useResendCooldown();
 
   async function resendCode() {
     setError("");
@@ -76,6 +78,10 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
     if (response && "error" in response && response?.error) {
       setError(response.error);
       return;
+    }
+
+    if (response) {
+      resendCooldown.start();
     }
 
     // Signal success via URL search param so the "code sent" alert is shown
@@ -138,7 +144,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
             </span>
             <button
               aria-label="Resend Code"
-              disabled={loading}
+              disabled={loading || resendCooldown.isCoolingDown}
               type="button"
               className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
               onClick={() => {
@@ -147,6 +153,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
               data-testid="resend-button"
             >
               <Translated i18nKey="verify.resendCode" namespace="verify" />
+              {resendCooldown.isCoolingDown && <> ({resendCooldown.remaining}s)</>}
             </button>
           </div>
         </Alert>
