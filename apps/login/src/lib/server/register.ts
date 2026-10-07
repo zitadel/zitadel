@@ -1,8 +1,17 @@
 "use server";
 
 import { createSessionAndUpdateCookie, createSessionForIdpAndUpdateCookie } from "@/lib/server/cookie";
-import { addHumanUser, addIDPLink, getLoginSettings, getUserByID, listAuthenticationMethodTypes } from "@/lib/zitadel";
-import { Code, ConnectError, Duration, create } from "@zitadel/client";
+import {
+  addHumanUser,
+  addIDPLink,
+  getLoginSettings,
+  getUserByID,
+  listAuthenticationMethodTypes,
+  listUsers,
+  ServiceConfig,
+  setUserPassword,
+} from "@/lib/zitadel";
+import { Code, ConnectError, create, Duration } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks, ChecksJson, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import crypto from "crypto";
@@ -11,6 +20,12 @@ import { cookies, headers } from "next/headers";
 import { completeFlowOrGetUrl } from "../client";
 import { getOrSetFingerprintId } from "../fingerprint";
 import { createLogger } from "../logger";
+import {
+  createRegistrationMarker,
+  readRegistrationMarker,
+  REGISTRATION_MARKER_COOKIE_NAME,
+  REGISTRATION_MARKER_LIFETIME_SECONDS,
+} from "../registration-marker";
 import { getServiceConfig } from "../service-url";
 import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
 
@@ -43,6 +58,86 @@ async function createSessionWithRetry(command: { checks: Checks; requestId: stri
     }
   }
   throw lastError;
+}
+
+/**
+ * Sets the registration marker cookie for a user this request just created on the passkey path.
+ * It is never issued again on a resume, so the 15-minute window cannot be extended.
+ * Without a configured signing secret no marker is issued, so the registration cannot be resumed.
+ */
+async function issueRegistrationMarker(userId: string, organization: string) {
+  const marker = createRegistrationMarker(userId, organization);
+  if (!marker) {
+    logger.warn("No signing secret configured, an unfinished registration cannot be resumed");
+    return;
+  }
+
+  const cookiesList = await cookies();
+  await cookiesList.set({
+    name: REGISTRATION_MARKER_COOKIE_NAME,
+    value: marker,
+    httpOnly: true,
+    path: "/",
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: REGISTRATION_MARKER_LIFETIME_SECONDS,
+  });
+}
+
+/**
+ * The passkey path of `registerUser` creates the user before any passkey exists. If the person
+ * leaves `/passkey/set` without registering one (or changes their mind and picks a password),
+ * the next registration attempt for the same e-mail fails because the user already exists.
+ *
+ * `registerUser` continues with that user only when ALL of the following hold:
+ *  1. `addHumanUser` failed with `AlreadyExists` (checked by the caller),
+ *  2. exactly one human user with this e-mail as username exists in the organization,
+ *  3. its e-mail address is not verified,
+ *  4. it has no authentication method at all (no password, passkey or IdP link),
+ *  5. the request carries a registration marker for exactly this user id and organization that has
+ *     not expired and is signed with the login app's signing secret. Only `registerUser` issues it,
+ *     once, when it created this account on the passkey path; it is valid for 15 minutes from then
+ *     and a resume does not extend it.
+ *
+ * An account an administrator created and invited can be in the same state as 2–4. Condition 5
+ * limits the resume to a request holding the marker issued when this account was registered.
+ *
+ * The marker is checked first, so without a valid marker no user lookup is made.
+ *
+ * Returns the id of the user (conditions 2–5), otherwise undefined.
+ */
+async function resumableRegistrationUserId(
+  serviceConfig: ServiceConfig,
+  command: { email: string; organization: string },
+): Promise<string | undefined> {
+  const cookiesList = await cookies();
+  const markerUserId = readRegistrationMarker(cookiesList.get(REGISTRATION_MARKER_COOKIE_NAME)?.value, command.organization);
+  if (!markerUserId) {
+    return undefined;
+  }
+
+  try {
+    const users = await listUsers({ serviceConfig, userName: command.email, organizationId: command.organization });
+    if (users.result.length !== 1) {
+      return undefined;
+    }
+
+    const user = users.result[0];
+    if (user.userId !== markerUserId || user.type.case !== "human" || user.type.value.email?.isVerified) {
+      return undefined;
+    }
+
+    const authMethods = await listAuthenticationMethodTypes({ serviceConfig, userId: user.userId });
+    if (authMethods.authMethodTypes.length !== 0) {
+      return undefined;
+    }
+
+    logger.info("Resuming an unfinished registration", { userId: user.userId });
+    return user.userId;
+  } catch (error) {
+    logger.error("Failed to check for an unfinished registration", { error });
+    return undefined;
+  }
 }
 
 type RegisterUserCommand = {
@@ -80,24 +175,51 @@ export async function registerUser(
     return { error: t("errors.localAuthenticationNotAllowed") };
   }
 
-  const addResponse = await addHumanUser({
-    serviceConfig,
-    email: command.email,
-    firstName: command.firstName,
-    lastName: command.lastName,
-    password: command.password ? command.password : undefined,
-    organization: command.organization,
-  }).catch((error) => {
+  let userId: string | undefined;
+  // true only if this call created the user (not when resuming an unfinished registration)
+  let created = false;
+  try {
+    const addResponse = await addHumanUser({
+      serviceConfig,
+      email: command.email,
+      firstName: command.firstName,
+      lastName: command.lastName,
+      password: command.password ? command.password : undefined,
+      organization: command.organization,
+    });
+    userId = addResponse.userId;
+    created = true;
+  } catch (error) {
     logger.error("Failed to create user", { error });
-    return null;
-  });
 
-  if (!addResponse) {
-    return { error: t("errors.couldNotCreateUser") };
+    if (error instanceof ConnectError && error.code === Code.AlreadyExists) {
+      userId = await resumableRegistrationUserId(serviceConfig, command);
+    }
+
+    if (!userId) {
+      return { error: t("errors.couldNotCreateUser") };
+    }
+
+    if (command.password) {
+      const passwordSet = await setUserPassword({ serviceConfig, userId, password: command.password })
+        .then((response) => !("error" in response))
+        .catch((error) => {
+          logger.error("Failed to set the password on a resumed registration", { error });
+          return false;
+        });
+
+      if (!passwordSet) {
+        return { error: t("errors.couldNotCreateUser") };
+      }
+
+      // the account has a password now, the marker has served its purpose
+      const cookiesList = await cookies();
+      cookiesList.delete(REGISTRATION_MARKER_COOKIE_NAME);
+    }
   }
 
   let checkPayload: any = {
-    user: { search: { case: "userId", value: addResponse.userId } },
+    user: { search: { case: "userId", value: userId } },
   };
 
   if (command.password) {
@@ -148,6 +270,12 @@ export async function registerUser(
       path: "/",
       maxAge: 300, // 5 minutes
     });
+
+    // Allows this browser to resume the registration if the passkey is not set up (see resumableRegistrationUserId).
+    // Only issued when the user was created now; a resume keeps the original marker and its expiry.
+    if (created) {
+      await issueRegistrationMarker(session.factors.user.id, command.organization);
+    }
 
     return { redirect: "/passkey/set?" + params };
   } else {
