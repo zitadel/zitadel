@@ -120,8 +120,9 @@ message EmailProviderRestrictions {
   // reserved_recipient_domains_suppressed states that emails to recipients of reserved domains,
   // like example.com or .test, are accepted but not sent.
   bool reserved_recipient_domains_suppressed = 2;
-  // sending_limit is the amount of emails the instance can send through the provider within a rolling time window.
-  // Notifications exceeding it are not sent. The field is not set if the amount is not limited.
+  // sending_limit is the amount of notification emails the instance can send through the provider within a rolling time window.
+  // Notifications exceeding it are not sent. Test emails of the provider are not limited.
+  // The field is not set if the amount is not limited.
   EmailProviderSendingLimit sending_limit = 3;
 }
 
