@@ -2,6 +2,7 @@ package notification
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/logging"
 
@@ -56,6 +57,7 @@ func newChannels(q *handlers.NotificationQueries, smtpRules smtp.Rules) *channel
 	registerCounter(c.counters.success.email, "Successfully delivered emails")
 	registerCounter(c.counters.failed.email, "Failed email deliveries")
 	registerCounter(types.SuppressedEmailsCounter, "Emails not sent to the provider because the recipient domain is reserved")
+	registerCounter(types.RejectedNotificationsCounter, "Notifications intentionally not sent, e.g. because a limit of the provider was exceeded")
 	registerCounter(c.counters.success.sms, "Successfully delivered SMS")
 	registerCounter(c.counters.failed.sms, "Failed SMS deliveries")
 	registerCounter(c.counters.success.json, "Successfully delivered JSON messages")
@@ -81,6 +83,10 @@ func (c *channels) Email(ctx context.Context, config *email.Config) (*senders.Ch
 		c.counters.success.email,
 		c.counters.failed.email,
 	)
+}
+
+func (c *channels) SentEmails(ctx context.Context, providerID string, since time.Time, limit uint64) (uint64, error) {
+	return c.q.SentEmails(ctx, providerID, since, limit)
 }
 
 func (c *channels) SMTPRule(ctx context.Context, config *smtp.Config, orgID string) smtp.Rule {

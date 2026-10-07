@@ -4,6 +4,7 @@ import (
 	"context"
 	"html"
 	"strings"
+	"time"
 
 	"go.opentelemetry.io/otel/attribute"
 
@@ -47,6 +48,12 @@ func generateEmail(
 		}
 		countSuppressedEmail(ctx, recipient, triggeringEventType)
 		return nil
+	}
+	if config.SMTPConfig != nil && rule.Limit != nil {
+		// Like the suppression, the limit is checked before the channels are created.
+		if err := checkEmailLimit(ctx, channels, rule.Limit, config.ProviderConfig); err != nil {
+			return err
+		}
 	}
 	if deliveryInfo != nil && config.ProviderConfig != nil {
 		// The provider is stated on the sent event, which is only created if the email was handled successfully.
@@ -99,6 +106,26 @@ func generateEmail(
 	return zchannels.NewCancelError(
 		zerrors.ThrowPreconditionFailed(nil, "MAIL-83nof", "Errors.Notification.Channels.NotPresent"),
 	)
+}
+
+// checkEmailLimit rejects the notification if the instance already sent as many emails
+// through the provider within the window as the limit of the operator rule allows.
+// The emails are counted by the sent events stating the provider.
+// Without its ID the limit cannot be applied, so the email is not sent.
+func checkEmailLimit(ctx context.Context, channels ChannelChains, limit *smtp.RuleLimit, provider *email.Provider) error {
+	if provider == nil || provider.ID == "" {
+		logging.Warn(ctx, "email not sent, the limit of the provider cannot be applied without the ID of the provider")
+		return zerrors.ThrowInternal(nil, "MAIL-Lm1t0", "Errors.Internal")
+	}
+	since := time.Now().Add(-time.Duration(limit.Window))
+	sent, err := channels.SentEmails(ctx, provider.ID, since, limit.Count)
+	if err != nil {
+		return err
+	}
+	if sent >= limit.Count {
+		return zchannels.NewRejectedError(zchannels.RejectionReasonLimitExceeded, provider.ID)
+	}
+	return nil
 }
 
 func countSuppressedEmail(ctx context.Context, recipient string, triggeringEventType eventstore.EventType) {

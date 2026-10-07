@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/muhlemmer/gu"
 	"github.com/spf13/viper"
@@ -39,9 +40,12 @@ func assertSMTPRules(t *testing.T, configs []smtp.RuleConfig) {
 		From: "noreply@example.com",
 	}
 	assert.Equal(t, smtp.Rule{
-		RestrictCustomHTML:               true,
-		SuppressReservedRecipientDomains: true,
-		Headers:                          map[string]string{"X-Instance-Id": "instance1"},
+		RuleOptions: smtp.RuleOptions{
+			RestrictCustomHTML:               true,
+			SuppressReservedRecipientDomains: true,
+			Limit:                            &smtp.RuleLimit{Count: 100, Window: smtp.RuleDuration(24 * time.Hour)},
+		},
+		Headers: map[string]string{"X-Instance-Id": "instance1"},
 	}, rules.Match(provider, smtp.RuleData{InstanceID: "instance1", OrgID: "org1"}))
 }
 
@@ -314,6 +318,9 @@ Notifications:
           - example.com
       RestrictCustomHTML: true
       SuppressReservedRecipientDomains: true
+      Limit:
+        Count: 100
+        Window: 24h
       Headers:
         X-Instance-ID: "{{.InstanceID}}"
 Log:
@@ -327,7 +334,7 @@ Log:
 		args: args{yaml: `
 Notifications:
   SMTPRules: >
-    [{"Match": {"Hosts": ["smtp.example.com"], "Users": ["token"], "SenderDomains": ["example.com"]}, "RestrictCustomHTML": true, "SuppressReservedRecipientDomains": true, "Headers": {"X-Instance-ID": "{{.InstanceID}}"}}]
+    [{"Match": {"Hosts": ["smtp.example.com"], "Users": ["token"], "SenderDomains": ["example.com"]}, "RestrictCustomHTML": true, "SuppressReservedRecipientDomains": true, "Limit": {"Count": 100, "Window": "24h"}, "Headers": {"X-Instance-ID": "{{.InstanceID}}"}}]
 Log:
   Level: info
 `},

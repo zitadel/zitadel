@@ -649,6 +649,8 @@ EventTypes:
     removed: "Sasaran dihapus"
   user:
     added: "Pengguna ditambahkan"
+    notification:
+      rejected: "Notifikasi ditolak"
     selfregistered: "Pengguna mendaftarkan dirinya sendiri"
     initialization:
       code:

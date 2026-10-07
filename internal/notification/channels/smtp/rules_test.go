@@ -1,7 +1,9 @@
 package smtp
 
 import (
+	"math"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -91,6 +93,33 @@ func TestCompileRules(t *testing.T) {
 			wantErr: `smtp rule 0: header "X-(Meta)": invalid name`,
 		},
 		{
+			name: "limit",
+			configs: []RuleConfig{{
+				RuleOptions: RuleOptions{Limit: &RuleLimit{Count: 100, Window: RuleDuration(24 * time.Hour)}},
+			}},
+		},
+		{
+			name: "limit without count",
+			configs: []RuleConfig{{
+				RuleOptions: RuleOptions{Limit: &RuleLimit{Window: RuleDuration(24 * time.Hour)}},
+			}},
+			wantErr: "smtp rule 0: limit: count must be greater than 0",
+		},
+		{
+			name: "limit with too large count",
+			configs: []RuleConfig{{
+				RuleOptions: RuleOptions{Limit: &RuleLimit{Count: math.MaxUint32 + 1, Window: RuleDuration(24 * time.Hour)}},
+			}},
+			wantErr: "smtp rule 0: limit: count must not be greater than 4294967295",
+		},
+		{
+			name: "limit without window",
+			configs: []RuleConfig{{
+				RuleOptions: RuleOptions{Limit: &RuleLimit{Count: 100}},
+			}},
+			wantErr: "smtp rule 0: limit: window must be greater than 0",
+		},
+		{
 			name: "header names differing in case only",
 			configs: []RuleConfig{{
 				Headers: map[string]string{"X-Header": "first", "x-header": "second"},
@@ -163,40 +192,46 @@ func TestRules_Match(t *testing.T) {
 		},
 		{
 			name:    "no provider",
-			configs: []RuleConfig{{RestrictCustomHTML: true}},
+			configs: []RuleConfig{{RuleOptions: RuleOptions{RestrictCustomHTML: true}}},
 			config:  nil,
 			want:    Rule{},
 		},
 		{
 			name:    "empty match applies to all providers",
-			configs: []RuleConfig{{RestrictCustomHTML: true}},
+			configs: []RuleConfig{{RuleOptions: RuleOptions{RestrictCustomHTML: true}}},
 			config:  defaultProvider,
-			want:    Rule{RestrictCustomHTML: true},
+			want:    Rule{RuleOptions: RuleOptions{RestrictCustomHTML: true}},
 		},
 		// hosts
 		{
 			name: "host without port matches any port",
 			configs: []RuleConfig{{
-				Match:              RuleMatch{Hosts: []string{"smtp.example.com"}},
-				RestrictCustomHTML: true,
+				Match: RuleMatch{Hosts: []string{"smtp.example.com"}},
+				RuleOptions: RuleOptions{
+					RestrictCustomHTML: true,
+				},
 			}},
 			config: defaultProvider,
-			want:   Rule{RestrictCustomHTML: true},
+			want:   Rule{RuleOptions: RuleOptions{RestrictCustomHTML: true}},
 		},
 		{
 			name: "host with port matches",
 			configs: []RuleConfig{{
-				Match:              RuleMatch{Hosts: []string{"smtp.example.com:587"}},
-				RestrictCustomHTML: true,
+				Match: RuleMatch{Hosts: []string{"smtp.example.com:587"}},
+				RuleOptions: RuleOptions{
+					RestrictCustomHTML: true,
+				},
 			}},
 			config: defaultProvider,
-			want:   Rule{RestrictCustomHTML: true},
+			want:   Rule{RuleOptions: RuleOptions{RestrictCustomHTML: true}},
 		},
 		{
 			name: "host with other port does not match",
 			configs: []RuleConfig{{
-				Match:              RuleMatch{Hosts: []string{"smtp.example.com:25"}},
-				RestrictCustomHTML: true,
+				Match: RuleMatch{Hosts: []string{"smtp.example.com:25"}},
+				RuleOptions: RuleOptions{
+					RestrictCustomHTML: true,
+				},
 			}},
 			config: defaultProvider,
 			want:   Rule{},
@@ -204,38 +239,48 @@ func TestRules_Match(t *testing.T) {
 		{
 			name: "host is case insensitive",
 			configs: []RuleConfig{{
-				Match:              RuleMatch{Hosts: []string{" SMTP.Example.com "}},
-				RestrictCustomHTML: true,
+				Match: RuleMatch{Hosts: []string{" SMTP.Example.com "}},
+				RuleOptions: RuleOptions{
+					RestrictCustomHTML: true,
+				},
 			}},
 			config: provider("smtp.EXAMPLE.com:587", "token", "noreply@example.com"),
-			want:   Rule{RestrictCustomHTML: true},
+			want:   Rule{RuleOptions: RuleOptions{RestrictCustomHTML: true}},
 		},
 		{
 			name: "provider host without port",
 			configs: []RuleConfig{{
-				Match:              RuleMatch{Hosts: []string{"smtp.example.com"}},
-				RestrictCustomHTML: true,
+				Match: RuleMatch{Hosts: []string{"smtp.example.com"}},
+				RuleOptions: RuleOptions{
+					RestrictCustomHTML: true,
+				},
 			}},
 			config: provider("smtp.example.com", "token", "noreply@example.com"),
-			want:   Rule{RestrictCustomHTML: true},
+			want:   Rule{RuleOptions: RuleOptions{RestrictCustomHTML: true}},
 		},
 		{
 			name: "IPv6 host with and without port",
 			configs: []RuleConfig{{
-				Match:              RuleMatch{Hosts: []string{"[2001:db8::1]"}},
-				RestrictCustomHTML: true,
+				Match: RuleMatch{Hosts: []string{"[2001:db8::1]"}},
+				RuleOptions: RuleOptions{
+					RestrictCustomHTML: true,
+				},
 			}, {
-				Match:              RuleMatch{Hosts: []string{"[2001:db8::2]:2525"}},
-				RestrictCustomHTML: true,
+				Match: RuleMatch{Hosts: []string{"[2001:db8::2]:2525"}},
+				RuleOptions: RuleOptions{
+					RestrictCustomHTML: true,
+				},
 			}},
 			config: provider("[2001:DB8::1]:2525", "token", "noreply@example.com"),
-			want:   Rule{RestrictCustomHTML: true},
+			want:   Rule{RuleOptions: RuleOptions{RestrictCustomHTML: true}},
 		},
 		{
 			name: "IPv6 host with other port does not match",
 			configs: []RuleConfig{{
-				Match:              RuleMatch{Hosts: []string{"[2001:db8::1]:25"}},
-				RestrictCustomHTML: true,
+				Match: RuleMatch{Hosts: []string{"[2001:db8::1]:25"}},
+				RuleOptions: RuleOptions{
+					RestrictCustomHTML: true,
+				},
 			}},
 			config: provider("[2001:db8::1]:2525", "token", "noreply@example.com"),
 			want:   Rule{},
@@ -244,17 +289,21 @@ func TestRules_Match(t *testing.T) {
 		{
 			name: "user matches",
 			configs: []RuleConfig{{
-				Match:              RuleMatch{Users: []string{"other", " token "}},
-				RestrictCustomHTML: true,
+				Match: RuleMatch{Users: []string{"other", " token "}},
+				RuleOptions: RuleOptions{
+					RestrictCustomHTML: true,
+				},
 			}},
 			config: defaultProvider,
-			want:   Rule{RestrictCustomHTML: true},
+			want:   Rule{RuleOptions: RuleOptions{RestrictCustomHTML: true}},
 		},
 		{
 			name: "user is case sensitive",
 			configs: []RuleConfig{{
-				Match:              RuleMatch{Users: []string{"TOKEN"}},
-				RestrictCustomHTML: true,
+				Match: RuleMatch{Users: []string{"TOKEN"}},
+				RuleOptions: RuleOptions{
+					RestrictCustomHTML: true,
+				},
 			}},
 			config: defaultProvider,
 			want:   Rule{},
@@ -267,7 +316,9 @@ func TestRules_Match(t *testing.T) {
 					Users:         []string{"token"},
 					SenderDomains: []string{"example.com"},
 				},
-				RestrictCustomHTML: true,
+				RuleOptions: RuleOptions{
+					RestrictCustomHTML: true,
+				},
 			}},
 			config: provider("smtp.example.com:587", "other", "noreply@example.com"),
 			want:   Rule{},
@@ -275,17 +326,21 @@ func TestRules_Match(t *testing.T) {
 		{
 			name: "user matches the XOAuth2 user",
 			configs: []RuleConfig{{
-				Match:              RuleMatch{Users: []string{"oauth-user"}},
-				RestrictCustomHTML: true,
+				Match: RuleMatch{Users: []string{"oauth-user"}},
+				RuleOptions: RuleOptions{
+					RestrictCustomHTML: true,
+				},
 			}},
 			config: &Config{SMTP: SMTP{Host: "smtp.example.com:587", XOAuth2Auth: &XOAuth2AuthConfig{User: "oauth-user"}}},
-			want:   Rule{RestrictCustomHTML: true},
+			want:   Rule{RuleOptions: RuleOptions{RestrictCustomHTML: true}},
 		},
 		{
 			name: "provider without authentication does not match a user",
 			configs: []RuleConfig{{
-				Match:              RuleMatch{Users: []string{"token"}},
-				RestrictCustomHTML: true,
+				Match: RuleMatch{Users: []string{"token"}},
+				RuleOptions: RuleOptions{
+					RestrictCustomHTML: true,
+				},
 			}},
 			config: &Config{SMTP: SMTP{Host: "smtp.example.com:587"}},
 			want:   Rule{},
@@ -294,17 +349,21 @@ func TestRules_Match(t *testing.T) {
 		{
 			name: "sender domain matches",
 			configs: []RuleConfig{{
-				Match:              RuleMatch{SenderDomains: []string{"EXAMPLE.com"}},
-				RestrictCustomHTML: true,
+				Match: RuleMatch{SenderDomains: []string{"EXAMPLE.com"}},
+				RuleOptions: RuleOptions{
+					RestrictCustomHTML: true,
+				},
 			}},
 			config: defaultProvider,
-			want:   Rule{RestrictCustomHTML: true},
+			want:   Rule{RuleOptions: RuleOptions{RestrictCustomHTML: true}},
 		},
 		{
 			name: "subdomain of sender domain does not match",
 			configs: []RuleConfig{{
-				Match:              RuleMatch{SenderDomains: []string{"example.com"}},
-				RestrictCustomHTML: true,
+				Match: RuleMatch{SenderDomains: []string{"example.com"}},
+				RuleOptions: RuleOptions{
+					RestrictCustomHTML: true,
+				},
 			}},
 			config: provider("smtp.example.com:587", "token", "noreply@mail.example.com"),
 			want:   Rule{},
@@ -312,8 +371,10 @@ func TestRules_Match(t *testing.T) {
 		{
 			name: "sender without domain does not match",
 			configs: []RuleConfig{{
-				Match:              RuleMatch{SenderDomains: []string{"example.com"}},
-				RestrictCustomHTML: true,
+				Match: RuleMatch{SenderDomains: []string{"example.com"}},
+				RuleOptions: RuleOptions{
+					RestrictCustomHTML: true,
+				},
 			}},
 			config: provider("smtp.example.com:587", "token", "example.com"),
 			want:   Rule{},
@@ -325,7 +386,9 @@ func TestRules_Match(t *testing.T) {
 					Hosts:         []string{"smtp.example.com"},
 					SenderDomains: []string{"example.com"},
 				},
-				RestrictCustomHTML: true,
+				RuleOptions: RuleOptions{
+					RestrictCustomHTML: true,
+				},
 			}},
 			config: provider("smtp.example.com:587", "token", "noreply@other.example"),
 			want:   Rule{},
@@ -337,7 +400,9 @@ func TestRules_Match(t *testing.T) {
 					Hosts:         []string{"smtp.example.com"},
 					SenderDomains: []string{"example.com"},
 				},
-				RestrictCustomHTML: true,
+				RuleOptions: RuleOptions{
+					RestrictCustomHTML: true,
+				},
 			}},
 			config: provider("smtp.other.example:587", "token", "noreply@example.com"),
 			want:   Rule{},
@@ -369,8 +434,11 @@ func TestRules_Match(t *testing.T) {
 					Users:         []string{"token"},
 					SenderDomains: []string{"example.com"},
 				},
-				RestrictCustomHTML:               true,
-				SuppressReservedRecipientDomains: true,
+				RuleOptions: RuleOptions{
+					RestrictCustomHTML:               true,
+					SuppressReservedRecipientDomains: true,
+					Limit:                            &RuleLimit{Count: 100, Window: RuleDuration(24 * time.Hour)},
+				},
 				Headers: map[string]string{
 					"X-Instance-ID": "{{.InstanceID}}",
 					"X-Org-ID":      "{{.OrgID}}",
@@ -380,8 +448,11 @@ func TestRules_Match(t *testing.T) {
 			}},
 			config: defaultProvider,
 			want: Rule{
-				RestrictCustomHTML:               true,
-				SuppressReservedRecipientDomains: true,
+				RuleOptions: RuleOptions{
+					RestrictCustomHTML:               true,
+					SuppressReservedRecipientDomains: true,
+					Limit:                            &RuleLimit{Count: 100, Window: RuleDuration(24 * time.Hour)},
+				},
 				Headers: map[string]string{
 					"X-Instance-Id": "instance1",
 					"X-Org-Id":      "org1",
@@ -412,6 +483,74 @@ func TestRules_Match(t *testing.T) {
 			rules, err := CompileRules(tt.configs)
 			require.NoError(t, err)
 			assert.Equal(t, tt.want, rules.Match(tt.config, data))
+		})
+	}
+}
+
+func TestRuleDuration_UnmarshalText(t *testing.T) {
+	tests := []struct {
+		text    string
+		want    RuleDuration
+		wantErr bool
+	}{
+		{text: "24h", want: RuleDuration(24 * time.Hour)},
+		{text: "90m", want: RuleDuration(90 * time.Minute)},
+		{text: "1h30m", want: RuleDuration(90 * time.Minute)},
+		{text: "24", wantErr: true},
+		{text: "one day", wantErr: true},
+		{text: "", wantErr: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.text, func(t *testing.T) {
+			var got RuleDuration
+			err := got.UnmarshalText([]byte(tt.text))
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestRules_Options(t *testing.T) {
+	limit := &RuleLimit{Count: 100, Window: RuleDuration(24 * time.Hour)}
+	rules, err := CompileRules([]RuleConfig{
+		{
+			Match:       RuleMatch{Hosts: []string{"smtp.example.com"}, Users: []string{"token"}, SenderDomains: []string{"example.com"}},
+			RuleOptions: RuleOptions{RestrictCustomHTML: true, Limit: limit},
+		},
+		{
+			Match:       RuleMatch{Hosts: []string{"smtp.example.com"}},
+			RuleOptions: RuleOptions{SuppressReservedRecipientDomains: true},
+		},
+	})
+	require.NoError(t, err)
+
+	tests := []struct {
+		name   string
+		rules  Rules
+		host   string
+		user   string
+		sender string
+		want   RuleOptions
+	}{
+		{name: "no rules", rules: nil, host: "smtp.example.com:587", user: "token", sender: "noreply@example.com", want: RuleOptions{}},
+		{name: "first rule", rules: rules, host: "smtp.example.com:587", user: "token", sender: "noreply@example.com", want: RuleOptions{RestrictCustomHTML: true, Limit: limit}},
+		{name: "other user, second rule", rules: rules, host: "smtp.example.com:587", user: "other", sender: "noreply@example.com", want: RuleOptions{SuppressReservedRecipientDomains: true}},
+		{name: "no user, second rule", rules: rules, host: "smtp.example.com:587", user: "", sender: "noreply@example.com", want: RuleOptions{SuppressReservedRecipientDomains: true}},
+		{name: "other host, no rule", rules: rules, host: "smtp.other.example:587", user: "token", sender: "noreply@example.com", want: RuleOptions{}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, tt.rules.Options(tt.host, tt.user, tt.sender))
+			// the options are the ones applied to the emails of the provider
+			applied := tt.rules.Match(&Config{
+				SMTP: SMTP{Host: tt.host, PlainAuth: &PlainAuthConfig{User: tt.user}},
+				From: tt.sender,
+			}, RuleData{})
+			assert.Equal(t, tt.want, applied.RuleOptions)
 		})
 	}
 }

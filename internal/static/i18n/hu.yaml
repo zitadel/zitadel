@@ -654,6 +654,8 @@ EventTypes:
     removed: "Cél törölve"
   user:
     added: "Felhasználó hozzáadva"
+    notification:
+      rejected: "Értesítés elutasítva"
     selfregistered: "A felhasználó regisztrálta magát"
     initialization:
       code:

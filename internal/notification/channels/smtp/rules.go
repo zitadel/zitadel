@@ -4,10 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"maps"
+	"math"
 	"net"
 	"net/textproto"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/notification/messages"
@@ -17,6 +19,16 @@ import (
 // Rules are part of the runtime configuration and can therefore not be changed through the API.
 type RuleConfig struct {
 	Match RuleMatch
+	// squash flattens the options into the rule in the configuration
+	RuleOptions `mapstructure:",squash"`
+	// Headers are added to every email sent through the matching provider.
+	// The names are canonicalized (e.g. x-instance-id becomes X-Instance-Id),
+	// the values can contain text and the placeholders {{.InstanceID}} and {{.OrgID}}.
+	Headers map[string]string
+}
+
+// RuleOptions are the restrictions applied to the emails sent through a matching SMTP provider.
+type RuleOptions struct {
 	// RestrictCustomHTML removes HTML from custom message texts.
 	// Simple formatting (line breaks, bold, italic, underline, paragraphs) is kept,
 	// all other elements like links, images or styles are removed, their text is kept.
@@ -24,10 +36,45 @@ type RuleConfig struct {
 	// SuppressReservedRecipientDomains accepts notifications to recipients of reserved domains (RFC 2606, RFC 6761)
 	// like example.com or .test, but does not send them to the provider.
 	SuppressReservedRecipientDomains bool
-	// Headers are added to every email sent through the matching provider.
-	// The names are canonicalized (e.g. x-instance-id becomes X-Instance-Id),
-	// the values can contain text and the placeholders {{.InstanceID}} and {{.OrgID}}.
-	Headers map[string]string
+	// Limit restricts the amount of emails an instance can send through the provider.
+	// Notifications exceeding it are rejected. Suppressed emails are not counted.
+	Limit *RuleLimit
+}
+
+// RuleLimit restricts the amount of emails sent through a provider per instance within a rolling time window.
+type RuleLimit struct {
+	// Count is the maximum amount of emails sent within the window.
+	Count uint64
+	// Window is the rolling time window the emails are counted in, e.g. 24h.
+	Window RuleDuration
+}
+
+// RuleDuration is a duration, which is read as text (e.g. 24h) from the YAML and the JSON form of the configuration.
+type RuleDuration time.Duration
+
+func (d *RuleDuration) UnmarshalText(text []byte) error {
+	duration, err := time.ParseDuration(string(text))
+	if err != nil {
+		return err
+	}
+	*d = RuleDuration(duration)
+	return nil
+}
+
+func (l *RuleLimit) validate() error {
+	if l == nil {
+		return nil
+	}
+	if l.Count == 0 {
+		return errors.New("limit: count must be greater than 0")
+	}
+	if l.Count > math.MaxUint32 {
+		return errors.New("limit: count must not be greater than 4294967295")
+	}
+	if l.Window <= 0 {
+		return errors.New("limit: window must be greater than 0")
+	}
+	return nil
 }
 
 // RuleMatch defines the criteria a SMTP provider must fulfill for the rule to be applied.
@@ -61,20 +108,18 @@ var headerPlaceholders = map[string]func(RuleData) string{
 // Rule is the result of the first matching [RuleConfig].
 // The zero value is returned if no rule matches.
 type Rule struct {
-	RestrictCustomHTML               bool
-	SuppressReservedRecipientDomains bool
-	Headers                          map[string]string
+	RuleOptions
+	Headers map[string]string
 }
 
 // Rules are the compiled [RuleConfig]s in the order they were defined.
 type Rules []*compiledRule
 
 type compiledRule struct {
-	hosts                            []hostPort
-	users                            []string
-	senderDomains                    []string
-	restrictCustomHTML               bool
-	suppressReservedRecipientDomains bool
+	hosts         []hostPort
+	users         []string
+	senderDomains []string
+	options       RuleOptions
 	// headers with canonical names
 	headers map[string]string
 }
@@ -116,13 +161,15 @@ func compileRule(config RuleConfig) (*compiledRule, error) {
 	if err != nil {
 		return nil, err
 	}
+	if err := config.Limit.validate(); err != nil {
+		return nil, err
+	}
 	return &compiledRule{
-		hosts:                            hosts,
-		users:                            users,
-		senderDomains:                    senderDomains,
-		restrictCustomHTML:               config.RestrictCustomHTML,
-		suppressReservedRecipientDomains: config.SuppressReservedRecipientDomains,
-		headers:                          headers,
+		hosts:         hosts,
+		users:         users,
+		senderDomains: senderDomains,
+		options:       config.RuleOptions,
+		headers:       headers,
 	}, nil
 }
 
@@ -170,23 +217,48 @@ func (r Rules) Match(config *Config, data RuleData) Rule {
 	if config == nil {
 		return Rule{}
 	}
-	for _, rule := range r {
-		if !rule.matches(config) {
-			continue
-		}
-		return Rule{
-			RestrictCustomHTML:               rule.restrictCustomHTML,
-			SuppressReservedRecipientDomains: rule.suppressReservedRecipientDomains,
-			Headers:                          rule.renderHeaders(data),
-		}
+	rule := r.find(config.SMTP.Host, smtpUser(config.SMTP), config.From)
+	if rule == nil {
+		return Rule{}
 	}
-	return Rule{}
+	return Rule{
+		RuleOptions: rule.options,
+		Headers:     rule.renderHeaders(data),
+	}
 }
 
-func (r *compiledRule) matches(config *Config) bool {
-	return matchesHost(r.hosts, config.SMTP.Host) &&
-		matchesUser(r.users, config.SMTP) &&
-		matchesSenderDomain(r.senderDomains, config.From)
+// Options returns the options of the first rule matching the SMTP provider
+// identified by its host, the username of the authentication and the sender address.
+// If no rule matches, the zero value is returned.
+func (r Rules) Options(host, user, sender string) RuleOptions {
+	rule := r.find(host, user, sender)
+	if rule == nil {
+		return RuleOptions{}
+	}
+	return rule.options
+}
+
+// find returns the first rule matching the SMTP provider.
+func (r Rules) find(host, user, sender string) *compiledRule {
+	for _, rule := range r {
+		if matchesHost(rule.hosts, host) &&
+			matchesUser(rule.users, user) &&
+			matchesSenderDomain(rule.senderDomains, sender) {
+			return rule
+		}
+	}
+	return nil
+}
+
+// smtpUser returns the username of the authentication of the provider.
+func smtpUser(config SMTP) string {
+	switch {
+	case config.PlainAuth != nil:
+		return config.PlainAuth.User
+	case config.XOAuth2Auth != nil:
+		return config.XOAuth2Auth.User
+	}
+	return ""
 }
 
 func (r *compiledRule) renderHeaders(data RuleData) map[string]string {
@@ -213,16 +285,9 @@ func matchesHost(hosts []hostPort, hostAndPort string) bool {
 	})
 }
 
-func matchesUser(users []string, config SMTP) bool {
+func matchesUser(users []string, user string) bool {
 	if len(users) == 0 {
 		return true
-	}
-	var user string
-	switch {
-	case config.PlainAuth != nil:
-		user = config.PlainAuth.User
-	case config.XOAuth2Auth != nil:
-		user = config.XOAuth2Auth.User
 	}
 	return user != "" && slices.Contains(users, strings.TrimSpace(user))
 }

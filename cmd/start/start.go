@@ -112,6 +112,7 @@ import (
 	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/net"
 	"github.com/zitadel/zitadel/internal/notification"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/queue"
 	"github.com/zitadel/zitadel/internal/serviceping"
@@ -535,7 +536,12 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, instance_v2.CreateServer(commands, queries, config.DefaultInstance, config.ExternalDomain, permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.DatabaseName(), commands, queries, keys.User, config.AuditLogRetention), tlsConfig); err != nil {
+	// the rules are validated when the notifications are registered, so they are known to be valid here
+	smtpRules, err := smtp.CompileRules(config.Notifications.SMTPRules)
+	if err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.DatabaseName(), commands, queries, keys.User, config.AuditLogRetention, smtpRules), tlsConfig); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, keys.User), tlsConfig); err != nil {
@@ -565,7 +571,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, session_v2.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, settings_v2.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
+	if err := apis.RegisterService(ctx, settings_v2.CreateServer(config.SystemDefaults, commands, queries, permissionCheck, smtpRules)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, org_v2.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {

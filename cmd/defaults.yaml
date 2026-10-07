@@ -627,6 +627,14 @@ Notifications:
   #     # are accepted, but not sent to the provider. The notification is marked as sent, but flagged as not delivered.
   #     # The reserved domains include localhost, so do not enable it for a provider that delivers to a local mail sink.
   #     SuppressReservedRecipientDomains: true
+  #     # Limits the emails an instance can send through the provider within a rolling time window.
+  #     # Notifications exceeding the limit are rejected, which is stated as event on the user or session.
+  #     # Emails which are not sent because of a reserved recipient domain are not counted.
+  #     # The emails are counted per provider by their sent events, up to Count events are read for every email.
+  #     # The limit is therefore meant for small numbers and for credentials the instance cannot use for a provider of its own.
+  #     Limit:
+  #       Count: 100
+  #       Window: 24h
   #     # Headers are added to every email. The names are canonicalized (X-Instance-Id),
   #     # the values can contain text and the placeholders {{.InstanceID}} and {{.OrgID}}.
   #     Headers:

@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2/settingsconnect"
@@ -27,6 +28,8 @@ type Server struct {
 
 	checkPermission domain.PermissionCheck
 	assetsAPIDomain func(context.Context) string
+	// smtpRules are the operator rules restricting email providers
+	smtpRules smtp.Rules
 }
 
 func CreateServer(
@@ -34,6 +37,7 @@ func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
 	checkPermission domain.PermissionCheck,
+	smtpRules smtp.Rules,
 ) *Server {
 	return &Server{
 		systemDefaults:  systemDefaults,
@@ -41,6 +45,7 @@ func CreateServer(
 		query:           query,
 		checkPermission: checkPermission,
 		assetsAPIDomain: assets.AssetAPI(),
+		smtpRules:       smtpRules,
 	}
 }
 

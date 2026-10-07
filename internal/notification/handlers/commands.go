@@ -3,6 +3,8 @@ package handlers
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
 	"github.com/zitadel/zitadel/internal/repository/quota"
@@ -22,6 +24,7 @@ type Commands interface {
 	PasswordChangeSent(ctx context.Context, orgID, userID string, deliveryInfo senders.DeliveryInfo) error
 	HumanPhoneVerificationCodeSent(ctx context.Context, orgID, userID string, generatorInfo *senders.CodeGeneratorInfo) error
 	InviteCodeSent(ctx context.Context, userID, orgID string, deliveryInfo senders.DeliveryInfo) error
+	NotificationRejected(ctx context.Context, aggregate *eventstore.Aggregate, rejection channels.Rejection) error
 	UsageNotificationSent(ctx context.Context, dueEvent *quota.NotificationDueEvent) error
 	MilestonePushed(ctx context.Context, instanceID string, msType milestone.Type, endpoints []string) error
 	BackChannelLogoutSent(ctx context.Context, id, oidcSessionID, instanceID string) (err error)

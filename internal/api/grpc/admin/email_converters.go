@@ -2,6 +2,9 @@ package admin
 
 import (
 	"context"
+	"time"
+
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
@@ -24,22 +27,47 @@ func listEmailProvidersToModel(req *admin_pb.ListEmailProvidersRequest) (*query.
 	}, nil
 }
 
-func emailProvidersToPb(configs []*query.SMTPConfig) []*settings_pb.EmailProvider {
+func emailProvidersToPb(configs []*query.SMTPConfig, rules smtp.Rules) []*settings_pb.EmailProvider {
 	c := make([]*settings_pb.EmailProvider, len(configs))
 	for i, config := range configs {
-		c[i] = emailProviderToProviderPb(config)
+		c[i] = emailProviderToProviderPb(config, rules)
 	}
 	return c
 }
 
-func emailProviderToProviderPb(config *query.SMTPConfig) *settings_pb.EmailProvider {
+func emailProviderToProviderPb(config *query.SMTPConfig, rules smtp.Rules) *settings_pb.EmailProvider {
 	return &settings_pb.EmailProvider{
-		Details:     object.ToViewDetailsPb(config.Sequence, config.CreationDate, config.ChangeDate, config.ResourceOwner),
-		Id:          config.ID,
-		Description: config.Description,
-		State:       emailProviderStateToPb(config.State),
-		Config:      emailProviderToPb(config),
+		Details:      object.ToViewDetailsPb(config.Sequence, config.CreationDate, config.ChangeDate, config.ResourceOwner),
+		Id:           config.ID,
+		Description:  config.Description,
+		State:        emailProviderStateToPb(config.State),
+		Config:       emailProviderToPb(config),
+		Restrictions: emailProviderRestrictionsToPb(config, rules),
 	}
+}
+
+// emailProviderRestrictionsToPb states the options of the operator rule matching the provider.
+// Rules are only applied to SMTP providers. Nil is returned if the provider is not restricted.
+func emailProviderRestrictionsToPb(config *query.SMTPConfig, rules smtp.Rules) *settings_pb.EmailProviderRestrictions {
+	if config.SMTPConfig == nil {
+		return nil
+	}
+	options := rules.Options(config.SMTPConfig.Host, config.SMTPConfig.User, config.SMTPConfig.SenderAddress)
+	if options == (smtp.RuleOptions{}) {
+		return nil
+	}
+	restrictions := &settings_pb.EmailProviderRestrictions{
+		CustomHtmlRestricted:               options.RestrictCustomHTML,
+		ReservedRecipientDomainsSuppressed: options.SuppressReservedRecipientDomains,
+	}
+	if options.Limit != nil {
+		restrictions.SendingLimit = &settings_pb.EmailProviderSendingLimit{
+			// the count is validated to fit when the rules are compiled
+			Count:  uint32(options.Limit.Count), //nolint:gosec
+			Window: durationpb.New(time.Duration(options.Limit.Window)),
+		}
+	}
+	return restrictions
 }
 
 func emailProviderStateToPb(state domain.SMTPConfigState) settings_pb.EmailProviderState {
