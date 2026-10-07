@@ -2370,7 +2370,8 @@
       "HEADERNAME": "اسم الرأس",
       "JWTENDPOINT": "نقطة نهاية JWT",
       "JWTKEYSENDPOINT": "نقطة نهاية مفاتيح JWT",
-      "AUDIENCE": "الجمهور"
+      "AUDIENCE": "الجمهور",
+      "AUDIENCE_EMPTY_WARNING": "بدون تحديد الجمهور، يقبل ZITADEL أي رمز صالح من هذا المصدر، بغض النظر عن التطبيق الذي صدر من أجله. يوصى بشدة بتحديد الجمهور."
     },
     "APPLE": {
       "TEAMID": "معرف الفريق",
