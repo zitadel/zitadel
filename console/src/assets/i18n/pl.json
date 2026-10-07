@@ -2445,8 +2445,7 @@
   "SMTP": {
     "RESTRICTIONS": {
       "MANAGED": "Aktywny dostawca poczty e-mail jest zarządzany przez operatora ZITADEL i służy do rozpoczęcia pracy.",
-      "LIMIT_HOURS": "Wysyła najwyżej {{count}} wiadomości e-mail w ciągu {{duration}} godzin. Kolejne wiadomości nie są wysyłane.",
-      "LIMIT_MINUTES": "Wysyła najwyżej {{count}} wiadomości e-mail w ciągu {{duration}} minut. Kolejne wiadomości nie są wysyłane.",
+      "LIMIT": "Limit wiadomości e-mail: {{count}} w ciągu {{duration}}. Kolejne wiadomości nie są wysyłane.",
       "RESERVED_DOMAINS": "Wiadomości do domen testowych, takich jak example.com lub .test, nie są dostarczane.",
       "HTML": "HTML w niestandardowych tekstach wiadomości jest ograniczany do prostego formatowania. Linki, obrazy i style są usuwane.",
       "OWN_PROVIDER": "Do zastosowań produkcyjnych skonfiguruj własnego dostawcę.",

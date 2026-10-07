@@ -2470,8 +2470,7 @@
   "SMTP": {
     "RESTRICTIONS": {
       "MANAGED": "Az aktív e-mail-szolgáltatót a ZITADEL üzemeltetője kezeli, és a kezdéshez szolgál.",
-      "LIMIT_HOURS": "Legfeljebb {{count}} e-mailt küld {{duration}} órán belül. A további e-maileket nem küldi el.",
-      "LIMIT_MINUTES": "Legfeljebb {{count}} e-mailt küld {{duration}} percen belül. A további e-maileket nem küldi el.",
+      "LIMIT": "E-mail-korlát: {{count}} {{duration}} alatt. A további e-maileket nem küldi el.",
       "RESERVED_DOMAINS": "A tesztdomainekre, például az example.com vagy a .test címekre küldött e-mailek nem kerülnek kézbesítésre.",
       "HTML": "Az egyéni üzenetszövegekben a HTML egyszerű formázásra korlátozódik. A hivatkozások, képek és stílusok eltávolításra kerülnek.",
       "OWN_PROVIDER": "Éles használathoz állítson be saját szolgáltatót.",

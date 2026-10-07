@@ -2464,8 +2464,7 @@
   "SMTP": {
     "RESTRICTIONS": {
       "MANAGED": "Penyedia email yang aktif dikelola oleh operator ZITADEL dan ditujukan untuk memulai.",
-      "LIMIT_HOURS": "Penyedia ini mengirim paling banyak {{count}} email dalam {{duration}} jam. Email berikutnya tidak dikirim.",
-      "LIMIT_MINUTES": "Penyedia ini mengirim paling banyak {{count}} email dalam {{duration}} menit. Email berikutnya tidak dikirim.",
+      "LIMIT": "Batas email: {{count}} dalam {{duration}}. Email berikutnya tidak dikirim.",
       "RESERVED_DOMAINS": "Email ke domain pengujian seperti example.com atau .test tidak dikirimkan.",
       "HTML": "HTML dalam teks pesan kustom dikurangi menjadi format sederhana. Tautan, gambar, dan gaya dihapus.",
       "OWN_PROVIDER": "Konfigurasikan penyedia Anda sendiri untuk penggunaan produksi.",

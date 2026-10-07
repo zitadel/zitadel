@@ -2464,8 +2464,7 @@
   "SMTP": {
     "RESTRICTIONS": {
       "MANAGED": "De actieve e-mailprovider wordt beheerd door de ZITADEL-beheerder en is bedoeld om mee te starten.",
-      "LIMIT_HOURS": "Er worden maximaal {{count}} e-mails binnen {{duration}} uur verzonden. Verdere e-mails worden niet verzonden.",
-      "LIMIT_MINUTES": "Er worden maximaal {{count}} e-mails binnen {{duration}} minuten verzonden. Verdere e-mails worden niet verzonden.",
+      "LIMIT": "E-maillimiet: {{count}} binnen {{duration}}. Verdere e-mails worden niet verzonden.",
       "RESERVED_DOMAINS": "E-mails naar testdomeinen zoals example.com of .test worden niet afgeleverd.",
       "HTML": "HTML in aangepaste berichtteksten wordt teruggebracht tot eenvoudige opmaak. Links, afbeeldingen en stijlen worden verwijderd.",
       "OWN_PROVIDER": "Configureer een eigen provider voor productiegebruik.",

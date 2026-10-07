@@ -2445,8 +2445,7 @@
   "SMTP": {
     "RESTRICTIONS": {
       "MANAGED": "Der aktive E-Mail-Provider wird vom ZITADEL-Betreiber verwaltet und ist für den Einstieg gedacht.",
-      "LIMIT_HOURS": "Er versendet höchstens {{count}} E-Mails innerhalb von {{duration}} Stunden. Weitere E-Mails werden nicht versendet.",
-      "LIMIT_MINUTES": "Er versendet höchstens {{count}} E-Mails innerhalb von {{duration}} Minuten. Weitere E-Mails werden nicht versendet.",
+      "LIMIT": "E-Mail-Limit: {{count}} innerhalb von {{duration}}. Weitere E-Mails werden nicht versendet.",
       "RESERVED_DOMAINS": "E-Mails an Testdomains wie example.com oder .test werden nicht zugestellt.",
       "HTML": "HTML in benutzerdefinierten Nachrichtentexten wird auf einfache Formatierung reduziert. Links, Bilder und Styles werden entfernt.",
       "OWN_PROVIDER": "Konfiguriere für den produktiven Einsatz einen eigenen Provider.",

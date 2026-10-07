@@ -2469,8 +2469,7 @@
   "SMTP": {
     "RESTRICTIONS": {
       "MANAGED": "Den aktiva e-postleverantören hanteras av ZITADEL-operatören och är avsedd för att komma igång.",
-      "LIMIT_HOURS": "Den skickar högst {{count}} e-postmeddelanden inom {{duration}} timmar. Ytterligare e-postmeddelanden skickas inte.",
-      "LIMIT_MINUTES": "Den skickar högst {{count}} e-postmeddelanden inom {{duration}} minuter. Ytterligare e-postmeddelanden skickas inte.",
+      "LIMIT": "E-postgräns: {{count}} inom {{duration}}. Ytterligare e-postmeddelanden skickas inte.",
       "RESERVED_DOMAINS": "E-post till testdomäner som example.com eller .test levereras inte.",
       "HTML": "HTML i anpassade meddelandetexter reduceras till enkel formatering. Länkar, bilder och stilar tas bort.",
       "OWN_PROVIDER": "Konfigurera en egen leverantör för produktionsbruk.",

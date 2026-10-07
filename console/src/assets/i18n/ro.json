@@ -2462,8 +2462,7 @@
   "SMTP": {
     "RESTRICTIONS": {
       "MANAGED": "Furnizorul de e-mail activ este gestionat de operatorul ZITADEL și este destinat începutului.",
-      "LIMIT_HOURS": "Trimite cel mult {{count}} e-mailuri în {{duration}} ore. E-mailurile următoare nu sunt trimise.",
-      "LIMIT_MINUTES": "Trimite cel mult {{count}} e-mailuri în {{duration}} minute. E-mailurile următoare nu sunt trimise.",
+      "LIMIT": "Limită de e-mailuri: {{count}} în {{duration}}. E-mailurile următoare nu sunt trimise.",
       "RESERVED_DOMAINS": "E-mailurile către domenii de test precum example.com sau .test nu sunt livrate.",
       "HTML": "HTML-ul din textele personalizate ale mesajelor este redus la formatare simplă. Linkurile, imaginile și stilurile sunt eliminate.",
       "OWN_PROVIDER": "Configurați propriul furnizor pentru utilizarea în producție.",

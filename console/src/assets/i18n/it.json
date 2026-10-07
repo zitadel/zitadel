@@ -2446,8 +2446,7 @@
   "SMTP": {
     "RESTRICTIONS": {
       "MANAGED": "Il provider e-mail attivo è gestito dall'operatore di ZITADEL ed è pensato per iniziare.",
-      "LIMIT_HOURS": "Invia al massimo {{count}} e-mail in {{duration}} ore. Le e-mail successive non vengono inviate.",
-      "LIMIT_MINUTES": "Invia al massimo {{count}} e-mail in {{duration}} minuti. Le e-mail successive non vengono inviate.",
+      "LIMIT": "Limite e-mail: {{count}} in {{duration}}. Le e-mail successive non vengono inviate.",
       "RESERVED_DOMAINS": "Le e-mail verso domini di test come example.com o .test non vengono recapitate.",
       "HTML": "L'HTML nei testi dei messaggi personalizzati viene ridotto a una formattazione semplice. Link, immagini e stili vengono rimossi.",
       "OWN_PROVIDER": "Configura un tuo provider per l'uso in produzione.",

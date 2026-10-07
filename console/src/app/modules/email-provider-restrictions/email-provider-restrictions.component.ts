@@ -35,11 +35,7 @@ export class EmailProviderRestrictionsComponent {
     if (!limit) {
       return undefined;
     }
-    const minutes = Math.round(Number(limit.window?.seconds ?? 0) / 60);
-    // whole hours read better than minutes
-    return minutes % 60 === 0
-      ? { key: 'SMTP.RESTRICTIONS.LIMIT_HOURS', params: { count: limit.count, duration: minutes / 60 } }
-      : { key: 'SMTP.RESTRICTIONS.LIMIT_MINUTES', params: { count: limit.count, duration: minutes } };
+    return { count: limit.count, duration: formatWindow(Number(limit.window?.seconds ?? 0)) };
   });
 
   protected readonly show = computed(() => {
@@ -49,4 +45,15 @@ export class EmailProviderRestrictionsComponent {
     }
     return this.mode() === 'provider' || restrictions.customHtmlRestricted;
   });
+}
+
+// formatWindow states the window in the largest unit representing it exactly, e.g. 24 h, 5 min or 90 s.
+function formatWindow(seconds: number): string {
+  if (seconds % 3600 === 0) {
+    return `${seconds / 3600} h`;
+  }
+  if (seconds % 60 === 0) {
+    return `${seconds / 60} min`;
+  }
+  return `${seconds} s`;
 }

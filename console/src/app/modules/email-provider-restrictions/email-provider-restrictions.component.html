@@ -5,7 +5,7 @@
       <p class="lead">{{ 'SMTP.RESTRICTIONS.MANAGED' | translate }}</p>
       <ul>
         @if (limit(); as limit) {
-          <li data-e2e="email-provider-restrictions-limit">{{ limit.key | translate: limit.params }}</li>
+          <li data-e2e="email-provider-restrictions-limit">{{ 'SMTP.RESTRICTIONS.LIMIT' | translate: limit }}</li>
         }
         @if (r?.reservedRecipientDomainsSuppressed) {
           <li>{{ 'SMTP.RESTRICTIONS.RESERVED_DOMAINS' | translate }}</li>

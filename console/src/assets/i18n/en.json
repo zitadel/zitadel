@@ -2472,8 +2472,7 @@
   "SMTP": {
     "RESTRICTIONS": {
       "MANAGED": "The active email provider is managed by the ZITADEL operator and is meant for getting started.",
-      "LIMIT_HOURS": "It sends at most {{count}} emails within {{duration}} hours. Further emails are not sent.",
-      "LIMIT_MINUTES": "It sends at most {{count}} emails within {{duration}} minutes. Further emails are not sent.",
+      "LIMIT": "Email limit: {{count}} within {{duration}}. Further emails are not sent.",
       "RESERVED_DOMAINS": "Emails to test domains like example.com or .test are not delivered.",
       "HTML": "HTML in custom message texts is reduced to simple formatting. Links, images and styles are removed.",
       "OWN_PROVIDER": "Configure your own provider for production use.",

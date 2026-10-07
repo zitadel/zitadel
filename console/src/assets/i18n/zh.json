@@ -2474,8 +2474,7 @@
   "SMTP": {
     "RESTRICTIONS": {
       "MANAGED": "当前启用的电子邮件提供商由ZITADEL的运营方管理,用于入门使用。",
-      "LIMIT_HOURS": "它在 {{duration}} 小时内最多发送 {{count}} 封电子邮件。超出的电子邮件不会发送。",
-      "LIMIT_MINUTES": "它在 {{duration}} 分钟内最多发送 {{count}} 封电子邮件。超出的电子邮件不会发送。",
+      "LIMIT": "电子邮件上限：{{duration}} 内 {{count}} 封。超出的电子邮件不会发送。",
       "RESERVED_DOMAINS": "发往 example.com 或 .test 等测试域名的电子邮件不会送达。",
       "HTML": "自定义消息文本中的 HTML 会被精简为简单格式。链接、图片和样式会被移除。",
       "OWN_PROVIDER": "请为生产环境配置您自己的提供商。",

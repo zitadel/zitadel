@@ -2442,8 +2442,7 @@
   "SMTP": {
     "RESTRICTIONS": {
       "MANAGED": "El proveedor de correo activo está gestionado por el operador de ZITADEL y está pensado para empezar.",
-      "LIMIT_HOURS": "Envía como máximo {{count}} correos en {{duration}} horas. Los correos adicionales no se envían.",
-      "LIMIT_MINUTES": "Envía como máximo {{count}} correos en {{duration}} minutos. Los correos adicionales no se envían.",
+      "LIMIT": "Límite de correos: {{count}} en {{duration}}. Los correos adicionales no se envían.",
       "RESERVED_DOMAINS": "Los correos a dominios de prueba como example.com o .test no se entregan.",
       "HTML": "El HTML de los textos de mensaje personalizados se reduce a un formato simple. Se eliminan enlaces, imágenes y estilos.",
       "OWN_PROVIDER": "Configura tu propio proveedor para el uso en producción.",
