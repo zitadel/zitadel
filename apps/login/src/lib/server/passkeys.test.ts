@@ -11,6 +11,7 @@ vi.mock("@zitadel/client", () => ({
   Duration: vi.fn(),
   Timestamp: vi.fn(),
   timestampDate: vi.fn(),
+  timestampMs: vi.fn(),
 }));
 
 vi.mock("../service-url", () => ({
@@ -22,6 +23,7 @@ vi.mock("../zitadel", () => ({
   getSession: vi.fn(),
   getUserByID: vi.fn(),
   listUsers: vi.fn(),
+  searchUsers: vi.fn(),
   createPasskeyRegistrationLink: vi.fn(),
   registerPasskey: vi.fn(),
   listAuthenticationMethodTypes: vi.fn(),
@@ -76,7 +78,7 @@ describe("sendPasskey", () => {
     // Import mocked modules
     const { headers } = await import("next/headers");
     const { getServiceConfig } = await import("../service-url");
-    const { getLoginSettings, getUserByID, listUsers } = await import("../zitadel");
+    const { getLoginSettings, getUserByID, getSession, listUsers } = await import("../zitadel");
     const { setSessionAndUpdateCookie, createSessionAndUpdateCookie } = await import("./cookie");
     const { getSessionCookieById, getSessionCookieByLoginName, getMostRecentSessionCookie } = await import("../cookies");
     const { checkEmailVerification } = await import("../verify-helper");
@@ -107,8 +109,15 @@ describe("sendPasskey", () => {
     headersList.set("host", "test.com");
     mockHeaders.mockResolvedValue(headersList);
     mockGetServiceUrlFromHeaders.mockReturnValue({
-      serviceUrl: "https://example.com",
+      serviceConfig: { baseUrl: "https://example.com" },
     });
+    mockListUsers.mockResolvedValue({
+      details: { totalResult: BigInt(1) },
+      result: [{ userId: "user-123", preferredLoginName: "test@example.com" }],
+    });
+    vi.mocked(getSession).mockResolvedValue({
+      session: { id: "session-123", factors: { user: { id: "user-123", loginName: "test@example.com" } } },
+    } as any);
     mockGetLoginSettings.mockResolvedValue({
       multiFactorCheckLifetime: {
         seconds: BigInt(300),
@@ -134,7 +143,7 @@ describe("sendPasskey", () => {
       });
     });
 
-    test("should return error when session cookie is not found by loginName", async () => {
+    test("should reject an assertion without its challenge session ID", async () => {
       mockGetSessionCookieByLoginName.mockResolvedValue(null); // Not found
       mockCreateSessionAndUpdateCookie.mockRejectedValue(new Error("Creation failed")); // Force creation failure
 
@@ -147,13 +156,11 @@ describe("sendPasskey", () => {
       expect(result).toEqual({
         error: "couldNotFindSession",
       });
-      expect(mockGetSessionCookieByLoginName).toHaveBeenCalledWith({
-        loginName: "test@example.com",
-        organization: "org-123",
-      });
+      expect(mockGetSessionCookieByLoginName).not.toHaveBeenCalled();
+      expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
     });
 
-    test("should return error when no session cookie found (most recent fallback)", async () => {
+    test("should not use the most recent session for an assertion", async () => {
       mockGetMostRecentSessionCookie.mockResolvedValue(null);
 
       const result = await sendPasskey({
@@ -163,7 +170,7 @@ describe("sendPasskey", () => {
       expect(result).toEqual({
         error: "couldNotFindSession",
       });
-      expect(mockGetMostRecentSessionCookie).toHaveBeenCalled();
+      expect(mockGetMostRecentSessionCookie).not.toHaveBeenCalled();
     });
   });
 
@@ -187,7 +194,7 @@ describe("sendPasskey", () => {
       });
 
       expect(result).toEqual({
-        error: "couldNotUpdateSession",
+        error: "couldNotFindSession",
       });
     });
 
@@ -200,58 +207,18 @@ describe("sendPasskey", () => {
       });
 
       expect(result).toEqual({
-        error: "couldNotUpdateSession",
+        error: "couldNotFindSession",
       });
     });
 
-    test("should fallback to createSessionAndUpdateCookie when setSessionAndUpdateCookie fails and checks are present", async () => {
+    test("should not create a different session when assertion verification fails", async () => {
       mockSetSessionAndUpdateCookie.mockRejectedValue(new Error("session already terminated"));
-
-      mockCreateSessionAndUpdateCookie.mockResolvedValue({
-        session: {
-          id: "new-session-123",
-          factors: {
-            user: {
-              id: "user-123",
-              loginName: "test@example.com",
-            },
-          },
-        },
-        sessionCookie: {
-          id: "new-session-123",
-          token: "new-token",
-        },
-      });
-
-      mockListUsers.mockResolvedValue({
-        details: { totalResult: BigInt(1) },
-        result: [{ userId: "user-123" }],
-      });
-
-      mockGetUserByID.mockResolvedValue({
-        user: {
-          id: "user-123",
-          type: {
-            case: "human",
-            value: { email: { isVerified: true } },
-          },
-        },
-      });
-
-      mockCheckEmailVerification.mockResolvedValue(true);
-      mockCompleteFlowOrGetUrl.mockResolvedValue({ redirect: "/dashboard" });
-
       const result = await sendPasskey({
         sessionId: "session-123",
         checks: { webAuthN: { credentialAssertionData: {} } } as any,
       });
-
-      // It should succeed with the new session
-      expect(result).toEqual({
-        redirect: "/dashboard",
-      });
-
-      expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
+      expect(result).toEqual({ error: "couldNotFindSession" });
+      expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
     });
   });
 
@@ -263,7 +230,7 @@ describe("sendPasskey", () => {
         loginName: "test@example.com",
       });
       mockSetSessionAndUpdateCookie.mockResolvedValue({
-        sessionId: "session-123",
+        id: "session-123",
         sessionToken: "new-token",
         factors: {
           user: {
