@@ -33,7 +33,9 @@ describe("loginWithOIDCAndSession", () => {
   let mockCookies: any[];
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    // reset, not clear: a stubbed resolved value on the shared sendLoginname mock would
+    // otherwise leak into the cases that expect no re-authentication redirect
+    vi.resetAllMocks();
     vi.spyOn(console, "log").mockImplementation(() => {});
     vi.spyOn(console, "error").mockImplementation(() => {});
 
@@ -168,6 +170,76 @@ describe("loginWithOIDCAndSession", () => {
       expect(result.redirect).toContain("/signedin");
       expect(result.redirect).toContain("loginName=test%40example.com");
       expect(result.redirect).toContain("organization=org-123");
+    }
+  });
+
+  it("should re-authenticate when createCallback demands a fresh authentication", async () => {
+    const { ConnectError } = await import("@zitadel/client");
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(true);
+    vi.mocked(zitadelModule.createCallback).mockRejectedValue(new ConnectError("already handled", 9));
+    vi.mocked(loginnameModule.sendLoginname).mockResolvedValue({
+      redirect: "/password",
+    });
+
+    const result = await loginWithOIDCAndSession({
+      serviceUrl: mockServiceUrl,
+      authRequest: mockAuthRequest,
+      sessionId: mockSessionId,
+      sessions: mockSessions,
+      sessionCookies: mockCookies,
+    });
+
+    expect(result).toEqual({ redirect: "/password" });
+    expect(loginnameModule.sendLoginname).toHaveBeenCalledWith({
+      loginName: "test@example.com",
+      organization: "org-123",
+      requestId: `oidc_${mockAuthRequest}`,
+    });
+    expect(zitadelModule.getLoginSettings).not.toHaveBeenCalled();
+  });
+
+  it("should fall back to /signedin when re-authentication yields no redirect", async () => {
+    const { ConnectError } = await import("@zitadel/client");
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(true);
+    vi.mocked(zitadelModule.createCallback).mockRejectedValue(new ConnectError("already handled", 9));
+    vi.mocked(loginnameModule.sendLoginname).mockResolvedValue({
+      error: "User not found",
+    });
+    vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({} as any);
+
+    const result = await loginWithOIDCAndSession({
+      serviceUrl: mockServiceUrl,
+      authRequest: mockAuthRequest,
+      sessionId: mockSessionId,
+      sessions: mockSessions,
+      sessionCookies: mockCookies,
+    });
+
+    expect(loginnameModule.sendLoginname).toHaveBeenCalled();
+    expect(result).toHaveProperty("redirect");
+    if ("redirect" in result) {
+      expect(result.redirect).toContain("/signedin");
+    }
+  });
+
+  it("should fall back to /signedin when re-authentication itself rejects", async () => {
+    const { ConnectError } = await import("@zitadel/client");
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(true);
+    vi.mocked(zitadelModule.createCallback).mockRejectedValue(new ConnectError("already handled", 9));
+    vi.mocked(loginnameModule.sendLoginname).mockRejectedValue(new Error("could not get login settings"));
+    vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({} as any);
+
+    const result = await loginWithOIDCAndSession({
+      serviceUrl: mockServiceUrl,
+      authRequest: mockAuthRequest,
+      sessionId: mockSessionId,
+      sessions: mockSessions,
+      sessionCookies: mockCookies,
+    });
+
+    expect(result).toHaveProperty("redirect");
+    if ("redirect" in result) {
+      expect(result.redirect).toContain("/signedin");
     }
   });
 
