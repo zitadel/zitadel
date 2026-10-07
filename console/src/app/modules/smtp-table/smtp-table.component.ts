@@ -38,7 +38,7 @@ export class SMTPTableComponent implements OnInit {
 
   public loginPolicy!: LoginPolicy.AsObject;
 
-  // The providers which are restricted by the operator of the system are marked in the table.
+  // The providers which are restricted by the ZITADEL operator are marked in the table.
   private readonly emailProvidersQuery = injectQuery(() => this.newAdminService.listEmailProvidersQueryOptions());
   private readonly restrictedIds = computed(
     () =>

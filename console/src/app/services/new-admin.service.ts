@@ -12,6 +12,7 @@ import {
 import { injectQuery, QueryClient, queryOptions, skipToken } from '@tanstack/angular-query-experimental';
 import { NewAuthService } from './new-auth.service';
 import { UserService } from './user.service';
+import { NewSettingsService } from './new-settings.service';
 
 @Injectable({
   providedIn: 'root',
@@ -22,6 +23,7 @@ export class NewAdminService {
     private readonly authService: NewAuthService,
     private readonly userService: UserService,
     private readonly queryClient: QueryClient,
+    private readonly settingsService: NewSettingsService,
   ) {}
 
   public setupOrg(req: MessageInitShape<typeof SetUpOrgRequestSchema>) {
@@ -53,19 +55,6 @@ export class NewAdminService {
     return this.grpcService.adminNew.getEmailProviderById({ id }, { signal });
   }
 
-  private getEmailProvider(signal: AbortSignal) {
-    return this.grpcService.adminNew.getEmailProvider({}, { signal });
-  }
-
-  // The active email provider. The query fails if no provider is active.
-  public getEmailProviderQueryOptions() {
-    return queryOptions({
-      queryKey: [this.userService.userId(), 'AdminService', 'emailProviders', 'active'],
-      queryFn: ({ signal }) => this.getEmailProvider(signal),
-      retry: false,
-    });
-  }
-
   public listEmailProvidersQueryOptions() {
     return queryOptions({
       queryKey: [this.userService.userId(), 'AdminService', 'emailProviders', 'list'],
@@ -74,10 +63,14 @@ export class NewAdminService {
   }
 
   // Reloads the email providers after one of them was activated, deactivated, changed or removed.
+  // The general settings state the restrictions of the active provider, so they are reloaded as well.
   public invalidateEmailProviders() {
-    return this.queryClient.invalidateQueries({
-      queryKey: [this.userService.userId(), 'AdminService', 'emailProviders'],
-    });
+    return Promise.all([
+      this.queryClient.invalidateQueries({
+        queryKey: [this.userService.userId(), 'AdminService', 'emailProviders'],
+      }),
+      this.settingsService.invalidateGeneralSettings(),
+    ]);
   }
 
   public getEmailProviderByIdQueryOptions(id?: string) {
