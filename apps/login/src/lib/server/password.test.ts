@@ -296,6 +296,7 @@ describe("sendPassword", () => {
   let mockHeaders: any;
   let mockGetServiceConfig: any;
   let mockGetSessionCookieByLoginName: any;
+  let mockGetSessionCookieById: any;
   let mockSearchUsers: any;
   let mockGetLoginSettings: any;
   let mockCreateSessionAndUpdateCookie: any;
@@ -307,13 +308,14 @@ describe("sendPassword", () => {
 
     const { headers } = await import("next/headers");
     const { getServiceConfig } = await import("../service-url");
-    const { getSessionCookieByLoginName } = await import("../cookies");
+    const { getSessionCookieByLoginName, getSessionCookieById } = await import("../cookies");
     const { getLoginSettings, getLockoutSettings, searchUsers } = await import("../zitadel");
     const { createSessionAndUpdateCookie, setSessionAndUpdateCookie } = await import("./cookie");
 
     mockHeaders = vi.mocked(headers);
     mockGetServiceConfig = vi.mocked(getServiceConfig);
     mockGetSessionCookieByLoginName = vi.mocked(getSessionCookieByLoginName);
+    mockGetSessionCookieById = vi.mocked(getSessionCookieById);
     mockSearchUsers = vi.mocked(searchUsers);
     mockGetLoginSettings = vi.mocked(getLoginSettings);
     mockCreateSessionAndUpdateCookie = vi.mocked(createSessionAndUpdateCookie);
@@ -454,6 +456,89 @@ describe("sendPassword", () => {
 
     expect(mockSetSessionAndUpdateCookie).toHaveBeenCalled();
     expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
+  });
+
+  test("should prefer session cookie lookup by sessionId when provided", async () => {
+    mockGetSessionCookieById.mockResolvedValue({
+      id: "session123",
+      token: "token123",
+      organization: "org123",
+    });
+    mockGetLoginSettings.mockResolvedValue({
+      allowLocalAuthentication: true,
+      passwordCheckLifetime: { seconds: BigInt(60 * 60 * 24), nanos: 0 },
+    });
+    mockSetSessionAndUpdateCookie.mockResolvedValue({
+      id: "session123",
+      factors: { user: { id: "user123", loginName: "user@example.com" }, password: { verifiedAt: {} } },
+    });
+
+    const { getUserByID, getPasswordExpirySettings, listAuthenticationMethodTypes } = await import("../zitadel");
+    vi.mocked(getUserByID).mockResolvedValue({
+      user: { userId: "user123", type: { case: "human", value: {} }, state: 1 },
+    } as any);
+    vi.mocked(getPasswordExpirySettings).mockResolvedValue({});
+    vi.mocked(listAuthenticationMethodTypes).mockResolvedValue({
+      authMethodTypes: [AuthenticationMethodType.PASSWORD],
+    } as any);
+
+    await sendPassword({
+      loginName: "user@example.com",
+      sessionId: "session123",
+      checks: { password: { password: "password" } } as any,
+    });
+
+    expect(mockGetSessionCookieById).toHaveBeenCalledWith({ sessionId: "session123" });
+    expect(mockGetSessionCookieByLoginName).not.toHaveBeenCalled();
+    expect(mockSetSessionAndUpdateCookie).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recentCookie: expect.objectContaining({ id: "session123" }),
+      }),
+    );
+  });
+
+  test("should fall back to loginName cookie lookup when sessionId cookie is missing", async () => {
+    mockGetSessionCookieById.mockResolvedValue(undefined);
+    mockGetSessionCookieByLoginName.mockResolvedValue({
+      id: "session-from-name",
+      token: "token123",
+      organization: "org123",
+    });
+    mockGetLoginSettings.mockResolvedValue({
+      allowLocalAuthentication: true,
+      passwordCheckLifetime: { seconds: BigInt(60 * 60 * 24), nanos: 0 },
+    });
+    mockSetSessionAndUpdateCookie.mockResolvedValue({
+      id: "session-from-name",
+      factors: { user: { id: "user123", loginName: "user@example.com" }, password: { verifiedAt: {} } },
+    });
+
+    const { getUserByID, getPasswordExpirySettings, listAuthenticationMethodTypes } = await import("../zitadel");
+    vi.mocked(getUserByID).mockResolvedValue({
+      user: { userId: "user123", type: { case: "human", value: {} }, state: 1 },
+    } as any);
+    vi.mocked(getPasswordExpirySettings).mockResolvedValue({});
+    vi.mocked(listAuthenticationMethodTypes).mockResolvedValue({
+      authMethodTypes: [AuthenticationMethodType.PASSWORD],
+    } as any);
+
+    await sendPassword({
+      loginName: "user@example.com",
+      sessionId: "missing-session",
+      organization: "org123",
+      checks: { password: { password: "password" } } as any,
+    });
+
+    expect(mockGetSessionCookieById).toHaveBeenCalledWith({ sessionId: "missing-session" });
+    expect(mockGetSessionCookieByLoginName).toHaveBeenCalledWith({
+      loginName: "user@example.com",
+      organization: "org123",
+    });
+    expect(mockSetSessionAndUpdateCookie).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recentCookie: expect.objectContaining({ id: "session-from-name" }),
+      }),
+    );
   });
 });
 describe("resetPassword", () => {

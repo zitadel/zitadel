@@ -18,7 +18,7 @@ import { timestampDate } from "@zitadel/client";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import * as cookiesModule from "./cookies";
-import { isSessionValid, loadMostRecentSession } from "./session";
+import { isSessionValid, loadMostRecentSession, loadSessionById } from "./session";
 import * as verifyHelperModule from "./verify-helper";
 import * as zitadelModule from "./zitadel";
 
@@ -35,6 +35,7 @@ vi.mock("./zitadel", () => ({
 
 vi.mock("./cookies", () => ({
   getMostRecentCookieWithLoginname: vi.fn(),
+  getSessionCookieById: vi.fn(),
 }));
 
 vi.mock("./verify-helper", () => ({
@@ -1678,6 +1679,55 @@ describe("loadMostRecentSession", () => {
 
     await expect(loadMostRecentSession({ serviceConfig, sessionParams })).rejects.toBe(unexpected);
     expect(consoleSpy).not.toHaveBeenCalled();
+    consoleSpy.mockRestore();
+  });
+});
+
+describe("loadSessionById", () => {
+  const serviceConfig = { baseUrl: "https://zitadel-abc123.zitadel.cloud" };
+  const cookie = { id: "session-id", token: "session-token", loginName: "test@example.com", organization: "test-org-id" };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  test("returns undefined without calling getSession when no cookie is found", async () => {
+    vi.mocked(cookiesModule.getSessionCookieById).mockResolvedValue(undefined as any);
+
+    const result = await loadSessionById({ serviceConfig, sessionId: "session-id" });
+
+    expect(result).toBeUndefined();
+    expect(zitadelModule.getSession).not.toHaveBeenCalled();
+  });
+
+  test("returns the session when getSession succeeds", async () => {
+    const session = { id: "session-id", factors: { user: { id: "user-id" } } };
+    vi.mocked(cookiesModule.getSessionCookieById).mockResolvedValue(cookie as any);
+    vi.mocked(zitadelModule.getSession).mockResolvedValue({ session } as any);
+
+    const result = await loadSessionById({ serviceConfig, sessionId: "session-id" });
+
+    expect(result).toBe(session);
+    expect(cookiesModule.getSessionCookieById).toHaveBeenCalledWith({
+      sessionId: "session-id",
+    });
+    expect(zitadelModule.getSession).toHaveBeenCalledWith({
+      serviceConfig,
+      sessionId: cookie.id,
+      sessionToken: cookie.token,
+    });
+  });
+
+  test("returns undefined instead of throwing when getSession rejects with NotFound (stale cookie)", async () => {
+    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const notFound = new ConnectError("Session does not exist (QUERY-SFeaa)", Code.NotFound);
+    vi.mocked(cookiesModule.getSessionCookieById).mockResolvedValue(cookie as any);
+    vi.mocked(zitadelModule.getSession).mockRejectedValue(notFound);
+
+    const result = await loadSessionById({ serviceConfig, sessionId: "session-id" });
+
+    expect(result).toBeUndefined();
+    expect(consoleSpy).toHaveBeenCalledWith(expect.any(String), notFound);
     consoleSpy.mockRestore();
   });
 });
