@@ -209,7 +209,9 @@
         "PREVIOUS_TABLE": {
           "TITLE": "Korábbi Webkulcsok",
           "DESCRIPTION": "Ezek a korábbi webkulcsai, amelyek már nem aktívak.",
-          "DEACTIVATED_ON": "Deaktiválva ekkor"
+          "DEACTIVATED_ON": "Deaktiválva ekkor",
+          "DELETE_TITLE": "Korábbi webkulcs törlése",
+          "DELETE_DESCRIPTION": "Ennek a korábbi webkulcsnak az eltávolítása érvényteleníti az összes tokent, amelyet azzal írtak alá. Ez a művelet nem vonható vissza."
         }
       },
       "MESSAGE_TEXTS": {
