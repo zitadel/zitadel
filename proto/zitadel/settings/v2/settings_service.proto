@@ -22,6 +22,7 @@ import "zitadel/filter/v2/filter.proto";
 import "zitadel/settings/v2/organization_settings.proto";
 import "zitadel/settings/v2/link_settings.proto";
 import "zitadel/settings/v2/effective_settings.proto";
+import "zitadel/settings/v2/email_provider.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
 
@@ -793,6 +794,11 @@ message GetGeneralSettingsResponse {
       example: "[\"en\", \"de\", \"it\"]"
     }
   ];
+
+  // The restrictions the operator of the ZITADEL installation defined for the active email provider,
+  // e.g. a default provider shared by multiple instances. They apply to all emails sent by the instance.
+  // The field is not set if the active email provider is not restricted or no email provider is active.
+  EmailProviderRestrictions email_provider_restrictions = 6;
 }
 
 message GetSecuritySettingsRequest{}
