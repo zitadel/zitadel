@@ -106,12 +106,12 @@ message EmailProvider {
     EmailProviderSMTP smtp = 4;
     EmailProviderHTTP http = 5;
   }
-  // restrictions are defined by the operator of the system for the provider.
+  // restrictions are defined by the operator of the ZITADEL installation for the provider.
   // They are read-only and cannot be changed through the API. The field is not set if the provider is not restricted.
   EmailProviderRestrictions restrictions = 7;
 }
 
-// EmailProviderRestrictions state how the operator of the system restricts the emails sent through a provider,
+// EmailProviderRestrictions state how the operator of the ZITADEL installation restricts the emails sent through a provider,
 // e.g. a default provider shared by multiple instances.
 message EmailProviderRestrictions {
   // custom_html_restricted states that HTML in custom message texts is reduced to simple formatting.

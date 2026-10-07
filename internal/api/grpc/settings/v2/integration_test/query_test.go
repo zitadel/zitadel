@@ -23,6 +23,43 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 )
 
+func TestServer_GetGeneralSettings(t *testing.T) {
+	tests := []struct {
+		name    string
+		ctx     context.Context
+		wantErr bool
+	}{
+		{
+			name:    "permission error",
+			ctx:     CTX,
+			wantErr: true,
+		},
+		{
+			name: "org owner",
+			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
+		},
+		{
+			name: "iam owner",
+			ctx:  AdminCTX,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Client.GetGeneralSettings(tt.ctx, &settings.GetGeneralSettingsRequest{})
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			assert.NotEmpty(t, got.GetSupportedLanguages())
+			assert.NotEmpty(t, got.GetDefaultLanguage())
+			assert.Equal(t, Instance.DefaultOrg.GetId(), got.GetDefaultOrgId())
+			// the email provider of the integration tests is not restricted by operator rules
+			assert.Nil(t, got.GetEmailProviderRestrictions())
+		})
+	}
+}
+
 func TestServer_GetSecuritySettings(t *testing.T) {
 	_, err := Client.SetSecuritySettings(AdminCTX, &settings.SetSecuritySettingsRequest{
 		EmbeddedIframe: &settings.EmbeddedIframeSettings{
