@@ -2439,6 +2439,16 @@
     }
   },
   "SMTP": {
+    "RESTRICTIONS": {
+      "MANAGED": "O provedor de e-mail ativo é gerido pelo operador do ZITADEL e destina-se a começar.",
+      "LIMIT": "Limite de e-mails: {{count}} em {{duration}}. Os e-mails seguintes não são enviados.",
+      "RESERVED_DOMAINS": "E-mails para domínios de teste como example.com ou .test não são entregues.",
+      "HTML": "O HTML nos textos de mensagem personalizados é reduzido a formatação simples. Links, imagens e estilos são removidos.",
+      "OWN_PROVIDER": "Configure o seu próprio provedor para uso em produção.",
+      "HTML_HINT": "O provedor de e-mail ativo só permite formatação simples nos textos de mensagem. Links, imagens e estilos são removidos.",
+      "HTML_HINT_LINK": "Configurar o seu próprio provedor",
+      "ROW_TOOLTIP": "Gerido pelo operador do ZITADEL. Aplicam-se restrições enquanto este provedor estiver ativo."
+    },
     "LIST": {
       "TITLE": "Provedor SMTP",
       "DESCRIPTION": "Estes são os provedores SMTP para sua instância Zitadel. Ative aquele que deseja usar para enviar notificações aos seus usuários.",

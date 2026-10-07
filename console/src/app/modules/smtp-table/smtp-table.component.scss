@@ -68,6 +68,12 @@ tr {
   color: var(--warn);
 }
 
+.smtp-restricted {
+  margin-left: 0.5rem;
+  font-size: 1.2rem;
+  vertical-align: middle;
+}
+
 .smtp-table-actions {
   width: 100px;
 }

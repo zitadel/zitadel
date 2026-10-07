@@ -2468,6 +2468,16 @@
     }
   },
   "SMTP": {
+    "RESTRICTIONS": {
+      "MANAGED": "Etkin e-posta sağlayıcısı ZITADEL operatörü tarafından yönetilir ve başlangıç için tasarlanmıştır.",
+      "LIMIT": "E-posta sınırı: {{duration}} içinde {{count}}. Sonraki e-postalar gönderilmez.",
+      "RESERVED_DOMAINS": "example.com veya .test gibi test alan adlarına gönderilen e-postalar teslim edilmez.",
+      "HTML": "Özel mesaj metinlerindeki HTML basit biçimlendirmeye indirgenir. Bağlantılar, görseller ve stiller kaldırılır.",
+      "OWN_PROVIDER": "Üretim kullanımı için kendi sağlayıcınızı yapılandırın.",
+      "HTML_HINT": "Etkin e-posta sağlayıcısı mesaj metinlerinde yalnızca basit biçimlendirmeye izin verir. Bağlantılar, görseller ve stiller kaldırılır.",
+      "HTML_HINT_LINK": "Kendi sağlayıcınızı yapılandırın",
+      "ROW_TOOLTIP": "ZITADEL operatörü tarafından yönetilir. Bu sağlayıcı etkin olduğu sürece kısıtlamalar geçerlidir."
+    },
     "LIST": {
       "TITLE": "SMTP Sağlayıcısı",
       "DESCRIPTION": "Bunlar Zitadel örneğiniz için SMTP sağlayıcılarıdır. Kullanıcılarınıza bildirim göndermek için kullanmak istediğinizi etkinleştirin.",

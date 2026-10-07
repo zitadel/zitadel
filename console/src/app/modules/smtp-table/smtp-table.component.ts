@@ -1,11 +1,13 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, computed, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ListQuery } from 'src/app/proto/generated/zitadel/object_pb';
 import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { NewAdminService } from 'src/app/services/new-admin.service';
+import { injectQuery } from '@tanstack/angular-query-experimental';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
@@ -36,8 +38,20 @@ export class SMTPTableComponent implements OnInit {
 
   public loginPolicy!: LoginPolicy.AsObject;
 
+  // The providers which are restricted by the ZITADEL operator are marked in the table.
+  private readonly emailProvidersQuery = injectQuery(() => this.newAdminService.listEmailProvidersQueryOptions());
+  private readonly restrictedIds = computed(
+    () =>
+      new Set(
+        (this.emailProvidersQuery.data()?.result ?? [])
+          .filter((provider) => !!provider.restrictions)
+          .map((provider) => provider.id),
+      ),
+  );
+
   constructor(
     private adminService: AdminService,
+    private newAdminService: NewAdminService,
     public translate: TranslateService,
     private toast: ToastService,
     private dialog: MatDialog,
@@ -50,6 +64,10 @@ export class SMTPTableComponent implements OnInit {
 
   ngOnInit(): void {
     this.getData(10, 0);
+  }
+
+  public isRestricted(id: string): boolean {
+    return this.restrictedIds().has(id);
   }
 
   public isActive(state: number) {
@@ -190,6 +208,8 @@ export class SMTPTableComponent implements OnInit {
 
   public refreshPage(): void {
     this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
+    // the restrictions depend on the active provider, which is shown outside of the table as well
+    void this.newAdminService.invalidateEmailProviders();
   }
 
   public routerLinkForRow(row: SMTPConfig.AsObject): any {

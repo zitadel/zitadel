@@ -2467,6 +2467,16 @@
     }
   },
   "SMTP": {
+    "RESTRICTIONS": {
+      "MANAGED": "Den aktiva e-postleverantören hanteras av ZITADEL-operatören och är avsedd för att komma igång.",
+      "LIMIT": "E-postgräns: {{count}} inom {{duration}}. Ytterligare e-postmeddelanden skickas inte.",
+      "RESERVED_DOMAINS": "E-post till testdomäner som example.com eller .test levereras inte.",
+      "HTML": "HTML i anpassade meddelandetexter reduceras till enkel formatering. Länkar, bilder och stilar tas bort.",
+      "OWN_PROVIDER": "Konfigurera en egen leverantör för produktionsbruk.",
+      "HTML_HINT": "Den aktiva e-postleverantören tillåter endast enkel formatering i meddelandetexter. Länkar, bilder och stilar tas bort.",
+      "HTML_HINT_LINK": "Konfigurera en egen leverantör",
+      "ROW_TOOLTIP": "Hanteras av ZITADEL-operatören. Begränsningar gäller så länge den här leverantören är aktiv."
+    },
     "LIST": {
       "TITLE": "SMTP-leverantör",
       "DESCRIPTION": "Dessa är SMTP-leverantörerna för din Zitadel-instans. Aktivera den du vill använda för att skicka meddelanden till dina användare.",

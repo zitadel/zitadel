@@ -29,8 +29,26 @@ configure XOAUTH2 as well.
 
 <Callout title="Default Provider ZITADEL Cloud">
 A default SMTP provider is configured for ZITADEL Cloud customers.
-This provider meant for development and testing purposes and you must replace this provider with your custom SMTP provider for production use cases to guarantee security and reliability of your service.
+This provider is meant for development and testing purposes and you must replace this provider with your custom SMTP provider for production use cases to guarantee security and reliability of your service.
 </Callout>
+
+### Restrictions of the default provider
+
+The default provider is shared by many instances. To keep it reliable for everyone, the following restrictions apply as long as it is the active provider.
+The Console shows the restrictions of the active provider in the SMTP provider settings. The API returns them in the `restrictions` of the email provider and, readable by organization admins as well, in the general settings.
+None of them apply once you activate your own provider.
+
+- **Test recipients are not delivered**: Emails to reserved domains (`example.com`, `example.net`, `example.org` and the top-level domains `.test`, `.example`, `.invalid` and `.localhost`) are accepted, but not sent, since nobody can receive them.
+  The notification is handled as usual and its sent event (e.g. `user.human.invite.code.sent`) states `"deliverySuppressed": true`.
+  Use these domains for test users, they do not count towards the sending limit.
+- **Sending limit**: An instance can only send a limited number of emails within a rolling time window.
+  Emails exceeding the limit are not sent and not retried. The API request which triggered the email, e.g. creating an invite code, still succeeds.
+  Instead of a sent event, the user (or session) gets a `user.notification.rejected` (or `session.notification.rejected`) event with the reason `limit_exceeded`.
+  Once the limit allows it again, request a new code to send the email.
+- **Simple formatting in message texts**: HTML in [custom message texts](./texts) is reduced to simple formatting (`br`, `strong`, `b`, `em`, `i`, `u`, `p`).
+  Other elements like links, images or styles are removed, their text is kept.
+
+If you need the code of a notification in automated tests, let the API return it instead of sending an email, for example with `returnCode` when [creating an invite code](/reference/api/user/zitadel.user.v2.UserService.CreateInviteCode).
 
 ## Webhook / HTTP provider
 

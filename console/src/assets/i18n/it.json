@@ -2444,6 +2444,16 @@
     }
   },
   "SMTP": {
+    "RESTRICTIONS": {
+      "MANAGED": "Il provider e-mail attivo è gestito dall'operatore di ZITADEL ed è pensato per iniziare.",
+      "LIMIT": "Limite e-mail: {{count}} in {{duration}}. Le e-mail successive non vengono inviate.",
+      "RESERVED_DOMAINS": "Le e-mail verso domini di test come example.com o .test non vengono recapitate.",
+      "HTML": "L'HTML nei testi dei messaggi personalizzati viene ridotto a una formattazione semplice. Link, immagini e stili vengono rimossi.",
+      "OWN_PROVIDER": "Configura un tuo provider per l'uso in produzione.",
+      "HTML_HINT": "Il provider e-mail attivo consente solo una formattazione semplice nei testi dei messaggi. Link, immagini e stili vengono rimossi.",
+      "HTML_HINT_LINK": "Configura un tuo provider",
+      "ROW_TOOLTIP": "Gestito dall'operatore di ZITADEL. Finché questo provider è attivo si applicano delle restrizioni."
+    },
     "LIST": {
       "TITLE": "Fornitore SMTP",
       "DESCRIPTION": "Questi sono i provider SMTP per la tua istanza Zitadel. Attiva quello che desideri utilizzare per inviare notifiche ai tuoi utenti.",

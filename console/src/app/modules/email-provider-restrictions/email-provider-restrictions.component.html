@@ -1,0 +1,25 @@
+@if (show()) {
+  @let r = restrictions();
+  <cnsl-info-section class="email-provider-restrictions" data-e2e="email-provider-restrictions">
+    @if (mode() === 'provider') {
+      <p class="lead">{{ 'SMTP.RESTRICTIONS.MANAGED' | translate }}</p>
+      <ul>
+        @if (limit(); as limit) {
+          <li data-e2e="email-provider-restrictions-limit">{{ 'SMTP.RESTRICTIONS.LIMIT' | translate: limit }}</li>
+        }
+        @if (r?.reservedRecipientDomainsSuppressed) {
+          <li>{{ 'SMTP.RESTRICTIONS.RESERVED_DOMAINS' | translate }}</li>
+        }
+        @if (r?.customHtmlRestricted) {
+          <li>{{ 'SMTP.RESTRICTIONS.HTML' | translate }}</li>
+        }
+      </ul>
+      <p>{{ 'SMTP.RESTRICTIONS.OWN_PROVIDER' | translate }}</p>
+    } @else {
+      <p>{{ 'SMTP.RESTRICTIONS.HTML_HINT' | translate }}</p>
+      <a class="own-provider" mat-stroked-button [routerLink]="['/instance']" [queryParams]="{ id: 'smtpprovider' }">
+        {{ 'SMTP.RESTRICTIONS.HTML_HINT_LINK' | translate }}
+      </a>
+    }
+  </cnsl-info-section>
+}
