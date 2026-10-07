@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { randomBytes } from "node:crypto";
 import { buildCSP } from "./lib/csp";
 import { applyCustomHeaders } from "./lib/custom-headers";
 import { createLogger } from "./lib/logger";
@@ -14,6 +15,9 @@ export const config = {
 export async function proxy(request: NextRequest) {
   // Add the original URL as a header to all requests
   const requestHeaders = new Headers(request.headers);
+  // A caller must never choose the nonce used by the rendering tree.
+  requestHeaders.delete("x-zitadel-csp-nonce");
+  const nonce = process.env.CSP_NONCE_ENABLED === "true" ? randomBytes(16).toString("base64") : undefined;
 
   // Extract "organization" search param from the URL and set it as a header if available
   const organization = request.nextUrl.searchParams.get("organization");
@@ -29,6 +33,12 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
+  // Next's synthetic fallback documents are prerendered without a request
+  // nonce. They are internal implementation paths, not supplied Login routes.
+  if (nonce && ["/_not-found", "/_global-error"].includes(request.nextUrl.pathname)) {
+    return new NextResponse(null, { status: 404, headers: { "Cache-Control": "private, no-store" } });
+  }
+
   const { serviceConfig } = getServiceConfig(request.headers);
   const { baseUrl, publicHost, instanceHost } = serviceConfig;
 
@@ -42,7 +52,7 @@ export async function proxy(request: NextRequest) {
     try {
       const iframeOrigins = await getIframeOrigins(baseUrl, instanceHost, publicHost);
 
-      responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: baseUrl, iframeOrigins }));
+      responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: baseUrl, iframeOrigins, nonce }));
 
       if (!iframeOrigins) {
         responseHeaders.set("X-Frame-Options", "deny");
@@ -51,11 +61,11 @@ export async function proxy(request: NextRequest) {
       logger.error("Failed to load security settings for CSP, using default CSP", {
         error: err instanceof Error ? err.message : String(err),
       });
-      responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: baseUrl }));
+      responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: baseUrl, nonce }));
       responseHeaders.set("X-Frame-Options", "deny");
     }
   } else {
-    responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: baseUrl }));
+    responseHeaders.set("Content-Security-Policy", buildCSP({ serviceUrl: baseUrl, nonce }));
     responseHeaders.set("X-Frame-Options", "deny");
   }
 
@@ -64,6 +74,14 @@ export async function proxy(request: NextRequest) {
   const isMatched = proxyPaths.some((prefix) => request.nextUrl.pathname.startsWith(prefix));
 
   if (!isMatched) {
+    if (nonce) {
+      // Next reads this policy when noncing bootstrap, chunk and streamed
+      // scripts. Its middleware response policy must be identical.
+      requestHeaders.set("x-zitadel-csp-nonce", nonce);
+      requestHeaders.set("Content-Security-Policy", responseHeaders.get("Content-Security-Policy")!);
+      requestHeaders.delete("Content-Security-Policy-Report-Only");
+      responseHeaders.set("Cache-Control", "private, no-store");
+    }
     return NextResponse.next({
       request: { headers: requestHeaders },
       headers: responseHeaders,
