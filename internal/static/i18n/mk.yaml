@@ -1375,6 +1375,51 @@ EventTypes:
     activated: "Веб-клучот е активиран"
     deactivated: "Веб-клучот е деактивиран"
     removed: "Веб-клучот е отстранет"
+  session:
+    added: "Креирана е сесија"
+    user:
+      checked: "Проверен е корисникот на сесијата"
+    password:
+      checked: "Проверена е лозинката на сесијата"
+    intent:
+      checked: "Проверен е intent на провајдерот на идентитет на сесијата"
+    webAuthN:
+      challenged: "Креиран е WebAuthN предизвик на сесијата"
+      checked: "Проверен е WebAuthN на сесијата"
+    totp:
+      checked: "Проверен е TOTP на сесијата"
+    otp:
+      sms:
+        challenged: "Креиран е OTP СМС предизвик на сесијата"
+        sent: "Испратен е OTP СМС-код на сесијата"
+        checked: "Проверен е OTP СМС на сесијата"
+      email:
+        challenged: "Креиран е OTP е-пошта предизвик на сесијата"
+        sent: "Испратен е OTP е-пошта код на сесијата"
+        checked: "Проверен е OTP е-пошта на сесијата"
+    recoveryCode:
+      checked: "Проверен е кодот за враќање на сесијата"
+    token:
+      set: "Поставен е токенот на сесијата"
+    metadata:
+      set: "Поставени се метаподатоците на сесијата"
+    lifetime:
+      set: "Поставено е траењето на сесијата"
+    terminated: "Сесијата е завршена"
+  oidc_session:
+    added: "Креирана е OIDC сесија"
+    access_token:
+      added: "Креиран е токен за пристап на OIDC сесијата"
+      revoked: "Отповикан е токенот за пристап на OIDC сесијата"
+    refresh_token:
+      added: "Креиран е токен за обновување на OIDC сесијата"
+      renewed: "Обновен е токенот за обновување на OIDC сесијата"
+      revoked: "Отповикан е токенот за обновување на OIDC сесијата"
+  saml_session:
+    added: "Креирана е SAML сесија"
+    saml_response:
+      added: "Креиран е SAML одговор на сесијата"
+      revoked: "Отповикан е SAML одговорот на сесијата"
 Application:
   OIDC:
     UnsupportedVersion: "Вашата OIDC верзија не е поддржана"
