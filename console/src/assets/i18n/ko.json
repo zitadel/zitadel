@@ -1556,7 +1556,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "sk": "Slovenčina"
       }
     },
     "SMTP": {
@@ -1805,7 +1806,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "sk": "Slovenčina"
       },
       "KEYS": {
         "emailVerificationDoneText": "이메일 인증 완료",
@@ -2817,7 +2819,8 @@
     "ro": "Română",
     "tr": "Türkçe",
     "uk": "Українська",
-    "ar": "العربية"
+    "ar": "العربية",
+    "sk": "Slovenčina"
   },
   "MEMBER": {
     "ADD": "관리자 추가",
