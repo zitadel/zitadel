@@ -369,6 +369,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Usuario externo no encontrado
   Description: Usuario externo no encontrado. ¿Quieres vincular tu usuario o autoregistrar uno nuevo?
+  NoOptionAvailable: No se ha encontrado ninguna cuenta que coincida con su usuario externo y no se puede crear una nueva cuenta. Póngase en contacto con su administrador o con el soporte.
   LinkButtonText: Vincular
   AutoRegisterButtonText: registrar
   TosAndPrivacyLabel: Términos y condiciones

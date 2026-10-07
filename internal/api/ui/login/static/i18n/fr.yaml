@@ -369,6 +369,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Utilisateur externe introuvable
   Description: Utilisateur externe non trouvé. Voulez-vous lier votre utilisateur ou enregistrer automatiquement un nouvel utilisateur ?
+  NoOptionAvailable: Aucun compte correspondant à votre utilisateur externe n'a été trouvé et aucun nouveau compte ne peut être créé. Veuillez contacter votre administrateur ou le support.
   LinkButtonText: Lier
   AutoRegisterButtonText: Enregistrer
   TosAndPrivacyLabel: Termes et conditions

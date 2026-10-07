@@ -366,6 +366,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: لم يتم العثور على مستخدم خارجي
   Description: لم يتم العثور على المستخدم الخارجي. هل تريد ربط المستخدم الخاص بك أو التسجيل التلقائي لمستخدم جديد؟
+  NoOptionAvailable: لم يتم العثور على حساب مطابق للمستخدم الخارجي الخاص بك ولا يمكن إنشاء حساب جديد. يرجى الاتصال بالمسؤول أو بالدعم.
   LinkButtonText: ربط
   AutoRegisterButtonText: تسجيل
   TosAndPrivacyLabel: الشروط والأحكام

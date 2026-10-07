@@ -1014,6 +1014,10 @@ func (c *Commands) createExternalUserNotFoundEvents(ctx context.Context, agg *ev
 	if event != nil {
 		events = append(events, event)
 	}
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyExternalNotFoundNoOptionAvailable, existingText.ExternalUserNotFoundNoOptionAvailable, text.ExternalNotFound.NoOptionAvailable, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
 	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyExternalNotFoundLinkButtonText, existingText.ExternalUserNotFoundLinkButtonText, text.ExternalNotFound.LinkButtonText, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
