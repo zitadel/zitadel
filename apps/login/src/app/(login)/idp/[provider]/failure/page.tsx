@@ -74,6 +74,7 @@ export default async function Page(props: {
               <UserAvatar
                 loginName={user.preferredLoginName}
                 displayName={human?.profile?.displayName}
+                imageUrl={human?.profile?.avatarUrl}
                 showDropdown={false}
               />
             )}

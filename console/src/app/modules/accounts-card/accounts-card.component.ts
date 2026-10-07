@@ -6,8 +6,10 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { SessionService } from 'src/app/services/session.service';
+import { EnvironmentService } from 'src/app/services/environment.service';
 import {
   catchError,
+  combineLatest,
   defer,
   from,
   map,
@@ -60,6 +62,7 @@ export class AccountsCardComponent {
     private readonly router: Router,
     private readonly userService: GrpcAuthService,
     private readonly sessionService: SessionService,
+    private readonly environmentService: EnvironmentService,
     private readonly featureService: NewFeatureService,
     private readonly toast: ToastService,
   ) {
@@ -114,31 +117,30 @@ export class AccountsCardComponent {
   }
 
   private getV2Sessions(): Observable<V1AndV2Session[]> {
-    return defer(() =>
-      this.sessionService.listSessions({
-        queries: [
-          {
-            query: {
-              case: 'userAgentQuery',
-              value: {},
-            },
-          },
-        ],
-      }),
-    ).pipe(
-      mergeMap(({ sessions }) => from(sessions)),
-      withLatestFrom(this.user$),
-      filter(([s, user]) => s.factors?.user?.loginName !== user.preferredLoginName),
-      map(([s]) => ({
-        displayName: s.factors?.user?.displayName ?? '',
-        avatarUrl: '',
-        loginName: s.factors?.user?.loginName ?? '',
-        authState: V2SessionState.ACTIVE,
-        userName: s.factors?.user?.loginName ?? '',
-      })),
-      map((s) => [s.loginName, s] as const),
-      toArray(),
-      map((sessions) => Array.from(new Map(sessions).values())), // Ensure unique loginNames
+    return combineLatest({
+      response: defer(() =>
+        this.sessionService.listSessions({
+          queries: [{ query: { case: 'userAgentQuery', value: {} } }],
+        }),
+      ),
+      environment: this.environmentService.env,
+      user: this.user$,
+    }).pipe(
+      map(({ response, environment, user }) =>
+        response.sessions
+          .filter((s) => s.factors?.user?.loginName !== user.preferredLoginName)
+          .map((s) => ({
+            displayName: s.factors?.user?.displayName ?? '',
+            avatarUrl:
+              s.factors?.user?.organizationId && s.factors.user.id
+                ? `${environment.api}/assets/v1/${encodeURIComponent(s.factors.user.organizationId)}/users/${encodeURIComponent(s.factors.user.id)}/avatar`
+                : '',
+            loginName: s.factors?.user?.loginName ?? '',
+            authState: V2SessionState.ACTIVE,
+            userName: s.factors?.user?.loginName ?? '',
+          })),
+      ),
+      map((sessions) => Array.from(new Map(sessions.map((s) => [s.loginName, s])).values())),
     );
   }
 
