@@ -92,6 +92,17 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
     return response;
   }
 
+  // `codeSent` is set when a code was just sent before arriving here, so the
+  // initial send is covered by the cooldown as well.
+  const { start: startResendCooldown } = resendCooldown;
+  useEffect(() => {
+    if (codeSent) {
+      startResendCooldown();
+    }
+    // only on arrival; later resends start the cooldown themselves
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const processedCode = useRef<string | undefined>(undefined);
 
   const fcn = useCallback(
@@ -143,7 +154,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
               <Translated i18nKey="verify.noCodeReceived" namespace="verify" />
             </span>
             <button
-              aria-label="Resend Code"
+              aria-label={`${t("verify.resendCode")}${resendCooldown.suffix}`}
               disabled={loading || resendCooldown.isCoolingDown}
               type="button"
               className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
@@ -153,7 +164,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
               data-testid="resend-button"
             >
               <Translated i18nKey="verify.resendCode" namespace="verify" />
-              {resendCooldown.isCoolingDown && <> ({resendCooldown.remaining}s)</>}
+              {resendCooldown.suffix}
             </button>
           </div>
         </Alert>
