@@ -1,12 +1,12 @@
 Login:
   Title: Välkommen!
-  Description: Logga in med dina användaruppgifter
+  Description: Logga in med dina användaruppgifter.
   TitleLinking: Koppla ihop inloggningskonto
-  DescriptionLinking: Ange dina användaruppgifter för att länka med ett befintligt konto
+  DescriptionLinking: Ange dina användaruppgifter för att länka med ett befintligt konto.
   LoginNameLabel: Login-namn
   UsernamePlaceHolder: Användarnamn
   LoginnamePlaceHolder: namn@domain.com
-  ExternalUserDescription: Använd ett externt konto
+  ExternalUserDescription: Använd ett externt konto.
   MustBeMemberOfOrg: Användaren måste finnas i organisationen {{.OrgName}}.
   RegisterButtonText: Skapa nytt konto
   NextButtonText: Fortsätt
@@ -22,7 +22,7 @@ SelectAccount:
   Title: Välj konto
   Description: Använd befintligt konto
   TitleLinking: Välj konto som ska kopplas ihop
-  DescriptionLinking: Välj det konto som ska kopplas ihop med det extrerna kontot
+  DescriptionLinking: Välj det konto som ska kopplas ihop med det externa kontot.
   OtherUser: Välj ett annat konto
   SessionState0: aktivt
   SessionState1: Utloggad
@@ -82,7 +82,7 @@ InitUser:
 
 InitUserDone:
   Title: Aktiverat användarkonto
-  Description: E-postadressen är bekräftad och lösenordet har sparats.
+  Description: E-postadressen är bekräftad och lösenordet har sparats
   NextButtonText: Fortsätt
   CancelButtonText: Avbryt
 
@@ -96,10 +96,10 @@ InviteUser:
   ResendButtonText: Skicka koden igen
 
 InitMFAPrompt:
-  Title: tvåfaktorinställningar
+  Title: Tvåfaktorinställningar
   Description: 2-factor-identifiering ökar säkerheten för ditt konto. Enbart du som har tillgång till enheten kan logga in.
-  Provider0: Mobil App (T ex Google/Microsoft Authenticator, Authy)
-  Provider1: Din fysiska mobil/laptop (T ex FaceID, Windows Hello, Fingeravtryck)
+  Provider0: Mobilapp (t.ex. Google/Microsoft Authenticator, Authy)
+  Provider1: Din fysiska mobil/laptop (t.ex. FaceID, Windows Hello, fingeravtryck)
   Provider3: Engångslösenord på SMS
   Provider4: Engångslösenord på E-Post
   NextButtonText: Fortsätt
@@ -107,8 +107,8 @@ InitMFAPrompt:
 
 InitMFAOTP:
   Title: Tvåfaktor verifiering
-  Description: Bekräfta med en andra faktor. Ladda ned en autentiserings-app (T ex Google/Microsoft Authenticator, Authy) om du inte redan har en.
-  OTPDescription: Skanna koden med din autentiserings-app (T ex Google/Microsoft Authenticator, Authy). Eller kopiera nyckeln och fyll i den genererade säkerhetskoden här nedan.
+  Description: Bekräfta med en andra faktor. Ladda ned en autentiserings-app (t.ex. Google/Microsoft Authenticator, Authy) om du inte redan har en.
+  OTPDescription: Skanna koden med din autentiserings-app (t.ex. Google/Microsoft Authenticator, Authy). Eller kopiera nyckeln och fyll i den genererade säkerhetskoden här nedan.
   SecretLabel: Nyckel
   CodeLabel: Säkerhetskod
   NextButtonText: Fortsätt
@@ -129,7 +129,7 @@ InitMFAU2F:
   Title: Lägg till säkerhetsnyckel
   Description: Säkerhetsnycklar kan genereras från din mobil, via Bluetooth eller från en enhet som kopplas till din dators USB-port.
   TokenNameLabel: Namnge enheten som skapar säkerhetsnycklar
-  NotSupported: Din webbläsare har inte stöd för WebAuthN-standarden. Kontrollera att du har den senaste versionen, eller byt till en webbläsare med stöd (t ex Chrome, Safari, Firefox)
+  NotSupported: Din webbläsare har inte stöd för WebAuthN-standarden. Kontrollera att du har den senaste versionen, eller byt till en webbläsare med stöd (t.ex. Chrome, Safari, Firefox)
   RegisterTokenButtonText: Lägg till säkerhetsnyckel
   ErrorRetry: Försök igen. Skapa en ny kod eller pröva ett annat sätt.
 
@@ -140,43 +140,43 @@ InitMFADone:
   CancelButtonText: Avbryt
 
 MFAProvider:
-  Provider0: Mobil App (T ex Google/Microsoft Authenticator, Authy)
-  Provider1: Din fysiska mobil/laptop (T ex FaceID, Windows Hello, Fingeravtryck)
+  Provider0: Mobilapp (t.ex. Google/Microsoft Authenticator, Authy)
+  Provider1: Din fysiska mobil/laptop (t.ex. FaceID, Windows Hello, fingeravtryck)
   Provider3: Engångslösenord på SMS
   Provider4: Engångslösenord på E-Post
   ChooseOther: eller välj ett annat alternativ
 
 VerifyMFAOTP:
   Title: Verifiera tvåfaktor
-  Description: Verifiera med kod från din Tvåfaktor-enhet
+  Description: Verifiera med kod från din tvåfaktor-enhet
   CodeLabel: Kod
   NextButtonText: Fortsätt
 
 VerifyOTP:
   Title: Verifiera tvåfaktor
-  Description: Verifiera med kod från din Tvåfaktor-enhet
+  Description: Verifiera med kod från din tvåfaktor-enhet
   CodeLabel: Kod
   ResendButtonText: Skicka ny kod
   NextButtonText: Fortsätt
 
 VerifyMFAU2F:
   Title: Verifiera tvåfaktor
-  Description: Verifiera med kod från din Tvåfaktor-enhet (t ex FaceID, Windows Hello, Fingeravtryck)
-  NotSupported: Din webbläsare har inte stöd för WebAuthN-standarden. Kontrollera att du har den senaste versionen, eller byt till en webbläsare med stöd (t ex Chrome, Safari, Firefox)
+  Description: Verifiera med kod från din tvåfaktor-enhet (t.ex. FaceID, Windows Hello, fingeravtryck)
+  NotSupported: Din webbläsare har inte stöd för WebAuthN-standarden. Kontrollera att du har den senaste versionen, eller byt till en webbläsare med stöd (t.ex. Chrome, Safari, Firefox)
   ErrorRetry: Försök igen, gör en ny förfrågan eller välj en annan metod.
   ValidateTokenButtonText: Verifiera tvåfaktor
 
 Passwordless:
   Title: Lösenordsfri inloggning
-  Description: Logga in med hjälp av din mobil/laptop (med t ex FaceID, Windows Hello, Fingeravtryck)
-  NotSupported: Din webbläsare har inte stöd för WebAuthN-standarden. Kontrollera att du har den senaste versionen, eller byt till en webbläsare med stöd (t ex Chrome, Safari, Firefox)
+  Description: Logga in med hjälp av din mobil/laptop (med t.ex. FaceID, Windows Hello, fingeravtryck).
+  NotSupported: Din webbläsare har inte stöd för WebAuthN-standarden. Kontrollera att du har den senaste versionen, eller byt till en webbläsare med stöd (t.ex. Chrome, Safari, Firefox)
   ErrorRetry: Försök igen. Skapa en ny kod eller pröva ett annat sätt.
   LoginWithPwButtonText: Logga in med lösenord
   ValidateTokenButtonText: Lösenordsfri inloggning
 
 PasswordlessPrompt:
   Title: Lösenordsfri inloggning
-  Description: Vill du konfigurera lösenordsfri inloggning med hjälp av din mobil/laptop? (via t exFaceID, Windows Hello eller Fingeravtryck)
+  Description: Vill du konfigurera lösenordsfri inloggning med hjälp av din mobil/laptop? (via t.ex. FaceID, Windows Hello eller fingeravtryck)
   DescriptionInit: You need to set up passwordless login. Use the link you were given to register your device.
   PasswordlessButtonText: Go passwordless
   NextButtonText: Fortsätt
@@ -184,9 +184,9 @@ PasswordlessPrompt:
 
 PasswordlessRegistration:
   Title: Konfigurera lösenordsfri inloggning
-  Description: Välj ett beskrivande namn för din inloggningsenhet och klicka sen på 'Konfigurera lösenordsfritt'-knappen nedan
+  Description: Välj ett beskrivande namn för din inloggningsenhet och klicka sen på 'Konfigurera lösenordsfritt'-knappen nedan.
   TokenNameLabel: Namn på enheten
-  NotSupported: Din webbläsare har inte stöd för WebAuthN-standarden. Kontrollera att du har den senaste versionen, eller byt till en webbläsare med stöd (t ex Chrome, Safari, Firefox)
+  NotSupported: Din webbläsare har inte stöd för WebAuthN-standarden. Kontrollera att du har den senaste versionen, eller byt till en webbläsare med stöd (t.ex. Chrome, Safari, Firefox)
   RegisterTokenButtonText: Konfigurera lösenordsfritt
   ErrorRetry: Försök igen. Skapa en ny kod eller pröva ett annat sätt.
 
@@ -214,7 +214,7 @@ PasswordChangeDone:
   NextButtonText: Fortsätt
 
 PasswordResetDone:
-  Title: Länk för att återställa Lösenord har skickats.
+  Title: Länk för att återställa lösenord har skickats
   Description: Kontrollera din inkorg för e-post för vidare instruktioner om hur du återställer ditt lösenord.
   NextButtonText: Fortsätt
 
@@ -234,7 +234,7 @@ EmailVerificationDone:
 
 RegisterOption:
   Title: Registrera användarkonto
-  Description: Hur vill du registrera dig?
+  Description: Välj hur du vill registrera dig
   RegisterUsernamePasswordButtonText: Med användarnamn och lösenord
   ExternalLoginDescription: Med ett extern användarkonto
   LoginButtonText: Logga in
@@ -294,7 +294,7 @@ ExternalRegistrationUserOverview:
   LastnameLabel: Efternamn
   NicknameLabel: Tilltalsnamn
   PhoneLabel: Mobilnummer
-  LanguageLabel: språk
+  LanguageLabel: Språk
   German: Deutsch
   English: English
   Italian: Italiano
@@ -328,7 +328,7 @@ ExternalRegistrationUserOverview:
 
 RegistrationOrg:
   Title: Registrering av organisation
-  Description: Ange din organisation-data
+  Description: Ange din organisations namn och användardata.
   OrgNameLabel: Namn på organisation
   EmailLabel: E-post
   UsernameLabel: Användarnamn
@@ -368,7 +368,7 @@ LinkingUsersDone:
 
 ExternalNotFound:
   Title: Det finns inget konto
-  Description: Du kan registrera ett nytt konto eller koppla ihop det här kontot med ett befintligt.
+  Description: Externt konto hittades inte. Vill du länka ditt konto eller registrera ett nytt?
   LinkButtonText: Koppla ihop
   AutoRegisterButtonText: Registrera nytt
   TosConfirm: Jag accepterar
@@ -421,7 +421,7 @@ Footer:
   Tos: Användarvillkor
   PrivacyPolicy: Personuppgiftspolicy
   Help: Hjälp
-  SupportEmail: Kundsupport E-post
+  SupportEmail: Kundsupport e-post
 
 SignIn: Logga in med {{.Provider}}
 
