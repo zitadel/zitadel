@@ -1,0 +1,55 @@
+version: 2
+
+project_name: zitadel
+
+dist: .artifacts/cli
+
+builds:
+  - id: zitadel-cli
+    dir: apps/cli
+    main: .
+    binary: zitadel-cli
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X github.com/zitadel/zitadel/cmd/build.version={{.Version}}
+      - -X github.com/zitadel/zitadel/cmd/build.commit={{.ShortCommit}}
+      - -X github.com/zitadel/zitadel/cmd/build.date={{.Date}}
+
+archives:
+  - id: zitadel-cli
+    ids:
+      - zitadel-cli
+    name_template: "zitadel-cli-{{ .Os }}-{{ .Arch }}"
+    formats:
+      - tar.gz
+    files:
+      - apps/cli/README.md
+      - LICENSE
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  use: github
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^chore:"
+      - "^ci:"
+      - "^test:"
+
+release:
+  github:
+    owner: zitadel
+    name: zitadel
+  draft: true
