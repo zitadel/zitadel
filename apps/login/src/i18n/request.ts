@@ -1,3 +1,4 @@
+import { resolveLanguage } from "@/lib/auth-utils";
 import { LANGS, LANGUAGE_COOKIE_NAME, LANGUAGE_HEADER_NAME } from "@/lib/i18n";
 import { getServiceConfig } from "@/lib/service-url";
 import { getAllowedLanguages, getHostedLoginTranslation } from "@/lib/zitadel";
@@ -33,17 +34,17 @@ export default getRequestConfig(async () => {
 
   const languageHeader = await (await headers()).get(LANGUAGE_HEADER_NAME);
   if (languageHeader) {
-    // splits "en-US,en;q=0.9" to ["en", "US"] or ["en"]
-    const headerLocale = languageHeader.split(",")[0].split("-")[0];
-    if (allowedLanguages.includes(headerLocale)) {
+    const headerLocale = resolveLanguage(languageHeader.split(",")[0].split(";")[0]);
+    if (headerLocale && allowedLanguages.includes(headerLocale)) {
       locale = headerLocale;
     }
   }
 
   const languageCookie = cookiesList?.get(LANGUAGE_COOKIE_NAME);
   if (languageCookie && languageCookie.value) {
-    if (allowedLanguages.includes(languageCookie.value)) {
-      locale = languageCookie.value;
+    const cookieLocale = resolveLanguage(languageCookie.value);
+    if (cookieLocale && allowedLanguages.includes(cookieLocale)) {
+      locale = cookieLocale;
     } else {
       // If the cookie tells a language that is other than the supported ones, fall back to the default.
       locale = defaultLanguage;

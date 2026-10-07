@@ -1,0 +1,503 @@
+Login:
+  Title: 歡迎回來！
+  Description: 輸入您的登入資料。
+  TitleLinking: 登入以進行使用者連結
+  DescriptionLinking: 輸入您的登入資料以將您的外部使用者與 Zitadel 使用者關聯。
+  LoginNameLabel: 登入名稱
+  UsernamePlaceHolder: 使用者名稱
+  LoginnamePlaceHolder: username@domain
+  ExternalUserDescription: 使用外部使用者登入。
+  MustBeMemberOfOrg: 使用者必須是 {{.OrgName}} 組織的成員。
+  RegisterButtonText: 註冊
+  NextButtonText: 繼續
+LDAP:
+  Title: 註冊
+  Description: 輸入您的登入資料。
+  LoginNameLabel: 登入名稱
+  PasswordLabel: 密碼
+  NextButtonText: 繼續
+SelectAccount:
+  Title: 選擇帳戶
+  Description: 使用您的 Zitadel 帳戶
+  TitleLinking: 選擇用於使用者連結的帳戶
+  DescriptionLinking: 選擇您的帳戶以與您的外部使用者關聯。
+  OtherUser: 其他使用者
+  SessionState0: 啟用
+  SessionState1: 未登入
+  MustBeMemberOfOrg: 使用者必須是 {{.OrgName}} 組織的成員。
+Password:
+  Title: 密碼
+  Description: 輸入您的登入資料。
+  PasswordLabel: 密碼
+  MinLength: 必須至少有
+  MinLengthp2: 個字元。
+  MaxLength: 必須少於70個字元。
+  HasUppercase: 必須包含一個大寫字母。
+  HasLowercase: 必須包含一個小寫字母。
+  HasNumber: 必須包含一個數字。
+  HasSymbol: 必須包含一個符號。
+  Confirmation: 密碼確認匹配。
+  ResetLinkText: 重設密碼
+  BackButtonText: 返回
+  NextButtonText: 下一步
+UsernameChange:
+  Title: 更改使用者名稱
+  Description: 設定您的新使用者名稱
+  UsernameLabel: 使用者名稱
+  CancelButtonText: 取消
+  NextButtonText: 繼續
+UsernameChangeDone:
+  Title: 使用者名稱已更改
+  Description: 您的使用者名稱已成功更改。
+  NextButtonText: 繼續
+InitPassword:
+  Title: 設定密碼
+  Description: 您將到一個驗證碼，您必須在下面輸入該驗證碼以設定您的新密碼。
+  CodeLabel: 驗證碼
+  NewPasswordLabel: 新密碼
+  NewPasswordConfirmLabel: 確認密碼
+  ResendButtonText: 重發驗證碼
+  NextButtonText: 繼續
+InitPasswordDone:
+  Title: 密碼設定
+  Description: 密碼設定成功
+  NextButtonText: 繼續
+  CancelButtonText: 取消
+InitUser:
+  Title: 啟用使用者
+  Description: 請在下面輸入您收到的驗證碼，以驗證您的電子郵件並設定您的密碼。
+  CodeLabel: 驗證碼
+  NewPasswordLabel: 新密碼
+  NewPasswordConfirm: 確認密碼
+  NextButtonText: 繼續
+  ResendButtonText: 重發驗證碼
+InitUserDone:
+  Title: 使用者已啟用
+  Description: 電子郵件驗證和密碼設定成功
+  NextButtonText: 繼續
+  CancelButtonText: 取消
+InviteUser:
+  Title: 啟用使用者
+  Description: 使用以下驗證碼驗證您的電子郵件並設定您的密碼。
+  CodeLabel: 驗證碼
+  NewPasswordLabel: 新密碼
+  NewPasswordConfirm: 確認密碼
+  NextButtonText: 下一步
+  ResendButtonText: 重新傳送驗證碼
+InitMFAPrompt:
+  Title: 兩步驗證設定
+  Description: 兩步驗證為您的帳戶提供了額外的安全保障。這確保只有你能存取你的帳戶。
+  Provider0: 軟體應用（如 Google/Microsoft Authenticator、Authy）
+  Provider1: 硬體裝置（如 Face ID、Windows Hello、指紋）
+  Provider3: 一次性密碼簡訊
+  Provider4: 一次性密碼電子郵件
+  NextButtonText: 繼續
+  SkipButtonText: 跳過
+InitMFAOTP:
+  Title: 雙因素驗證
+  Description: 建立你的雙因素。如果你還沒有，請下載一個驗證器應用程式。
+  OTPDescription: 使用您的身分驗證器應用程式（例如 Google Authenticator）掃描驗證碼或複製密碼並在下方插入生成的驗證碼。
+  SecretLabel: 秘鑰
+  CodeLabel: 驗證碼
+  NextButtonText: 繼續
+  CancelButtonText: 取消
+InitMFAOTPSMS:
+  Title: 雙因素驗證
+  DescriptionPhone: 建立雙因素身分驗證。輸入您的電話號碼進行驗證。
+  DescriptionCode: 建立雙因素身分驗證。輸入收到的驗證碼以驗證您的電話號碼。
+  CountryCodeLabel: 國家
+  PhoneLabel: 電話號碼
+  CodeLabel: 驗證碼
+  EditButtonText: 編輯
+  ResendButtonText: 重發驗證碼
+  NextButtonText: 繼續
+InitMFAU2F:
+  Title: 新增安全金鑰
+  Description: 安全金鑰是一種驗證方法，可以內建在手機中、使用藍芽或直接插入計算機的 USB 埠。
+  TokenNameLabel: 雙因素/裝置的名稱
+  NotSupported: 您的瀏覽器不支援 WebAuthN。請確保它是最新的或使用其他版本（例如 Chrome、Safari、Firefox）
+  RegisterTokenButtonText: 註冊雙因素
+  ErrorRetry: 重試、建立新挑戰碼或選擇不同的方法。
+InitMFADone:
+  Title: 雙因素驗證設定完成
+  Description: 您已完成雙因素驗證設定。往後登入時，請使用您設定的第二驗證方式。
+  NextButtonText: 繼續
+  CancelButtonText: 取消
+MFAProvider:
+  Provider0: 軟體應用（如 Google/Microsoft Authenticator、Authy）
+  Provider1: 硬體裝置（如 Face ID、Windows Hello、指紋）
+  Provider3: 一次性密碼簡訊
+  Provider4: 一次性密碼電子郵件
+  ChooseOther: 或選擇其他選項
+VerifyMFAOTP:
+  Title: 驗證2-Factor
+  Description: 驗證你的第二個因素
+  CodeLabel: 驗證碼
+  NextButtonText: 繼續
+VerifyOTP:
+  Title: 驗證2-Factor
+  Description: 驗證你的第二個因素
+  CodeLabel: 驗證碼
+  ResendButtonText: 重發驗證碼
+  NextButtonText: 繼續
+VerifyMFAU2F:
+  Title: 驗證2-Factor
+  Description: 用註冊的裝置驗證你的2-Factor（如FaceID、Windows Hello、Fingerprint）。
+  NotSupported: 您的瀏覽器不支援 WebAuthN。確保您使用的是最新版本或將您的瀏覽器更改為受支援的版本（Chrome、Safari、Firefox）
+  ErrorRetry: 重試、建立新請求或選擇其他方法。
+  ValidateTokenButtonText: 驗證2-Factor
+Passwordless:
+  Title: 無密碼登入
+  Description: 用你的裝置提供的驗證方式登入，如FaceID、Windows Hello或指紋。
+  NotSupported: 您的瀏覽器不支援 WebAuthN。請確保它是最新的或使用其他版本（例如 Chrome、Safari、Firefox）
+  ErrorRetry: 重試、建立新挑戰碼或選擇不同的方法。
+  LoginWithPwButtonText: 使用密碼登入
+  ValidateTokenButtonText: 使用無密碼登入
+PasswordlessPrompt:
+  Title: 無密碼登入設定
+  Description: 您想設定無密碼登入嗎？你的裝置的驗證方式，如FaceID、Windows Hello或指紋。
+  DescriptionInit: 您需要設定無密碼登入，使用您提供的連結來註冊您的裝置。
+  PasswordlessButtonText: 去設定無密碼登入
+  NextButtonText: 繼續
+  SkipButtonText: 跳過
+PasswordlessRegistration:
+  Title: 無密碼設定
+  Description: 透過提供一個名稱（如 MyMobilePhone、MacBook等），然後點選下面的 "註冊無密碼" 按鈕，新增你的認證。
+  TokenNameLabel: 裝置的名稱
+  NotSupported: 您的瀏覽器不支援 WebAuthN。請確保它是最新的或使用其他版本（例如 Chrome、Safari、Firefox）
+  RegisterTokenButtonText: 註冊無密碼
+  ErrorRetry: 重試、建立新挑戰碼或選擇不同的方法。
+PasswordlessRegistrationDone:
+  Title: 無密碼登入設定完成
+  Description: 成功新增無密碼的裝置。
+  DescriptionClose: 您現在可以關閉此視窗
+  NextButtonText: 繼續
+  CancelButtonText: 取消
+PasswordChange:
+  Title: 變更密碼
+  Description: 更改您的密碼。輸入您的舊密碼和新密碼。
+  ExpiredDescription: 您的密碼已過期，需要更改。請輸入您的新舊密碼。
+  OldPasswordLabel: 舊密碼
+  NewPasswordLabel: 新密碼
+  NewPasswordConfirmLabel: 確認密碼
+  CancelButtonText: 取消
+  NextButtonText: 繼續
+  Footer: 頁尾
+PasswordChangeDone:
+  Title: 變更密碼
+  Description: 您的密碼已成功更改。
+  NextButtonText: 繼續
+PasswordResetDone:
+  Title: 傳送密碼重設連結
+  Description: 請檢查您的電子郵件以重設您的密碼。
+  NextButtonText: 繼續
+EmailVerification:
+  Title: 電子郵件驗證
+  Description: 我們已向您傳送一封電子郵件以驗證您的地址。請在下面的表格中輸入驗證碼。
+  CodeLabel: 驗證碼
+  NextButtonText: 繼續
+  ResendButtonText: 重發驗證碼
+EmailVerificationDone:
+  Title: 電子郵件驗證
+  Description: 您的電子郵件地址已成功驗證。
+  NextButtonText: 繼續
+  CancelButtonText: 取消
+  LoginButtonText: 登入
+RegisterOption:
+  Title: 註冊選項
+  Description: 選擇您的註冊方式
+  RegisterUsernamePasswordButtonText: 使用使用者名稱密碼
+  ExternalLoginDescription: 或使用外部身分提供者
+  LoginButtonText: 登入
+RegistrationUser:
+  Title: 註冊
+  Description: 輸入您的使用者資料。您的電子郵件地址將用作登入名稱。
+  DescriptionOrgRegister: 輸入您的使用者資料。
+  EmailLabel: 電子郵件
+  UsernameLabel: 使用者名稱
+  FirstnameLabel: 名
+  LastnameLabel: 姓
+  LanguageLabel: 語言
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 簡體中文
+  ChineseTraditional: 繁體中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  GenderLabel: 性別
+  Female: 女性
+  Male: 男性
+  Diverse: 其他 / X
+  PasswordLabel: 密碼
+  PasswordConfirmLabel: 確認密碼
+  TosAndPrivacyLabel: 條款和條款
+  TosConfirm: 我接受
+  TosLinkText: 服務條款
+  PrivacyConfirm: 我接受
+  PrivacyLinkText: 隱私政策
+  ExternalLogin: 使用外部身分提供者註冊
+  BackButtonText: 登入
+  NextButtonText: 繼續
+ExternalRegistrationUserOverview:
+  Title: 外部使用者註冊
+  Description: 我們已從所選提供者處取得您的使用者詳細資訊。您現在可以更改或完善它們。
+  EmailLabel: 電子郵件
+  UsernameLabel: 使用者名稱
+  FirstnameLabel: 名
+  LastnameLabel: 姓
+  NicknameLabel: 暱稱
+  PhoneLabel: 手機號碼
+  LanguageLabel: 語言
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 簡體中文
+  ChineseTraditional: 繁體中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  TosAndPrivacyLabel: 條款和條款
+  TosConfirm: 我接受
+  TosLinkText: 服務條款
+  PrivacyConfirm: 我接受
+  PrivacyLinkText: 隱私政策
+  ExternalLogin: 使用外部身分提供者註冊
+  BackButtonText: 返回
+  NextButtonText: 儲存
+RegistrationOrg:
+  Title: 註冊組織
+  Description: 輸入您的組織名稱和使用者資料。
+  OrgNameLabel: 組織名稱
+  EmailLabel: 電子郵件
+  UsernameLabel: 使用者名稱
+  FirstnameLabel: 名
+  LastnameLabel: 姓
+  PasswordLabel: 密碼
+  PasswordConfirmLabel: 確認密碼
+  TosAndPrivacyLabel: 條款和條款
+  TosConfirm: 我接受
+  TosLinkText: 服務條款
+  PrivacyConfirm: 我接受
+  PrivacyLinkText: 隱私政策
+  SaveButtonText: 建立組織
+LoginSuccess:
+  Title: 登陸成功
+  AutoRedirectDescription: 您將被自動引導至您的應用程式。如果沒有，請單擊下面的按鈕。之後您可以關閉視窗。
+  RedirectedDescription: 您現在可以關閉此視窗。
+  NextButtonText: 繼續
+LogoutDone:
+  Title: 退出登入
+  Description: 您已成功退出登入。
+  LoginButtonText: 登入
+LinkingUserPrompt:
+  Title: 已找到現有使用者
+  Description: '您想關聯您現有的帳戶嗎:'
+  LinkButtonText: 關聯
+  OtherButtonText: 其他選項
+LinkingUsersDone:
+  Title: 使用者連結
+  Description: 使用者連結完成。
+  CancelButtonText: 取消
+  NextButtonText: 繼續
+ExternalNotFound:
+  Title: 找不到外部使用者
+  Description: 找不到外部使用者。你想連結你已存在的使用者還是自動註冊一個新使用者。
+  LinkButtonText: 連結
+  AutoRegisterButtonText: 註冊
+  TosAndPrivacyLabel: 條款和條款
+  TosConfirm: 我接受
+  TosLinkText: 服務條款
+  PrivacyConfirm: 我接受
+  PrivacyLinkText: 隱私政策
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 簡體中文
+  ChineseTraditional: 繁體中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+DeviceAuth:
+  Title: 裝置授權
+  UserCode:
+    Label: 使用者驗證碼
+    Description: 輸入裝置上顯示的使用者驗證碼。
+    ButtonNext: 下一個
+  Action:
+    Description: 授予裝置存取權限。
+    GrantDevice: 您即將授予裝置
+    AccessToScopes: 存取以下範圍
+    Button:
+      Allow: 允許
+      Deny: 否定
+  Done:
+    Description: 完畢。
+    Approved: 裝置授權已批准。 您現在可以返回裝置。
+    Denied: 裝置授權被拒絕。 您現在可以返回裝置。
+Footer:
+  PoweredBy: Powered By
+  Tos: 服務條款
+  PrivacyPolicy: 隱私政策
+  Help: 協助
+  SupportEmail: 支援電子郵件
+SignIn: 透過 {{.Provider}} 登入
+Errors:
+  Internal: 發生了內部錯誤
+  AuthRequest:
+    NotFound: 找不到授權請求
+    UserAgentNotCorresponding: 使用者代理未響應
+    UserAgentNotFound: 找不到使用者代理 ID
+    TokenNotFound: 找不到令牌
+    RequestTypeNotSupported: 不支援請求的型別
+    MissingParameters: 缺少必需的引數
+  User:
+    NotFound: 找不到使用者
+    AlreadyExists: 使用者已存在
+    Inactive: 使用者處於停用狀態
+    NotFoundOnOrg: 在所選組織中找不到使用者
+    NotAllowedOrg: 使用者不是所需組織的成員
+    NotMatchingUserID: 身分驗證請求中的使用者資訊不匹配
+    UserIDMissing: 使用者 ID 為空
+    Invalid: 無效的使用者資料
+    DomainNotAllowedAsUsername: 網域已存在，但無法使用
+    NotAllowedToLink: 不允許使用者使用外部身分提供者註冊
+    Profile:
+      NotFound: 找不到個人資料
+      NotChanged: 個人資料未更改
+      Empty: 簡介是空的
+      FirstNameEmpty: 個人資料中的名字為空
+      LastNameEmpty: 個人資料中的姓氏為空
+      IDMissing: 簡介ID丟失
+    Email:
+      NotFound: 電子郵件找不到
+      Invalid: 電子郵件無效
+      AlreadyVerified: 電子郵件已經過驗證
+      NotChanged: 電子郵件未更改
+      Empty: 電子郵件是空的
+      IDMissing: 電子郵件ID丟失
+    Phone:
+      NotFound: 手機號碼找不到
+      Invalid: 手機號碼無效
+      AlreadyVerified: 手機號碼已經驗證
+      Empty: 電話號碼是空的
+      NotChanged: 電話號碼沒有改變
+    Address:
+      NotFound: 找不到地址
+      NotChanged: 地址沒有改變
+    Username:
+      AlreadyExists: 使用者名稱已被使用
+      Reserved: 使用者名稱已被使用
+      Empty: 使用者名稱是空的
+    Password:
+      ConfirmationWrong: 密碼不一致
+      Empty: 密碼為空
+      Invalid: 密碼無效
+      InvalidAndLocked: 密碼無效且使用者被鎖定，請聯絡您的管理員。
+      NotChanged: 新密碼不能與您目前的密碼相同
+    UsernameOrPassword:
+      Invalid: 使用者名稱或密碼無效
+    PasswordComplexityPolicy:
+      NotFound: 找不到密碼策略
+      MinLength: 密碼太短
+      HasLower: 密碼必須包含小寫字母
+      HasUpper: 密碼必須包含大寫字母
+      HasNumber: 密碼必須包含數字
+      HasSymbol: 密碼必須包含符號
+    Code:
+      Expired: 驗證碼已過期
+      Invalid: 無效的驗證碼
+      Empty: 驗證碼不能為空
+      CryptoCodeNil: 加密驗證碼為空
+      NotFound: 找不到驗證碼
+      GeneratorAlgNotSupported: 不支援的生成器演算法
+    EmailVerify:
+      UserIDEmpty: 使用者 ID 為空
+    ExternalData:
+      CouldNotRead: 無法正確讀取外部資料
+    MFA:
+      NoProviders: 沒有可用的多因素提供者
+      OTP:
+        AlreadyReady: OTP (一次性密碼) 已設定
+        NotExisting: OTP (一次性密碼) 不存在
+        InvalidCode: 無效的驗證碼
+        Reused: 此驗證碼已被使用。請等待新的驗證碼
+        NotReady: OTP (一次性密碼) 還沒準備好
+    Locked: 使用者被鎖定
+    SomethingWentWrong: 似乎出問題了
+    NotActive: 使用者已停用
+    ExternalIDP:
+      IDPTypeNotImplemented: IDP 型別未實現
+      NotAllowed: 不允許使用外部身分提供者登入
+      IDPConfigIDEmpty: 身分提供者 ID 為空
+      ExternalUserIDEmpty: 外部使用者 ID 為空
+      UserDisplayNameEmpty: 使用者顯示名稱為空
+      NoExternalUserData: 未收到外部使用者資料
+      CreationNotAllowed: 不允許在該提供者上建立新使用者
+      LinkingNotAllowed: 在此提供者上不允許連結一個使用者
+      NoOptionAllowed: 此提供者不允許建立或連結。請聯絡您的管理員。
+      LoginFailedSwitchLocal: '外部身分提供者的登入失敗。返回到本機登入。
+
+
+        錯誤詳情: {{.Details}}
+
+        '
+    GrantRequired: 無法登入，使用者需要在應用程式上擁有至少一項授權，請聯絡您的管理員。
+    ProjectRequired: 無法登入，使用者的組織必須授予專案，請聯絡您的管理員。
+  IdentityProvider:
+    InvalidConfig: 身分提供者設定無效
+  IAM:
+    LockoutPolicy:
+      NotExisting: 使用者鎖定政策不存在
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: 不允許註冊
+  DeviceAuth:
+    NotExisting: 使用者驗證碼不存在
+optional: (可選)

@@ -223,6 +223,7 @@ RegistrationUser:
   Italian: Olasz
   French: Francia
   Chinese: Egyszerűsített Kínai
+  ChineseTraditional: 繁體中文
   Polish: Lengyel
   Japanese: Japán
   Spanish: Spanyol
@@ -269,6 +270,7 @@ ExternalRegistrationUserOverview:
   Italian: Olasz
   French: Francia
   Chinese: Egyszerűsített kínai
+  ChineseTraditional: 繁體中文
   Polish: Lengyel
   Japanese: Japán
   Spanish: Spanyol
@@ -344,6 +346,7 @@ ExternalNotFound:
   Italian: Olasz
   French: Francia
   Chinese: Egyszerűsített kínai
+  ChineseTraditional: 繁體中文
   Polish: Lengyel
   Japanese: Japán
   Spanish: Spanyol

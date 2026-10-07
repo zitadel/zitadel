@@ -1,0 +1,2911 @@
+{
+  "APP_NAME": "Zitadel",
+  "DESCRIPTIONS": {
+    "METADATA_TITLE": "後設資料",
+    "HOME": {
+      "TITLE": "開始使用Zitadel",
+      "NEXT": {
+        "TITLE": "你的下一步",
+        "DESCRIPTION": "完成以下步驟來保護你的應用程式。",
+        "CREATE_PROJECT": {
+          "TITLE": "建立專案",
+          "DESCRIPTION": "新增專案並定義角色及角色分配。"
+        }
+      },
+      "MORE_SHORTCUTS": {
+        "GET_STARTED": {
+          "TITLE": "開始",
+          "DESCRIPTION": "跟隨快速啟動指南一步一步開始構建。"
+        },
+        "DOCS": {
+          "TITLE": "文件",
+          "DESCRIPTION": "探索Zitadel的知識庫，熟悉核心概念和思想。學習Zitadel的工作原理和如何使用它。"
+        },
+        "EXAMPLES": {
+          "TITLE": "示例和軟體開發工具包",
+          "DESCRIPTION": "瀏覽我們的示例和SDK，以你喜歡的程式語言和工具一起使用Zitadel。"
+        }
+      }
+    },
+    "ORG": {
+      "TITLE": "組織",
+      "DESCRIPTION": "一個組織託管使用者、帶有應用的專案、身分提供者和設定，如公司品牌。你想跨多個組織共享設定嗎？設定預設設定。",
+      "METADATA": "為組織新增自定義屬性，如其位置或在其他系統中的識別符號。你可以在你的行動中使用這些資訊。"
+    },
+    "PROJECTS": {
+      "TITLE": "專案",
+      "DESCRIPTION": "一個專案託管一個或多個應用，你可以用它們來驗證你的使用者。例如，你可能有一個包含3個應用的專案；一個用於你的Web前端，一個用於你的移動應用，一個用於你的後端。你還可以透過專案對使用者進行授權。為了允許其他組織的使用者登入到你的應用，給予他們存取你的專案的權限。<br/><br/>如果你找不到一個專案，請聯絡專案所有者或擁有相應權利的人以獲得存取權限。",
+      "OWNED": {
+        "TITLE": "所擁有的專案",
+        "DESCRIPTION": "這些是您擁有的專案。您可以管理其設定、角色分配和應用程式。"
+      },
+      "GRANTED": {
+        "TITLE": "授予的專案",
+        "DESCRIPTION": "這些是其他組織授予你的專案。透過授予的專案，你可以讓你的使用者存取其他組織的應用。"
+      }
+    },
+    "USERS": {
+      "TITLE": "使用者",
+      "DESCRIPTION": "使用者是可以存取你的應用的人或服務帳戶。",
+      "HUMANS": {
+        "TITLE": "使用者",
+        "DESCRIPTION": "使用者在瀏覽器工作階段中透過登入提示進行互動身分驗證。",
+        "METADATA": "為使用者新增自定義屬性，如部門。你可以在你的行動中使用這些資訊。"
+      },
+      "MACHINES": {
+        "TITLE": "服務帳戶",
+        "DESCRIPTION": "服務帳戶使用使用私鑰簽名的 JWT 不記名令牌進行非互動式身分驗證。他們還可以使用個人存取令牌。",
+        "METADATA": "為使用者新增自定義屬性，如認證系統。你可以在你的行動中使用這些資訊。"
+      },
+      "SELF": {
+        "METADATA": "為你自己新增自定義屬性，如你的部門。你可以在你的組織的行動中使用這些資訊。"
+      }
+    },
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "角色分配",
+      "DESCRIPTION": "角色分配定義使用者對專案的存取權限。您可以授予使用者存取專案的權限，並定義他們在專案中的角色。"
+    },
+    "ACTIONS": {
+      "TITLE": "操作",
+      "DESCRIPTION": "在使用者在Zitadel進行認證時發生的事件上執行自定義驗證碼。自動化您的流程，豐富您使用者的後設資料和令牌或通知外部系統。",
+      "SCRIPTS": {
+        "TITLE": "指令碼",
+        "DESCRIPTION": "編寫一次JavaScript驗證碼，並在多個流程中觸發它。"
+      },
+      "FLOWS": {
+        "TITLE": "流程",
+        "DESCRIPTION": "選擇一個認證流程，並在該流程中的特定事件上觸發您的操作。"
+      },
+      "ACTIONSTWO_NOTE": "Actions V2，一個全新改進版的Actions，現在已上線。目前版本仍可使用，但未來開發將專注於新版本，最終將取代目前版本。"
+    },
+    "SETTINGS": {
+      "INSTANCE": {
+        "TITLE": "預設設定",
+        "DESCRIPTION": "所有組織的預設設定。有了正確的權限，其中一些權限在組織設定中是可以覆蓋的。"
+      },
+      "ORG": {
+        "TITLE": "組織設定",
+        "DESCRIPTION": "自定義您的組織設定。"
+      },
+      "FEATURES": {
+        "TITLE": "功能設定",
+        "DESCRIPTION": "解鎖您的執行個體的功能。"
+      },
+      "IDPS": {
+        "TITLE": "身分提供者",
+        "DESCRIPTION": "建立並啟用外部身分提供者。選擇一個知名提供者或根據您的選擇設定任何其他相容OIDC、OAuth或SAML的提供者。您甚至可以透過設定JWT身分提供者，使用您現有的JWT令牌作為聯合身分。",
+        "NEXT": "下一步？",
+        "SAML": {
+          "TITLE": "設定你的SAML身分提供者",
+          "DESCRIPTION": "Zitadel已設定。現在需要設定你的SAML身分提供者。大多數提供者允許你直接上傳整個Zitadel後設資料XML。其他提供者可能僅要求你提供一些特定的URL，例如實體ID（後設資料URL）、斷言消費服務（ACS）URL或單點登出URL。"
+        },
+        "CALLBACK": {
+          "TITLE": "設定你的{{ provider }}身分提供者",
+          "DESCRIPTION": "在你能設定Zitadel之前，將這個URL傳遞給你的身分提供者，以便在認證後啟用瀏覽器重新導向回到Zitadel。"
+        },
+        "JWT": {
+          "TITLE": "將JWT用作聯合身分",
+          "DESCRIPTION": "JWT身分提供者使你能夠將現有的JWT令牌用作聯合身分。如果你已經有一個JWT發行者，這個功能非常有用。使用JWT IdP，你可以利用這些JWT即時建立和更新Zitadel中的使用者。"
+        },
+        "LDAP": {
+          "TITLE": "設定Zitadel以連線到你的LDAP身分提供者",
+          "DESCRIPTION": "提供你的LDAP伺服器的連線細節，並設定你的LDAP屬性到Zitadel屬性的對映。"
+        },
+        "AUTOFILL": {
+          "TITLE": "自動填充使用者資料",
+          "DESCRIPTION": "使用一個操作來改善使用者體驗。你可以使用身分提供者的值預填充Zitadel的登錄檔單。"
+        },
+        "ACTIVATE": {
+          "TITLE": "啟用IdP",
+          "DESCRIPTION": "你的IdP尚未啟用。啟用它，以允許你的使用者登入。"
+        }
+      },
+      "PW_COMPLEXITY": {
+        "TITLE": "密碼複雜度",
+        "DESCRIPTION": "透過定義複雜度規則，確保您的使用者使用強密碼。"
+      },
+      "BRANDING": {
+        "TITLE": "品牌",
+        "DESCRIPTION": "自定義登入表單的外觀和感覺。完成時記得應用您的設定。"
+      },
+      "PRIVACY_POLICY": {
+        "TITLE": "外部連結",
+        "DESCRIPTION": "引導您的使用者存取登入頁面上顯示的自定義外部資源。使用者需要先接受服務條款和隱私政策，然後才能註冊。更改文件的連結或設定空字串以在管理控制檯中隱藏文件按鈕。在管理控制檯中新增自定義外部連結和該連結的自定義文字，或將它們設定為空以隱藏該按鈕。"
+      },
+      "SMTP_PROVIDER": {
+        "TITLE": "SMTP設定",
+        "DESCRIPTION": "設定您的SMTP伺服器，使用您的使用者知道並信任的網域作為發件人地址。"
+      },
+      "SMS_PROVIDER": {
+        "TITLE": "SMS設定",
+        "DESCRIPTION": "為了解鎖Zitadel的所有功能，設定Twilio向您的使用者傳送SMS訊息。"
+      },
+      "IAM_EVENTS": {
+        "TITLE": "事件",
+        "DESCRIPTION": "此頁面顯示您執行個體中的所有狀態更改，直到您執行個體的審計跟蹤限制為止。出於除錯目的按時間範圍過濾列表，或出於審計目的按彙總過濾列表。"
+      },
+      "IAM_FAILED_EVENTS": {
+        "TITLE": "失敗的事件",
+        "DESCRIPTION": "此頁面顯示您執行個體中的所有失敗事件。如果Zitadel的行為不符合您的預期，請始終首先檢查此列表。"
+      },
+      "IAM_VIEWS": {
+        "TITLE": "檢視",
+        "DESCRIPTION": "此頁面顯示您所有資料庫檢視以及它們處理最新事件的時間。如果您缺少某些資料，請檢查檢視是否是最新的。"
+      },
+      "LANGUAGES": {
+        "TITLE": "語言",
+        "DESCRIPTION": "限制登入表單和通知訊息翻譯到的語言。如果您想停用某些語言，請將它們拖到不允許的語言部分。您可以指定一個允許的語言作為預設語言。如果使用者偏好的語言不被允許，將使用預設語言。"
+      },
+      "SECRET_GENERATORS": {
+        "TITLE": "金鑰生成器",
+        "DESCRIPTION": "定義您的金鑰的複雜性和生命週期。更高的複雜性和生命週期可以提高安全性，較低的複雜性和生命週期可以提高解密效能。"
+      },
+      "SECURITY": {
+        "TITLE": "安全設定",
+        "DESCRIPTION": "啟用可能會影響安全性的Zitadel功能。在更改這些設定之前，您確實需要知道自己在做什麼。"
+      },
+      "OIDC": {
+        "TITLE": "OpenID Connect設定",
+        "DESCRIPTION": "設定您的OIDC令牌壽命。使用更短的壽命來增加使用者的安全性，使用更長的壽命來增加使用者的便利性。",
+        "LABEL_HOURS": "最大生命週期（小時）",
+        "LABEL_DAYS": "最大生命週期（天）",
+        "ACCESS_TOKEN": {
+          "TITLE": "存取令牌",
+          "DESCRIPTION": "存取令牌用於認證使用者。它是一個短期令牌，用於存取使用者的資料。使用短的生命週期來最小化未授權存取的風險。存取令牌可以使用重新整理令牌自動重新整理。"
+        },
+        "ID_TOKEN": {
+          "TITLE": "ID令牌",
+          "DESCRIPTION": "ID令牌是一個包含使用者宣告的JSON Web令牌（JWT）。ID令牌的生命週期不應超過存取令牌的生命週期。"
+        },
+        "REFRESH_TOKEN": {
+          "TITLE": "重新整理令牌",
+          "DESCRIPTION": "重新整理令牌用於取得新的存取令牌。它是一個長期令牌，用於重新整理存取令牌。當重新整理令牌過期時，使用者必須手動重新認證。"
+        },
+        "REFRESH_TOKEN_IDLE": {
+          "TITLE": "空閒重新整理令牌",
+          "DESCRIPTION": "空閒重新整理令牌的生命週期是重新整理令牌可以未使用的最長時間。"
+        }
+      },
+      "WEB_KEYS": {
+        "DESCRIPTION": "管理您的 OIDC Web 金鑰，以安全地簽署和驗證您的 Zitadel 執行個體的令牌。",
+        "TABLE": {
+          "TITLE": "活動和未來的 Web 金鑰",
+          "DESCRIPTION": "您的目前活動和即將啟用的 Web 金鑰。啟用新金鑰將會停用目前金鑰。",
+          "NOTE": "注意：JWKs OIDC 端點返回可快取的響應（預設 5 分鐘）。請避免過早啟用金鑰，否則它可能尚未在快取或應用中可用。",
+          "ACTIVATE": "啟用下一個 Web 金鑰",
+          "ACTIVE": "目前活動",
+          "NEXT": "佇列中的下一個",
+          "FUTURE": "未來",
+          "WARNING": "Web金鑰不到5分鐘。"
+        },
+        "CREATE": {
+          "TITLE": "建立新的 Web 金鑰",
+          "DESCRIPTION": "建立新的 Web 金鑰會將其新增到您的列表。Zitadel 預設使用 RSA2048 金鑰和 SHA256 雜湊演算法。",
+          "KEY_TYPE": "金鑰型別",
+          "BITS": "位數",
+          "HASHER": "雜湊演算法",
+          "CURVE": "曲線"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "先前的 Web 金鑰",
+          "DESCRIPTION": "這些是您之前使用但不再活動的 Web 金鑰。",
+          "DEACTIVATED_ON": "停用時間"
+        }
+      },
+      "MESSAGE_TEXTS": {
+        "TITLE": "訊息文字",
+        "DESCRIPTION": "自定義您的通知電子郵件或簡訊訊息的文字。如果您想停用某些語言，請在您的執行個體語言設定中限制它們。",
+        "TYPE_DESCRIPTIONS": {
+          "DC": "當您為您的組織宣告一個域時，那些在其登入名稱中未使用此域的使用者將被提示更改其登入名稱以匹配宣告的域。",
+          "INIT": "當建立使用者時，他們將收到一封帶有設定密碼連結的電子郵件。",
+          "PC": "當使用者更改其密碼時，如果您在通知設定中啟用了此功能，他們將收到有關更改的通知。",
+          "PL": "當使用者新增Passkey驗證方式時，他們需要透過點選電子郵件中的連結來啟用它。",
+          "PR": "當使用者重設其密碼時，他們將收到一封帶有設定新密碼連結的電子郵件。",
+          "VE": "當使用者更改其電子郵件地址時，他們將收到一封帶有驗證新地址連結的電子郵件。",
+          "VP": "當使用者更改其電話號碼時，他們將收到一條帶有驗證新號碼的驗證碼的簡訊。",
+          "VEO": "當使用者透過電子郵件方式新增 OTP 時，他們需要透過輸入傳送到其電子郵件地址的驗證碼來啟用它。",
+          "VSO": "當使用者透過簡訊方式新增 OTP 時，他們需要透過輸入傳送到其電話號碼的驗證碼來啟用它。",
+          "IU": "當建立使用者邀請驗證碼時，他們將收到一封包含設定其身分驗證方法的連結的電子郵件。"
+        }
+      },
+      "LOGIN_TEXTS": {
+        "TITLE": "登入介面文字",
+        "DESCRIPTION": "自定義您的登入表單的文字。如果文字為空，則佔位符顯示預設值。如果您想停用某些語言，請在您的執行個體語言設定中限制它們。"
+      },
+      "DOMAINS": {
+        "TITLE": "域設定",
+        "DESCRIPTION": "定義您的域上的限制並設定您的登入名稱模式。Zitadel在使用者輸入其登入名稱時立即選擇使用者的組織。因此，登入名稱需要跨所有組織唯一。如果您有在多個域中擁有帳戶的使用者，您可以透過在登入名稱後加上組織域來確保唯一性。",
+        "REQUIRE_VERIFICATION": {
+          "TITLE": "需要驗證自定義域",
+          "DESCRIPTION": "如果啟用此功能，組織域必須在它們可以用於域發現或使用者名稱字尾之前進行驗證。"
+        },
+        "LOGIN_NAME_PATTERN": {
+          "TITLE": "登入名稱模式",
+          "DESCRIPTION": "控制您使用者的登入名稱模式。"
+        },
+        "DOMAIN_VERIFICATION": {
+          "TITLE": "域驗證",
+          "DESCRIPTION": "僅允許您的組織使用它們實際控制的域。如果啟用，組織域將定期透過DNS或HTTP挑戰進行驗證，然後才能使用。這是一項安全功能，用於防止網域劫持。"
+        },
+        "SMTP_SENDER_ADDRESS": {
+          "TITLE": "SMTP發件人地址",
+          "DESCRIPTION": "僅當SMTP發件人地址匹配您的執行個體域之一時允許它。"
+        }
+      },
+      "LOGIN": {
+        "LIFETIMES": {
+          "TITLE": "登入有效期",
+          "DESCRIPTION": "透過減少一些與登入相關的最大有效期來加強您的安全性。",
+          "LABEL": "最大有效期（小時）",
+          "PW_CHECK": {
+            "TITLE": "密碼檢查",
+            "DESCRIPTION": "此期間後，使用者將需要使用密碼重新驗證。"
+          },
+          "EXT_LOGIN_CHECK": {
+            "TITLE": "外部登入檢查",
+            "DESCRIPTION": "您的使用者將在這些時期內被重新導向到他們的外部身分提供者。"
+          },
+          "MULTI_FACTOR_INIT": {
+            "TITLE": "多因素初始化檢查",
+            "DESCRIPTION": "如果您的使用者還沒有這樣做，他們將在這些時期內被提示設定第二因素或多因素認證。有效期為0將停用此提示。"
+          },
+          "SECOND_FACTOR_CHECK": {
+            "TITLE": "第二因素檢查",
+            "DESCRIPTION": "您的使用者必須在這些時期內重新驗證他們的第二因素。"
+          },
+          "MULTI_FACTOR_CHECK": {
+            "TITLE": "多因素檢查",
+            "DESCRIPTION": "您的使用者必須在這些時期內重新驗證他們的多因素認證。"
+          }
+        },
+        "FORM": {
+          "TITLE": "登入表單",
+          "DESCRIPTION": "自定義登入表單。",
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "允許本機身分驗證",
+            "DESCRIPTION": "允許您的使用者使用其使用者名稱和密碼或通行金鑰身分驗證登入。如果停用此選項，您的使用者只能使用外部身分提供者登入。"
+          },
+          "USER_REGISTRATION_ALLOWED": {
+            "TITLE": "允許使用者註冊",
+            "DESCRIPTION": "允許匿名使用者建立帳戶。"
+          },
+          "ORG_REGISTRATION_ALLOWED": {
+            "TITLE": "允許組織註冊",
+            "DESCRIPTION": "允許匿名使用者建立組織。"
+          },
+          "EXTERNAL_LOGIN_ALLOWED": {
+            "TITLE": "允許外部登入",
+            "DESCRIPTION": "允許使用者使用外部身分提供者登入，而不是使用Zitadel使用者登入。"
+          },
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "隱藏密碼重設",
+            "DESCRIPTION": "不允許使用者重設密碼。"
+          },
+          "DOMAIN_DISCOVERY_ALLOWED": {
+            "TITLE": "允許網域發現",
+            "DESCRIPTION": "根據使用者登入名稱的網域找到使用者的組織，例如他們的電子郵件地址。"
+          },
+          "IGNORE_UNKNOWN_USERNAMES": {
+            "TITLE": "忽略未知的使用者名稱",
+            "DESCRIPTION": "如果此功能被啟用，登入表單將不會顯示錯誤訊息，如果使用者名稱未知。這有助於防止使用者名稱猜測。"
+          },
+          "DISABLE_EMAIL_LOGIN": {
+            "TITLE": "停用電子郵件登入",
+            "DESCRIPTION": "如果此功能被啟用，你的使用者不能使用他們的電子郵件地址登入。注意，如果你停用此功能，你的使用者的電子郵件地址必須在所有組織中唯一，以便登入。"
+          },
+          "DISABLE_PHONE_LOGIN": {
+            "TITLE": "停用電話登入",
+            "DESCRIPTION": "如果此功能被啟用，你的使用者不能使用他們的電話號碼登入。注意，如果你停用此功能，你的使用者的電話號碼必須在所有組織中唯一，以便登入。"
+          }
+        }
+      }
+    }
+  },
+  "PAGINATOR": {
+    "PREVIOUS": "上一頁",
+    "NEXT": "下一頁",
+    "COUNT": "總數",
+    "MORE": "顯示更多"
+  },
+  "FOOTER": {
+    "LINKS": {
+      "CONTACT": "聯絡",
+      "TOS": "服務條款",
+      "PP": "隱私政策"
+    },
+    "THEME": {
+      "DARK": "深色",
+      "LIGHT": "淺色"
+    }
+  },
+  "HOME": {
+    "WELCOME": "開始使用 Zitadel",
+    "DISCLAIMER": "Zitadel 對您的資料進行保密和安全處理。",
+    "DISCLAIMERLINK": "更多的資訊",
+    "DOCUMENTATION": {
+      "DESCRIPTION": "快速開始使用 Zitadel。"
+    },
+    "GETSTARTED": {
+      "DESCRIPTION": "快速開始使用 Zitadel。"
+    },
+    "QUICKSTARTS": {
+      "LABEL": "第一步",
+      "DESCRIPTION": "快速開始使用 Zitadel。"
+    },
+    "SHORTCUTS": {
+      "SHORTCUTS": "快捷方式",
+      "SETTINGS": "可用的快捷方式",
+      "PROJECTS": "專案",
+      "REORDER": "按住並拖動來移動它",
+      "ADD": "按住並拖動來新增"
+    }
+  },
+  "ONBOARDING": {
+    "DESCRIPTION": "你的入職過程",
+    "MOREDESCRIPTION": "更多捷徑",
+    "COMPLETED": "已完成",
+    "DISMISS": "隱藏",
+    "CARD": {
+      "TITLE": "讓你的Zitadel運轉起來",
+      "DESCRIPTION": "這份清單有助於設定你的執行個體，並指導你完成最重要的步驟"
+    },
+    "MILESTONES": {
+      "instance.policy.label.added": {
+        "title": "設定你的品牌",
+        "description": "定義你的登入的顏色和形狀，上傳你的標誌和圖示。",
+        "action": "設定品牌"
+      },
+      "instance.smtp.config.added": {
+        "title": "SMTP設定",
+        "description": "設定你自己的郵件伺服器設定",
+        "action": "設定 SMTP 設定"
+      },
+      "PROJECT_CREATED": {
+        "title": "建立你的第一個專案",
+        "description": "新增專案並定義角色及角色分配。",
+        "action": "建立專案"
+      },
+      "APPLICATION_CREATED": {
+        "title": "註冊你的應用程式",
+        "description": "建立一個web、native、api或saml應用程式並設定你的認證流程。",
+        "action": "建立應用程式"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "登入你的應用程式",
+        "description": "將你的應用程式與 Zitadel 整合以進行身分驗證，並透過使用管理員使用者登入來測試它。",
+        "action": "登入"
+      },
+      "user.human.added": {
+        "title": "新增使用者",
+        "description": "新增你的應用程式使用者",
+        "action": "建立使用者"
+      },
+      "user.grant.added": {
+        "title": "授予使用者",
+        "description": "允許使用者存取你的應用程式並設定他們的角色。",
+        "action": "建立授權"
+      }
+    }
+  },
+  "MENU": {
+    "INSTANCE": "預設設定",
+    "DASHBOARD": "首頁",
+    "PERSONAL_INFO": "個人資訊",
+    "DOCUMENTATION": "文件",
+    "INSTANCEOVERVIEW": "執行個體",
+    "ORGS": "組織",
+    "VIEWS": "資料表",
+    "EVENTS": "活動",
+    "FAILEDEVENTS": "失敗事件",
+    "ORGANIZATION": "組織",
+    "PROJECT": "專案",
+    "PROJECTOVERVIEW": "概覽",
+    "PROJECTGRANTS": "專案授權",
+    "ROLES": "角色",
+    "GRANTEDPROJECT": "已授予的專案",
+    "HUMANUSERS": "使用者",
+    "MACHINEUSERS": "服務帳戶",
+    "LOGOUT": "退出所有帳戶",
+    "NEWORG": "建立組織",
+    "IAMADMIN": "您是執行個體管理員。請注意您具有擴充套件權限。",
+    "SHOWORGS": "檢視所有組織",
+    "GRANTS": "角色分配",
+    "ACTIONS": "認證流程",
+    "PRIVACY": "隱私",
+    "TOS": "服務條款",
+    "OPENSHORTCUTSTOOLTIP": "按下 ？鍵檢視快捷鍵",
+    "SETTINGS": "設定",
+    "CUSTOMERPORTAL": "客戶入口網站",
+    "TARGETS": "目標"
+  },
+  "QUICKSTART": {
+    "TITLE": "將 Zitadel 整合到您的應用程式中",
+    "DESCRIPTION": "將 Zitadel 整合到您的應用程式中，或使用我們的示例，幾分鐘內即可開始使用。",
+    "BTN_START": "建立應用程式",
+    "BTN_LEARNMORE": "瞭解更多",
+    "CREATEPROJECTFORAPP": "建立專案 {{value}}",
+    "SELECT_FRAMEWORK": "選擇框架",
+    "FRAMEWORK": "框架",
+    "FRAMEWORK_OTHER": "其他 (OIDC, SAML, API)",
+    "ALMOSTDONE": "就快好了",
+    "REVIEWCONFIGURATION": "審查設定",
+    "REVIEWCONFIGURATION_DESCRIPTION": "我們為 {{value}} 應用程式建立了一個基本設定。建立後，您可以根據自己的需要調整該設定。",
+    "REDIRECTS": "設定重新導向",
+    "DEVMODEWARN": "預設情況下啟用開發模式。您可以稍後更新生產值。",
+    "GUIDE": "指南",
+    "BROWSEEXAMPLES": "瀏覽示例",
+    "DUPLICATEAPPRENAME": "具有相同名稱的應用程式已經存在。請選擇不同的名稱。",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "變革框架",
+        "DESCRIPTION": "從可用的框架中選擇一個，快速設定您的應用程式。"
+      }
+    }
+  },
+  "ACTIONS": {
+    "ACTIONS": "操作",
+    "FILTER": "過濾",
+    "RENAME": "重新命名",
+    "SET": "設定",
+    "COPY": "複製到剪下板",
+    "COPIED": "已複製到剪下板.",
+    "RESET": "重設",
+    "RESETDEFAULT": "恢復預設",
+    "RESETTO": "重設為: ",
+    "RESETCURRENT": "重設目前",
+    "SHOW": "展示",
+    "HIDE": "隱藏",
+    "SAVE": "儲存",
+    "SAVENOW": "立即儲存",
+    "NEW": "建立",
+    "ADD": "新增",
+    "CREATE": "建立",
+    "CONTINUE": "繼續",
+    "CONTINUEWITH": "繼續 {{value}}",
+    "BACK": "返回",
+    "CLOSE": "關閉",
+    "CLEAR": "清除",
+    "CANCEL": "取消",
+    "INFO": "資訊",
+    "OK": "確認",
+    "SELECT": "選擇",
+    "VIEW": "展示",
+    "SELECTIONDELETE": "刪除選中內容",
+    "DELETE": "刪除",
+    "REMOVE": "刪除",
+    "VERIFY": "Verify",
+    "FINISH": "完成",
+    "FINISHED": "關閉",
+    "CHANGE": "修改",
+    "REACTIVATE": "重新啟用",
+    "ACTIVATE": "啟用",
+    "DEACTIVATE": "停用",
+    "REFRESH": "重新整理",
+    "LOGIN": "登入",
+    "EDIT": "編輯",
+    "PIN": "固定 / 取消固定",
+    "CONFIGURE": "設定",
+    "SEND": "傳送",
+    "NEWVALUE": "新增值",
+    "RESTORE": "恢復",
+    "CONTINUEWITHOUTSAVE": "忽略並繼續",
+    "OF": "of",
+    "PREVIOUS": "上一頁",
+    "NEXT": "下一頁",
+    "MORE": "更多",
+    "STEP": "步",
+    "SETUP": "設定",
+    "TEST": "測試",
+    "UNSAVEDCHANGES": "未儲存的更改",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "您確定要放棄此新操作嗎？你的行動將會失敗",
+        "CANCEL": "取消",
+        "DISCARD": "丟棄"
+      }
+    },
+    "TABLE": {
+      "SHOWUSER": "Show user {{value}}"
+    },
+    "DOWNLOAD": "下載",
+    "APPLY": "申請"
+  },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "您目前正在使用新的 Actions V2（測試版）。之前的版本1仍可使用，但未來將停止支援。請報告任何問題或反饋意見。",
+    "EXECUTION": {
+      "TITLE": "操作",
+      "DESCRIPTION": "操作允許您執行自定義驗證碼以響應 API 請求、事件或特定函式。使用它們來擴充套件 Zitadel、自動化工作流程並與其他系統整合。",
+      "TYPES": {
+        "request": "請求",
+        "response": "響應",
+        "event": "事件",
+        "function": "函式"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "建立操作",
+        "UPDATE_TITLE": "更新操作",
+        "TYPE": {
+          "DESCRIPTION": "選擇您希望此操作執行的時間",
+          "REQUEST": {
+            "TITLE": "請求",
+            "DESCRIPTION": "Zitadel 中發生的請求。這可能是登入請求呼叫之類的操作。"
+          },
+          "RESPONSE": {
+            "TITLE": "響應",
+            "DESCRIPTION": "來自 Zitadel 中請求的響應。考慮一下從取得使用者返回的響應。"
+          },
+          "EVENTS": {
+            "TITLE": "事件",
+            "DESCRIPTION": "Zitadel 中發生的事件。這可能是使用者建立帳戶、成功登入等任何操作。"
+          },
+          "FUNCTIONS": {
+            "TITLE": "函式",
+            "DESCRIPTION": "您可以在 Zitadel 中呼叫的函式。這可能是從傳送電子郵件到建立使用者的任何操作。"
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "選擇此操作是適用於所有請求、特定服務（例如使用者管理）還是單個請求（例如建立使用者）。",
+          "ALL": {
+            "TITLE": "全部",
+            "DESCRIPTION": "如果您希望在每個請求上執行您的操作，請選擇此項"
+          },
+          "ALL_EVENTS": "如果您想在每個事件上執行操作，請選擇此項",
+          "SELECT_SERVICE": {
+            "TITLE": "選擇服務",
+            "DESCRIPTION": "為您的操作選擇一個 Zitadel 服務。"
+          },
+          "SELECT_METHOD": {
+            "TITLE": "選擇方法",
+            "DESCRIPTION": "如果您只想在特定請求上執行，請在此處選擇它",
+            "NOTE": "如果您不選擇方法，您的操作將在您選擇的服務中的每個請求上執行。"
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "函式名稱",
+            "DESCRIPTION": "選擇您要執行的函式"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "設定組",
+            "DESCRIPTION": "如果您只想在事件組上執行，請在此處設定組"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "選擇事件",
+            "DESCRIPTION": "如果您只想在特定事件上執行，請在此處指定它"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "您可以選擇執行目標，或在與其他目標相同的條件下執行它。",
+          "TARGET": {
+            "DESCRIPTION": "您要為此操作執行的目標"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "執行條件"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "條件",
+        "TYPE": "型別",
+        "TARGET": "目標",
+        "CREATIONDATE": "建立日期"
+      }
+    },
+    "TARGET": {
+      "TITLE": "目標",
+      "DESCRIPTION": "目標是您要從操作中執行的驗證碼的目標。在此處建立一個目標並將其新增到您的操作中。",
+      "CREATE": {
+        "TITLE": "建立您的目標",
+        "DESCRIPTION": "在 Zitadel 外部建立您自己的目標",
+        "NAME": "名稱",
+        "NAME_DESCRIPTION": "為您的目標提供清晰、描述性的名稱，以便稍後輕鬆識別",
+        "TYPE": "型別",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST 呼叫",
+          "restAsync": "REST 非同步"
+        },
+        "TYPES_DESCRIPTION": "Webhook，呼叫處理狀態碼但響應無關緊要\nCall，呼叫處理狀態碼和響應\nAsync，呼叫既不處理狀態碼也不處理響應，但可以與其他目標並行呼叫",
+        "PAYLOAD_TYPE": "有效負載型別",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "未指定",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "加密的 JSON Web Token (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: 用於驗證的簽名頭的標準 JSON 有效負載。\nJWT: 有效負載作為已簽名的 JWT 傳送。驗證透過 JWT 簽名完成。\nJWE: JWT 另外被加密，以防止對有效負載資訊的未授權存取。",
+        "ENDPOINT": "端點",
+        "ENDPOINT_DESCRIPTION": "輸入您的驗證碼託管的端點。確保我們可以存取它！",
+        "TIMEOUT": "超時",
+        "TIMEOUT_DESCRIPTION": "設定您的目標必須響應的最大時間。如果花費的時間更長，我們將停止請求。",
+        "INTERRUPT_ON_ERROR": "錯誤時中斷",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "當目標返回錯誤時，停止所有執行",
+        "INTERRUPT_ON_ERROR_WARNING": "注意：“出錯時中斷”會在失敗時停止操作，存在被鎖定的風險。請在停用該選項的情況下進行測試，以避免阻止登入/建立。",
+        "AWAIT_RESPONSE": "等待響應",
+        "AWAIT_RESPONSE_DESCRIPTION": "我們將在執行任何其他操作之前等待響應。如果您打算為單個操作使用多個目標，這將非常有用"
+      },
+      "TABLE": {
+        "NAME": "名稱",
+        "ENDPOINT": "端點",
+        "CREATIONDATE": "建立日期",
+        "REORDER": "重新排序"
+      }
+    }
+  },
+  "MEMBERROLES": {
+    "IAM_OWNER": "控制整個執行個體，包括所有組織",
+    "IAM_OWNER_VIEWER": "有權審查整個執行個體，包括所有組織",
+    "IAM_ORG_MANAGER": "有權建立和管理組織",
+    "IAM_USER_MANAGER": "有權建立和管理使用者",
+    "IAM_ADMIN_IMPERSONATOR": "有權模擬所有組織的管理員和終端使用者",
+    "IAM_END_USER_IMPERSONATOR": "有權模擬所有組織的終端使用者",
+    "IAM_LOGIN_CLIENT": "具有管理登入應用程式的權限",
+    "ORG_OWNER": "擁有整個組織的權限",
+    "ORG_USER_MANAGER": "有權建立和管理組織的使用者",
+    "ORG_OWNER_VIEWER": "有權審查整個組織",
+    "ORG_SETTINGS_MANAGER": "有權管理組織的設定",
+    "ORG_USER_PERMISSION_EDITOR": "具有管理角色分配的權限",
+    "ORG_PROJECT_PERMISSION_EDITOR": "有權管理專案授權",
+    "ORG_PROJECT_CREATOR": "有權建立自己的專案和基礎設定",
+    "ORG_DYNAMIC_CLIENT_REGISTRAR": "有權動態註冊 OAuth 2.0 客戶端",
+    "ORG_ADMIN_IMPERSONATOR": "有權模擬組織的管理員和終端使用者",
+    "ORG_END_USER_IMPERSONATOR": "有權模擬組織的終端使用者",
+    "ORG_USER_SELF_MANAGER": "有權管理自己的使用者",
+    "PROJECT_OWNER": "擁有整個專案的權限",
+    "PROJECT_OWNER_VIEWER": "有權審查整個專案",
+    "PROJECT_OWNER_GLOBAL": "擁有整個專案的權限",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "有權審查整個專案",
+    "PROJECT_GRANT_OWNER": "有權管理專案授權",
+    "PROJECT_GRANT_OWNER_VIEWER": "有權審查專案授權"
+  },
+  "OVERLAYS": {
+    "ORGSWITCHER": {
+      "TEXT": "控制檯中的所有組織設定和表格都基於選定的組織。單擊此按鈕可切換組織或建立新組織。"
+    },
+    "INSTANCE": {
+      "TEXT": "單擊此處進入執行個體設定。請注意，如果您具有增強的權限，您只能存取此按鈕。"
+    },
+    "PROFILE": {
+      "TEXT": "在這裡，您可以在您的使用者帳戶之間切換並管理您的工作階段和個人資料。"
+    },
+    "NAV": {
+      "TEXT": "此導航會根據您在上面選擇的組織或您的執行個體而改變"
+    },
+    "CONTEXTCHANGED": {
+      "TEXT": "注意！組織環境發生了變化。"
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "檢視剛剛更改為執行個體！"
+    }
+  },
+  "FILTER": {
+    "TITLE": "過濾",
+    "STATE": "狀態",
+    "DISPLAYNAME": "展示名稱",
+    "EMAIL": "電子郵件",
+    "USERNAME": "使用者名稱",
+    "ORGNAME": "組織名稱",
+    "ORGID": "組織ID",
+    "PRIMARYDOMAIN": "組織網域",
+    "PROJECTNAME": "專案名稱",
+    "RESOURCEOWNER": "資源所有者",
+    "METHODS": {
+      "5": "包含",
+      "7": "結尾是",
+      "1": "等於"
+    }
+  },
+  "KEYBOARDSHORTCUTS": {
+    "TITLE": "快捷鍵",
+    "UNDERORGCONTEXT": "在組織管理頁面中",
+    "SIDEWIDE": "站點快捷方式",
+    "SHORTCUTS": {
+      "HOME": "前往首頁",
+      "INSTANCE": "前往執行個體",
+      "ORG": "前往組織",
+      "ORGSETTINGS": "前往組織設定",
+      "ORGSWITCHER": "更改組織",
+      "ME": "前往個人資料",
+      "PROJECTS": "前往專案",
+      "USERS": "前往使用者",
+      "ROLEASSIGNMENTS": "角色分配",
+      "ACTIONS": "前往認證流程",
+      "DOMAINS": "前往網域"
+    }
+  },
+  "RESOURCEID": "資源ID",
+  "NAME": "名稱",
+  "VERSION": "版本",
+  "TABLE": {
+    "NOROWS": "沒有資料"
+  },
+  "ERRORS": {
+    "REQUIRED": "請填寫此欄",
+    "ATLEASTONE": "P至少提供一個值。",
+    "TOKENINVALID": {
+      "TITLE": "您的授權令牌已過期。",
+      "DESCRIPTION": "點選下方按鈕再次登入。"
+    },
+    "EXHAUSTED": {
+      "TITLE": "您的執行個體已被阻止。",
+      "DESCRIPTION": "請聯絡您的 Zitadel 執行個體管理員以更新訂閱。"
+    },
+    "INVALID_FORMAT": "格式是無效的。",
+    "NOTANEMAIL": "給定的值不是合法電子郵件地址。",
+    "MINLENGTH": "長度必須至少是{{requiredLength}}字元。",
+    "MAXLENGTH": "必須少於{{requiredLength}}個字元.",
+    "UPPERCASEMISSING": "密碼必須包含大寫字元。",
+    "LOWERCASEMISSING": "密碼必須包含小寫字元。",
+    "SYMBOLERROR": "密碼必須包含符號或標點符號。",
+    "NUMBERERROR": "密碼必須包含數字。",
+    "PWNOTEQUAL": "提供的密碼不匹配。",
+    "PHONE": "電話號碼必須以 + 開頭。"
+  },
+  "USER": {
+    "SETTINGS": {
+      "TITLE": "設定",
+      "GENERAL": "通用",
+      "IDP": "身分提供者",
+      "SECURITY": "密碼和安全",
+      "KEYS": "秘鑰",
+      "PAT": "個人存取令牌",
+      "ROLEASSIGNMENTS": "角色分配",
+      "MEMBERSHIPS": "管理員角色",
+      "METADATA": "後設資料"
+    },
+    "TITLE": "個人資訊",
+    "DESCRIPTION": "管理您的資訊和安全設定。",
+    "PAGES": {
+      "TITLE": "使用者",
+      "DETAIL": "詳情",
+      "CREATE": "建立",
+      "MY": "我的資訊",
+      "LOGINNAMES": "登入名稱",
+      "LOGINMETHODS": "登入方式",
+      "LOGINNAMESDESC": "這些是您的登入名稱:",
+      "NOUSER": "沒有關聯的使用者。",
+      "REACTIVATE": "重新啟用",
+      "DEACTIVATE": "停用",
+      "FILTER": "過濾",
+      "STATE": "狀態",
+      "DELETE": "刪除使用者",
+      "UNLOCK": "解鎖使用者",
+      "GENERATESECRET": "生成客戶密匙",
+      "REMOVESECRET": "刪除客戶密匙",
+      "LOCKEDDESCRIPTION": "此使用者因超過最大登入嘗試次數而被鎖定，必須解鎖才能再次使用。",
+      "DELETEACCOUNT": "刪除帳戶",
+      "DELETEACCOUNT_DESC": "如果您執行此操作，您將被登出並且無法再存取您的帳戶。此操作不可逆，因此請謹慎操作。",
+      "DELETEACCOUNT_BTN": "刪除帳戶",
+      "DELETEACCOUNT_SUCCESS": "賬號刪除成功！"
+    },
+    "DETAILS": {
+      "DATECREATED": "建立於",
+      "DATECHANGED": "修改於"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "刪除使用者",
+      "DELETE_SELF_TITLE": "刪除帳戶",
+      "DELETE_DESCRIPTION": "您即將永久刪除使用者。你確定嗎？",
+      "DELETE_SELF_DESCRIPTION": "您即將永久刪除您的個人帳戶。這將使您登出並刪除您的使用者。此操作無法撤消！",
+      "DELETE_AUTH_DESCRIPTION": "您即將永久刪除您的個人帳戶。你確定嗎？",
+      "TYPEUSERNAME": "輸入 '{{value}}'，確認並刪除該使用者。",
+      "USERNAME": "登入名稱",
+      "DELETE_BTN": "永久刪除"
+    },
+    "SENDEMAILDIALOG": {
+      "TITLE": "傳送電子郵件通知",
+      "DESCRIPTION": "單擊下面的按鈕可向目前電子郵件地址傳送通知或更改電子郵件地址。",
+      "NEWEMAIL": "新的電子郵件地址"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "客戶端秘鑰",
+      "CLIENTSECRET_DESCRIPTION": "將您的客戶保密在一個安全的地方，因為一旦對話方塊關閉，便無法再次檢視。"
+    },
+    "TABLE": {
+      "DEACTIVATE": "停用",
+      "ACTIVATE": "啟用",
+      "CHANGEDATE": "最後修改於",
+      "CREATIONDATE": "建立於",
+      "FILTER": {
+        "0": "篩選展示名稱",
+        "1": "篩選使用者名稱",
+        "2": "篩選展示名稱",
+        "3": "篩選使用者名稱",
+        "4": "篩選郵件地址",
+        "5": "篩選展示名稱",
+        "10": "篩選組織名稱",
+        "12": "篩選專案名稱"
+      },
+      "EMPTY": "沒有條目"
+    },
+    "PASSWORDLESS": {
+      "SEND": "傳送註冊連結",
+      "TABLETYPE": "型別",
+      "TABLESTATE": "狀態",
+      "NAME": "名稱",
+      "EMPTY": "沒有可用的裝置",
+      "TITLE": "Passkey 認證",
+      "DESCRIPTION": "新增基於 WebAuthn 的身分驗證方法以使用 Passkey 登入 Zitadel。",
+      "MANAGE_DESCRIPTION": "管理使用者的第二因素認證方式。",
+      "U2F": "新增方法",
+      "U2F_DIALOG_TITLE": "身分驗證器",
+      "U2F_DIALOG_DESCRIPTION": "輸入您使用的 Passkey 登入名稱",
+      "U2F_SUCCESS": "Passkey 驗證建立成功！",
+      "U2F_ERROR": "安裝過程中發生錯誤！",
+      "U2F_NAME": "身分驗證器名稱",
+      "TYPE": {
+        "0": "未定義 MFA",
+        "1": "OTP",
+        "2": "Passkey"
+      },
+      "STATE": {
+        "0": "無狀態",
+        "1": "不可用",
+        "2": "可使用",
+        "3": "已刪除"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "刪除 Passkey",
+        "DELETE_DESCRIPTION": "您即將刪除 Passkey。你確定嗎？",
+        "ADD_TITLE": "Passkey 認證",
+        "ADD_DESCRIPTION": "選擇用於建立 Passkey 的可用選項之一。",
+        "SEND_DESCRIPTION": "將 Passkey 註冊連結傳送到您的電子郵件地址。",
+        "SEND": "傳送註冊連結",
+        "SENT": "電子郵件已成功傳送。檢查您的電子郵件以繼續設定。",
+        "QRCODE_DESCRIPTION": "生成QR Code以使用其他裝置進行掃描。",
+        "QRCODE": "生成QR Code",
+        "QRCODE_SCAN": "掃描此 QR 碼以繼續在您的裝置上進行設定。",
+        "NEW_DESCRIPTION": "使用此裝置設定 Passkey。",
+        "NEW": "新增"
+      }
+    },
+    "MFA": {
+      "TABLETYPE": "型別",
+      "TABLESTATE": "狀態",
+      "NAME": "名稱",
+      "EMPTY": "無多因素認證方式",
+      "TITLE": "多因素身分驗證",
+      "DESCRIPTION": "新增第二個因素以確保您帳戶的最佳安全性。",
+      "MANAGE_DESCRIPTION": "管理使用者的第二因素身分認證方式。",
+      "ADD": "新增因子",
+      "OTP": "用於 TOTP 的身分驗證器應用程式",
+      "OTP_DIALOG_TITLE": "新增 OTP",
+      "OTP_DIALOG_DESCRIPTION": "使用驗證器應用程式掃描QR Code並輸入下面的驗證碼以驗證並啟用 OTP 方法。",
+      "U2F": "Passkey",
+      "U2F_DIALOG_TITLE": "驗證因子",
+      "U2F_DIALOG_DESCRIPTION": "輸入您使用的通用 Multifactor 的名稱。",
+      "U2F_SUCCESS": "身分驗證因子新增成功！",
+      "U2F_ERROR": "安裝過程中發生錯誤！",
+      "U2F_NAME": "身分驗證器名稱",
+      "OTPSMS": "帶簡訊的 OTP",
+      "OTPEMAIL": "帶電子郵件的 OTP",
+      "SETUPOTPSMSDESCRIPTION": "您想將此電話號碼設定為 OTP 第二因素嗎？",
+      "OTPSMSSUCCESS": "OTP 因子設定成功。",
+      "OTPSMSPHONEMUSTBEVERIFIED": "您的手機必須經過驗證才能使用此方法。",
+      "OTPEMAILSUCCESS": "OTP 因子設定成功。",
+      "TYPE": {
+        "0": "未定義 MFA",
+        "1": "OTP",
+        "2": "Passkey"
+      },
+      "STATE": {
+        "0": "無狀態",
+        "1": "不可用",
+        "2": "可使用",
+        "3": "已刪除"
+      },
+      "DIALOG": {
+        "MFA_DELETE_TITLE": "刪除第二因素身分驗證",
+        "MFA_DELETE_DESCRIPTION": "您即將刪除第二因素身分驗證。你確定嗎？",
+        "ADD_MFA_TITLE": "新增第二身分驗證因素",
+        "ADD_MFA_DESCRIPTION": "從下面的選項中選擇一個。"
+      }
+    },
+    "EXTERNALIDP": {
+      "TITLE": "外部身分提供者",
+      "DESC": "",
+      "IDPCONFIGID": "身分提供者 ID",
+      "IDPNAME": "身分提供者名稱",
+      "USERDISPLAYNAME": "外部名稱",
+      "EXTERNALUSERID": "外部使用者 ID",
+      "EMPTY": "找不到外部身分提供者",
+      "DIALOG": {
+        "DELETE_TITLE": "刪除外部身分提供者",
+        "DELETE_DESCRIPTION": "您即將從使用者中刪除身分提供者。你真的要繼續嗎？"
+      }
+    },
+    "CREATE": {
+      "TITLE": "建立一個新使用者",
+      "DESCRIPTION": "請提供必要的資訊。",
+      "NAMEANDEMAILSECTION": "姓名和電子郵件",
+      "GENDERLANGSECTION": "性別和語言",
+      "PHONESECTION": "手機號碼",
+      "PASSWORDSECTION": "初始密碼",
+      "ADDRESSANDPHONESECTION": "手機號碼",
+      "INITMAILDESCRIPTION": "如果選擇了這兩個選項，則不會傳送初始化電子郵件。如果只選擇了其中一個選項，將傳送一封提供/驗證資料的郵件。",
+      "SETUPAUTHENTICATIONLATER": "稍後為此使用者設定身分驗證。",
+      "INVITATION": "傳送邀請郵件以進行身分驗證設定和電子郵件驗證。",
+      "INITIALPASSWORD": "為使用者設定初始密碼。"
+    },
+    "CODEDIALOG": {
+      "TITLE": "驗證手機號碼",
+      "DESCRIPTION": "輸入您透過簡訊收到的驗證碼以驗證您的手機號碼。",
+      "CODE": "驗證碼"
+    },
+    "DATA": {
+      "STATE": "狀態",
+      "STATE0": "未知",
+      "STATE1": "啟用",
+      "STATE2": "停用",
+      "STATE3": "已刪除",
+      "STATE4": "已鎖定",
+      "STATE5": "已暫停",
+      "STATE6": "初始化"
+    },
+    "PROFILE": {
+      "TITLE": "資訊",
+      "EMAIL": "電子郵件",
+      "PHONE": "手機號碼",
+      "PHONE_HINT": "使用+號，後跟呼叫者的國家/地區驗證碼，或從下拉選單中選擇國家/地區，最後輸入電話號碼",
+      "PHONE_VERIFIED": "電話號碼已驗證",
+      "SEND_SMS": "傳送驗證簡訊",
+      "SEND_EMAIL": "傳送電子郵件",
+      "USERNAME": "使用者名稱",
+      "CHANGEUSERNAME": "修改",
+      "CHANGEUSERNAME_TITLE": "修改使用者名稱稱",
+      "CHANGEUSERNAME_DESC": "在下面的欄位中輸入新名稱。",
+      "FIRSTNAME": "名字",
+      "LASTNAME": "姓氏",
+      "NICKNAME": "暱稱",
+      "DISPLAYNAME": "展示名稱",
+      "PREFERREDLOGINNAME": "首選登入名稱",
+      "PREFERRED_LANGUAGE": "語言",
+      "GENDER": "性別",
+      "PASSWORD": "密碼",
+      "AVATAR": {
+        "UPLOADTITLE": "上傳您的頭像",
+        "UPLOADBTN": "選擇檔案",
+        "UPLOAD": "上傳",
+        "CURRENT": "目前圖片",
+        "PREVIEW": "預覽",
+        "DELETESUCCESS": "刪除成功！",
+        "CROPPERERROR": "上傳檔案時出錯。如有必要，請嘗試不同的格式和大小。"
+      },
+      "COUNTRY": "國家"
+    },
+    "MACHINE": {
+      "TITLE": "服務帳戶詳情",
+      "USERNAME": "使用者名稱",
+      "NAME": "名稱",
+      "DESCRIPTION": "描述",
+      "KEYSTITLE": "秘鑰",
+      "KEYSDESC": "定義您的金鑰並新增可選的到期日期。",
+      "TOKENSTITLE": "個人存取令牌",
+      "TOKENSDESC": "個人存取令牌的功能類似於普通的 OAuth 存取令牌。",
+      "ID": "秘鑰 ID",
+      "TYPE": "型別",
+      "EXPIRATIONDATE": "截止日期",
+      "CHOOSEDATEAFTER": "輸入一個有效的過期時間",
+      "CHOOSEEXPIRY": "選擇過期時間",
+      "CREATIONDATE": "建立於",
+      "KEYDETAILS": "秘鑰詳情",
+      "ACCESSTOKENTYPE": "存取令牌型別 ",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
+      "ADD": {
+        "TITLE": "新增秘鑰",
+        "DESCRIPTION": "選擇您的金鑰型別並選擇一個可選的到期日期。"
+      },
+      "ADDED": {
+        "TITLE": "金鑰已建立",
+        "DESCRIPTION": "您必須下載並儲存金鑰，因為關閉此對話方塊後將無法再檢視！"
+      },
+      "KEYTYPES": {
+        "1": "JSON"
+      },
+      "DIALOG": {
+        "DELETE_KEY": {
+          "TITLE": "刪除秘鑰",
+          "DESCRIPTION": "是否要刪除選定的金鑰？這不能被撤消。"
+        }
+      }
+    },
+    "PASSWORD": {
+      "TITLE": "密碼",
+      "LABEL": "安全密碼有助於保護帳戶",
+      "DESCRIPTION": "根據以下策略輸入新密碼。",
+      "OLD": "目前密碼",
+      "NEW": "新密碼",
+      "CONFIRM": "確認新密碼",
+      "NEWINITIAL": "密碼",
+      "CONFIRMINITIAL": "確認密碼",
+      "RESET": "重設目前密碼",
+      "SET": "設定新密碼",
+      "RESENDNOTIFICATION": "傳送重設密碼連結",
+      "REQUIRED": "缺少必填欄位。",
+      "MINLENGTHERROR": "密碼長度必須至少為 {{value}} 個字元。",
+      "MAXLENGTHERROR": "必須少於{{value}}個字元"
+    },
+    "ID": "使用者ID",
+    "EMAIL": "電子郵件",
+    "PHONE": "手機號碼",
+    "PHONEEMPTY": "未定義手機號碼",
+    "PHONEVERIFIED": "手機號碼已驗證。",
+    "EMAILVERIFIED": "電子郵件已驗證",
+    "NOTVERIFIED": "未驗證",
+    "PREFERRED_LOGINNAME": "首選登入名稱",
+    "ISINITIAL": "使用者尚未啟用。",
+    "LOGINMETHODS": {
+      "TITLE": "聯絡資訊",
+      "DESCRIPTION": "提供的資訊用於向您傳送重要資訊，例如密碼重設電子郵件。",
+      "EMAIL": {
+        "TITLE": "電子郵件",
+        "VALID": "已驗證",
+        "ISVERIFIED": "電子郵件已驗證",
+        "ISVERIFIEDDESC": "如果電子郵件顯示為已驗證，則不會發出電子郵件驗證請求。",
+        "RESEND": "重新傳送驗證電子郵件",
+        "EDITTITLE": "更改電子郵件",
+        "EDITDESC": "在下面的欄位中輸入新電子郵件。"
+      },
+      "PHONE": {
+        "TITLE": "手機號碼",
+        "VALID": "已驗證",
+        "RESEND": "重新傳送驗證簡訊",
+        "EDITTITLE": "更改手機號碼",
+        "EDITVALUE": "手機號碼",
+        "EDITDESC": "在下面的欄位中輸入新的手機號碼。",
+        "DELETETITLE": "刪除手機號碼",
+        "DELETEDESC": "你真的要刪除手機號碼嗎",
+        "OTPSMSREMOVALWARNING": "此帳戶使用此電話號碼作為第二因素。繼續後您將無法使用它。"
+      },
+      "RESENDCODE": "重新傳送驗證碼",
+      "ENTERCODE": "驗證",
+      "ENTERCODE_DESC": "驗證碼"
+    },
+    "GRANTS": {
+      "TITLE": "角色分配",
+      "DESCRIPTION": "授予此使用者對某些專案的存取權限",
+      "CREATE": {
+        "TITLE": "建立角色分配",
+        "DESCRIPTION": "搜尋組織、專案和相應的專案角色。"
+      },
+      "PROJECTNAME": "專案名稱",
+      "PROJECT-OWNED": "專案",
+      "PROJECT-GRANTED": "已授權專案",
+      "FILTER": {
+        "0": "過濾使用者",
+        "1": "過濾網域",
+        "2": "過濾專案名稱",
+        "3": "過濾角色名稱"
+      }
+    },
+    "STATE": {
+      "0": "未知",
+      "1": "啟用",
+      "2": "停用",
+      "3": "已刪除",
+      "4": "已鎖定",
+      "5": "已暫停",
+      "6": "初始化"
+    },
+    "STATEV2": {
+      "0": "未知",
+      "1": "啟用",
+      "2": "停用",
+      "3": "已刪除",
+      "4": "已鎖定",
+      "5": "初始化"
+    },
+    "SEARCH": {
+      "ADDITIONAL": "登入名稱 (目前組織)",
+      "ADDITIONAL-EXTERNAL": "登入名稱 (外部組織)"
+    },
+    "TARGET": {
+      "SELF": "如果您想授予其他組織的使用者",
+      "EXTERNAL": "授予您組織的使用者",
+      "CLICKHERE": "點選這裡"
+    },
+    "SIGNEDOUT": "您已退出登入。 點選 \"登入\" 按鈕再次登入。",
+    "SIGNEDOUT_BTN": "登入",
+    "EDITACCOUNT": "編輯帳戶",
+    "ADDACCOUNT": "登入其他帳戶",
+    "RESENDINITIALEMAIL": "重新傳送啟用郵件",
+    "RESENDEMAILNOTIFICATION": "重新傳送電子郵件通知",
+    "TOAST": {
+      "CREATED": "使用者建立成功。",
+      "SAVED": "使用者資訊已成功儲存。",
+      "USERNAMECHANGED": "使用者名稱已更改。",
+      "EMAILSAVED": "電子郵件已成功儲存。",
+      "INITEMAILSENT": "初始化郵件已傳送。",
+      "PHONESAVED": "手機號碼儲存成功。",
+      "PHONEREMOVED": "手機號碼已被移除。",
+      "PHONEVERIFIED": "手機號碼驗證成功。",
+      "PHONEVERIFICATIONSENT": "手機驗證碼已傳送。",
+      "EMAILVERIFICATIONSENT": "電子郵件驗證碼已傳送。",
+      "OTPREMOVED": "OTP (一次性密碼) 已刪除。",
+      "U2FREMOVED": "認證因子已刪除。",
+      "PASSWORDLESSREMOVED": "Passkey 已刪除。",
+      "INITIALPASSWORDSET": "初始密碼已設定。",
+      "PASSWORDNOTIFICATIONSENT": "已傳送密碼更改通知。",
+      "PASSWORDCHANGED": "密碼修改成功。",
+      "REACTIVATED": "使用者已重新啟用。",
+      "DEACTIVATED": "使用者已停用。",
+      "SELECTEDREACTIVATED": "選中的使用者已被重新啟用。",
+      "SELECTEDDEACTIVATED": "選中的使用者已被停用。",
+      "SELECTEDKEYSDELETED": "選中的 Keys 已被刪除。",
+      "KEYADDED": "Key 已新增！",
+      "MACHINEADDED": "服務帳戶已建立成功!",
+      "DELETED": "使用者刪除成功!",
+      "UNLOCKED": "使用者解鎖成功!",
+      "PASSWORDLESSREGISTRATIONSENT": "註冊連結傳送成功。",
+      "SECRETGENERATED": "秘密成功生成!",
+      "SECRETREMOVED": "秘密被成功刪除!"
+    },
+    "MEMBERSHIPS": {
+      "TITLE": "Zitadel 管理員角色",
+      "DESCRIPTION": "這些都是使用者管理員角色。您還可以在組織、專案或執行個體詳細資訊頁面上修改它們。",
+      "ORGCONTEXT": "您會看到與目前所選組織相關的所有組織和專案。",
+      "USERCONTEXT": "您會看到您被授權的所有組織和專案。包括其他組織。",
+      "CREATIONDATE": "建立於",
+      "CHANGEDATE": "最後修改於",
+      "DISPLAYNAME": "展示名稱",
+      "REMOVE": "刪除",
+      "TYPE": "型別",
+      "ORGID": "組織 ID",
+      "UPDATED": "管理員角色已更新。",
+      "NOPERMISSIONTOEDIT": "您缺少編輯角色所需的權限！",
+      "TYPES": {
+        "UNKNOWN": "未知",
+        "ORG": "組織",
+        "PROJECT": "專案",
+        "GRANTEDPROJECT": "授權專案"
+      }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "ID",
+      "TOKEN": "令牌",
+      "ADD": {
+        "TITLE": "生成新的個人存取令牌",
+        "DESCRIPTION": "為令牌定義自定義過期時間。",
+        "CHOOSEEXPIRY": "選擇到期日期",
+        "CHOOSEDATEAFTER": "輸入一個有效的過期時間"
+      },
+      "ADDED": {
+        "TITLE": "個人存取令牌",
+        "DESCRIPTION": "請確保複製您的個人存取令牌並儲存。關閉後將不在展示!"
+      },
+      "DELETE": {
+        "TITLE": "刪除存取令牌",
+        "DESCRIPTION": "您即將刪除個人存取令牌。你確定嗎？"
+      },
+      "DELETED": "成功刪除令牌。"
+    }
+  },
+  "METADATA": {
+    "TITLE": "後設資料",
+    "KEY": "鍵",
+    "VALUE": "值",
+    "ADD": "新條目",
+    "SAVE": "儲存",
+    "EMPTY": "暫無後設資料",
+    "SETSUCCESS": "鍵值對儲存成功",
+    "REMOVESUCCESS": "鍵值對刪除成功"
+  },
+  "FLOWS": {
+    "ID": "ID",
+    "NAME": "名稱",
+    "STATE": "狀態",
+    "STATES": {
+      "0": "無狀態",
+      "1": "停用",
+      "2": "啟用"
+    },
+    "ADDTRIGGER": "新增觸發器",
+    "FLOWCHANGED": "流量已成功更改",
+    "FLOWCLEARED": "流已成功刪除",
+    "TIMEOUT": "超時時間",
+    "TIMEOUTINSEC": "以秒為單位的超時時間",
+    "ALLOWEDTOFAIL": "允許失敗",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "警告",
+      "DESCRIPTION": "如果您停用此設定，可能會導致您的組織中的使用者無法登入。此外，您將無法再存取管理控制檯以停用該操作。我們建議您在單獨的組織中建立管理員使用者，或在開發環境或開發組織中先測試指令碼。"
+    },
+    "SCRIPT": "指令碼",
+    "FLOWTYPE": "流程型別",
+    "TRIGGERTYPE": "觸發器型別",
+    "ACTIONS": "動作",
+    "ACTIONSMAX": "根據您的等級，您可以使用有限數量的動作 ({{value}})。確保停用您不需要的那些或考慮升級您的等級。",
+    "DIALOG": {
+      "ADD": {
+        "TITLE": "建立動作"
+      },
+      "UPDATE": {
+        "TITLE": "更新動作"
+      },
+      "DELETEACTION": {
+        "TITLE": "刪除動作？",
+        "DESCRIPTION": "您將要刪除一個動作。這是無法恢復的。你確定嗎？",
+        "DELETE_SUCCESS": "動作已成功刪除。"
+      },
+      "CLEAR": {
+        "TITLE": "清理流程？",
+        "DESCRIPTION": "您即將重設流程及其觸發器和動作。此更改無法恢復。你確定嗎？"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "刪除選定的操作？",
+        "DESCRIPTION": "您確定要從流中刪除選定的操作嗎？"
+      },
+      "ABOUTNAME": "javascript 中的操作名稱和函式名稱必須相同"
+    },
+    "TOAST": {
+      "ACTIONSSET": "動作設定",
+      "ACTIONREACTIVATED": "動作已被重新啟用",
+      "ACTIONDEACTIVATED": "動作已被停用"
+    }
+  },
+  "IAM": {
+    "POLICIES": {
+      "TITLE": "系統策略和存取設定",
+      "DESCRIPTION": "管理您的全域性策略和管理存取設定。"
+    },
+    "EVENTSTORE": {
+      "TITLE": "執行個體儲存管理",
+      "DESCRIPTION": "管理您的 Zitadel 檢視和失敗的事件。"
+    },
+    "MEMBER": {
+      "TITLE": "管理員",
+      "DESCRIPTION": "這些管理員可以在您的執行個體中進行更改。"
+    },
+    "PAGES": {
+      "STATE": "狀態",
+      "DOMAINLIST": "自定義網域"
+    },
+    "STATE": {
+      "0": "未指定",
+      "1": "建立中",
+      "2": "執行中",
+      "3": "停止中",
+      "4": "已停止"
+    },
+    "VIEWS": {
+      "VIEWNAME": "名稱",
+      "DATABASE": "資料庫",
+      "SEQUENCE": "序列",
+      "EVENTTIMESTAMP": "時間",
+      "LASTSPOOL": "成功的 spool",
+      "ACTIONS": "操作",
+      "CLEAR": "清理",
+      "CLEARED": "檢視已成功清除！",
+      "DIALOG": {
+        "VIEW_CLEAR_TITLE": "清除檢視",
+        "VIEW_CLEAR_DESCRIPTION": "您即將清除檢視。清除檢視會建立一個過程，在此過程中資料可能對終端使用者不可用。你真的確定嗎？"
+      }
+    },
+    "FAILEDEVENTS": {
+      "VIEWNAME": "名稱",
+      "DATABASE": "資料庫",
+      "FAILEDSEQUENCE": "失敗的序列",
+      "FAILURECOUNT": "失敗計數",
+      "LASTFAILED": "最後一次失敗是在",
+      "ERRORMESSAGE": "錯誤訊息",
+      "ACTIONS": "操作",
+      "DELETE": "刪除",
+      "DELETESUCCESS": "失敗的事件被移除。"
+    },
+    "EVENTS": {
+      "EDITOR": "編輯",
+      "EDITORID": "編者號",
+      "AGGREGATE": "總數",
+      "AGGREGATEID": "彙總的ID",
+      "AGGREGATETYPE": "骨料型別",
+      "RESOURCEOWNER": "所有者",
+      "SEQUENCE": "序列",
+      "CREATIONDATE": "建立日期",
+      "TYPE": "型別",
+      "PAYLOAD": "有效載荷",
+      "FILTERS": {
+        "BTN": "過濾器",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "按使用者過濾"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "骨料型別",
+          "IDLABEL": "ID",
+          "CHECKBOX": "按總量過濾"
+        },
+        "TYPE": {
+          "TYPELABEL": "型別",
+          "CHECKBOX": "按型別過濾"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "按資源所有者過濾"
+        },
+        "SEQUENCE": {
+          "LABEL": "序列",
+          "CHECKBOX": "按順序過濾"
+        },
+        "SORT": "分揀",
+        "ASC": "上升中",
+        "DESC": "下降",
+        "CREATIONDATE": {
+          "RADIO_FROM": "從",
+          "RADIO_RANGE": "範圍",
+          "LABEL_SINCE": "自從",
+          "LABEL_UNTIL": "直到"
+        },
+        "OTHER": "其他",
+        "OTHERS": "其他"
+      },
+      "DIALOG": {
+        "TITLE": "事件的細節"
+      }
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "管理員已刪除。",
+      "MEMBERSADDED": "已新增多個管理員。",
+      "MEMBERADDED": "管理員已新增。",
+      "MEMBERCHANGED": "管理員已改變。",
+      "ROLEREMOVED": "角色已刪除。",
+      "ROLECHANGED": "角色已更改。",
+      "REACTIVATED": "重新啟用",
+      "DEACTIVATED": "已停用"
+    }
+  },
+  "ORG": {
+    "PAGES": {
+      "NAME": "名稱",
+      "ID": "組織ID",
+      "CREATIONDATE": "建立於",
+      "DATECHANGED": "修改於",
+      "FILTER": "篩選",
+      "FILTERPLACEHOLDER": "篩選名稱",
+      "LIST": "組織",
+      "LISTDESCRIPTION": "選擇一個組織。",
+      "ACTIVE": "啟用",
+      "CREATE": "建立組織",
+      "DEACTIVATE": "停用組織",
+      "REACTIVATE": "重新啟用組織",
+      "NOPERMISSION": "您沒有存取組織設定的權限。",
+      "USERSELFACCOUNT": "使用您的個人帳戶作為組織所有者",
+      "ORGDETAIL_TITLE": "輸入新組織的名稱和網域。",
+      "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "輸入新組織的名稱。",
+      "ORGDETAILUSER_TITLE": "設定組織所有者",
+      "DELETE": "刪除組織",
+      "DEFAULTLABEL": "預設情況下",
+      "SETASDEFAULT": "設定為預設組織",
+      "DEFAULTORGSET": "預設的組織已經改變",
+      "RENAME": {
+        "ACTION": "改名",
+        "TITLE": "重新命名組織",
+        "DESCRIPTION": "輸入組織的新名稱",
+        "BTN": "改名"
+      },
+      "ORGDOMAIN": {
+        "TITLE": "驗證 {{value}} 所有權",
+        "VERIFICATION": "我們為您提供兩種手動驗證域的方法：",
+        "VERIFICATION_HTML": "- HTTP。在您的網站上託管臨時驗證檔案",
+        "VERIFICATION_DNS": "- DNS。建立 TXT 記錄 DNS 條目",
+        "VERIFICATION_DNS_DESC": "如果您管理 {{ value }} 並且有權存取您的 DNS 記錄，則可以使用以下值建立新的 TXT 記錄：",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "使用此驗證碼作為 TXT 記錄的值：",
+        "VERIFICATION_HTTP_DESC": "如果您有權存取您的網站託管，只需下載驗證檔案並將其上傳到提供的 URL",
+        "VERIFICATION_HTTP_URL_LABEL": "預期網址：",
+        "VERIFICATION_HTTP_FILE_LABEL": "驗證檔案：",
+        "VERIFICATION_SKIP": "您現在可以跳過驗證並繼續建立您的組織，但為了使用您的域，必須完成此步驟！",
+        "VERIFICATION_VALIDATION_DESC": "不要刪除驗證碼，因為 Zitadel 會不時重新檢查您的網域所有權。",
+        "VERIFICATION_NEWTOKEN_TITLE": "請求新令牌",
+        "VERIFICATION_VALIDATION_ONGOING": "已選擇 {{ value }} 方法來驗證您的域。單擊該按鈕可觸發驗證檢查或重設驗證過程。",
+        "VERIFICATION_SUCCESSFUL": "網域驗證成功！",
+        "RESETMETHOD": "重設驗證方式"
+      },
+      "DOWNLOAD_FILE": "下載檔案",
+      "SELECTORGTOOLTIP": "選擇此組織。",
+      "PRIMARYDOMAIN": "組織網域",
+      "STATE": "狀態",
+      "USEPASSWORD": "設定初始密碼",
+      "USEPASSWORDDESC": "使用者初始化時無需設定密碼。"
+    },
+    "LIST": {
+      "TITLE": "組織",
+      "DESCRIPTION": "這些是您執行個體上的組織"
+    },
+    "DOMAINS": {
+      "NEW": "新增網域",
+      "TITLE": "組織網域",
+      "DESCRIPTION": "設定您的網域。此網域可用於您的使用者登入。",
+      "SETPRIMARY": "組織網域",
+      "DELETE": {
+        "TITLE": "刪除網域",
+        "DESCRIPTION": "您即將刪除您的一個網域。請注意，您的使用者不能再使用此域進行登入。"
+      },
+      "ADD": {
+        "TITLE": "新增網域",
+        "DESCRIPTION": "您即將為您的組織新增一個網域。成功完成後，您的使用者將能夠使用該域進行登入。"
+      }
+    },
+    "STATE": {
+      "0": "未定義",
+      "1": "啟用",
+      "2": "停用"
+    },
+    "MEMBER": {
+      "TITLE": "組織管理員",
+      "DESCRIPTION": "定義可以更改組織首選項的使用者。"
+    },
+    "TOAST": {
+      "UPDATED": "組織已更新",
+      "DEACTIVATED": "組織已停用。",
+      "REACTIVATED": "組織重新啟用。",
+      "DOMAINADDED": "網域已新增。",
+      "DOMAINREMOVED": "網域已刪除。",
+      "MEMBERADDED": "管理員已新增。",
+      "MEMBERREMOVED": "管理員已刪除。",
+      "MEMBERCHANGED": "管理員以改變。",
+      "SETPRIMARY": "組織網域已成功設定。",
+      "DELETED": "成功刪除的組織",
+      "DEFAULTORGNOTFOUND": "找不到預設組織",
+      "ORG_WAS_DELETED": "組織被刪除"
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "停用組織",
+        "DESCRIPTION": "您即將停用您的組織。之後使用者將無法登入。你確定要繼續嗎？"
+      },
+      "REACTIVATE": {
+        "TITLE": "重新啟用組織",
+        "DESCRIPTION": "您即將重新啟用您的組織。使用者將能夠再次登入。你確定要繼續嗎？"
+      },
+      "DELETE": {
+        "TITLE": "刪除組織",
+        "DESCRIPTION": "你即將刪除你的組織。這將啟動一個過程，所有與組織有關的資料將被刪除。你現在還不能恢復這一行動。",
+        "TYPENAME": "輸入「{{value}}」以刪除您的組織。",
+        "ORGNAME": "組織名稱",
+        "BTN": "刪除"
+      }
+    }
+  },
+  "SETTINGS": {
+    "LIST": {
+      "ORGS": "組織",
+      "FEATURESETTINGS": "功能設定",
+      "LANGUAGES": "語言",
+      "LOGIN": "登入行為和安全",
+      "LOCKOUT": "安全鎖策略",
+      "AGE": "密碼過期",
+      "COMPLEXITY": "密碼複雜性",
+      "NOTIFICATIONS": "通知設定",
+      "SMTP_PROVIDER": "SMTP 提供者",
+      "SMS_PROVIDER": "簡訊/電話提供者",
+      "NOTIFICATIONS_DESC": "SMTP 和 SMS 設定",
+      "MESSAGETEXTS": "訊息文字",
+      "IDP": "身分提供者",
+      "VERIFIED_DOMAINS": "組織網域",
+      "DOMAIN": "網域設定",
+      "LOGINTEXTS": "登入介面文字",
+      "BRANDING": "品牌標識",
+      "PRIVACYPOLICY": "隱私政策",
+      "OIDC": "OIDC 令牌有效期和過期時間",
+      "WEB_KEYS": "OIDC Web Keys",
+      "SECRETS": "驗證碼外觀",
+      "SECURITY": "安全設定",
+      "EVENTS": "活動",
+      "FAILEDEVENTS": "失敗事件",
+      "VIEWS": "資料表",
+      "ACTIONS": "Actions",
+      "TARGETS": "Targets"
+    },
+    "GROUPS": {
+      "GENERAL": "通用",
+      "NOTIFICATIONS": "通知",
+      "LOGIN": "登入和存取",
+      "DOMAIN": "網域",
+      "TEXTS": "文字和語言",
+      "APPEARANCE": "外觀",
+      "OTHER": "其他",
+      "STORAGE": "貯存",
+      "ACTIONS": "Actions"
+    },
+    "BETA": "測試版"
+  },
+  "SETTING": {
+    "LANGUAGES": {
+      "DEFAULT": "預設語言",
+      "ALLOWED": "允許的語言",
+      "NOT_ALLOWED": "不允許的語言",
+      "ALLOW_ALL": "允許所有語言",
+      "DISALLOW_ALL": "禁止所有語言",
+      "SETASDEFAULT": "設定為預設語言",
+      "DEFAULT_SAVED": "預設語言已儲存",
+      "ALLOWED_SAVED": "允許的語言已儲存",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "簡體中文",
+        "zh-TW": "繁體中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands",
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Türkçe",
+        "uk": "Українська",
+        "ar": "العربية"
+      }
+    },
+    "SMTP": {
+      "TITLE": "SMTP 設定",
+      "DESCRIPTION": "描述",
+      "SENDERADDRESS": "發件人地址",
+      "SENDERNAME": "發件人名稱",
+      "REPLYTOADDRESS": "Reply-to 地址",
+      "HOSTANDPORT": "主機和埠",
+      "USER": "使用者名稱",
+      "PASSWORD": "密碼",
+      "SETPASSWORD": "設定 SMTP 密碼",
+      "PASSWORDSET": "SMTP 密碼設定成功。",
+      "TLS": "使用安全傳輸層 (TLS)",
+      "SAVED": "儲存成功！",
+      "NOCHANGES": "沒有變化！",
+      "REQUIREDWARN": "要從您的域傳送通知，您必須輸入您的 SMTP 資料。"
+    },
+    "SMS": {
+      "PROVIDERS": "服務商",
+      "PROVIDER": "SMS 服務商",
+      "ADDPROVIDER": "新增 SMS 服務商",
+      "ADDPROVIDERDESCRIPTION": "選擇可用的提供者之一併輸入所需的資料。",
+      "REMOVEPROVIDER": "移除提供者",
+      "REMOVEPROVIDER_DESC": "您即將刪除服務商的設定。你想繼續嗎？",
+      "SMSPROVIDERSTATE": {
+        "0": "未指定",
+        "1": "啟用",
+        "2": "停用"
+      },
+      "ACTIVATED": "服務商已啟用。",
+      "DEACTIVATED": "服務商已停用。",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "令牌",
+        "SENDERNUMBER": "發件人號碼",
+        "VERIFYSERVICESID": "驗證服務 SID",
+        "VERIFYSERVICESID_DESCRIPTION": "設定驗證服務 SID，允許使用 Twilio 驗證服務而不是訊息服務來驗證電話號碼和 OTP SMS。",
+        "ADDED": "Twilio 新增成功。",
+        "UPDATED": "Twilio 更新成功。",
+        "REMOVED": "Twilio 已刪除",
+        "CHANGETOKEN": "更改令牌",
+        "SETTOKEN": "設定令牌",
+        "TOKENSET": "令牌設定成功。"
+      }
+    },
+    "SECRETS": {
+      "TYPES": "驗證碼型別",
+      "TYPE": {
+        "1": "初始化郵件",
+        "2": "電子郵件驗證",
+        "3": "電話號碼驗證",
+        "4": "重設密碼",
+        "5": "Passkey 初始化",
+        "6": "應用金鑰",
+        "7": "OTP - SMS",
+        "8": "OTP - 電子郵件",
+        "9": "邀請碼"
+      },
+      "EXPIRY": "過期時間 (以分鐘為單位)",
+      "INCLUDEDIGITS": "包含數字",
+      "INCLUDESYMBOLS": "包含特殊符號",
+      "INCLUDELOWERLETTERS": "包含小寫字母",
+      "INCLUDEUPPERLETTERS": "包含大寫字母",
+      "LENGTH": "長度",
+      "UPDATED": "設定已更新。"
+    },
+    "SECURITY": {
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "此設定將CSP設定為允許來自一組允許的域的框架。請注意，透過啟用iFrames的使用，你會有允許點選劫持的風險。",
+      "IFRAMEENABLED": "允許 iFrame",
+      "ALLOWEDORIGINS": "允許的來源 URL",
+      "IMPERSONATIONTITLE": "冒充",
+      "IMPERSONATIONENABLED": "允許模擬",
+      "IMPERSONATIONDESCRIPTION": "此設定原則上允許使用模擬。請注意，模擬者還需要分配適當的 `*_IMPERSONATOR` 角色。"
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "登入預設組織",
+      "LOGINDEFAULTORG_DESCRIPTION": "如果沒有設定組織上下文，登入介面將使用預設組織的設定（而不是執行個體的設定）",
+      "USERSCHEMA": "使用者架構",
+      "USERSCHEMA_DESCRIPTION": "使用者架構允許管理使用者的資料架構。如果啟用此標誌，您將可以使用新的 API 及其功能。",
+      "ACTIONS": "操作",
+      "ACTIONS_DESCRIPTION": "Actions v2 可以管理資料執行和目標。如果啟用此標誌，您將可以使用新的 API 及其功能。",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 終止工作階段",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "如果啟用了標誌，您可以透過在 end_session 端點上提供帶有 `sid` 宣告的 id_token 作為 id_token_hint 來從登入 UI 終止單個工作階段。 請注意，目前所有來自同一使用者代理（瀏覽器）的工作階段都在登入 UI 中終止。 透過工作階段 API 管理的工作階段已經允許終止單個工作階段。",
+      "DEBUGOIDCPARENTERROR": "除錯 OIDC 父錯誤",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "如果啟用該標誌，OIDC 父錯誤將記錄在控制檯中。",
+      "PERMISSIONCHECKV2": "權限檢查 V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "如果啟用該標誌，您將能夠使用新的 API 及其功能。",
+      "STATES": {
+        "INHERITED": "繼承",
+        "ENABLED": "已啟用",
+        "DISABLED": "已停用"
+      },
+      "INHERITED_DESCRIPTION": "此設定將值設定為系統預設值。",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "“已啟用” 是繼承的",
+        "DISABLED": "“已停用” 是繼承的"
+      },
+      "RESET": "全部設定為繼承",
+      "CONSOLEUSEV2USERAPI": "在管理控制檯中使用V2 API建立使用者。",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "啟用此標誌時，管理控制檯使用V2使用者API建立新使用者。使用V2 API，新建立的使用者將以無初始狀態開始。",
+      "LOGINV2": "登入 V2",
+      "LOGINV2_DESCRIPTION": "啟用此選項將啟用基於 TypeScript 的新登入介面，具有更高的安全性、效能和可定製性。",
+      "LOGINV2_BASEURI": "基礎 URI",
+      "ENABLERELATIONALTABLES": "關係表",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "啟用此功能以使用關係表而不是投影來儲存資料。目前此切換沒有任何作用。"
+    },
+    "DIALOG": {
+      "RESET": {
+        "DEFAULTTITLE": "重設設定",
+        "DEFAULTDESCRIPTION": "您即將將設定重設為執行個體的預設設定。你確定你要繼續嗎？",
+        "LOGINPOLICY_DESCRIPTION": "警告：如果您繼續，身分提供程式設定也將重設為執行個體設定。"
+      }
+    }
+  },
+  "POLICY": {
+    "APPLIEDTO": "應用於",
+    "PWD_COMPLEXITY": {
+      "TITLE": "密碼複雜性",
+      "DESCRIPTION": "確保所有設定的密碼對應於特定模式",
+      "SYMBOLANDNUMBERERROR": "密碼必須由數字和符號/標點符號組成。",
+      "SYMBOLERROR": "密碼必須包含符號/標點符號。",
+      "NUMBERERROR": "密碼必須包含數字。",
+      "PATTERNERROR": "密碼不符合要求。"
+    },
+    "NOTIFICATION": {
+      "TITLE": "通知",
+      "DESCRIPTION": "確定將傳送哪些更改、通知",
+      "PASSWORDCHANGE": "密碼已更改"
+    },
+    "PRIVATELABELING": {
+      "DESCRIPTION": "為登入提供您的個性化風格並修改其行為。",
+      "PREVIEW_DESCRIPTION": "策略的更改將自動部署到預覽環境。",
+      "BTN": "選擇檔案",
+      "ACTIVATEPREVIEW": "應用設定",
+      "DARK": "深色模式",
+      "LIGHT": "淺色模式",
+      "CHANGEVIEW": "改變檢視",
+      "ACTIVATED": "策略變更現已生效",
+      "THEME": "主題",
+      "COLORS": "顏色",
+      "FONT": "字型",
+      "ADVANCEDBEHAVIOR": "高階行為",
+      "DROP": "將影象拖放到此處或",
+      "RELEASE": "Release",
+      "DROPFONT": "將字型檔案放入這裡",
+      "RELEASEFONT": "Release",
+      "USEOFLOGO": "您的徽標將用於登入和電子郵件，而圖示用於較小的 UI 元素，例如管理控制檯中的組織切換器",
+      "MAXSIZE": "圖片最大支援 524kB",
+      "EMAILNOSVG": "電子郵件不支援 SVG 檔案格式。因此建議以 PNG 或其他支援的格式上傳您的 Logo。",
+      "MAXSIZEEXCEEDED": "檔案大小超過了 524kB。",
+      "NOSVGSUPPORTED": "不支援 SVG 格式！",
+      "FONTINLOGINONLY": "該字型僅在目前登入介面中顯示。",
+      "BACKGROUNDCOLOR": "背景顏色",
+      "PRIMARYCOLOR": "原色",
+      "WARNCOLOR": "警示色",
+      "FONTCOLOR": "字型顏色",
+      "VIEWS": {
+        "PREVIEW": "預覽",
+        "CURRENT": "目前設定"
+      },
+      "PREVIEW": {
+        "TITLE": "登入",
+        "SECOND": "使用您的 Zitadel 帳戶登入。",
+        "ERROR": "找不到使用者！",
+        "PRIMARYBUTTON": "下一步",
+        "SECONDARYBUTTON": "註冊"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "自動模式",
+        "THEME_MODE_LIGHT": "僅限燈光模式",
+        "THEME_MODE_DARK": "僅限深色模式"
+      }
+    },
+    "PWD_AGE": {
+      "TITLE": "密碼過期",
+      "DESCRIPTION": "您可以設定密碼過期策略。此策略將強制使用者在密碼過期後下次登入時變更密碼。沒有自動警告和通知。"
+    },
+    "PWD_LOCKOUT": {
+      "TITLE": "鎖定策略",
+      "DESCRIPTION": "設定密碼重試的最大次數，之後帳戶將被阻止。"
+    },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "品牌標識",
+      "BTN": "選擇檔案",
+      "DESCRIPTION": "自定義登入介面的外觀",
+      "ACTIVATEPREVIEW": "啟用設定"
+    },
+    "LOGIN_POLICY": {
+      "TITLE": "登入設定",
+      "DESCRIPTION": "定義如何對使用者進行身分驗證和設定身分提供者",
+      "DESCRIPTIONCREATEADMIN": "使用者可以從以下可用的身分提供者中進行選擇。",
+      "DESCRIPTIONCREATEMGMT": "使用者可以從以下可用的身分提供者中進行選擇。注意：您可為系統設定提供者也可以僅為您的組織單獨設定提供者。",
+      "LIFETIME_INVALID": "表單包含無效值。",
+      "SAVED": "儲存成功！",
+      "PROVIDER_ADDED": "身分提供者已啟用。"
+    },
+    "PRIVACY_POLICY": {
+      "DESCRIPTION": "設定您的隱私政策和服務條款連結",
+      "TOSLINK": "連結到服務條款",
+      "POLICYLINK": "連結到隱私政策",
+      "HELPLINK": "連結到協助",
+      "SUPPORTEMAIL": "支援電子郵件",
+      "DOCSLINK": "文件連結（管理控制檯）",
+      "CUSTOMLINK": "自定義連結（管理控制檯）",
+      "CUSTOMLINKTEXT": "自定義連結文字（管理控制檯）",
+      "SAVED": "儲存成功！",
+      "RESET_TITLE": "恢復預設值",
+      "RESET_DESCRIPTION": "您即將恢復 TOS 和隱私政策的預設連結。你真的要繼續嗎？"
+    },
+    "LOGIN_TEXTS": {
+      "TITLE": "登入介面文字",
+      "DESCRIPTION": "定義登入介面的文字。如果文字為空，將使用顯示為佔位符的預設值。",
+      "DESCRIPTION_SHORT": "定義登入介面的文字。",
+      "NEWERVERSIONEXISTS": "存在較新版本",
+      "CURRENTDATE": "目前設定",
+      "CHANGEDATE": "較新版本來自",
+      "KEYNAME": "登入螢幕/介面",
+      "RESET_TITLE": "恢復預設值",
+      "RESET_DESCRIPTION": "您即將恢復所有預設值。您所做的所有更改都將被永久刪除。你真的要繼續嗎？",
+      "UNSAVED_TITLE": "繼續但不儲存？",
+      "UNSAVED_DESCRIPTION": "您在未儲存的情況下進行了更改。您現在要儲存嗎？",
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "您選擇了不允許的語言。您可以繼續修改文字。但是，如果您希望您的使用者實際上能夠使用此語言，請更改您的執行個體限制。",
+      "LANGUAGES_NOT_ALLOWED": "不允許：",
+      "LANGUAGE": "語言",
+      "LANGUAGES": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "簡體中文",
+        "zh-TW": "繁體中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands",
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Türkçe",
+        "uk": "Українська",
+        "ar": "العربية"
+      },
+      "KEYS": {
+        "emailVerificationDoneText": "電子郵件驗證完成",
+        "emailVerificationText": "電子郵件驗證",
+        "externalUserNotFoundText": "找不到外部使用者",
+        "footerText": "頁尾",
+        "initMfaDoneText": "初始化 MFA 完成",
+        "initMfaOtpText": "初始化 MFA",
+        "initMfaPromptText": "初始化 MFA 提示",
+        "initMfaU2fText": "初始化通用第二身分驗證因子",
+        "initPasswordDoneText": "初始化密碼完成",
+        "initPasswordText": "初始化密碼",
+        "initializeDoneText": "初始化使用者完成",
+        "initializeUserText": "初始化使用者",
+        "linkingUserDoneText": "連結使用者完成",
+        "loginText": "登入",
+        "logoutText": "登出",
+        "mfaProvidersText": "MFA 提供者",
+        "passwordChangeDoneText": "密碼修改完成",
+        "passwordChangeText": "變更密碼",
+        "passwordResetDoneText": "密碼重設完成",
+        "passwordText": "密碼",
+        "registrationOptionText": "註冊選項",
+        "registrationOrgText": "註冊組織",
+        "registrationUserText": "註冊使用者",
+        "selectAccountText": "選擇帳戶",
+        "successLoginText": "登入成功",
+        "usernameChangeDoneText": "使用者名稱更改完成",
+        "usernameChangeText": "更改使用者名稱",
+        "verifyMfaOtpText": "OTP 驗證",
+        "verifyMfaU2fText": "通用第二身分因素驗證",
+        "passwordlessPromptText": "Passkey 提示",
+        "passwordlessRegistrationDoneText": "Passkey 註冊完成",
+        "passwordlessRegistrationText": "Passkey 註冊",
+        "passwordlessText": "Passkey",
+        "externalRegistrationUserOverviewText": "外部註冊使用者概述"
+      }
+    },
+    "MESSAGE_TEXTS": {
+      "TYPE": "通知",
+      "TYPES": {
+        "INIT": "初始化",
+        "VE": "驗證電子郵件",
+        "VP": "驗證手機號碼",
+        "VSO": "驗證簡訊 OTP",
+        "VEO": "驗證電子郵件 OTP",
+        "PR": "重設密碼",
+        "DC": "網域宣告",
+        "PL": "Passkey",
+        "PC": "修改密碼",
+        "IU": "邀請使用者"
+      },
+      "CHIPS": {
+        "firstname": "名字",
+        "lastname": "姓氏",
+        "code": "Code",
+        "preferredLoginName": "首選登入名稱",
+        "displayName": "展示名稱",
+        "nickName": "暱稱",
+        "loginnames": "登入名稱",
+        "domain": "網域",
+        "lastEmail": "電子郵件",
+        "lastPhone": "手機號碼",
+        "verifiedEmail": "已驗證的電子郵件",
+        "verifiedPhone": "已驗證的手機號碼",
+        "changedate": "修改於",
+        "username": "使用者名稱",
+        "tempUsername": "臨時使用者名稱",
+        "otp": "OTP",
+        "verifyUrl": "驗證 OTP 的 URL",
+        "expiry": "過期時間",
+        "applicationName": "應用程式名稱"
+      },
+      "TOAST": {
+        "UPDATED": "自定義文字已儲存。"
+      }
+    },
+    "DEFAULTLABEL": "目前設定與您的執行個體的標準相對應。",
+    "BTN_INSTALL": "設定",
+    "BTN_EDIT": "修改",
+    "DATA": {
+      "DESCRIPTION": "描述",
+      "MINLENGTH": "最小長度",
+      "HASNUMBER": "包含數字",
+      "HASSYMBOL": "包含符號",
+      "HASLOWERCASE": "包含小寫字母",
+      "HASUPPERCASE": "包含大寫字母",
+      "SHOWLOCKOUTFAILURES": "顯示鎖定失敗",
+      "MAXPASSWORDATTEMPTS": "密碼最大嘗試次數",
+      "MAXOTPATTEMPTS": "最多嘗試 OTP 次數",
+      "EXPIREWARNDAYS": "密碼將在幾天後過期",
+      "MAXAGEDAYS": "最大有效期 (天)",
+      "USERLOGINMUSTBEDOMAIN": "使用者名稱必須包含組織網域",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "如果啟用此設定，所有登入名稱都將以組織域為字尾。如果停用此設定，您必須確保使用者名稱在所有組織中都是唯一的。",
+      "VALIDATEORGDOMAINS": "組織網域驗證需要 (DNS 或 HTTP 挑戰)",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP 發件人地址與執行個體網域匹配",
+      "ALLOWUSERNAMEPASSWORD_DESC": "允許使用使用者名稱和密碼進行登入。",
+      "ALLOWEXTERNALIDP_DESC": "允許外部身分提供者進行登入",
+      "ALLOWREGISTER_DESC": "如果選擇了該選項，登入中會出現一個用於註冊使用者的附加步驟。",
+      "FORCEMFA": "強制所有使用者使用 MFA",
+      "FORCEMFALOCALONLY": "僅強制本機認證使用者使用 MFA",
+      "FORCEMFALOCALONLY_DESC": "如果選擇該選項，本機經過身分驗證的使用者必須設定第二個登入因素。",
+      "HIDEPASSWORDRESET_DESC": "如果選擇該選項，則使用者無法在登入過程中重設其密碼。",
+      "HIDELOGINNAMESUFFIX": "隱藏登入名稱字尾",
+      "HIDELOGINNAMESUFFIX_DESC": "在登入介面隱藏登入名稱字尾",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "如果選擇該選項，即使找不到使用者，登入過程中也會顯示密碼螢幕。如果使用者名稱或密碼錯誤，密碼檢查的錯誤不會透露。",
+      "ALLOWDOMAINDISCOVERY_DESC": "如果選擇該選項，在登入螢幕上輸入的未知使用者名稱的字尾（@domain.com）將與組織的網域進行匹配，成功後將重新導向到組織的註冊。",
+      "DEFAULTREDIRECTURI": "預設重新導向 URI",
+      "DEFAULTREDIRECTURI_DESC": "定義如果在沒有應用程式上下文的情況下開始登入（例如來自郵件），使用者將被重新導向到哪裡。",
+      "ERRORMSGPOPUP": "在對話方塊中顯示錯誤",
+      "DISABLEWATERMARK": "隱藏水印",
+      "DISABLEWATERMARK_DESC": "登入介面隱藏 Powered by Zitadel 水印"
+    },
+    "RESET": "重設為執行個體預設值",
+    "CREATECUSTOM": "建立自定義策略",
+    "TOAST": {
+      "SET": "策略設定成功！",
+      "RESETSUCCESS": "策略重設成功！",
+      "UPLOADSUCCESS": "上傳成功！",
+      "DELETESUCCESS": "刪除成功！",
+      "UPLOADFAILED": "上傳失敗！"
+    }
+  },
+  "ORG_DETAIL": {
+    "TITLE": "組織",
+    "DESCRIPTION": "您可以在此處編輯組織的設定並管理管理員。",
+    "DETAIL": {
+      "TITLE": "詳情",
+      "NAME": "名稱",
+      "DOMAIN": "網域",
+      "STATE": {
+        "0": "未定義",
+        "1": "啟用",
+        "2": "停用"
+      }
+    },
+    "MEMBER": {
+      "TITLE": "管理員",
+      "USERNAME": "使用者名稱",
+      "DISPLAYNAME": "展示名稱",
+      "LOGINNAME": "登入名稱",
+      "EMAIL": "電子郵件",
+      "ROLES": "角色",
+      "ADD": "新增管理員",
+      "ADDDESCRIPTION": "輸入要新增的使用者的名稱。"
+    },
+    "TABLE": {
+      "TOTAL": "條目總數",
+      "SELECTION": "選中條目",
+      "DEACTIVATE": "停用使用者",
+      "ACTIVATE": "啟用使用者",
+      "DELETE": "刪除使用者",
+      "CLEAR": "清空選擇"
+    }
+  },
+  "PROJECT": {
+    "PAGES": {
+      "TITLE": "專案",
+      "DESCRIPTION": "在這裡，您可以定義應用程式、管理角色並授權其他組織使用您的專案。",
+      "DELETE": "刪除專案",
+      "DETAIL": "詳情",
+      "CREATE": "建立專案",
+      "CREATE_DESC": "插入您的專案名稱。",
+      "ROLE": "角色",
+      "NOITEMS": "沒有專案",
+      "ZITADELPROJECT": "這屬於 Zitadel 專案。注意：如果您修改了設定，Zitadel 可能無法正常執行。",
+      "TYPE": {
+        "OWNED": "擁有的專案",
+        "OWNED_SINGULAR": "擁有專案",
+        "GRANTED_SINGULAR": "授予{{name}}的專案"
+      },
+      "PRIVATELABEL": {
+        "TITLE": "品牌標識設定",
+        "0": {
+          "TITLE": "未指定",
+          "DESC": "識別使用者後，將顯示已識別使用者的組織品牌，然後顯示系統預設值。"
+        },
+        "1": {
+          "TITLE": "使用專案設定",
+          "DESC": "將顯示擁有該專案的組織的品牌。"
+        },
+        "2": {
+          "TITLE": "使用使用者組織設定",
+          "DESC": "將顯示專案組織的品牌，但一旦識別使用者，將顯示已識別使用者的組織設定。"
+        },
+        "DIALOG": {
+          "TITLE": "品牌標識設定",
+          "DESCRIPTION": "選擇專案登入時使用的行為。"
+        }
+      },
+      "PINNED": "固定",
+      "ALL": "所有",
+      "CREATEDON": "建立於",
+      "LASTMODIFIED": "最後更改於",
+      "ADDNEW": "建立新專案",
+      "DIALOG": {
+        "REACTIVATE": {
+          "TITLE": "重新啟用專案",
+          "DESCRIPTION": "您真的要重新啟用您的專案嗎？"
+        },
+        "DEACTIVATE": {
+          "TITLE": "停用專案",
+          "DESCRIPTION": "您真的要停用您的專案嗎？"
+        },
+        "DELETE": {
+          "TITLE": "刪除專案",
+          "DESCRIPTION": "您真的要刪除您的專案嗎？",
+          "TYPENAME": "鍵入專案的名稱以將其永久刪除。"
+        }
+      },
+      "ID": "專案ID"
+    },
+    "SETTINGS": {
+      "TITLE": "設定",
+      "DESCRIPTION": ""
+    },
+    "STATE": {
+      "TITLE": "狀態",
+      "0": "未定義",
+      "1": "啟用",
+      "2": "停用"
+    },
+    "TYPE": {
+      "TITLE": "型別",
+      "0": "未知型別",
+      "1": "擁有的",
+      "2": "被授權的"
+    },
+    "NAME": "名稱",
+    "NAMEDIALOG": {
+      "TITLE": "重新命名專案",
+      "DESCRIPTION": "輸入專案的新名稱",
+      "NAME": "新名稱"
+    },
+    "MEMBER": {
+      "TITLE": "管理員",
+      "TITLEDESC": "管理員可以根據他們的角色對此專案進行更改。",
+      "DESCRIPTION": "這些管理員可能能夠編輯您的專案。",
+      "USERNAME": "使用者名稱",
+      "DISPLAYNAME": "展示名稱",
+      "LOGINNAME": "登入名稱",
+      "EMAIL": "電子郵件",
+      "ROLES": "角色",
+      "USERID": "使用者 ID"
+    },
+    "GRANT": {
+      "EMPTY": "沒有被授權的組織。",
+      "TITLE": "專案授權",
+      "DESCRIPTION": "允許其他組織使用您的專案。",
+      "EDITTITLE": "編輯角色",
+      "CREATE": {
+        "TITLE": "建立專案授權",
+        "SEL_USERS": "選擇您要授予存取權限的使用者",
+        "SEL_PROJECT": "搜尋專案",
+        "SEL_ROLES": "選擇要新增到授權中的角色",
+        "SEL_USER": "選擇一個或多個使用者",
+        "SEL_ORG": "搜尋組織",
+        "SEL_ORG_DESC": "搜尋要授予的組織",
+        "ORG_DESCRIPTION": "您即將授予組織 {{name}} 的使用者。",
+        "ORG_DESCRIPTION_DESC": "切換上面標題中的上下文以授予另一個組織的使用者。",
+        "SEL_ORG_FORMFIELD": "組織",
+        "FOR_ORG": "專案授權將為以下物件建立:"
+      },
+      "DETAIL": {
+        "TITLE": "專案授權",
+        "DESC": "您可以選擇指定組織可以使用哪些角色，並選擇管理員",
+        "MEMBERTITLE": "管理員",
+        "MEMBERDESC": "這些是被授予組織的管理員。在此處新增應有權編輯專案資料的使用者。",
+        "PROJECTNAME": "專案名稱",
+        "GRANTEDORG": "授予組織",
+        "RESOURCEOWNER": "資源所有者"
+      },
+      "STATE": "狀態",
+      "STATES": {
+        "1": "啟用",
+        "2": "停用"
+      },
+      "ALL": "所有",
+      "SHOWDETAIL": "顯示詳細資料",
+      "USER": "使用者",
+      "MEMBERS": "管理員",
+      "ORG": "組織",
+      "PROJECTNAME": "專案名稱",
+      "GRANTEDORG": "授予組織",
+      "GRANTEDORGDOMAIN": "網域",
+      "RESOURCEOWNER": "資源所有者",
+      "GRANTEDORGNAME": "組織名稱",
+      "GRANTID": "授權編號",
+      "CREATIONDATE": "建立於",
+      "CHANGEDATE": "最後更新於",
+      "DATES": "日期",
+      "ROLENAMESLIST": "角色",
+      "NOROLES": "沒有角色",
+      "TYPE": "型別",
+      "TOAST": {
+        "PROJECTGRANTUSERGRANTADDED": "專案授權已建立。",
+        "PROJECTGRANTADDED": "專案授權已建立。",
+        "PROJECTGRANTCHANGED": "專案授權已更改",
+        "PROJECTGRANTMEMBERADDED": "授權管理員已新增",
+        "PROJECTGRANTMEMBERCHANGED": "授權管理員已更改。",
+        "PROJECTGRANTMEMBERREMOVED": "授權管理員已刪除。",
+        "PROJECTGRANTUPDATED": "專案授權已更新。"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "刪除專案授權",
+        "DELETE_DESCRIPTION": "您即將刪除專案授權。你確定嗎？"
+      },
+      "ROLES": "專案角色"
+    },
+    "APP": {
+      "TITLE": "應用",
+      "NAME": "名稱",
+      "NAMEREQUIRED": "應用名稱是必需的。"
+    },
+    "ROLE": {
+      "EMPTY": "尚未建立任何角色。",
+      "ADDNEWLINE": "新增角色",
+      "KEY": "關鍵字",
+      "TITLE": "角色",
+      "DESCRIPTION": "定義一些可用於建立專案授權的角色。",
+      "NAME": "名稱",
+      "DISPLAY_NAME": "展示名稱",
+      "GROUP": "組名",
+      "ACTIONS": "操作",
+      "ADDTITLE": "建立角色",
+      "ADDDESCRIPTION": "輸入新角色的資料。",
+      "EDITTITLE": "編輯角色",
+      "EDITDESCRIPTION": "輸入角色的新資料。",
+      "DELETE": "刪除角色",
+      "CREATIONDATE": "建立於",
+      "CHANGEDATE": "最後修改於",
+      "SELECTGROUPTOOLTIP": "選擇組 {{group}} 的所有角色。",
+      "OPTIONS": "選項",
+      "ASSERTION": "身分驗證時附加角色資訊",
+      "ASSERTION_DESCRIPTION": "角色資訊將包含在使用者資訊中，具體取決於令牌型別和應用程式設定。",
+      "CHECK": "身分驗證時檢查使用者授權",
+      "CHECK_DESCRIPTION": "若使用者未被分配到該專案中的任何角色，則拒絕認證。允許向專案分配角色權限，但無需為使用者指定具體角色。",
+      "DIALOG": {
+        "DELETE_TITLE": "刪除角色",
+        "DELETE_DESCRIPTION": "您即將刪除專案角色。你確定嗎？"
+      }
+    },
+    "HAS_PROJECT": "身分驗證時檢查是否擁有專案",
+    "HAS_PROJECT_DESCRIPTION": "檢查使用者或組織是否有這個專案。如果沒有則使用者身分驗證失敗。",
+    "TABLE": {
+      "TOTAL": "條目總數:",
+      "SELECTION": "選定條目",
+      "DEACTIVATE": "停用專案",
+      "ACTIVATE": "啟用專案",
+      "DELETE": "刪除專案",
+      "ORGNAME": "組織名稱",
+      "ORGID": "組織ID",
+      "ORGDOMAIN": "組織網域",
+      "STATE": "狀態",
+      "TYPE": "型別",
+      "CREATIONDATE": "建立於",
+      "CHANGEDATE": "最後更改於",
+      "RESOURCEOWNER": "所有者",
+      "SHOWTABLE": "表檢視",
+      "SHOWGRID": "網格檢視",
+      "EMPTY": "找不到專案"
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "管理員已刪除。",
+      "MEMBERSADDED": "管理員已新增。",
+      "MEMBERADDED": "管理員已新增。",
+      "MEMBERCHANGED": "管理員已更改。",
+      "ROLESCREATED": "角色已建立。",
+      "ROLEREMOVED": "角色已刪除。",
+      "ROLECHANGED": "角色已更改。",
+      "REACTIVATED": "已重新啟用。",
+      "DEACTIVATED": "已停用。",
+      "CREATED": "專案已建立。",
+      "UPDATED": "專案已修改。",
+      "GRANTUPDATED": "專案授權已更改。",
+      "DELETED": "專案已刪除"
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "刪除角色",
+      "DELETE_DESCRIPTION": "您即將刪除一個角色。你確定嗎？"
+    }
+  },
+  "NEXTSTEPS": {
+    "TITLE": "下一步"
+  },
+  "IDP": {
+    "LIST": {
+      "ACTIVETITLE": "啟用的身分提供者"
+    },
+    "CREATE": {
+      "TITLE": "建立身分提供者",
+      "DESCRIPTION": "選擇以下一個或多個身分提供者。",
+      "STEPPERTITLE": "建立身分提供者",
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "輸入所需資料，以允許其他 ZITADEL 執行個體的使用者進行身分驗證。"
+      },
+      "OIDC": {
+        "TITLE": "OIDC 身分提供者",
+        "DESCRIPTION": "輸入你的 OIDC 提供者的必要資料。"
+      },
+      "OAUTH": {
+        "TITLE": "OAuth 身分提供者",
+        "DESCRIPTION": "輸入你的 OAuth 提供者的必要資料。"
+      },
+      "JWT": {
+        "TITLE": "JWT 身分提供者",
+        "DESCRIPTION": "輸入你的 JWT 提供者所需的資料。"
+      },
+      "GOOGLE": {
+        "TITLE": "Google 身分提供者",
+        "DESCRIPTION": "輸入您的 Google 身分提供者的憑證"
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab 身分提供者",
+        "DESCRIPTION": "輸入您的 Gitlab 身分提供者的憑證"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab 自我託管身分提供者",
+        "DESCRIPTION": "輸入您的 Gitlab 自我託管身分提供者的憑證"
+      },
+      "GITHUBES": {
+        "TITLE": "Github Enterprise Server 身分提供者",
+        "DESCRIPTION": "輸入您的 GitHub Enterprise Server 身分提供者的憑證"
+      },
+      "GITHUB": {
+        "TITLE": "Github 身分提供者",
+        "DESCRIPTION": "輸入您的 Github 身分提供者的憑證"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft 身分提供者",
+        "DESCRIPTION": "輸入您的 Microsoft 身分提供者的憑證"
+      },
+      "LDAP": {
+        "TITLE": "域控服務 / LDAP 身分提供者",
+        "DESCRIPTION": "輸入您的 LDAP 身分提供者的憑證"
+      },
+      "APPLE": {
+        "TITLE": "Apple 身分提供者",
+        "DESCRIPTION": "輸入您的 Apple 身分提供者的憑證"
+      },
+      "SAML": {
+        "TITLE": "SAML 身分提供者",
+        "DESCRIPTION": "輸入您的 SAML 身分提供者的憑證"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "身分提供者",
+      "DESCRIPTION": "更新你的身分提供者設定",
+      "DATECREATED": "已建立",
+      "DATECHANGED": "已更新"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "是自動建立",
+      "ISAUTOCREATION_DESC": "如果選擇了，如果帳戶還不存在，就會建立一個帳戶。",
+      "ISAUTOUPDATE": "正在自動更新",
+      "ISAUTOUPDATE_DESC": "如果選擇，帳戶將在重新認證時更新。",
+      "ISCREATIONALLOWED": "允許建立帳戶（手動）",
+      "ISCREATIONALLOWED_DESC": "確定是否可以使用外部帳戶建立帳戶。如果使用者在啟用自動建立時不應該能夠編輯帳戶資訊，請停用。",
+      "ISLINKINGALLOWED": "允許連結帳戶（手動）",
+      "ISLINKINGALLOWED_DESC": "確定是否可以手動將身分連結到現有帳戶。如果使用者只能在啟用自動連結的情況下連結建議的帳戶，請停用。",
+      "AUTOLINKING_DESC": "確定是否提示將身分連結到現有帳戶。",
+      "AUTOLINKINGTYPE": {
+        "0": "已停用",
+        "1": "檢查現有使用者名稱",
+        "2": "檢查現有電子郵件"
+      }
+    },
+    "OWNERTYPES": {
+      "0": "未知",
+      "1": "執行個體",
+      "2": "組織"
+    },
+    "TYPES": {},
+    "STATES": {
+      "1": "啟用",
+      "2": "停用"
+    },
+    "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Consumers"
+    },
+    "AZUREADTENANTTYPE": "租戶型別",
+    "AZUREADTENANTID": "租戶編號",
+    "EMAILVERIFIED": "電子郵件已驗證",
+    "NAMEHINT": "如果指定，它將顯示在登入介面。",
+    "OPTIONAL": "可選",
+    "LDAPATTRIBUTES": "LDAP 屬性",
+    "UPDATEBINDPASSWORD": "更新連結密碼",
+    "UPDATECLIENTSECRET": "更新客戶秘密",
+    "ADD": "新增身分提供者",
+    "TYPE": "型別",
+    "OWNER": "所有者",
+    "ID": "身分提供者ID",
+    "NAME": "名稱",
+    "AUTHORIZATIONENDPOINT": "授權端點",
+    "TOKENENDPOINT": "令牌端點",
+    "USERENDPOINT": "使用者端點",
+    "IDATTRIBUTE": "標識屬性",
+    "AVAILABILITY": "可用性",
+    "AVAILABLE": "可用的",
+    "AVAILABLEBUTINACTIVE": "可用但已停用",
+    "SETAVAILABLE": "設定為可用",
+    "SETUNAVAILABLE": "設定為不可用",
+    "CONFIG": "設定",
+    "STATE": "狀態",
+    "ISSUER": "Issuer",
+    "SCOPESLIST": "Scopes List",
+    "INSTANCEROLESINFO": "執行個體角色對映",
+    "INSTANCEROLESINFO_DESC": "透過此提供者進行身分驗證的使用者將獲得他們在遠端 ZITADEL 執行個體的所列組織中擁有的執行個體成員角色（IAM_ 字首）。組織 ID 和主網域必須同時匹配。",
+    "ORGANIZATIONID": "組織 ID",
+    "ORGANIZATIONDOMAIN": "組織網域",
+    "CLIENTID": "Client ID",
+    "CLIENTSECRET": "Client Secret",
+    "LDAPCONNECTION": "聯絡",
+    "LDAPUSERBINDING": "使用者連結",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind Password",
+    "SERVERS": "Servers",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Timeout in seconds",
+    "USERBASE": "Userbase",
+    "USERFILTERS": "User filters",
+    "USEROBJECTCLASSES": "User Object Classes",
+    "REQUIRED": "必需的",
+    "LDAPIDATTRIBUTE": "ID attribute",
+    "AVATARURLATTRIBUTE": "Avatar Url attribute",
+    "DISPLAYNAMEATTRIBUTE": "Displayname attribute",
+    "EMAILATTRIBUTEATTRIBUTE": "Email attribute",
+    "EMAILVERIFIEDATTRIBUTE": "Email verified attribute",
+    "FIRSTNAMEATTRIBUTE": "姓名屬性",
+    "LASTNAMEATTRIBUTE": "姓氏屬性",
+    "NICKNAMEATTRIBUTE": "Nickname attribute",
+    "PHONEATTRIBUTE": "Phone attribute",
+    "PHONEVERIFIEDATTRIBUTE": "Phone verified attribute",
+    "PREFERREDLANGUAGEATTRIBUTE": "Preferred language attribute",
+    "PREFERREDUSERNAMEATTRIBUTE": "Preferred username attribute",
+    "PROFILEATTRIBUTE": "Profile attribute",
+    "IDPDISPLAYNAMMAPPING": "IDP 展示名稱對映",
+    "USERNAMEMAPPING": "使用者名稱對映",
+    "DATES": "日期",
+    "CREATIONDATE": "建立於",
+    "CHANGEDATE": "最後修改於",
+    "DEACTIVATE": "停用",
+    "ACTIVATE": "啟用",
+    "DELETE": "刪除",
+    "DELETE_TITLE": "刪除 IDP",
+    "DELETE_DESCRIPTION": "您即將刪除身分提供者。由此產生的變化是不可撤銷的。你真的想這樣做嗎？",
+    "REMOVE_WARN_TITLE": "刪除國內流離失所者",
+    "REMOVE_WARN_DESCRIPTION": "您即將刪除身分提供者。這將為您的使用者刪除可用 IDP 的選擇，並且已經註冊的使用者將無法再次登入。您確定要繼續嗎？",
+    "DELETE_SELECTION_TITLE": "刪除 IDP",
+    "DELETE_SELECTION_DESCRIPTION": "您即將刪除身分提供者。由此產生的變化是不可撤銷的。你真的想這樣做嗎？",
+    "FEDERATEDLOGOUTENABLED": "已啟用聯合登出",
+    "FEDERATEDLOGOUTENABLED_DESC": "如果啟用，使用者在 Zitadel 中終止工作階段時，也會從 IdP 登出。",
+    "EMPTY": "沒有可用的 IDP",
+    "OIDC": {
+      "GENERAL": "通用資訊",
+      "TITLE": "OIDC 設定",
+      "DESCRIPTION": "輸入 OIDC 身分提供者的資料。"
+    },
+    "JWT": {
+      "TITLE": "JWT 設定",
+      "DESCRIPTION": "輸入 JWT 身分提供者的資料。",
+      "HEADERNAME": "請求頭名稱",
+      "JWTENDPOINT": "JWT 端點",
+      "JWTKEYSENDPOINT": "JWT Keys 端點",
+      "AUDIENCE": "受眾"
+    },
+    "APPLE": {
+      "TEAMID": "Team ID",
+      "KEYID": "Key ID",
+      "PRIVATEKEY": "私鑰",
+      "UPDATEPRIVATEKEY": "更新私鑰",
+      "UPLOADPRIVATEKEY": "上傳私鑰",
+      "KEYMAXSIZEEXCEEDED": "達到了最大 5kB 的上限。"
+    },
+    "SAML": {
+      "METADATAXML": "後設資料 Xml",
+      "METADATAURL": "後設資料 URL",
+      "BINDING": "連結",
+      "SIGNEDREQUEST": "登入請求",
+      "NAMEIDFORMAT": "名字 ID 格式",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "自定義對映屬性名稱",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "如果返回的 `nameid-format` 是 `transient` ，則對映使用者的備用屬性名稱，參考 `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`",
+      "SIGNATUREALGORITHM": "簽章演算法"
+    },
+    "TOAST": {
+      "SAVED": "成功儲存。",
+      "REACTIVATED": "IDP 已重新啟用.",
+      "DEACTIVATED": "IDP 已停用.",
+      "SELECTEDREACTIVATED": "選定的 IDPs 已重新啟用。",
+      "SELECTEDDEACTIVATED": "選定的 IDPs 已停用。",
+      "SELECTEDKEYSDELETED": "已刪除選定的 IDPs。",
+      "DELETED": "IDP 刪除成功！",
+      "ADDED": "新增成功。",
+      "REMOVED": "成功刪除。"
+    },
+    "ISIDTOKENMAPPING": "從ID令牌對映",
+    "ISIDTOKENMAPPING_DESC": "如果選中，提供者資訊將從ID令牌對映，而不是從userinfo端點。",
+    "USEPKCE": "使用PKCE",
+    "USEPKCE_DESC": "確定 auth 請求中是否包含 code_challenge 和 code_challenge_method 引數"
+  },
+  "MFA": {
+    "LIST": {
+      "MULTIFACTORTITLE": "Passkey",
+      "MULTIFACTORDESCRIPTION": "在此處為您的 Passkey 認證定義多因素。",
+      "SECONDFACTORTITLE": "多因素身分認證",
+      "SECONDFACTORDESCRIPTION": "進一步定義您可以用來保護您的密碼身分認證的可能因素。"
+    },
+    "CREATE": {
+      "TITLE": "建立身分認證因素",
+      "DESCRIPTION": "選擇您的新身分認證因素型別。"
+    },
+    "DELETE": {
+      "TITLE": "刪除身分認證因素 Factor",
+      "DESCRIPTION": "您即將從登入設定中刪除一個身分認證因素。你確定嗎？"
+    },
+    "TOAST": {
+      "ADDED": "新增成功。",
+      "SAVED": "儲存成功。",
+      "DELETED": "成功移除。"
+    },
+    "TYPE": "型別",
+    "MULTIFACTORTYPES": {
+      "0": "未知",
+      "1": "Passkey"
+    },
+    "SECONDFACTORTYPES": {
+      "0": "未知",
+      "1": "身分驗證應用程式的 OTP（TOTP）",
+      "2": "Passkey",
+      "3": "電子郵件 OTP (OTP email)",
+      "4": "簡訊 OTP (OTP SMS)",
+      "5": "恢復碼"
+    }
+  },
+  "LOGINPOLICY": {
+    "CREATE": {
+      "TITLE": "登入設定",
+      "DESCRIPTION": "定義如何在您的組織中對您的使用者進行身分驗證。"
+    },
+    "IDPS": "身分提供者",
+    "ADDIDP": {
+      "TITLE": "新增身分提供者",
+      "DESCRIPTION": "您可以選擇預定義或自行建立的提供程式進行身分驗證。",
+      "SELECTIDPS": "身分提供者"
+    },
+    "PASSWORDLESS": "Passkey 登入",
+    "PASSWORDLESSTYPE": {
+      "0": "不允許",
+      "1": "允許"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "SMTP 提供者",
+      "DESCRIPTION": "這些是您的 Zitadel 執行個體的 SMTP 提供者。啟用您想要用來向使用者傳送通知的通知。",
+      "EMPTY": "沒有可用的 SMTP 提供者",
+      "ACTIVATED": "活性",
+      "ACTIVATE": "啟用提供者",
+      "DEACTIVATE": "停用提供者",
+      "TEST": "測試您的提供者",
+      "TYPE": "型別",
+      "DIALOG": {
+        "ACTIVATED": "SMTP 設定已啟用",
+        "ACTIVATE_WARN_TITLE": "啟用 SMTP 設定",
+        "ACTIVATE_WARN_DESCRIPTION": "您即將啟用 SMTP 設定。首先，我們將停用目前活動的提供程式，然後啟用此設定。你確定嗎？",
+        "DEACTIVATE_WARN_TITLE": "停用 SMTP 設定",
+        "DEACTIVATE_WARN_DESCRIPTION": "您即將停用 SMTP 設定。你確定嗎？",
+        "DEACTIVATED": "SMTP 設定已停用",
+        "DELETE_TITLE": "刪除 SMTP 設定",
+        "DELETE_DESCRIPTION": "您將要刪除一個設定。輸入發件人姓名確認此操作",
+        "DELETED": "SMTP 設定已被刪除",
+        "SENDER": "輸入 {{value}} 以刪除此 SMTP 提供者。",
+        "TEST_TITLE": "測試你的 SMTP 設定",
+        "TEST_DESCRIPTION": "指定一個電子郵件地址來測試此提供者的 SMTP 設定",
+        "TEST_EMAIL": "郵件地址",
+        "TEST_RESULT": "測試結果"
+      }
+    },
+    "CREATE": {
+      "TITLE": "新增 SMTP 提供者",
+      "DESCRIPTION": "選擇以下一個或多個提供者。",
+      "STEPS": {
+        "TITLE": "新增 {{ value }} SMTP 提供者",
+        "CREATE_DESC_TITLE": "逐步輸入您的 {{ value }} SMTP 設定",
+        "CURRENT_DESC_TITLE": "這些是您的 SMTP 設定",
+        "PROVIDER_SETTINGS": "SMTP 提供者設定",
+        "SENDER_SETTINGS": "發件人設定",
+        "NEXT_STEPS": "下一步",
+        "ACTIVATE": {
+          "TITLE": "啟用您的 SMTP 提供者",
+          "DESCRIPTION": "在您啟用此 SMTP 提供程式之前，Zitadel 無法使用它來傳送通知。如果您啟用此提供程式，任何其他處於活動狀態的提供程式現在都將被停用。"
+        },
+        "DEACTIVATE": {
+          "TITLE": "停用您的 SMTP 提供者",
+          "DESCRIPTION": "如果您停用此 SMTP 提供程式，Zitadel 將無法使用它傳送通知，直到您再次啟用它。"
+        },
+        "SAVE_SETTINGS": "儲存您的設定",
+        "TEST": {
+          "TITLE": "測試您的設定",
+          "DESCRIPTION": "您可以測試您的 SMTP 提供者設定並在儲存之前檢查測試結果",
+          "RESULT": "您的電子郵件已成功傳送"
+        }
+      }
+    },
+    "DETAIL": {
+      "TITLE": "SMTP 提供者設定"
+    },
+    "EMPTY": "沒有可用的 SMTP 提供者",
+    "STEPS": {
+      "SENDGRID": {}
+    }
+  },
+  "APP": {
+    "LIST": "應用",
+    "COMPLIANCE": "OIDC 相容性",
+    "URLS": "URLs",
+    "CONFIGURATION": "設定",
+    "TOKEN": "令牌設定",
+    "PAGES": {
+      "TITLE": "應用",
+      "ID": "應用ID",
+      "DESCRIPTION": "在這裡您可以編輯您的應用程式資料及其設定。",
+      "CREATE": "OIDC 應用",
+      "CREATE_SELECT_PROJECT": "首先選擇你的專案",
+      "CREATE_NEW_PROJECT": "或輸入新專案的名稱",
+      "CREATE_DESC_TITLE": "逐步輸入您的應用詳情",
+      "CREATE_DESC_SUB": "將自動生成推薦的設定。",
+      "STATE": "狀態",
+      "DATECREATED": "建立於",
+      "DATECHANGED": "修改於",
+      "URLS": "URLs",
+      "DELETE": "刪除應用",
+      "JUMPTOPROJECT": "要設定角色、角色分配等設定，請導航至專案頁面。",
+      "DETAIL": {
+        "TITLE": "詳情",
+        "STATE": {
+          "0": "未定義",
+          "1": "啟用",
+          "2": "停用"
+        }
+      },
+      "DIALOG": {
+        "CONFIG": {
+          "TITLE": "變更OIDC設定"
+        },
+        "DELETE": {
+          "TITLE": "刪除應用",
+          "DESCRIPTION": "您真的要刪除此應用程式嗎？"
+        }
+      },
+      "NEXTSTEPS": {
+        "TITLE": "下一步",
+        "0": {
+          "TITLE": "新增角色",
+          "DESC": "輸入您的專案角色"
+        },
+        "1": {
+          "TITLE": "新增使用者",
+          "DESC": "為新增新使用者"
+        },
+        "2": {
+          "TITLE": "協助支援",
+          "DESC": "閱讀我們關於建立應用程式的文件或聯絡我們的支援"
+        }
+      }
+    },
+    "NAMEDIALOG": {
+      "TITLE": "重新命名應用",
+      "DESCRIPTION": "為您的應用輸入新名稱",
+      "NAME": "新名稱"
+    },
+    "NAME": "名稱",
+    "TYPE": "應用型別",
+    "AUTHMETHOD": "身分驗證方式",
+    "AUTHMETHODSECTION": "身分驗證方式",
+    "GRANT": "授權型別",
+    "ADDITIONALORIGINS": "其他來源",
+    "ADDITIONALORIGINSDESC": "如果您想向您的應用程式新增不用作重新導向的其他來源，您可以在此處執行此操作。",
+    "ORIGINS": "其他來源",
+    "NOTANORIGIN": "輸入的值不是有效來源",
+    "OIDC": {
+      "WELLKNOWN": "如需更多資訊，請參閱<a href='{{url}}' title='探索端點' target='_blank'>探索端點</a>。",
+      "INFO": {
+        "ISSUER": "Issuer",
+        "CLIENTID": "Client Id"
+      },
+      "CURRENT": "目前設定",
+      "TOKENSECTIONTITLE": "AuthToken 選項",
+      "REDIRECTSECTIONTITLE": "重新導向設定",
+      "REDIRECTTITLE": "指定登入將重新導向到的 URL。",
+      "POSTREDIRECTTITLE": "這是退出登入後的重新導向 URL。",
+      "REDIRECTDESCRIPTIONWEB": "重新導向 URI 必須以 https:// 開頭。 http:// 僅對啟用的開發模式有效。",
+      "REDIRECTDESCRIPTIONNATIVE": "重新導向 URI 必須以您自己的協議、http://127.0.0.1、http://[::1] 或 http://localhost 開頭。",
+      "REDIRECTNOTVALID": "此重新導向 URL 無效。",
+      "COMMAORENTERSEPERATION": "separate with ↵",
+      "TYPEREQUIRED": "型別是必填的。",
+      "TITLE": "OIDC 設定",
+      "CLIENTID": "客戶端 ID",
+      "CLIENTDETAILS": "客戶端詳情",
+      "CLIENTSECRET_NOSECRET": "使用您選擇的身分驗證流程，不需要任何秘密，因此不可用。",
+      "CLIENTSECRET_DESCRIPTION": "將您的客戶保密在一個安全的地方，因為一旦對話方塊關閉，便無法再次檢視。",
+      "REGENERATESECRET": "重新生成客戶端金鑰",
+      "DEVMODE": "開發模式",
+      "DEVMODE_ENABLED": "活性",
+      "DEVMODE_DISABLED": "已停用",
+      "DEVMODEDESC": "注意：啟用開發模式的重新導向 URI 將不會被驗證。",
+      "SKIPNATIVEAPPSUCCESSPAGE": "登入後跳過成功頁面",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "登入後跳過本機應用的成功頁面",
+      "APPLINKSSECTION": "原生應用關聯",
+      "APPLINKSDESC": "設定 iOS 和 Android 關聯，使此執行個體能夠為您的原生應用提供通行金鑰信任檔案。",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "在 apple-app-site-association 中作為 webcredentials 條目 TEAMID.BUNDLEID 提供。",
+      "TEAMID": "團隊 ID",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "Apple Team ID 必須恰好為 10 個字母或數字，例如 ABCDE12345。",
+      "TEAMIDLENGTH": "Team ID 必須恰好為 10 個字母或數字。",
+      "BUNDLEID": "Bundle ID",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "iOS Bundle Identifier（CFBundleIdentifier），例如 com.example.app。請勿包含 Team ID 字首。",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "在 assetlinks.json 中為 Digital Asset Links / 通行金鑰憑證提供。",
+      "PACKAGENAME": "軟體包名稱",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "Android applicationId / 軟體包名稱，例如 com.example.app。",
+      "FINGERPRINTS": "SHA-256 證書指紋",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "每行一個指紋（64 個十六進位制字元，冒號可選）。按需包含除錯版和正式版。",
+      "REDIRECT": "重新導向 URLs",
+      "REDIRECTSECTION": "重新導向 URLs",
+      "POSTLOGOUTREDIRECT": "退出登入重新導向 URLs",
+      "RESPONSESECTION": "響應型別",
+      "GRANTSECTION": "授權型別",
+      "GRANTTITLE": "選擇您的授權型別。注意：隱式僅適用於基於瀏覽器的應用程式。",
+      "APPTYPE": {
+        "0": "Web",
+        "1": "User Agent",
+        "2": "Native"
+      },
+      "RESPONSETYPE": "響應型別",
+      "RESPONSE": {
+        "0": "Code",
+        "1": "ID Token",
+        "2": "Token-ID Token"
+      },
+      "REFRESHTOKEN": "Refresh Token",
+      "GRANTTYPE": "授權型別",
+      "GRANT": {
+        "0": "Authorization Code",
+        "1": "Implicit",
+        "2": "Refresh Token",
+        "3": "Device Code",
+        "4": "Token Exchange"
+      },
+      "AUTHMETHOD": {
+        "0": "Basic",
+        "1": "Post",
+        "2": "None",
+        "3": "Private Key JWT"
+      },
+      "TOKENTYPE": "身分驗證令牌型別",
+      "TOKENTYPE0": "Bearer Token",
+      "TOKENTYPE1": "JWT",
+      "UNSECUREREDIRECT": "我當然希望你知道你在做什麼。",
+      "OVERVIEWSECTION": "概覽",
+      "OVERVIEWTITLE": "你現在完成了。檢查您的設定。",
+      "ACCESSTOKENROLEASSERTION": "將使用者角色新增到存取令牌",
+      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "如果勾選，則將經過身分驗證的使用者的請求角色新增到存取令牌中。",
+      "IDTOKENROLEASSERTION": "在 ID Token 中包含使用者角色",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "如果勾選，則已驗證使用者的請求角色將新增到 ID Token 中。",
+      "IDTOKENUSERINFOASSERTION": "在 ID Token 中包含使用者資訊",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "使應用程式能夠從 ID Token 中讀取個人資料、電子郵件、電話和地址宣告。",
+      "CLOCKSKEW": "使應用程式能夠處理 OP 和應用程式的時鐘偏差。持續時間（0-5 秒）將新增到 exp 宣告中，並從 iats、auth_time 和 nbf 中減去。",
+      "RECOMMENDED": "推薦的",
+      "NOTRECOMMENDED": "不推薦的",
+      "SELECTION": {
+        "APPTYPE": {
+          "WEB": {
+            "TITLE": "Web",
+            "DESCRIPTION": "常規 Web 應用程式，如：.net，PHP，Node.js，Java 等。"
+          },
+          "NATIVE": {
+            "TITLE": "Native",
+            "DESCRIPTION": "移動端應用, 桌面應用, 智慧終端裝置等"
+          },
+          "USERAGENT": {
+            "TITLE": "User Agent",
+            "DESCRIPTION": "單頁應用程式 (SPA) 以及通常在瀏覽器中執行的所有 JS 框架"
+          }
+        }
+      },
+      "BACKCHANNELLOOGOUTURI": "反向通道登出URI",
+      "IOSAPPLINKINCOMPLETE": "iOS Team ID 與 Bundle ID 必須同時填寫，或同時留空。",
+      "ANDROIDPACKAGEREQUIRED": "設定證書指紋時必須填寫 Android 軟體包名稱。"
+    },
+    "API": {
+      "INFO": {
+        "CLIENTID": "Client Id"
+      },
+      "REGENERATESECRET": "重新生成客戶端金鑰",
+      "SELECTION": {
+        "TITLE": "API",
+        "DESCRIPTION": "通用的 APIs 服務"
+      },
+      "AUTHMETHOD": {
+        "0": "Basic",
+        "1": "Private Key JWT"
+      }
+    },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "SAML 應用"
+      },
+      "CONFIGSECTION": "SAML 設定",
+      "CHOOSEMETADATASOURCE": "使用以下選項之一提供您的 SAML 設定：",
+      "METADATAOPT1": "選項 1.指定後設資料檔案所在的 url",
+      "METADATAOPT2": "選項 2. 上傳包含後設資料 XML 的檔案",
+      "METADATAOPT3": "選項 3. 動態建立最小後設資料檔案，提供 ENTITYID 和 ACS URL",
+      "UPLOAD": "上傳 XML 檔案",
+      "METADATA": "後設資料",
+      "METADATAFROMFILE": "檔案中的後設資料",
+      "CERTIFICATE": "SAML證書",
+      "DOWNLOADCERT": "下載 SAML 證書",
+      "CREATEMETADATA": "建立後設資料",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
+    },
+    "AUTHMETHODS": {
+      "CODE": {
+        "TITLE": "Code",
+        "DESCRIPTION": "交換存取令牌的授權碼"
+      },
+      "PKCE": {
+        "TITLE": "PKCE",
+        "DESCRIPTION": "使用隨機雜湊而不是靜態客戶端密碼以提高安全性"
+      },
+      "POST": {
+        "TITLE": "POST",
+        "DESCRIPTION": "傳送 client_id 和 client_secret 作為表單的一部分"
+      },
+      "PK_JWT": {
+        "TITLE": "Private Key JWT",
+        "DESCRIPTION": "使用私鑰授權您的應用程式"
+      },
+      "BASIC": {
+        "TITLE": "Basic",
+        "DESCRIPTION": "使用使用者名稱和密碼進行身分驗證"
+      },
+      "IMPLICIT": {
+        "TITLE": "Implicit",
+        "DESCRIPTION": "直接從授權端點取得令牌"
+      },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "在計算機或智慧手機上授權裝置。"
+      },
+      "CUSTOM": {
+        "TITLE": "Custom",
+        "DESCRIPTION": "您的設定與任何其他選項都不對應。"
+      }
+    },
+    "TOAST": {
+      "REACTIVATED": "應用程式已重新啟用。",
+      "DEACTIVATED": "應用程式已停用。",
+      "OIDCUPDATED": "應用已更新。",
+      "APIUPDATED": "應用已更新。",
+      "UPDATED": "應用已更新。",
+      "CREATED": "應用已建立。",
+      "CLIENTSECRETREGENERATED": "客戶端秘鑰已生成。",
+      "DELETED": "應用已刪除。",
+      "CONFIGCHANGED": "檢測到變化！"
+    },
+    "LOGINV2": {
+      "USEV2": "使用新的登入UI",
+      "BASEURL": "新的登入UI的自定義基本URL"
+    },
+    "PROSWITCH": "我熟悉設定，略過此精靈。",
+    "NAMEANDTYPESECTION": "名稱與類型",
+    "TITLEFIRST": "應用程式名稱",
+    "TYPETITLE": "應用程式類型"
+  },
+  "GENDERS": {
+    "0": "未知",
+    "1": "女性",
+    "2": "男性",
+    "3": "其他"
+  },
+  "LANGUAGES": {
+    "de": "Deutsch",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "簡體中文",
+    "zh-TW": "繁體中文",
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский",
+    "nl": "Nederlands",
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia",
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română",
+    "tr": "Türkçe",
+    "uk": "Українська",
+    "ar": "العربية"
+  },
+  "MEMBER": {
+    "ADD": "新增管理員",
+    "CREATIONTYPE": "建立型別",
+    "CREATIONTYPES": {
+      "3": "執行個體",
+      "2": "Organization",
+      "0": "Owned Project",
+      "1": "Granted Project",
+      "4": "Project"
+    },
+    "EDITROLE": "編輯角色",
+    "EDITFOR": "編輯使用者：{{value}} 的角色",
+    "DIALOG": {
+      "DELETE_TITLE": "刪除管理員",
+      "DELETE_DESCRIPTION": "您即將刪除管理員。你確定嗎？"
+    },
+    "SHOWDETAILS": "點選顯示詳情。"
+  },
+  "ROLESLABEL": "角色",
+  "GRANTS": {
+    "TITLE": "角色分配",
+    "DESC": "這些是您組織中的所有角色分配。",
+    "DELETE": "刪除角色分配",
+    "EMPTY": "找不到角色分配",
+    "ADD": "建立角色分配",
+    "ADD_BTN": "建立",
+    "PROJECT": {
+      "TITLE": "角色分配",
+      "DESCRIPTION": "為指定專案定義角色分配。請注意，您僅能檢視具有權限的專案和使用者條目。"
+    },
+    "USER": {
+      "TITLE": "角色分配",
+      "DESCRIPTION": "為指定使用者定義角色分配。請注意，您僅能檢視具有權限的專案和使用者條目。"
+    },
+    "CREATE": {
+      "TITLE": "建立角色分配",
+      "DESCRIPTION": "搜尋組織、專案和相應的角色。"
+    },
+    "EDIT": {
+      "TITLE": "更改角色分配"
+    },
+    "DETAIL": {
+      "TITLE": "角色分配的詳細資訊",
+      "DESCRIPTION": "此處可檢視角色分配的所有詳細資訊"
+    },
+    "TOAST": {
+      "UPDATED": "角色分配已更新",
+      "REMOVED": "角色分配已被移除",
+      "BULKREMOVED": "角色分配已被移除",
+      "CANTSHOWINFO": "您無法存取該使用者的個人資料，因為您不是該使用者所屬組織的管理員"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "刪除角色分配",
+      "DELETE_DESCRIPTION": "您即將移除一個角色分配。繼續？",
+      "BULK_DELETE_TITLE": "刪除角色分配",
+      "BULK_DELETE_DESCRIPTION": "您即將移除多個角色分配。繼續？"
+    }
+  },
+  "CHANGES": {
+    "LISTTITLE": "最後變更",
+    "BOTTOM": "您已到達列表的末尾。",
+    "LOADMORE": "載入更多",
+    "ORG": {
+      "TITLE": "目前組織事件",
+      "DESCRIPTION": "在這裡您可以看到組織變更的最新事件。"
+    },
+    "PROJECT": {
+      "TITLE": "目前專案事件",
+      "DESCRIPTION": "在這裡您可以看到專案變更的最新事件。"
+    },
+    "USER": {
+      "TITLE": "目前使用者事件",
+      "DESCRIPTION": "在這裡您可以看到使用者變更的最新事件。"
+    }
+  },
+  "INSTANCEID": "執行個體ID"
+}
