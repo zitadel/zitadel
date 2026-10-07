@@ -40,13 +40,21 @@ function setCSPHeaders(
   response: NextResponse,
   serviceConfig: ServiceConfig,
   securitySettings: SecuritySettings | undefined,
+  request: NextRequest,
 ): void {
   const iframeOrigins =
     securitySettings?.embeddedIframe?.enabled && securitySettings.embeddedIframe.allowedOrigins.length > 0
       ? securitySettings.embeddedIframe.allowedOrigins
       : undefined;
 
-  response.headers.set("Content-Security-Policy", buildCSP({ serviceUrl: serviceConfig.baseUrl, iframeOrigins }));
+  const nonce = request.headers.get("x-zitadel-csp-nonce") ?? undefined;
+  response.headers.set(
+    "Content-Security-Policy",
+    nonce
+      ? request.headers.get("Content-Security-Policy")!
+      : buildCSP({ serviceUrl: serviceConfig.baseUrl, iframeOrigins }),
+  );
+  if (nonce) response.headers.set("Cache-Control", "private, no-store");
 
   if (!iframeOrigins) {
     response.headers.set("X-Frame-Options", "deny");
@@ -60,26 +68,36 @@ function setCSPHeaders(
  * Callers must validate `url` (isSafeRedirectUri) before calling; all values
  * are HTML-escaped here.
  */
-function buildAutoSubmitFormResponse(url: string, fields: Record<string, string>): NextResponse {
+function buildAutoSubmitFormResponse(url: string, fields: Record<string, string>, request: NextRequest): NextResponse {
+  const nonce = request.headers.get("x-zitadel-csp-nonce");
   const hiddenInputs = Object.entries(fields)
     .map(([key, value]) => `<input type="hidden" name="${escapeHtml(key)}" value="${escapeHtml(value)}" />`)
     .join("\n");
 
   const html = `
     <html>
-      <body onload="document.forms[0].submit()">
+      <body>
         <form action="${escapeHtml(url)}" method="post">
           ${hiddenInputs}
           <noscript>
             <button type="submit">Continue</button>
           </noscript>
         </form>
+        <script${nonce ? ` nonce="${escapeHtml(nonce)}"` : ""}>document.forms[0].submit()</script>
       </body>
     </html>
   `;
 
   return new NextResponse(html, {
-    headers: { "Content-Type": "text/html" },
+    headers: {
+      "Content-Type": "text/html",
+      ...(nonce
+        ? {
+            "Content-Security-Policy": request.headers.get("Content-Security-Policy")!,
+            "Cache-Control": "private, no-store",
+          }
+        : {}),
+    },
   });
 }
 
@@ -198,7 +216,7 @@ const resolveLoginHint = async ({
         return null;
       }
 
-      return buildAutoSubmitFormResponse(res.samlData.url, res.samlData.fields);
+      return buildAutoSubmitFormResponse(res.samlData.url, res.samlData.fields, request);
     }
 
     if (res && "error" in res && res.error) {
@@ -346,7 +364,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         }
 
         if (response.fields) {
-          return buildAutoSubmitFormResponse(response.url, response.fields);
+          return buildAutoSubmitFormResponse(response.url, response.fields, request);
         }
 
         let url = response.url;
@@ -429,7 +447,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       const selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
 
       const noSessionResponse = NextResponse.json({ error: "No active session found" }, { status: 400 });
-      setCSPHeaders(noSessionResponse, serviceConfig, securitySettings);
+      setCSPHeaders(noSessionResponse, serviceConfig, securitySettings, request);
 
       if (!selectedSession || !selectedSession.id) {
         return noSessionResponse;
@@ -462,7 +480,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
       }
       const callbackResponse = NextResponse.redirect(callbackUrl);
-      setCSPHeaders(callbackResponse, serviceConfig, securitySettings);
+      setCSPHeaders(callbackResponse, serviceConfig, securitySettings, request);
       return callbackResponse;
     } else {
       let selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
@@ -666,10 +684,14 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
         logger.warn("Blocked unsafe SAML post URL", { url });
         return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
       }
-      return buildAutoSubmitFormResponse(url, {
-        RelayState: binding.value.relayState,
-        SAMLResponse: binding.value.samlResponse,
-      });
+      return buildAutoSubmitFormResponse(
+        url,
+        {
+          RelayState: binding.value.relayState,
+          SAMLResponse: binding.value.samlResponse,
+        },
+        request,
+      );
     }
   } catch (error) {
     logger.error("SAML createResponse failed:", { error });

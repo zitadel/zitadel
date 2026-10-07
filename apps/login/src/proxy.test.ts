@@ -1,6 +1,9 @@
 // @vitest-environment node
+import { statSync } from "node:fs";
 import { NextRequest } from "next/server";
 import { afterEach, describe, expect, test, vi } from "vitest";
+
+vi.mock("node:fs", () => ({ statSync: vi.fn(() => ({ isFile: () => true })) }));
 
 vi.mock("./lib/service-url", () => ({
   getServiceConfig: () => ({ serviceConfig: { baseUrl: "https://idp.example.com" } }),
@@ -14,6 +17,7 @@ import { proxy } from "./proxy";
 
 afterEach(() => {
   vi.unstubAllEnvs();
+  vi.mocked(statSync).mockReturnValue({ isFile: () => true } as any);
   vi.mocked(getIframeOrigins).mockResolvedValue(null);
 });
 
@@ -50,6 +54,38 @@ describe("strict Login CSP", () => {
     expect(first.headers.get("Cache-Control")).toBe("private, no-store");
   });
 
+  test.each([
+    "/_next/static/chunks/owned.js",
+    "/favicon/favicon.ico",
+    "/grid-light.svg",
+    "/logo/zitadel-logo-solo-lightdesign.svg",
+  ])("keeps static asset cache handling: %s", async (path) => {
+    vi.stubEnv("CSP_NONCE_ENABLED", "true");
+    vi.stubEnv("CSP_FETCH_ENABLED", "false");
+    const response = await proxy(new NextRequest(`https://login.example.com${path}`));
+    expect(response.headers.get("Cache-Control")).toBeNull();
+  });
+
+  test.each(["/login", "/unknown.svg"])("keeps Accept-less documents private: %s", async (path) => {
+    vi.stubEnv("CSP_NONCE_ENABLED", "true");
+    const response = await proxy(new NextRequest(`https://login.example.com${path}`));
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+  });
+
+  test.each(["missing", "directory", "unreadable"])("refuses the synthetic static error shell: %s", async (kind) => {
+    vi.stubEnv("CSP_NONCE_ENABLED", "true");
+    if (kind === "missing") vi.mocked(statSync).mockReturnValue(undefined as any);
+    if (kind === "directory") vi.mocked(statSync).mockReturnValue({ isFile: () => false } as any);
+    if (kind === "unreadable")
+      vi.mocked(statSync).mockImplementationOnce(() => {
+        throw new Error("unreadable fixture");
+      });
+    const response = await proxy(new NextRequest("https://login.example.com/_next/static/owned.js"));
+    expect(response.status).toBe(404);
+    expect(await response.text()).toBe("");
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+  });
+
   test("strict policy also survives settings lookup failure", async () => {
     vi.stubEnv("CSP_NONCE_ENABLED", "true");
     vi.stubEnv("CSP_FETCH_ENABLED", "true");
@@ -67,7 +103,9 @@ describe("strict Login CSP", () => {
         headers: { "x-zitadel-csp-nonce": "caller-selected" },
       }),
     );
-    expect(response.headers.get("Content-Security-Policy")).toContain("script-src 'self' 'unsafe-inline' 'unsafe-eval'");
+    expect(response.headers.get("Content-Security-Policy")).toContain(
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+    );
     expect(response.headers.get("x-middleware-request-x-zitadel-csp-nonce")).toBeNull();
   });
 });

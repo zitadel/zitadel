@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { randomBytes } from "node:crypto";
+import { statSync } from "node:fs";
+import { resolve } from "node:path";
 import { buildCSP } from "./lib/csp";
 import { applyCustomHeaders } from "./lib/custom-headers";
 import { createLogger } from "./lib/logger";
@@ -37,6 +39,18 @@ export async function proxy(request: NextRequest) {
   // nonce. They are internal implementation paths, not supplied Login routes.
   if (nonce && ["/_not-found", "/_global-error"].includes(request.nextUrl.pathname)) {
     return new NextResponse(null, { status: 404, headers: { "Cache-Control": "private, no-store" } });
+  }
+
+  // Next's missing static-chunk error uses a prerendered shell, bypassing the
+  // dynamic root layout. Keep real chunk caching but never serve that shell.
+  if (nonce && request.nextUrl.pathname.startsWith("/_next/static/")) {
+    const root = resolve(process.cwd(), ".next/static");
+    const file = resolve(root, request.nextUrl.pathname.slice("/_next/static/".length));
+    let found = false;
+    try {
+      found = file.startsWith(root + "/") && !!statSync(file, { throwIfNoEntry: false })?.isFile();
+    } catch {}
+    if (!found) return new NextResponse(null, { status: 404, headers: { "Cache-Control": "private, no-store" } });
   }
 
   const { serviceConfig } = getServiceConfig(request.headers);
@@ -80,7 +94,22 @@ export async function proxy(request: NextRequest) {
       requestHeaders.set("x-zitadel-csp-nonce", nonce);
       requestHeaders.set("Content-Security-Policy", responseHeaders.get("Content-Security-Policy")!);
       requestHeaders.delete("Content-Security-Policy-Report-Only");
-      responseHeaders.set("Cache-Control", "private, no-store");
+      // Static files keep Next's asset caching; dynamic fallback documents still
+      // use the root layout's no-store rendering, including missing assets.
+      const path = request.nextUrl.pathname;
+      const staticAsset =
+        path.startsWith("/_next/static/") ||
+        path.startsWith("/favicon/") ||
+        path.startsWith("/logo/") ||
+        [
+          "/favicon.ico",
+          "/checkbox.svg",
+          "/grid-light.svg",
+          "/grid-dark.svg",
+          "/zitadel-logo-light.svg",
+          "/zitadel-logo-dark.svg",
+        ].includes(path);
+      if (!staticAsset) responseHeaders.set("Cache-Control", "private, no-store");
     }
     return NextResponse.next({
       request: { headers: requestHeaders },
