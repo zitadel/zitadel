@@ -13,8 +13,9 @@ message EmailProviderRestrictions {
   // custom_html_restricted states that HTML in custom message texts is reduced to simple formatting.
   // Links, images and styles are removed.
   bool custom_html_restricted = 1;
-  // sending_limit is the amount of emails the instance can send through the provider within a rolling time window.
-  // Notifications exceeding it are not sent. The field is not set if the amount is not limited.
+  // sending_limit is the amount of notification emails the instance can send through the provider within a rolling time window.
+  // Notifications exceeding it are not sent. Test emails of the provider are not limited.
+  // The field is not set if the amount is not limited.
   EmailProviderSendingLimit sending_limit = 2;
 }
 

@@ -796,7 +796,7 @@ message GetGeneralSettingsResponse {
   ];
 
   // The restrictions the operator of the ZITADEL installation defined for the active email provider,
-  // e.g. a default provider shared by multiple instances. They apply to all emails sent by the instance.
+  // e.g. a default provider shared by multiple instances. They apply to the notification emails sent by the instance.
   // The field is not set if the active email provider is not restricted or no email provider is active.
   EmailProviderRestrictions email_provider_restrictions = 6;
 }
