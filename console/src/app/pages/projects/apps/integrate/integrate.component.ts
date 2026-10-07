@@ -46,23 +46,26 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
     public navigation: NavigationService,
   ) {
     effect(() => {
-      const fwId = this.framework()?.id;
       const fw = this.framework();
-      if (fw && fwId) {
-        const request = OIDC_CONFIGURATIONS[fwId];
-        request.setProjectId(this.projectId);
-        request.setName(fw.title);
-        request.setDevMode(true);
-        this.requestRedirectValuesSubject$.next();
-        this.showRenameWarning.next(false);
+      // May be missing: frameworks.json also lists SDK/library entries that
+      // have no OIDC configuration to build an app from.
+      const config = fw?.id ? OIDC_CONFIGURATIONS[fw.id] : undefined;
 
-        this.oidcAppRequest.next(request);
-        return request;
-      } else {
-        const request = new AddOIDCAppRequest();
-        this.oidcAppRequest.next(request);
-        return request;
+      if (!fw || !config) {
+        this.oidcAppRequest.next(new AddOIDCAppRequest());
+        return;
       }
+
+      // config() builds a fresh request, so configuring it here cannot leak
+      // into the next app created with the same framework.
+      const request = config();
+      request.setProjectId(this.projectId);
+      request.setName(fw.title);
+      request.setDevMode(true);
+      this.requestRedirectValuesSubject$.next();
+      this.showRenameWarning.next(false);
+
+      this.oidcAppRequest.next(request);
     });
   }
 

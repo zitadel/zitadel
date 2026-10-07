@@ -30,12 +30,16 @@
 
       <div class="grid-layout">
         <div>
-          @if (framework()) {
-            <cnsl-framework-change
-              class="framework-selector"
-              (frameworkChanged)="setFramework($event)"
-            ></cnsl-framework-change>
-          }
+          <!-- Always rendered: this component is what reads the ?framework=
+               query parameter and emits it through (frameworkChanged). Gating it
+               on framework() deadlocked the page — the only thing that can set
+               the framework could not mount until the framework was set. It
+               already renders a "select framework" card plus the change button
+               when no framework is chosen. -->
+          <cnsl-framework-change
+            class="framework-selector"
+            (frameworkChanged)="setFramework($event)"
+          ></cnsl-framework-change>
           <div class="steps">
             <div class="step">
               <span class="step-title">{{ 'PROJECT.PAGES.TITLE' | translate }}</span>
