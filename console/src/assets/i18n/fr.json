@@ -2445,14 +2445,14 @@
   },
   "SMTP": {
     "RESTRICTIONS": {
-      "MANAGED": "Le fournisseur d'e-mails actif est géré par l'opérateur de ce système et est destiné à la prise en main.",
+      "MANAGED": "Le fournisseur d'e-mails actif est géré par l'opérateur de ZITADEL et est destiné à la prise en main.",
       "LIMIT_HOURS": "Il envoie au maximum {{count}} e-mails en {{duration}} heures. Les e-mails supplémentaires ne sont pas envoyés.",
       "LIMIT_MINUTES": "Il envoie au maximum {{count}} e-mails en {{duration}} minutes. Les e-mails supplémentaires ne sont pas envoyés.",
       "HTML": "Le HTML des textes de message personnalisés est réduit à une mise en forme simple. Les liens, images et styles sont supprimés.",
       "OWN_PROVIDER": "Configurez votre propre fournisseur pour une utilisation en production.",
       "HTML_HINT": "Le fournisseur d'e-mails actif n'autorise qu'une mise en forme simple dans les textes de message. Les liens, images et styles sont supprimés.",
       "HTML_HINT_LINK": "Configurer votre propre fournisseur",
-      "ROW_TOOLTIP": "Géré par l'opérateur de ce système. Des restrictions s'appliquent tant que ce fournisseur est actif."
+      "ROW_TOOLTIP": "Géré par l'opérateur de ZITADEL. Des restrictions s'appliquent tant que ce fournisseur est actif."
     },
     "LIST": {
       "TITLE": "Fournisseur SMTP",

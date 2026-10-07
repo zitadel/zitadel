@@ -21,6 +21,7 @@ import {
   createUserServiceClient,
   createSessionServiceClient,
   createOrganizationServiceClient,
+  createSettingsServiceClient,
 } from '@zitadel/client/v2';
 import { createAdminServiceClient, createAuthServiceClient, createManagementServiceClient } from '@zitadel/client/v1';
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
@@ -49,6 +50,7 @@ export class GrpcService {
   public mgmtNew!: ReturnType<typeof createManagementServiceClient>;
   public authNew!: ReturnType<typeof createAuthServiceClient>;
   public featureNew!: ReturnType<typeof createFeatureServiceClient>;
+  public settingsNew!: ReturnType<typeof createSettingsServiceClient>;
   public actionNew!: ReturnType<typeof createActionServiceClient>;
   public webKey!: ReturnType<typeof createWebKeyServiceClient>;
   public organizationNew!: ReturnType<typeof createOrganizationServiceClient>;
@@ -110,6 +112,7 @@ export class GrpcService {
         this.mgmtNew = createManagementServiceClient(transportOldAPIs);
         this.authNew = createAuthServiceClient(transportOldAPIs);
         this.featureNew = createFeatureServiceClient(transport);
+        this.settingsNew = createSettingsServiceClient(transport);
         this.actionNew = createActionServiceClient(transport);
         this.webKey = createWebKeyServiceClient(transport);
         this.organizationNew = createOrganizationServiceClient(transport);
