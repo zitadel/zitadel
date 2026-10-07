@@ -2469,7 +2469,7 @@
   },
   "SMTP": {
     "RESTRICTIONS": {
-      "MANAGED": "Az aktív e-mail-szolgáltatót a rendszer üzemeltetője kezeli, és a kezdéshez szolgál.",
+      "MANAGED": "Az aktív e-mail-szolgáltatót a ZITADEL üzemeltetője kezeli, és a kezdéshez szolgál.",
       "LIMIT_HOURS": "Legfeljebb {{count}} e-mailt küld {{duration}} órán belül. A további e-maileket nem küldi el.",
       "LIMIT_MINUTES": "Legfeljebb {{count}} e-mailt küld {{duration}} percen belül. A további e-maileket nem küldi el.",
       "RESERVED_DOMAINS": "A tesztdomainekre, például az example.com vagy a .test címekre küldött e-mailek nem kerülnek kézbesítésre.",
@@ -2477,7 +2477,7 @@
       "OWN_PROVIDER": "Éles használathoz állítson be saját szolgáltatót.",
       "HTML_HINT": "Az aktív e-mail-szolgáltató az üzenetszövegekben csak egyszerű formázást engedélyez. A hivatkozások, képek és stílusok eltávolításra kerülnek.",
       "HTML_HINT_LINK": "Saját szolgáltató beállítása",
-      "ROW_TOOLTIP": "A rendszer üzemeltetője kezeli. Amíg ez a szolgáltató aktív, korlátozások érvényesek."
+      "ROW_TOOLTIP": "A ZITADEL üzemeltetője kezeli. Amíg ez a szolgáltató aktív, korlátozások érvényesek."
     },
     "LIST": {
       "TITLE": "SMTP Szolgáltató",

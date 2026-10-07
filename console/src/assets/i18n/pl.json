@@ -2444,7 +2444,7 @@
   },
   "SMTP": {
     "RESTRICTIONS": {
-      "MANAGED": "Aktywny dostawca poczty e-mail jest zarządzany przez operatora tego systemu i służy do rozpoczęcia pracy.",
+      "MANAGED": "Aktywny dostawca poczty e-mail jest zarządzany przez operatora ZITADEL i służy do rozpoczęcia pracy.",
       "LIMIT_HOURS": "Wysyła najwyżej {{count}} wiadomości e-mail w ciągu {{duration}} godzin. Kolejne wiadomości nie są wysyłane.",
       "LIMIT_MINUTES": "Wysyła najwyżej {{count}} wiadomości e-mail w ciągu {{duration}} minut. Kolejne wiadomości nie są wysyłane.",
       "RESERVED_DOMAINS": "Wiadomości do domen testowych, takich jak example.com lub .test, nie są dostarczane.",
@@ -2452,7 +2452,7 @@
       "OWN_PROVIDER": "Do zastosowań produkcyjnych skonfiguruj własnego dostawcę.",
       "HTML_HINT": "Aktywny dostawca poczty e-mail dopuszcza w tekstach wiadomości tylko proste formatowanie. Linki, obrazy i style są usuwane.",
       "HTML_HINT_LINK": "Skonfiguruj własnego dostawcę",
-      "ROW_TOOLTIP": "Zarządzany przez operatora tego systemu. Dopóki ten dostawca jest aktywny, obowiązują ograniczenia."
+      "ROW_TOOLTIP": "Zarządzany przez operatora ZITADEL. Dopóki ten dostawca jest aktywny, obowiązują ograniczenia."
     },
     "LIST": {
       "TITLE": "Dostawca SMTP",

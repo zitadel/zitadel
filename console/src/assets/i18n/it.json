@@ -2445,7 +2445,7 @@
   },
   "SMTP": {
     "RESTRICTIONS": {
-      "MANAGED": "Il provider e-mail attivo è gestito dall'operatore di questo sistema ed è pensato per iniziare.",
+      "MANAGED": "Il provider e-mail attivo è gestito dall'operatore di ZITADEL ed è pensato per iniziare.",
       "LIMIT_HOURS": "Invia al massimo {{count}} e-mail in {{duration}} ore. Le e-mail successive non vengono inviate.",
       "LIMIT_MINUTES": "Invia al massimo {{count}} e-mail in {{duration}} minuti. Le e-mail successive non vengono inviate.",
       "RESERVED_DOMAINS": "Le e-mail verso domini di test come example.com o .test non vengono recapitate.",
@@ -2453,7 +2453,7 @@
       "OWN_PROVIDER": "Configura un tuo provider per l'uso in produzione.",
       "HTML_HINT": "Il provider e-mail attivo consente solo una formattazione semplice nei testi dei messaggi. Link, immagini e stili vengono rimossi.",
       "HTML_HINT_LINK": "Configura un tuo provider",
-      "ROW_TOOLTIP": "Gestito dall'operatore di questo sistema. Finché questo provider è attivo si applicano delle restrizioni."
+      "ROW_TOOLTIP": "Gestito dall'operatore di ZITADEL. Finché questo provider è attivo si applicano delle restrizioni."
     },
     "LIST": {
       "TITLE": "Fornitore SMTP",

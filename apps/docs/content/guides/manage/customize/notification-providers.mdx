@@ -35,7 +35,7 @@ This provider is meant for development and testing purposes and you must replace
 ### Restrictions of the default provider
 
 The default provider is shared by many instances. To keep it reliable for everyone, the following restrictions apply as long as it is the active provider.
-The Console shows the restrictions of the active provider in the SMTP provider settings, and the API returns them in the `restrictions` of the email provider.
+The Console shows the restrictions of the active provider in the SMTP provider settings. The API returns them in the `restrictions` of the email provider and, readable by organization admins as well, in the general settings.
 None of them apply once you activate your own provider.
 
 - **Test recipients are not delivered**: Emails to reserved domains (`example.com`, `example.net`, `example.org` and the top-level domains `.test`, `.example`, `.invalid` and `.localhost`) are accepted, but not sent, since nobody can receive them.

@@ -2468,7 +2468,7 @@
   },
   "SMTP": {
     "RESTRICTIONS": {
-      "MANAGED": "Den aktiva e-postleverantören hanteras av systemets operatör och är avsedd för att komma igång.",
+      "MANAGED": "Den aktiva e-postleverantören hanteras av ZITADEL-operatören och är avsedd för att komma igång.",
       "LIMIT_HOURS": "Den skickar högst {{count}} e-postmeddelanden inom {{duration}} timmar. Ytterligare e-postmeddelanden skickas inte.",
       "LIMIT_MINUTES": "Den skickar högst {{count}} e-postmeddelanden inom {{duration}} minuter. Ytterligare e-postmeddelanden skickas inte.",
       "RESERVED_DOMAINS": "E-post till testdomäner som example.com eller .test levereras inte.",
@@ -2476,7 +2476,7 @@
       "OWN_PROVIDER": "Konfigurera en egen leverantör för produktionsbruk.",
       "HTML_HINT": "Den aktiva e-postleverantören tillåter endast enkel formatering i meddelandetexter. Länkar, bilder och stilar tas bort.",
       "HTML_HINT_LINK": "Konfigurera en egen leverantör",
-      "ROW_TOOLTIP": "Hanteras av systemets operatör. Begränsningar gäller så länge den här leverantören är aktiv."
+      "ROW_TOOLTIP": "Hanteras av ZITADEL-operatören. Begränsningar gäller så länge den här leverantören är aktiv."
     },
     "LIST": {
       "TITLE": "SMTP-leverantör",

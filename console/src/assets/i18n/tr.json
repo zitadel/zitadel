@@ -2469,7 +2469,7 @@
   },
   "SMTP": {
     "RESTRICTIONS": {
-      "MANAGED": "Etkin e-posta sağlayıcısı sistemin operatörü tarafından yönetilir ve başlangıç için tasarlanmıştır.",
+      "MANAGED": "Etkin e-posta sağlayıcısı ZITADEL operatörü tarafından yönetilir ve başlangıç için tasarlanmıştır.",
       "LIMIT_HOURS": "{{duration}} saat içinde en fazla {{count}} e-posta gönderir. Sonraki e-postalar gönderilmez.",
       "LIMIT_MINUTES": "{{duration}} dakika içinde en fazla {{count}} e-posta gönderir. Sonraki e-postalar gönderilmez.",
       "RESERVED_DOMAINS": "example.com veya .test gibi test alan adlarına gönderilen e-postalar teslim edilmez.",
@@ -2477,7 +2477,7 @@
       "OWN_PROVIDER": "Üretim kullanımı için kendi sağlayıcınızı yapılandırın.",
       "HTML_HINT": "Etkin e-posta sağlayıcısı mesaj metinlerinde yalnızca basit biçimlendirmeye izin verir. Bağlantılar, görseller ve stiller kaldırılır.",
       "HTML_HINT_LINK": "Kendi sağlayıcınızı yapılandırın",
-      "ROW_TOOLTIP": "Sistemin operatörü tarafından yönetilir. Bu sağlayıcı etkin olduğu sürece kısıtlamalar geçerlidir."
+      "ROW_TOOLTIP": "ZITADEL operatörü tarafından yönetilir. Bu sağlayıcı etkin olduğu sürece kısıtlamalar geçerlidir."
     },
     "LIST": {
       "TITLE": "SMTP Sağlayıcısı",

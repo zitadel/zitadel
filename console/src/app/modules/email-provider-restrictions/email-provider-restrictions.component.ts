@@ -5,11 +5,11 @@ import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 
 import { InfoSectionModule } from '../info-section/info-section.module';
-import { NewAdminService } from 'src/app/services/new-admin.service';
+import { NewSettingsService } from 'src/app/services/new-settings.service';
 
-// States the restrictions the operator of the system defined for the active email provider,
+// States the restrictions the ZITADEL operator defined for the active email provider,
 // e.g. a default provider shared by multiple instances.
-// Nothing is rendered if the active provider is not restricted or cannot be read.
+// Nothing is rendered if the active provider is not restricted or the settings cannot be read.
 @Component({
   selector: 'cnsl-email-provider-restrictions',
   templateUrl: './email-provider-restrictions.component.html',
@@ -21,10 +21,14 @@ export class EmailProviderRestrictionsComponent {
   // 'provider' states all restrictions, 'texts' only the one concerning custom message texts
   public readonly mode = input<'provider' | 'texts'>('provider');
 
-  private readonly adminService = inject(NewAdminService);
-  private readonly providerQuery = injectQuery(() => this.adminService.getEmailProviderQueryOptions());
+  private readonly settingsService = inject(NewSettingsService);
+  // the general settings are readable by organization admins, which customize message texts as well
+  private readonly settingsQuery = injectQuery(() => this.settingsService.getGeneralSettingsQueryOptions());
 
-  protected readonly restrictions = computed(() => this.providerQuery.data()?.config?.restrictions);
+  // a failed reload keeps the previous data, which must not keep a stale banner
+  protected readonly restrictions = computed(() =>
+    this.settingsQuery.isError() ? undefined : this.settingsQuery.data()?.emailProviderRestrictions,
+  );
 
   protected readonly limit = computed(() => {
     const limit = this.restrictions()?.sendingLimit;

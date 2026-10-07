@@ -2473,7 +2473,7 @@
   },
   "SMTP": {
     "RESTRICTIONS": {
-      "MANAGED": "当前启用的电子邮件提供商由本系统的运营方管理,用于入门使用。",
+      "MANAGED": "当前启用的电子邮件提供商由ZITADEL的运营方管理,用于入门使用。",
       "LIMIT_HOURS": "它在 {{duration}} 小时内最多发送 {{count}} 封电子邮件。超出的电子邮件不会发送。",
       "LIMIT_MINUTES": "它在 {{duration}} 分钟内最多发送 {{count}} 封电子邮件。超出的电子邮件不会发送。",
       "RESERVED_DOMAINS": "发往 example.com 或 .test 等测试域名的电子邮件不会送达。",
@@ -2481,7 +2481,7 @@
       "OWN_PROVIDER": "请为生产环境配置您自己的提供商。",
       "HTML_HINT": "当前启用的电子邮件提供商仅允许在消息文本中使用简单格式。链接、图片和样式会被移除。",
       "HTML_HINT_LINK": "配置您自己的提供商",
-      "ROW_TOOLTIP": "由本系统的运营方管理。启用此提供商期间将应用限制。"
+      "ROW_TOOLTIP": "由ZITADEL的运营方管理。启用此提供商期间将应用限制。"
     },
     "LIST": {
       "TITLE": "SMTP 提供商",
