@@ -42,7 +42,7 @@ func TestIsStepDone(t *testing.T) {
 		require.NotNil(t, es.query)
 		queries := es.query.GetQueries()
 		require.Len(t, queries, 1)
-		assert.Equal(t, []eventstore.EventType{DoneType}, queries[0].GetEventTypes())
+		assert.ElementsMatch(t, []eventstore.EventType{StartedType, DoneType, failedType}, queries[0].GetEventTypes())
 	})
 
 	t.Run("done event is stored", func(t *testing.T) {
@@ -54,6 +54,30 @@ func TestIsStepDone(t *testing.T) {
 		done, err := IsStepDone(t.Context(), es, EventstorePositionClockTimestampStep)
 		require.NoError(t, err)
 		assert.True(t, done)
+	})
+
+	t.Run("started without done or failed errors", func(t *testing.T) {
+		es := &stubEventQuerier{
+			events: []eventstore.Event{
+				&eventstore.BaseEvent{EventType: StartedType},
+			},
+		}
+		done, err := IsStepDone(t.Context(), es, EventstorePositionClockTimestampStep)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "started without a done or failed event")
+		assert.False(t, done)
+	})
+
+	t.Run("failed without done is not done", func(t *testing.T) {
+		es := &stubEventQuerier{
+			events: []eventstore.Event{
+				&eventstore.BaseEvent{EventType: StartedType},
+				&eventstore.BaseEvent{EventType: failedType},
+			},
+		}
+		done, err := IsStepDone(t.Context(), es, EventstorePositionClockTimestampStep)
+		require.NoError(t, err)
+		assert.False(t, done)
 	})
 
 	t.Run("undefined table is not done", func(t *testing.T) {
