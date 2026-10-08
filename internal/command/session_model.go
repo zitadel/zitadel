@@ -110,6 +110,8 @@ func (wm *SessionWriteModel) Reduce() error {
 			wm.reduceTerminate()
 		case *session.RecoveryCodeCheckedEvent:
 			wm.reduceRecoveryCodeChecked(e)
+		case *session.MetadataSetEvent:
+			wm.reduceMetadataSet(e)
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -232,6 +234,10 @@ func (wm *SessionWriteModel) reduceTerminate() {
 
 func (wm *SessionWriteModel) reduceRecoveryCodeChecked(e *session.RecoveryCodeCheckedEvent) {
 	wm.RecoveryCodeCheckedAt = e.CheckedAt
+}
+
+func (wm *SessionWriteModel) reduceMetadataSet(e *session.MetadataSetEvent) {
+	wm.Metadata = e.Metadata
 }
 
 // AuthenticationTime returns the time the user authenticated using the latest time of all checks
