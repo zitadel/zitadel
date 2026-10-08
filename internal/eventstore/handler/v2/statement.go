@@ -52,10 +52,10 @@ func (h *Handler) eventsToStatements(ctx context.Context, tx *sql.Tx, events []e
 		statement, err := h.reduce(event)
 		if err != nil {
 			logging.Error(ctx, "reduce failed", "err", err, "event", failureFromEvent(event, err))
-			if shouldContinue := h.handleFailedStmt(ctx, tx, failureFromEvent(event, err)); shouldContinue {
-				continue
+			if shouldContinue := h.handleFailedStmt(ctx, tx, failureFromEvent(event, err)); !shouldContinue {
+				return statements, &executionError{err}
 			}
-			return statements, &executionError{err}
+			statement = NewNoOpStatement(event)
 		}
 		if !h.filterOffsetIsCursor {
 			offset++
