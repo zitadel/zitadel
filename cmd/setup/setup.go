@@ -298,6 +298,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s23CorrectGlobalUniqueConstraints,
 		steps.s24AddActorToAuthTokens,
 		steps.s26AuthUsers3,
+		steps.s82CurrentStatesInTxOrder,
 		steps.s29FillFieldsForProjectGrant,
 		steps.s30FillFieldsForOrgDomainVerified,
 		steps.s34AddCacheSchema,
@@ -330,7 +331,6 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s78UniqueConstraintOwners,
 		steps.s80Users14InstanceResourceOwnerIndex,
 		steps.s81CommandsToEventsClockTimestamp,
-		steps.s82CurrentStatesInTxOrder,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {

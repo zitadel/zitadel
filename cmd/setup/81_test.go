@@ -3,6 +3,7 @@ package setup
 import (
 	"os"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -40,6 +41,8 @@ func TestSetupExecutionSliceOmits77(t *testing.T) {
 		assert.NotContains(t, slice, "s77StampEventPositionAtInsert")
 		assert.Contains(t, slice, "s81CommandsToEventsClockTimestamp")
 		assert.Contains(t, slice, "s82CurrentStatesInTxOrder")
+		assert.Less(t, strings.Index(slice, "s82CurrentStatesInTxOrder"), strings.Index(slice, "s29FillFieldsForProjectGrant"),
+			"82 must add in_tx_order before field handlers query current_states")
 	}
 	assert.True(t, found, "expected the one-shot migration slice to include 81 and 82")
 }
