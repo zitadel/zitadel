@@ -35,9 +35,13 @@ The following endpoints now behave like all other v2 list endpoints:
 - `zitadel.user.v2.UserService.ListIDPLinks`
 - `zitadel.org.v2.OrganizationService.ListOrganizations`
 - `zitadel.session.v2.SessionService.ListSessions` (and v2beta)
+- `zitadel.instance.v2.InstanceService.ListInstances`, `ListCustomDomains` and `ListTrustedDomains` (and v2beta)
+- `zitadel.app.v2beta.AppService.ListApplications` and `ListApplicationKeys`
 
 Requests without a `limit` return at most `DefaultQueryLimit` (100) results.
 Requests with a `limit` greater than `MaxQueryLimit` (1000) fail with an `InvalidArgument` error.
+
+Additionally, `ListSessions` and `ListOrganizations` (v2 and v2beta) requests without a sorting column now return the results sorted by ID (descending by default) instead of in an undefined order, so they can be paginated reliably.
 
 ### v1 APIs
 
@@ -48,7 +52,9 @@ Requests with a `limit` greater than `MaxQueryLimit` fail with an `InvalidArgume
 
 The `Auth.SearchLimit` and `Admin.SearchLimit` configuration options are removed.
 `Admin.SearchLimit` had no effect.
-`Auth.SearchLimit` only limited the refresh tokens returned by `ListMyRefreshTokens`, which are now limited by `MaxQueryLimit`.
+`Auth.SearchLimit` only limited the refresh tokens listed by `ListMyRefreshTokens` and revoked by `RevokeAllMyRefreshTokens`, which are now limited by `MaxQueryLimit`.
+
+The events API (`zitadel.admin.v1.AdminService.ListEvents`) is not affected: it keeps its own maximum of 1000 events and silently caps higher limits, independent of `MaxQueryLimit`.
 
 ### Who is affected
 
