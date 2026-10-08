@@ -180,34 +180,108 @@ func TestUniqueConstraintOwners(t *testing.T) {
 	}
 }
 
-func TestBulkRemoveAlsoEmitsRemoveByOwner(t *testing.T) {
+func TestBulkRemoveKeyedAndByOwnerAreExclusive(t *testing.T) {
 	ctx := t.Context()
 	orgAgg := agg(org.AggregateType, "org-1", "org-1")
-	orgConstraints := org.NewOrgRemovedEvent(ctx, orgAgg, "acme", nil, false, nil, nil, nil).UniqueConstraints()
-	require.GreaterOrEqual(t, len(orgConstraints), 2)
-	assert.Equal(t, eventstore.UniqueConstraintRemoveByOwner, orgConstraints[1].Action)
-	assert.Equal(t, []string{"org:org-1"}, orgConstraints[1].Owners)
-
 	userAgg := agg(user.AggregateType, "user-1", "org-1")
-	userConstraints := user.NewUserRemovedEvent(ctx, userAgg, "alice", nil, false).UniqueConstraints()
-	last := userConstraints[len(userConstraints)-1]
-	assert.Equal(t, eventstore.UniqueConstraintRemoveByOwner, last.Action)
-	assert.Equal(t, []string{"user:user-1"}, last.Owners)
-
-	idpConstraints := idpconfig.NewIDPConfigRemovedEvent(&eventstore.BaseEvent{Agg: orgAgg}, "idp-1", "Google").UniqueConstraints()
-	assert.Equal(t, eventstore.UniqueConstraintRemoveByOwner, idpConstraints[1].Action)
-	assert.Equal(t, []string{"idp:idp-1"}, idpConstraints[1].Owners)
-
 	projectAgg := agg(project.AggregateType, "project-1", "org-1")
-	projectConstraints := project.NewProjectRemovedEvent(ctx, projectAgg, "docs", nil).UniqueConstraints()
-	assert.Equal(t, eventstore.UniqueConstraintRemoveByOwner, projectConstraints[1].Action)
-	assert.Equal(t, []string{"project:project-1"}, projectConstraints[1].Owners)
 
-	grantConstraints := project.NewGrantRemovedEvent(ctx, projectAgg, "grant-1", "granted-org").UniqueConstraints()
-	require.Len(t, grantConstraints, 2)
-	assert.Equal(t, eventstore.UniqueConstraintRemove, grantConstraints[0].Action)
-	assert.Equal(t, eventstore.UniqueConstraintRemoveByOwner, grantConstraints[1].Action)
-	assert.Equal(t, []string{"grant:grant-1"}, grantConstraints[1].Owners)
+	assertExclusive := func(t *testing.T, constraints []*eventstore.UniqueConstraint) {
+		t.Helper()
+		var hasKeyed, hasByOwner bool
+		for _, constraint := range constraints {
+			switch constraint.Action {
+			case eventstore.UniqueConstraintRemove:
+				hasKeyed = true
+			case eventstore.UniqueConstraintRemoveByOwner:
+				hasByOwner = true
+			case eventstore.UniqueConstraintAdd, eventstore.UniqueConstraintInstanceRemove:
+			}
+		}
+		assert.False(t, hasKeyed && hasByOwner, "UniqueConstraints must not mix keyed remove and RemoveByOwner")
+	}
+
+	orgKeyed := org.NewOrgRemovedEvent(ctx, orgAgg, "acme", nil, false, nil, nil, nil).UniqueConstraints()
+	require.Len(t, orgKeyed, 1)
+	assert.Equal(t, eventstore.UniqueConstraintRemove, orgKeyed[0].Action)
+	assertExclusive(t, orgKeyed)
+	orgByOwner := org.NewOrgRemovedByOwnerEvent(ctx, orgAgg, "acme").UniqueConstraints()
+	require.Len(t, orgByOwner, 1)
+	assert.Equal(t, eventstore.UniqueConstraintRemoveByOwner, orgByOwner[0].Action)
+	assert.Equal(t, []string{"org:org-1"}, orgByOwner[0].Owners)
+	assertExclusive(t, orgByOwner)
+
+	keyedUser := user.NewUserRemovedEvent(ctx, userAgg, "alice", nil, false).UniqueConstraints()
+	require.Len(t, keyedUser, 1)
+	assert.Equal(t, eventstore.UniqueConstraintRemove, keyedUser[0].Action)
+	assertExclusive(t, keyedUser)
+	userByOwner := user.NewUserRemovedByOwnerEvent(ctx, userAgg).UniqueConstraints()
+	require.Len(t, userByOwner, 1)
+	assert.Equal(t, eventstore.UniqueConstraintRemoveByOwner, userByOwner[0].Action)
+	assert.Equal(t, []string{"user:user-1"}, userByOwner[0].Owners)
+	assertExclusive(t, userByOwner)
+	assert.Empty(t, user.NewUserRemovedEvent(ctx, userAgg, "", nil, false).UniqueConstraints())
+
+	idpKeyed := idpconfig.NewIDPConfigRemovedEvent(&eventstore.BaseEvent{Agg: orgAgg}, "idp-1", "Google").UniqueConstraints()
+	require.Len(t, idpKeyed, 1)
+	assert.Equal(t, eventstore.UniqueConstraintRemove, idpKeyed[0].Action)
+	assertExclusive(t, idpKeyed)
+	idpByOwner := idpconfig.NewIDPConfigRemovedByOwnerEvent(&eventstore.BaseEvent{Agg: orgAgg}, "idp-1", "Google").UniqueConstraints()
+	require.Len(t, idpByOwner, 1)
+	assert.Equal(t, eventstore.UniqueConstraintRemoveByOwner, idpByOwner[0].Action)
+	assert.Equal(t, []string{"idp:idp-1"}, idpByOwner[0].Owners)
+	assertExclusive(t, idpByOwner)
+
+	projectKeyed := project.NewProjectRemovedEvent(ctx, projectAgg, "docs", nil).UniqueConstraints()
+	require.Len(t, projectKeyed, 1)
+	assert.Equal(t, eventstore.UniqueConstraintRemove, projectKeyed[0].Action)
+	assertExclusive(t, projectKeyed)
+	projectByOwner := project.NewProjectRemovedByOwnerEvent(ctx, projectAgg, "docs").UniqueConstraints()
+	require.Len(t, projectByOwner, 1)
+	assert.Equal(t, eventstore.UniqueConstraintRemoveByOwner, projectByOwner[0].Action)
+	assert.Equal(t, []string{"project:project-1"}, projectByOwner[0].Owners)
+	assertExclusive(t, projectByOwner)
+
+	grantKeyed := project.NewGrantRemovedEvent(ctx, projectAgg, "grant-1", "granted-org").UniqueConstraints()
+	require.Len(t, grantKeyed, 1)
+	assert.Equal(t, eventstore.UniqueConstraintRemove, grantKeyed[0].Action)
+	assertExclusive(t, grantKeyed)
+	grantByOwner := project.NewGrantRemovedByOwnerEvent(ctx, projectAgg, "grant-1", "granted-org").UniqueConstraints()
+	require.Len(t, grantByOwner, 1)
+	assert.Equal(t, eventstore.UniqueConstraintRemoveByOwner, grantByOwner[0].Action)
+	assert.Equal(t, []string{"grant:grant-1"}, grantByOwner[0].Owners)
+	assertExclusive(t, grantByOwner)
+
+	appByOwner := project.NewApplicationRemovedByOwnerEvent(ctx, projectAgg, "app-1").UniqueConstraints()
+	require.Len(t, appByOwner, 1)
+	assert.Equal(t, eventstore.UniqueConstraintRemoveByOwner, appByOwner[0].Action)
+	assertExclusive(t, appByOwner)
+	appKeyed := project.NewApplicationRemovedEvent(ctx, projectAgg, "app-1", "console", "").UniqueConstraints()
+	require.Len(t, appKeyed, 1)
+	assert.Equal(t, eventstore.UniqueConstraintRemove, appKeyed[0].Action)
+	assertExclusive(t, appKeyed)
+}
+
+func TestSkipCommandUniqueConstraints(t *testing.T) {
+	ctx := t.Context()
+	orgAgg := agg(org.AggregateType, "org-1", "org-1")
+	userAgg := agg(user.AggregateType, "user-1", "org-1")
+	projectAgg := agg(project.AggregateType, "project-1", "org-1")
+	grantAgg := agg(usergrant.AggregateType, "grant-row", "org-1")
+
+	cmds := []eventstore.Command{
+		usergrant.NewUserGrantCascadeRemovedEvent(ctx, grantAgg, "user-1", "project-1", "grant-1"),
+		org.NewMemberCascadeRemovedEvent(ctx, orgAgg, "user-1"),
+		project.NewProjectMemberCascadeRemovedEvent(ctx, projectAgg, "user-1"),
+		instance.NewMemberCascadeRemovedEvent(ctx, agg(instance.AggregateType, "instance-1", "instance-1"), "user-1"),
+		project.NewProjectGrantMemberCascadeRemovedEvent(ctx, projectAgg, "user-1", "grant-1"),
+		user.NewUserIDPLinkCascadeRemovedEvent(ctx, userAgg, "idp-1", "ext-1"),
+	}
+	for _, cmd := range cmds {
+		require.NotEmpty(t, cmd.UniqueConstraints())
+		eventstore.SkipCommandUniqueConstraints(cmd)
+		assert.Empty(t, cmd.UniqueConstraints())
+	}
 }
 
 func TestUsernameScopeRewriteKeepsUserTag(t *testing.T) {

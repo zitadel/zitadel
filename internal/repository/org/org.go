@@ -282,6 +282,7 @@ type OrgRemovedEvent struct {
 	domains                     []string
 	externalIDPs                []*domain.UserIDPLink
 	samlEntityIDs               []string
+	removeByOwner               bool
 }
 
 func (e *OrgRemovedEvent) Payload() interface{} {
@@ -289,9 +290,13 @@ func (e *OrgRemovedEvent) Payload() interface{} {
 }
 
 func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	if e.removeByOwner {
+		return []*eventstore.UniqueConstraint{
+			eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ID),
+		}
+	}
 	constraints := []*eventstore.UniqueConstraint{
 		NewRemoveOrgNameUniqueConstraint(e.name),
-		eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ID),
 	}
 	for _, name := range e.usernames {
 		constraints = append(constraints, user.NewRemoveUsernameUniqueConstraint(name, e.Aggregate().ID, e.organizationScopedUsernames))
@@ -329,6 +334,12 @@ func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, na
 		samlEntityIDs:               samlEntityIDs,
 		organizationScopedUsernames: organizationScopedUsernames,
 	}
+}
+
+func NewOrgRemovedByOwnerEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string) *OrgRemovedEvent {
+	removed := NewOrgRemovedEvent(ctx, aggregate, name, nil, false, nil, nil, nil)
+	removed.removeByOwner = true
+	return removed
 }
 
 func OrgRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {

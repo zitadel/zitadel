@@ -200,19 +200,15 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 	}
 	var events []eventstore.Command
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
-	userName := existingUser.UserName
-	idpLinks := existingUser.IDPLinks
-	orgScoped := domainPolicy.UserLoginMustBeDomain || orgScopedUsername
 	ownerDeleteReady, err := c.isUniqueConstraintOwnerDeleteReady(ctx)
 	if err != nil {
 		return nil, err
 	}
 	if ownerDeleteReady {
-		userName = ""
-		idpLinks = nil
-		orgScoped = false
+		events = append(events, user.NewUserRemovedByOwnerEvent(ctx, userAgg))
+	} else {
+		events = append(events, user.NewUserRemovedEvent(ctx, userAgg, existingUser.UserName, existingUser.IDPLinks, domainPolicy.UserLoginMustBeDomain || orgScopedUsername))
 	}
-	events = append(events, user.NewUserRemovedEvent(ctx, userAgg, userName, idpLinks, orgScoped))
 
 	for _, grantID := range cascadingGrantIDs {
 		removeEvent, _, err := c.removeUserGrant(ctx, grantID, "", true, false, nil)
@@ -220,6 +216,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 			logging.WithFields("usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
 			continue
 		}
+		skipCascadeUniqueConstraints(ownerDeleteReady, removeEvent)
 		events = append(events, removeEvent)
 	}
 
@@ -228,6 +225,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 		if err != nil {
 			return nil, err
 		}
+		skipCascadeUniqueConstraints(ownerDeleteReady, membershipEvents...)
 		events = append(events, membershipEvents...)
 	}
 
