@@ -19,9 +19,10 @@ func TestCurrentStatesInTxOrderSQL(t *testing.T) {
 	assert.Contains(t, currentStatesInTxOrder, "BEFORE UPDATE ON projections.current_states")
 	assert.Contains(t, currentStatesInTxOrder, "current_states_keep_in_tx_order_opt_in")
 	assert.Contains(t, currentStatesInTxOrder, "NEW.in_tx_order := NULL")
+	assert.Contains(t, currentStatesInTxOrder, "SET in_tx_order = e.in_tx_order")
+	assert.Contains(t, currentStatesInTxOrder, "FROM eventstore.events2")
 	assert.NotContains(t, currentStatesInTxOrder, "BEFORE INSERT OR UPDATE")
 	assert.NotContains(t, currentStatesInTxOrder, "filter_offset = e.in_tx_order")
-	assert.NotContains(t, currentStatesInTxOrder, "FROM eventstore.events2")
 }
 
 func TestCurrentStatesInTxOrder_Execute(t *testing.T) {
