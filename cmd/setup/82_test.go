@@ -2,6 +2,7 @@ package setup
 
 import (
 	"context"
+	"fmt"
 	"regexp"
 	"testing"
 
@@ -13,7 +14,7 @@ import (
 )
 
 func TestCurrentStatesInTxOrderSQL(t *testing.T) {
-	assert.Contains(t, currentStatesInTxOrder, "ADD COLUMN IF NOT EXISTS in_tx_order INTEGER")
+	assert.Contains(t, currentStatesInTxOrder, "ADD COLUMN IF NOT EXISTS in_tx_order %s")
 	assert.Contains(t, currentStatesInTxOrder, "zitadel.keep_in_tx_order")
 	assert.Contains(t, currentStatesInTxOrder, "BEFORE UPDATE OF in_tx_order")
 	assert.Contains(t, currentStatesInTxOrder, "BEFORE UPDATE ON projections.current_states")
@@ -30,7 +31,9 @@ func TestCurrentStatesInTxOrder_Execute(t *testing.T) {
 	require.NoError(t, err)
 	defer db.Close()
 
-	mock.ExpectExec(regexp.QuoteMeta(currentStatesInTxOrder)).
+	mock.ExpectQuery(regexp.QuoteMeta(`SELECT data_type FROM information_schema.columns WHERE table_schema = 'eventstore' AND table_name = 'events2' AND column_name = 'in_tx_order'`)).
+		WillReturnRows(sqlmock.NewRows([]string{"data_type"}).AddRow("integer"))
+	mock.ExpectExec(regexp.QuoteMeta(fmt.Sprintf(currentStatesInTxOrder, "integer"))).
 		WillReturnResult(sqlmock.NewResult(0, 0))
 
 	mig := &CurrentStatesInTxOrder{dbClient: &database.DB{DB: db}}

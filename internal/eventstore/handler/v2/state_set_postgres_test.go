@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -65,7 +66,7 @@ INSERT INTO projections.current_states (
 	require.True(t, ok)
 	stepSQL, err := os.ReadFile(filepath.Join(filepath.Dir(thisFile), "..", "..", "..", "..", "cmd", "setup", "82.sql"))
 	require.NoError(t, err)
-	_, err = db.Exec(string(stepSQL))
+	_, err = db.Exec(fmt.Sprintf(string(stepSQL), "integer"))
 	require.NoError(t, err)
 	assertInTxOrder(t, db, 9)
 

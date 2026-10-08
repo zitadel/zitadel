@@ -1,4 +1,4 @@
-ALTER TABLE projections.current_states ADD COLUMN IF NOT EXISTS in_tx_order INTEGER;
+ALTER TABLE projections.current_states ADD COLUMN IF NOT EXISTS in_tx_order %s;
 
 UPDATE projections.current_states cs
 SET in_tx_order = e.in_tx_order
