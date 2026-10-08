@@ -43,7 +43,7 @@ git clone https://github.com/zitadel/example-api-python3-flask
 
 cd example-api-python3-flask
 ```
-2. The [server.py](https://github.com/zitadel/example-api-python3-flask/blob/main/server.py) file contains a Flask-based API that provides authentication for routes using the OpenID Connect protocol as shown below.
+2. The [server.py](https://github.com/zitadel/example-api-python3-flask/blob/main/server.py) file contains a Flask-based API that protects its routes by validating access tokens with OAuth 2.0 token introspection, as shown below.
 
 ```python
 from flask import Flask, jsonify, Response
@@ -62,7 +62,7 @@ def handle_auth_error(ex: ValidatorError) -> Response:
     response.status_code = ex.status_code
     return response
 
-@APP.route("/img/api/public")
+@APP.route("/api/public")
 def public():
     """No access token required."""
     response = (
@@ -70,7 +70,8 @@ def public():
     )
     return jsonify(message=response)
 
-@APP.route("/img/api/private")
+
+@APP.route("/api/private")
 @require_auth(None)
 def private():
     """A valid access token is required."""
@@ -79,7 +80,8 @@ def private():
     )
     return jsonify(message=response)
 
-@APP.route("/img/api/private-scoped")
+
+@APP.route("/api/private-scoped")
 @require_auth(["read:messages"])
 def private_scoped():
     """A valid access token and scope are required."""
@@ -95,9 +97,9 @@ if __name__ == "__main__":
 The API has three routes:
 
 <ul>
-<li> "/img/api/public" - No access token is required.</li>
-<li>"/img/api/private" - A valid access token is required.</li>
-<li>"/img/api/private-scoped" - A valid access token and a "read:messages" scope are required.</li>
+<li> "/api/public" - No access token is required.</li>
+<li>"/api/private" - A valid access token is required.</li>
+<li>"/api/private-scoped" - A valid access token and a "read:messages" scope are required.</li>
 </ul>
 
 The [validator.py](https://github.com/zitadel/example-api-python3-flask/blob/main/validator.py) file implements the ZitadelIntrospectTokenValidator class, which is a custom class that inherits from the IntrospectTokenValidator class provided by the authlib library. The introspection process retrieves the token details from ZITADEL using ZITADEL's introspection endpoint.
@@ -118,6 +120,7 @@ load_dotenv()
 ZITADEL_DOMAIN = os.getenv("ZITADEL_DOMAIN")
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+
 
 class ValidatorError(Exception):
 
@@ -154,16 +157,18 @@ class ZitadelIntrospectTokenValidator(IntrospectTokenValidator):
         now = int( time.time() )
         if not token:
             raise ValidatorError({
-                "code": "invalid_token_revoked",
-                "description": "Token was revoked." }, 401)
+                "code": "invalid_token",
+                "description": "Invalid Token." }, 401)
+        """Revoked"""
+        if not token["active"]:
+            raise ValidatorError({
+                "code": "invalid_token",
+                "description": "Invalid token (active: false)" }, 401)
         """Expired"""
         if token["exp"] < now:
             raise ValidatorError({
                 "code": "invalid_token_expired",
                 "description": "Token has expired." }, 401)
-        """Revoked"""
-        if not token["active"]:
-            raise InvalidTokenError()
         """Insufficient Scope"""
         if not self.match_token_scopes(token, scopes):
             raise ValidatorError({
@@ -253,4 +258,4 @@ You should get a response with Status Code 200 and the following message.
 
 `{"message":"Private, scoped route - You need to be authenticated and have the role read:messages to see this."}`
 
-You can remove the role from the service account in ZITADEL and try again. You should then get a Status Code 403, Forbidden error.
+You can remove the role from the service account in ZITADEL and try again. You should then get a Status Code 401 with the error code `insufficient_scope`.
