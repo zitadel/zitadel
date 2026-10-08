@@ -3,6 +3,7 @@ package setup
 import (
 	"context"
 	_ "embed"
+	"fmt"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -18,7 +19,11 @@ type CurrentStatesInTxOrder struct {
 }
 
 func (mig *CurrentStatesInTxOrder) Execute(ctx context.Context, _ eventstore.Event) error {
-	_, err := mig.dbClient.ExecContext(ctx, currentStatesInTxOrder)
+	inTxOrderType, err := inTxOrderType(ctx, mig.dbClient)
+	if err != nil {
+		return err
+	}
+	_, err = mig.dbClient.ExecContext(ctx, fmt.Sprintf(currentStatesInTxOrder, inTxOrderType))
 	return err
 }
 
