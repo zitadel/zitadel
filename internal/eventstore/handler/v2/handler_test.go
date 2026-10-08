@@ -281,7 +281,7 @@ func TestHandler_eventsToStatements_cursorModeDoesNotCountOffset(t *testing.T) {
 }
 
 func TestUpdateStateStmt_singleWriteOptsIn(t *testing.T) {
-	assert.Contains(t, updateStateStmt, "set_config('zitadel.keep_in_tx_order', 'true', true)")
+	assert.NotContains(t, updateStateStmt, "set_config")
 	assert.Contains(t, updateStateStmt, "in_tx_order")
 	assert.NotContains(t, updateStateStmt, "UPDATE projections.current_states SET")
 	assert.Equal(t, 1, strings.Count(updateStateStmt, "INSERT INTO projections.current_states"))

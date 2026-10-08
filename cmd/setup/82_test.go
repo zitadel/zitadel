@@ -15,9 +15,13 @@ import (
 func TestCurrentStatesInTxOrderSQL(t *testing.T) {
 	assert.Contains(t, currentStatesInTxOrder, "ADD COLUMN IF NOT EXISTS in_tx_order INTEGER")
 	assert.Contains(t, currentStatesInTxOrder, "zitadel.keep_in_tx_order")
-	assert.Contains(t, currentStatesInTxOrder, "BEFORE INSERT OR UPDATE")
+	assert.Contains(t, currentStatesInTxOrder, "BEFORE UPDATE OF in_tx_order")
+	assert.Contains(t, currentStatesInTxOrder, "BEFORE UPDATE ON projections.current_states")
+	assert.Contains(t, currentStatesInTxOrder, "current_states_keep_in_tx_order_opt_in")
 	assert.Contains(t, currentStatesInTxOrder, "NEW.in_tx_order := NULL")
+	assert.NotContains(t, currentStatesInTxOrder, "BEFORE INSERT OR UPDATE")
 	assert.NotContains(t, currentStatesInTxOrder, "filter_offset = e.in_tx_order")
+	assert.NotContains(t, currentStatesInTxOrder, "FROM eventstore.events2")
 }
 
 func TestCurrentStatesInTxOrder_Execute(t *testing.T) {
