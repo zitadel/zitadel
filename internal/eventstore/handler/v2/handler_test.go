@@ -2,6 +2,8 @@ package handler
 
 import (
 	"context"
+	"database/sql/driver"
+	"errors"
 	"strings"
 	"testing"
 
@@ -9,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -278,6 +281,73 @@ func TestHandler_eventsToStatements_cursorModeDoesNotCountOffset(t *testing.T) {
 	require.Len(t, statements, 1)
 	assert.Equal(t, uint32(0), statements[0].offset)
 	assert.Equal(t, uint32(5), statements[0].inTxOrder)
+}
+
+func TestHandler_eventsToStatements_skippedReduceAdvancesOffset(t *testing.T) {
+	sqlMock := mock.NewSQLMock(t,
+		mock.ExpectBegin(nil),
+		mock.ExpectQuery(failureCountStmt,
+			mock.WithQueryResult([]string{"failure_count"}, [][]driver.Value{{int64(0)}}),
+		),
+		mock.ExcpectExec(setFailedEventStmt,
+			mock.WithExecRowsAffected(1),
+		),
+	)
+	t.Cleanup(func() { sqlMock.Assert(t) })
+
+	tx, err := sqlMock.DB.BeginTx(context.Background(), nil)
+	require.NoError(t, err)
+
+	reduceErr := errors.New("reduce failed")
+	h := &Handler{
+		projection: &projection{
+			name: "users14",
+			reducers: []AggregateReducer{{
+				Aggregate: "user",
+				EventReducers: []EventReducer{
+					{
+						Event: "user.human.added",
+						Reduce: func(eventstore.Event) (*Statement, error) {
+							return nil, reduceErr
+						},
+					},
+					{
+						Event: "user.human.password.changed",
+						Reduce: func(event eventstore.Event) (*Statement, error) {
+							return NewStatement(event, func(context.Context, Executer, string) error { return nil }), nil
+						},
+					},
+				},
+			}},
+		},
+		maxFailureCount: 1,
+	}
+	pos := decimal.NewFromInt(1)
+	agg := &eventstore.Aggregate{ID: "agg-a", Type: "user", InstanceID: "inst"}
+	events := []eventstore.Event{
+		&eventstore.BaseEvent{
+			Agg:       agg,
+			EventType: "user.human.added",
+			Seq:       1,
+			Pos:       pos,
+			InTx:      5,
+		},
+		&eventstore.BaseEvent{
+			Agg:       agg,
+			EventType: "user.human.password.changed",
+			Seq:       2,
+			Pos:       pos,
+			InTx:      9,
+		},
+	}
+
+	statements, err := h.eventsToStatements(context.Background(), tx, events, &state{})
+	require.NoError(t, err)
+	require.Len(t, statements, 2)
+	assert.Nil(t, statements[0].Execute)
+	assert.NotNil(t, statements[1].Execute)
+	assert.Equal(t, uint32(1), statements[0].offset)
+	assert.Equal(t, uint32(2), statements[1].offset)
 }
 
 func TestUpdateStateStmt_singleWriteOptsIn(t *testing.T) {
