@@ -1,0 +1,44 @@
+---
+title: Technical Advisory 10017
+description: "A-10017: Upgrading to ZITADEL v4 without previously enabling OIDC web keys can invalidate existing JWTs"
+---
+
+## Date and Version
+
+Versions: upgrades to >= v4.0.0 from installations that never activated OIDC web keys
+
+Date: 2026-07-15
+
+## Description
+
+ZITADEL signs OIDC ID tokens (and JWT access tokens, when configured) with asymmetric keys exposed on the JWKS endpoint.
+
+On v3, instances could still use **legacy signing keys** until the `web_key` feature was enabled.
+Starting with v4, **web keys are mandatory** and the legacy signing path is removed.
+Setup generates web keys if they are missing, but tokens that were signed with legacy keys before the upgrade are no longer verifiable.
+
+To prepare existing deployments, v3.4 introduced web key setup support, and **v3.4.1** enables the web key feature by default so new tokens can roll onto web keys while legacy keys may remain on JWKS until they expire.
+
+## Impact
+
+If you upgrade to v4 without having web keys active beforehand:
+
+- Existing JWT access tokens and ID tokens may become invalid immediately
+- Users may be forced to re-authenticate
+- Flows that rely on `id_token_hint` (for example Console logout / re-login) can fail until session storage is cleared
+
+## Mitigation
+
+1. Upgrade to the latest **v3.4.x** (at least **v3.4.1**).
+2. Let tokens and sessions signed with legacy keys expire (soak), **or** accept a planned re-login window.
+3. Upgrade to v4 using your normal process (`setup`, then `start`). See [Upgrade from ZITADEL v3 to v4](/self-hosting/manage/upgrade-v3-to-v4).
+
+### No action needed if
+
+- You already run **>= v3.4.1** and have soaked since enabling web keys, or
+- You previously enabled the `web_key` feature on v3 and waited for legacy-signed tokens to expire
+
+## Related
+
+- [OIDC web keys](/guides/integrate/login/oidc/webkeys)
+- [Upgrade from ZITADEL v3 to v4](/self-hosting/manage/upgrade-v3-to-v4)

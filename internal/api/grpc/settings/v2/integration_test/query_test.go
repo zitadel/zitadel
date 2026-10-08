@@ -692,3 +692,27 @@ func assertPaginationResponse(t *assert.CollectT, expected *filter.PaginationRes
 	assert.Equal(t, expected.AppliedLimit, actual.AppliedLimit)
 	assert.Equal(t, expected.TotalResult, actual.TotalResult)
 }
+
+func TestServer_GetActiveIdentityProviders_ZitadelType(t *testing.T) {
+	instance := integration.NewInstance(CTX)
+	iamOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+
+	idpName := integration.IDPName()
+	idpResp := instance.AddZitadelProvider(iamOwnerCTX, idpName)
+	instance.AddProviderToDefaultLoginPolicy(iamOwnerCTX, idpResp.GetId())
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamOwnerCTX, time.Minute)
+	assert.EventuallyWithT(t, func(ct *assert.CollectT) {
+		got, err := instance.Client.SettingsV2.GetActiveIdentityProviders(iamOwnerCTX, &settings.GetActiveIdentityProvidersRequest{})
+		if !assert.NoError(ct, err) {
+			return
+		}
+		providers := got.GetIdentityProviders()
+		if !assert.Len(ct, providers, 1) {
+			return
+		}
+		assert.Equal(ct, idpResp.GetId(), providers[0].GetId())
+		assert.Equal(ct, idpName, providers[0].GetName())
+		assert.Equal(ct, settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_ZITADEL, providers[0].GetType())
+	}, retryDuration, tick)
+}

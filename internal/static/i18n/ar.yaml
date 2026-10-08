@@ -177,6 +177,7 @@ Errors:
         NotExisting: "المصادقة متعددة العوامل OTP (كلمة مرور لمرة واحدة) غير موجودة"
         NotReady: "المصادقة متعددة العوامل OTP (كلمة مرور لمرة واحدة) ليست جاهزة"
         InvalidCode: "رمز غير صالح"
+        Reused: "تم استخدام هذا الرمز بالفعل. يرجى انتظار رمز جديد"
       U2F:
         NotExisting: "U2F غير موجود"
       Passwordless:
@@ -205,6 +206,7 @@ Errors:
     AlreadyActive: "المنظمة نشطة بالفعل"
     Empty: "المنظمة فارغة"
     NotFound: "المنظمة غير موجودة"
+    NotActive: "المنظمة غير نشطة"
     NotChanged: "المنظمة لم تتغير"
     DefaultOrgNotDeletable: "لا يجب حذف المنظمة الافتراضية"
     ZitadelOrgNotDeletable: "المنظمة التي تحتوي على مشروع ZITADEL لا يجب حذفها"
@@ -283,6 +285,8 @@ Errors:
     LabelPolicy:
       NotFound: "سياسة العلامة الخاصة غير موجودة"
       NotChanged: "سياسة العلامة الخاصة لم تتغير"
+    IDPConfig:
+      NotExisting: "تكوين مزود الهوية غير موجود"
   Project:
     ProjectIDMissing: "معرف المشروع مفقود"
     AlreadyExists: "المشروع موجود بالفعل في المنظمة"
@@ -760,6 +764,7 @@ EventTypes:
           check:
             succeeded: "نجح فحص OTP للمصادقة متعددة العوامل"
             failed: "فشل فحص OTP للمصادقة متعددة العوامل"
+            reused: "أعيد استخدام رمز OTP للمصادقة متعددة العوامل"
           sms:
             added: "تمت إضافة OTP SMS للمصادقة متعددة العوامل"
             removed: "تمت إزالة OTP SMS للمصادقة متعددة العوامل"

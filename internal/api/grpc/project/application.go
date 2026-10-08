@@ -3,6 +3,7 @@ package project
 import (
 	"net/url"
 
+	"github.com/muhlemmer/gu"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	object_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
@@ -68,6 +69,8 @@ func AppOIDCConfigToPb(app *query.OIDCApp) *app_pb.App_OidcConfig {
 			SkipNativeAppSuccessPage: app.SkipNativeAppSuccessPage,
 			BackChannelLogoutUri:     app.BackChannelLogoutURI,
 			LoginVersion:             loginVersionToPb(app.LoginVersion, app.LoginBaseURI),
+			Ios:                      iosAppLinkConfigToPb(app.IOSTeamID, app.IOSBundleID),
+			Android:                  androidAppLinkConfigToPb(app.AndroidPackageName, app.AndroidSHA256CertFingerprints),
 		},
 	}
 }
@@ -343,5 +346,43 @@ func LoginVersionToDomain(version *app_pb.LoginVersion) (domain.LoginVersion, st
 		return domain.LoginVersion2, v.LoginV2.GetBaseUri(), err
 	default:
 		return domain.LoginVersionUnspecified, "", nil
+	}
+}
+
+func IOSAppLinkConfigToDomain(cfg *app_pb.IOSAppLinkConfig) (teamID, bundleID *string) {
+	if cfg == nil {
+		return nil, nil
+	}
+	return gu.Ptr(cfg.GetTeamId()), gu.Ptr(cfg.GetBundleId())
+}
+
+func AndroidAppLinkConfigToDomain(cfg *app_pb.AndroidAppLinkConfig) (packageName *string, fingerprints []string) {
+	if cfg == nil {
+		return nil, nil
+	}
+	fps := cfg.GetSha256CertFingerprints()
+	if fps == nil {
+		fps = []string{}
+	}
+	return gu.Ptr(cfg.GetPackageName()), fps
+}
+
+func iosAppLinkConfigToPb(teamID, bundleID string) *app_pb.IOSAppLinkConfig {
+	if teamID == "" && bundleID == "" {
+		return nil
+	}
+	return &app_pb.IOSAppLinkConfig{
+		TeamId:   teamID,
+		BundleId: bundleID,
+	}
+}
+
+func androidAppLinkConfigToPb(packageName string, fingerprints []string) *app_pb.AndroidAppLinkConfig {
+	if packageName == "" && len(fingerprints) == 0 {
+		return nil
+	}
+	return &app_pb.AndroidAppLinkConfig{
+		PackageName:            packageName,
+		Sha256CertFingerprints: fingerprints,
 	}
 }

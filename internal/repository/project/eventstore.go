@@ -36,6 +36,7 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, OIDCConfigChangedType, OIDCConfigChangedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, OIDCConfigSecretChangedType, OIDCConfigSecretChangedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, OIDCConfigSecretHashUpdatedType, eventstore.GenericEventMapper[OIDCConfigSecretHashUpdatedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, OIDCConfigRegistrationTokenChangedType, eventstore.GenericEventMapper[OIDCConfigRegistrationTokenChangedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, APIConfigAddedType, APIConfigAddedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, APIConfigChangedType, APIConfigChangedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, APIConfigSecretChangedType, APIConfigSecretChangedEventMapper)

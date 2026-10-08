@@ -53,13 +53,12 @@ END $$;
 CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command2[]) 
     RETURNS SETOF eventstore.events2 
     LANGUAGE 'plpgsql'
-    STABLE PARALLEL SAFE
+    VOLATILE PARALLEL SAFE
     ROWS 10
 AS $$
 DECLARE
     _latest_events eventstore.latest_command[];
     command eventstore.command2;
-    last_owner TEXT;
     i INTEGER;
 BEGIN
 
@@ -132,14 +131,14 @@ BEGIN
         , c.command_type AS event_type
         , COALESCE(e.sequence, 0) + ROW_NUMBER() OVER (PARTITION BY c.instance_id, c.aggregate_type, c.aggregate_id ORDER BY c.in_tx_order) AS sequence
         , c.revision
-        , NOW() AS created_at
+        , statement_timestamp() AS created_at
         , c.payload
         , c.creator
         , CASE WHEN c.enforce_owner
             THEN c.owner
             ELSE COALESCE(e.owner, c.owner)
         END AS owner
-        , EXTRACT(EPOCH FROM NOW()) AS position
+        , EXTRACT(EPOCH FROM clock_timestamp()) AS position
         , c.in_tx_order
     FROM (
         SELECT c.*, CAST(ROW_NUMBER() OVER () AS INTEGER) AS in_tx_order

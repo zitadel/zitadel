@@ -71,6 +71,7 @@ const (
 
 type TokenVerifier interface {
 	ExistsOrg(ctx context.Context, id, domain string) (string, error)
+	CheckOrgActive(ctx context.Context, orgID string) error
 	ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error)
 	AccessTokenVerifier
 	SystemTokenVerifier
@@ -130,6 +131,13 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 		orgID, err = t.ExistsOrg(ctx, orgID, orgDomain)
 		if err != nil {
 			return CtxData{}, zerrors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
+		}
+	}
+	// Reject tokens whose caller's organization is inactive. Gate resourceOwner, not the
+	// resolved target orgID, so instance admins can still manage a deactivated org.
+	if resourceOwner != "" {
+		if err = t.CheckOrgActive(ctx, resourceOwner); err != nil {
+			return CtxData{}, zerrors.ThrowUnauthenticated(err, "AUTH-oR9nA", "Errors.Org.NotActive")
 		}
 	}
 	return CtxData{

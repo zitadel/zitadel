@@ -2,7 +2,6 @@ package crypto
 
 import (
 	"database/sql/driver"
-	"encoding/base64"
 	"encoding/json"
 	"slices"
 
@@ -14,7 +13,7 @@ const (
 	TypeHash                  // Depcrecated: use [passwap.Swapper] instead
 )
 
-//go:generate mockgen -typed -package crypto -destination ./crypto.mock.go . EncryptionAlgorithm
+//go:generate mockgen -typed -package crypto -destination ./crypto.mock.go . EncryptionAlgorithm,AuthEncryptionAlgorithm
 
 // EncryptionAlgorithm is an interface that defines the methods for encrypting and decrypting values,
 // used for sensitive data stored in the database.
@@ -149,18 +148,14 @@ func checkEncryptionAlgorithm(value *CryptoValue, alg EncryptionAlgorithm) error
 	return zerrors.ThrowInvalidArgument(nil, "CRYPT-Kq12vn", "value was encrypted with a different key")
 }
 
-func CheckToken(alg EncryptionAlgorithm, token string, content string) error {
+func CheckToken(alg AuthAlgorithm, token string, content string) error {
 	if token == "" {
 		return zerrors.ThrowPermissionDenied(nil, "CRYPTO-Sfefs", "Errors.Intent.InvalidToken")
 	}
 	if alg == nil {
 		return zerrors.ThrowInvalidArgument(nil, "CRYPT-edCJsp", "input encryption algorithm cannot be nil")
 	}
-	data, err := base64.RawURLEncoding.DecodeString(token)
-	if err != nil {
-		return zerrors.ThrowPermissionDenied(err, "CRYPTO-Swg31", "Errors.Intent.InvalidToken")
-	}
-	decryptedToken, err := alg.DecryptString(data, alg.EncryptionKeyID())
+	decryptedToken, err := alg.DecryptToken(token)
 	if err != nil {
 		return zerrors.ThrowPermissionDenied(err, "CRYPTO-Sf4gt", "Errors.Intent.InvalidToken")
 	}

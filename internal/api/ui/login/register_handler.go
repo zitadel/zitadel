@@ -42,8 +42,14 @@ type registerData struct {
 }
 
 func determineResourceOwner(ctx context.Context, authRequest *domain.AuthRequest) string {
-	if authRequest != nil && authRequest.RequestedOrgID != "" {
+	if authRequest == nil {
+		return authz.GetInstance(ctx).DefaultOrganisationID()
+	}
+	if authRequest.RequestedOrgID != "" {
 		return authRequest.RequestedOrgID
+	}
+	if authRequest.UserOrgID != "" {
+		return authRequest.UserOrgID
 	}
 	return authz.GetInstance(ctx).DefaultOrganisationID()
 }

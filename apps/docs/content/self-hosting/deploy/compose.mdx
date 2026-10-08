@@ -88,10 +88,23 @@ The masterkey [encrypts sensitive data at rest](/concepts/architecture/secrets).
 ZITADEL_MASTERKEY=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)
 echo "ZITADEL_MASTERKEY=$ZITADEL_MASTERKEY" >> .env
 
+# Generate the Login UI session cookie secret (at least 32 characters)
+echo "LOGIN_SESSION_COOKIE_SECRET=$(openssl rand -base64 32)" >> .env
+
 # Set strong database passwords
 echo "POSTGRES_ADMIN_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)" >> .env
 echo "POSTGRES_ZITADEL_PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)" >> .env
 ```
+
+The commands above cover the masterkey, the session cookie secret and the database passwords. The **initial admin user** (`zitadel-admin`) has a password too, defaulting to `Password1!`. To set your own before the first start, add it to `.env`:
+
+```dotenv
+ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD=MyInitialPassw0rd!
+```
+
+<Callout type="warn">
+The initial admin password must satisfy the default [password complexity policy](/guides/manage/console/default-settings#password-complexity): at least 8 characters, including an uppercase letter, a lowercase letter, a number, and a symbol. A password that doesn't meet these requirements causes the initial setup to fail with a password complexity error. Like all `ZITADEL_FIRSTINSTANCE_*` variables, it is only applied during the first start; change it later from the Console.
+</Callout>
 
 ### External URL settings
 

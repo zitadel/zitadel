@@ -38,6 +38,12 @@ func (wm *InstanceSecurityPolicyWriteModel) Reduce() error {
 			if e.EnableImpersonation != nil {
 				wm.EnableImpersonation = *e.EnableImpersonation
 			}
+			if e.EnableDynamicClientRegistration != nil {
+				wm.EnableDynamicClientRegistration = *e.EnableDynamicClientRegistration
+			}
+			if e.AllowUnauthenticatedDynamicClientRegistration != nil {
+				wm.AllowUnauthenticatedDynamicClientRegistration = *e.AllowUnauthenticatedDynamicClientRegistration
+			}
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -59,7 +65,7 @@ func (wm *InstanceSecurityPolicyWriteModel) NewSetEvent(
 	aggregate *eventstore.Aggregate,
 	policy *SecurityPolicy,
 ) (*instance.SecurityPolicySetEvent, error) {
-	changes := make([]instance.SecurityPolicyChanges, 0, 2)
+	changes := make([]instance.SecurityPolicyChanges, 0, 5)
 	var err error
 
 	if wm.EnableIframeEmbedding != policy.EnableIframeEmbedding {
@@ -70,6 +76,12 @@ func (wm *InstanceSecurityPolicyWriteModel) NewSetEvent(
 	}
 	if wm.EnableImpersonation != policy.EnableImpersonation {
 		changes = append(changes, instance.ChangeSecurityPolicyEnableImpersonation(policy.EnableImpersonation))
+	}
+	if wm.EnableDynamicClientRegistration != policy.EnableDynamicClientRegistration {
+		changes = append(changes, instance.ChangeSecurityPolicyEnableDynamicClientRegistration(policy.EnableDynamicClientRegistration))
+	}
+	if wm.AllowUnauthenticatedDynamicClientRegistration != policy.AllowUnauthenticatedDynamicClientRegistration {
+		changes = append(changes, instance.ChangeSecurityPolicyAllowUnauthenticatedDynamicClientRegistration(policy.AllowUnauthenticatedDynamicClientRegistration))
 	}
 	changeEvent, err := instance.NewSecurityPolicySetEvent(ctx, aggregate, changes)
 	if err != nil {

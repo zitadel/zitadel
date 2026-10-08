@@ -61,6 +61,8 @@ type Event interface {
 	CreatedAt() time.Time
 	// Position is the global position of the event
 	Position() decimal.Decimal
+	// InTxOrder is the 1-based ordinal of the event inside its push transaction
+	InTxOrder() uint32
 
 	// Unmarshal parses the payload and stores the result
 	// in the value pointed to by ptr. If ptr is nil or not a pointer,

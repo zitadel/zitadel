@@ -177,6 +177,7 @@ Errors:
         NotExisting: "Multifactor OTP (Parolă Unică) nu există"
         NotReady: "Multifactor OTP (Parolă Unică) nu este pregătit"
         InvalidCode: "Cod invalid"
+        Reused: "Acest cod a fost deja utilizat. Vă rugăm să așteptați un cod nou"
       U2F:
         NotExisting: "U2F nu există"
       Passwordless:
@@ -205,6 +206,7 @@ Errors:
     AlreadyActive: "Organizația este deja activă"
     Empty: "Organizația este goală"
     NotFound: "Organizația nu a fost găsită"
+    NotActive: "Organizația nu este activă"
     NotChanged: "Organizația nu a fost schimbată"
     DefaultOrgNotDeletable: "Organizația implicită nu trebuie să fie ștearsă"
     ZitadelOrgNotDeletable: "Organizația cu proiectul Zitadel nu trebuie să fie ștearsă"
@@ -283,6 +285,8 @@ Errors:
     LabelPolicy:
       NotFound: "Politica de etichete private nu a fost găsită"
       NotChanged: "Politica de etichete private nu a fost schimbată"
+    IDPConfig:
+      NotExisting: "Configurația furnizorului de identitate nu există"
   Project:
     ProjectIDMissing: "ID-ul proiectului lipsește"
     AlreadyExists: "Proiectul există deja în organizație"
@@ -760,6 +764,7 @@ Errors:
               check:
                 succeeded: "Verificarea Multifactor OTP a reușit"
                 failed: "Verificarea Multifactor OTP a eșuat"
+                reused: "Cod Multifactor OTP reutilizat"
               sms:
                 added: "Multifactor OTP SMS adăugat"
                 removed: "Multifactor OTP SMS șters"

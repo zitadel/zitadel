@@ -512,6 +512,10 @@ func Test_idpTypeToPb(t *testing.T) {
 			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_SAML,
 		},
 		{
+			args: args{domain.IDPTypeZitadel},
+			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_ZITADEL,
+		},
+		{
 			args: args{99},
 			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_UNSPECIFIED,
 		},
@@ -532,13 +536,25 @@ func Test_securityPolicyToSettingsPb(t *testing.T) {
 			AllowedOrigins: []string{"foo", "bar"},
 		},
 		EnableImpersonation: true,
+		DynamicClientRegistration: &settings.DynamicClientRegistrationSettings{
+			Enabled:              true,
+			AllowUnauthenticated: true,
+		},
 	}
 	got := securityPolicyToSettingsPb(&query.SecurityPolicy{
 		EnableIframeEmbedding: true,
 		AllowedOrigins:        []string{"foo", "bar"},
 		EnableImpersonation:   true,
+
+		EnableDynamicClientRegistration:               true,
+		AllowUnauthenticatedDynamicClientRegistration: true,
 	})
 	assert.Equal(t, want, got)
+}
+
+func Test_securityPolicyToSettingsPb_dynamicClientRegistrationDisabled(t *testing.T) {
+	got := securityPolicyToSettingsPb(&query.SecurityPolicy{})
+	assert.Equal(t, &settings.DynamicClientRegistrationSettings{}, got.GetDynamicClientRegistration())
 }
 
 func Test_securitySettingsToCommand(t *testing.T) {
@@ -546,6 +562,9 @@ func Test_securitySettingsToCommand(t *testing.T) {
 		EnableIframeEmbedding: true,
 		AllowedOrigins:        []string{"foo", "bar"},
 		EnableImpersonation:   true,
+
+		EnableDynamicClientRegistration:               true,
+		AllowUnauthenticatedDynamicClientRegistration: true,
 	}
 	got := securitySettingsToCommand(&settings.SetSecuritySettingsRequest{
 		EmbeddedIframe: &settings.EmbeddedIframeSettings{
@@ -553,6 +572,18 @@ func Test_securitySettingsToCommand(t *testing.T) {
 			AllowedOrigins: []string{"foo", "bar"},
 		},
 		EnableImpersonation: true,
+		DynamicClientRegistration: &settings.DynamicClientRegistrationSettings{
+			Enabled:              true,
+			AllowUnauthenticated: true,
+		},
 	})
 	assert.Equal(t, want, got)
+}
+
+// A request that omits dynamic_client_registration must leave the feature off rather than
+// panicking on the nil message.
+func Test_securitySettingsToCommand_dynamicClientRegistrationOmitted(t *testing.T) {
+	got := securitySettingsToCommand(&settings.SetSecuritySettingsRequest{})
+	assert.False(t, got.EnableDynamicClientRegistration)
+	assert.False(t, got.AllowUnauthenticatedDynamicClientRegistration)
 }

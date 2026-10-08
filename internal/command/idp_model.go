@@ -26,6 +26,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	saml2 "github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml/requesttracker"
+	"github.com/zitadel/zitadel/internal/idp/providers/zitadel"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -2014,6 +2015,8 @@ func (wm *IDPRemoveWriteModel) Reduce() error {
 			wm.reduceAdded(e.ConfigID)
 		case *idpconfig.IDPConfigRemovedEvent:
 			wm.reduceRemoved(e.ConfigID)
+		case *idp.ZitadelIDPAddedEvent:
+			wm.reduceAdded(e.ID)
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -2126,6 +2129,10 @@ func (wm *IDPTypeWriteModel) Reduce() error {
 			wm.reduceRemoved(e.ConfigID)
 		case *org.IDPConfigRemovedEvent:
 			wm.reduceRemoved(e.ConfigID)
+		case *instance.ZitadelIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeZitadel, e.Aggregate())
+		case *org.ZitadelIDPAddedEvent:
+			wm.reduceAdded(e.ID, domain.IDPTypeZitadel, e.Aggregate())
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -2177,6 +2184,7 @@ func (wm *IDPTypeWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.SAMLIDPAddedEventType,
 			instance.OIDCIDPMigratedAzureADEventType,
 			instance.OIDCIDPMigratedGoogleEventType,
+			instance.ZitadelIDPAddedEventType,
 			instance.IDPRemovedEventType,
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).
@@ -2197,6 +2205,7 @@ func (wm *IDPTypeWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.SAMLIDPAddedEventType,
 			org.OIDCIDPMigratedAzureADEventType,
 			org.OIDCIDPMigratedGoogleEventType,
+			org.ZitadelIDPAddedEventType,
 			org.IDPRemovedEventType,
 		).
 		EventData(map[string]interface{}{"id": wm.ID}).
@@ -2271,6 +2280,8 @@ func NewAllIDPWriteModel(resourceOwner string, instanceBool bool, id string, idp
 			writeModel.model = NewGoogleInstanceIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeApple:
 			writeModel.model = NewAppleInstanceIDPWriteModel(resourceOwner, id)
+		case domain.IDPTypeZitadel:
+			writeModel.model = NewInstanceZitadelIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeSAML:
 			writeModel.samlModel = NewSAMLInstanceIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeUnspecified:
@@ -2302,6 +2313,8 @@ func NewAllIDPWriteModel(resourceOwner string, instanceBool bool, id string, idp
 			writeModel.model = NewGoogleOrgIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeApple:
 			writeModel.model = NewAppleOrgIDPWriteModel(resourceOwner, id)
+		case domain.IDPTypeZitadel:
+			writeModel.model = NewZitadelOrgIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeSAML:
 			writeModel.samlModel = NewSAMLOrgIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeUnspecified:
@@ -2393,7 +2406,6 @@ func (wm *ZitadelIDPWriteModel) Reduce() error {
 		case *idp.ZitadelIDPAddedEvent:
 			wm.reduceAddedEvent(e)
 		case *idp.ZitadelIDPChangedEvent:
-			// todo (@grvijayan): to please the linter for now
 			wm.reduceChangedEvent(e)
 		}
 	}
@@ -2412,5 +2424,99 @@ func (wm *ZitadelIDPWriteModel) reduceAddedEvent(e *idp.ZitadelIDPAddedEvent) {
 }
 
 func (wm *ZitadelIDPWriteModel) reduceChangedEvent(e *idp.ZitadelIDPChangedEvent) {
-	// todo (@grvijayan): will be implemented along with UpdateZitadelProvider changes
+	if e.ClientID != nil {
+		wm.ClientID = *e.ClientID
+	}
+	if e.ClientSecret != nil {
+		wm.ClientSecret = e.ClientSecret
+	}
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
+	if e.Issuer != nil {
+		wm.Issuer = *e.Issuer
+	}
+	if e.Scopes != nil {
+		wm.Scopes = *e.Scopes
+	}
+	if e.InstanceRolesInfo != nil {
+		wm.InstanceRolesInfo = *e.InstanceRolesInfo
+	}
+	wm.ReduceChanges(e.OptionChanges)
+}
+
+func (wm *ZitadelIDPWriteModel) NewChanges(
+	name,
+	issuer,
+	clientID,
+	clientSecretString string,
+	secretCrypto crypto.EncryptionAlgorithm,
+	scopes []string,
+	options idp.Options,
+	info []idp.RolesInfo,
+) ([]idp.ZitadelIDPChanges, error) {
+	changes := make([]idp.ZitadelIDPChanges, 0)
+	var clientSecret *crypto.CryptoValue
+	var err error
+	if clientSecretString != "" {
+		clientSecret, err = crypto.Crypt([]byte(clientSecretString), secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeZitadelIDPClientSecret(clientSecret))
+	}
+	if wm.ClientID != clientID {
+		changes = append(changes, idp.ChangeZitadelIDPClientID(clientID))
+	}
+	if wm.Name != name {
+		changes = append(changes, idp.ChangeZitadelIDPName(name))
+	}
+	if wm.Issuer != issuer {
+		changes = append(changes, idp.ChangeZitadelIDPIssuer(issuer))
+	}
+	if !slices.Equal(wm.Scopes, scopes) {
+		changes = append(changes, idp.ChangeZitadelIDPScopes(scopes))
+	}
+	if !slices.Equal(wm.InstanceRolesInfo, info) {
+		changes = append(changes, idp.ChangeZitadelIDPInstanceRolesInfo(info))
+	}
+	opts := wm.Changes(options)
+	if !opts.IsZero() {
+		changes = append(changes, idp.ChangeZitadelIDPOptions(opts))
+	}
+	return changes, nil
+}
+
+func (wm *ZitadelIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, httpClient *http.Client) (providers.Provider, error) {
+	secret, err := crypto.DecryptString(wm.ClientSecret, idpAlg)
+	if err != nil {
+		return nil, err
+	}
+	opts := make([]oidc.ProviderOpts, 1, 7)
+	opts[0] = oidc.WithSelectAccount()
+	if wm.IsCreationAllowed {
+		opts = append(opts, oidc.WithCreationAllowed())
+	}
+	if wm.IsLinkingAllowed {
+		opts = append(opts, oidc.WithLinkingAllowed())
+	}
+	if wm.IsAutoCreation {
+		opts = append(opts, oidc.WithAutoCreation())
+	}
+	if wm.IsAutoUpdate {
+		opts = append(opts, oidc.WithAutoUpdate())
+	}
+	return zitadel.New(
+		wm.Issuer,
+		wm.ClientID,
+		secret,
+		callbackURL,
+		wm.Scopes,
+		httpClient,
+		opts...,
+	)
+}
+
+func (wm *ZitadelIDPWriteModel) GetProviderOptions() idp.Options {
+	return wm.Options
 }

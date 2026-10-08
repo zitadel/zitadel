@@ -125,6 +125,16 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
       {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <form className="w-full">
         <div className="mb-4 grid grid-cols-1 gap-4 pt-4">
+          <input
+            type="text"
+            name="username"
+            autoComplete="username"
+            value={loginName}
+            readOnly
+            tabIndex={-1}
+            aria-hidden="true"
+            className="sr-only"
+          />
           <div className="">
             <TextInput
               type="password"

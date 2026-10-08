@@ -39,6 +39,7 @@ const (
 	SAMLIDPChangedEventType             eventstore.EventType = "org.idp.saml.changed"
 	IDPRemovedEventType                 eventstore.EventType = "org.idp.removed"
 	ZitadelIDPAddedEventType            eventstore.EventType = "org.idp.zitadel.added"
+	ZitadelIDPChangedEventType          eventstore.EventType = "org.idp.zitadel.changed"
 )
 
 type OAuthIDPAddedEvent struct {
@@ -1169,5 +1170,31 @@ func NewZitadelIDPAddedEvent(
 }
 
 func (e *ZitadelIDPAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+type ZitadelIDPChangedEvent struct {
+	idp.ZitadelIDPChangedEvent
+}
+
+func NewZitadelIDPChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id string,
+	changes []idp.ZitadelIDPChanges,
+) *ZitadelIDPChangedEvent {
+	changedEvent := idp.NewZitadelIDPChangedEvent(
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			ZitadelIDPChangedEventType,
+		),
+		id,
+		changes,
+	)
+	return &ZitadelIDPChangedEvent{ZitadelIDPChangedEvent: *changedEvent}
+}
+
+func (e *ZitadelIDPChangedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = *event
 }

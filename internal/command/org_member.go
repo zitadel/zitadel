@@ -22,13 +22,14 @@ func (c *Commands) AddOrgMemberCommand(member *AddOrgMember) preparation.Validat
 				ctx, span := tracing.NewSpan(ctx)
 				defer func() { span.EndWithError(err) }()
 
-				if exists, err := ExistsUser(ctx, filter, member.UserID, "", false); err != nil || !exists {
+				userResourceOwner, exists, err := existingUser(ctx, filter, member.UserID, "", false)
+				if err != nil || !exists {
 					return nil, zerrors.ThrowPreconditionFailed(err, "ORG-GoXOn", "Errors.User.NotFound")
 				}
 				if isMember, err := IsOrgMember(ctx, filter, member.OrgID, member.UserID); err != nil || isMember {
 					return nil, zerrors.ThrowAlreadyExists(err, "ORG-poWwe", "Errors.Org.Member.AlreadyExists")
 				}
-				return []eventstore.Command{org.NewMemberAddedEvent(ctx, &org.NewAggregate(member.OrgID).Aggregate, member.UserID, member.Roles...)}, nil
+				return []eventstore.Command{org.NewMemberAddedEvent(ctx, &org.NewAggregate(member.OrgID).Aggregate, member.UserID, member.Roles...).WithUserResourceOwner(userResourceOwner)}, nil
 			},
 			nil
 	}

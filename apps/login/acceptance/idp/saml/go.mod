@@ -1,12 +1,12 @@
 module github.com/zitadel/typescript/acceptance/idp/saml
 
-go 1.24.1
+go 1.25.0
 
 require (
 	github.com/crewjam/saml v0.4.14
 	github.com/mattermost/xml-roundtrip-validator v0.1.0
 	github.com/zenazn/goji v1.0.1
-	golang.org/x/crypto v0.36.0
+	golang.org/x/crypto v0.52.0
 )
 
 require (

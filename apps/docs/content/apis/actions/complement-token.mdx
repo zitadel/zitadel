@@ -25,6 +25,11 @@ The trigger is represented by the following Ids in the API: `4`
       - `grants` [*UserGrantList*](./objects#user-grant-list)
     - `org`
       - `getMetadata()` [*metadataResult*](./objects#metadata-result)
+    - `application`
+      - `getClientId()` *string*
+        The client id of the application the token was requested for
+    - `actor` [*token actor*](./objects#token-actor)
+      The party which obtained the token on behalf of the user, `null` unless the token was obtained through token exchange or impersonation
 - `api`
   The second parameter contains the following fields:
   - `v1`
@@ -59,6 +64,11 @@ The trigger is represented by the following Ids in the API: `5`
       - `grants` [*UserGrantList*](./objects#user-grant-list)
     - `org`
       - `getMetadata()` [*metadataResult*](./objects#metadata-result)
+    - `application`
+      - `getClientId()` *string*
+        The client id of the application the token was requested for
+    - `actor` [*token actor*](./objects#token-actor)
+      The party which obtained the token on behalf of the user, `null` unless the token was obtained through token exchange or impersonation
 - `api`
   The second parameter contains the following fields:
   - `v1`

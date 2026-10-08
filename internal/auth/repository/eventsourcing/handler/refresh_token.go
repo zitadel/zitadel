@@ -90,6 +90,10 @@ func (t *RefreshToken) Reducers() []handler.AggregateReducer {
 					Event:  org.OrgRemovedEventType,
 					Reduce: t.Reduce,
 				},
+				{
+					Event:  org.OrgDeactivatedEventType,
+					Reduce: t.Reduce,
+				},
 			},
 		},
 	}
@@ -166,7 +170,8 @@ func (t *RefreshToken) Reduce(event eventstore.Event) (_ *handler.Statement, err
 				handler.NewCond(view_model.RefreshTokenKeyInstanceID, event.Aggregate().InstanceID),
 			},
 		), nil
-	case org.OrgRemovedEventType:
+	case org.OrgRemovedEventType,
+		org.OrgDeactivatedEventType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
 				handler.NewCond(view_model.RefreshTokenKeyInstanceID, event.Aggregate().InstanceID),

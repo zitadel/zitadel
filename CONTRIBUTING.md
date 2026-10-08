@@ -1,5 +1,10 @@
 # Contributing to Zitadel
 
+> [!IMPORTANT]
+> Thank you for contributing to ZITADEL. Our engineering team is currently focused on building the [next generation of ZITADEL](https://github.com/zitadel/nextgen), which means our capacity to review community pull requests for the current codebase is limited.
+> We cannot guarantee that a pull request will be reviewed or merged, even if it is well prepared. Before investing time in a larger change, please open an issue or discussion so we can confirm whether it aligns with our current direction.
+> We truly appreciate your contributions and your understanding.
+
 Zitadel is an open-source identity and access management platform built with a modern tech stack including Go (API), Next.js/React (Login), Angular (Console), and Fumadocs (Docs) - all orchestrated through an Nx monorepo with pnpm for efficient development workflows.
 
 ## Quick Start

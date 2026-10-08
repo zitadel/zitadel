@@ -397,6 +397,14 @@ func (m *mockInstance) EnableImpersonation() bool {
 	return false
 }
 
+func (m *mockInstance) EnableDynamicClientRegistration() bool {
+	return false
+}
+
+func (m *mockInstance) AllowUnauthenticatedDynamicClientRegistration() bool {
+	return false
+}
+
 func (m *mockInstance) Features() feature.Features {
 	return feature.Features{}
 }

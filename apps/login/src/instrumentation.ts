@@ -29,19 +29,49 @@ import type { LoggerProvider } from "@opentelemetry/api-logs";
 let _loggerProvider: LoggerProvider | null = null;
 
 export async function register(): Promise<void> {
-  // Only run OpenTelemetry in the Node.js environment
-  if (process.env.NEXT_RUNTIME === "nodejs") {
-    // Disable by default in local development to avoid unnecessary overhead
-    if (process.env.NODE_ENV === "development" && process.env.OTEL_SDK_DISABLED !== "false") {
-      return;
-    }
+  // Only run in the Node.js environment
+  if (process.env.NEXT_RUNTIME !== "nodejs") return;
 
-    // Explicit check for disabled env variable
-    if (process.env.OTEL_SDK_DISABLED === "true") return;
-
+  if (isOtelEnabled()) {
     const { registerNode } = await import("./instrumentation.node");
     _loggerProvider = await registerNode();
   }
+
+  // Logged after the SDK is registered so the logger is instrumented, and before the
+  // credential check so it is visible even if that check exits the process.
+  await logSessionCookieSecretNotice();
+
+  // Verify the configured API credentials once at startup (fail fast).
+  // Connectivity problems are only logged; reachability is covered by the
+  // readiness probe (/ready) and ZITADEL_API_AWAITINITIALCONN.
+  const { verifyApiCredentials, FATAL_CREDENTIAL_CHECK_RESULTS } = await import("./lib/verify-credentials");
+  const result = await verifyApiCredentials();
+  if (FATAL_CREDENTIAL_CHECK_RESULTS.has(result)) {
+    process.exit(1);
+  }
+}
+
+function isOtelEnabled(): boolean {
+  // Disable by default in local development to avoid unnecessary overhead
+  if (process.env.NODE_ENV === "development" && process.env.OTEL_SDK_DISABLED !== "false") {
+    return false;
+  }
+  // Explicit check for disabled env variable
+  return process.env.OTEL_SDK_DISABLED !== "true";
+}
+
+/**
+ * Logs once at startup if session cookies are signed via the deprecated API credential fallback
+ * or cannot be signed at all (see lib/session-cookie-signature.ts).
+ */
+async function logSessionCookieSecretNotice(): Promise<void> {
+  const { getSessionCookieSecretStartupNotice } = await import("./lib/session-cookie-signature");
+  const notice = getSessionCookieSecretStartupNotice();
+  if (!notice) {
+    return;
+  }
+  const { createLogger } = await import("./lib/logger");
+  createLogger("startup")[notice.level](notice.message);
 }
 
 export function getLoggerProvider(): LoggerProvider | null {

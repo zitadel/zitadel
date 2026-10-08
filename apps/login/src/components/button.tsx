@@ -42,9 +42,9 @@ export const getButtonClasses = (
         variant === ButtonVariants.Primary && color !== ButtonColors.Warn,
       "bg-warn-light-500 dark:bg-warn-dark-500 hover:bg-warn-light-400 hover:dark:bg-warn-dark-400 text-white dark:text-white":
         variant === ButtonVariants.Primary && color === ButtonColors.Warn,
-      "border border-button-light-border dark:border-button-dark-border text-gray-950 hover:bg-gray-500 hover:bg-opacity-20 hover:dark:bg-white hover:dark:bg-opacity-10 focus:bg-gray-500 focus:bg-opacity-20 focus:dark:bg-white focus:dark:bg-opacity-10 dark:text-white disabled:text-gray-600 disabled:hover:bg-transparent disabled:dark:hover:bg-transparent disabled:cursor-not-allowed disabled:dark:text-gray-900":
+      "border border-button-light-border dark:border-button-dark-border text-gray-950 hover:bg-gray-500/20 hover:dark:bg-white/10 focus:bg-gray-500/20 focus:dark:bg-white/10 dark:text-white disabled:text-gray-600 disabled:hover:bg-transparent disabled:dark:hover:bg-transparent disabled:cursor-not-allowed disabled:dark:text-gray-900":
         variant === ButtonVariants.Secondary,
-      "border border-button-light-border dark:border-button-dark-border text-warn-light-500 dark:text-warn-dark-500 hover:bg-warn-light-500 hover:bg-opacity-10 dark:hover:bg-warn-light-500 dark:hover:bg-opacity-10 focus:bg-warn-light-500 focus:bg-opacity-20 dark:focus:bg-warn-light-500 dark:focus:bg-opacity-20":
+      "border border-button-light-border dark:border-button-dark-border text-warn-light-500 dark:text-warn-dark-500 hover:bg-warn-light-500/10 dark:hover:bg-warn-light-500/10 focus:bg-warn-light-500/20 dark:focus:bg-warn-light-500/20":
         color === ButtonColors.Warn && variant !== ButtonVariants.Primary,
       "px-16 py-2": size === ButtonSizes.Large,
       "px-4 h-[36px]": size === ButtonSizes.Small,

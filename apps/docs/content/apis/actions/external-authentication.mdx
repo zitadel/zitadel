@@ -43,7 +43,12 @@ The first parameter contains the following fields
   - `v1`
     - `user`
       - `appendMetadata(string, Any)`
-        The first parameter represents the key and the second a value which will be stored
+        The first parameter represents the key and the second a value which will be stored.
+        The value is JSON-encoded, so a string is stored with surrounding quotes (e.g. `"de"`).
+      - `appendMetadataRaw(string, string | Uint8Array | number[])`
+        The first parameter represents the key and the second a value which will be stored as raw bytes without JSON encoding.
+        A string is stored as its plain UTF-8 bytes (e.g. `de` without quotes), a byte array (`Uint8Array` or an array of integers between 0 and 255) is stored as-is.
+        Use this if the systems consuming the metadata expect an unencoded value.
   - `setFirstName(string)`
     Sets the first name
   - `setLastName(string)`
@@ -113,7 +118,12 @@ The trigger is represented by the following Ids in the API: `TRIGGER_TYPE_PRE_CR
   - `v1`
     - `user`
       - `appendMetadata(string, Any)`
-        The first parameter represents the key and the second a value which will be stored
+        The first parameter represents the key and the second a value which will be stored.
+        The value is JSON-encoded, so a string is stored with surrounding quotes (e.g. `"de"`).
+      - `appendMetadataRaw(string, string | Uint8Array | number[])`
+        The first parameter represents the key and the second a value which will be stored as raw bytes without JSON encoding.
+        A string is stored as its plain UTF-8 bytes (e.g. `de` without quotes), a byte array (`Uint8Array` or an array of integers between 0 and 255) is stored as-is.
+        Use this if the systems consuming the metadata expect an unencoded value.
 
 ## Post Creation
 

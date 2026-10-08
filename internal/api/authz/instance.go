@@ -26,6 +26,12 @@ type Instance interface {
 	DefaultOrganisationID() string
 	SecurityPolicyAllowedOrigins() []string
 	EnableImpersonation() bool
+	// EnableDynamicClientRegistration states if the OAuth 2.0 Dynamic Client Registration
+	// endpoint (RFC 7591) is served and advertised in the discovery document.
+	EnableDynamicClientRegistration() bool
+	// AllowUnauthenticatedDynamicClientRegistration states if clients may register without
+	// an access token. It implies EnableDynamicClientRegistration.
+	AllowUnauthenticatedDynamicClientRegistration() bool
 	Block() *bool
 	AuditLogRetention() *time.Duration
 	Features() feature.Features
@@ -41,15 +47,17 @@ type InstanceVerifier interface {
 }
 
 type instance struct {
-	id               string
-	projectID        string
-	appID            string
-	clientID         string
-	orgID            string
-	defaultLanguage  language.Tag
-	allowedLanguages []language.Tag
-	features         feature.Features
-	executionTargets target.Router
+	id                      string
+	projectID               string
+	appID                   string
+	clientID                string
+	orgID                   string
+	defaultLanguage         language.Tag
+	allowedLanguages        []language.Tag
+	features                feature.Features
+	executionTargets        target.Router
+	enableDCR               bool
+	allowUnauthenticatedDCR bool
 }
 
 func (i *instance) Block() *bool {
@@ -94,6 +102,14 @@ func (i *instance) SecurityPolicyAllowedOrigins() []string {
 
 func (i *instance) EnableImpersonation() bool {
 	return false
+}
+
+func (i *instance) EnableDynamicClientRegistration() bool {
+	return i.enableDCR
+}
+
+func (i *instance) AllowUnauthenticatedDynamicClientRegistration() bool {
+	return i.enableDCR && i.allowUnauthenticatedDCR
 }
 
 func (i *instance) Features() feature.Features {

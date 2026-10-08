@@ -13,7 +13,7 @@ var (
 	legacyEventstore              eventstore.LegacyEventstore
 	sysConfig                     systemdefaults.SystemDefaults
 	passwordHasher                *crypto.Hasher
-	idpEncryptionAlgo             crypto.EncryptionAlgorithm
+	idpEncryptionAlgo             crypto.AuthEncryptionAlgorithm
 	sessionTokenDecryptor         SessionTokenDecryptor
 	mfaEncryptionAlgo             crypto.EncryptionAlgorithm
 	otpSMSSecretGeneratorConfig   *crypto.GeneratorConfig
@@ -37,7 +37,7 @@ func SetPasswordHasher(hasher *crypto.Hasher) {
 	passwordHasher = hasher
 }
 
-func SetIDPEncryptionAlgorithm(idpEncryptionAlg crypto.EncryptionAlgorithm) {
+func SetIDPEncryptionAlgorithm(idpEncryptionAlg crypto.AuthEncryptionAlgorithm) {
 	idpEncryptionAlgo = idpEncryptionAlg
 }
 

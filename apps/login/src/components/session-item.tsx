@@ -8,7 +8,7 @@ import * as Tooltip from "@radix-ui/react-tooltip";
 import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import moment from "moment";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { Alert } from "./alert";
@@ -16,7 +16,7 @@ import { AutoSubmitForm } from "./auto-submit-form";
 import { Avatar } from "./avatar";
 import { Translated } from "./translated";
 
-export function isSessionValid(session: Partial<Session>): {
+export function isSessionPrimaryFactorAndLifetimeValid(session: Partial<Session>): {
   valid: boolean;
   verifiedAt?: Timestamp;
 } {
@@ -35,26 +35,33 @@ export function isSessionValid(session: Partial<Session>): {
 export function SessionItem({ session, reload, requestId }: { session: Session; reload: () => void; requestId?: string }) {
   const currentLocale = useLocale();
   moment.locale(currentLocale === "zh" ? "zh-cn" : currentLocale);
+  const t = useTranslations("error");
 
   const [_loading, setLoading] = useState<boolean>(false);
 
-  async function clearSessionId(id: string) {
+  /**
+   * Returns true when the session was removed (server-side and from the cookie).
+   * On failure the error is shown and the card must stay in the list.
+   */
+  async function clearSessionId(id: string): Promise<boolean> {
     setLoading(true);
-    const response = await clearSession({
-      sessionId: id,
-    })
-      .catch((error) => {
-        setError(error.message);
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-
-    return response;
+    setError(null);
+    try {
+      const response = await clearSession({ sessionId: id });
+      if (response && "error" in response && response.error) {
+        setError(response.error);
+        return false;
+      }
+      return true;
+    } catch {
+      setError(t("couldNotClearSession"));
+      return false;
+    } finally {
+      setLoading(false);
+    }
   }
 
-  const { valid, verifiedAt } = isSessionValid(session);
+  const { valid, verifiedAt } = isSessionPrimaryFactorAndLifetimeValid(session);
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const [error, setError] = useState<string | null>(null);
@@ -139,8 +146,9 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
                 onClick={async (event: React.MouseEvent) => {
                   event.preventDefault();
                   event.stopPropagation();
-                  await clearSessionId(session.id);
-                  reload();
+                  if (await clearSessionId(session.id)) {
+                    reload();
+                  }
                 }}
               />
             </div>

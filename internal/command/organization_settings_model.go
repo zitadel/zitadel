@@ -98,7 +98,7 @@ func (wm *OrganizationSettingsWriteModel) NewSet(
 	ctx context.Context,
 	organizationScopedUsernames *bool,
 	userLoginMustBeDomain bool,
-	usernamesF func(ctx context.Context, orgID string) ([]string, error),
+	usernamesF func(ctx context.Context, orgID string) ([]user.UsernameChange, error),
 ) (_ []eventstore.Command, err error) {
 	if err := wm.checkPermissionWrite(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
 		return nil, err
@@ -108,7 +108,7 @@ func (wm *OrganizationSettingsWriteModel) NewSet(
 		return nil, nil
 	}
 
-	var usernames []string
+	var usernames []user.UsernameChange
 	if (wm.OrganizationScopedUsernames || userLoginMustBeDomain) != (*organizationScopedUsernames || userLoginMustBeDomain) {
 		usernames, err = usernamesF(ctx, wm.AggregateID)
 		if err != nil {
@@ -129,13 +129,13 @@ func (wm *OrganizationSettingsWriteModel) NewSet(
 func (wm *OrganizationSettingsWriteModel) NewRemoved(
 	ctx context.Context,
 	userLoginMustBeDomain bool,
-	usernamesF func(ctx context.Context, orgID string) ([]string, error),
+	usernamesF func(ctx context.Context, orgID string) ([]user.UsernameChange, error),
 ) (_ []eventstore.Command, err error) {
 	if err := wm.checkPermissionDelete(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
 		return nil, err
 	}
 
-	var usernames []string
+	var usernames []user.UsernameChange
 	if userLoginMustBeDomain != wm.OrganizationScopedUsernames {
 		usernames, err = usernamesF(ctx, wm.AggregateID)
 		if err != nil {

@@ -299,6 +299,7 @@ func TestCommands_CreateSAMLSessionFromSAMLRequest(t *testing.T) {
 							false,
 						),
 					),
+					expectFilterActiveOrg("org1"),
 					expectPush(
 						samlsession.NewAddedEvent(context.Background(), &samlsession.NewAggregate("V2_samlSessionID", "org1").Aggregate,
 							"userID", "org1", "sessionID", "issuer", []string{"issuer"},

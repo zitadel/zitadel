@@ -16,11 +16,11 @@ import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { NewOrganizationService } from '../../../services/new-organization.service';
+import { NewOrganizationService } from 'src/app/services/new-organization.service';
 import { injectMutation } from '@tanstack/angular-query-experimental';
 import { Organization, OrganizationState } from '@zitadel/proto/zitadel/org/v2/org_pb';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { GrpcAuthService } from '../../../services/grpc-auth.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { Org } from '@zitadel/proto/zitadel/org_pb';
 
 @Component({
@@ -33,7 +33,7 @@ export class OrgDetailComponent implements OnInit {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
   public OrganizationState = OrganizationState;
-  public ChangeType: any = ChangeType;
+  public ChangeType = ChangeType;
 
   public metadata: Metadata.AsObject[] = [];
   public loadingMetadata: boolean = true;

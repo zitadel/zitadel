@@ -194,7 +194,12 @@ func (q *Queries) searchUserAuthMethods(ctx context.Context, queries *UserAuthMe
 func (q *Queries) ListUserAuthMethodTypes(ctx context.Context, userID string, activeOnly bool, includeWithoutDomain bool, queryDomain string) (userAuthMethodTypes *AuthMethodTypes, err error) {
 	ctxData := authz.GetCtxData(ctx)
 	if ctxData.UserID != userID {
-		if err := q.checkPermission(ctx, domain.PermissionUserRead, ctxData.OrgID, userID); err != nil {
+		// Check against the organization owning the user, not the caller's own organization.
+		user, err := q.GetUserByID(ctx, false, userID)
+		if err != nil {
+			return nil, err
+		}
+		if err := q.checkPermission(ctx, domain.PermissionUserRead, user.ResourceOwner, userID); err != nil {
 			return nil, err
 		}
 	}

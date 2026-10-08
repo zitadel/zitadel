@@ -172,6 +172,7 @@ export async function token(request: TokenRequest): Promise<Tokens> {
 const authRequestByIDTrend = new Trend('oidc_auth_request_by_id_duration', true);
 export async function authRequestByID(id: string, tokens: any): Promise<Response> {
   const response = http.get(url(`/v2/oidc/auth_requests/${id}`), {
+    tags: { name: '/v2/oidc/auth_requests/{id}' },
     headers: {
       Authorization: `Bearer ${tokens.accessToken}`,
     },
@@ -195,6 +196,7 @@ export async function finalizeAuthRequest(id: string, session: any, tokens: any)
       },
     }),
     {
+      tags: { name: '/v2/oidc/auth_requests/{id}' },
       headers: {
         Authorization: `Bearer ${tokens.accessToken}`,
         'Content-Type': 'application/json',

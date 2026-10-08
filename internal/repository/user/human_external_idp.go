@@ -47,7 +47,7 @@ func (e *UserIDPLinkAddedEvent) Payload() interface{} {
 }
 
 func (e *UserIDPLinkAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddUserIDPLinkUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
+	return []*eventstore.UniqueConstraint{NewAddUserIDPLinkUniqueConstraint(e.IDPConfigID, e.ExternalUserID).WithOwners(idpLinkOwnerTags(e.Aggregate(), e.IDPConfigID)...)}
 }
 
 func NewUserIDPLinkAddedEvent(
@@ -130,8 +130,9 @@ func UserIDPLinkRemovedEventMapper(event eventstore.Event) (eventstore.Event, er
 type UserIDPLinkCascadeRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	IDPConfigID    string `json:"idpConfigId"`
-	ExternalUserID string `json:"userId,omitempty"`
+	IDPConfigID           string `json:"idpConfigId"`
+	ExternalUserID        string `json:"userId,omitempty"`
+	skipUniqueConstraints bool
 }
 
 func (e *UserIDPLinkCascadeRemovedEvent) Payload() interface{} {
@@ -139,7 +140,14 @@ func (e *UserIDPLinkCascadeRemovedEvent) Payload() interface{} {
 }
 
 func (e *UserIDPLinkCascadeRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	if e.skipUniqueConstraints {
+		return nil
+	}
 	return []*eventstore.UniqueConstraint{NewRemoveUserIDPLinkUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
+}
+
+func (e *UserIDPLinkCascadeRemovedEvent) SkipUniqueConstraints() {
+	e.skipUniqueConstraints = true
 }
 
 func NewUserIDPLinkCascadeRemovedEvent(

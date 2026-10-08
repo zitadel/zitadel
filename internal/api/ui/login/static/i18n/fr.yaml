@@ -505,6 +505,7 @@ Errors:
         AlreadyReady: L'OTP multifactoriel (Mot de passe à usage unique) est déjà configuré.
         NotExisting: OTP multifactoriel (Mot de passe à usage unique) n'existe pas.
         InvalidCode: Code invalide
+        Reused: Ce code a déjà été utilisé. Veuillez attendre un nouveau code
         NotReady: Le système OTP multifactoriel (Mot de passe à usage unique) n'est pas prêt.
     Locked: L'utilisateur est verrouillé
     SomethingWentWrong: Il y a eu un problème

@@ -239,7 +239,7 @@ func copyUniqueConstraints(ctx context.Context, source, dest *db.DB) {
 		err := sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
 			var stmt database.Statement
-			stmt.WriteString("COPY (SELECT instance_id, unique_type, unique_field FROM eventstore.unique_constraints ")
+			stmt.WriteString("COPY (SELECT instance_id, unique_type, unique_field, owners FROM eventstore.unique_constraints ")
 			stmt.WriteString(instanceClause())
 			stmt.WriteString(") TO stdout")
 
@@ -268,7 +268,7 @@ func copyUniqueConstraints(ctx context.Context, source, dest *db.DB) {
 			}
 		}
 
-		tag, err := conn.PgConn().CopyFrom(ctx, reader, "COPY eventstore.unique_constraints FROM stdin")
+		tag, err := conn.PgConn().CopyFrom(ctx, reader, "COPY eventstore.unique_constraints (instance_id, unique_type, unique_field, owners) FROM stdin")
 		eventCount = tag.RowsAffected()
 
 		return err

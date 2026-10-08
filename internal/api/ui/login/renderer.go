@@ -154,9 +154,6 @@ func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName 
 		"passwordLessRegistrationUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointPasswordlessRegistration)
 		},
-		"passwordlessPromptUrl": func() string {
-			return path.Join(r.pathPrefix, EndpointPasswordlessPrompt)
-		},
 		"passwordResetUrl": func(id string) string {
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s", EndpointPasswordReset, QueryAuthRequestID, id))
 		},

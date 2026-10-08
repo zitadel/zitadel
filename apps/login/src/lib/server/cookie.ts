@@ -2,6 +2,7 @@
 
 import { addSessionToCookie, updateSessionCookie } from "@/lib/cookies";
 import { createLogger } from "@/lib/logger";
+import { sanitizeChallenges } from "@/lib/server/challenges";
 import {
   createSessionForUserIdAndIdpIntent,
   createSessionFromChecksAndChallenges,
@@ -67,7 +68,7 @@ export async function createSessionAndUpdateCookie(command: {
     serviceConfig,
     checks: command.checks,
     lifetime: sessionLifetime,
-    challenges: command.challenges,
+    challenges: sanitizeChallenges(command.challenges),
   });
 
   if (createdSession) {
@@ -211,7 +212,7 @@ export async function setSessionAndUpdateCookie(command: {
     serviceConfig,
     sessionId: command.recentCookie.id,
     sessionToken: command.recentCookie.token,
-    challenges: command.challenges,
+    challenges: sanitizeChallenges(command.challenges),
     checks: command.checks,
     lifetime: command.lifetime,
   })

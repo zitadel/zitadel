@@ -1,0 +1,141 @@
+name: Tag stale issues
+
+# Runs daily. Finds open issues with no real activity in the last 12 months
+# and labels + comments on them, same as the original one-time 12-month
+# cleanup sweep.
+#
+# "Activity" = a human comment, a reaction, or a cross-reference from another
+# issue/PR -- whichever is most recent. Label and other metadata changes do
+# NOT count as activity.
+#
+# Skips issues already labeled "To-be-closed" or "to-be-reviewed" -- they're
+# already in the pipeline.
+#
+# This only labels and comments. It does not close anything (that's a
+# separate, still-inactive workflow) and does not touch the reply-detection
+# automation (also separate).
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # daily at 06:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  issues: write
+
+jobs:
+  tag-stale:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find and tag stale issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          CLOSE_LABEL="To-be-closed"
+          REVIEW_LABEL="to-be-reviewed"
+          MARKER="Thanks for filing this issue. As part of an ongoing backlog cleanup, we're closing issues that have had no activity in over 12 months."
+
+          # The sed strips this script's own indentation off each line, so the
+          # comment file itself has no leading whitespace (10+ leading spaces
+          # would make GitHub render it as a code block).
+          cat <<'EOF' | sed 's/^          //' > /tmp/stale-comment.md
+          Thanks for filing this issue. As part of an ongoing backlog cleanup, we're closing issues that have had no activity in over 12 months.
+
+          If this is still relevant, let us know in a comment (or reopen the issue) and we'll take another look.
+
+          This issue will close in 30 days if there's no further activity.
+
+          <!-- zitadel-backlog-cleanup-auto-comment -->
+          EOF
+
+          CUTOFF_12=$(date -u -d "-12 months" +%s)
+
+          QUERY='query($owner:String!, $name:String!, $cursor:String) {
+            repository(owner:$owner, name:$name) {
+              issues(states:OPEN, first:30, after:$cursor) {
+                pageInfo { hasNextPage endCursor }
+                nodes {
+                  number
+                  createdAt
+                  labels(first:20) { nodes { name } }
+                  comments(last:50) {
+                    totalCount
+                    nodes { createdAt author { __typename login } }
+                  }
+                  reactions(first:1, orderBy:{field:CREATED_AT, direction:DESC}) {
+                    nodes { createdAt }
+                  }
+                  crossRefs: timelineItems(itemTypes:[CROSS_REFERENCED_EVENT], last:1) {
+                    nodes { ... on CrossReferencedEvent { createdAt } }
+                  }
+                }
+              }
+            }
+          }'
+
+          CURSOR=""
+          PAGE=1
+
+          while true; do
+            echo "Fetching page $PAGE..."
+
+            if [[ -n "$CURSOR" ]]; then
+              RESPONSE=$(gh api graphql -f query="$QUERY" -F owner="${REPO%/*}" -F name="${REPO#*/}" -F cursor="$CURSOR")
+            else
+              RESPONSE=$(gh api graphql -f query="$QUERY" -F owner="${REPO%/*}" -F name="${REPO#*/}")
+            fi
+
+            HAS_NEXT=$(echo "$RESPONSE" | jq -r '.data.repository.issues.pageInfo.hasNextPage')
+            CURSOR=$(echo "$RESPONSE" | jq -r '.data.repository.issues.pageInfo.endCursor')
+
+            while IFS= read -r node; do
+              NUM=$(echo "$node" | jq -r '.number')
+              CREATED=$(echo "$node" | jq -r '.createdAt')
+              LABELS=$(echo "$node" | jq -r '.labels.nodes[].name')
+
+              if echo "$LABELS" | grep -qxi "$CLOSE_LABEL" || echo "$LABELS" | grep -qxi "$REVIEW_LABEL"; then
+                continue
+              fi
+
+              LAST_HUMAN_COMMENT=$(echo "$node" | jq -r '
+                [.comments.nodes[] | select(.author == null or .author.__typename != "Bot")] | last | .createdAt // empty')
+              LAST_REACTION=$(echo "$node" | jq -r '.reactions.nodes[0].createdAt // empty')
+              LAST_CROSSREF=$(echo "$node" | jq -r '.crossRefs.nodes[0].createdAt // empty')
+
+              LAST_ACTIVITY="$CREATED"
+              for d in "$LAST_HUMAN_COMMENT" "$LAST_REACTION" "$LAST_CROSSREF"; do
+                if [[ -n "$d" ]]; then
+                  d_epoch=$(date -u -d "$d" +%s)
+                  la_epoch=$(date -u -d "$LAST_ACTIVITY" +%s)
+                  if [[ "$d_epoch" -gt "$la_epoch" ]]; then
+                    LAST_ACTIVITY="$d"
+                  fi
+                fi
+              done
+
+              LAST_ACTIVITY_EPOCH=$(date -u -d "$LAST_ACTIVITY" +%s)
+
+              if [[ "$LAST_ACTIVITY_EPOCH" -lt "$CUTOFF_12" ]]; then
+                echo "#$NUM: stale since $LAST_ACTIVITY"
+
+                ALREADY_COMMENTED=$(MARKER="$MARKER" gh issue view "$NUM" --repo "$REPO" --json comments \
+                  --jq '[.comments[] | select(.body | contains(env.MARKER))] | length')
+
+                if [[ "$ALREADY_COMMENTED" -gt 0 ]]; then
+                  echo "  already has this comment -- skipping comment"
+                else
+                  gh issue comment "$NUM" --repo "$REPO" --body-file /tmp/stale-comment.md
+                fi
+
+                gh issue edit "$NUM" --repo "$REPO" --add-label "$CLOSE_LABEL"
+              fi
+            done < <(echo "$RESPONSE" | jq -c '.data.repository.issues.nodes[]')
+
+            PAGE=$((PAGE + 1))
+            [[ "$HAS_NEXT" == "true" ]] || break
+          done
+
+          echo "Done."

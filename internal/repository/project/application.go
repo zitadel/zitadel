@@ -43,7 +43,7 @@ func (e *ApplicationAddedEvent) Payload() interface{} {
 }
 
 func (e *ApplicationAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID)}
+	return []*eventstore.UniqueConstraint{NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID).WithOwners(appOwnerTags(e.Aggregate(), e.AppID)...)}
 }
 
 func NewApplicationAddedEvent(
@@ -91,7 +91,7 @@ func (e *ApplicationChangedEvent) Payload() interface{} {
 func (e *ApplicationChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{
 		NewRemoveApplicationUniqueConstraint(e.oldName, e.Aggregate().ID),
-		NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID),
+		NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID).WithOwners(appOwnerTags(e.Aggregate(), e.AppID)...),
 	}
 }
 
@@ -217,6 +217,8 @@ type ApplicationRemovedEvent struct {
 	AppID    string `json:"appId,omitempty"`
 	name     string
 	entityID string
+	// removeByOwner deletes appname and entity_ids by app id after setup 79 has stamped that tag.
+	removeByOwner bool
 }
 
 func (e *ApplicationRemovedEvent) Payload() interface{} {
@@ -224,6 +226,11 @@ func (e *ApplicationRemovedEvent) Payload() interface{} {
 }
 
 func (e *ApplicationRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	if e.removeByOwner {
+		return []*eventstore.UniqueConstraint{
+			eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerApp, e.AppID),
+		}
+	}
 	remove := []*eventstore.UniqueConstraint{NewRemoveApplicationUniqueConstraint(e.name, e.Aggregate().ID)}
 	if e.entityID != "" {
 		remove = append(remove, NewRemoveSAMLConfigEntityIDUniqueConstraint(e.entityID))
@@ -248,6 +255,17 @@ func NewApplicationRemovedEvent(
 		name:     name,
 		entityID: entityID,
 	}
+}
+
+// NewApplicationRemovedByOwnerEvent removes every unique constraint tagged with the app id.
+func NewApplicationRemovedByOwnerEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	appID string,
+) *ApplicationRemovedEvent {
+	removed := NewApplicationRemovedEvent(ctx, aggregate, appID, "", "")
+	removed.removeByOwner = true
+	return removed
 }
 
 func ApplicationRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {

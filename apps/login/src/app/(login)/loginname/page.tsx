@@ -20,8 +20,13 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const loginName = searchParams?.loginName;
   const requestId = searchParams?.requestId;
   const organization = searchParams?.organization;
-  const suffix = searchParams?.suffix;
+  const orgDomain = searchParams?.orgDomain;
   const submit: boolean = searchParams?.submit === "true";
+
+  // With an org domain suffix the login name may only be the local part (the
+  // form shows the suffix separately), so put it back together for the IdP
+  // login hint the same way sendLoginname does for the username form.
+  const idpLoginHint = loginName && orgDomain && !loginName.includes("@") ? `${loginName}@${orgDomain}` : loginName;
 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
@@ -64,7 +69,8 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
             defaultOrganization={defaultOrganization}
             loginSettings={loginSettings}
-            suffix={suffix}
+            suffix={orgDomain}
+            hideSuffix={branding?.hideLoginNameSuffix}
             submit={submit}
             allowRegister={!!loginSettings?.allowRegister}
           ></UsernameForm>
@@ -77,6 +83,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
               requestId={requestId}
               organization={organization}
               postErrorRedirectUrl="/loginname"
+              loginHint={idpLoginHint}
               showLabel={loginSettings?.allowLocalAuthentication}
             ></SignInWithIdp>
           </div>

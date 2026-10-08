@@ -172,6 +172,72 @@ func Test_redirectToFailureURLErr(t *testing.T) {
 	}
 }
 
+func Test_checkSAMLIntentIDP(t *testing.T) {
+	type args struct {
+		requestIDPID string
+		intentIDPID  string
+	}
+	type res struct {
+		err bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			"match",
+			args{
+				requestIDPID: "idp-a",
+				intentIDPID:  "idp-a",
+			},
+			res{
+				err: false,
+			},
+		},
+		{
+			"mismatch",
+			args{
+				requestIDPID: "idp-a",
+				intentIDPID:  "idp-b",
+			},
+			res{
+				err: true,
+			},
+		},
+		{
+			"both empty match",
+			args{
+				requestIDPID: "",
+				intentIDPID:  "",
+			},
+			res{
+				err: false,
+			},
+		},
+		{
+			"one empty mismatch",
+			args{
+				requestIDPID: "idp-a",
+				intentIDPID:  "",
+			},
+			res{
+				err: true,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := checkSAMLIntentIDP(tt.args.requestIDPID, tt.args.intentIDPID)
+			if tt.res.err {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
 func Test_parseCallbackRequest(t *testing.T) {
 	type args struct {
 		url string

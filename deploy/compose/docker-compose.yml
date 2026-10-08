@@ -128,6 +128,8 @@ services:
       ZITADEL_API_URL: http://zitadel-api:8080
       NEXT_PUBLIC_BASE_PATH: /ui/v2/login
       ZITADEL_SERVICE_USER_TOKEN_FILE: /zitadel/bootstrap/login-client.pat
+      # Signs the Login UI session cookie. At least 32 characters, e.g. `openssl rand -base64 32`.
+      ZITADEL_SESSION_COOKIE_SECRET: ${LOGIN_SESSION_COOKIE_SECRET}
       CUSTOM_REQUEST_HEADERS: Host:${ZITADEL_DOMAIN},X-Forwarded-Proto:${ZITADEL_PUBLIC_SCHEME}
 
       # Future-ready placeholders for upcoming Login OTEL support.

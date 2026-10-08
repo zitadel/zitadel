@@ -1,0 +1,27 @@
+{
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker": {
+      "version": "1.10.0",
+      "resolved": "ghcr.io/devcontainers/features/docker-outside-of-docker@sha256:c2c2cf829505ead8e4892c88c31b6594ae94a2bbb209e16e1fac456c1a3a624e",
+      "integrity": "sha256:c2c2cf829505ead8e4892c88c31b6594ae94a2bbb209e16e1fac456c1a3a624e"
+    },
+    "ghcr.io/devcontainers/features/go:1": {
+      "version": "1.3.4",
+      "resolved": "ghcr.io/devcontainers/features/go@sha256:d85e921f91b41340055bb12b325d9d551170ed04b3b832e33530bf42f167c032",
+      "integrity": "sha256:d85e921f91b41340055bb12b325d9d551170ed04b3b832e33530bf42f167c032"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "1.7.1",
+      "resolved": "ghcr.io/devcontainers/features/node@sha256:8c0de46939b61958041700ee89e3493f3b2e4131a06dc46b4d9423427d06e5f6",
+      "integrity": "sha256:8c0de46939b61958041700ee89e3493f3b2e4131a06dc46b4d9423427d06e5f6"
+    },
+    "ghcr.io/schlich/devcontainer-features/cypress:1": {
+      "version": "1.0.2",
+      "resolved": "ghcr.io/schlich/devcontainer-features/cypress@sha256:ad2dc65a2207e8e4cc8d8a847e4a6d228a9f138e071cf7f0385cebdb78c0a425",
+      "integrity": "sha256:ad2dc65a2207e8e4cc8d8a847e4a6d228a9f138e071cf7f0385cebdb78c0a425",
+      "dependsOn": [
+        "ghcr.io/devcontainers/features/node:1"
+      ]
+    }
+  }
+}

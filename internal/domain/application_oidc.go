@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/muhlemmer/gu"
+
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
@@ -20,11 +22,16 @@ const (
 type OIDCApp struct {
 	models.ObjectRoot
 
-	AppID                    string
-	AppName                  string
-	ClientID                 string
-	EncodedHash              string
-	ClientSecretString       string
+	AppID              string
+	AppName            string
+	ClientID           string
+	EncodedHash        string
+	ClientSecretString string
+	// RegistrationAccessToken is the plain registration access token (RFC 7592 §3) of a
+	// dynamically registered client. It is only populated transiently on registration and
+	// rotation so the registration endpoint can return it to the client; it is never
+	// persisted (only its hash is, see project.OIDCConfigRegistrationTokenChangedEvent).
+	RegistrationAccessToken  string
 	RedirectUris             []string
 	ResponseTypes            []OIDCResponseType
 	GrantTypes               []OIDCGrantType
@@ -44,6 +51,14 @@ type OIDCApp struct {
 	BackChannelLogoutURI     *string
 	LoginVersion             *LoginVersion
 	LoginBaseURI             *string
+	// IOSTeamID and IOSBundleID are Associated Domains / passkey trust fields.
+	// Both must be set together, or both empty. Composed as TEAMID.BUNDLEID in AASA.
+	IOSTeamID   *string
+	IOSBundleID *string
+	// AndroidPackageName and AndroidSHA256CertFingerprints are Digital Asset Links /
+	// passkey trust fields. Package name is required when fingerprints are non-empty.
+	AndroidPackageName            *string
+	AndroidSHA256CertFingerprints []string
 
 	State AppState
 }
@@ -133,7 +148,7 @@ const (
 )
 
 func (a *OIDCApp) IsValid() bool {
-	if (a.ClockSkew != nil && (*a.ClockSkew > time.Second*5 || *a.ClockSkew < time.Second*0)) || !a.OriginsValid() {
+	if (a.ClockSkew != nil && (*a.ClockSkew > time.Second*5 || *a.ClockSkew < time.Second*0)) || !a.OriginsValid() || !a.AppLinkConfigValid() {
 		return false
 	}
 	grantTypes := a.getRequiredGrantTypes()
@@ -147,6 +162,19 @@ func (a *OIDCApp) IsValid() bool {
 		}
 	}
 	return true
+}
+
+// AppLinkConfigValid checks sibling rules for iOS/Android association fields.
+// Nil and blank (after trim) are treated the same: both iOS fields must be set or
+// both empty; Android package name is required whenever fingerprints are present.
+func (a *OIDCApp) AppLinkConfigValid() bool {
+	teamID := strings.TrimSpace(gu.Value(a.IOSTeamID))
+	bundleID := strings.TrimSpace(gu.Value(a.IOSBundleID))
+	if (teamID == "") != (bundleID == "") {
+		return false
+	}
+	packageName := strings.TrimSpace(gu.Value(a.AndroidPackageName))
+	return len(a.AndroidSHA256CertFingerprints) == 0 || packageName != ""
 }
 
 func (a *OIDCApp) OriginsValid() bool {
@@ -377,6 +405,15 @@ func containsCustom(uris []string) bool {
 		}
 	}
 	return false
+}
+
+// OIDCRedirectURIsRequireNative reports whether the given redirect URIs can only be
+// compliant for a native application, because they use a custom scheme. It lets a caller
+// that has to infer the application type (see the dynamic client registration endpoint)
+// stay in agreement with CheckRedirectUrisCode and CheckRedirectUrisImplicitAndCode, which
+// reserve custom schemes for native applications.
+func OIDCRedirectURIsRequireNative(redirectURIs []string) bool {
+	return containsCustom(redirectURIs)
 }
 
 // onlyLocalhostIsHttp returns true if:

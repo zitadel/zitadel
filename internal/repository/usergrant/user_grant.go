@@ -40,14 +40,37 @@ type UserGrantAddedEvent struct {
 	ProjectID      string   `json:"projectId,omitempty"`
 	ProjectGrantID string   `json:"grantId,omitempty"`
 	RoleKeys       []string `json:"roleKeys,omitempty"`
+	// owner orgs are not persisted in the event payload.
+	userResourceOwner    string
+	projectResourceOwner string
+	grantedOrg           string
 }
 
 func (e *UserGrantAddedEvent) Payload() interface{} {
 	return e
 }
 
+func userGrantOwnerTags(agg *eventstore.Aggregate, userID, userResourceOwner, projectID, projectResourceOwner, grantID, grantedOrg string) []string {
+	return []string{
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, agg.ResourceOwner),
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, userResourceOwner),
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, projectResourceOwner),
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, grantedOrg),
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerUser, userID),
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerProject, projectID),
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerGrant, grantID),
+	}
+}
+
 func (e *UserGrantAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.UserID, e.ProjectID, e.ProjectGrantID)}
+	return []*eventstore.UniqueConstraint{NewAddUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.UserID, e.ProjectID, e.ProjectGrantID).WithOwners(userGrantOwnerTags(e.Aggregate(), e.UserID, e.userResourceOwner, e.ProjectID, e.projectResourceOwner, e.ProjectGrantID, e.grantedOrg)...)}
+}
+
+func (e *UserGrantAddedEvent) WithOwnerOrgs(userResourceOwner, projectResourceOwner, grantedOrg string) *UserGrantAddedEvent {
+	e.userResourceOwner = userResourceOwner
+	e.projectResourceOwner = projectResourceOwner
+	e.grantedOrg = grantedOrg
+	return e
 }
 
 func NewUserGrantAddedEvent(
@@ -207,10 +230,11 @@ func UserGrantRemovedEventMapper(event eventstore.Event) (eventstore.Event, erro
 }
 
 type UserGrantCascadeRemovedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-	userID               string `json:"-"`
-	projectID            string `json:"-"`
-	projectGrantID       string `json:"-"`
+	eventstore.BaseEvent  `json:"-"`
+	userID                string `json:"-"`
+	projectID             string `json:"-"`
+	projectGrantID        string `json:"-"`
+	skipUniqueConstraints bool
 }
 
 func (e *UserGrantCascadeRemovedEvent) Payload() interface{} {
@@ -218,7 +242,14 @@ func (e *UserGrantCascadeRemovedEvent) Payload() interface{} {
 }
 
 func (e *UserGrantCascadeRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	if e.skipUniqueConstraints {
+		return nil
+	}
 	return []*eventstore.UniqueConstraint{NewRemoveUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.userID, e.projectID, e.projectGrantID)}
+}
+
+func (e *UserGrantCascadeRemovedEvent) SkipUniqueConstraints() {
+	e.skipUniqueConstraints = true
 }
 
 func NewUserGrantCascadeRemovedEvent(
