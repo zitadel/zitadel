@@ -310,6 +310,28 @@
       "submit": "Continuer"
     }
   },
+  "recoveryCode": {
+    "verify": {
+      "title": "Vérification à deux facteurs",
+      "description": "Saisissez l'un de vos codes de récupération. Chaque code ne peut être utilisé qu'une seule fois.",
+      "useRecoveryCode": "Utiliser un code de récupération",
+      "submit": "Continuer",
+      "labels": {
+        "code": "Code de récupération"
+      },
+      "required": {
+        "code": "Ce champ est requis"
+      },
+      "errors": {
+        "invalidCode": "Le code de récupération est invalide ou a déjà été utilisé.",
+        "userLocked": "Votre compte a été verrouillé. Veuillez contacter votre administrateur.",
+        "notReady": "Aucun code de récupération n'est configuré pour ce compte.",
+        "couldNotFindSession": "Session introuvable",
+        "couldNotVerifyCode": "Impossible de vérifier le code de récupération",
+        "couldNotDetermineRedirect": "Impossible de déterminer l'URL de redirection après la vérification"
+      }
+    }
+  },
   "register": {
     "methods": {
       "passkey": "Clé d'accès",
@@ -434,7 +456,8 @@
       "otpEmail": "Code par e-mail",
       "otpSms": "Code par SMS",
       "passkey": "Clés d'accès",
-      "password": "Mot de passe"
+      "password": "Mot de passe",
+      "recoveryCode": "Code de récupération"
     }
   },
   "device": {
