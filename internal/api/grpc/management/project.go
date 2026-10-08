@@ -65,17 +65,7 @@ func (s *Server) ListProjects(ctx context.Context, req *mgmt_pb.ListProjectsRequ
 }
 
 func (s *Server) ListProjectGrantChanges(ctx context.Context, req *mgmt_pb.ListProjectGrantChangesRequest) (*mgmt_pb.ListProjectGrantChangesResponse, error) {
-	var (
-		limit    uint64
-		sequence uint64
-		asc      bool
-	)
-	if req.Query != nil {
-		limit = uint64(req.Query.Limit)
-		sequence = req.Query.Sequence
-		asc = req.Query.Asc
-	}
-	limit, err := s.systemDefaults.V1QueryLimit(limit)
+	limit, sequence, asc, err := change_grpc.ChangeQueryToModel(s.systemDefaults, req.Query)
 	if err != nil {
 		return nil, err
 	}
@@ -150,17 +140,7 @@ func (s *Server) ListGrantedProjectRoles(ctx context.Context, req *mgmt_pb.ListG
 }
 
 func (s *Server) ListProjectChanges(ctx context.Context, req *mgmt_pb.ListProjectChangesRequest) (*mgmt_pb.ListProjectChangesResponse, error) {
-	var (
-		limit    uint64
-		sequence uint64
-		asc      bool
-	)
-	if req.Query != nil {
-		limit = uint64(req.Query.Limit)
-		sequence = req.Query.Sequence
-		asc = req.Query.Asc
-	}
-	limit, err := s.systemDefaults.V1QueryLimit(limit)
+	limit, sequence, asc, err := change_grpc.ChangeQueryToModel(s.systemDefaults, req.Query)
 	if err != nil {
 		return nil, err
 	}
@@ -354,7 +334,7 @@ func (s *Server) ListProjectMemberRoles(ctx context.Context, _ *mgmt_pb.ListProj
 }
 
 func (s *Server) ListProjectMembers(ctx context.Context, req *mgmt_pb.ListProjectMembersRequest) (*mgmt_pb.ListProjectMembersResponse, error) {
-	queries, err := ListProjectMembersRequestToModel(s.systemDefaults, ctx, req)
+	queries, err := ListProjectMembersRequestToModel(ctx, s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}

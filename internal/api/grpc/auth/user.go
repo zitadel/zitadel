@@ -62,17 +62,7 @@ func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserReques
 }
 
 func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserChangesRequest) (*auth_pb.ListMyUserChangesResponse, error) {
-	var (
-		limit    uint64
-		sequence uint64
-		asc      bool
-	)
-	if req.Query != nil {
-		limit = uint64(req.Query.Limit)
-		sequence = req.Query.Sequence
-		asc = req.Query.Asc
-	}
-	limit, err := s.defaults.V1QueryLimit(limit)
+	limit, sequence, asc, err := change.ChangeQueryToModel(s.defaults, req.Query)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +146,7 @@ func ctxToObjectRoot(ctx context.Context) models.ObjectRoot {
 }
 
 func (s *Server) ListMyUserGrants(ctx context.Context, req *auth_pb.ListMyUserGrantsRequest) (*auth_pb.ListMyUserGrantsResponse, error) {
-	queries, err := ListMyUserGrantsRequestToQuery(s.defaults, ctx, req)
+	queries, err := ListMyUserGrantsRequestToQuery(ctx, s.defaults, req)
 	if err != nil {
 		return nil, err
 	}
