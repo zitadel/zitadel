@@ -159,9 +159,10 @@ func FieldNameToOrgColumn(fieldName v2beta_org.OrgFieldName) query.Column {
 	case v2beta_org.OrgFieldName_ORG_FIELD_NAME_CREATION_DATE:
 		return query.OrgColumnCreationDate
 	case v2beta_org.OrgFieldName_ORG_FIELD_NAME_UNSPECIFIED:
-		return query.Column{}
+		// sort by the ID by default, so the results can be paginated reliably
+		return query.OrgColumnID
 	default:
-		return query.Column{}
+		return query.OrgColumnID
 	}
 }
 

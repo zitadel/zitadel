@@ -296,10 +296,10 @@ func fieldNameToSessionColumn(field session.SessionFieldName) query.Column {
 	case session.SessionFieldName_SESSION_FIELD_NAME_CREATION_DATE:
 		return query.SessionColumnCreationDate
 	case session.SessionFieldName_SESSION_FIELD_NAME_UNSPECIFIED:
-		// Handle all remaining cases so the linter succeeds
-		return query.Column{}
+		// sort by the ID by default, so the results can be paginated reliably
+		return query.SessionColumnID
 	default:
-		return query.Column{}
+		return query.SessionColumnID
 	}
 }
 

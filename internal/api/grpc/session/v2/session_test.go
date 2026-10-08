@@ -392,9 +392,10 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 			},
 			want: &query.SessionsSearchQueries{
 				SearchRequest: query.SearchRequest{
-					Offset: 0,
-					Limit:  100,
-					Asc:    false,
+					Offset:        0,
+					Limit:         100,
+					Asc:           false,
+					SortingColumn: query.SessionColumnID,
 				},
 				Queries: []query.SearchQuery{},
 			},
@@ -466,9 +467,10 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 			},
 			want: &query.SessionsSearchQueries{
 				SearchRequest: query.SearchRequest{
-					Offset: 10,
-					Limit:  20,
-					Asc:    true,
+					Offset:        10,
+					Limit:         20,
+					Asc:           true,
+					SortingColumn: query.SessionColumnID,
 				},
 				Queries: []query.SearchQuery{
 					mustNewListQuery(t, query.SessionColumnID, []interface{}{"1", "2", "3"}, query.ListIn),
