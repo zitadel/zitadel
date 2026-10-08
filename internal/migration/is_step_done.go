@@ -3,6 +3,7 @@ package migration
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/jackc/pgx/v5/pgconn"
 
@@ -14,24 +15,32 @@ type eventQuerier interface {
 }
 
 type stepDoneCheck struct {
-	name string
-	done bool
+	name    string
+	started bool
+	done    bool
+	failed  bool
 }
 
 func (s *stepDoneCheck) AppendEvents(events ...eventstore.Event) {
-	if len(events) > 0 {
-		s.done = true
+	for _, event := range events {
+		switch event.Type() {
+		case StartedType:
+			s.started = true
+		case DoneType:
+			s.done = true
+		case failedType:
+			s.failed = true
+		}
 	}
 }
 
 func (s *stepDoneCheck) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		Limit(1).
 		InstanceID("").
 		AddQuery().
 		AggregateTypes(SystemAggregate).
 		AggregateIDs(SystemAggregateID).
-		EventTypes(DoneType).
+		EventTypes(StartedType, DoneType, failedType).
 		EventData(map[string]interface{}{
 			"name": s.name,
 		}).
@@ -46,6 +55,8 @@ var _ eventstore.QueryReducer = (*stepDoneCheck)(nil)
 
 // IsStepDone reports whether a setup step with the given name has a Done event.
 // A missing events table (fresh setup before 14) is treated as not done.
+// Started without Done or Failed is an error: Execute may have committed
+// without a completion event, so OFFSET vs cursor must not be guessed.
 func IsStepDone(ctx context.Context, es eventQuerier, name string) (bool, error) {
 	if es == nil {
 		return false, nil
@@ -59,5 +70,11 @@ func IsStepDone(ctx context.Context, es eventQuerier, name string) (bool, error)
 		}
 		return false, err
 	}
-	return check.done, nil
+	if check.done {
+		return true, nil
+	}
+	if check.started && !check.failed {
+		return false, fmt.Errorf("setup %s started without a done or failed event; filter_offset may already hold in_tx_order", name)
+	}
+	return false, nil
 }

@@ -27,6 +27,15 @@ func TestFilterOffsetIsCursorFromEventstore(t *testing.T) {
 		require.NoError(t, err)
 		assert.False(t, got)
 	})
+
+	t.Run("77 started without done errors", func(t *testing.T) {
+		es := newMockEventStore().appendFilterResponse([]eventstore.Event{
+			&eventstore.BaseEvent{EventType: migration.StartedType},
+		})
+		got, err := filterOffsetIsCursorFromEventstore(t.Context(), es)
+		require.Error(t, err)
+		assert.False(t, got)
+	})
 }
 
 func TestApplyCustomConfigPreservesFilterOffsetIsCursor(t *testing.T) {
