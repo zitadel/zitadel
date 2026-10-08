@@ -722,10 +722,10 @@ func (h *Handler) eventQuery(currentState *state, minPosition decimal.Decimal) *
 		OrderAsc().
 		InstanceID(currentState.instanceID)
 
-	resumeAfterSortKey := h.resumeAfterSortKey(currentState, minPosition)
+	var resumeAfterSortKey bool
 	if minPosition.GreaterThan(decimal.NewFromInt(0)) {
 		builder = builder.PositionAtLeast(minPosition)
-	} else if resumeAfterSortKey {
+	} else if resumeAfterSortKey = h.resumeAfterSortKey(currentState); resumeAfterSortKey {
 		builder = builder.AfterEventSortKey(currentState.cursor)
 	} else if currentState.cursor.Position.GreaterThan(decimal.Decimal{}) {
 		builder = builder.PositionAtLeast(currentState.cursor.Position)
@@ -768,10 +768,7 @@ func (h *Handler) eventQuerySingle(builder *eventstore.SearchQueryBuilder) *even
 	return builder.AddQuery().AggregateTypes(aggregateTypes...).EventTypes(eventTypes...).Builder()
 }
 
-func (h *Handler) resumeAfterSortKey(currentState *state, minPosition decimal.Decimal) bool {
-	if minPosition.GreaterThan(decimal.NewFromInt(0)) {
-		return false
-	}
+func (h *Handler) resumeAfterSortKey(currentState *state) bool {
 	if currentState.cursor.IsZero() {
 		return false
 	}

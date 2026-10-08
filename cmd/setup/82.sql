@@ -1,13 +1,14 @@
 ALTER TABLE projections.current_states ADD COLUMN IF NOT EXISTS in_tx_order INTEGER;
 
-UPDATE projections.current_states cs
-SET in_tx_order = e.in_tx_order
-FROM eventstore.events2 e
-WHERE cs.instance_id = e.instance_id
-  AND cs.aggregate_id = e.aggregate_id
-  AND cs.aggregate_type = e.aggregate_type
-  AND cs."sequence" = e.sequence
-  AND e.in_tx_order <> 0;
+CREATE OR REPLACE FUNCTION projections.current_states_keep_in_tx_order_opt_in()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  PERFORM set_config('zitadel.keep_in_tx_order', 'true', true);
+  RETURN NULL;
+END;
+$$;
 
 CREATE OR REPLACE FUNCTION projections.current_states_keep_in_tx_order()
 RETURNS trigger
@@ -21,8 +22,14 @@ BEGIN
 END;
 $$;
 
+DROP TRIGGER IF EXISTS current_states_keep_in_tx_order_opt_in ON projections.current_states;
+CREATE TRIGGER current_states_keep_in_tx_order_opt_in
+  BEFORE UPDATE OF in_tx_order ON projections.current_states
+  FOR EACH STATEMENT
+  EXECUTE FUNCTION projections.current_states_keep_in_tx_order_opt_in();
+
 DROP TRIGGER IF EXISTS current_states_keep_in_tx_order ON projections.current_states;
 CREATE TRIGGER current_states_keep_in_tx_order
-  BEFORE INSERT OR UPDATE ON projections.current_states
+  BEFORE UPDATE ON projections.current_states
   FOR EACH ROW
   EXECUTE FUNCTION projections.current_states_keep_in_tx_order();
