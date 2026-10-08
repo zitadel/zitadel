@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
-  const { loginName, requestId, sessionId, organization } = searchParams;
+  const { loginName, requestId, sessionId, organization, altRecoveryCode } = searchParams;
 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
@@ -78,6 +78,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             sessionId={sessionId}
             requestId={requestId}
             altPassword={false}
+            altRecoveryCode={altRecoveryCode === "true"}
             organization={organization}
             login={false} // this sets the userVerificationRequirement to discouraged as its used as second factor
           />

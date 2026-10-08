@@ -41,6 +41,12 @@ export async function checkMFAFactors(
       params.append("organization", organization ?? (session.factors?.user?.organizationId as string));
     }
 
+    // recovery codes are never selected as the primary second factor, but they can be used
+    // as an alternative on the single factor page
+    if (authMethods.includes(AuthenticationMethodType.RECOVERY_CODE)) {
+      params.append("altRecoveryCode", "true");
+    }
+
     const factor = availableMultiFactors[0];
     // if passkey is other method, but user selected password as alternative, perform a login
     if (factor === AuthenticationMethodType.TOTP) {
