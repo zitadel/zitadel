@@ -40,11 +40,7 @@ func ToListDetails(response query.SearchResponse) *object.ListDetails {
 // ListQueryToQuery converts the list query into offset, limit and sorting order.
 // The limit is defaulted and checked by [systemdefaults.SystemDefaults.QueryLimit].
 func ListQueryToQuery(defaults systemdefaults.SystemDefaults, query *object.ListQuery) (offset, limit uint64, asc bool, err error) {
-	limit, err = defaults.QueryLimit(uint64(query.GetLimit()))
-	if err != nil {
-		return 0, 0, false, err
-	}
-	return query.GetOffset(), limit, query.GetAsc(), nil
+	return defaults.PaginationToQuery(query)
 }
 
 func ResourceOwnerFromReq(ctx context.Context, req *object.RequestContext) string {

@@ -58,11 +58,7 @@ func ByteMethodPbToQuery(method filter.ByteFilterMethod) query.BytesComparison {
 }
 
 func PaginationPbToQuery(defaults systemdefaults.SystemDefaults, query *filter.PaginationRequest) (offset, limit uint64, asc bool, err error) {
-	limit, err = defaults.QueryLimit(uint64(query.GetLimit()))
-	if err != nil {
-		return 0, 0, false, err
-	}
-	return query.GetOffset(), limit, query.GetAsc(), nil
+	return defaults.PaginationToQuery(query)
 }
 
 func QueryToPaginationPb(request query.SearchRequest, response query.SearchResponse) *filter.PaginationResponse {

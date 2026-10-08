@@ -43,6 +43,22 @@ func (s SystemDefaults) QueryLimit(requested uint64) (uint64, error) {
 	return requested, nil
 }
 
+// Pagination is implemented by the list query messages of the APIs (e.g. ListQuery and PaginationRequest).
+type Pagination interface {
+	GetOffset() uint64
+	GetLimit() uint32
+	GetAsc() bool
+}
+
+// PaginationToQuery returns the offset, the limit (see [SystemDefaults.QueryLimit]) and the sorting order of the pagination.
+func (s SystemDefaults) PaginationToQuery(pagination Pagination) (offset, limit uint64, asc bool, err error) {
+	limit, err = s.QueryLimit(uint64(pagination.GetLimit()))
+	if err != nil {
+		return 0, 0, false, err
+	}
+	return pagination.GetOffset(), limit, pagination.GetAsc(), nil
+}
+
 type SecretGenerators struct {
 	MachineKeySize     uint32
 	ApplicationKeySize uint32

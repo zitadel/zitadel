@@ -64,3 +64,72 @@ func TestSystemDefaults_QueryLimit(t *testing.T) {
 		})
 	}
 }
+
+type testPagination struct {
+	offset uint64
+	limit  uint32
+	asc    bool
+}
+
+func (p *testPagination) GetOffset() uint64 {
+	if p == nil {
+		return 0
+	}
+	return p.offset
+}
+
+func (p *testPagination) GetLimit() uint32 {
+	if p == nil {
+		return 0
+	}
+	return p.limit
+}
+
+func (p *testPagination) GetAsc() bool {
+	if p == nil {
+		return false
+	}
+	return p.asc
+}
+
+func TestSystemDefaults_PaginationToQuery(t *testing.T) {
+	t.Parallel()
+
+	defaults := SystemDefaults{DefaultQueryLimit: 100, MaxQueryLimit: 1000}
+	tests := []struct {
+		name       string
+		pagination *testPagination
+		wantOffset uint64
+		wantLimit  uint64
+		wantAsc    bool
+		wantErr    error
+	}{
+		{
+			name:       "nil pagination, default limit",
+			pagination: nil,
+			wantLimit:  100,
+		},
+		{
+			name:       "all fields set",
+			pagination: &testPagination{offset: 10, limit: 50, asc: true},
+			wantOffset: 10,
+			wantLimit:  50,
+			wantAsc:    true,
+		},
+		{
+			name:       "limit exceeds max",
+			pagination: &testPagination{offset: 10, limit: 1001, asc: true},
+			wantErr:    zerrors.ThrowInvalidArgument(nil, "QUERY-4M0fs", "Errors.Query.LimitExceeded"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			offset, limit, asc, err := defaults.PaginationToQuery(tt.pagination)
+			assert.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantOffset, offset)
+			assert.Equal(t, tt.wantLimit, limit)
+			assert.Equal(t, tt.wantAsc, asc)
+		})
+	}
+}
