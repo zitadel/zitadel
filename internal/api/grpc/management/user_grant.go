@@ -29,7 +29,7 @@ func (s *Server) GetUserGrantByID(ctx context.Context, req *mgmt_pb.GetUserGrant
 }
 
 func (s *Server) ListUserGrants(ctx context.Context, req *mgmt_pb.ListUserGrantRequest) (*mgmt_pb.ListUserGrantResponse, error) {
-	queries, err := ListUserGrantsRequestToQuery(s.systemDefaults, ctx, req)
+	queries, err := ListUserGrantsRequestToQuery(ctx, s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}

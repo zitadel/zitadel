@@ -91,7 +91,7 @@ func updateJWTConfigToDomain(req *mgmt_pb.UpdateOrgIDPJWTConfigRequest) *domain.
 	}
 }
 
-func listIDPsToModel(defaults systemdefaults.SystemDefaults, ctx context.Context, req *mgmt_pb.ListOrgIDPsRequest) (queries *query.IDPSearchQueries, err error) {
+func listIDPsToModel(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListOrgIDPsRequest) (queries *query.IDPSearchQueries, err error) {
 	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
 	if err != nil {
 		return nil, err
@@ -157,7 +157,7 @@ func userLinksToDomain(idps []*query.IDPUserLink) []*domain.UserIDPLink {
 	return links
 }
 
-func listProvidersToQuery(defaults systemdefaults.SystemDefaults, ctx context.Context, req *mgmt_pb.ListProvidersRequest) (*query.IDPTemplateSearchQueries, error) {
+func listProvidersToQuery(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListProvidersRequest) (*query.IDPTemplateSearchQueries, error) {
 	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
 	if err != nil {
 		return nil, err

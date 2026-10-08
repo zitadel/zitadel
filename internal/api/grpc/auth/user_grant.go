@@ -11,7 +11,7 @@ import (
 	auth_pb "github.com/zitadel/zitadel/pkg/grpc/auth"
 )
 
-func ListMyUserGrantsRequestToQuery(defaults systemdefaults.SystemDefaults, ctx context.Context, req *auth_pb.ListMyUserGrantsRequest) (*query.UserGrantsQueries, error) {
+func ListMyUserGrantsRequestToQuery(ctx context.Context, defaults systemdefaults.SystemDefaults, req *auth_pb.ListMyUserGrantsRequest) (*query.UserGrantsQueries, error) {
 	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
 	if err != nil {
 		return nil, err

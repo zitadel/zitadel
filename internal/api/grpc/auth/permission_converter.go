@@ -11,7 +11,7 @@ import (
 	auth_pb "github.com/zitadel/zitadel/pkg/grpc/auth"
 )
 
-func ListMyMembershipsRequestToModel(defaults systemdefaults.SystemDefaults, ctx context.Context, req *auth_pb.ListMyMembershipsRequest) (*query.MembershipSearchQuery, error) {
+func ListMyMembershipsRequestToModel(ctx context.Context, defaults systemdefaults.SystemDefaults, req *auth_pb.ListMyMembershipsRequest) (*query.MembershipSearchQuery, error) {
 	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
 	if err != nil {
 		return nil, err

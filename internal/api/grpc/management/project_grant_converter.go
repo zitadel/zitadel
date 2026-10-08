@@ -130,7 +130,7 @@ func UpdateProjectGrantRequestToCommand(req *mgmt_pb.UpdateProjectGrantRequest, 
 	}
 }
 
-func ListProjectGrantMembersRequestToModel(defaults systemdefaults.SystemDefaults, ctx context.Context, req *mgmt_pb.ListProjectGrantMembersRequest) (*query.ProjectGrantMembersQuery, error) {
+func ListProjectGrantMembersRequestToModel(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListProjectGrantMembersRequest) (*query.ProjectGrantMembersQuery, error) {
 	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
 	if err != nil {
 		return nil, err

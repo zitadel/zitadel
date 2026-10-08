@@ -17,7 +17,7 @@ import (
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
-func ListAppsRequestToModel(defaults systemdefaults.SystemDefaults, ctx context.Context, req *mgmt_pb.ListAppsRequest) (*query.AppSearchQueries, error) {
+func ListAppsRequestToModel(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListAppsRequest) (*query.AppSearchQueries, error) {
 	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
 	if err != nil {
 		return nil, err
@@ -197,7 +197,7 @@ func AddAPIClientKeyRequestToDomain(key *mgmt_pb.AddAppKeyRequest) *domain.Appli
 	}
 }
 
-func ListAPIClientKeysRequestToQuery(defaults systemdefaults.SystemDefaults, ctx context.Context, req *mgmt_pb.ListAppKeysRequest) (*query.AuthNKeySearchQueries, error) {
+func ListAPIClientKeysRequestToQuery(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListAppKeysRequest) (*query.AuthNKeySearchQueries, error) {
 	resourceOwner, err := query.NewAuthNKeyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err

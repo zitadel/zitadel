@@ -213,7 +213,7 @@ func UpdateMachineRequestToCommand(req *mgmt_pb.UpdateMachineRequest, orgID stri
 	}
 }
 
-func ListMachineKeysRequestToQuery(defaults systemdefaults.SystemDefaults, ctx context.Context, req *mgmt_pb.ListMachineKeysRequest) (*query.AuthNKeySearchQueries, error) {
+func ListMachineKeysRequestToQuery(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListMachineKeysRequest) (*query.AuthNKeySearchQueries, error) {
 	resourcOwner, err := query.NewAuthNKeyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
@@ -294,7 +294,7 @@ func RemovePersonalAccessTokenRequestToCommand(req *mgmt_pb.RemovePersonalAccess
 	}
 }
 
-func ListPersonalAccessTokensRequestToQuery(defaults systemdefaults.SystemDefaults, ctx context.Context, req *mgmt_pb.ListPersonalAccessTokensRequest) (*query.PersonalAccessTokenSearchQueries, error) {
+func ListPersonalAccessTokensRequestToQuery(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListPersonalAccessTokensRequest) (*query.PersonalAccessTokenSearchQueries, error) {
 	resourceOwner, err := query.NewPersonalAccessTokenResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
@@ -332,7 +332,7 @@ func RemoveHumanLinkedIDPRequestToDomain(ctx context.Context, req *mgmt_pb.Remov
 	}
 }
 
-func ListHumanLinkedIDPsRequestToQuery(defaults systemdefaults.SystemDefaults, ctx context.Context, req *mgmt_pb.ListHumanLinkedIDPsRequest) (*query.IDPUserLinksSearchQuery, error) {
+func ListHumanLinkedIDPsRequestToQuery(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListHumanLinkedIDPsRequest) (*query.IDPUserLinksSearchQuery, error) {
 	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
 	if err != nil {
 		return nil, err
@@ -355,7 +355,7 @@ func ListHumanLinkedIDPsRequestToQuery(defaults systemdefaults.SystemDefaults, c
 	}, nil
 }
 
-func ListUserMembershipsRequestToModel(defaults systemdefaults.SystemDefaults, ctx context.Context, req *mgmt_pb.ListUserMembershipsRequest) (*query.MembershipSearchQuery, error) {
+func ListUserMembershipsRequestToModel(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListUserMembershipsRequest) (*query.MembershipSearchQuery, error) {
 	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
 	if err != nil {
 		return nil, err

@@ -165,7 +165,7 @@ func (s *Server) ListProjectGrantMemberRoles(ctx context.Context, req *mgmt_pb.L
 }
 
 func (s *Server) ListProjectGrantMembers(ctx context.Context, req *mgmt_pb.ListProjectGrantMembersRequest) (*mgmt_pb.ListProjectGrantMembersResponse, error) {
-	queries, err := ListProjectGrantMembersRequestToModel(s.systemDefaults, ctx, req)
+	queries, err := ListProjectGrantMembersRequestToModel(ctx, s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}

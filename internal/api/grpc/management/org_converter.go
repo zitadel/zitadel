@@ -88,7 +88,7 @@ func UpdateOrgMemberRequestToCommand(req *mgmt_pb.UpdateOrgMemberRequest, orgID 
 	}
 }
 
-func ListOrgMembersRequestToModel(defaults systemdefaults.SystemDefaults, ctx context.Context, req *mgmt_pb.ListOrgMembersRequest) (*query.OrgMembersQuery, error) {
+func ListOrgMembersRequestToModel(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListOrgMembersRequest) (*query.OrgMembersQuery, error) {
 	ctxData := authz.GetCtxData(ctx)
 	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
 	if err != nil {

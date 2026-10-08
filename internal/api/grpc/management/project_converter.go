@@ -199,7 +199,7 @@ func listGrantedProjectRolesRequestToModel(defaults systemdefaults.SystemDefault
 	}, nil
 }
 
-func ListProjectMembersRequestToModel(defaults systemdefaults.SystemDefaults, ctx context.Context, req *mgmt_pb.ListProjectMembersRequest) (*query.ProjectMembersQuery, error) {
+func ListProjectMembersRequestToModel(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListProjectMembersRequest) (*query.ProjectMembersQuery, error) {
 	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
 	if err != nil {
 		return nil, err

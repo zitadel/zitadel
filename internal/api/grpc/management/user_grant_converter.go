@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
-func ListUserGrantsRequestToQuery(defaults systemdefaults.SystemDefaults, ctx context.Context, req *mgmt_pb.ListUserGrantRequest) (*query.UserGrantsQueries, error) {
+func ListUserGrantsRequestToQuery(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListUserGrantRequest) (*query.UserGrantsQueries, error) {
 	queries, err := user_grpc.UserGrantQueriesToQuery(ctx, req.Queries)
 	if err != nil {
 		return nil, err
