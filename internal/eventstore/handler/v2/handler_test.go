@@ -152,6 +152,7 @@ func TestHandler_eventQuery(t *testing.T) {
 		assert.Nil(t, builder.GetEventSortKeyAfter())
 		assert.True(t, builder.GetPositionAtLeast().Equal(minPosition))
 		assert.Equal(t, uint32(0), builder.GetOffset())
+		assert.True(t, builder.GetScanEventTypesSeparately())
 	})
 }
 

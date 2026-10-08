@@ -722,15 +722,16 @@ func (h *Handler) eventQuery(currentState *state, minPosition decimal.Decimal) *
 		OrderAsc().
 		InstanceID(currentState.instanceID)
 
-	var resumeAfterSortKey bool
+	offsetResume := false
 	if minPosition.GreaterThan(decimal.NewFromInt(0)) {
 		builder = builder.PositionAtLeast(minPosition)
-	} else if resumeAfterSortKey = h.resumeAfterSortKey(currentState); resumeAfterSortKey {
+	} else if h.resumeAfterSortKey(currentState) {
 		builder = builder.AfterEventSortKey(currentState.cursor)
 	} else if currentState.cursor.Position.GreaterThan(decimal.Decimal{}) {
 		builder = builder.PositionAtLeast(currentState.cursor.Position)
 		if currentState.offset > 0 {
 			builder = builder.Offset(currentState.offset)
+			offsetResume = true
 		}
 	}
 
@@ -739,7 +740,7 @@ func (h *Handler) eventQuery(currentState *state, minPosition decimal.Decimal) *
 	}
 
 	// OFFSET resume cannot scan event types separately (repository requires Offset == 0).
-	if !resumeAfterSortKey && currentState.cursor.Position.GreaterThan(decimal.Decimal{}) {
+	if offsetResume {
 		return h.eventQuerySingle(builder)
 	}
 
