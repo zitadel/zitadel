@@ -117,7 +117,11 @@ export async function isSessionValid({
   const authMethodTypes = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id });
 
   const authMethods = authMethodTypes.authMethodTypes;
-  // Filter to only MFA methods (exclude PASSWORD and PASSKEY)
+  // Filter to only MFA methods (exclude PASSWORD and PASSKEY).
+  // Recovery codes are intentionally not part of this list: they are never offered as the
+  // primary second factor (see checkMFAFactors), so a user whose only second factor is
+  // recovery codes is treated like a user without MFA. A verified recovery code still
+  // satisfies the checks below.
   const mfaMethods = authMethods?.filter(
     (method) =>
       method === AuthenticationMethodType.TOTP ||
@@ -133,6 +137,8 @@ export async function isSessionValid({
   // flow never asks for the second factor but this check would deem the session invalid.
   const hasAuthenticatedWithPasskey = !!session.factors.webAuthN?.verifiedAt && !!session.factors.webAuthN?.userVerified;
 
+  const recoveryCodeValid = !!session.factors.recoveryCode?.verifiedAt;
+
   if (mfaMethods && mfaMethods.length > 0) {
     // User has MFA methods configured — they must be verified regardless of policy,
     // unless the session was already authenticated with a user-verified passkey
@@ -141,7 +147,7 @@ export async function isSessionValid({
     const otpSmsValid = mfaMethods.includes(AuthenticationMethodType.OTP_SMS) && !!session.factors.otpSms?.verifiedAt;
     const u2fValid = mfaMethods.includes(AuthenticationMethodType.U2F) && !!session.factors.webAuthN?.verifiedAt;
 
-    mfaValid = hasAuthenticatedWithPasskey || totpValid || otpEmailValid || otpSmsValid || u2fValid;
+    mfaValid = hasAuthenticatedWithPasskey || totpValid || otpEmailValid || otpSmsValid || u2fValid || recoveryCodeValid;
   } else if (isMfaRequired) {
     // No MFA methods configured, but MFA is forced by policy — check for any verified MFA factors
     const otpEmail = session.factors.otpEmail?.verifiedAt;
@@ -149,7 +155,7 @@ export async function isSessionValid({
     const totp = session.factors.totp?.verifiedAt;
     const webAuthN = session.factors.webAuthN?.verifiedAt;
 
-    mfaValid = !!(otpEmail || otpSms || totp || webAuthN);
+    mfaValid = !!(otpEmail || otpSms || totp || webAuthN || recoveryCodeValid);
   }
 
   // If user has no MFA methods and MFA is not required by policy, mfaValid remains true
