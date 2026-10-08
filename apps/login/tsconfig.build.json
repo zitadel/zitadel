@@ -1,0 +1,4 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": ["node_modules", "acceptance", "dockerized", "vitest.config*.ts", "**/*.test.ts", "**/*.test.tsx"]
+}
