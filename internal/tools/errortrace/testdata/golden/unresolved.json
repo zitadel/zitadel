@@ -1,0 +1,7 @@
+{
+  "Dynamic": {
+    "handler": "internal/tools/errortrace/testdata/unresolved/handler.go:16",
+    "errors": [],
+    "unresolved": 1
+  }
+}
