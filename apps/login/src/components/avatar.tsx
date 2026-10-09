@@ -1,8 +1,6 @@
-"use client";
-
 import { ColorShade, getColorHash } from "@/helpers/colors";
 import { getComponentRoundness } from "@/lib/theme";
-import { useTheme } from "next-themes";
+import { CSSProperties } from "react";
 
 interface AvatarProps {
   name: string | null | undefined;
@@ -36,25 +34,27 @@ function getAvatarRoundness(): string {
 }
 
 export function Avatar({ size = "base", name, loginName, imageUrl, shadow }: AvatarProps) {
-  const { resolvedTheme } = useTheme();
   const credentials = getInitials(name ?? loginName, loginName);
   const avatarRoundness = getAvatarRoundness();
 
   const color: ColorShade = getColorHash(loginName);
 
-  const avatarStyleDark = {
-    backgroundColor: color[900],
-    color: color[200],
-  };
-
-  const avatarStyleLight = {
-    backgroundColor: color[200],
-    color: color[900],
-  };
+  // Both palettes are exposed as theme-independent CSS variables so the server
+  // and the client render identical markup. The `dark:` variants switch
+  // between them once next-themes resolves the theme on the client, which
+  // avoids a hydration mismatch when the system theme is light - an inline
+  // style based on `resolvedTheme` would render the dark branch on the server
+  // and the light branch during hydration.
+  const avatarVars = {
+    "--avatar-bg": color[200],
+    "--avatar-fg": color[900],
+    "--avatar-bg-dark": color[900],
+    "--avatar-fg-dark": color[200],
+  } as CSSProperties;
 
   return (
     <div
-      className={`dark:group-focus:ring-offset-blue dark:text-blue bg-primary-light-500 text-primary-light-contrast-500 hover:bg-primary-light-400 group-focus:ring-primary-light-200 dark:bg-primary-dark-300 dark:text-primary-dark-contrast-300 hover:dark:bg-primary-dark-500 dark:group-focus:ring-primary-dark-400 pointer-events-none flex h-full w-full flex-shrink-0 cursor-default items-center justify-center transition-colors duration-200 group-focus:ring-2 group-focus:outline-none ${avatarRoundness} ${
+      className={`dark:group-focus:ring-offset-blue dark:text-blue bg-[var(--avatar-bg)] text-[var(--avatar-fg)] hover:bg-primary-light-400 group-focus:ring-primary-light-200 dark:bg-[var(--avatar-bg-dark)] dark:text-[var(--avatar-fg-dark)] hover:dark:bg-primary-dark-500 dark:group-focus:ring-primary-dark-400 pointer-events-none flex h-full w-full flex-shrink-0 cursor-default items-center justify-center transition-colors duration-200 group-focus:ring-2 group-focus:outline-none ${avatarRoundness} ${
         shadow ? "shadow" : ""
       } ${
         size === "large"
@@ -65,7 +65,7 @@ export function Avatar({ size = "base", name, loginName, imageUrl, shadow }: Ava
               ? "!h-[32px] !w-[32px] text-[13px] font-bold"
               : "h-12 w-12"
       }`}
-      style={resolvedTheme === "light" ? avatarStyleLight : avatarStyleDark}
+      style={avatarVars}
     >
       {imageUrl ? (
         <img
