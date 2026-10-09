@@ -59,6 +59,16 @@ func (s SystemDefaults) PaginationToQuery(pagination Pagination) (offset, limit 
 	return pagination.GetOffset(), limit, pagination.GetAsc(), nil
 }
 
+// V1QueryLimit returns the limit to apply to a list query of the v1 APIs.
+// Unlike [SystemDefaults.QueryLimit], the MaxQueryLimit is also used as default if no limit is requested,
+// which corresponds to the previous behavior of the v1 APIs.
+func (s SystemDefaults) V1QueryLimit(requested uint64) (uint64, error) {
+	return SystemDefaults{
+		DefaultQueryLimit: s.MaxQueryLimit,
+		MaxQueryLimit:     s.MaxQueryLimit,
+	}.QueryLimit(requested)
+}
+
 type SecretGenerators struct {
 	MachineKeySize     uint32
 	ApplicationKeySize uint32

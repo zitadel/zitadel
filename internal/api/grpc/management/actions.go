@@ -10,7 +10,7 @@ import (
 )
 
 func (s *Server) ListActions(ctx context.Context, req *mgmt_pb.ListActionsRequest) (*mgmt_pb.ListActionsResponse, error) {
-	query, err := listActionsToQuery(authz.GetCtxData(ctx).OrgID, req)
+	query, err := listActionsToQuery(s.systemDefaults, authz.GetCtxData(ctx).OrgID, req)
 	if err != nil {
 		return nil, err
 	}
