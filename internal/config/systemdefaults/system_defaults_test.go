@@ -133,3 +133,48 @@ func TestSystemDefaults_PaginationToQuery(t *testing.T) {
 		})
 	}
 }
+
+func TestSystemDefaults_V1QueryLimit(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name      string
+		defaults  SystemDefaults
+		requested uint64
+		want      uint64
+		wantErr   error
+	}{
+		{
+			name:      "no limit requested, max applied",
+			defaults:  SystemDefaults{DefaultQueryLimit: 100, MaxQueryLimit: 1000},
+			requested: 0,
+			want:      1000,
+		},
+		{
+			name:      "limit below max",
+			defaults:  SystemDefaults{DefaultQueryLimit: 100, MaxQueryLimit: 1000},
+			requested: 500,
+			want:      500,
+		},
+		{
+			name:      "limit exceeds max",
+			defaults:  SystemDefaults{DefaultQueryLimit: 100, MaxQueryLimit: 1000},
+			requested: 1001,
+			wantErr:   zerrors.ThrowInvalidArgument(nil, "QUERY-4M0fs", "Errors.Query.LimitExceeded"),
+		},
+		{
+			name:      "no max configured",
+			defaults:  SystemDefaults{DefaultQueryLimit: 100},
+			requested: 0,
+			want:      0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			got, err := tt.defaults.V1QueryLimit(tt.requested)
+			assert.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
