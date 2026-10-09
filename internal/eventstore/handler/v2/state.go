@@ -68,23 +68,32 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 		AggregateID:   aggregateID.String,
 		Sequence:      uint64(sequence.Int64),
 	}
-	if h.filterOffsetIsCursor {
-		currentState.cursor.InTxOrder = uint32(filterOffset.Int64)
-		return currentState, nil
-	}
-	currentState.offset = uint32(filterOffset.Int64)
-	if inTxOrder.Valid && inTxOrder.Int64 != 0 {
-		currentState.cursor.InTxOrder = uint32(inTxOrder.Int64)
-		currentState.inTxOrderSet = true
-	}
+	h.hydrateState(currentState, *filterOffset, *inTxOrder)
 	return currentState, nil
 }
 
-func (h *Handler) setState(ctx context.Context, tx *sql.Tx, updatedState *state) error {
-	filterOffset := updatedState.cursor.InTxOrder
-	if !h.filterOffsetIsCursor {
-		filterOffset = updatedState.offset
+func (h *Handler) hydrateState(s *state, filterOffset, inTxOrder sql.NullInt64) {
+	if h.filterOffsetIsCursor {
+		s.cursor.InTxOrder = uint32(filterOffset.Int64)
+		return
 	}
+	s.offset = uint32(filterOffset.Int64)
+	if inTxOrder.Valid && inTxOrder.Int64 != 0 {
+		s.cursor.InTxOrder = uint32(inTxOrder.Int64)
+		s.inTxOrderSet = true
+	}
+}
+
+func (h *Handler) storedOffsets(s *state) (filterOffset any, inTxOrder any) {
+	inTx := inTxOrderValue(s.cursor.InTxOrder)
+	if h.filterOffsetIsCursor {
+		return s.cursor.InTxOrder, inTx
+	}
+	return s.offset, inTx
+}
+
+func (h *Handler) setState(ctx context.Context, tx *sql.Tx, updatedState *state) error {
+	filterOffset, inTxOrder := h.storedOffsets(updatedState)
 	res, err := tx.Exec(updateStateStmt,
 		h.projection.Name(),
 		updatedState.instanceID,
@@ -94,7 +103,7 @@ func (h *Handler) setState(ctx context.Context, tx *sql.Tx, updatedState *state)
 		updatedState.eventTimestamp,
 		updatedState.cursor.Position,
 		filterOffset,
-		inTxOrderValue(updatedState.cursor.InTxOrder),
+		inTxOrder,
 	)
 	if err != nil {
 		err = zerrors.ThrowInternal(err, "V2-WF23g2", "unable to update state")
@@ -114,6 +123,13 @@ func inTxOrderValue(order uint32) any {
 		return nil
 	}
 	return order
+}
+
+func nextFilterOffset(prev decimal.Decimal, offset uint32, pos decimal.Decimal) (decimal.Decimal, uint32) {
+	if prev.Equal(pos) {
+		return pos, offset + 1
+	}
+	return pos, 1
 }
 
 func (s *state) applyStatement(stmt *Statement) {

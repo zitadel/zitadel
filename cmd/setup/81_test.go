@@ -19,8 +19,11 @@ func TestCommandsToEventsClockTimestamp_String(t *testing.T) {
 }
 
 func TestCommandsToEventsClockTimestampSQL(t *testing.T) {
-	assert.Contains(t, stampEventPositionAtInsert, "clock_timestamp()")
-	assert.Contains(t, stampEventPositionAtInsert, "CREATE OR REPLACE FUNCTION eventstore.commands_to_events")
+	assert.NotContains(t, commandsToEventsClockTimestampSQL, "last_owner")
+	assert.Contains(t, commandsToEventsClockTimestampSQL, "i INTEGER")
+	assert.Contains(t, commandsToEventsClockTimestampSQL, "clock_timestamp()")
+	assert.Contains(t, commandsToEventsClockTimestampSQL, "VOLATILE PARALLEL SAFE")
+	assert.Contains(t, commandsToEventsClockTimestampSQL, "CREATE OR REPLACE FUNCTION eventstore.commands_to_events")
 }
 
 func TestSetupExecutionSliceOmits77(t *testing.T) {
