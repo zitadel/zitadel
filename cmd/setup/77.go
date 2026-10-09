@@ -14,9 +14,6 @@ var (
 	stampEventPositionAtInsert string
 )
 
-// StampEventPositionAtInsert is historical setup 77. It is no longer executed.
-// Existing Done events with this name remain the flag that filter_offset already
-// stores events2.in_tx_order. New installs never record this name.
 type StampEventPositionAtInsert struct{}
 
 func (*StampEventPositionAtInsert) Execute(context.Context, eventstore.Event) error {

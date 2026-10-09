@@ -280,8 +280,7 @@ func ApplyCustomConfig(customConfig CustomConfig) handler.Config {
 	return applyCustomConfig(projectionConfig, customConfig)
 }
 
-// FilterOffsetIsCursor reports whether setup 77 is stored as done, so
-// current_states.filter_offset already holds events2.in_tx_order.
+// FilterOffsetIsCursor reports whether setup 77 is stored as done (filter_offset holds events2.in_tx_order).
 func FilterOffsetIsCursor() bool {
 	return projectionConfig.FilterOffsetIsCursor
 }

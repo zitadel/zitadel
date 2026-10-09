@@ -18,9 +18,8 @@ const (
 	SystemAggregate    = eventstore.AggregateType("system")
 	SystemAggregateID  = "SYSTEM"
 
-	// EventstorePositionClockTimestampStep is the historical setup 77 name.
-	// It is no longer executed; a Done event with this name means
-	// projections.current_states.filter_offset already stores events2.in_tx_order.
+	// EventstorePositionClockTimestampStep is historical setup 77. A Done event
+	// means current_states.filter_offset already stores events2.in_tx_order.
 	EventstorePositionClockTimestampStep = "77_eventstore_position_clock_timestamp"
 )
 

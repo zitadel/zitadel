@@ -53,10 +53,8 @@ func (*stepDoneCheck) Reduce() error {
 
 var _ eventstore.QueryReducer = (*stepDoneCheck)(nil)
 
-// IsStepDone reports whether a setup step with the given name has a Done event.
-// A missing events table (fresh setup before 14) is treated as not done.
-// Started without Done or Failed is an error: Execute may have committed
-// without a completion event, so OFFSET vs cursor must not be guessed.
+// IsStepDone reports whether a setup step has a Done event. A missing events
+// table is not done. Started without Done or Failed is an error.
 func IsStepDone(ctx context.Context, es eventQuerier, name string) (bool, error) {
 	if es == nil {
 		return false, nil

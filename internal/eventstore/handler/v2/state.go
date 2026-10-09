@@ -19,10 +19,8 @@ type state struct {
 	instanceID     string
 	eventTimestamp time.Time
 	cursor         eventstore.EventSortKey
-	// offset is the filtered row count at cursor.Position when setup 77 is not stored.
-	offset uint32
-	// inTxOrderSet is true when current_states.in_tx_order is a real ordinal (not NULL / 0).
-	inTxOrderSet bool
+	offset         uint32
+	inTxOrderSet   bool
 }
 
 var (
