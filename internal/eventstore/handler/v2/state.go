@@ -19,6 +19,8 @@ type state struct {
 	instanceID     string
 	eventTimestamp time.Time
 	cursor         eventstore.EventSortKey
+	offset         uint32
+	inTxOrderSet   bool
 }
 
 var (
@@ -39,6 +41,7 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 		sequence      = new(sql.NullInt64)
 		timestamp     = new(sql.NullTime)
 		position      = new(decimal.NullDecimal)
+		filterOffset  = new(sql.NullInt64)
 		inTxOrder     = new(sql.NullInt64)
 	)
 
@@ -49,6 +52,7 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 		sequence,
 		timestamp,
 		position,
+		filterOffset,
 		inTxOrder,
 	)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
@@ -59,16 +63,37 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 	currentState.eventTimestamp = timestamp.Time
 	currentState.cursor = eventstore.EventSortKey{
 		Position:      position.Decimal,
-		InTxOrder:     uint32(inTxOrder.Int64),
 		InstanceID:    currentState.instanceID,
 		AggregateType: eventstore.AggregateType(aggregateType.String),
 		AggregateID:   aggregateID.String,
 		Sequence:      uint64(sequence.Int64),
 	}
+	h.hydrateState(currentState, *filterOffset, *inTxOrder)
 	return currentState, nil
 }
 
+func (h *Handler) hydrateState(s *state, filterOffset, inTxOrder sql.NullInt64) {
+	if h.filterOffsetIsCursor {
+		s.cursor.InTxOrder = uint32(filterOffset.Int64)
+		return
+	}
+	s.offset = uint32(filterOffset.Int64)
+	if inTxOrder.Valid && inTxOrder.Int64 != 0 {
+		s.cursor.InTxOrder = uint32(inTxOrder.Int64)
+		s.inTxOrderSet = true
+	}
+}
+
+func (h *Handler) storedOffsets(s *state) (filterOffset any, inTxOrder any) {
+	inTx := inTxOrderValue(s.cursor.InTxOrder)
+	if h.filterOffsetIsCursor {
+		return s.cursor.InTxOrder, inTx
+	}
+	return s.offset, inTx
+}
+
 func (h *Handler) setState(ctx context.Context, tx *sql.Tx, updatedState *state) error {
+	filterOffset, inTxOrder := h.storedOffsets(updatedState)
 	res, err := tx.Exec(updateStateStmt,
 		h.projection.Name(),
 		updatedState.instanceID,
@@ -77,7 +102,8 @@ func (h *Handler) setState(ctx context.Context, tx *sql.Tx, updatedState *state)
 		updatedState.cursor.Sequence,
 		updatedState.eventTimestamp,
 		updatedState.cursor.Position,
-		updatedState.cursor.InTxOrder,
+		filterOffset,
+		inTxOrder,
 	)
 	if err != nil {
 		err = zerrors.ThrowInternal(err, "V2-WF23g2", "unable to update state")
@@ -92,9 +118,24 @@ func (h *Handler) setState(ctx context.Context, tx *sql.Tx, updatedState *state)
 	return nil
 }
 
+func inTxOrderValue(order uint32) any {
+	if order == 0 {
+		return nil
+	}
+	return order
+}
+
+func nextFilterOffset(prev decimal.Decimal, offset uint32, pos decimal.Decimal) (decimal.Decimal, uint32) {
+	if prev.Equal(pos) {
+		return pos, offset + 1
+	}
+	return pos, 1
+}
+
 func (s *state) applyStatement(stmt *Statement) {
 	s.cursor = stmt.eventSortKey()
 	s.eventTimestamp = stmt.CreationDate
+	s.offset = stmt.offset
 }
 
 func (s *state) applyEvent(event eventstore.Event) {

@@ -17,6 +17,10 @@ const (
 	repeatableDoneType = eventstore.EventType("system.migration.repeatable.done")
 	SystemAggregate    = eventstore.AggregateType("system")
 	SystemAggregateID  = "SYSTEM"
+
+	// EventstorePositionClockTimestampStep is historical setup 77. A Done event
+	// means current_states.filter_offset already stores events2.in_tx_order.
+	EventstorePositionClockTimestampStep = "77_eventstore_position_clock_timestamp"
 )
 
 var (
