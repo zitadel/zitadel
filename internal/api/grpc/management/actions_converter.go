@@ -3,6 +3,7 @@ package management
 import (
 	action_grpc "github.com/zitadel/zitadel/internal/api/grpc/action"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -31,8 +32,11 @@ func updateActionRequestToDomain(req *mgmt_pb.UpdateActionRequest) *domain.Actio
 	}
 }
 
-func listActionsToQuery(orgID string, req *mgmt_pb.ListActionsRequest) (_ *query.ActionSearchQueries, err error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func listActionsToQuery(defaults systemdefaults.SystemDefaults, orgID string, req *mgmt_pb.ListActionsRequest) (_ *query.ActionSearchQueries, err error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries := make([]query.SearchQuery, len(req.Queries)+1)
 	queries[0], err = query.NewActionResourceOwnerQuery(orgID)
 	if err != nil {

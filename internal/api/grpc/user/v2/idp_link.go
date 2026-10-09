@@ -7,6 +7,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -28,7 +29,7 @@ func (s *Server) AddIDPLink(ctx context.Context, req *connect.Request[user.AddID
 }
 
 func (s *Server) ListIDPLinks(ctx context.Context, req *connect.Request[user.ListIDPLinksRequest]) (_ *connect.Response[user.ListIDPLinksResponse], err error) {
-	queries, err := ListLinkedIDPsRequestToQuery(req.Msg)
+	queries, err := ListLinkedIDPsRequestToQuery(s.systemDefaults, req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -42,8 +43,11 @@ func (s *Server) ListIDPLinks(ctx context.Context, req *connect.Request[user.Lis
 	}), nil
 }
 
-func ListLinkedIDPsRequestToQuery(req *user.ListIDPLinksRequest) (*query.IDPUserLinksSearchQuery, error) {
-	offset, limit, asc := object.ListQueryToQuery(req.Query)
+func ListLinkedIDPsRequestToQuery(defaults systemdefaults.SystemDefaults, req *user.ListIDPLinksRequest) (*query.IDPUserLinksSearchQuery, error) {
+	offset, limit, asc, err := object.ListQueryToQuery(defaults, req.GetQuery())
+	if err != nil {
+		return nil, err
+	}
 	userQuery, err := query.NewIDPUserLinksUserIDSearchQuery(req.UserId)
 	if err != nil {
 		return nil, err

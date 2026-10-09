@@ -2,14 +2,18 @@ package convert
 
 import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func ListUsersRequestToModel(req *user.ListUsersRequest) (*query.UserSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToQuery(req.GetQuery())
+func ListUsersRequestToModel(defaults systemdefaults.SystemDefaults, req *user.ListUsersRequest) (*query.UserSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToQuery(defaults, req.GetQuery())
+	if err != nil {
+		return nil, err
+	}
 	queries, err := userQueriesToQuery(req.GetQueries(), 0 /*start from level 0*/)
 	if err != nil {
 		return nil, err

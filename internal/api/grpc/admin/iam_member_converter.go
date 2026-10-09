@@ -4,6 +4,7 @@ import (
 	member_grpc "github.com/zitadel/zitadel/internal/api/grpc/member"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/query"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	member_pb "github.com/zitadel/zitadel/pkg/grpc/member"
@@ -25,8 +26,11 @@ func UpdateIAMMemberToCommand(req *admin_pb.UpdateIAMMemberRequest, instanceID s
 	}
 }
 
-func ListIAMMembersRequestToQuery(req *admin_pb.ListIAMMembersRequest) (*query.IAMMembersQuery, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func ListIAMMembersRequestToQuery(defaults systemdefaults.SystemDefaults, req *admin_pb.ListIAMMembersRequest) (*query.IAMMembersQuery, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := member_grpc.MemberQueriesToQuery(req.Queries)
 	if err != nil {
 		return nil, err

@@ -14,6 +14,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -316,6 +317,10 @@ func mustNewTimestampQuery(t testing.TB, column query.Column, ts time.Time, comp
 }
 
 func Test_listSessionsRequestToQuery(t *testing.T) {
+	queryDefaults := systemdefaults.SystemDefaults{
+		DefaultQueryLimit: 100,
+		MaxQueryLimit:     1000,
+	}
 	type args struct {
 		ctx context.Context
 		req *session.ListSessionsRequest
@@ -338,7 +343,7 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 			want: &query.SessionsSearchQueries{
 				SearchRequest: query.SearchRequest{
 					Offset:        0,
-					Limit:         0,
+					Limit:         100,
 					SortingColumn: query.SessionColumnCreationDate,
 					Asc:           false,
 				},
@@ -382,9 +387,10 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 			},
 			want: &query.SessionsSearchQueries{
 				SearchRequest: query.SearchRequest{
-					Offset: 10,
-					Limit:  20,
-					Asc:    true,
+					Offset:        10,
+					Limit:         20,
+					Asc:           true,
+					SortingColumn: query.SessionColumnID,
 				},
 				Queries: []query.SearchQuery{
 					mustNewListQuery(t, query.SessionColumnID, []interface{}{"1", "2", "3"}, query.ListIn),
@@ -393,6 +399,18 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 					mustNewTimestampQuery(t, query.SessionColumnCreationDate, creationDate, query.TimestampGreater),
 				},
 			},
+		},
+		{
+			name: "limit exceeds max",
+			args: args{
+				ctx: authz.NewMockContext("123", "456", "789"),
+				req: &session.ListSessionsRequest{
+					Query: &object.ListQuery{
+						Limit: 1001,
+					},
+				},
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "QUERY-4M0fs", "Errors.Query.LimitExceeded"),
 		},
 		{
 			name: "invalid argument error",
@@ -419,7 +437,7 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := listSessionsRequestToQuery(tt.args.ctx, tt.args.req)
+			got, err := listSessionsRequestToQuery(tt.args.ctx, queryDefaults, tt.args.req)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
 		})

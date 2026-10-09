@@ -27,6 +27,15 @@ type EventEditor struct {
 	AvatarKey         string
 }
 
+// maxEditorsCapacity limits the initial capacity of the editors map of the [eventsReducer].
+// The map only holds the distinct editors of the events, which are usually far less than the limit of the query.
+const maxEditorsCapacity = 100
+
+// editorsCapacity returns the initial capacity of the editors map for the given limit of the query.
+func editorsCapacity(limit uint64) uint64 {
+	return min(limit, maxEditorsCapacity)
+}
+
 type eventsReducer struct {
 	ctx     context.Context
 	q       *Queries
@@ -50,7 +59,7 @@ func (q *Queries) SearchEvents(ctx context.Context, query *eventstore.SearchQuer
 	if auditLogRetention != 0 {
 		query = filterAuditLogRetention(ctx, auditLogRetention, query)
 	}
-	reducer := &eventsReducer{ctx: ctx, q: q, editors: make(map[string]*EventEditor, query.GetLimit())}
+	reducer := &eventsReducer{ctx: ctx, q: q, editors: make(map[string]*EventEditor, editorsCapacity(query.GetLimit()))}
 	if err = q.eventstore.FilterToReducer(ctx, query, reducer); err != nil {
 		return nil, err
 	}
