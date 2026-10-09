@@ -120,8 +120,8 @@ export function RegisterForm({
         <div className="mb-4 grid grid-cols-2 gap-4">
           <div className="">
             <TextInput
-              type="firstname"
-              autoComplete="firstname"
+              type="text"
+              autoComplete="given-name"
               autoFocus
               required
               {...register("firstname", { required: t("required.firstname") })}
@@ -132,8 +132,8 @@ export function RegisterForm({
           </div>
           <div className="">
             <TextInput
-              type="lastname"
-              autoComplete="lastname"
+              type="text"
+              autoComplete="family-name"
               required
               {...register("lastname", { required: t("required.lastname") })}
               label={t("labels.lastname")}
