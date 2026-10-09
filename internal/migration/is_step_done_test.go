@@ -80,6 +80,48 @@ func TestIsStepDone(t *testing.T) {
 		assert.False(t, done)
 	})
 
+	t.Run("started after failed is stuck", func(t *testing.T) {
+		es := &stubEventQuerier{
+			events: []eventstore.Event{
+				&eventstore.BaseEvent{EventType: StartedType},
+				&eventstore.BaseEvent{EventType: failedType},
+				&eventstore.BaseEvent{EventType: StartedType},
+			},
+		}
+		done, err := IsStepDone(t.Context(), es, EventstorePositionClockTimestampStep)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "started without a done or failed event")
+		assert.False(t, done)
+	})
+
+	t.Run("started after failed then done is stored", func(t *testing.T) {
+		es := &stubEventQuerier{
+			events: []eventstore.Event{
+				&eventstore.BaseEvent{EventType: StartedType},
+				&eventstore.BaseEvent{EventType: failedType},
+				&eventstore.BaseEvent{EventType: StartedType},
+				&eventstore.BaseEvent{EventType: DoneType},
+			},
+		}
+		done, err := IsStepDone(t.Context(), es, EventstorePositionClockTimestampStep)
+		require.NoError(t, err)
+		assert.True(t, done)
+	})
+
+	t.Run("started after failed then failed is not done", func(t *testing.T) {
+		es := &stubEventQuerier{
+			events: []eventstore.Event{
+				&eventstore.BaseEvent{EventType: StartedType},
+				&eventstore.BaseEvent{EventType: failedType},
+				&eventstore.BaseEvent{EventType: StartedType},
+				&eventstore.BaseEvent{EventType: failedType},
+			},
+		}
+		done, err := IsStepDone(t.Context(), es, EventstorePositionClockTimestampStep)
+		require.NoError(t, err)
+		assert.False(t, done)
+	})
+
 	t.Run("undefined table is not done", func(t *testing.T) {
 		es := &stubEventQuerier{
 			err: &pgconn.PgError{Code: "42P01"},
