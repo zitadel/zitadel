@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, switchMap } from 'rxjs';
+import { BehaviorSubject, concat, from, of, switchMap } from 'rxjs';
 
 import { ManagementService } from './mgmt.service';
 
@@ -40,14 +40,18 @@ export class BreadcrumbService {
   public readonly breadcrumbs$: BehaviorSubject<Breadcrumb[]> = new BehaviorSubject<Breadcrumb[]>([]);
   public readonly breadcrumbsExtended$ = this.breadcrumbs$.pipe(
     switchMap((breadcrumbs) => {
-      const newValues = breadcrumbs.map(async (b) => {
-        // the names of granted projects are set by the pages, since they can't be loaded by the project id only
-        if (!b.name && b.type === BreadcrumbType.PROJECT && b.param) {
-          b.name = await this.projectName(b.param.value);
-        }
-        return b;
-      });
-      return Promise.all(newValues);
+      // the names of granted projects are set by the pages, since they can't be loaded by the project id only
+      const unnamed = breadcrumbs.filter((b) => !b.name && b.type === BreadcrumbType.PROJECT && b.param);
+      if (!unnamed.length) {
+        return of(breadcrumbs);
+      }
+      // show the breadcrumbs right away and update them once the names are loaded
+      const named = Promise.all(
+        unnamed.map(async (b) => {
+          b.name = await this.projectName(b.param?.value ?? '');
+        }),
+      ).then(() => [...breadcrumbs]);
+      return concat(of(breadcrumbs), from(named));
     }),
   );
 
