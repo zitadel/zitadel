@@ -24,6 +24,7 @@ import {
 import { NewFeatureService } from 'src/app/services/new-feature.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { SessionState as V2SessionState } from '@zitadel/proto/zitadel/user_pb';
+import { SessionFieldName } from '@zitadel/proto/zitadel/session/v2/session_pb';
 import { filter, withLatestFrom } from 'rxjs/operators';
 
 interface V1AndV2Session {
@@ -124,6 +125,11 @@ export class AccountsCardComponent {
             },
           },
         ],
+        // the number of returned sessions is limited, so make sure to get the most recent ones
+        sortingColumn: SessionFieldName.CREATION_DATE,
+        query: {
+          asc: false,
+        },
       }),
     ).pipe(
       mergeMap(({ sessions }) => from(sessions)),

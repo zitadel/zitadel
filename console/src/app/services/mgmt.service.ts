@@ -538,7 +538,7 @@ import { MetadataQuery } from '../proto/generated/zitadel/metadata_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { DomainSearchQuery, DomainValidationType } from '../proto/generated/zitadel/org_pb';
 import { PasswordComplexityPolicy } from '../proto/generated/zitadel/policy_pb';
-import { GrantedProject, Project, ProjectQuery, RoleQuery } from '../proto/generated/zitadel/project_pb';
+import { ProjectQuery, RoleQuery } from '../proto/generated/zitadel/project_pb';
 import {
   AccessTokenType,
   Gender,
@@ -555,9 +555,7 @@ export type ResponseMapper<TResp, TMappedResp> = (resp: TResp) => TMappedResp;
   providedIn: 'root',
 })
 export class ManagementService {
-  public ownedProjects: BehaviorSubject<Project.AsObject[]> = new BehaviorSubject<Project.AsObject[]>([]);
   public ownedProjectsCount: BehaviorSubject<number> = new BehaviorSubject(0);
-  public grantedProjects: BehaviorSubject<GrantedProject.AsObject[]> = new BehaviorSubject<GrantedProject.AsObject[]>([]);
   public grantedProjectsCount: BehaviorSubject<number> = new BehaviorSubject(0);
 
   constructor(private readonly grpcService: GrpcService) {}
@@ -2237,16 +2235,7 @@ export class ManagementService {
     if (queryList) {
       req.setQueriesList(queryList);
     }
-    return this.grpcService.mgmt.listProjects(req, null).then((value) => {
-      const obj = value.toObject();
-      const count = obj.resultList.length;
-      if (count >= 0) {
-        this.ownedProjects.next(obj.resultList);
-        this.ownedProjectsCount.next(count);
-      }
-
-      return obj;
-    });
+    return this.grpcService.mgmt.listProjects(req, null).then((value) => value.toObject());
   }
 
   public listGrantedProjects(
@@ -2268,12 +2257,28 @@ export class ManagementService {
     if (queryList) {
       req.setQueriesList(queryList);
     }
-    return this.grpcService.mgmt.listGrantedProjects(req, null).then((value) => {
-      const obj = value.toObject();
-      this.grantedProjects.next(obj.resultList);
-      this.grantedProjectsCount.next(obj.resultList.length);
-      return obj;
-    });
+    return this.grpcService.mgmt.listGrantedProjects(req, null).then((value) => value.toObject());
+  }
+
+  /**
+   * Returns the number of owned and granted projects of the active organization.
+   * Only the total results are needed, so a single project is requested.
+   * A count which can't be loaded is returned as 0.
+   */
+  public getProjectCounts(): Promise<{ owned: number; granted: number }> {
+    return Promise.all([
+      this.listProjects(1, 0)
+        .then((resp) => resp.details?.totalResult ?? 0)
+        .catch(() => 0),
+      this.listGrantedProjects(1, 0)
+        .then((resp) => resp.details?.totalResult ?? 0)
+        .catch(() => 0),
+    ]).then(([owned, granted]) => ({ owned, granted }));
+  }
+
+  public setProjectCounts(owned: number, granted: number): void {
+    this.ownedProjectsCount.next(owned);
+    this.grantedProjectsCount.next(granted);
   }
 
   public getOIDCInformation(): Promise<GetOIDCInformationResponse.AsObject> {

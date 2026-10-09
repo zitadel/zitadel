@@ -2,8 +2,7 @@ import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit, effect, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, Subject, combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, Subject, defer, of } from 'rxjs';
 import { OIDCAppType } from 'src/app/proto/generated/zitadel/app_pb';
 import { AddAPIAppResponse, AddOIDCAppRequest, AddOIDCAppResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -66,17 +65,16 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
     });
   }
 
-  public projectName$ = combineLatest([this.mgmtService.ownedProjects, this.mgmtService.grantedProjects]).pipe(
-    map(([projects, grantedProjects]) => {
-      const project = projects.find((project) => project.id === this.activatedRoute.snapshot.paramMap.get('projectid'));
-
-      const grantedproject = grantedProjects.find(
-        (grantedproject) => grantedproject.projectId === this.activatedRoute.snapshot.paramMap.get('projectid'),
-      );
-
-      return project?.name ?? grantedproject?.projectName ?? '';
-    }),
-  );
+  public projectName$ = defer(() => {
+    const projectId = this.activatedRoute.snapshot.paramMap.get('projectid');
+    if (!projectId) {
+      return of('');
+    }
+    return this.mgmtService
+      .getProjectByID(projectId)
+      .then((resp) => resp.project?.name ?? '')
+      .catch(() => '');
+  });
 
   public setFramework(framework: Framework | undefined) {
     this.framework.set(framework);
