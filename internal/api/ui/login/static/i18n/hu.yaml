@@ -233,6 +233,7 @@ RegistrationUser:
   Russian: Orosz
   Dutch: Holland
   Swedish: Svéd
+  Danish: Dansk
   Indonesian: Indonéz
   Hungarian: Magyar
   Korean: 한국어
@@ -279,6 +280,7 @@ ExternalRegistrationUserOverview:
   Russian: Orosz
   Dutch: Holland
   Swedish: Svéd
+  Danish: Dansk
   Indonesian: Indonéz
   Hungarian: Magyar
   Korean: 한국어
@@ -354,6 +356,7 @@ ExternalNotFound:
   Russian: Orosz
   Dutch: Holland
   Swedish: Svéd
+  Danish: Dansk
   Indonesian: Indonéz
   Hungarian: Magyar
   Korean: 한국어
