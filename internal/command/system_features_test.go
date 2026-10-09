@@ -294,6 +294,7 @@ func TestSystemFeatures_isEmpty(t *testing.T) {
 		{name: "LoginV2 set", sysFeatures: &SystemFeatures{LoginV2: &feature.LoginV2{}}, want: false},
 		{name: "PermissionCheckV2 set", sysFeatures: &SystemFeatures{PermissionCheckV2: gu.Ptr(true)}, want: false},
 		{name: "EnableRelationalTables set", sysFeatures: &SystemFeatures{EnableRelationalTables: gu.Ptr(true)}, want: false},
+		{name: "AllowOTPCodeOverride set", sysFeatures: &SystemFeatures{AllowOTPCodeOverride: gu.Ptr(true)}, want: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
