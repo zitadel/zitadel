@@ -27,7 +27,7 @@ func (s *Server) GetProjectGrantByID(ctx context.Context, req *mgmt_pb.GetProjec
 }
 
 func (s *Server) ListProjectGrants(ctx context.Context, req *mgmt_pb.ListProjectGrantsRequest) (*mgmt_pb.ListProjectGrantsResponse, error) {
-	queries, err := listProjectGrantsRequestToModel(req)
+	queries, err := listProjectGrantsRequestToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (s *Server) ListProjectGrants(ctx context.Context, req *mgmt_pb.ListProject
 }
 
 func (s *Server) ListAllProjectGrants(ctx context.Context, req *mgmt_pb.ListAllProjectGrantsRequest) (*mgmt_pb.ListAllProjectGrantsResponse, error) {
-	queries, err := listAllProjectGrantsRequestToModel(req)
+	queries, err := listAllProjectGrantsRequestToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ func (s *Server) ListProjectGrantMemberRoles(ctx context.Context, req *mgmt_pb.L
 }
 
 func (s *Server) ListProjectGrantMembers(ctx context.Context, req *mgmt_pb.ListProjectGrantMembersRequest) (*mgmt_pb.ListProjectGrantMembersResponse, error) {
-	queries, err := ListProjectGrantMembersRequestToModel(ctx, req)
+	queries, err := ListProjectGrantMembersRequestToModel(ctx, s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}

@@ -189,12 +189,15 @@ func (es *Eventstore) Search(ctx context.Context, conditions ...map[FieldType]an
 	return es.searcher.Search(ctx, conditions...)
 }
 
+// maxFilterCapacity limits the initial capacity of the events in [Eventstore.Filter].
+const maxFilterCapacity = 1000
+
 // Filter filters the stored events based on the searchQuery
 // and maps the events to the defined event structs
 //
 // Deprecated: Use [FilterToQueryReducer] instead to avoid allocations.
 func (es *Eventstore) Filter(ctx context.Context, searchQuery *SearchQueryBuilder) ([]Event, error) {
-	events := make([]Event, 0, searchQuery.GetLimit())
+	events := make([]Event, 0, min(searchQuery.GetLimit(), maxFilterCapacity))
 	searchQuery.ensureInstanceID(ctx)
 	err := es.querier.FilterToReducer(ctx, searchQuery, func(event Event) error {
 		event, err := es.mapEvent(event)

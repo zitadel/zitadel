@@ -19,7 +19,7 @@ func (s *Server) GetMyInstance(ctx context.Context, _ *admin_pb.GetMyInstanceReq
 }
 
 func (s *Server) ListInstanceDomains(ctx context.Context, req *admin_pb.ListInstanceDomainsRequest) (*admin_pb.ListInstanceDomainsResponse, error) {
-	queries, err := ListInstanceDomainsRequestToModel(req)
+	queries, err := ListInstanceDomainsRequestToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (s *Server) ListInstanceDomains(ctx context.Context, req *admin_pb.ListInst
 }
 
 func (s *Server) ListInstanceTrustedDomains(ctx context.Context, req *admin_pb.ListInstanceTrustedDomainsRequest) (*admin_pb.ListInstanceTrustedDomainsResponse, error) {
-	queries, err := ListInstanceTrustedDomainsRequestToModel(req)
+	queries, err := ListInstanceTrustedDomainsRequestToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}

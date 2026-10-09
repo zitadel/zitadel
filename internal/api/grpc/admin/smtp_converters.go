@@ -2,14 +2,18 @@ package admin
 
 import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	settings_pb "github.com/zitadel/zitadel/pkg/grpc/settings"
 )
 
-func listSMTPConfigsToModel(req *admin_pb.ListSMTPConfigsRequest) (*query.SMTPConfigsSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func listSMTPConfigsToModel(defaults systemdefaults.SystemDefaults, req *admin_pb.ListSMTPConfigsRequest) (*query.SMTPConfigsSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	return &query.SMTPConfigsSearchQueries{
 		SearchRequest: query.SearchRequest{
 			Offset: offset,
