@@ -7,7 +7,7 @@ description: "A-10018: List endpoints of the v1 and v2 APIs enforce a default an
 
 Versions: >= v4.20.0
 
-Date: 2026-10-XX
+Date: 2026-10-09
 
 ## Description
 
@@ -23,7 +23,7 @@ This contradicts the API documentation and can cause expensive database queries 
 
 For the v1 APIs, this is a regression: they previously applied a default and maximum limit of 1000 (configured by `SearchLimit`), which was lost during a refactoring.
 
-With this release, the limits are enforced on all list endpoints.
+Starting with v4.20.0, the limits are enforced on all list endpoints.
 
 ## Impact
 
