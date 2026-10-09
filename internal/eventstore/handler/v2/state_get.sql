@@ -1,6 +1,4 @@
--- filter_offset is either events2.in_tx_order (setup 77 already Done) or a
--- row OFFSET count. in_tx_order is the events2 ordinal; the BEFORE UPDATE
--- trigger clears it unless this statement opted in via UPDATE OF in_tx_order.
+-- filter_offset is events2.in_tx_order when setup 77 is Done, else a row OFFSET.
 SELECT
     aggregate_id
     , aggregate_type

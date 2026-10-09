@@ -50,8 +50,7 @@ type Config struct {
 	}
 	SkipInstanceIDs []string
 
-	// FilterOffsetIsCursor is true when setup 77 is stored as done, so
-	// current_states.filter_offset already holds events2.in_tx_order.
+	// FilterOffsetIsCursor is true when setup 77 is stored as done (filter_offset holds events2.in_tx_order).
 	FilterOffsetIsCursor bool
 }
 
