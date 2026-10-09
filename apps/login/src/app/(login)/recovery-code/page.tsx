@@ -1,6 +1,6 @@
 import { Alert } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
-import { LoginPasskey } from "@/components/login-passkey";
+import { LoginRecoveryCode } from "@/components/login-recovery-code";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
@@ -12,21 +12,24 @@ import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("u2f");
+  const t = await getTranslations("recoveryCode");
   return { title: t("verify.title") };
 }
 
 export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
-  const { loginName, requestId, sessionId, organization, altRecoveryCode } = searchParams;
-
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  const branding = await getBrandingSettings({ serviceConfig, organization });
+  const {
+    loginName, // send from password page
+    requestId,
+    sessionId,
+    organization,
+  } = searchParams;
 
-  const sessionFactors = sessionId
+  const session = sessionId
     ? await loadSessionById(sessionId, organization)
     : await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } });
 
@@ -44,44 +47,48 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     });
   }
 
+  const branding = await getBrandingSettings({
+    serviceConfig,
+    organization: organization ?? session?.factors?.user?.organizationId,
+  });
+
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col space-y-4">
         <h1>
-          <Translated i18nKey="verify.title" namespace="u2f" />
+          <Translated i18nKey="verify.title" namespace="recoveryCode" />
         </h1>
 
-        <p className="ztdl-p mb-6 block">
-          <Translated i18nKey="verify.description" namespace="u2f" />
+        <p className="ztdl-p">
+          <Translated i18nKey="verify.description" namespace="recoveryCode" />
         </p>
 
-        {sessionFactors && (
+        {!session && (
+          <div className="py-4">
+            <Alert>
+              <Translated i18nKey="unknownContext" namespace="error" />
+            </Alert>
+          </div>
+        )}
+
+        {session && (
           <UserAvatar
-            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-            displayName={sessionFactors.factors?.user?.displayName}
+            loginName={loginName ?? session.factors?.user?.loginName}
+            displayName={session.factors?.user?.displayName}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
         )}
-
-        {!(loginName || sessionId) && (
-          <Alert>
-            <Translated i18nKey="unknownContext" namespace="error" />
-          </Alert>
-        )}
       </div>
 
       <div className="w-full">
-        {(loginName || sessionId) && (
-          <LoginPasskey
-            loginName={loginName}
+        {session && (
+          <LoginRecoveryCode
+            loginName={loginName ?? session.factors?.user?.loginName}
             sessionId={sessionId}
             requestId={requestId}
-            altPassword={false}
-            altRecoveryCode={altRecoveryCode === "true"}
-            organization={organization}
-            login={false} // this sets the userVerificationRequirement to discouraged as its used as second factor
-          />
+            organization={organization ?? session.factors?.user?.organizationId}
+          ></LoginRecoveryCode>
         )}
       </div>
     </DynamicTheme>

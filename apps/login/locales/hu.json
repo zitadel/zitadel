@@ -310,6 +310,28 @@
       "submit": "Tovább"
     }
   },
+  "recoveryCode": {
+    "verify": {
+      "title": "Kétlépcsős azonosítás igazolása",
+      "description": "Add meg az egyik helyreállítási kódodat. Minden kód csak egyszer használható.",
+      "useRecoveryCode": "Helyreállítási kód használata",
+      "submit": "Tovább",
+      "labels": {
+        "code": "Helyreállítási kód"
+      },
+      "required": {
+        "code": "Ez a mező kötelező"
+      },
+      "errors": {
+        "invalidCode": "A helyreállítási kód érvénytelen, vagy már fel lett használva.",
+        "userLocked": "A fiókodat zároltuk. Kérjük, fordulj a rendszergazdádhoz.",
+        "notReady": "Ehhez a fiókhoz nincsenek beállítva helyreállítási kódok.",
+        "couldNotFindSession": "Nem található munkamenet",
+        "couldNotVerifyCode": "A helyreállítási kódot nem sikerült ellenőrizni",
+        "couldNotDetermineRedirect": "Az ellenőrzés utáni átirányítási URL nem állapítható meg"
+      }
+    }
+  },
   "register": {
     "methods": {
       "passkey": "Jelkulcs",
@@ -434,7 +456,8 @@
       "otpEmail": "Kód e-mailben",
       "otpSms": "Kód SMS-ben",
       "passkey": "Jelkulcs",
-      "password": "Jelszó"
+      "password": "Jelszó",
+      "recoveryCode": "Helyreállítási kód"
     }
   },
   "device": {

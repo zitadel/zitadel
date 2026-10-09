@@ -846,4 +846,68 @@ describe("checkMFAFactors", () => {
 
     expect(result).toBeUndefined();
   });
+
+  it("should offer recovery codes as an alternative on the single factor page", async () => {
+    const authMethods = [AuthenticationMethodType.TOTP, AuthenticationMethodType.RECOVERY_CODE];
+
+    const result = await checkMFAFactors({ baseUrl: "https://example.com" }, mockSession, mockLoginSettings, authMethods);
+
+    expect(result?.redirect).toContain("/otp/time-based");
+    expect(result?.redirect).toContain("altRecoveryCode=true");
+  });
+
+  it("should offer recovery codes as an alternative on the u2f page", async () => {
+    const authMethods = [AuthenticationMethodType.U2F, AuthenticationMethodType.RECOVERY_CODE];
+
+    const result = await checkMFAFactors({ baseUrl: "https://example.com" }, mockSession, mockLoginSettings, authMethods);
+
+    expect(result?.redirect).toContain("/u2f");
+    expect(result?.redirect).toContain("altRecoveryCode=true");
+  });
+
+  it("should not set altRecoveryCode when the user has no recovery codes", async () => {
+    const authMethods = [AuthenticationMethodType.TOTP];
+
+    const result = await checkMFAFactors({ baseUrl: "https://example.com" }, mockSession, mockLoginSettings, authMethods);
+
+    expect(result?.redirect).not.toContain("altRecoveryCode");
+  });
+
+  it("should not treat recovery codes as a selectable second factor", async () => {
+    // a user whose only second factor is recovery codes is treated like a user without MFA
+    const authMethods = [AuthenticationMethodType.RECOVERY_CODE];
+
+    const result = await checkMFAFactors({ baseUrl: "https://example.com" }, mockSession, mockLoginSettings, authMethods);
+
+    expect(result).toBeUndefined();
+  });
+
+  it("should redirect to MFA setup when only recovery codes are available and MFA is forced", async () => {
+    const authMethods = [AuthenticationMethodType.RECOVERY_CODE];
+
+    const result = await checkMFAFactors(
+      { baseUrl: "https://example.com" },
+      mockSession,
+      { ...mockLoginSettings, forceMfa: true },
+      authMethods,
+    );
+
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/mfa/set?"),
+    });
+  });
+
+  it("should redirect to the MFA selection page when recovery codes accompany several factors", async () => {
+    const authMethods = [
+      AuthenticationMethodType.TOTP,
+      AuthenticationMethodType.OTP_SMS,
+      AuthenticationMethodType.RECOVERY_CODE,
+    ];
+
+    const result = await checkMFAFactors({ baseUrl: "https://example.com" }, mockSession, mockLoginSettings, authMethods);
+
+    expect(result).toEqual({
+      redirect: expect.stringContaining("/mfa?"),
+    });
+  });
 });

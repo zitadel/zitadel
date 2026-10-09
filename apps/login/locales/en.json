@@ -310,6 +310,28 @@
       "submit": "Continue"
     }
   },
+  "recoveryCode": {
+    "verify": {
+      "title": "Verify 2-Factor",
+      "description": "Enter one of your recovery codes. Each code can only be used once.",
+      "useRecoveryCode": "Use recovery code",
+      "submit": "Continue",
+      "labels": {
+        "code": "Recovery code"
+      },
+      "required": {
+        "code": "This field is required"
+      },
+      "errors": {
+        "invalidCode": "The recovery code is invalid or has already been used.",
+        "userLocked": "Your account has been locked. Please contact your administrator.",
+        "notReady": "No recovery codes are set up for this account.",
+        "couldNotFindSession": "Could not find session",
+        "couldNotVerifyCode": "Could not verify recovery code",
+        "couldNotDetermineRedirect": "Could not determine redirect URL after verification"
+      }
+    }
+  },
   "register": {
     "methods": {
       "passkey": "Passkey",
@@ -434,7 +456,8 @@
       "otpEmail": "Code via Email",
       "otpSms": "Code via SMS",
       "passkey": "Passkeys",
-      "password": "Password"
+      "password": "Password",
+      "recoveryCode": "Recovery Code"
     }
   },
   "device": {

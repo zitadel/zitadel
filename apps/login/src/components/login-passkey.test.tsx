@@ -1,6 +1,6 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { LoginPasskey } from "./login-passkey";
 
 // Mock next/navigation
@@ -51,6 +51,11 @@ describe("LoginPasskey Component", () => {
         },
       },
     },
+    recoveryCode: {
+      verify: {
+        useRecoveryCode: "Use recovery code",
+      },
+    },
   };
 
   const renderWithIntl = (component: React.ReactElement) => {
@@ -72,6 +77,9 @@ describe("LoginPasskey Component", () => {
     mockSendPasskey = vi.mocked(sendPasskey);
     mockUpdateSession = vi.mocked(updateOrCreateSession);
   });
+
+  // vitest is configured without globals, so testing-library does not auto-cleanup between tests
+  afterEach(cleanup);
 
   describe("Initialization and Challenge Request", () => {
     test("should display error when challenge request fails", async () => {
@@ -396,6 +404,56 @@ describe("LoginPasskey Component", () => {
           }),
         );
       });
+    });
+
+    test("should render the recovery code button when altRecoveryCode is set", async () => {
+      mockUpdateSession.mockResolvedValue({ error: "Test error" });
+
+      renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} altRecoveryCode={true} />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId("recovery-code-button")).toBeInTheDocument();
+      });
+      expect(screen.queryByTestId("password-button")).not.toBeInTheDocument();
+    });
+
+    test("should prefer the password alternative over the recovery code alternative", async () => {
+      mockUpdateSession.mockResolvedValue({ error: "Test error" });
+
+      renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={true} altRecoveryCode={true} />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-button")).toBeInTheDocument();
+      });
+      expect(screen.queryByTestId("recovery-code-button")).not.toBeInTheDocument();
+    });
+
+    test("should navigate to the recovery code page with the session params", async () => {
+      mockUpdateSession.mockResolvedValue({ error: "Test error" });
+
+      renderWithIntl(
+        <LoginPasskey
+          loginName="test@example.com"
+          sessionId="session-123"
+          requestId="oidc_123"
+          organization="org-123"
+          altPassword={false}
+          altRecoveryCode={true}
+        />,
+      );
+
+      const button = await screen.findByTestId("recovery-code-button");
+      fireEvent.click(button);
+
+      expect(mockPush).toHaveBeenCalledTimes(1);
+      const target = mockPush.mock.calls[0][0] as string;
+      expect(target.startsWith("/recovery-code?")).toBe(true);
+
+      const params = new URLSearchParams(target.split("?")[1]);
+      expect(params.get("loginName")).toBe("test@example.com");
+      expect(params.get("sessionId")).toBe("session-123");
+      expect(params.get("requestId")).toBe("oidc_123");
+      expect(params.get("organization")).toBe("org-123");
     });
 
     test("should pass requestId to server actions when provided", async () => {

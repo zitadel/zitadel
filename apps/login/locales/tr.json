@@ -310,6 +310,28 @@
       "submit": "Devam"
     }
   },
+  "recoveryCode": {
+    "verify": {
+      "title": "2 Faktörlü Doğrulama",
+      "description": "Kurtarma kodlarınızdan birini girin. Her kod yalnızca bir kez kullanılabilir.",
+      "useRecoveryCode": "Kurtarma kodu kullan",
+      "submit": "Devam",
+      "labels": {
+        "code": "Kurtarma kodu"
+      },
+      "required": {
+        "code": "Bu alan zorunludur"
+      },
+      "errors": {
+        "invalidCode": "Kurtarma kodu geçersiz veya daha önce kullanılmış.",
+        "userLocked": "Hesabınız kilitlendi. Lütfen yöneticinizle iletişime geçin.",
+        "notReady": "Bu hesap için kurtarma kodu tanımlanmamış.",
+        "couldNotFindSession": "Oturum bulunamadı",
+        "couldNotVerifyCode": "Kurtarma kodu doğrulanamadı",
+        "couldNotDetermineRedirect": "Doğrulama sonrası yönlendirme adresi belirlenemedi"
+      }
+    }
+  },
   "register": {
     "methods": {
       "passkey": "Passkey",
@@ -434,7 +456,8 @@
       "otpEmail": "E-posta ile kod",
       "otpSms": "SMS ile kod",
       "passkey": "Passkey",
-      "password": "Şifre"
+      "password": "Şifre",
+      "recoveryCode": "Kurtarma kodu"
     }
   },
   "device": {

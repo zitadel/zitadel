@@ -23,11 +23,20 @@ type Props = {
   sessionId?: string;
   requestId?: string;
   altPassword: boolean;
+  altRecoveryCode?: boolean;
   login?: boolean;
   organization?: string;
 };
 
-export function LoginPasskey({ loginName, sessionId, requestId, altPassword, organization, login = true }: Props) {
+export function LoginPasskey({
+  loginName,
+  sessionId,
+  requestId,
+  altPassword,
+  altRecoveryCode = false,
+  organization,
+  login = true,
+}: Props) {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
@@ -224,6 +233,35 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
             data-testid="password-button"
           >
             <Translated i18nKey="verify.usePassword" namespace="passkey" />
+          </Button>
+        ) : altRecoveryCode ? (
+          <Button
+            type="button"
+            variant={ButtonVariants.Secondary}
+            onClick={() => {
+              const params = new URLSearchParams();
+
+              if (loginName) {
+                params.append("loginName", loginName);
+              }
+
+              if (sessionId) {
+                params.append("sessionId", sessionId);
+              }
+
+              if (requestId) {
+                params.append("requestId", requestId);
+              }
+
+              if (organization) {
+                params.append("organization", organization);
+              }
+
+              return router.push("/recovery-code?" + params);
+            }}
+            data-testid="recovery-code-button"
+          >
+            <Translated i18nKey="verify.useRecoveryCode" namespace="recoveryCode" />
           </Button>
         ) : (
           <BackButton />
