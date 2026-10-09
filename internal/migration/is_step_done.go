@@ -26,10 +26,14 @@ func (s *stepDoneCheck) AppendEvents(events ...eventstore.Event) {
 		switch event.Type() {
 		case StartedType:
 			s.started = true
+			s.done = false
+			s.failed = false
 		case DoneType:
 			s.done = true
+			s.failed = false
 		case failedType:
 			s.failed = true
+			s.done = false
 		}
 	}
 }
