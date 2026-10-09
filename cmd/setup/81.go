@@ -2,11 +2,17 @@ package setup
 
 import (
 	"context"
+	_ "embed"
 	"fmt"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
+)
+
+var (
+	//go:embed 81.sql
+	commandsToEventsClockTimestampSQL string
 )
 
 type CommandsToEventsClockTimestamp struct {
@@ -19,7 +25,7 @@ func (mig *CommandsToEventsClockTimestamp) Execute(ctx context.Context, _ events
 		return err
 	}
 
-	stmt := fmt.Sprintf(stampEventPositionAtInsert, inTxOrderType)
+	stmt := fmt.Sprintf(commandsToEventsClockTimestampSQL, inTxOrderType)
 	_, err = mig.dbClient.ExecContext(ctx, stmt)
 	if err != nil {
 		return err

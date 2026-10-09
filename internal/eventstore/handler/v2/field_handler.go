@@ -173,14 +173,10 @@ func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState
 	}
 
 	if !h.filterOffsetIsCursor {
-		previousPosition := currentState.cursor.Position
+		prev := currentState.cursor.Position
 		offset := currentState.offset
 		for _, event := range events {
-			offset++
-			if !previousPosition.Equal(event.Position()) {
-				offset = 1
-			}
-			previousPosition = event.Position()
+			prev, offset = nextFilterOffset(prev, offset, event.Position())
 		}
 		currentState.offset = offset
 	}

@@ -31,6 +31,7 @@ BEGIN
 END;
 $$;
 
+-- UPDATE OF in_tx_order is the opt-in; see handler/v2/state_set.sql.
 DROP TRIGGER IF EXISTS current_states_keep_in_tx_order_opt_in ON projections.current_states;
 CREATE TRIGGER current_states_keep_in_tx_order_opt_in
   BEFORE UPDATE OF in_tx_order ON projections.current_states

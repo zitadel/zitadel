@@ -1,3 +1,6 @@
+-- Listing in_tx_order in SET trips projections.current_states_keep_in_tx_order_opt_in
+-- (BEFORE UPDATE OF in_tx_order). Omitting it (old binaries) leaves the GUC unset so
+-- current_states_keep_in_tx_order nulls the column. Do not drop in_tx_order from SET.
 INSERT INTO projections.current_states (
     projection_name
     , instance_id

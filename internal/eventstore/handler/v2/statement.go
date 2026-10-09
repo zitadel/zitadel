@@ -58,12 +58,8 @@ func (h *Handler) eventsToStatements(ctx context.Context, tx *sql.Tx, events []e
 			statement = NewNoOpStatement(event)
 		}
 		if !h.filterOffsetIsCursor {
-			offset++
-			if !previousPosition.Equal(event.Position()) {
-				offset = 1
-			}
+			previousPosition, offset = nextFilterOffset(previousPosition, offset, event.Position())
 			statement.offset = offset
-			previousPosition = event.Position()
 		}
 		statements = append(statements, statement)
 	}

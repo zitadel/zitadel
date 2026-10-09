@@ -660,10 +660,6 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	}
 
 	additionalIteration = eventAmount == int(h.bulkLimit)
-	if len(statements) < len(events) {
-		// retry immediately if statements failed
-		additionalIteration = true
-	}
 
 	return statements, additionalIteration, nil
 }
@@ -721,16 +717,14 @@ func (h *Handler) eventQuery(currentState *state, minPosition decimal.Decimal) *
 		OrderAsc().
 		InstanceID(currentState.instanceID)
 
-	offsetResume := false
-	if minPosition.GreaterThan(decimal.NewFromInt(0)) {
-		builder = builder.PositionAtLeast(minPosition)
-	} else if h.resumeAfterSortKey(currentState) {
+	r := h.resumeFrom(currentState, minPosition)
+	switch {
+	case r.afterSortKey:
 		builder = builder.AfterEventSortKey(currentState.cursor)
-	} else if currentState.cursor.Position.GreaterThan(decimal.Decimal{}) {
-		builder = builder.PositionAtLeast(currentState.cursor.Position)
-		if currentState.offset > 0 {
-			builder = builder.Offset(currentState.offset)
-			offsetResume = true
+	case !r.position.IsZero():
+		builder = builder.PositionAtLeast(r.position)
+		if r.offset > 0 {
+			builder = builder.Offset(r.offset)
 		}
 	}
 
@@ -739,7 +733,7 @@ func (h *Handler) eventQuery(currentState *state, minPosition decimal.Decimal) *
 	}
 
 	// OFFSET resume cannot scan event types separately (repository requires Offset == 0).
-	if offsetResume {
+	if r.offset > 0 {
 		return h.eventQuerySingle(builder)
 	}
 
@@ -766,13 +760,6 @@ func (h *Handler) eventQuerySingle(builder *eventstore.SearchQueryBuilder) *even
 		eventTypes = append(eventTypes, events...)
 	}
 	return builder.AddQuery().AggregateTypes(aggregateTypes...).EventTypes(eventTypes...).Builder()
-}
-
-func (h *Handler) resumeAfterSortKey(currentState *state) bool {
-	if currentState.cursor.IsZero() {
-		return false
-	}
-	return h.filterOffsetIsCursor || currentState.inTxOrderSet
 }
 
 // ProjectionName returns the name of the underlying projection.
