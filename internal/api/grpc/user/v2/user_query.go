@@ -28,7 +28,7 @@ func (s *Server) GetUserByID(ctx context.Context, req *connect.Request[user.GetU
 }
 
 func (s *Server) ListUsers(ctx context.Context, req *connect.Request[user.ListUsersRequest]) (*connect.Response[user.ListUsersResponse], error) {
-	queries, err := convert.ListUsersRequestToModel(req.Msg)
+	queries, err := convert.ListUsersRequestToModel(s.systemDefaults, req.Msg)
 	if err != nil {
 		return nil, err
 	}

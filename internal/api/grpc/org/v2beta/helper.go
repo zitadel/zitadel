@@ -16,7 +16,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	v2beta "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
@@ -160,9 +159,10 @@ func FieldNameToOrgColumn(fieldName v2beta_org.OrgFieldName) query.Column {
 	case v2beta_org.OrgFieldName_ORG_FIELD_NAME_CREATION_DATE:
 		return query.OrgColumnCreationDate
 	case v2beta_org.OrgFieldName_ORG_FIELD_NAME_UNSPECIFIED:
-		return query.Column{}
+		// sort by the ID by default, so the results can be paginated reliably
+		return query.OrgColumnID
 	default:
-		return query.Column{}
+		return query.OrgColumnID
 	}
 }
 
@@ -184,13 +184,6 @@ func ListOrgDomainsRequestToModel(systemDefaults systemdefaults.SystemDefaults, 
 		// SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil
-}
-
-func ListQueryToModel(query *v2beta.ListQuery) (offset, limit uint64, asc bool) {
-	if query == nil {
-		return 0, 0, false
-	}
-	return query.Offset, uint64(query.Limit), query.Asc
 }
 
 func DomainQueriesToModel(queries []*v2beta_org.DomainSearchFilter) (_ []query.SearchQuery, err error) {

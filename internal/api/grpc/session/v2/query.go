@@ -11,6 +11,7 @@ import (
 	sessionv2 "github.com/zitadel/zitadel/backend/v3/api/session/v2"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -42,7 +43,7 @@ func (s *Server) ListSessions(ctx context.Context, req *connect.Request[session.
 	if authz.GetFeatures(ctx).EnableRelationalTables {
 		return sessionv2.ListSessions(ctx, req)
 	}
-	queries, err := listSessionsRequestToQuery(ctx, req.Msg)
+	queries, err := listSessionsRequestToQuery(ctx, s.systemDefaults, req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -56,8 +57,11 @@ func (s *Server) ListSessions(ctx context.Context, req *connect.Request[session.
 	}), nil
 }
 
-func listSessionsRequestToQuery(ctx context.Context, req *session.ListSessionsRequest) (*query.SessionsSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToQuery(req.Query)
+func listSessionsRequestToQuery(ctx context.Context, defaults systemdefaults.SystemDefaults, req *session.ListSessionsRequest) (*query.SessionsSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToQuery(defaults, req.GetQuery())
+	if err != nil {
+		return nil, err
+	}
 	queries, err := sessionQueriesToQuery(ctx, req.GetQueries())
 	if err != nil {
 		return nil, err
@@ -159,9 +163,10 @@ func fieldNameToSessionColumn(field session.SessionFieldName) query.Column {
 	case session.SessionFieldName_SESSION_FIELD_NAME_CREATION_DATE:
 		return query.SessionColumnCreationDate
 	case session.SessionFieldName_SESSION_FIELD_NAME_UNSPECIFIED:
-		return query.Column{}
+		// sort by the ID by default, so the results can be paginated reliably
+		return query.SessionColumnID
 	default:
-		return query.Column{}
+		return query.SessionColumnID
 	}
 }
 

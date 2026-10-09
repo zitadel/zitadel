@@ -14,6 +14,7 @@ import (
 
 	object "github.com/zitadel/zitadel/internal/api/grpc/object/v2beta"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -42,7 +43,7 @@ func (s *Server) GetSession(ctx context.Context, req *connect.Request[session.Ge
 }
 
 func (s *Server) ListSessions(ctx context.Context, req *connect.Request[session.ListSessionsRequest]) (*connect.Response[session.ListSessionsResponse], error) {
-	queries, err := listSessionsRequestToQuery(ctx, req.Msg)
+	queries, err := listSessionsRequestToQuery(ctx, s.systemDefaults, req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -237,8 +238,11 @@ func userFactorToPb(factor query.SessionUserFactor) *session.UserFactor {
 	}
 }
 
-func listSessionsRequestToQuery(ctx context.Context, req *session.ListSessionsRequest) (*query.SessionsSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToQuery(req.Query)
+func listSessionsRequestToQuery(ctx context.Context, defaults systemdefaults.SystemDefaults, req *session.ListSessionsRequest) (*query.SessionsSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToQuery(defaults, req.GetQuery())
+	if err != nil {
+		return nil, err
+	}
 	queries, err := sessionQueriesToQuery(ctx, req.GetQueries())
 	if err != nil {
 		return nil, err
@@ -292,10 +296,10 @@ func fieldNameToSessionColumn(field session.SessionFieldName) query.Column {
 	case session.SessionFieldName_SESSION_FIELD_NAME_CREATION_DATE:
 		return query.SessionColumnCreationDate
 	case session.SessionFieldName_SESSION_FIELD_NAME_UNSPECIFIED:
-		// Handle all remaining cases so the linter succeeds
-		return query.Column{}
+		// sort by the ID by default, so the results can be paginated reliably
+		return query.SessionColumnID
 	default:
-		return query.Column{}
+		return query.SessionColumnID
 	}
 }
 
