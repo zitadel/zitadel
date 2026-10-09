@@ -32,6 +32,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
@@ -81,6 +82,7 @@ func NewConfig(cmd *cobra.Command, v *viper.Viper) (*Config, instrumentation.Shu
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 			hooks.SliceTypeStringDecode[*domain.CustomMessageText],
 			hooks.SliceTypeStringDecode[authz.RoleMapping],
+			hooks.SliceTypeStringDecode[smtp.RuleConfig],
 			hooks.MapTypeStringDecode[string, *authz.SystemAPIUser],
 			hooks.MapHTTPHeaderStringDecode,
 			database.DecodeHook(false),

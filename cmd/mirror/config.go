@@ -21,6 +21,7 @@ import (
 	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 )
 
 type Migration struct {
@@ -89,6 +90,7 @@ func newConfig(v *viper.Viper, config any) error {
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 			hooks.SliceTypeStringDecode[*domain.CustomMessageText],
 			hooks.SliceTypeStringDecode[*command.SetQuota],
+			hooks.SliceTypeStringDecode[smtp.RuleConfig],
 			hooks.SliceTypeStringDecode[internal_authz.RoleMapping],
 			hooks.MapTypeStringDecode[string, *internal_authz.SystemAPIUser],
 			hooks.MapTypeStringDecode[domain.Feature, any],

@@ -602,6 +602,32 @@ Notifications:
   MaxAttempts: 3 # ZITADEL_NOTIFICATIONS_MAXATTEMPTS
   # Automatically cancel the notification if it cannot be handled within a specific time
   MaxTtl: 5m  # ZITADEL_NOTIFICATIONS_MAXTTL
+  # Rules are applied to the emails sent through a matching SMTP provider.
+  # They allow operators to restrict and tag emails of a provider they are responsible for,
+  # e.g. a default provider shared by multiple instances.
+  # The rules cannot be changed through the API. If multiple rules match, the first one is applied.
+  # The environment variable expects a JSON array.
+  # SMTPRules:
+  #   - Match:
+  #       # Every defined criterion must match. Without any criterion the rule matches all SMTP providers.
+  #       # Hosts of the SMTP provider. An entry without port matches any port.
+  #       Hosts:
+  #         - smtp.example.com
+  #       # Usernames of the SMTP authentication, e.g. the token of the provider. They identify the account
+  #       # of the provider, as opposed to the sender address, which can be changed in the provider config.
+  #       Users:
+  #         - token
+  #       # Domains of the sender address.
+  #       SenderDomains:
+  #         - example.com
+  #     # Removes HTML from custom message texts. Simple formatting (br, strong, b, em, i, u, p) is kept,
+  #     # all other elements like links, images or styles are removed, their text is kept.
+  #     RestrictCustomHTML: true
+  #     # Headers are added to every email. The names are canonicalized (X-Instance-Id),
+  #     # the values can contain text and the placeholders {{.InstanceID}} and {{.OrgID}}.
+  #     Headers:
+  #       X-Instance-ID: "{{.InstanceID}}"
+  SMTPRules: [] # ZITADEL_NOTIFICATIONS_SMTPRULES
 
 Executions:
   # The amount of workers processing the execution request events.
