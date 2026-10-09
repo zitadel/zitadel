@@ -654,6 +654,7 @@
     "IAM_OWNER_VIEWER": "Tüm organizasyonlar dahil olmak üzere tüm örneği gözden geçirme iznine sahiptir",
     "IAM_ORG_MANAGER": "Organizasyonları oluşturma ve yönetme iznine sahiptir",
     "IAM_USER_MANAGER": "Kullanıcıları oluşturma ve yönetme iznine sahiptir",
+    "IAM_USER_VIEWER": "Kullanıcıları görüntüleme iznine sahiptir",
     "IAM_ADMIN_IMPERSONATOR": "Tüm organizasyonlardan admin ve son kullanıcıların kimliğine bürünme iznine sahiptir",
     "IAM_END_USER_IMPERSONATOR": "Tüm organizasyonlardan son kullanıcıların kimliğine bürünme iznine sahiptir",
     "IAM_LOGIN_CLIENT": "Giriş uygulamalarını yönetme iznine sahiptir",

@@ -653,6 +653,7 @@
     "IAM_OWNER_VIEWER": "Ha l'autorizzazione per esaminare l'intera istanza, comprese tutte le organizzazioni",
     "IAM_ORG_MANAGER": "Ha il permesso di creare e gestire organizzazioni",
     "IAM_USER_MANAGER": "Ha l'autorizzazione per creare e gestire utenti",
+    "IAM_USER_VIEWER": "Ha l'autorizzazione per visualizzare gli utenti",
     "IAM_ADMIN_IMPERSONATOR": "Dispone dell'autorizzazione per rappresentare l'amministratore e gli utenti finali di tutte le organizzazioni",
     "IAM_END_USER_IMPERSONATOR": "Dispone dell'autorizzazione per rappresentare gli utenti finali di tutte le organizzazioni",
     "IAM_LOGIN_CLIENT": "Ha il permesso di gestire le applicazioni di accesso",

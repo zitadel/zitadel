@@ -654,6 +654,7 @@
     "IAM_OWNER_VIEWER": "すべての組織を含むインスタンス全体を閲覧する権限を持ちます",
     "IAM_ORG_MANAGER": "組織の作成および管理する権限を持ちます",
     "IAM_USER_MANAGER": "ユーザーの作成および管理する権限を持ちます",
+    "IAM_USER_VIEWER": "ユーザーを閲覧する権限を持ちます",
     "IAM_ADMIN_IMPERSONATOR": "すべての組織の管理者およびエンドユーザーになりすます権限を持っています",
     "IAM_END_USER_IMPERSONATOR": "すべての組織のエンドユーザーになりすます権限を持っています",
     "IAM_LOGIN_CLIENT": "ログインアプリケーションを管理する権限を持っています",
