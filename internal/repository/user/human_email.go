@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -179,28 +180,34 @@ func HumanEmailCodeAddedEventMapper(event eventstore.Event) (eventstore.Event, e
 
 type HumanEmailCodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	// DeliveryInfo states the provider the email was sent through or that the delivery was suppressed.
+	senders.DeliveryInfo
 }
 
+// Payload returns nil if no delivery information is set, as the event had no payload before it was introduced.
 func (e *HumanEmailCodeSentEvent) Payload() interface{} {
-	return nil
+	if e.DeliveryInfo == (senders.DeliveryInfo{}) {
+		return nil
+	}
+	return e
 }
 
 func (e *HumanEmailCodeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func NewHumanEmailCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanEmailCodeSentEvent {
+func (e *HumanEmailCodeSentEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewHumanEmailCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate, deliveryInfo senders.DeliveryInfo) *HumanEmailCodeSentEvent {
 	return &HumanEmailCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			HumanEmailCodeSentType,
 		),
+		DeliveryInfo: deliveryInfo,
 	}
-}
-
-func HumanEmailCodeSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	return &HumanEmailCodeSentEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
 }
