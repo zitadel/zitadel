@@ -7,7 +7,7 @@ import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
-import { combineLatest, Observable, of } from 'rxjs';
+import { combineLatest, EMPTY, from, Observable, of } from 'rxjs';
 import { distinctUntilChanged, filter, map, startWith, switchMap, tap } from 'rxjs/operators';
 
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
@@ -208,17 +208,17 @@ export class AppComponent {
         filter(Boolean),
         distinctUntilChanged(),
         // don't show the counts of the previous org
-        tap(() => this.mgmtService.resetProjectCounts()),
+        tap(() => this.mgmtService.setProjectCounts(0, 0)),
       ),
       this.authService.isAllowed(['project.read']),
     ])
       .pipe(
-        filter(([, allowed]) => allowed),
-        map(([orgId]) => orgId),
-        distinctUntilChanged(),
+        distinctUntilChanged(([orgA, allowedA], [orgB, allowedB]) => orgA === orgB && allowedA === allowedB),
+        // switching the org (or losing the permission) drops the pending counts of the previous org
+        switchMap(([, allowed]) => (allowed ? from(this.mgmtService.getProjectCounts()) : EMPTY)),
         takeUntilDestroyed(),
       )
-      .subscribe(() => this.mgmtService.loadProjectCounts());
+      .subscribe(({ owned, granted }) => this.mgmtService.setProjectCounts(owned, granted));
 
     this.activatedRoute.queryParamMap
       .pipe(

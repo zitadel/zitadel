@@ -2261,17 +2261,24 @@ export class ManagementService {
   }
 
   /**
-   * Loads the number of owned and granted projects of the active organization.
+   * Returns the number of owned and granted projects of the active organization.
    * Only the total results are needed, so a single project is requested.
+   * A count which can't be loaded is returned as 0.
    */
-  public loadProjectCounts(): void {
-    this.listProjects(1, 0).then((resp) => this.ownedProjectsCount.next(resp.details?.totalResult ?? 0));
-    this.listGrantedProjects(1, 0).then((resp) => this.grantedProjectsCount.next(resp.details?.totalResult ?? 0));
+  public getProjectCounts(): Promise<{ owned: number; granted: number }> {
+    return Promise.all([
+      this.listProjects(1, 0)
+        .then((resp) => resp.details?.totalResult ?? 0)
+        .catch(() => 0),
+      this.listGrantedProjects(1, 0)
+        .then((resp) => resp.details?.totalResult ?? 0)
+        .catch(() => 0),
+    ]).then(([owned, granted]) => ({ owned, granted }));
   }
 
-  public resetProjectCounts(): void {
-    this.ownedProjectsCount.next(0);
-    this.grantedProjectsCount.next(0);
+  public setProjectCounts(owned: number, granted: number): void {
+    this.ownedProjectsCount.next(owned);
+    this.grantedProjectsCount.next(granted);
   }
 
   public getOIDCInformation(): Promise<GetOIDCInformationResponse.AsObject> {
