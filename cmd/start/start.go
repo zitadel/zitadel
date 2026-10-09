@@ -523,7 +523,7 @@ func startAPIs(
 		return nil, fmt.Errorf("error starting admin repo: %w", err)
 	}
 
-	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain), tlsConfig); err != nil {
+	if err := apis.RegisterServer(ctx, system.CreateServer(config.SystemDefaults, commands, queries, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain), tlsConfig); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, instance_v2beta.CreateServer(config.SystemDefaults, commands, queries, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain)); err != nil {
@@ -532,7 +532,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, instance_v2.CreateServer(config.SystemDefaults, commands, queries, config.DefaultInstance, config.ExternalDomain, permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.DatabaseName(), commands, queries, keys.User, config.AuditLogRetention), tlsConfig); err != nil {
+	if err := apis.RegisterServer(ctx, admin.CreateServer(config.SystemDefaults, config.Database.DatabaseName(), commands, queries, keys.User, config.AuditLogRetention), tlsConfig); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, keys.User), tlsConfig); err != nil {

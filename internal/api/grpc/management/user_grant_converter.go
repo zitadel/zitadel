@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -13,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
-func ListUserGrantsRequestToQuery(ctx context.Context, req *mgmt_pb.ListUserGrantRequest) (*query.UserGrantsQueries, error) {
+func ListUserGrantsRequestToQuery(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListUserGrantRequest) (*query.UserGrantsQueries, error) {
 	queries, err := user_grpc.UserGrantQueriesToQuery(ctx, req.Queries)
 	if err != nil {
 		return nil, err
@@ -27,7 +28,10 @@ func ListUserGrantsRequestToQuery(ctx context.Context, req *mgmt_pb.ListUserGran
 		queries = append(queries, ownerQuery)
 	}
 
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	request := &query.UserGrantsQueries{
 		SearchRequest: query.SearchRequest{
 			Offset: offset,

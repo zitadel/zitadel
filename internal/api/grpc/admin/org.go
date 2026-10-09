@@ -54,7 +54,7 @@ func (s *Server) GetOrgByID(ctx context.Context, req *admin_pb.GetOrgByIDRequest
 }
 
 func (s *Server) ListOrgs(ctx context.Context, req *admin_pb.ListOrgsRequest) (*admin_pb.ListOrgsResponse, error) {
-	queries, err := listOrgRequestToModel(req)
+	queries, err := listOrgRequestToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}

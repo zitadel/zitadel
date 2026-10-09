@@ -14,8 +14,6 @@ import (
 )
 
 type OrgRepository struct {
-	SearchLimit uint64
-
 	Eventstore     *eventstore.Eventstore
 	View           *auth_view.View
 	SystemDefaults systemdefaults.SystemDefaults
