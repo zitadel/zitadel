@@ -255,6 +255,7 @@
       "smsDescription": "Wprowadź swój numer telefonu, aby otrzymać kod SMS-em.",
       "emailDescription": "Wprowadź swój adres e-mail, aby otrzymać kod e-mailem.",
       "totpRegisterDescription": "Zeskanuj kod QR lub otwórz adres URL ręcznie.",
+      "manualSetupDescription": "Nie możesz zeskanować kodu QR? Wprowadź ten klucz w aplikacji uwierzytelniającej.",
       "submit": "Kontynuuj",
       "labels": {
         "code": "Kod"

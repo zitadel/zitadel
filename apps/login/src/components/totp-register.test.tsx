@@ -30,4 +30,18 @@ describe("TotpRegister", () => {
     const { getByTestId } = render(<TotpRegister uri="otpauth://totp/test" secret="SECRET" />);
     expect(getByTestId("code-text-input")).toHaveFocus();
   });
+
+  test("should show the secret as a manual setup key", () => {
+    const { getByTestId, getByText } = render(
+      <TotpRegister uri="otpauth://totp/test?secret=EXAMPLESECRET" secret="EXAMPLESECRET" />,
+    );
+    expect(getByText("set.manualSetupDescription")).toBeInTheDocument();
+    expect(getByTestId("totp-secret")).toHaveTextContent(/^EXAMPLESECRET$/);
+  });
+
+  test("should not show a manual setup key without a secret", () => {
+    const { queryByTestId, queryByText } = render(<TotpRegister uri="otpauth://totp/test" secret="" />);
+    expect(queryByText("set.manualSetupDescription")).not.toBeInTheDocument();
+    expect(queryByTestId("totp-secret")).not.toBeInTheDocument();
+  });
 });

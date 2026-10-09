@@ -248,6 +248,7 @@
       "smsDescription": "SMSでコードを受信する電話番号を入力してください。",
       "emailDescription": "メールでコードを受信するメールアドレスを入力してください。",
       "totpRegisterDescription": "QRコードをスキャンするか、URLに手動でアクセスしてください。",
+      "manualSetupDescription": "QRコードをスキャンできない場合は、認証アプリにこのキーを入力してください。",
       "submit": "続行",
       "labels": {
         "code": "コード"
