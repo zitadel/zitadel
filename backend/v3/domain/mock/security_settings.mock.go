@@ -44,6 +44,44 @@ func (m *MockSecuritySettingsRepository) EXPECT() *MockSecuritySettingsRepositor
 	return m.recorder
 }
 
+// AddClientIDMetadataDocumentAllowedURL mocks base method.
+func (m *MockSecuritySettingsRepository) AddClientIDMetadataDocumentAllowedURL(value string) database.Change {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddClientIDMetadataDocumentAllowedURL", value)
+	ret0, _ := ret[0].(database.Change)
+	return ret0
+}
+
+// AddClientIDMetadataDocumentAllowedURL indicates an expected call of AddClientIDMetadataDocumentAllowedURL.
+func (mr *MockSecuritySettingsRepositoryMockRecorder) AddClientIDMetadataDocumentAllowedURL(value any) *MockSecuritySettingsRepositoryAddClientIDMetadataDocumentAllowedURLCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddClientIDMetadataDocumentAllowedURL", reflect.TypeOf((*MockSecuritySettingsRepository)(nil).AddClientIDMetadataDocumentAllowedURL), value)
+	return &MockSecuritySettingsRepositoryAddClientIDMetadataDocumentAllowedURLCall{Call: call}
+}
+
+// MockSecuritySettingsRepositoryAddClientIDMetadataDocumentAllowedURLCall wrap *gomock.Call
+type MockSecuritySettingsRepositoryAddClientIDMetadataDocumentAllowedURLCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockSecuritySettingsRepositoryAddClientIDMetadataDocumentAllowedURLCall) Return(arg0 database.Change) *MockSecuritySettingsRepositoryAddClientIDMetadataDocumentAllowedURLCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockSecuritySettingsRepositoryAddClientIDMetadataDocumentAllowedURLCall) Do(f func(string) database.Change) *MockSecuritySettingsRepositoryAddClientIDMetadataDocumentAllowedURLCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockSecuritySettingsRepositoryAddClientIDMetadataDocumentAllowedURLCall) DoAndReturn(f func(string) database.Change) *MockSecuritySettingsRepositoryAddClientIDMetadataDocumentAllowedURLCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // CreatedAtColumn mocks base method.
 func (m *MockSecuritySettingsRepository) CreatedAtColumn() database.Column {
 	m.ctrl.T.Helper()
@@ -513,6 +551,44 @@ func (c *MockSecuritySettingsRepositoryPrimaryKeyConditionCall) DoAndReturn(f fu
 	return c
 }
 
+// RemoveClientIDMetadataDocumentAllowedURL mocks base method.
+func (m *MockSecuritySettingsRepository) RemoveClientIDMetadataDocumentAllowedURL(value string) database.Change {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveClientIDMetadataDocumentAllowedURL", value)
+	ret0, _ := ret[0].(database.Change)
+	return ret0
+}
+
+// RemoveClientIDMetadataDocumentAllowedURL indicates an expected call of RemoveClientIDMetadataDocumentAllowedURL.
+func (mr *MockSecuritySettingsRepositoryMockRecorder) RemoveClientIDMetadataDocumentAllowedURL(value any) *MockSecuritySettingsRepositoryRemoveClientIDMetadataDocumentAllowedURLCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveClientIDMetadataDocumentAllowedURL", reflect.TypeOf((*MockSecuritySettingsRepository)(nil).RemoveClientIDMetadataDocumentAllowedURL), value)
+	return &MockSecuritySettingsRepositoryRemoveClientIDMetadataDocumentAllowedURLCall{Call: call}
+}
+
+// MockSecuritySettingsRepositoryRemoveClientIDMetadataDocumentAllowedURLCall wrap *gomock.Call
+type MockSecuritySettingsRepositoryRemoveClientIDMetadataDocumentAllowedURLCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockSecuritySettingsRepositoryRemoveClientIDMetadataDocumentAllowedURLCall) Return(arg0 database.Change) *MockSecuritySettingsRepositoryRemoveClientIDMetadataDocumentAllowedURLCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockSecuritySettingsRepositoryRemoveClientIDMetadataDocumentAllowedURLCall) Do(f func(string) database.Change) *MockSecuritySettingsRepositoryRemoveClientIDMetadataDocumentAllowedURLCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockSecuritySettingsRepositoryRemoveClientIDMetadataDocumentAllowedURLCall) DoAndReturn(f func(string) database.Change) *MockSecuritySettingsRepositoryRemoveClientIDMetadataDocumentAllowedURLCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Set mocks base method.
 func (m *MockSecuritySettingsRepository) Set(ctx context.Context, client database.QueryExecutor, settings *domain.SecuritySettings) error {
 	m.ctrl.T.Helper()
@@ -623,6 +699,163 @@ func (c *MockSecuritySettingsRepositorySetAllowedOriginsCall) Do(f func([]string
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
 func (c *MockSecuritySettingsRepositorySetAllowedOriginsCall) DoAndReturn(f func([]string) json.JsonUpdate) *MockSecuritySettingsRepositorySetAllowedOriginsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SetClientIDMetadataDocumentAllowAnyURL mocks base method.
+func (m *MockSecuritySettingsRepository) SetClientIDMetadataDocumentAllowAnyURL(value bool) json.JsonUpdate {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetClientIDMetadataDocumentAllowAnyURL", value)
+	ret0, _ := ret[0].(json.JsonUpdate)
+	return ret0
+}
+
+// SetClientIDMetadataDocumentAllowAnyURL indicates an expected call of SetClientIDMetadataDocumentAllowAnyURL.
+func (mr *MockSecuritySettingsRepositoryMockRecorder) SetClientIDMetadataDocumentAllowAnyURL(value any) *MockSecuritySettingsRepositorySetClientIDMetadataDocumentAllowAnyURLCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetClientIDMetadataDocumentAllowAnyURL", reflect.TypeOf((*MockSecuritySettingsRepository)(nil).SetClientIDMetadataDocumentAllowAnyURL), value)
+	return &MockSecuritySettingsRepositorySetClientIDMetadataDocumentAllowAnyURLCall{Call: call}
+}
+
+// MockSecuritySettingsRepositorySetClientIDMetadataDocumentAllowAnyURLCall wrap *gomock.Call
+type MockSecuritySettingsRepositorySetClientIDMetadataDocumentAllowAnyURLCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockSecuritySettingsRepositorySetClientIDMetadataDocumentAllowAnyURLCall) Return(arg0 json.JsonUpdate) *MockSecuritySettingsRepositorySetClientIDMetadataDocumentAllowAnyURLCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockSecuritySettingsRepositorySetClientIDMetadataDocumentAllowAnyURLCall) Do(f func(bool) json.JsonUpdate) *MockSecuritySettingsRepositorySetClientIDMetadataDocumentAllowAnyURLCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockSecuritySettingsRepositorySetClientIDMetadataDocumentAllowAnyURLCall) DoAndReturn(f func(bool) json.JsonUpdate) *MockSecuritySettingsRepositorySetClientIDMetadataDocumentAllowAnyURLCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SetClientIDMetadataDocumentAllowedURLs mocks base method.
+func (m *MockSecuritySettingsRepository) SetClientIDMetadataDocumentAllowedURLs(values []string) json.JsonUpdate {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetClientIDMetadataDocumentAllowedURLs", values)
+	ret0, _ := ret[0].(json.JsonUpdate)
+	return ret0
+}
+
+// SetClientIDMetadataDocumentAllowedURLs indicates an expected call of SetClientIDMetadataDocumentAllowedURLs.
+func (mr *MockSecuritySettingsRepositoryMockRecorder) SetClientIDMetadataDocumentAllowedURLs(values any) *MockSecuritySettingsRepositorySetClientIDMetadataDocumentAllowedURLsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetClientIDMetadataDocumentAllowedURLs", reflect.TypeOf((*MockSecuritySettingsRepository)(nil).SetClientIDMetadataDocumentAllowedURLs), values)
+	return &MockSecuritySettingsRepositorySetClientIDMetadataDocumentAllowedURLsCall{Call: call}
+}
+
+// MockSecuritySettingsRepositorySetClientIDMetadataDocumentAllowedURLsCall wrap *gomock.Call
+type MockSecuritySettingsRepositorySetClientIDMetadataDocumentAllowedURLsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockSecuritySettingsRepositorySetClientIDMetadataDocumentAllowedURLsCall) Return(arg0 json.JsonUpdate) *MockSecuritySettingsRepositorySetClientIDMetadataDocumentAllowedURLsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockSecuritySettingsRepositorySetClientIDMetadataDocumentAllowedURLsCall) Do(f func([]string) json.JsonUpdate) *MockSecuritySettingsRepositorySetClientIDMetadataDocumentAllowedURLsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockSecuritySettingsRepositorySetClientIDMetadataDocumentAllowedURLsCall) DoAndReturn(f func([]string) json.JsonUpdate) *MockSecuritySettingsRepositorySetClientIDMetadataDocumentAllowedURLsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SetColumns mocks base method.
+func (m *MockSecuritySettingsRepository) SetColumns(ctx context.Context, client database.QueryExecutor, settings *domain.Settings, changes ...database.Change) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, client, settings}
+	for _, a := range changes {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SetColumns", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetColumns indicates an expected call of SetColumns.
+func (mr *MockSecuritySettingsRepositoryMockRecorder) SetColumns(ctx, client, settings any, changes ...any) *MockSecuritySettingsRepositorySetColumnsCall {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, client, settings}, changes...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetColumns", reflect.TypeOf((*MockSecuritySettingsRepository)(nil).SetColumns), varargs...)
+	return &MockSecuritySettingsRepositorySetColumnsCall{Call: call}
+}
+
+// MockSecuritySettingsRepositorySetColumnsCall wrap *gomock.Call
+type MockSecuritySettingsRepositorySetColumnsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockSecuritySettingsRepositorySetColumnsCall) Return(arg0 error) *MockSecuritySettingsRepositorySetColumnsCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockSecuritySettingsRepositorySetColumnsCall) Do(f func(context.Context, database.QueryExecutor, *domain.Settings, ...database.Change) error) *MockSecuritySettingsRepositorySetColumnsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockSecuritySettingsRepositorySetColumnsCall) DoAndReturn(f func(context.Context, database.QueryExecutor, *domain.Settings, ...database.Change) error) *MockSecuritySettingsRepositorySetColumnsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SetEnableClientIDMetadataDocument mocks base method.
+func (m *MockSecuritySettingsRepository) SetEnableClientIDMetadataDocument(value bool) json.JsonUpdate {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetEnableClientIDMetadataDocument", value)
+	ret0, _ := ret[0].(json.JsonUpdate)
+	return ret0
+}
+
+// SetEnableClientIDMetadataDocument indicates an expected call of SetEnableClientIDMetadataDocument.
+func (mr *MockSecuritySettingsRepositoryMockRecorder) SetEnableClientIDMetadataDocument(value any) *MockSecuritySettingsRepositorySetEnableClientIDMetadataDocumentCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetEnableClientIDMetadataDocument", reflect.TypeOf((*MockSecuritySettingsRepository)(nil).SetEnableClientIDMetadataDocument), value)
+	return &MockSecuritySettingsRepositorySetEnableClientIDMetadataDocumentCall{Call: call}
+}
+
+// MockSecuritySettingsRepositorySetEnableClientIDMetadataDocumentCall wrap *gomock.Call
+type MockSecuritySettingsRepositorySetEnableClientIDMetadataDocumentCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockSecuritySettingsRepositorySetEnableClientIDMetadataDocumentCall) Return(arg0 json.JsonUpdate) *MockSecuritySettingsRepositorySetEnableClientIDMetadataDocumentCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockSecuritySettingsRepositorySetEnableClientIDMetadataDocumentCall) Do(f func(bool) json.JsonUpdate) *MockSecuritySettingsRepositorySetEnableClientIDMetadataDocumentCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockSecuritySettingsRepositorySetEnableClientIDMetadataDocumentCall) DoAndReturn(f func(bool) json.JsonUpdate) *MockSecuritySettingsRepositorySetEnableClientIDMetadataDocumentCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

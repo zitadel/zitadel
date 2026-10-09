@@ -2,12 +2,14 @@ package command
 
 import (
 	"context"
+	"slices"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type SecurityPolicy struct {
@@ -17,11 +19,32 @@ type SecurityPolicy struct {
 
 	EnableDynamicClientRegistration               bool
 	AllowUnauthenticatedDynamicClientRegistration bool
+
+	EnableClientIDMetadataDocument bool
+	// ClientIDMetadataDocumentAllowedURLs are the client_id URLs the instance resolves as Client
+	// ID Metadata Documents, within the URLs the system allows.
+	ClientIDMetadataDocumentAllowedURLs []string
+	// ClientIDMetadataDocumentAllowAnyURL lets the instance resolve every client_id URL the system
+	// allows, regardless of ClientIDMetadataDocumentAllowedURLs.
+	ClientIDMetadataDocumentAllowAnyURL bool
 }
 
 func (c *Commands) SetSecurityPolicy(ctx context.Context, policy *SecurityPolicy) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareSetSecurityPolicy(instanceAgg, policy)
+	return c.pushSecurityPolicy(ctx, c.prepareSetSecurityPolicy(instanceAgg, policy))
+}
+
+// SetLegacySecurityPolicy sets the security settings the admin v1 and settings v2beta APIs know:
+// iframe embedding, its allowed origins and impersonation. Only those fields of policy are read;
+// every other setting keeps its current value, so a call through these APIs does not reset
+// settings they cannot express, such as dynamic client registration or client ID metadata
+// documents.
+func (c *Commands) SetLegacySecurityPolicy(ctx context.Context, policy *SecurityPolicy) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	return c.pushSecurityPolicy(ctx, c.prepareSetLegacySecurityPolicy(instanceAgg, policy))
+}
+
+func (c *Commands) pushSecurityPolicy(ctx context.Context, validation preparation.Validation) (*domain.ObjectDetails, error) {
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -39,12 +62,37 @@ func (c *Commands) SetSecurityPolicy(ctx context.Context, policy *SecurityPolicy
 
 func (c *Commands) prepareSetSecurityPolicy(a *instance.Aggregate, policy *SecurityPolicy) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		for _, allowedURL := range policy.ClientIDMetadataDocumentAllowedURLs {
+			if err := validateClientIDMetadataDocumentAllowedURL(allowedURL); err != nil {
+				return nil, err
+			}
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel, err := c.getSecurityPolicyWriteModel(ctx, filter)
 			if err != nil {
 				return nil, err
 			}
 			cmd, err := writeModel.NewSetEvent(ctx, &a.Aggregate, policy)
+			if err != nil {
+				return nil, err
+			}
+			return []eventstore.Command{cmd}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) prepareSetLegacySecurityPolicy(a *instance.Aggregate, legacy *SecurityPolicy) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel, err := c.getSecurityPolicyWriteModel(ctx, filter)
+			if err != nil {
+				return nil, err
+			}
+			policy := writeModel.SecurityPolicy
+			policy.EnableIframeEmbedding = legacy.EnableIframeEmbedding
+			policy.AllowedOrigins = legacy.AllowedOrigins
+			policy.EnableImpersonation = legacy.EnableImpersonation
+			cmd, err := writeModel.NewSetEvent(ctx, &a.Aggregate, &policy)
 			if err != nil {
 				return nil, err
 			}
@@ -65,4 +113,52 @@ func (c *Commands) getSecurityPolicyWriteModel(ctx context.Context, filter prepa
 	writeModel.AppendEvents(events...)
 	err = writeModel.Reduce()
 	return writeModel, err
+}
+
+// AddClientIDMetadataDocumentAllowedURL adds a client_id URL the instance resolves as a Client ID
+// Metadata Document. An entry ending with a slash allows every client_id it is a prefix of. The
+// URL must not be allowed already.
+func (c *Commands) AddClientIDMetadataDocumentAllowedURL(ctx context.Context, allowedURL string) (*domain.ObjectDetails, error) {
+	if err := validateClientIDMetadataDocumentAllowedURL(allowedURL); err != nil {
+		return nil, err
+	}
+	writeModel := NewInstanceSecurityPolicyWriteModel(ctx)
+	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
+		return nil, err
+	}
+	if slices.Contains(writeModel.ClientIDMetadataDocumentAllowedURLs, allowedURL) {
+		return nil, zerrors.ThrowAlreadyExists(nil, "COMMA-Vq7tY", "Errors.Instance.SecurityPolicy.ClientIDMetadataDocumentAllowedURL.AlreadyExists")
+	}
+	err := c.pushAppendAndReduce(ctx, writeModel, instance.NewSecurityPolicyClientIDMetadataDocumentAllowedURLAddedEvent(ctx, InstanceAggregateFromWriteModel(&writeModel.WriteModel), allowedURL))
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&writeModel.WriteModel), nil
+}
+
+// RemoveClientIDMetadataDocumentAllowedURL removes a client_id URL the instance resolves as a
+// Client ID Metadata Document. Removing a URL that is not allowed is not an error and returns no
+// details.
+func (c *Commands) RemoveClientIDMetadataDocumentAllowedURL(ctx context.Context, allowedURL string) (*domain.ObjectDetails, error) {
+	writeModel := NewInstanceSecurityPolicyWriteModel(ctx)
+	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
+		return nil, err
+	}
+	if !slices.Contains(writeModel.ClientIDMetadataDocumentAllowedURLs, allowedURL) {
+		return nil, nil
+	}
+	err := c.pushAppendAndReduce(ctx, writeModel, instance.NewSecurityPolicyClientIDMetadataDocumentAllowedURLRemovedEvent(ctx, InstanceAggregateFromWriteModel(&writeModel.WriteModel), allowedURL))
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&writeModel.WriteModel), nil
+}
+
+// validateClientIDMetadataDocumentAllowedURL requires allowedURL to be a valid client_id URL, so
+// that an entry ending with a slash cannot be widened by a client_id that is not one.
+func validateClientIDMetadataDocumentAllowedURL(allowedURL string) error {
+	if !domain.IsClientIDMetadataDocumentURL(allowedURL) {
+		return zerrors.ThrowInvalidArgument(nil, "COMMA-p4Lz8", "Errors.Instance.SecurityPolicy.ClientIDMetadataDocumentAllowedURL.Invalid")
+	}
+	return nil
 }

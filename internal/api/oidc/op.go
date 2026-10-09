@@ -45,6 +45,7 @@ type Config struct {
 	PublicKeyCacheMaxAge              time.Duration
 	DefaultBackChannelLogoutLifetime  time.Duration
 	BackChannelLogout                 handlers.BackChannelLogoutWorkerConfig
+	ClientIDMetadataDocument          ClientIDMetadataDocumentConfig
 }
 
 // BackChannelLogoutConfig returns the BackChannelLogoutWorkerConfig and takes the deprecated TokenLifetime into account.
@@ -89,6 +90,7 @@ type OPStorage struct {
 	assetAPIPrefix                    func(ctx context.Context) string
 	contextToIssuer                   func(context.Context) string
 	federateLogoutCache               cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout]
+	clientIDMetadataResolver          *clientIDMetadataResolver
 }
 
 // Provider is used to overload certain [op.Provider] methods
@@ -129,13 +131,19 @@ func NewServer(
 	fallbackLogger *slog.Logger,
 	hashConfig crypto.HashConfig,
 	federatedLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
+	clientIDMetadataDocumentCache cache.Cache[clientIDMetadataCacheIndex, string, *clientIDMetadataCacheEntry],
 	httpClient *http.Client,
 ) (*Server, error) {
 	opConfig, err := createOPConfig(config, defaultLogoutRedirectURI, cryptoKey)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
-	storage := newStorage(config, command, query, repo, authAlg, es, ContextToIssuer, federatedLogoutCache)
+	clientIDMetadataAllowlist, err := newClientIDMetadataAllowlist(config.ClientIDMetadataDocument)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "OIDC-Rb8tN", "cannot create client id metadata document allowlist")
+	}
+	clientIDMetadataResolver := newClientIDMetadataResolver(httpClient, clientIDMetadataAllowlist, clientIDMetadataDocumentCache, config.DefaultAccessTokenLifetime, config.DefaultIdTokenLifetime, fallbackLogger)
+	storage := newStorage(config, command, query, repo, authAlg, es, ContextToIssuer, federatedLogoutCache, clientIDMetadataResolver)
 	keyCache := newPublicKeyCache(ctx, config.PublicKeyCacheMaxAge, queryKeyFunc(query))
 	accessTokenKeySet := newOidcKeySet(keyCache, withKeyExpiryCheck(true))
 	idTokenHintKeySet := newOidcKeySet(keyCache)
@@ -194,6 +202,7 @@ func NewServer(
 		assetAPIPrefix:             assets.AssetAPI(),
 		httpClient:                 httpClient,
 		registrationEndpoint:       registrationEndpoint(config.CustomEndpoints),
+		clientIDMetadataResolver:   clientIDMetadataResolver,
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 
@@ -304,6 +313,7 @@ func newStorage(
 	es *eventstore.Eventstore,
 	contextToIssuer func(context.Context) string,
 	federateLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
+	clientIDMetadataResolver *clientIDMetadataResolver,
 ) *OPStorage {
 	return &OPStorage{
 		repo:                              repo,
@@ -321,6 +331,7 @@ func newStorage(
 		assetAPIPrefix:                    assets.AssetAPI(),
 		contextToIssuer:                   contextToIssuer,
 		federateLogoutCache:               federateLogoutCache,
+		clientIDMetadataResolver:          clientIDMetadataResolver,
 	}
 }
 

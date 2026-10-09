@@ -983,6 +983,15 @@ func (s securitySettings) SetSettingFields(value domain.SecuritySettingsAttribut
 	if value.AllowUnauthenticatedDynamicClientRegistration != nil {
 		changes = append(changes, s.SetAllowUnauthenticatedDynamicClientRegistration(*value.AllowUnauthenticatedDynamicClientRegistration))
 	}
+	if value.EnableClientIDMetadataDocument != nil {
+		changes = append(changes, s.SetEnableClientIDMetadataDocument(*value.EnableClientIDMetadataDocument))
+	}
+	if value.ClientIDMetadataDocumentAllowedURLs != nil {
+		changes = append(changes, s.SetClientIDMetadataDocumentAllowedURLs(value.ClientIDMetadataDocumentAllowedURLs))
+	}
+	if value.ClientIDMetadataDocumentAllowAnyURL != nil {
+		changes = append(changes, s.SetClientIDMetadataDocumentAllowAnyURL(*value.ClientIDMetadataDocumentAllowAnyURL))
+	}
 	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
 }
 
@@ -1004,6 +1013,37 @@ func (securitySettings) SetEnableDynamicClientRegistration(value bool) db_json.J
 
 func (securitySettings) SetAllowUnauthenticatedDynamicClientRegistration(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"allowUnauthenticatedDynamicClientRegistration"}, value)
+}
+
+func (securitySettings) SetEnableClientIDMetadataDocument(value bool) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"enableClientIdMetadataDocument"}, value)
+}
+
+func (securitySettings) SetClientIDMetadataDocumentAllowedURLs(value []string) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"clientIdMetadataDocumentAllowedUrls"}, value)
+}
+
+func (securitySettings) SetClientIDMetadataDocumentAllowAnyURL(value bool) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"clientIdMetadataDocumentAllowAnyUrl"}, value)
+}
+
+func (s securitySettings) AddClientIDMetadataDocumentAllowedURL(value string) database.Change {
+	return db_json.NewJsonChanges(s.SettingsColumn(),
+		db_json.NewArrayChange([]string{"clientIdMetadataDocumentAllowedUrls"}, value, false),
+	)
+}
+
+func (s securitySettings) RemoveClientIDMetadataDocumentAllowedURL(value string) database.Change {
+	return db_json.NewJsonChanges(s.SettingsColumn(),
+		db_json.NewArrayChange([]string{"clientIdMetadataDocumentAllowedUrls"}, value, true),
+	)
+}
+
+func (s securitySettings) SetColumns(ctx context.Context, client database.QueryExecutor, settings *domain.Settings, changes ...database.Change) error {
+	settings.Type = domain.SettingTypeSecurity
+	settings.State = domain.SettingStateActive
+
+	return s.set(ctx, client, settings, changes...)
 }
 
 func SecuritySettingsRepository() domain.SecuritySettingsRepository {

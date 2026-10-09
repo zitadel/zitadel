@@ -411,6 +411,10 @@ Errors:
       NotFound: "Політика сповіщень за замовчуванням не знайдена"
       NotChanged: "Політика сповіщень за замовчуванням не змінена"
       AlreadyExists: "Політика сповіщень за замовчуванням вже існує"
+    SecurityPolicy:
+      ClientIDMetadataDocumentAllowedURL:
+        Invalid: "URL документа метаданих ідентифікатора клієнта недійсний"
+        AlreadyExists: "URL документа метаданих ідентифікатора клієнта вже дозволено"
   Policy:
     AlreadyExists: "Політика вже існує"
     Label:
