@@ -1,7 +1,9 @@
+import { createRequire } from "node:module";
+import { buildCSP } from "../csp";
 import type { Cookie } from "@/lib/cookies";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { FlowInitiationParams, handleOIDCFlowInitiation } from "./flow-initiation";
+import { FlowInitiationParams, handleOIDCFlowInitiation, handleSAMLFlowInitiation } from "./flow-initiation";
 
 vi.mock("@/lib/cookies", () => ({
   getLanguageCookie: vi.fn(),
@@ -42,10 +44,6 @@ vi.mock("@/lib/zitadel", () => ({
 
 vi.mock("@zitadel/client", () => ({
   create: vi.fn(),
-}));
-
-vi.mock("escape-html", () => ({
-  default: (s: string) => s,
 }));
 
 function makeRequest(url = "https://example.com/login?requestId=oidc_abc123"): NextRequest {
@@ -1091,4 +1089,110 @@ describe("handleOIDCFlowInitiation — idp scope (urn:zitadel:iam:org:idp:id)", 
       }),
     );
   });
+});
+
+describe("strict CSP for self-rendered POST bindings", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  test.each(["hint", "idp", "saml"])(
+    "nonces and submits the %s form without an inline handler",
+    async (flow) => {
+      vi.clearAllMocks();
+      const api = await import("@/lib/zitadel");
+      const session = await import("@/lib/session");
+      const loginname = await import("@/lib/server/loginname");
+      const nonce = Buffer.alloc(16, 7).toString("base64");
+      const policy = buildCSP({ nonce });
+      const base = "https://localhost:8443";
+      const post = base + "/owned-saml-post";
+      const fields = { SAMLRequest: "<script>window.injected=1</script>", RelayState: 'owned"value' };
+      const request = new NextRequest(base + "/ui/v2/login/login", {
+        headers: {
+          "x-zitadel-csp-nonce": nonce,
+          "Content-Security-Policy": policy,
+        },
+      });
+      vi.mocked(session.findValidSession).mockResolvedValue(null);
+      vi.mocked(api.getAuthRequest).mockResolvedValue({
+        authRequest: {
+          id: "abc",
+          uiLocales: [],
+          scope: flow === "idp" ? ["urn:zitadel:iam:org:idp:id:owned"] : [],
+          prompt: [],
+          loginHint: flow === "hint" ? "synthetic@owned.localhost" : undefined,
+        },
+      } as any);
+      vi.mocked(loginname.sendLoginname).mockResolvedValue({ samlData: { url: post, fields } });
+      vi.mocked(api.getActiveIdentityProviders).mockResolvedValue({
+        identityProviders: [{ id: "owned", type: 1 }],
+      } as any);
+      vi.mocked(api.startIdentityProviderFlow).mockResolvedValue({ url: post, fields } as any);
+      const params = makeBaseParams({ request });
+      if (flow === "saml") {
+        params.requestId = "saml_owned";
+        params.sessions = [{ id: "owned-session" }] as any;
+        params.sessionCookies = [makeCookie("owned-session")];
+        vi.mocked(api.getSAMLRequest).mockResolvedValue({ samlRequest: {} } as any);
+        vi.mocked(session.findValidSession).mockResolvedValue(params.sessions[0]);
+        vi.mocked(api.createResponse).mockResolvedValue({
+          url: post,
+          binding: {
+            case: "post",
+            value: {
+              samlResponse: fields.SAMLRequest,
+              relayState: fields.RelayState,
+            },
+          },
+        } as any);
+      }
+      const response = await (flow === "saml" ? handleSAMLFlowInitiation(params) : handleOIDCFlowInitiation(params));
+      const html = await response.text();
+      expect(response.headers.get("Content-Security-Policy")).toBe(policy);
+      expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+      expect(html).toContain(`<script nonce="${nonce}">document.forms[0].submit()</script>`);
+      expect(html).not.toContain("onload=");
+      expect(html).toContain("&lt;script&gt;");
+      expect(html).toContain("owned&quot;value");
+      // Optional production CI browser uses the pinned package, with only two
+      // fulfilled same-origin synthetic requests and no external delivery.
+      if (process.env.CSP_TEST_PLAYWRIGHT_PACKAGE) {
+        const { chromium } = createRequire(process.env.CSP_TEST_PLAYWRIGHT_PACKAGE)("playwright");
+        const browser = await chromium.launch({ headless: true, args: ["--no-sandbox"] });
+        try {
+          const context = await browser.newContext();
+          let posts = 0,
+            requests = 0, violations = 0;
+          await context.exposeBinding("captureCsp", () => violations++);
+          await context.addInitScript(() => window.addEventListener("securitypolicyviolation", () => (window as any).captureCsp()));
+          await context.route("**/*", async (route: any) => {
+            expect(++requests).toBeLessThanOrEqual(2);
+            if (route.request().url() === post && route.request().method() === "POST") {
+              posts++;
+              expect(new URLSearchParams(route.request().postData()).get("RelayState")).toBe(fields.RelayState);
+              await route.fulfill({ contentType: "text/html", body: "<title>Owned post received</title>" });
+            } else if (route.request().url() === request.url) {
+              await route.fulfill({
+                contentType: "text/html",
+                headers: { "Content-Security-Policy": policy },
+                body: html,
+              });
+            } else {
+              await route.abort();
+              throw new Error("Unexpected form fixture request");
+            }
+          });
+          const page = await context.newPage();
+          await page.goto(request.url, { timeout: 10000 });
+          await page.waitForURL(post, { timeout: 10000 });
+          expect(posts).toBe(1);
+          expect(violations).toBe(0);
+          console.info(`Owned ${flow} POST: ${requests} fulfilled local requests, ${posts} submission, ${violations} CSP violations; Chromium ${browser.version()}`);
+          await context.close();
+        } finally {
+          await browser.close();
+        }
+      }
+    },
+    30000,
+  );
 });

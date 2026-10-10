@@ -21,6 +21,9 @@ const lato = Lato({
   subsets: ["latin"],
 });
 
+// Per-response nonces cannot be used with prerendered or shared cached HTML.
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("common");
   return { title: t("title") };
@@ -28,6 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const _headers = await headers();
+  const nonce = _headers.get("x-zitadel-csp-nonce") ?? undefined;
   const { serviceConfig } = getServiceConfig(_headers);
 
   let languages = LANGS;
@@ -46,7 +50,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html className={`${lato.className}`} suppressHydrationWarning>
       <head />
       <body>
-        <ThemeProvider>
+        <ThemeProvider nonce={nonce}>
           <Tooltip.Provider>
             <Suspense
               fallback={

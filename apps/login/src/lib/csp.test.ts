@@ -2,6 +2,22 @@ import { describe, expect, test } from "vitest";
 import { buildCSP } from "./csp";
 
 describe("buildCSP", () => {
+  test("nonce policy admits only trusted scripts and preserves supplied styles and iframe settings", () => {
+    const nonce = "AAECAwQFBgcICQoLDA0ODw==";
+    const csp = buildCSP({ nonce, iframeOrigins: ["https://portal.example.com"] });
+    const scripts = csp.split("; ").find((directive) => directive.startsWith("script-src "));
+    expect(scripts).toBe(`script-src 'nonce-${nonce}' 'strict-dynamic'`);
+    expect(csp).toContain("script-src-attr 'none'");
+    expect(csp).toContain("base-uri 'none'");
+    expect(csp).toContain("style-src 'self' 'unsafe-inline'");
+    expect(csp).toContain("frame-ancestors https://portal.example.com");
+  });
+
+  test.each(["caller-nonce", "'unsafe-inline'", "AAECAwQFBgcICQoLDA0ODw==; script-src *"])(
+    "rejects an invalid nonce: %s",
+    (nonce) => expect(() => buildCSP({ nonce })).toThrow("Invalid CSP nonce"),
+  );
+
   test("returns all base directives with safe defaults", () => {
     const csp = buildCSP();
 
