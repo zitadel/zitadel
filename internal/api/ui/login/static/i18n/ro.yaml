@@ -270,6 +270,7 @@ RegistrationUser:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Albanian: Shqip
   GenderLabel: Gen
   Female: Femeie
   Male: Bărbat
@@ -317,6 +318,7 @@ ExternalRegistrationUserOverview:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Albanian: Shqip
   TosAndPrivacyLabel: Termeni și condiții
   TosConfirm: Accept
   TosLinkText: TOS
@@ -398,6 +400,7 @@ ExternalNotFound:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Albanian: Shqip
 DeviceAuth:
   Title: Autorizare dispozitiv
   UserCode:

@@ -1,0 +1,542 @@
+Login:
+  Title: Mirë se u rikthyet!
+  Description: Vendosni të dhënat e hyrjes.
+  TitleLinking: Hyrja për lidhjen e përdoruesit
+  DescriptionLinking: Vendosni të dhënat e hyrjes për të lidhur përdoruesin tuaj të jashtëm.
+  LoginNameLabel: Emri i hyrjes
+  UsernamePlaceHolder: emri i përdoruesit
+  LoginnamePlaceHolder: përdoruesi@domeni
+  ExternalUserDescription: Hyni me një përdorues të jashtëm.
+  MustBeMemberOfOrg: Përdoruesi duhet të jetë anëtar i organizatës {{.OrgName}}.
+  RegisterButtonText: Regjistrohu
+  NextButtonText: Tjetra
+
+LDAP:
+  Title: Hyrja
+  Description: Vendosni të dhënat e hyrjes.
+  LoginNameLabel: Emri i hyrjes
+  PasswordLabel: Fjalëkalimi
+  NextButtonText: Tjetra
+
+SelectAccount:
+  Title: Zgjidh llogarinë
+  Description: Përdorni llogarinë tuaj
+  TitleLinking: Zgjidh llogarinë për lidhjen e përdoruesit
+  DescriptionLinking: Zgjidhni llogarinë tuaj për ta lidhur me përdoruesin tuaj të jashtëm.
+  OtherUser: Përdorues tjetër
+  SessionState0: aktiv
+  SessionState1: Ka dalë
+  MustBeMemberOfOrg: Përdoruesi duhet të jetë anëtar i organizatës {{.OrgName}}.
+
+Password:
+  Title: Fjalëkalimi
+  Description: Vendosni të dhënat e hyrjes.
+  PasswordLabel: Fjalëkalimi
+  MinLength: Duhet të ketë të paktën
+  MinLengthp2: karaktere.
+  MaxLength: Duhet të ketë më pak se 70 karaktere.
+  HasUppercase: Duhet të përmbajë një shkronjë të madhe.
+  HasLowercase: Duhet të përmbajë një shkronjë të vogël.
+  HasNumber: Duhet të përmbajë një numër.
+  HasSymbol: Duhet të përmbajë një simbol.
+  Confirmation: Konfirmimi i fjalëkalimit përputhet.
+  ResetLinkText: Rivendos fjalëkalimin
+  BackButtonText: Mbrapa
+  NextButtonText: Tjetra
+
+UsernameChange:
+  Title: Ndrysho emrin e përdoruesit
+  Description: Vendosni emrin tuaj të ri të përdoruesit
+  UsernameLabel: Emri i përdoruesit
+  CancelButtonText: Anulo
+  NextButtonText: Tjetra
+
+UsernameChangeDone:
+  Title: Emri i përdoruesit u ndryshua
+  Description: Emri juaj i përdoruesit u ndryshua me sukses.
+  NextButtonText: Tjetra
+
+InitPassword:
+  Title: Vendos fjalëkalimin
+  Description: Keni marrë një kod, të cilin duhet ta vendosni në formularin më poshtë për të caktuar fjalëkalimin tuaj të ri.
+  CodeLabel: Kodi
+  NewPasswordLabel: Fjalëkalimi i ri
+  NewPasswordConfirmLabel: Konfirmo fjalëkalimin
+  ResendButtonText: Ridërgo kodin
+  NextButtonText: Tjetra
+
+InitPasswordDone:
+  Title: Fjalëkalimi u vendos
+  Description: Fjalëkalimi u vendos me sukses
+  NextButtonText: Tjetra
+  CancelButtonText: Anulo
+
+InitUser:
+  Title: Aktivizo përdoruesin
+  Description: Verifikoni emailin tuaj me kodin më poshtë dhe vendosni fjalëkalimin tuaj.
+  CodeLabel: Kodi
+  NewPasswordLabel: Fjalëkalimi i ri
+  NewPasswordConfirm: Konfirmo fjalëkalimin
+  NextButtonText: Tjetra
+  ResendButtonText: Ridërgo kodin
+
+InitUserDone:
+  Title: Përdoruesi u aktivizua
+  Description: Emaili u verifikua dhe fjalëkalimi u vendos me sukses
+  NextButtonText: Tjetra
+  CancelButtonText: Anulo
+
+InviteUser:
+  Title: Aktivizo përdoruesin
+  Description: Verifikoni emailin tuaj me kodin më poshtë dhe vendosni fjalëkalimin tuaj.
+  CodeLabel: Kodi
+  NewPasswordLabel: Fjalëkalimi i ri
+  NewPasswordConfirm: Konfirmo fjalëkalimin
+  NextButtonText: Tjetra
+  ResendButtonText: Ridërgo kodin
+
+InitMFAPrompt:
+  Title: Konfigurimi i vërtetimit me dy faktorë
+  Description: Vërtetimi me dy faktorë i shton llogarisë suaj një shtresë shtesë sigurie. Kështu siguroheni që vetëm ju keni akses në llogarinë tuaj.
+  Provider0: Aplikacioni i vërtetimit (p.sh. Google/Microsoft Authenticator, Authy)
+  Provider1: Sipas pajisjes (p.sh. FaceID, Windows Hello, gjurma e gishtit)
+  Provider3: OTP me SMS
+  Provider4: OTP me email
+  NextButtonText: Tjetra
+  SkipButtonText: Kapërce
+
+InitMFAOTP:
+  Title: Verifikimi me dy faktorë
+  Description: Krijoni faktorin tuaj të dytë. Shkarkoni një aplikacion vërtetimi nëse nuk keni ende një të tillë.
+  OTPDescription: Skanoni kodin me aplikacionin tuaj të vërtetimit (p.sh. Google/Microsoft Authenticator, Authy) ose kopjoni sekretin dhe vendosni më poshtë kodin e gjeneruar.
+  SecretLabel: Sekreti
+  CodeLabel: Kodi
+  NextButtonText: Tjetra
+  CancelButtonText: Anulo
+
+InitMFAOTPSMS:
+  Title: Verifikimi me dy faktorë
+  DescriptionPhone: Krijoni faktorin tuaj të dytë. Vendosni numrin tuaj të telefonit për ta verifikuar.
+  DescriptionCode: Krijoni faktorin tuaj të dytë. Vendosni kodin e marrë për të verifikuar numrin tuaj të telefonit.
+  CountryCodeLabel: Shteti
+  PhoneLabel: Telefoni
+  CodeLabel: Kodi
+  EditButtonText: Ndrysho
+  ResendButtonText: Ridërgo kodin
+  NextButtonText: Tjetra
+
+InitMFAU2F:
+  Title: Shto çelës sigurie
+  Description: Çelësi i sigurisë është një metodë verifikimi që mund të jetë e integruar në telefonin tuaj, të përdorë Bluetooth ose të lidhet drejtpërdrejt në portën USB të kompjuterit tuaj.
+  TokenNameLabel: Emri i çelësit të sigurisë / pajisjes
+  NotSupported: WebAuthN nuk mbështetet nga shfletuesi juaj. Sigurohuni që është i përditësuar ose përdorni një shfletues tjetër (p.sh. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Shto çelës sigurie
+  ErrorRetry: Provoni sërish, krijoni një sfidë të re ose zgjidhni një metodë tjetër.
+
+InitMFADone:
+  Title: Faktori i dytë u verifikua
+  Description: Shkëlqyeshëm! Sapo konfiguruat me sukses faktorin tuaj të dytë dhe e bëtë llogarinë tuaj shumë më të sigurt. Faktori duhet të vendoset në çdo hyrje.
+  NextButtonText: Tjetra
+  CancelButtonText: Anulo
+
+MFAProvider:
+  Provider0: Aplikacioni i vërtetimit (p.sh. Google/Microsoft Authenticator, Authy)
+  Provider1: Sipas pajisjes (p.sh. FaceID, Windows Hello, gjurma e gishtit)
+  Provider3: OTP me SMS
+  Provider4: OTP me email
+  ChooseOther: ose zgjidhni një opsion tjetër
+
+VerifyMFAOTP:
+  Title: Verifiko faktorin e dytë
+  Description: Verifikoni faktorin tuaj të dytë
+  CodeLabel: Kodi
+  NextButtonText: Tjetra
+
+VerifyOTP:
+  Title: Verifiko faktorin e dytë
+  Description: Verifikoni faktorin tuaj të dytë
+  CodeLabel: Kodi
+  ResendButtonText: Ridërgo kodin
+  NextButtonText: Tjetra
+
+VerifyMFAU2F:
+  Title: Verifikimi me dy faktorë
+  Description: Verifikoni faktorin tuaj të dytë me pajisjen e regjistruar (p.sh. FaceID, Windows Hello, gjurma e gishtit)
+  NotSupported: WebAuthN nuk mbështetet nga shfletuesi juaj. Sigurohuni që përdorni versionin më të ri ose kaloni në një shfletues të mbështetur (Chrome, Safari, Firefox)
+  ErrorRetry: Provoni sërish, krijoni një kërkesë të re ose zgjidhni një metodë tjetër.
+  ValidateTokenButtonText: Verifiko faktorin e dytë
+
+Passwordless:
+  Title: Hyrja pa fjalëkalim
+  Description: Hyni me metodat e vërtetimit që ofron pajisja juaj, si FaceID, Windows Hello ose gjurma e gishtit.
+  NotSupported: WebAuthN nuk mbështetet nga shfletuesi juaj. Sigurohuni që është i përditësuar ose përdorni një shfletues tjetër (p.sh. Chrome, Safari, Firefox)
+  ErrorRetry: Provoni sërish, krijoni një sfidë të re ose zgjidhni një metodë tjetër.
+  LoginWithPwButtonText: Hyr me fjalëkalim
+  ValidateTokenButtonText: Hyr pa fjalëkalim
+
+PasswordlessPrompt:
+  Title: Konfigurimi i hyrjes pa fjalëkalim
+  Description: Dëshironi të konfiguroni hyrjen pa fjalëkalim? (Metodat e vërtetimit të pajisjes suaj, si FaceID, Windows Hello ose gjurma e gishtit)
+  DescriptionInit: Duhet të konfiguroni hyrjen pa fjalëkalim. Përdorni lidhjen që ju është dhënë për të regjistruar pajisjen tuaj.
+  PasswordlessButtonText: Kalo te hyrja pa fjalëkalim
+  NextButtonText: Tjetra
+  SkipButtonText: Kapërce
+
+PasswordlessRegistration:
+  Title: Konfigurimi i hyrjes pa fjalëkalim
+  Description: Shtoni metodën tuaj të vërtetimit duke dhënë një emër (p.sh. TelefoniIm, MacBook etj.) dhe më pas duke klikuar butonin 'Regjistro hyrjen pa fjalëkalim' më poshtë.
+  TokenNameLabel: Emri i pajisjes
+  NotSupported: WebAuthN nuk mbështetet nga shfletuesi juaj. Sigurohuni që është i përditësuar ose përdorni një shfletues tjetër (p.sh. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Regjistro hyrjen pa fjalëkalim
+  ErrorRetry: Provoni sërish, krijoni një sfidë të re ose zgjidhni një metodë tjetër.
+
+PasswordlessRegistrationDone:
+  Title: Hyrja pa fjalëkalim u konfigurua
+  Description: Pajisja për hyrjen pa fjalëkalim u shtua me sukses.
+  DescriptionClose: Tani mund ta mbyllni këtë dritare.
+  NextButtonText: Tjetra
+  CancelButtonText: Anulo
+
+PasswordChange:
+  Title: Ndrysho fjalëkalimin
+  Description: Ndryshoni fjalëkalimin tuaj. Vendosni fjalëkalimin e vjetër dhe të riun.
+  ExpiredDescription: Fjalëkalimi juaj ka skaduar dhe duhet ndryshuar. Vendosni fjalëkalimin e vjetër dhe të riun.
+  OldPasswordLabel: Fjalëkalimi i vjetër
+  NewPasswordLabel: Fjalëkalimi i ri
+  NewPasswordConfirmLabel: Konfirmimi i fjalëkalimit
+  CancelButtonText: Anulo
+  NextButtonText: Tjetra
+  Footer: Fundi i faqes
+
+PasswordChangeDone:
+  Title: Ndrysho fjalëkalimin
+  Description: Fjalëkalimi juaj u ndryshua me sukses.
+  NextButtonText: Tjetra
+
+PasswordResetDone:
+  Title: Lidhja për rivendosjen e fjalëkalimit u dërgua
+  Description: Kontrolloni emailin tuaj për të rivendosur fjalëkalimin.
+  NextButtonText: Tjetra
+
+EmailVerification:
+  Title: Verifikimi i emailit
+  Description: Ju kemi dërguar një email për të verifikuar adresën tuaj. Ju lutemi vendosni kodin në formularin më poshtë.
+  CodeLabel: Kodi
+  NextButtonText: Tjetra
+  ResendButtonText: Ridërgo kodin
+
+EmailVerificationDone:
+  Title: Verifikimi i emailit
+  Description: Adresa juaj e emailit u verifikua me sukses.
+  NextButtonText: Tjetra
+  CancelButtonText: Anulo
+  LoginButtonText: Hyr
+
+RegisterOption:
+  Title: Opsionet e regjistrimit
+  Description: Zgjidhni si dëshironi të regjistroheni
+  RegisterUsernamePasswordButtonText: Me emër përdoruesi dhe fjalëkalim
+  ExternalLoginDescription: ose regjistrohuni me një përdorues të jashtëm
+  LoginButtonText: Hyr
+
+RegistrationUser:
+  Title: Regjistrimi
+  Description: Vendosni të dhënat tuaja të përdoruesit. Adresa juaj e emailit do të përdoret si emri juaj i hyrjes.
+  DescriptionOrgRegister: Vendosni të dhënat tuaja të përdoruesit.
+  EmailLabel: Email
+  UsernameLabel: Emri i përdoruesit
+  FirstnameLabel: Emri
+  LastnameLabel: Mbiemri
+  LanguageLabel: Gjuha
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Albanian: Shqip
+  GenderLabel: Gjinia
+  Female: Femër
+  Male: Mashkull
+  Diverse: tjetër / X
+  PasswordLabel: Fjalëkalimi
+  PasswordConfirmLabel: Konfirmimi i fjalëkalimit
+  TosAndPrivacyLabel: Kushtet e përdorimit
+  TosConfirm: Pranoj
+  TosLinkText: kushtet e shërbimit
+  PrivacyConfirm: Pranoj
+  PrivacyLinkText: politikën e privatësisë
+  ExternalLogin: ose regjistrohuni me një përdorues të jashtëm
+  BackButtonText: Hyr
+  NextButtonText: Tjetra
+
+ExternalRegistrationUserOverview:
+  Title: Regjistrimi i përdoruesit të jashtëm
+  Description: Kemi marrë të dhënat tuaja të përdoruesit nga ofruesi i zgjedhur. Tani mund t'i ndryshoni ose t'i plotësoni.
+  EmailLabel: Email
+  UsernameLabel: Emri i përdoruesit
+  FirstnameLabel: Emri
+  LastnameLabel: Mbiemri
+  NicknameLabel: Pseudonimi
+  PhoneLabel: Numri i telefonit
+  LanguageLabel: Gjuha
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Albanian: Shqip
+  TosAndPrivacyLabel: Kushtet e përdorimit
+  TosConfirm: Pranoj
+  TosLinkText: kushtet e shërbimit
+  PrivacyConfirm: Pranoj
+  PrivacyLinkText: politikën e privatësisë
+  ExternalLogin: ose regjistrohuni me një përdorues të jashtëm
+  BackButtonText: Mbrapa
+  NextButtonText: Ruaj
+
+RegistrationOrg:
+  Title: Regjistrimi i organizatës
+  Description: Vendosni emrin e organizatës dhe të dhënat tuaja të përdoruesit.
+  OrgNameLabel: Emri i organizatës
+  EmailLabel: Email
+  UsernameLabel: Emri i përdoruesit
+  FirstnameLabel: Emri
+  LastnameLabel: Mbiemri
+  PasswordLabel: Fjalëkalimi
+  PasswordConfirmLabel: Konfirmimi i fjalëkalimit
+  TosAndPrivacyLabel: Kushtet e përdorimit
+  TosConfirm: Pranoj
+  TosLinkText: kushtet e shërbimit
+  PrivacyConfirm: Pranoj
+  PrivacyLinkText: politikën e privatësisë
+  SaveButtonText: Krijo organizatën
+
+LoginSuccess:
+  Title: Hyrja u krye me sukses
+  AutoRedirectDescription: Do të ridrejtoheni automatikisht te aplikacioni juaj. Nëse jo, klikoni butonin më poshtë. Më pas mund ta mbyllni dritaren.
+  RedirectedDescription: Tani mund ta mbyllni këtë dritare.
+  NextButtonText: Tjetra
+
+LogoutDone:
+  Title: Keni dalë
+  Description: Dolët me sukses.
+  LoginButtonText: Hyr
+
+LinkingUserPrompt:
+  Title: U gjet një përdorues ekzistues
+  Description: "Dëshironi të lidhni llogarinë tuaj ekzistuese:"
+  LinkButtonText: Lidh
+  OtherButtonText: Opsione të tjera
+
+LinkingUsersDone:
+  Title: Lidhja e përdoruesit
+  Description: Përdoruesi u lidh.
+  CancelButtonText: Anulo
+  NextButtonText: Tjetra
+
+ExternalNotFound:
+  Title: Përdoruesi i jashtëm nuk u gjet
+  Description: Përdoruesi i jashtëm nuk u gjet. Dëshironi të lidhni përdoruesin tuaj apo të regjistroni automatikisht një të ri?
+  LinkButtonText: Lidh
+  AutoRegisterButtonText: Regjistrohu
+  TosAndPrivacyLabel: Kushtet e përdorimit
+  TosConfirm: Pranoj
+  TosLinkText: kushtet e shërbimit
+  PrivacyConfirm: Pranoj
+  PrivacyLinkText: politikën e privatësisë
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Albanian: Shqip
+DeviceAuth:
+  Title: Autorizimi i pajisjes
+  UserCode:
+    Label: Kodi i përdoruesit
+    Description: Vendosni kodin e përdoruesit që shfaqet në pajisje.
+    ButtonNext: Tjetra
+  Action:
+    Description: Jepini akses pajisjes.
+    GrantDevice: po i jepni pajisjes
+    AccessToScopes: akses në fushat e mëposhtme
+    Button:
+      Allow: Lejo
+      Deny: Refuzo
+  Done:
+    Description: U krye.
+    Approved: Autorizimi i pajisjes u miratua. Tani mund të ktheheni te pajisja.
+    Denied: Autorizimi i pajisjes u refuzua. Tani mund të ktheheni te pajisja.
+
+Footer:
+  PoweredBy: Mundësuar nga
+  Tos: Kushtet e shërbimit
+  PrivacyPolicy: Politika e privatësisë
+  Help: Ndihmë
+  SupportEmail: Emaili i mbështetjes
+
+SignIn: Hyr me {{.Provider}}
+
+Errors:
+  Internal: Ndodhi një gabim i brendshëm
+  AuthRequest:
+    NotFound: Kërkesa e vërtetimit nuk u gjet
+    UserAgentNotCorresponding: User Agent nuk përputhet
+    UserAgentNotFound: ID-ja e User Agent nuk u gjet
+    TokenNotFound: Token-i nuk u gjet
+    RequestTypeNotSupported: Lloji i kërkesës nuk mbështetet
+    MissingParameters: Mungojnë parametrat e detyrueshëm
+  User:
+    NotFound: Përdoruesi nuk u gjet
+    AlreadyExists: Përdoruesi ekziston tashmë
+    Inactive: Përdoruesi është joaktiv
+    NotFoundOnOrg: Përdoruesi nuk u gjet në organizatën e zgjedhur
+    NotAllowedOrg: Përdoruesi nuk është anëtar i organizatës së kërkuar
+    NotMatchingUserID: Përdoruesi dhe përdoruesi në kërkesën e vërtetimit nuk përputhen
+    UserIDMissing: ID-ja e përdoruesit është bosh
+    Invalid: Të dhëna të pavlefshme përdoruesi
+    DomainNotAllowedAsUsername: Domeni është tashmë i rezervuar dhe nuk mund të përdoret
+    NotAllowedToLink: Përdoruesit nuk i lejohet të lidhet me ofruesin e jashtëm të hyrjes
+    Profile:
+      NotFound: Profili nuk u gjet
+      NotChanged: Profili nuk ndryshoi
+      Empty: Profili është bosh
+      FirstNameEmpty: Emri në profil është bosh
+      LastNameEmpty: Mbiemri në profil është bosh
+      IDMissing: Mungon ID-ja e profilit
+    Email:
+      NotFound: Emaili nuk u gjet
+      Invalid: Emaili është i pavlefshëm
+      AlreadyVerified: Emaili është verifikuar tashmë
+      NotChanged: Emaili nuk ndryshoi
+      Empty: Emaili është bosh
+      IDMissing: Mungon ID-ja e emailit
+    Phone:
+      NotFound: Telefoni nuk u gjet
+      Invalid: Telefoni është i pavlefshëm
+      AlreadyVerified: Telefoni është verifikuar tashmë
+      Empty: Telefoni është bosh
+      NotChanged: Telefoni nuk ndryshoi
+    Address:
+      NotFound: Adresa nuk u gjet
+      NotChanged: Adresa nuk ndryshoi
+    Username:
+      AlreadyExists: Emri i përdoruesit është i zënë
+      Reserved: Emri i përdoruesit është tashmë i zënë
+      Empty: Emri i përdoruesit është bosh
+    Password:
+      ConfirmationWrong: Konfirmimi i fjalëkalimit është i gabuar
+      Empty: Fjalëkalimi është bosh
+      Invalid: Fjalëkalimi është i pavlefshëm
+      InvalidAndLocked: Fjalëkalimi është i pavlefshëm dhe përdoruesi është i bllokuar. Kontaktoni administratorin tuaj.
+      NotChanged: Fjalëkalimi i ri nuk mund të jetë i njëjtë me fjalëkalimin tuaj aktual
+    UsernameOrPassword:
+      Invalid: Emri i përdoruesit ose fjalëkalimi është i pavlefshëm
+    PasswordComplexityPolicy:
+      NotFound: Politika e fjalëkalimit nuk u gjet
+      MinLength: Fjalëkalimi është shumë i shkurtër
+      HasLower: Fjalëkalimi duhet të përmbajë një shkronjë të vogël
+      HasUpper: Fjalëkalimi duhet të përmbajë një shkronjë të madhe
+      HasNumber: Fjalëkalimi duhet të përmbajë një numër
+      HasSymbol: Fjalëkalimi duhet të përmbajë një simbol
+    Code:
+      Expired: Kodi ka skaduar
+      Invalid: Kodi është i pavlefshëm
+      Empty: Kodi është bosh
+      CryptoCodeNil: Kodi kriptografik është nil
+      NotFound: Kodi nuk u gjet
+      GeneratorAlgNotSupported: Algoritmi i gjeneruesit nuk mbështetet
+    EmailVerify:
+      UserIDEmpty: ID-ja e përdoruesit është bosh
+    ExternalData:
+      CouldNotRead: Të dhënat e jashtme nuk mund të lexoheshin saktë
+    MFA:
+      NoProviders: Nuk ka ofrues të disponueshëm për vërtetimin me shumë faktorë
+      OTP:
+        AlreadyReady: OTP (fjalëkalimi njëpërdorimsh) për vërtetimin me shumë faktorë është konfiguruar tashmë
+        NotExisting: OTP (fjalëkalimi njëpërdorimsh) për vërtetimin me shumë faktorë nuk ekziston
+        InvalidCode: Kod i pavlefshëm
+        Reused: Ky kod është përdorur tashmë. Ju lutemi prisni për një kod të ri
+        NotReady: OTP (fjalëkalimi njëpërdorimsh) për vërtetimin me shumë faktorë nuk është gati
+    Locked: Përdoruesi është i bllokuar
+    SomethingWentWrong: Diçka shkoi keq
+    NotActive: Përdoruesi nuk është aktiv
+    ExternalIDP:
+      IDPTypeNotImplemented: Lloji i IDP-së nuk është implementuar
+      NotAllowed: Ofruesi i jashtëm i hyrjes nuk lejohet
+      IDPConfigIDEmpty: ID-ja e ofruesit të identitetit është bosh
+      ExternalUserIDEmpty: ID-ja e përdoruesit të jashtëm është bosh
+      UserDisplayNameEmpty: Emri i shfaqur i përdoruesit është bosh
+      NoExternalUserData: Nuk u morën të dhëna të përdoruesit të jashtëm
+      CreationNotAllowed: Krijimi i një përdoruesi të ri nuk lejohet te ky ofrues
+      LinkingNotAllowed: Lidhja e një përdoruesi nuk lejohet te ky ofrues
+      NoOptionAllowed: As krijimi, as lidhja nuk lejohen te ky ofrues. Ju lutemi kontaktoni administratorin tuaj.
+      LoginFailedSwitchLocal: |
+        Hyrja te IdP-ja e jashtme dështoi. Po kalohet te hyrja lokale.
+                
+        Detajet e gabimit: {{.Details}}
+    GrantRequired: Hyrja nuk është e mundur. Përdoruesi duhet të ketë të paktën një dhënie aksesi në aplikacion. Ju lutemi kontaktoni administratorin tuaj.
+    ProjectRequired: Hyrja nuk është e mundur. Organizatës së përdoruesit duhet t'i jepet akses në projekt. Ju lutemi kontaktoni administratorin tuaj.
+  IdentityProvider:
+    InvalidConfig: Konfigurimi i ofruesit të identitetit është i pavlefshëm
+  IAM:
+    LockoutPolicy:
+      NotExisting: Politika e bllokimit nuk ekziston
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Regjistrimi nuk lejohet
+  DeviceAuth:
+    NotExisting: Kodi i përdoruesit nuk ekziston
+
+optional: (opsionale)
