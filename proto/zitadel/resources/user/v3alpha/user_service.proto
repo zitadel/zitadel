@@ -110,7 +110,7 @@ service ZITADELUsers {
 
   // Search users
   //
-  // Search all matching users. By default, we will return all users of your instance.
+  // Search all matching users. By default, the first 100 users of your instance are returned (the default and the maximum limit of 1000 can be configured).
   // Make sure to include a limit and sorting for pagination.
   rpc SearchUsers (SearchUsersRequest) returns (SearchUsersResponse) {
     option (google.api.http) = {

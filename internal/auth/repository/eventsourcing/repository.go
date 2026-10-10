@@ -18,7 +18,6 @@ import (
 )
 
 type Config struct {
-	SearchLimit                uint64
 	Spooler                    auth_handler.Config
 	AmountOfCachedAuthRequests uint16
 }
@@ -44,7 +43,6 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 	authReq := cache.Start(dbClient, conf.AmountOfCachedAuthRequests)
 
 	userRepo := eventstore.UserRepo{
-		SearchLimit:    conf.SearchLimit,
 		Eventstore:     esV2,
 		View:           view,
 		Query:          queries,
@@ -90,14 +88,13 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 		eventstore.RefreshTokenRepo{
 			View:         view,
 			Eventstore:   esV2,
-			SearchLimit:  conf.SearchLimit,
+			SearchLimit:  systemDefaults.MaxQueryLimit,
 			KeyAlgorithm: oidcEncryption,
 		},
 		eventstore.UserSessionRepo{
 			View: view,
 		},
 		eventstore.OrgRepository{
-			SearchLimit:    conf.SearchLimit,
 			View:           view,
 			SystemDefaults: systemDefaults,
 			Eventstore:     esV2,

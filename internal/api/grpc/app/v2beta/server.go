@@ -27,11 +27,13 @@ type Server struct {
 type Config struct{}
 
 func CreateServer(
+	systemDefaults systemdefaults.SystemDefaults,
 	command *command.Commands,
 	query *query.Queries,
 	checkPermission domain.PermissionCheck,
 ) *Server {
 	return &Server{
+		systemDefaults:  systemDefaults,
 		command:         command,
 		query:           query,
 		checkPermission: checkPermission,

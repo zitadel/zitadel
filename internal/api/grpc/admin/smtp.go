@@ -78,7 +78,7 @@ func (s *Server) UpdateSMTPConfigPassword(ctx context.Context, req *admin_pb.Upd
 
 // Deprecated: use [ListEmailProviders] instead.
 func (s *Server) ListSMTPConfigs(ctx context.Context, req *admin_pb.ListSMTPConfigsRequest) (*admin_pb.ListSMTPConfigsResponse, error) {
-	queries, err := listSMTPConfigsToModel(req)
+	queries, err := listSMTPConfigsToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
