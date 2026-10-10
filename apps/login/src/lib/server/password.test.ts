@@ -525,6 +525,54 @@ describe("resetPassword", () => {
     expect(result).toEqual({ error: "errors.couldNotSendResetLink" });
     expect(mockPasswordReset).not.toHaveBeenCalled();
   });
+
+  describe("with a user who has several login names", () => {
+    const user = {
+      userId: "user-1",
+      preferredLoginName: "user@example.com",
+      loginNames: ["user@example.com", "user@organization.id.example.com"],
+      details: { resourceOwner: "org-1" },
+      type: {
+        case: "human",
+        value: { email: { email: "user@gmail.com" }, phone: { phone: "+41791234567" } },
+      },
+    };
+
+    beforeEach(() => {
+      mockSearchUsers.mockResolvedValue({ result: [user] });
+      mockPasswordReset.mockResolvedValue({});
+    });
+
+    test.each([
+      ["email login disabled", { disableLoginWithEmail: true }],
+      ["phone login disabled", { disableLoginWithPhone: true }],
+      ["email and phone login disabled", { disableLoginWithEmail: true, disableLoginWithPhone: true }],
+    ])("sends the reset link for a non-preferred login name with %s", async (_label, settings) => {
+      mockGetLoginSettings.mockResolvedValue(settings);
+
+      const result = await resetPassword({ loginName: "user@organization.id.example.com" });
+
+      expect(result).not.toHaveProperty("error");
+      expect(mockPasswordReset).toHaveBeenCalledWith(expect.objectContaining({ userId: "user-1" }));
+    });
+
+    test("matches a login name regardless of case, as the search does", async () => {
+      mockGetLoginSettings.mockResolvedValue({ disableLoginWithEmail: true, disableLoginWithPhone: true });
+
+      await resetPassword({ loginName: "User@Organization.ID.example.com" });
+
+      expect(mockPasswordReset).toHaveBeenCalledWith(expect.objectContaining({ userId: "user-1" }));
+    });
+
+    test("still refuses the email when email login is disabled", async () => {
+      mockGetLoginSettings.mockResolvedValue({ disableLoginWithEmail: true, disableLoginWithPhone: true });
+
+      const result = await resetPassword({ loginName: "user@gmail.com" });
+
+      expect(result).toEqual({ error: "errors.couldNotSendResetLink" });
+      expect(mockPasswordReset).not.toHaveBeenCalled();
+    });
+  });
 });
 
 describe("changePassword", () => {
