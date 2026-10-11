@@ -18,11 +18,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   const branding = await getBrandingSettings({ serviceConfig, organization });
 
-  const sessionFactors = await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } }).catch(
-    (error) => {
-      console.warn("Error loading session:", error);
-    },
-  );
+  const sessionFactors = await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } });
 
   const id = userId ?? sessionFactors?.factors?.user?.id;
 

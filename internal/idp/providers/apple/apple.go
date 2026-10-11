@@ -2,6 +2,7 @@ package apple
 
 import (
 	"crypto/ecdsa"
+	"net/http"
 	"time"
 
 	"github.com/go-jose/go-jose/v4"
@@ -25,13 +26,13 @@ type Provider struct {
 	*oidc.Provider
 }
 
-func New(clientID, teamID, keyID, callbackURL string, key []byte, scopes []string, options ...oidc.ProviderOpts) (*Provider, error) {
+func New(clientID, teamID, keyID, callbackURL string, key []byte, scopes []string, httpClient *http.Client, options ...oidc.ProviderOpts) (*Provider, error) {
 	secret, err := clientSecretFromPrivateKey(key, teamID, clientID, keyID)
 	if err != nil {
 		return nil, err
 	}
 	options = append(options, oidc.WithResponseMode("form_post"))
-	rp, err := oidc.New(name, issuer, clientID, secret, callbackURL, scopes, oidc.DefaultMapper, options...)
+	rp, err := oidc.New(name, issuer, clientID, secret, callbackURL, scopes, oidc.DefaultMapper, httpClient, options...)
 	if err != nil {
 		return nil, err
 	}

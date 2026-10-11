@@ -85,6 +85,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/console/path"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
+	"github.com/zitadel/zitadel/internal/api/well_known"
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/authz"
 	authz_repo "github.com/zitadel/zitadel/internal/authz/repository"
@@ -182,6 +183,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	if err != nil {
 		return fmt.Errorf("cannot start DB client for queries: %w", err)
 	}
+	database.RegisterPoolMetrics(ctx, dbClient.Pool)
 	new_domain.SetPool(v3_postgres.PGxPool(dbClient.Pool))
 
 	keyStorage, err := cryptoDB.NewKeyStorage(dbClient, masterKey)
@@ -248,6 +250,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		config.AuditLogRetention,
 		config.SystemAPIUsers,
 		true,
+		config.DefaultInstance.SecretGenerators.ToMap(),
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)
@@ -272,6 +275,8 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 
 	new_domain.SetWebAuthNConfig(webAuthNConfig)
 
+	httpClient := config.HTTPClient.NewClient()
+
 	commands, err := command.StartCommands(ctx,
 		eventstoreClient,
 		cacheConnectors,
@@ -291,7 +296,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.SAML,
 		keys.Target,
 		keys.OIDC,
-		&http.Client{},
+		httpClient,
 		permissionCheck,
 		sessionTokenVerifier,
 		config.OIDC.DefaultAccessTokenLifetime,
@@ -299,7 +304,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		config.OIDC.DefaultRefreshTokenIdleExpiration,
 		config.DefaultInstance.SecretGenerators,
 		config.Login.DefaultPaths,
-		config.Executions.DenyList,
+		config.HTTPClient.DenyList,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
@@ -345,12 +350,14 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.SMTP,
 		keys.SMS,
 		q,
+		httpClient,
 	)
 	notification.Start(ctx)
 
 	execution.Register(
 		ctx,
 		config.Executions,
+		httpClient,
 		q,
 		keys.Target,
 		queries.GetActiveSigningWebKey,
@@ -390,6 +397,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys,
 		permissionCheck,
 		cacheConnectors,
+		httpClient,
 	)
 	if err != nil {
 		return err
@@ -435,6 +443,7 @@ func startAPIs(
 	keys *encryption.EncryptionKeys,
 	permissionCheck domain.PermissionCheck,
 	cacheConnectors connector.Connectors,
+	httpClient *http.Client,
 ) (*api.API, error) {
 	repo := struct {
 		authz_repo.Repository
@@ -492,7 +501,7 @@ func startAPIs(
 		keys.Target,
 		translator,
 		config.Instrumentation.Trace.TrustRemoteSpans,
-		config.Executions.DenyList,
+		httpClient,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("error creating api %w", err)
@@ -514,16 +523,16 @@ func startAPIs(
 		return nil, fmt.Errorf("error starting admin repo: %w", err)
 	}
 
-	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain), tlsConfig); err != nil {
+	if err := apis.RegisterServer(ctx, system.CreateServer(config.SystemDefaults, commands, queries, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain), tlsConfig); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, instance_v2beta.CreateServer(commands, queries, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain)); err != nil {
+	if err := apis.RegisterService(ctx, instance_v2beta.CreateServer(config.SystemDefaults, commands, queries, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, instance_v2.CreateServer(commands, queries, config.DefaultInstance, config.ExternalDomain, permissionCheck)); err != nil {
+	if err := apis.RegisterService(ctx, instance_v2.CreateServer(config.SystemDefaults, commands, queries, config.DefaultInstance, config.ExternalDomain, permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.DatabaseName(), commands, queries, keys.User, config.AuditLogRetention), tlsConfig); err != nil {
+	if err := apis.RegisterServer(ctx, admin.CreateServer(config.SystemDefaults, config.Database.DatabaseName(), commands, queries, keys.User, config.AuditLogRetention), tlsConfig); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, keys.User), tlsConfig); err != nil {
@@ -532,13 +541,13 @@ func startAPIs(
 	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, keys.User), tlsConfig); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, user_v2beta.CreateServer(commands, queries, keys.User, keys.IDPConfig, idp.CallbackURL(), idp.SAMLRootURL(), assets.AssetAPI(), permissionCheck)); err != nil {
+	if err := apis.RegisterService(ctx, user_v2beta.CreateServer(config.SystemDefaults, commands, queries, keys.User, keys.IDPConfig, idp.CallbackURL(), idp.SAMLRootURL(), assets.AssetAPI(), permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, user_v2.CreateServer(commands, queries, config.SystemDefaults, keys.User, keys.IDPConfig, idp.CallbackURL(), idp.SAMLRootURL(), assets.AssetAPI(), permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, session_v2beta.CreateServer(commands, queries, permissionCheck)); err != nil {
+	if err := apis.RegisterService(ctx, session_v2beta.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, settings_v2beta.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
@@ -550,7 +559,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, feature_v2beta.CreateServer(commands, queries)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, session_v2.CreateServer(commands, queries, permissionCheck)); err != nil {
+	if err := apis.RegisterService(ctx, session_v2.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, settings_v2.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
@@ -604,7 +613,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, authorization_v2.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, app_v2beta.CreateServer(commands, queries, permissionCheck)); err != nil {
+	if err := apis.RegisterService(ctx, app_v2beta.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, application.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
@@ -650,6 +659,9 @@ func startAPIs(
 	}
 	apis.RegisterHandlerOnPrefix(robots_txt.HandlerPrefix, robotsTxtHandler)
 
+	// native app link well-known files (instance-scoped)
+	apis.RegisterHandlerPrefixes(instanceInterceptor.Handler(well_known.NewHandler(queries)), well_known.HandlerPrefixes...)
+
 	// TODO: Record openapi access logs?
 	openAPIHandler, err := openapi.Start()
 	if err != nil {
@@ -675,13 +687,29 @@ func startAPIs(
 		config.Log.Slog(),
 		config.SystemDefaults.SecretHasher,
 		federatedLogoutsCache,
+		httpClient,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start oidc provider: %w", err)
 	}
 	apis.RegisterHandlerPrefixes(oidcServer, oidcPrefixes...)
 
-	samlProvider, err := saml.NewProvider(config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.SAML, keys.Target, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor, limitingAccessInterceptor)
+	samlProvider, err := saml.NewProvider(
+		config.SAML,
+		config.ExternalSecure,
+		commands,
+		queries,
+		authRepo,
+		keys.OIDC,
+		keys.SAML,
+		keys.Target,
+		eventstore,
+		dbClient,
+		instanceInterceptor.Handler,
+		userAgentInterceptor,
+		limitingAccessInterceptor,
+		httpClient,
+	)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start saml provider: %w", err)
 	}
@@ -726,6 +754,7 @@ func startAPIs(
 		keys.CSRFCookieKey,
 		cacheConnectors,
 		federatedLogoutsCache,
+		httpClient,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start login: %w", err)

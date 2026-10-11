@@ -504,6 +504,7 @@ Errors:
         AlreadyReady: Tvåfaktor OTP (OneTimePassword) är redan konfigurerat
         NotExisting: Tvåfaktor OTP (OneTimePassword) finns inte
         InvalidCode: Ogiltig kod
+        Reused: Den här koden har redan använts. Vänta på en ny kod
         NotReady: Tvåfaktor OTP (OneTimePassword) är inte redo
     Locked: Användaren är spärrad
     SomethingWentWrong: Någonting gick fel

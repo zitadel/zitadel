@@ -97,6 +97,7 @@ type JWT struct {
 	Issuer       string `json:"issuer,omitempty"`
 	KeysEndpoint string `json:"keysEndpoint,omitempty"`
 	HeaderName   string `json:"headerName,omitempty"`
+	Audience     string `json:"audience,omitempty"`
 }
 
 type IDPJWT struct {

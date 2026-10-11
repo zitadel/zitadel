@@ -998,6 +998,12 @@ func (s securitySettings) SetSettingFields(value domain.SecuritySettingsAttribut
 	if value.EnableImpersonation != nil {
 		changes = append(changes, s.SetEnableImpersonation(*value.EnableImpersonation))
 	}
+	if value.EnableDynamicClientRegistration != nil {
+		changes = append(changes, s.SetEnableDynamicClientRegistration(*value.EnableDynamicClientRegistration))
+	}
+	if value.AllowUnauthenticatedDynamicClientRegistration != nil {
+		changes = append(changes, s.SetAllowUnauthenticatedDynamicClientRegistration(*value.AllowUnauthenticatedDynamicClientRegistration))
+	}
 	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
 }
 
@@ -1011,6 +1017,14 @@ func (securitySettings) SetAllowedOrigins(value []string) db_json.JsonUpdate {
 
 func (securitySettings) SetEnableImpersonation(value bool) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"enableImpersonation"}, value)
+}
+
+func (securitySettings) SetEnableDynamicClientRegistration(value bool) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"enableDynamicClientRegistration"}, value)
+}
+
+func (securitySettings) SetAllowUnauthenticatedDynamicClientRegistration(value bool) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"allowUnauthenticatedDynamicClientRegistration"}, value)
 }
 
 func SecuritySettingsRepository() domain.SecuritySettingsRepository {
@@ -1477,6 +1491,9 @@ func (s secretGeneratorSettings) SetSettingFields(value domain.SecretGeneratorSe
 	if value.OTPEmail != nil {
 		changes = append(changes, s.SetOTPEmail(*value.OTPEmail))
 	}
+	if value.InviteCode != nil {
+		changes = append(changes, s.SetInviteCode(*value.InviteCode))
+	}
 	return db_json.NewJsonChanges(s.SettingsColumn(), changes...)
 }
 
@@ -1514,6 +1531,10 @@ func (s secretGeneratorSettings) SetOTPSMS(value domain.OTPSMSAttributes) db_jso
 
 func (s secretGeneratorSettings) SetOTPEmail(value domain.OTPEmailAttributes) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"otpEmail"}, value)
+}
+
+func (s secretGeneratorSettings) SetInviteCode(value domain.InviteCodeAttributes) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"inviteCode"}, value)
 }
 
 func SecretGeneratorSettingsRepository() domain.SecretGeneratorSettingsRepository {

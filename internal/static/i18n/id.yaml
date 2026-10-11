@@ -176,6 +176,7 @@ Errors:
         NotExisting: "OTP multifaktor (OneTimePassword) tidak ada"
         NotReady: "OTP multifaktor (OneTimePassword) belum siap"
         InvalidCode: "Kode tidak valid"
+        Reused: "Kode ini sudah digunakan. Silakan tunggu kode baru"
       U2F:
         NotExisting: "U2F tidak ada"
       Passwordless:
@@ -204,6 +205,7 @@ Errors:
     AlreadyActive: "Organisasi sudah aktif"
     Empty: "Organisasi kosong"
     NotFound: "Organisasi tidak ditemukan"
+    NotActive: "Organisasi tidak aktif"
     NotChanged: "Organisasi tidak berubah"
     DefaultOrgNotDeletable: "Organisasi Default tidak boleh dihapus"
     ZitadelOrgNotDeletable: "Organisasi dengan proyek Zitadel tidak boleh dihapus"
@@ -282,6 +284,8 @@ Errors:
     LabelPolicy:
       NotFound: "Kebijakan Label Pribadi tidak ditemukan"
       NotChanged: "Kebijakan Label Pribadi belum diubah"
+    IDPConfig:
+      NotExisting: "Konfigurasi Penyedia Identitas tidak ada"
   Project:
     ProjectIDMissing: "Id Proyek tidak ada"
     AlreadyExists: "Proyek sudah ada di organisasi"
@@ -759,6 +763,7 @@ EventTypes:
           check:
             succeeded: "Pemeriksaan OTP multifaktor berhasil"
             failed: "Pemeriksaan OTP multifaktor gagal"
+            reused: "Kode OTP multifaktor digunakan kembali"
           sms:
             added: "OTP SMS multifaktor ditambahkan"
             removed: "OTP SMS multifaktor dihapus"

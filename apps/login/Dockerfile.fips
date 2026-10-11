@@ -1,0 +1,23 @@
+FROM registry.access.redhat.com/ubi9/nodejs-24
+USER root
+RUN update-crypto-policies --set FIPS
+WORKDIR /app
+# If /.env-file/.env is mounted into the container, its variables are made available to the server before it starts up.
+RUN mkdir -p /.env-file && touch /.env-file/.env && chown -R 1001:0 /.env-file
+
+COPY --chown=1001:0 .next/standalone ./
+
+USER 1001
+ENV HOSTNAME="::" \
+    PORT="3000" \
+    NODE_ENV="production" \
+    NODE_OPTIONS="--use-openssl-ca --openssl-shared-config --enable-fips --require /app/load-ssl-cert-dir.cjs" \
+    SSL_CERT_FILE="/etc/pki/tls/certs/ca-bundle.crt" \
+    ZITADEL_TLS_ENABLED="false" \
+    ZITADEL_FIPS_REQUIRED="true" \
+    OTEL_SERVICE_NAME="zitadel-login" \
+    OTEL_EXPORTER_OTLP_PROTOCOL="http/protobuf"
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD ["node", "/app/healthcheck.mjs", "/ui/v2/login/ready"]
+ENTRYPOINT ["/app/entrypoint.sh", "node", "apps/login/server.js"]

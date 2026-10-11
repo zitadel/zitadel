@@ -19,13 +19,6 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 )
 
-// TODO(IAM-Marco): When permission checks will be implemented, this test needs to be updated to
-// add the feature flag switch:
-//
-//	relTableState := integration.RelationalTablesEnableMatrix()
-//
-// See TestServer_ListOrganizations in org/v2beta/integration_test
-// See https://github.com/zitadel/zitadel/issues/10219
 func TestServer_ListOrganizations(t *testing.T) {
 	ListOrgIinstance := integration.NewInstance(CTX)
 	listOrgIAmOwnerCtx := ListOrgIinstance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)

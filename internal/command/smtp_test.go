@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"errors"
+	"net"
 	"testing"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
@@ -1335,6 +1337,8 @@ func TestCommandSide_AddSMTPConfigHTTP(t *testing.T) {
 		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 		defaultSecretGenerators     *SecretGenerators
 		idGenerator                 id.Generator
+		denyList                    []denylist.AddressChecker
+		ipLookupFunc                func(string) ([]net.IP, error)
 	}
 	type args struct {
 		http *AddSMTPConfigHTTP
@@ -1387,6 +1391,9 @@ func TestCommandSide_AddSMTPConfigHTTP(t *testing.T) {
 				idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "configid"),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("12345678", time.Hour),
 				defaultSecretGenerators:     &SecretGenerators{},
+				ipLookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{net.ParseIP("10.0.0.1")}, nil
+				},
 			},
 			args: args{
 				http: &AddSMTPConfigHTTP{
@@ -1401,6 +1408,29 @@ func TestCommandSide_AddSMTPConfigHTTP(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "add smtp config, blocked endpoint",
+			fields: fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "configid"),
+				denyList:    []denylist.AddressChecker{denylist.NewHostChecker("blocked.example.com")},
+				ipLookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{net.ParseIP("10.0.0.1")}, nil
+				},
+			},
+			args: args{
+				http: &AddSMTPConfigHTTP{
+					ResourceOwner: "INSTANCE",
+					Description:   "test",
+					Endpoint:      "https://blocked.example.com/hook",
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-Uf0294nKls", ""))
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1409,6 +1439,8 @@ func TestCommandSide_AddSMTPConfigHTTP(t *testing.T) {
 				idGenerator:                 tt.fields.idGenerator,
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
+				denyList:                    tt.fields.denyList,
+				ipLookupFunction:            tt.fields.ipLookupFunc,
 			}
 			err := r.AddSMTPConfigHTTP(context.Background(), tt.args.http)
 			if tt.res.err == nil {
@@ -1430,6 +1462,8 @@ func TestCommandSide_ChangeSMTPConfigHTTP(t *testing.T) {
 		eventstore                  func(t *testing.T) *eventstore.Eventstore
 		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 		defaultSecretGenerators     *SecretGenerators
+		denyList                    []denylist.AddressChecker
+		ipLookupFunc                func(string) ([]net.IP, error)
 	}
 	type args struct {
 		http *ChangeSMTPConfigHTTP
@@ -1479,6 +1513,9 @@ func TestCommandSide_ChangeSMTPConfigHTTP(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				ipLookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{net.ParseIP("10.0.0.1")}, nil
+				},
 			},
 			args: args{
 				http: &ChangeSMTPConfigHTTP{
@@ -1516,6 +1553,9 @@ func TestCommandSide_ChangeSMTPConfigHTTP(t *testing.T) {
 						),
 					),
 				),
+				ipLookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{net.ParseIP("10.0.0.1")}, nil
+				},
 			},
 			args: args{
 				http: &ChangeSMTPConfigHTTP{
@@ -1569,6 +1609,9 @@ func TestCommandSide_ChangeSMTPConfigHTTP(t *testing.T) {
 				),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("87654321", time.Hour),
 				defaultSecretGenerators:     &SecretGenerators{},
+				ipLookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{net.ParseIP("10.0.0.1")}, nil
+				},
 			},
 			args: args{
 				http: &ChangeSMTPConfigHTTP{
@@ -1585,6 +1628,28 @@ func TestCommandSide_ChangeSMTPConfigHTTP(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "change smtp config, blocked endpoint",
+			fields: fields{
+				eventstore: expectEventstore(),
+				denyList:   []denylist.AddressChecker{denylist.NewHostChecker("blocked.example.com")},
+				ipLookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{net.ParseIP("10.0.0.1")}, nil
+				},
+			},
+			args: args{
+				http: &ChangeSMTPConfigHTTP{
+					ResourceOwner: "INSTANCE",
+					ID:            "configid",
+					Endpoint:      "https://blocked.example.com/hook",
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-Uf0294nKls", ""))
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1592,6 +1657,8 @@ func TestCommandSide_ChangeSMTPConfigHTTP(t *testing.T) {
 				eventstore:                  tt.fields.eventstore(t),
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
+				denyList:                    tt.fields.denyList,
+				ipLookupFunction:            tt.fields.ipLookupFunc,
 			}
 			err := r.ChangeSMTPConfigHTTP(context.Background(), tt.args.http)
 			if tt.res.err == nil {
@@ -1603,6 +1670,66 @@ func TestCommandSide_ChangeSMTPConfigHTTP(t *testing.T) {
 			if tt.res.err == nil {
 				assertObjectDetails(t, tt.res.want, tt.args.http.Details)
 			}
+		})
+	}
+}
+
+func TestCommands_validateNotificationWebhookEndpoint(t *testing.T) {
+	t.Parallel()
+
+	blockedLookup := func(_ string) ([]net.IP, error) {
+		return []net.IP{net.ParseIP("10.0.0.1")}, nil
+	}
+
+	wantBlockedErr := zerrors.ThrowInvalidArgument(nil, "COMMAND-Uf0294nKls", "")
+
+	tests := []struct {
+		name     string
+		denyList []denylist.AddressChecker
+		endpoint string
+		wantErr  error
+	}{
+		{
+			name:     "empty endpoint skips denylist check",
+			endpoint: "",
+		},
+		{
+			name:     "endpoint not on denylist, ok",
+			endpoint: "https://external.example.com/hook",
+			denyList: []denylist.AddressChecker{denylist.NewHostChecker("blocked.example.com")},
+		},
+		{
+			name:     "no denylist configured, ok",
+			endpoint: "https://anything.example.com/hook",
+		},
+		{
+			name:     "endpoint domain on denylist, blocked",
+			endpoint: "https://blocked.example.com/hook",
+			denyList: []denylist.AddressChecker{denylist.NewHostChecker("blocked.example.com")},
+			wantErr:  wantBlockedErr,
+		},
+		{
+			name:     "endpoint resolves to blocked IP range, blocked",
+			endpoint: "https://internal.host/hook",
+			denyList: []denylist.AddressChecker{denylist.NewHostChecker("10.0.0.0/8")},
+			wantErr:  wantBlockedErr,
+		},
+		{
+			name:     "localhost IP directly in URL is blocked",
+			endpoint: "http://127.0.0.1/hook",
+			denyList: []denylist.AddressChecker{denylist.NewHostChecker("127.0.0.0/8")},
+			wantErr:  wantBlockedErr,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			r := &Commands{
+				denyList:         tt.denyList,
+				ipLookupFunction: blockedLookup,
+			}
+			err := r.validateNotificationWebhookEndpoint(tt.endpoint)
+			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}
 }

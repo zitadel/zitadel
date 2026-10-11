@@ -96,6 +96,32 @@ func Test_commandToEvent(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "enforced resource owner",
+			args: args{
+				command: &enforcedMockCommand{
+					mockCommand: &mockCommand{
+						aggregate: mockAggregate("V3-Red9I"),
+						payload:   nil,
+					},
+				},
+			},
+			want: want{
+				event: &event{
+					command: &command{
+						InstanceID:    "instance",
+						AggregateType: "type",
+						AggregateID:   "V3-Red9I",
+						Owner:         "ro",
+						Creator:       "creator",
+						Revision:      1,
+						CommandType:   "event.type",
+						Payload:       nil,
+						EnforceOwner:  true,
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		if tt.want.err == nil {
@@ -454,6 +480,53 @@ func Test_commandsToEvents(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "single enforced command",
+			args: args{
+				ctx: ctx,
+				cmds: []eventstore.Command{
+					&enforcedMockCommand{
+						mockCommand: &mockCommand{
+							aggregate: mockAggregate("V3-Red9I"),
+							payload:   nil,
+						},
+					},
+				},
+			},
+			want: want{
+				events: []eventstore.Event{
+					&event{
+						command: &command{
+							InstanceID:    "instance",
+							AggregateType: "type",
+							AggregateID:   "V3-Red9I",
+							Owner:         "ro",
+							Creator:       "creator",
+							Revision:      1,
+							CommandType:   "event.type",
+							Payload:       nil,
+							EnforceOwner:  true,
+						},
+					},
+				},
+				commands: []*command{
+					{
+						InstanceID:    "instance",
+						AggregateType: "type",
+						AggregateID:   "V3-Red9I",
+						Owner:         "ro",
+						CommandType:   "event.type",
+						Revision:      1,
+						Payload:       nil,
+						Creator:       "creator",
+						EnforceOwner:  true,
+					},
+				},
+				err: func(t *testing.T, err error) {
+					require.NoError(t, err)
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -479,4 +552,5 @@ func assertCommand(t *testing.T, want, got *command) {
 	assert.Equal(t, want.AggregateType, got.AggregateType)
 	assert.Equal(t, want.InstanceID, got.InstanceID)
 	assert.Equal(t, want.Revision, got.Revision)
+	assert.Equal(t, want.EnforceOwner, got.EnforceOwner)
 }

@@ -504,6 +504,7 @@ Errors:
         AlreadyReady: Çok faktörlü OTP (Tek Seferlik Şifre) zaten ayarlanmış
         NotExisting: Çok faktörlü OTP (Tek Seferlik Şifre) mevcut değil
         InvalidCode: Geçersiz kod
+        Reused: Bu kod zaten kullanıldı. Lütfen yeni bir kod bekleyin
         NotReady: Çok faktörlü OTP (Tek Seferlik Şifre) hazır değil
     Locked: Kullanıcı kilitli
     SomethingWentWrong: Bir şeyler yanlış gitti

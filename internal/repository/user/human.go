@@ -58,12 +58,14 @@ type HumanAddedEvent struct {
 	ChangeRequired bool                `json:"changeRequired,omitempty"`
 }
 
+func (*HumanAddedEvent) EnforceResourceOwner() {}
+
 func (e *HumanAddedEvent) Payload() interface{} {
 	return e
 }
 
 func (e *HumanAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.orgScopedUsername)}
+	return []*eventstore.UniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.orgScopedUsername).WithOwners(usernameOwnerTags(e.Aggregate())...)}
 }
 
 func (e *HumanAddedEvent) AddAddressData(
@@ -167,12 +169,14 @@ type HumanRegisteredEvent struct {
 	UserAgentID string `json:"userAgentID,omitempty"`
 }
 
+func (*HumanRegisteredEvent) EnforceResourceOwner() {}
+
 func (e *HumanRegisteredEvent) Payload() interface{} {
 	return e
 }
 
 func (e *HumanRegisteredEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.orgScopedUsername)}
+	return []*eventstore.UniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.orgScopedUsername).WithOwners(usernameOwnerTags(e.Aggregate())...)}
 }
 
 func (e *HumanRegisteredEvent) AddAddressData(

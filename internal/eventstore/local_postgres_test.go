@@ -2,7 +2,6 @@ package eventstore_test
 
 import (
 	"context"
-	"encoding/json"
 	"os"
 	"testing"
 	"time"
@@ -159,10 +158,39 @@ func generateCommand(aggregateType eventstore.AggregateType, aggregateID string,
 	return e
 }
 
+func generateEnforcedCommand(aggregateType eventstore.AggregateType, aggregateID string, opts ...func(*testEvent)) eventstore.Command {
+	e := &enforcedTestEvent{
+		testEvent: testEvent{
+			BaseEvent: eventstore.BaseEvent{
+				Agg: &eventstore.Aggregate{
+					ID:            aggregateID,
+					Type:          aggregateType,
+					ResourceOwner: "ro",
+					Version:       "v1",
+				},
+				Service:   "svc",
+				EventType: "test.created",
+			},
+		},
+	}
+
+	for _, opt := range opts {
+		opt(&e.testEvent)
+	}
+
+	return e
+}
+
 type testEvent struct {
 	eventstore.BaseEvent
 	uniqueConstraints []*eventstore.UniqueConstraint
 }
+
+type enforcedTestEvent struct {
+	testEvent
+}
+
+func (*enforcedTestEvent) EnforceResourceOwner() {}
 
 func (e *testEvent) Payload() any {
 	return e.BaseEvent.Data
@@ -178,19 +206,23 @@ func canceledCtx() context.Context {
 	return ctx
 }
 
-func fillUniqueData(unique_type, field, instanceID string) error {
-	_, err := testClient.Exec("INSERT INTO eventstore.unique_constraints (unique_type, unique_field, instance_id) VALUES ($1, $2, $3)", unique_type, field, instanceID)
+func fillUniqueData(unique_type, field, instanceID string, owners ...string) error {
+	return insertUniqueConstraint(testClient, instanceID, unique_type, field, owners...)
+}
+
+func insertUniqueConstraint(db *database.DB, instanceID, uniqueType, uniqueField string, owners ...string) error {
+	if len(owners) == 0 {
+		_, err := db.Exec("INSERT INTO eventstore.unique_constraints (instance_id, unique_type, unique_field) VALUES ($1, $2, $3)", instanceID, uniqueType, uniqueField)
+		return err
+	}
+	_, err := db.Exec("INSERT INTO eventstore.unique_constraints (instance_id, unique_type, unique_field, owners) VALUES ($1, $2, $3, $4)", instanceID, uniqueType, uniqueField, database.TextArray[string](owners))
 	return err
 }
 
-func generateAddUniqueConstraint(table, uniqueField string) func(e *testEvent) {
+func generateAddUniqueConstraint(table, uniqueField string, owners ...string) func(e *testEvent) {
 	return func(e *testEvent) {
 		e.uniqueConstraints = append(e.uniqueConstraints,
-			&eventstore.UniqueConstraint{
-				UniqueType:  table,
-				UniqueField: uniqueField,
-				Action:      eventstore.UniqueConstraintAdd,
-			},
+			eventstore.NewAddEventUniqueConstraint(table, uniqueField, "").WithOwners(owners...),
 		)
 	}
 }
@@ -207,13 +239,27 @@ func generateRemoveUniqueConstraint(table, uniqueField string) func(e *testEvent
 	}
 }
 
-func withTestData(data any) func(e *testEvent) {
+func generateRemoveInstanceUniqueConstraints() func(e *testEvent) {
 	return func(e *testEvent) {
-		d, err := json.Marshal(data)
-		if err != nil {
-			panic("marshal data failed")
-		}
-		e.BaseEvent.Data = d
+		e.uniqueConstraints = append(e.uniqueConstraints, eventstore.NewRemoveInstanceUniqueConstraints())
+	}
+}
+
+func generateRemoveUniqueConstraintsByOwner(kind, id string) func(e *testEvent) {
+	return func(e *testEvent) {
+		e.uniqueConstraints = append(e.uniqueConstraints, eventstore.NewRemoveUniqueConstraintsByOwner(kind, id))
+	}
+}
+
+func withInstanceID(instanceID string) func(e *testEvent) {
+	return func(e *testEvent) {
+		e.Agg.InstanceID = instanceID
+	}
+}
+
+func withEventType(eventType eventstore.EventType) func(e *testEvent) {
+	return func(e *testEvent) {
+		e.EventType = eventType
 	}
 }
 

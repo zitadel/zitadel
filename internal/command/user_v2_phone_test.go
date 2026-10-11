@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -684,6 +684,7 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 		defaultSecretGenerators     *SecretGenerators
 	}
 	type args struct {
+		ctx        context.Context
 		userID     string
 		phone      string
 		returnCode bool
@@ -701,6 +702,7 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args: args{
+				ctx:        t.Context(),
 				userID:     "",
 				phone:      "+41791234567",
 				returnCode: false,
@@ -735,6 +737,7 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
+				ctx:        t.Context(),
 				userID:     "user1",
 				phone:      "+41791234567",
 				returnCode: false,
@@ -769,6 +772,7 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
+				ctx:        t.Context(),
 				userID:     "user1",
 				phone:      "",
 				returnCode: false,
@@ -803,6 +807,7 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
+				ctx:        t.Context(),
 				userID:     "user1",
 				phone:      "+41791234567",
 				returnCode: false,
@@ -887,6 +892,7 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 				defaultSecretGenerators:     defaultGenerators,
 			},
 			args: args{
+				ctx:        t.Context(),
 				userID:     "user1",
 				phone:      "+41791234568",
 				returnCode: false,
@@ -901,7 +907,7 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 			},
 		},
 		{
-			name: "phone changed, return code",
+			name: "phone change not allowed when return code=true for self-management",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -924,73 +930,16 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 							}(),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSMSConfigActivatedEvent(
-								context.Background(),
-								&instance.NewAggregate("instanceID").Aggregate,
-								"id",
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSMSConfigTwilioAddedEvent(
-								context.Background(),
-								&instance.NewAggregate("instanceID").Aggregate,
-								"id",
-								"",
-								"sid",
-								"senderNumber",
-								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
-								"",
-							),
-						),
-						eventFromEventPusher(
-							instance.NewSMSConfigActivatedEvent(
-								context.Background(),
-								&instance.NewAggregate("instanceID").Aggregate,
-								"id",
-							),
-						),
-					),
-					expectPush(
-						user.NewHumanPhoneChangedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-							"+41791234568",
-						),
-						user.NewHumanPhoneCodeAddedEventV2(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-							&crypto.CryptoValue{
-								CryptoType: crypto.TypeEncryption,
-								Algorithm:  "enc",
-								KeyID:      "id",
-								Crypted:    []byte("a"),
-							},
-							time.Hour*1,
-							true,
-							"",
-						),
-					),
 				),
-				checkPermission:             newMockPermissionCheckAllowed(),
-				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("a", time.Hour),
-				defaultSecretGenerators:     defaultGenerators,
+				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
+				ctx:        authz.SetCtxData(t.Context(), authz.CtxData{UserID: "user1"}),
 				userID:     "user1",
 				phone:      "+41791234568",
 				returnCode: true,
 			},
-			want: &domain.Phone{
-				ObjectRoot: models.ObjectRoot{
-					AggregateID:   "user1",
-					ResourceOwner: "org1",
-				},
-				PhoneNumber:     "+41791234568",
-				IsPhoneVerified: false,
-				PlainCode:       gu.Ptr("a"),
-			},
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 	}
 	for _, tt := range tests {
@@ -1002,7 +951,7 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 				userEncryption:              tt.fields.userEncryption,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
 			}
-			got, err := c.changeUserPhoneWithGenerator(context.Background(), tt.args.userID, tt.args.phone, GetMockSecretGenerator(t), tt.args.returnCode)
+			got, err := c.changeUserPhoneWithGenerator(tt.args.ctx, tt.args.userID, tt.args.phone, GetMockSecretGenerator(t), tt.args.returnCode)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, got, tt.want)
 		})
@@ -1027,6 +976,7 @@ func TestCommands_resendUserPhoneCodeWithGenerator(t *testing.T) {
 		defaultSecretGenerators     *SecretGenerators
 	}
 	type args struct {
+		ctx        context.Context
 		userID     string
 		returnCode bool
 	}
@@ -1043,6 +993,7 @@ func TestCommands_resendUserPhoneCodeWithGenerator(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args: args{
+				ctx:        t.Context(),
 				userID:     "",
 				returnCode: false,
 			},
@@ -1076,6 +1027,7 @@ func TestCommands_resendUserPhoneCodeWithGenerator(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
+				ctx:        t.Context(),
 				userID:     "user1",
 				returnCode: false,
 			},
@@ -1109,6 +1061,7 @@ func TestCommands_resendUserPhoneCodeWithGenerator(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
+				ctx:        t.Context(),
 				userID:     "user1",
 				returnCode: false,
 			},
@@ -1202,6 +1155,7 @@ func TestCommands_resendUserPhoneCodeWithGenerator(t *testing.T) {
 				defaultSecretGenerators:     defaultGenerators,
 			},
 			args: args{
+				ctx:        t.Context(),
 				userID:     "user1",
 				returnCode: false,
 			},
@@ -1292,6 +1246,7 @@ func TestCommands_resendUserPhoneCodeWithGenerator(t *testing.T) {
 				defaultSecretGenerators:     defaultGenerators,
 			},
 			args: args{
+				ctx:        t.Context(),
 				userID:     "user1",
 				returnCode: false,
 			},
@@ -1305,7 +1260,7 @@ func TestCommands_resendUserPhoneCodeWithGenerator(t *testing.T) {
 			},
 		},
 		{
-			name: "return code",
+			name: "resend code not allowed when return code=true for self-management",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -1327,83 +1282,16 @@ func TestCommands_resendUserPhoneCodeWithGenerator(t *testing.T) {
 								return event
 							}(),
 						),
-						eventFromEventPusher(
-							user.NewHumanPhoneCodeAddedEventV2(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("a"),
-								},
-								time.Hour*1,
-								true,
-								"",
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSMSConfigActivatedEvent(
-								context.Background(),
-								&instance.NewAggregate("instanceID").Aggregate,
-								"id",
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSMSConfigTwilioAddedEvent(
-								context.Background(),
-								&instance.NewAggregate("instanceID").Aggregate,
-								"id",
-								"",
-								"sid",
-								"senderNumber",
-								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
-								"",
-							),
-						),
-						eventFromEventPusher(
-							instance.NewSMSConfigActivatedEvent(
-								context.Background(),
-								&instance.NewAggregate("instanceID").Aggregate,
-								"id",
-							),
-						),
-					),
-					expectPush(
-						user.NewHumanPhoneCodeAddedEventV2(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-							&crypto.CryptoValue{
-								CryptoType: crypto.TypeEncryption,
-								Algorithm:  "enc",
-								KeyID:      "id",
-								Crypted:    []byte("a"),
-							},
-							time.Hour*1,
-							true,
-							"",
-						),
 					),
 				),
-				checkPermission:             newMockPermissionCheckAllowed(),
-				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("a", time.Hour),
-				defaultSecretGenerators:     defaultGenerators,
+				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
+				ctx:        authz.SetCtxData(t.Context(), authz.CtxData{UserID: "user1"}),
 				userID:     "user1",
 				returnCode: true,
 			},
-			want: &domain.Phone{
-				ObjectRoot: models.ObjectRoot{
-					AggregateID:   "user1",
-					ResourceOwner: "org1",
-				},
-				PhoneNumber:     "+41791234567",
-				IsPhoneVerified: false,
-				PlainCode:       gu.Ptr("a"),
-			},
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 	}
 	for _, tt := range tests {
@@ -1414,7 +1302,7 @@ func TestCommands_resendUserPhoneCodeWithGenerator(t *testing.T) {
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
 			}
-			got, err := c.resendUserPhoneCodeWithGenerator(context.Background(), tt.args.userID, GetMockSecretGenerator(t), tt.args.returnCode)
+			got, err := c.resendUserPhoneCodeWithGenerator(tt.args.ctx, tt.args.userID, GetMockSecretGenerator(t), tt.args.returnCode)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, got, tt.want)
 		})

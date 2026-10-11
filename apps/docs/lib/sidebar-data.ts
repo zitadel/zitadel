@@ -269,6 +269,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "apis/openidoauth/grant-types",
           "apis/openidoauth/authrequest",
           "guides/integrate/login/oidc/webkeys",
+          "guides/integrate/login/oidc/native-app-links",
           "guides/integrate/token-exchange",
         ],
       },
@@ -513,6 +514,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "guides/integrate/login-ui/saml-standard",
           "guides/integrate/login-ui/device-auth",
           "guides/integrate/login-ui/login-app",
+          "guides/integrate/login-ui/fork-and-deploy-login-app",
         ],
       },
       {
@@ -571,6 +573,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "guides/migrate/sources/zitadel",
           "guides/migrate/sources/auth0",
           "guides/migrate/sources/keycloak",
+          "guides/migrate/sources/firebase",
         ],
       },
     ],
@@ -581,6 +584,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
     collapsed: true,
     items: [
       "guides/manage/user/reg-create-user",
+      "guides/manage/user/self-deletion",
       "guides/manage/terraform-provider",
       {
         type: "category",
@@ -659,6 +663,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
           "guides/integrate/retrieve-user-roles",
           "concepts/structure/granted_projects",
           "guides/manage/console/administrators",
+          "guides/manage/console/administrator-hardening",
         ],
       },
       {
@@ -743,6 +748,7 @@ export const guidesSidebar: readonly SidebarItem[] = [
                   "self-hosting/manage/tls_modes",
                   "self-hosting/manage/http2",
                   "self-hosting/manage/login-client",
+                  "self-hosting/manage/adopt-login-v2",
                 ],
               },
               {
@@ -808,8 +814,10 @@ export const guidesSidebar: readonly SidebarItem[] = [
         label: "Scaling & Performance",
         items: [
           "self-hosting/manage/updating_scaling",
+          "self-hosting/manage/upgrade-v3-to-v4",
           "self-hosting/manage/database/database",
           "self-hosting/manage/cache",
+          "self-hosting/manage/tuning",
         ],
       },
 
@@ -861,23 +869,9 @@ export const guidesSidebar: readonly SidebarItem[] = [
     collapsed: true,
     items: [
       {
-        type: "category",
-        label: "Product Features",
-        items: [
-          "product/roadmap",
-        ],
-      },
-      {
-        type: "category",
-        label: "Releases",
-        items: [
-          {
-            type: "link",
-            label: "Changelog",
-            href: "https://zitadel.com/changelog",
-          },
-          "product/release-cycle",
-        ],
+        type: "doc",
+        id: "product/roadmap",
+        label: "Roadmap",
       },
       {
         type: "category",
@@ -981,6 +975,11 @@ export const apisSidebar: readonly SidebarItem[] = [
     id: "apis/statuscodes",
   },
   {
+    type: "doc",
+    label: "Error Reference",
+    id: "apis/errors",
+  },
+  {
     type: "link",
     label: "Rate Limits (Cloud)",
     href: "/legal/policies/rate-limit-policy",
@@ -1026,6 +1025,23 @@ export const apisSidebar: readonly SidebarItem[] = [
           "apis/benchmarks/v4/otp_session",
           "apis/benchmarks/v4/password_session",
           "apis/benchmarks/v4/user_info",
+        ],
+      },
+      {
+        type: "category",
+        label: "v4.17.1",
+        items: [
+          "apis/benchmarks/v4.17.1/add_session",
+          "apis/benchmarks/v4.17.1/human_password_login",
+          "apis/benchmarks/v4.17.1/introspect",
+          "apis/benchmarks/v4.17.1/machine_client_credentials_login",
+          "apis/benchmarks/v4.17.1/machine_jwt_profile_grant",
+          "apis/benchmarks/v4.17.1/machine_pat_login",
+          "apis/benchmarks/v4.17.1/manipulate_user",
+          "apis/benchmarks/v4.17.1/oidc_session",
+          "apis/benchmarks/v4.17.1/otp_session",
+          "apis/benchmarks/v4.17.1/password_session",
+          "apis/benchmarks/v4.17.1/user_info",
         ],
       },
     ],

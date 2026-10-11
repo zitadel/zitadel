@@ -503,6 +503,7 @@ Errors:
         AlreadyReady: Multifaktor OTP (OneTimePassword) ist bereits eingerichtet
         NotExisting: Multifaktor OTP (OneTimePassword) existiert nicht
         InvalidCode: Code ist ungültig
+        Reused: Dieser Code wurde bereits verwendet. Bitte warten Sie auf einen neuen Code
         NotReady: Multifaktor OTP (OneTimePassword) ist nicht bereit
     Locked: Benutzer ist gesperrt
     SomethingWentWrong: Irgendetwas ist schief gelaufen

@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"errors"
+	"net"
 	"testing"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 	"go.uber.org/mock/gomock"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
@@ -312,6 +314,8 @@ func TestCommandSide_AddSMSConfigHTTP(t *testing.T) {
 		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 		defaultSecretGenerators     *SecretGenerators
 		alg                         crypto.EncryptionAlgorithm
+		denyList                    []denylist.AddressChecker
+		ipLookupFunc                func(string) ([]net.IP, error)
 	}
 	type args struct {
 		ctx  context.Context
@@ -366,6 +370,9 @@ func TestCommandSide_AddSMSConfigHTTP(t *testing.T) {
 				idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "providerid"),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("12345678", time.Hour),
 				defaultSecretGenerators:     &SecretGenerators{},
+				ipLookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{net.ParseIP("10.0.0.1")}, nil
+				},
 			},
 			args: args{
 				ctx: context.Background(),
@@ -381,6 +388,30 @@ func TestCommandSide_AddSMSConfigHTTP(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "add sms config http, blocked endpoint",
+			fields: fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "providerid"),
+				denyList:    []denylist.AddressChecker{denylist.NewHostChecker("blocked.example.com")},
+				ipLookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{net.ParseIP("10.0.0.1")}, nil
+				},
+			},
+			args: args{
+				ctx: context.Background(),
+				http: &AddSMSHTTP{
+					ResourceOwner: "INSTANCE",
+					Description:   "description",
+					Endpoint:      "https://blocked.example.com/hook",
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-Uf0294nKls", ""))
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -390,6 +421,8 @@ func TestCommandSide_AddSMSConfigHTTP(t *testing.T) {
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
 				smsEncryption:               tt.fields.alg,
+				denyList:                    tt.fields.denyList,
+				ipLookupFunction:            tt.fields.ipLookupFunc,
 			}
 			err := r.AddSMSConfigHTTP(tt.args.ctx, tt.args.http)
 			if tt.res.err == nil {
@@ -410,6 +443,8 @@ func TestCommandSide_ChangeSMSConfigHTTP(t *testing.T) {
 		eventstore                  func(*testing.T) *eventstore.Eventstore
 		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 		defaultSecretGenerators     *SecretGenerators
+		denyList                    []denylist.AddressChecker
+		ipLookupFunc                func(string) ([]net.IP, error)
 	}
 	type args struct {
 		ctx  context.Context
@@ -499,6 +534,9 @@ func TestCommandSide_ChangeSMSConfigHTTP(t *testing.T) {
 						),
 					),
 				),
+				ipLookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{net.ParseIP("10.0.0.1")}, nil
+				},
 			},
 			args: args{
 				ctx: context.Background(),
@@ -552,6 +590,9 @@ func TestCommandSide_ChangeSMSConfigHTTP(t *testing.T) {
 				),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("87654321", time.Hour),
 				defaultSecretGenerators:     &SecretGenerators{},
+				ipLookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{net.ParseIP("10.0.0.1")}, nil
+				},
 			},
 			args: args{
 				ctx: context.Background(),
@@ -569,6 +610,29 @@ func TestCommandSide_ChangeSMSConfigHTTP(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "change sms config, blocked endpoint",
+			fields: fields{
+				eventstore: expectEventstore(),
+				denyList:   []denylist.AddressChecker{denylist.NewHostChecker("blocked.example.com")},
+				ipLookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{net.ParseIP("10.0.0.1")}, nil
+				},
+			},
+			args: args{
+				ctx: context.Background(),
+				http: &ChangeSMSHTTP{
+					ResourceOwner: "INSTANCE",
+					ID:            "providerid",
+					Endpoint:      gu.Ptr("https://blocked.example.com/hook"),
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-Uf0294nKls", ""))
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -576,6 +640,8 @@ func TestCommandSide_ChangeSMSConfigHTTP(t *testing.T) {
 				eventstore:                  tt.fields.eventstore(t),
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
+				denyList:                    tt.fields.denyList,
+				ipLookupFunction:            tt.fields.ipLookupFunc,
 			}
 			err := r.ChangeSMSConfigHTTP(tt.args.ctx, tt.args.http)
 			if tt.res.err == nil {

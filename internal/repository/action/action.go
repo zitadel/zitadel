@@ -40,12 +40,14 @@ type AddedEvent struct {
 	AllowedToFail bool          `json:"allowedToFail"`
 }
 
+func (*AddedEvent) EnforceResourceOwner() {}
+
 func (e *AddedEvent) Payload() interface{} {
 	return e
 }
 
 func (e *AddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddActionNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
+	return []*eventstore.UniqueConstraint{NewAddActionNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner).WithOwners(eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ResourceOwner))}
 }
 
 func NewAddedEvent(
@@ -102,7 +104,7 @@ func (e *ChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	}
 	return []*eventstore.UniqueConstraint{
 		NewRemoveActionNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner),
-		NewAddActionNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner),
+		NewAddActionNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner).WithOwners(eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ResourceOwner)),
 	}
 }
 

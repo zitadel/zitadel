@@ -9,6 +9,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -70,6 +76,9 @@ var (
 		"include_symbols",
 		"count",
 	}
+	expectedSecretGeneratorByTypeQuery = regexp.QuoteMeta(prepareSecretGeneratorStmt +
+		` WHERE projections.secret_generators2.generator_type = $1 AND projections.secret_generators2.instance_id = $2`)
+	secretGeneratorByTypeInstanceID = "instanceID"
 )
 
 func Test_SecretGeneratorsPrepares(t *testing.T) {
@@ -311,6 +320,104 @@ func Test_SecretGeneratorsPrepares(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+		})
+	}
+}
+
+func TestQueries_SecretGeneratorByType(t *testing.T) {
+	ctx := authz.NewMockContext(secretGeneratorByTypeInstanceID, "orgID", "loginClient")
+	generatorType := domain.SecretGeneratorTypeInviteCode
+	queryArgs := []driver.Value{generatorType, secretGeneratorByTypeInstanceID}
+	inviteCodeDefault := &crypto.GeneratorConfig{
+		Length:              6,
+		Expiry:              72 * time.Hour,
+		IncludeUpperLetters: true,
+		IncludeDigits:       true,
+	}
+
+	tests := []struct {
+		name                    string
+		mock                    sqlExpectation
+		defaultSecretGenerators map[domain.SecretGeneratorType]*crypto.GeneratorConfig
+		want                    *SecretGenerator
+		wantErr                 error
+	}{
+		{
+			name: "found in DB",
+			mock: mockQuery(expectedSecretGeneratorByTypeQuery, prepareSecretGeneratorCols, []driver.Value{
+				"agg-id",
+				domain.SecretGeneratorTypeInviteCode,
+				testNow,
+				testNow,
+				"ro",
+				uint64(20211108),
+				6,
+				72 * time.Hour,
+				false,
+				true,
+				true,
+				false,
+			}, queryArgs...),
+			want: &SecretGenerator{
+				AggregateID:         "agg-id",
+				GeneratorType:       domain.SecretGeneratorTypeInviteCode,
+				CreationDate:        testNow,
+				ChangeDate:          testNow,
+				ResourceOwner:       "ro",
+				Sequence:            20211108,
+				Length:              6,
+				Expiry:              72 * time.Hour,
+				IncludeLowerLetters: false,
+				IncludeUpperLetters: true,
+				IncludeDigits:       true,
+				IncludeSymbols:      false,
+			},
+		},
+		{
+			name: "not found, default exists",
+			mock: mockQueryErr(expectedSecretGeneratorByTypeQuery, sql.ErrNoRows, queryArgs...),
+			defaultSecretGenerators: map[domain.SecretGeneratorType]*crypto.GeneratorConfig{
+				domain.SecretGeneratorTypeInviteCode: inviteCodeDefault,
+			},
+			want: &SecretGenerator{
+				AggregateID:         secretGeneratorByTypeInstanceID,
+				ResourceOwner:       secretGeneratorByTypeInstanceID,
+				GeneratorType:       domain.SecretGeneratorTypeInviteCode,
+				Length:              6,
+				Expiry:              72 * time.Hour,
+				IncludeUpperLetters: true,
+				IncludeDigits:       true,
+			},
+		},
+		{
+			name:                    "not found, no default",
+			mock:                    mockQueryErr(expectedSecretGeneratorByTypeQuery, sql.ErrNoRows, queryArgs...),
+			defaultSecretGenerators: map[domain.SecretGeneratorType]*crypto.GeneratorConfig{},
+			wantErr:                 sql.ErrNoRows,
+		},
+		{
+			name:    "DB internal error",
+			mock:    mockQueryErr(expectedSecretGeneratorByTypeQuery, sql.ErrConnDone, queryArgs...),
+			wantErr: sql.ErrConnDone,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			execMock(t, tt.mock, func(db *sql.DB) {
+				q := &Queries{
+					client: &database.DB{
+						DB: db,
+					},
+					defaultSecretGenerators: tt.defaultSecretGenerators,
+				}
+				got, err := q.SecretGeneratorByType(ctx, generatorType)
+				if tt.wantErr != nil {
+					require.ErrorIs(t, err, tt.wantErr)
+				} else {
+					require.NoError(t, err)
+				}
+				assert.Equal(t, tt.want, got)
+			})
 		})
 	}
 }

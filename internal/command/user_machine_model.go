@@ -34,11 +34,19 @@ func (wm *MachineWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *user.MachineAddedEvent:
+			wm.HashedSecret = ""
 			wm.UserName = e.UserName
 			wm.Name = e.Name
 			wm.Description = e.Description
 			wm.AccessTokenType = e.AccessTokenType
 			wm.UserState = domain.UserStateActive
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent:
+			wm.Name = ""
+			wm.Description = ""
+			wm.AccessTokenType = domain.OIDCTokenTypeBearer
+			wm.HashedSecret = ""
+			// We set the state to unspecified because it is not a valid machine.
+			wm.UserState = domain.UserStateUnspecified
 		case *user.UsernameChangedEvent:
 			wm.UserName = e.UserName
 		case *user.MachineChangedEvent:
@@ -68,6 +76,10 @@ func (wm *MachineWriteModel) Reduce() error {
 				wm.UserState = domain.UserStateActive
 			}
 		case *user.UserRemovedEvent:
+			wm.Name = ""
+			wm.Description = ""
+			wm.AccessTokenType = domain.OIDCTokenTypeBearer
+			wm.HashedSecret = ""
 			wm.UserState = domain.UserStateDeleted
 		case *user.MachineSecretSetEvent:
 			wm.HashedSecret = crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)
@@ -86,7 +98,10 @@ func (wm *MachineWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		EventTypes(user.MachineAddedEventType,
+		EventTypes(
+			user.MachineAddedEventType,
+			user.HumanAddedType,
+			user.HumanRegisteredType,
 			user.UserUserNameChangedType,
 			user.MachineChangedEventType,
 			user.UserLockedType,

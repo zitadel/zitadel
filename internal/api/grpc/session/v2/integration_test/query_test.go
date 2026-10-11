@@ -15,8 +15,6 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	featurepb "github.com/zitadel/zitadel/pkg/grpc/feature/v2"
-	instancepb "github.com/zitadel/zitadel/pkg/grpc/instance/v2"
 	objpb "github.com/zitadel/zitadel/pkg/grpc/object"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
@@ -250,8 +248,7 @@ type sessionAttr struct {
 	Details      *object.Details
 }
 
-// listSessionsEnv holds the environment context for ListSessions tests,
-// allowing the same test cases to run against both the eventstore and relational backends.
+// listSessionsEnv holds the environment context for ListSessions tests.
 type listSessionsEnv struct {
 	ownerCtx    context.Context // IAMOwner-level context; can list all sessions
 	loginCtx    context.Context // login-user context; used for session creation in deps
@@ -260,13 +257,9 @@ type listSessionsEnv struct {
 	loginUserID string
 	testUser    *user.AddHumanUserResponse
 	newUser     func(ctx context.Context) *user.AddHumanUserResponse
-	// isRelational controls behavior that currently differs between the eventstore
-	// and relational backends (e.g. sequence field, permission-check semantics).
-	isRelational bool
 }
 
 // runListSessionsTestCases defines and runs the full ListSessions test suite against env.
-// This is called by both [TestServer_ListSessions] (eventstore) and [TestServer_ListSessions_Relational].
 func runListSessionsTestCases(t *testing.T, env listSessionsEnv) {
 	t.Helper()
 
@@ -331,29 +324,17 @@ func runListSessionsTestCases(t *testing.T, env listSessionsEnv) {
 			},
 		},
 		{
-			// In the eventstore path, the session exists (TotalResult=1) but the permission
-			// callback hides its content (Sessions=[]). In the relational path the permission
-			// check is not yet implemented (returns SQL true), so the session is fully visible.
-			// TODO(IAM-Marco): align expectations once relational permission checks are implemented.
 			name: "list sessions, no permission",
 			ctx:  env.noPermCtx,
 			req:  &session.ListSessionsRequest{Queries: []*session.SearchQuery{}},
 			dep: func(t *testing.T, req *session.ListSessionsRequest) []*sessionAttr {
 				info := newSess(t, env.loginCtx, "", "", nil, nil)
 				req.Queries = append(req.Queries, &session.SearchQuery{Query: &session.SearchQuery_IdsQuery{IdsQuery: &session.IDsQuery{Ids: []string{info.ID}}}})
-				if env.isRelational {
-					return []*sessionAttr{info}
-				}
 				return []*sessionAttr{}
 			},
 			want: &session.ListSessionsResponse{
-				Details: &object.ListDetails{TotalResult: 1, Timestamp: timestamppb.Now()},
-				Sessions: func() []*session.Session {
-					if env.isRelational {
-						return []*session.Session{{}}
-					}
-					return []*session.Session{}
-				}(),
+				Details:  &object.ListDetails{TotalResult: 1, Timestamp: timestamppb.Now()},
+				Sessions: []*session.Session{},
 			},
 		},
 		{
@@ -670,11 +651,7 @@ func runListSessionsTestCases(t *testing.T, env listSessionsEnv) {
 
 				for i := range infos {
 					tt.want.Sessions[i].Id = infos[i].ID
-					if env.isRelational {
-						tt.want.Sessions[i].Sequence = 0
-					} else {
-						tt.want.Sessions[i].Sequence = infos[i].Details.GetSequence()
-					}
+					tt.want.Sessions[i].Sequence = infos[i].Details.GetSequence()
 					tt.want.Sessions[i].CreationDate = infos[i].Details.GetChangeDate()
 					tt.want.Sessions[i].ChangeDate = infos[i].Details.GetChangeDate()
 
@@ -765,37 +742,3 @@ func TestServer_ListSessions_with_expiration_date_filter(t *testing.T) {
 	assert.Equal(t, session2.SessionId, listSessionsResponse2.Sessions[0].Id)
 }
 
-func TestServer_ListSessions_Relational(t *testing.T) {
-	t.Parallel()
-
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
-	defer cancel()
-
-	sysAuthZ := integration.WithSystemAuthorization(ctx)
-
-	inst := integration.NewInstance(sysAuthZ)
-	integration.EnsureInstanceFeature(t, sysAuthZ, inst,
-		&featurepb.SetInstanceFeaturesRequest{EnableRelationalTables: gu.Ptr(true)},
-		func(tCollect *assert.CollectT, got *featurepb.GetInstanceFeaturesResponse) {
-			assert.True(tCollect, got.GetEnableRelationalTables().GetEnabled())
-		},
-	)
-	t.Cleanup(func() {
-		inst.Client.InstanceV2.DeleteInstance(sysAuthZ, &instancepb.DeleteInstanceRequest{InstanceId: inst.ID()})
-	})
-
-	instOwnerCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeIAMOwner)
-	loginCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeLogin)
-	noPermCtx := inst.WithAuthorizationToken(context.Background(), integration.UserTypeNoPermission)
-
-	runListSessionsTestCases(t, listSessionsEnv{
-		ownerCtx:     instOwnerCtx,
-		loginCtx:     loginCtx,
-		noPermCtx:    noPermCtx,
-		client:       inst.Client.SessionV2,
-		loginUserID:  inst.Users.Get(integration.UserTypeLogin).ID,
-		testUser:     inst.CreateHumanUser(instOwnerCtx),
-		newUser:      func(ctx context.Context) *user.AddHumanUserResponse { return inst.CreateHumanUser(ctx) },
-		isRelational: true,
-	})
-}

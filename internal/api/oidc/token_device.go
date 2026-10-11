@@ -25,12 +25,15 @@ func (s *Server) DeviceToken(ctx context.Context, r *op.ClientRequest[oidc.Devic
 	if !ok {
 		return nil, zerrors.ThrowInternal(nil, "OIDC-Ae2ph", "Error.Internal")
 	}
-	session, err := s.command.CreateOIDCSessionFromDeviceAuth(ctx, r.Data.DeviceCode, client.client.BackChannelLogoutURI)
+	session, err := s.command.CreateOIDCSessionFromDeviceAuth(ctx, r.Data.DeviceCode, client.client.BackChannelLogoutURI, client.client.ClientID)
 	if err == nil {
 		return response(s.accessTokenResponseFromSession(ctx, client, session, "", client.client.ProjectID, client.client.ProjectRoleAssertion, client.client.AccessTokenRoleAssertion, client.client.IDTokenRoleAssertion, client.client.IDTokenUserinfoAssertion))
 	}
 	if errors.Is(err, context.DeadlineExceeded) {
 		return nil, oidc.ErrSlowDown().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
+	}
+	if errors.Is(err, oidc.ErrInvalidClient()) {
+		return nil, err
 	}
 
 	var target command.DeviceAuthStateError

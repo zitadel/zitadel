@@ -221,5 +221,9 @@ func (p *relationalTablesProjection) reduceJWTIDPChangedColumns(payload *domain.
 		payloadChanged = true
 		payload.Issuer = *idpEvent.Issuer
 	}
+	if idpEvent.Audience != nil && *idpEvent.Audience != payload.Audience {
+		payloadChanged = true
+		payload.Audience = *idpEvent.Audience
+	}
 	return payloadChanged
 }

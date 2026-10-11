@@ -26,7 +26,6 @@ import (
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -58,7 +57,7 @@ type API struct {
 	targetEncryptionAlgorithm crypto.EncryptionAlgorithm
 	translator                *i18n.Translator
 	connectOTELInterceptor    *otelconnect.Interceptor
-	actionV2DenyList          []denylist.AddressChecker
+	httpClient                *http.Client
 }
 
 func (a *API) ListGrpcServices() []string {
@@ -113,7 +112,7 @@ func New(
 	targetEncryptionAlgorithm crypto.EncryptionAlgorithm,
 	translator *i18n.Translator,
 	trustRemoteSpans bool,
-	deniedIPList []denylist.AddressChecker,
+	httpClient *http.Client,
 ) (_ *API, err error) {
 	api := &API{
 		port:                      port,
@@ -129,10 +128,10 @@ func New(
 		connectServices:           make(map[string][]string),
 		targetEncryptionAlgorithm: targetEncryptionAlgorithm,
 		translator:                translator,
-		actionV2DenyList:          deniedIPList,
+		httpClient:                httpClient,
 	}
 
-	api.grpcServer = server.CreateServer(api.verifier, systemAuthz, authZ, queries, externalDomain, tlsConfig, accessInterceptor.AccessService(), targetEncryptionAlgorithm, api.translator, deniedIPList)
+	api.grpcServer = server.CreateServer(api.verifier, systemAuthz, authZ, queries, externalDomain, tlsConfig, accessInterceptor.AccessService(), targetEncryptionAlgorithm, api.translator, httpClient)
 	api.grpcGateway, err = server.CreateGateway(ctx, port, hostHeaders, accessInterceptor, tlsConfig)
 	if err != nil {
 		return nil, err
@@ -224,7 +223,7 @@ func (a *API) registerConnectServer(service server.ConnectServer) {
 		connect_middleware.AuthorizationInterceptor(a.verifier, a.systemAuthZ, a.authConfig),
 		connect_middleware.TranslationHandler(),
 		connect_middleware.QuotaExhaustedInterceptor(a.accessInterceptor.AccessService(), system_pb.SystemService_ServiceDesc.ServiceName),
-		connect_middleware.ExecutionHandler(a.targetEncryptionAlgorithm, a.queries.GetActiveSigningWebKey, a.actionV2DenyList),
+		connect_middleware.ExecutionHandler(a.targetEncryptionAlgorithm, a.queries.GetActiveSigningWebKey, a.httpClient),
 		connect_middleware.ValidationHandler(),
 		connect_middleware.ServiceHandler(),
 		connect_middleware.ActivityInterceptor(),

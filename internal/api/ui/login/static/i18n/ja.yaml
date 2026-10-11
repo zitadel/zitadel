@@ -505,6 +505,7 @@ Errors:
         AlreadyReady: 多要素OTP（ワンタイムパスワード）は設定済みです
         NotExisting: 多要素OTP（ワンタイムパスワード）が存在しません
         InvalidCode: 無効なコード
+        Reused: このコードはすでに使用されています。新しいコードをお待ちください
         NotReady: 多要素OTP（ワンタイムパスワード）は利用可能でありません
     Locked: ユーザーはロックされています
     SomethingWentWrong: エラーが発生しました

@@ -10,18 +10,18 @@ import (
 
 var (
 	//go:embed 71.sql
-	addLockoutPolicyShowRemainingLockoutTimeColumn string
+	addJWTAudience string
 )
 
-type LockoutPolicyShowRemainingLockoutTimeColumn struct {
+type JWTProvideAddAudienceColumn struct {
 	dbClient *database.DB
 }
 
-func (mig *LockoutPolicyShowRemainingLockoutTimeColumn) Execute(ctx context.Context, _ eventstore.Event) error {
-	_, err := mig.dbClient.DB.ExecContext(ctx, addLockoutPolicyShowRemainingLockoutTimeColumn)
+func (mig *JWTProvideAddAudienceColumn) Execute(ctx context.Context, _ eventstore.Event) error {
+	_, err := mig.dbClient.ExecContext(ctx, addJWTAudience)
 	return err
 }
 
-func (mig *LockoutPolicyShowRemainingLockoutTimeColumn) String() string {
-	return "71_lockout_policies3_add_show_remaining_lockout_time_column"
+func (mig *JWTProvideAddAudienceColumn) String() string {
+	return "71_idp_templates6_jwt_add_audience"
 }

@@ -10,6 +10,7 @@ type Config struct {
 	Method     string
 	Headers    http.Header
 	SigningKey string
+	Client     *http.Client
 }
 
 func (w *Config) Validate() error {

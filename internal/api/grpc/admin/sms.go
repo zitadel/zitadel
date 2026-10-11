@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Server) ListSMSProviders(ctx context.Context, req *admin_pb.ListSMSProvidersRequest) (*admin_pb.ListSMSProvidersResponse, error) {
-	queries, err := listSMSConfigsToModel(req)
+	queries, err := listSMSConfigsToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}

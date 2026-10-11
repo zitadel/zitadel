@@ -17,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/actions"
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/saml"
@@ -87,6 +88,7 @@ type Config struct {
 	Quotas              *QuotasConfig
 	Telemetry           *handlers.TelemetryPusherConfig
 	ServicePing         *serviceping.Config
+	HTTPClient          *http.ClientConfig
 }
 
 type QuotasConfig struct {
@@ -121,9 +123,12 @@ func NewConfig(cmd *cobra.Command, v *viper.Viper) (*Config, instrumentation.Shu
 	}
 
 	id.Configure(config.Machine)
+
+	var actionsDenylist []denylist.AddressChecker
 	if config.Actions != nil {
-		actions.SetHTTPConfig(&config.Actions.HTTP)
+		actionsDenylist = config.Actions.HTTP.DenyList
 	}
+	config.HTTPClient.MergeDeprecatedDenylists(actionsDenylist, config.Executions.DenyList)
 
 	err = config.SystemDefaults.Validate()
 	if err != nil {

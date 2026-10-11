@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { sendPasskey } from "./passkeys";
+import { registerPasskeyLink, sendPasskey } from "./passkeys";
 
 // Mock all the dependencies
 vi.mock("next/headers", () => ({
@@ -19,8 +19,12 @@ vi.mock("../service-url", () => ({
 
 vi.mock("../zitadel", () => ({
   getLoginSettings: vi.fn(),
+  getSession: vi.fn(),
   getUserByID: vi.fn(),
   listUsers: vi.fn(),
+  createPasskeyRegistrationLink: vi.fn(),
+  registerPasskey: vi.fn(),
+  listAuthenticationMethodTypes: vi.fn(),
 }));
 
 vi.mock("./cookie", () => ({
@@ -36,6 +40,11 @@ vi.mock("../cookies", () => ({
 
 vi.mock("../verify-helper", () => ({
   checkEmailVerification: vi.fn(),
+  checkUserVerification: vi.fn(),
+}));
+
+vi.mock("./host", () => ({
+  getPublicHost: vi.fn(),
 }));
 
 vi.mock("../client", () => ({
@@ -72,6 +81,7 @@ describe("sendPasskey", () => {
     const { getSessionCookieById, getSessionCookieByLoginName, getMostRecentSessionCookie } = await import("../cookies");
     const { checkEmailVerification } = await import("../verify-helper");
     const { completeFlowOrGetUrl } = await import("../client");
+    const { getPublicHost } = await import("./host");
 
     // Setup mocks
     mockHeaders = vi.mocked(headers);
@@ -90,6 +100,7 @@ describe("sendPasskey", () => {
     mockGetMostRecentSessionCookie = vi.mocked(getMostRecentSessionCookie);
     mockCheckEmailVerification = vi.mocked(checkEmailVerification);
     mockCompleteFlowOrGetUrl = vi.mocked(completeFlowOrGetUrl);
+    vi.mocked(getPublicHost).mockReturnValue("test.com");
 
     // Default mock implementations
     const headersList = new Headers();
@@ -471,6 +482,237 @@ describe("sendPasskey", () => {
           }),
         }),
       );
+    });
+  });
+});
+
+describe("registerPasskeyLink", () => {
+  let mockHeaders: any;
+  let mockGetServiceConfig: any;
+  let mockGetSession: any;
+  let mockGetSessionCookieById: any;
+  let mockCreatePasskeyRegistrationLink: any;
+  let mockRegisterPasskey: any;
+  let mockListAuthenticationMethodTypes: any;
+  let mockGetPublicHost: any;
+  let mockCheckUserVerification: any;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+
+    const { headers } = await import("next/headers");
+    const { getServiceConfig } = await import("../service-url");
+    const { getSession, createPasskeyRegistrationLink, registerPasskey, listAuthenticationMethodTypes } =
+      await import("../zitadel");
+    const { getSessionCookieById } = await import("../cookies");
+    const { getPublicHost } = await import("./host");
+    const { checkUserVerification } = await import("../verify-helper");
+
+    mockHeaders = vi.mocked(headers);
+    mockGetServiceConfig = vi.mocked(getServiceConfig);
+    mockGetSession = vi.mocked(getSession);
+    mockGetSessionCookieById = vi.mocked(getSessionCookieById);
+    mockCreatePasskeyRegistrationLink = vi.mocked(createPasskeyRegistrationLink);
+    mockRegisterPasskey = vi.mocked(registerPasskey);
+    mockListAuthenticationMethodTypes = vi.mocked(listAuthenticationMethodTypes);
+    mockGetPublicHost = vi.mocked(getPublicHost);
+    mockCheckUserVerification = vi.mocked(checkUserVerification);
+
+    const headersList = new Headers();
+    headersList.set("host", "test.com");
+    mockHeaders.mockResolvedValue(headersList);
+    mockGetServiceConfig.mockReturnValue({ serviceConfig: { baseUrl: "https://example.com" } });
+    mockGetPublicHost.mockReturnValue("test.com");
+  });
+
+  test("should return error when neither sessionId nor userId is provided", async () => {
+    const result = await registerPasskeyLink({});
+    expect(result).toEqual({ error: "Either sessionId or userId must be provided" });
+  });
+
+  test("should return error when session cookie is not found", async () => {
+    mockGetSessionCookieById.mockResolvedValue(null);
+
+    const result = await registerPasskeyLink({ sessionId: "session-123" });
+    expect(result).toEqual({ error: "Could not get session cookie" });
+  });
+
+  describe("IDP-authenticated session", () => {
+    const sessionCookie = {
+      id: "session-123",
+      token: "session-token",
+      loginName: "max@zitadel.com",
+    };
+
+    const idpSession = {
+      session: {
+        id: "session-123",
+        factors: {
+          user: { id: "user-123", loginName: "max@zitadel.com" },
+          intent: {
+            verifiedAt: { seconds: BigInt(1700000000), nanos: 0 },
+          },
+        },
+      },
+    };
+
+    test("should succeed for session authenticated via IDP intent", async () => {
+      mockGetSessionCookieById.mockResolvedValue(sessionCookie);
+      mockGetSession.mockResolvedValue(idpSession);
+      mockCreatePasskeyRegistrationLink.mockResolvedValue({
+        code: { id: "code-id", code: "code-value" },
+      });
+      mockRegisterPasskey.mockResolvedValue({
+        passkeyId: "passkey-123",
+        publicKeyCredentialCreationOptions: {},
+      });
+
+      const result = await registerPasskeyLink({ sessionId: "session-123" });
+
+      expect(result).toHaveProperty("passkeyId");
+      expect(mockRegisterPasskey).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: "user-123",
+          domain: "test.com",
+        }),
+      );
+    });
+
+    test("should not require user verification or auth method check when IDP session is valid", async () => {
+      mockGetSessionCookieById.mockResolvedValue(sessionCookie);
+      mockGetSession.mockResolvedValue(idpSession);
+      mockCreatePasskeyRegistrationLink.mockResolvedValue({
+        code: { id: "code-id", code: "code-value" },
+      });
+      mockRegisterPasskey.mockResolvedValue({
+        passkeyId: "passkey-123",
+        publicKeyCredentialCreationOptions: {},
+      });
+
+      await registerPasskeyLink({ sessionId: "session-123" });
+
+      // Should NOT call listAuthenticationMethodTypes or checkUserVerification
+      // because the session is already valid via IDP intent
+      expect(mockListAuthenticationMethodTypes).not.toHaveBeenCalled();
+      expect(mockCheckUserVerification).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("password-authenticated session", () => {
+    test("should succeed for session authenticated via password", async () => {
+      mockGetSessionCookieById.mockResolvedValue({
+        id: "session-123",
+        token: "session-token",
+        loginName: "max@zitadel.com",
+      });
+      mockGetSession.mockResolvedValue({
+        session: {
+          id: "session-123",
+          factors: {
+            user: { id: "user-123", loginName: "max@zitadel.com" },
+            password: {
+              verifiedAt: { seconds: BigInt(1700000000), nanos: 0 },
+            },
+          },
+        },
+      });
+      mockCreatePasskeyRegistrationLink.mockResolvedValue({
+        code: { id: "code-id", code: "code-value" },
+      });
+      mockRegisterPasskey.mockResolvedValue({
+        passkeyId: "passkey-123",
+        publicKeyCredentialCreationOptions: {},
+      });
+
+      const result = await registerPasskeyLink({ sessionId: "session-123" });
+
+      expect(result).toHaveProperty("passkeyId");
+    });
+  });
+
+  describe("session with no valid factors", () => {
+    test("should return error when session has no verified factors and user has auth methods", async () => {
+      mockGetSessionCookieById.mockResolvedValue({
+        id: "session-123",
+        token: "session-token",
+        loginName: "max@zitadel.com",
+      });
+      mockGetSession.mockResolvedValue({
+        session: {
+          id: "session-123",
+          factors: {
+            user: { id: "user-123", loginName: "max@zitadel.com" },
+            // No password, no webAuthN, no intent
+          },
+        },
+      });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [1], // has at least one auth method
+      });
+
+      const result = await registerPasskeyLink({ sessionId: "session-123" });
+
+      expect(result).toEqual({
+        error: "You have to authenticate or have a valid User Verification Check",
+      });
+    });
+
+    test("should check user verification when session has no factors and user has no auth methods", async () => {
+      mockGetSessionCookieById.mockResolvedValue({
+        id: "session-123",
+        token: "session-token",
+        loginName: "max@zitadel.com",
+      });
+      mockGetSession.mockResolvedValue({
+        session: {
+          id: "session-123",
+          factors: {
+            user: { id: "user-123", loginName: "max@zitadel.com" },
+          },
+        },
+      });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [],
+      });
+      mockCheckUserVerification.mockResolvedValue(false);
+
+      const result = await registerPasskeyLink({ sessionId: "session-123" });
+
+      expect(result).toEqual({
+        error: "User Verification Check has to be done",
+      });
+      expect(mockCheckUserVerification).toHaveBeenCalledWith("user-123");
+    });
+
+    test("should proceed when session has no factors but user verification passes", async () => {
+      mockGetSessionCookieById.mockResolvedValue({
+        id: "session-123",
+        token: "session-token",
+        loginName: "max@zitadel.com",
+      });
+      mockGetSession.mockResolvedValue({
+        session: {
+          id: "session-123",
+          factors: {
+            user: { id: "user-123", loginName: "max@zitadel.com" },
+          },
+        },
+      });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [],
+      });
+      mockCheckUserVerification.mockResolvedValue(true);
+      mockCreatePasskeyRegistrationLink.mockResolvedValue({
+        code: { id: "code-id", code: "code-value" },
+      });
+      mockRegisterPasskey.mockResolvedValue({
+        passkeyId: "passkey-123",
+        publicKeyCredentialCreationOptions: {},
+      });
+
+      const result = await registerPasskeyLink({ sessionId: "session-123" });
+
+      expect(result).toHaveProperty("passkeyId");
     });
   });
 });

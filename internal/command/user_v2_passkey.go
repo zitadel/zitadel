@@ -128,16 +128,28 @@ func (c *Commands) AddUserPasskeyCodeReturn(ctx context.Context, userID, resourc
 }
 
 func (c *Commands) addUserPasskeyCode(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm, urlTmpl string, returnCode bool) (*domain.PasskeyCodeDetails, error) {
+	// The code ID only serves to match events of an already existing code, of which there are
+	// none for a code that is about to be created. It is therefore generated after the
+	// permission check, so an unauthorized caller triggers neither ID generation nor the
+	// secret generator lookup behind newPasskeyCode.
+	wm := NewHumanPasswordlessInitCodeWriteModel(userID, "", resourceOwner)
+	err := c.eventstore.FilterToQueryReducer(ctx, wm)
+	if err != nil {
+		return nil, err
+	}
+	// Authorize against the target user's actual resource owner (resolved from the write
+	// model), not a caller-supplied org. The API auth interceptor only verifies the
+	// permission in the request-header org, so without this check an ORG_OWNER of one org
+	// could mint a passkey enrollment code for a user in another org.
+	if err := c.checkPermissionUpdateUserPasskey(ctx, wm.ResourceOwner, userID); err != nil {
+		return nil, err
+	}
 	codeID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
+	wm.CodeID = codeID
 	code, err := c.newPasskeyCode(ctx, c.eventstore.Filter, alg)
-	if err != nil {
-		return nil, err
-	}
-	wm := NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, wm)
 	if err != nil {
 		return nil, err
 	}

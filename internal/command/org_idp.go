@@ -811,7 +811,7 @@ func (c *Commands) prepareMigrateOrgOIDCToAzureADProvider(a *org.Aggregate, writ
 				return nil, err
 			}
 			if !writeModel.State.Exists() {
-				return nil, zerrors.ThrowNotFound(nil, "INST-Dg239201", "Errors.Instance.IDPConfig.NotExisting")
+				return nil, zerrors.ThrowNotFound(nil, "ORG-Dg239201", "Errors.Org.IDPConfig.NotExisting")
 			}
 			secret, err := crypto.Encrypt([]byte(provider.ClientSecret), c.idpConfigEncryption)
 			if err != nil {
@@ -853,7 +853,7 @@ func (c *Commands) prepareMigrateOrgOIDCToGoogleProvider(a *org.Aggregate, write
 				return nil, err
 			}
 			if !writeModel.State.Exists() {
-				return nil, zerrors.ThrowNotFound(nil, "INST-x09981", "Errors.Instance.IDPConfig.NotExisting")
+				return nil, zerrors.ThrowNotFound(nil, "ORG-x09981", "Errors.Org.IDPConfig.NotExisting")
 			}
 			secret, err := crypto.Encrypt([]byte(provider.ClientSecret), c.idpConfigEncryption)
 			if err != nil {
@@ -911,6 +911,7 @@ func (c *Commands) prepareAddOrgJWTProvider(a *org.Aggregate, writeModel *OrgJWT
 					provider.JWTEndpoint,
 					provider.KeyEndpoint,
 					provider.HeaderName,
+					provider.Audience,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -959,6 +960,7 @@ func (c *Commands) prepareUpdateOrgJWTProvider(a *org.Aggregate, writeModel *Org
 				provider.JWTEndpoint,
 				provider.KeyEndpoint,
 				provider.HeaderName,
+				provider.Audience,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {
@@ -1917,7 +1919,7 @@ func (c *Commands) AddOrgZitadelProvider(ctx context.Context, resourceOwner stri
 		return "", nil, err
 	}
 
-	err = c.validateOrgZitadelProvider(&provider)
+	err = c.validateOrgZitadelProvider(&provider, true)
 	if err != nil {
 		return "", nil, err
 	}
@@ -1968,7 +1970,71 @@ func (c *Commands) prepareAddOrgZitadelProvider(a *org.Aggregate, writeModel *Or
 	}
 }
 
-func (c *Commands) validateOrgZitadelProvider(provider *ZitadelProvider) error {
+func (c *Commands) UpdateOrgZitadelProvider(ctx context.Context, id string, resourceOwner string, provider ZitadelProvider) (*domain.ObjectDetails, error) {
+	err := c.validateOrgZitadelProvider(&provider, false)
+	if err != nil {
+		return nil, err
+	}
+	writeModel := NewZitadelOrgIDPWriteModel(resourceOwner, id)
+	orgAgg := org.NewAggregate(resourceOwner)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgZitadelProvider(orgAgg, writeModel, provider)) //nolint:staticcheck
+	if err != nil {
+		return nil, err
+	}
+	if len(cmds) == 0 {
+		// no change, so return directly
+		return &domain.ObjectDetails{
+			Sequence:      writeModel.ProcessedSequence,
+			EventDate:     writeModel.ChangeDate,
+			ResourceOwner: writeModel.ResourceOwner,
+		}, nil
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return pushedEventsToObjectDetails(pushedEvents), nil
+}
+
+func (c *Commands) prepareUpdateOrgZitadelProvider(a *org.Aggregate, writeModel *OrgZitadelIDPWriteModel, provider ZitadelProvider) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
+			return nil, zerrors.ThrowInvalidArgument(nil, "ORG-3pxLbA", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if !writeModel.State.Exists() {
+				return nil, zerrors.ThrowNotFound(nil, "ORG-Bg281", "Errors.Org.IDPConfig.NotExisting")
+			}
+			event, err := writeModel.NewChangedEvent(
+				ctx,
+				&a.Aggregate,
+				writeModel.ID,
+				provider.Name,
+				provider.Issuer,
+				provider.ClientID,
+				provider.ClientSecret,
+				c.idpConfigEncryption,
+				provider.Scopes,
+				provider.IDPOptions,
+				provider.InstanceRolesInfo,
+			)
+			if err != nil || event == nil {
+				return nil, err
+			}
+			return []eventstore.Command{event}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) validateOrgZitadelProvider(provider *ZitadelProvider, create bool) error {
 	if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
 		return zerrors.ThrowInvalidArgument(nil, "ORG-c3EC3W", "Errors.Invalid.Argument")
 	}
@@ -1978,19 +2044,17 @@ func (c *Commands) validateOrgZitadelProvider(provider *ZitadelProvider) error {
 	if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "ORG-feyb3A", "Errors.Invalid.Argument")
 	}
-	if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
+	// client_secret is required on creation, but optional on update
+	provider.ClientSecret = strings.TrimSpace(provider.ClientSecret)
+	if create && provider.ClientSecret == "" {
 		return zerrors.ThrowInvalidArgument(nil, "ORG-DxaSb9", "Errors.Invalid.Argument")
 	}
-
-	for i := range provider.InstanceRolesInfo {
-		provider.InstanceRolesInfo[i].OrganizationID = strings.TrimSpace(provider.InstanceRolesInfo[i].OrganizationID)
-		if provider.InstanceRolesInfo[i].OrganizationID == "" {
-			return zerrors.ThrowInvalidArgument(nil, "ORG-M0QmjB", "Errors.Invalid.Argument")
-		}
-		provider.InstanceRolesInfo[i].OrganizationDomain = strings.TrimSpace(provider.InstanceRolesInfo[i].OrganizationDomain)
-		if provider.InstanceRolesInfo[i].OrganizationDomain == "" {
-			return zerrors.ThrowInvalidArgument(nil, "ORG-HAELEz", "Errors.Invalid.Argument")
-		}
+	// instance_roles_info must never be set on an organization-scoped Zitadel provider:
+	// it drives instance-wide role grants on login, and honoring it here would let an
+	// org owner escalate themselves to instance-level roles. Only the instance-scoped
+	// Admin API may configure it.
+	if len(provider.InstanceRolesInfo) > 0 {
+		return zerrors.ThrowInvalidArgument(nil, "ORG-ImOVF3", "Errors.Invalid.Argument")
 	}
 	return nil
 }

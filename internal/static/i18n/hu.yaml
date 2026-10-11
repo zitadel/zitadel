@@ -176,6 +176,7 @@ Errors:
         NotExisting: "A multifaktoros OTP (OneTimePassword) nem létezik"
         NotReady: "A multifaktoros OTP (OneTimePassword) nincs készen"
         InvalidCode: "Érvénytelen kód"
+        Reused: "Ezt a kódot már felhasználták. Kérjük, várjon egy új kódra"
       U2F:
         NotExisting: "Az U2F nem létezik"
       Passwordless:
@@ -204,6 +205,7 @@ Errors:
     AlreadyActive: "A szervezet már aktív"
     Empty: "A szervezet üres"
     NotFound: "Szervezet nem található"
+    NotActive: "A szervezet nem aktív"
     NotChanged: "A szervezet nem változott"
     DefaultOrgNotDeletable: "Az alapértelmezett szervezetet nem szabad törölni"
     ZitadelOrgNotDeletable: "A Zitadel projekttel rendelkező szervezetet nem szabad törölni"
@@ -282,6 +284,8 @@ Errors:
     LabelPolicy:
       NotFound: "A Private Label Policy nem található"
       NotChanged: "A Private Label Policy nem lett megváltoztatva"
+    IDPConfig:
+      NotExisting: "Az identitásszolgáltató konfiguráció nem létezik"
   Project:
     ProjectIDMissing: "Hiányzó Project Id"
     AlreadyExists: "A projekt már létezik a szervezetben"
@@ -764,6 +768,7 @@ EventTypes:
           check:
             succeeded: "A multifaktoros OTP ellenőrzés sikeres"
             failed: "A multifaktoros OTP ellenőrzés sikertelen"
+            reused: "A multifaktoros OTP kód újrafelhasználva"
           sms:
             added: "Multifaktoros OTP SMS hozzáadva"
             removed: "Multifaktoros OTP SMS eltávolítva"

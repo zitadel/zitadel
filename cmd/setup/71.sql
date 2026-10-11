@@ -1,2 +1,2 @@
-ALTER TABLE IF EXISTS projections.lockout_policies3 
-ADD COLUMN IF NOT EXISTS show_remaining_lockout_time BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE IF EXISTS projections.idp_templates6_jwt
+ADD COLUMN IF NOT EXISTS audience text;

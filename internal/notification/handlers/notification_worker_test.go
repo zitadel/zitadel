@@ -108,7 +108,7 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 				}
 				codeAlg, code := cryptoValue(t, ctrl, "testcode")
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-				commands.EXPECT().InviteCodeSent(gomock.Any(), orgID, userID).Return(nil)
+				commands.EXPECT().InviteCodeSent(gomock.Any(), userID, orgID).Return(nil)
 				return fieldsWorker{
 						queries:  queries,
 						commands: commands,
@@ -433,6 +433,7 @@ func newNotificationWorker(t *testing.T, ctrl *gomock.Controller, queries *mock.
 			f.userDataCrypto,
 			smtpAlg,
 			f.SMSTokenCrypto,
+			nil,
 		),
 		channels: &notificationChannels{
 			Chain: *senders.ChainChannels(channel),

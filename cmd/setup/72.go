@@ -10,18 +10,18 @@ import (
 
 var (
 	//go:embed 72.sql
-	addLockoutPolicyShowAbsoluteLockoutTimeColumn string
+	addColumnsToLoginNamesView string
 )
 
-type LockoutPolicyShowAbsoluteLockoutTimeColumn struct {
+type AddColumnsToLoginNamesView struct {
 	dbClient *database.DB
 }
 
-func (mig *LockoutPolicyShowAbsoluteLockoutTimeColumn) Execute(ctx context.Context, _ eventstore.Event) error {
-	_, err := mig.dbClient.DB.ExecContext(ctx, addLockoutPolicyShowAbsoluteLockoutTimeColumn)
+func (mig *AddColumnsToLoginNamesView) Execute(ctx context.Context, _ eventstore.Event) error {
+	_, err := mig.dbClient.ExecContext(ctx, addColumnsToLoginNamesView)
 	return err
 }
 
-func (mig *LockoutPolicyShowAbsoluteLockoutTimeColumn) String() string {
-	return "72_lockout_policies3_add_show_absolute_lockout_time_column"
+func (mig *AddColumnsToLoginNamesView) String() string {
+	return "72_add_columns_to_login_names_view"
 }

@@ -3,6 +3,7 @@ package setup
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 
@@ -47,6 +48,8 @@ type FirstInstance struct {
 	externalPort      uint16
 	domain            string
 	defaultPaths      *login.DefaultPaths
+	httpClient        *http.Client
+	denylist          []denylist.AddressChecker
 }
 
 func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error {
@@ -89,7 +92,7 @@ func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error
 		nil,
 		nil,
 		oidcEncryption,
-		nil,
+		mig.httpClient,
 		nil,
 		nil,
 		0,
@@ -97,7 +100,7 @@ func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error
 		0,
 		nil,
 		mig.defaultPaths,
-		[]denylist.AddressChecker{},
+		mig.denylist,
 	)
 	if err != nil {
 		return err

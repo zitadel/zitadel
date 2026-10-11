@@ -13,6 +13,10 @@ import {
   shouldEnforceMFA,
 } from "./verify-helper";
 
+vi.mock("./server/verify", () => ({
+  trySendVerification: vi.fn(() => Promise.resolve(true)),
+}));
+
 // Mock function to create timestamps - following the same pattern as session.test.ts
 function createMockTimestamp(offsetMs = 3600000): any {
   return {
@@ -483,88 +487,78 @@ describe("checkEmailVerified", () => {
     },
   };
 
-  it("should redirect if email is not verified", () => {
+  it("should redirect if email is not verified", async () => {
     const humanUser: any = {
       email: {
         isVerified: false,
       },
     };
 
-    const result = checkEmailVerified(mockSession, humanUser);
+    const result = await checkEmailVerified(mockSession, humanUser);
 
     expect(result).toEqual({
       redirect: expect.stringContaining("/verify"),
     });
+    expect(result?.redirect).toContain("codeSent=true");
   });
 
-  it("should not redirect if email is verified", () => {
+  it("should not redirect if email is verified", async () => {
     const humanUser: any = {
       email: {
         isVerified: true,
       },
     };
 
-    const result = checkEmailVerified(mockSession, humanUser);
+    const result = await checkEmailVerified(mockSession, humanUser);
 
     expect(result).toBeUndefined();
   });
 
-  it("should include userId in verify redirect", () => {
+  it("should include userId in verify redirect", async () => {
     const humanUser: any = {
       email: {
         isVerified: false,
       },
     };
 
-    const result = checkEmailVerified(mockSession, humanUser);
+    const result = await checkEmailVerified(mockSession, humanUser);
 
     expect(result?.redirect).toContain("userId=user-123");
   });
 
-  it("should include send=true parameter", () => {
+  it("should include organization in redirect", async () => {
     const humanUser: any = {
       email: {
         isVerified: false,
       },
     };
 
-    const result = checkEmailVerified(mockSession, humanUser);
-
-    expect(result?.redirect).toContain("send=true");
-  });
-
-  it("should include organization in redirect", () => {
-    const humanUser: any = {
-      email: {
-        isVerified: false,
-      },
-    };
-
-    const result = checkEmailVerified(mockSession, humanUser, "custom-org");
+    const result = await checkEmailVerified(mockSession, humanUser, "custom-org");
 
     expect(result?.redirect).toContain("organization=custom-org");
   });
 
-  it("should include requestId in redirect", () => {
+  it("should include requestId in redirect", async () => {
     const humanUser: any = {
       email: {
         isVerified: false,
       },
     };
 
-    const result = checkEmailVerified(mockSession, humanUser, undefined, "request-123");
+    const result = await checkEmailVerified(mockSession, humanUser, undefined, "request-123");
 
     expect(result?.redirect).toContain("requestId=request-123");
   });
 
-  it("should handle no email on user", () => {
+  it("should handle no email on user", async () => {
     const humanUser: any = {};
 
-    const result = checkEmailVerified(mockSession, humanUser);
+    const result = await checkEmailVerified(mockSession, humanUser);
 
     expect(result).toEqual({
       redirect: expect.stringContaining("/verify"),
     });
+    expect(result?.redirect).toContain("codeSent=true");
   });
 });
 
@@ -584,7 +578,7 @@ describe("checkEmailVerification", () => {
     process.env.EMAIL_VERIFICATION = originalEnv;
   });
 
-  it("should redirect if email not verified and EMAIL_VERIFICATION is true", () => {
+  it("should redirect if email not verified and EMAIL_VERIFICATION is true", async () => {
     process.env.EMAIL_VERIFICATION = "true";
 
     const humanUser: any = {
@@ -593,14 +587,15 @@ describe("checkEmailVerification", () => {
       },
     };
 
-    const result = checkEmailVerification(mockSession, humanUser);
+    const result = await checkEmailVerification(mockSession, humanUser);
 
     expect(result).toEqual({
       redirect: expect.stringContaining("/verify"),
     });
+    expect(result?.redirect).toContain("codeSent=true");
   });
 
-  it("should not redirect if EMAIL_VERIFICATION is not true", () => {
+  it("should not redirect if EMAIL_VERIFICATION is not true", async () => {
     process.env.EMAIL_VERIFICATION = "false";
 
     const humanUser: any = {
@@ -609,12 +604,12 @@ describe("checkEmailVerification", () => {
       },
     };
 
-    const result = checkEmailVerification(mockSession, humanUser);
+    const result = await checkEmailVerification(mockSession, humanUser);
 
     expect(result).toBeUndefined();
   });
 
-  it("should not redirect if email is verified", () => {
+  it("should not redirect if email is verified", async () => {
     process.env.EMAIL_VERIFICATION = "true";
 
     const humanUser: any = {
@@ -623,12 +618,12 @@ describe("checkEmailVerification", () => {
       },
     };
 
-    const result = checkEmailVerification(mockSession, humanUser);
+    const result = await checkEmailVerification(mockSession, humanUser);
 
     expect(result).toBeUndefined();
   });
 
-  it("should include send=true parameter", () => {
+  it("should include organization in redirect", async () => {
     process.env.EMAIL_VERIFICATION = "true";
 
     const humanUser: any = {
@@ -637,21 +632,7 @@ describe("checkEmailVerification", () => {
       },
     };
 
-    const result = checkEmailVerification(mockSession, humanUser);
-
-    expect(result?.redirect).toContain("send=true");
-  });
-
-  it("should include organization in redirect", () => {
-    process.env.EMAIL_VERIFICATION = "true";
-
-    const humanUser: any = {
-      email: {
-        isVerified: false,
-      },
-    };
-
-    const result = checkEmailVerification(mockSession, humanUser, "custom-org");
+    const result = await checkEmailVerification(mockSession, humanUser, "custom-org");
 
     expect(result?.redirect).toContain("organization=custom-org");
   });

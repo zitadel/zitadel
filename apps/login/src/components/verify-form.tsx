@@ -3,9 +3,9 @@
 import { Alert, AlertType } from "@/components/alert";
 import { handleServerActionResponse } from "@/lib/client-utils";
 import { UNKNOWN_USER_ID } from "@/lib/constants";
-import { initialSendVerification, resendVerification, sendVerification } from "@/lib/server/verify";
+import { resendVerification, sendVerification } from "@/lib/server/verify";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { AutoSubmitForm } from "./auto-submit-form";
@@ -27,11 +27,13 @@ type Props = {
   isInvite: boolean;
   requestId?: string;
   submit: boolean;
-  doSend?: boolean;
 };
 
-export function VerifyForm({ userId, loginName, organization, requestId, code, isInvite, submit, doSend }: Props) {
+export function VerifyForm({ userId, loginName, organization, requestId, code, isInvite, submit }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const codeSent = searchParams.get("codeSent") === "true";
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onChange",
@@ -47,27 +49,8 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const initialSendDone = useRef(false);
-  const [initialSendError, setInitialSendError] = useState<string>("");
-  const [codeSent, setCodeSent] = useState(false);
-
-  useEffect(() => {
-    if (doSend && userId && userId !== UNKNOWN_USER_ID && !initialSendDone.current) {
-      initialSendDone.current = true;
-      setError("");
-      initialSendVerification({ userId, isInvite, requestId })
-        .then(() => {
-          setCodeSent(true);
-        })
-        .catch(() => {
-          setInitialSendError(isInvite ? t("errors.couldNotResendInvite") : t("errors.couldNotResendEmail"));
-        });
-    }
-  }, [doSend, userId, isInvite, requestId, t]);
-
   async function resendCode() {
     setError("");
-    setInitialSendError("");
     setLoading(true);
 
     // do not send code for dummy userid that is set to prevent user enumeration
@@ -95,6 +78,11 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
       return;
     }
 
+    // Signal success via URL search param so the "code sent" alert is shown
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("codeSent", "true");
+    router.replace(`${pathname}?${params.toString()}`);
+
     return response;
   }
 
@@ -103,7 +91,6 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
   const fcn = useCallback(
     async function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
       setError("");
-      setInitialSendError("");
       setLoading(true);
 
       try {
@@ -136,7 +123,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
   return (
     <>
       {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
-      {codeSent && !initialSendError && (
+      {codeSent && (
         <div className="w-full py-4">
           <Alert type={AlertType.INFO}>
             <Translated i18nKey="verify.codeSent" namespace="verify" />
@@ -174,9 +161,9 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
           />
         </div>
 
-        {(error || initialSendError) && (
+        {error && (
           <div className="py-4" data-testid="error">
-            <Alert>{error || initialSendError}</Alert>
+            <Alert>{error}</Alert>
           </div>
         )}
 

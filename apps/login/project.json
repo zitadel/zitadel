@@ -42,6 +42,19 @@
         "!{projectRoot}/acceptance/**/*"
       ]
     },
+    "pack-fips": {
+      "description": "Builds a local FIPS-hardened Docker image for the ZITADEL Login UI (zitadel/zitadel-login:local-fips). Requires Docker daemon.",
+      "dependsOn": ["build"],
+      "command": "docker build -f apps/login/Dockerfile.fips -t zitadel/zitadel-login:local-fips apps/login",
+      "cache": false,
+      "inputs": [
+        "default",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "{projectRoot}/Dockerfile.fips",
+        "!{projectRoot}/.env.*",
+        "!{projectRoot}/acceptance/**/*"
+      ]
+    },
     "build-vercel": {
       "description": "Builds the Next.js Login application for Vercel deployment",
       "cache": false,

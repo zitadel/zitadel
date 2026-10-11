@@ -20,6 +20,8 @@ type GroupAddedEvent struct {
 	Description string `json:"description,omitempty"`
 }
 
+func (*GroupAddedEvent) EnforceResourceOwner() {}
+
 func NewGroupAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -45,7 +47,7 @@ func (g *GroupAddedEvent) Payload() any {
 }
 
 func (g *GroupAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddGroupNameUniqueConstraint(g.Name, g.Aggregate().ResourceOwner)}
+	return []*eventstore.UniqueConstraint{NewAddGroupNameUniqueConstraint(g.Name, g.Aggregate().ResourceOwner).WithOwners(eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, g.Aggregate().ResourceOwner))}
 }
 
 func NewAddGroupNameUniqueConstraint(groupName, organizationID string) *eventstore.UniqueConstraint {
@@ -119,7 +121,7 @@ func (g *GroupChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	}
 	return []*eventstore.UniqueConstraint{
 		NewRemoveGroupNameUniqueConstraint(g.oldName, g.Aggregate().ResourceOwner),
-		NewAddGroupNameUniqueConstraint(*g.Name, g.Aggregate().ResourceOwner)}
+		NewAddGroupNameUniqueConstraint(*g.Name, g.Aggregate().ResourceOwner).WithOwners(eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, g.Aggregate().ResourceOwner))}
 }
 
 type GroupRemovedEvent struct {

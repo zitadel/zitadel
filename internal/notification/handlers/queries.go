@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/go-jose/go-jose/v4"
 	"golang.org/x/text/language"
@@ -44,6 +45,7 @@ type NotificationQueries struct {
 	UserDataCrypto     crypto.EncryptionAlgorithm
 	SMTPPasswordCrypto crypto.EncryptionAlgorithm
 	SMSTokenCrypto     crypto.EncryptionAlgorithm
+	httpClient         *http.Client
 }
 
 func NewNotificationQueries(
@@ -56,6 +58,7 @@ func NewNotificationQueries(
 	userDataCrypto crypto.EncryptionAlgorithm,
 	smtpPasswordCrypto crypto.EncryptionAlgorithm,
 	smsTokenCrypto crypto.EncryptionAlgorithm,
+	httpClient *http.Client,
 ) *NotificationQueries {
 	return &NotificationQueries{
 		Queries:            baseQueries,
@@ -67,5 +70,6 @@ func NewNotificationQueries(
 		UserDataCrypto:     userDataCrypto,
 		SMTPPasswordCrypto: smtpPasswordCrypto,
 		SMSTokenCrypto:     smsTokenCrypto,
+		httpClient:         httpClient,
 	}
 }

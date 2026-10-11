@@ -110,7 +110,7 @@ service ZITADELUsers {
 
   // Search users
   //
-  // Search all matching users. By default, we will return all users of your instance.
+  // Search all matching users. By default, the first 100 users of your instance are returned (the default and the maximum limit of 1000 can be configured).
   // Make sure to include a limit and sorting for pagination.
   rpc SearchUsers (SearchUsersRequest) returns (SearchUsersResponse) {
     option (google.api.http) = {
@@ -2154,11 +2154,11 @@ message GetIdentityProviderIntentRequest {
   ];
   // Token of the identity provider (IDP) intent, previously returned on the success response of the start identity provider intent.
   string idp_intent_token = 4 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
+    (validate.rules).string = {min_len: 1, max_len: 500},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 200;
+      max_length: 500;
       example: "\"SJKL3ioIDpo342ioqw98fjp3sdf32wahb=\"";
     }
   ];

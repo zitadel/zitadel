@@ -48,7 +48,7 @@ func InitChannel(ctx context.Context, cfg Config) (channels.NotificationChannel,
 			req.Header.Set(SigningHeader, actions.ComputeSignatureHeader(time.Now(), []byte(payload), cfg.SigningKey))
 		}
 
-		resp, err := http.DefaultClient.Do(req)
+		resp, err := cfg.Client.Do(req)
 		if err != nil {
 			return err
 		}

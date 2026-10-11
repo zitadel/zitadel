@@ -16,7 +16,6 @@ import (
 	grpc_api "github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/record"
@@ -69,7 +68,7 @@ func CreateServer(
 	accessSvc *logstore.Service[*record.AccessLog],
 	targetEncAlg crypto.EncryptionAlgorithm,
 	translator *i18n.Translator,
-	deniedIPList []denylist.AddressChecker,
+	httpClient *http.Client,
 ) *grpc.Server {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeTotalCount, metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode}
 	serverOptions := []grpc.ServerOption{
@@ -87,7 +86,7 @@ func CreateServer(
 				middleware.AuthorizationInterceptor(verifier, systemAuthz, authConfig),
 				middleware.TranslationHandler(),
 				middleware.QuotaExhaustedInterceptor(accessSvc, system_pb.SystemService_ServiceDesc.ServiceName),
-				middleware.ExecutionHandler(targetEncAlg, queries.GetActiveSigningWebKey, deniedIPList),
+				middleware.ExecutionHandler(targetEncAlg, queries.GetActiveSigningWebKey, httpClient),
 				middleware.ValidationHandler(),
 				middleware.ServiceHandler(),
 				middleware.ActivityInterceptor(),

@@ -26,6 +26,8 @@ type CreatedEvent struct {
 	Data                  json.RawMessage `json:"user,omitempty"`
 }
 
+func (*CreatedEvent) EnforceResourceOwner() {}
+
 func (e *CreatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }

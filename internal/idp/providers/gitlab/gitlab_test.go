@@ -2,6 +2,7 @@ package gitlab
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -53,7 +54,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 			a := assert.New(t)
 			r := require.New(t)
 
-			provider, err := New(tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.opts...)
+			provider, err := New(tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, http.DefaultClient, tt.fields.opts...)
 			r.NoError(err)
 			ctx := context.Background()
 			session, err := provider.BeginAuth(ctx, "testState")

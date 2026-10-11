@@ -99,6 +99,7 @@ func (l *Login) runPostExternalAuthenticationActions(
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
+				actions.SetFields("appendMetadataRaw", metadataList.AppendMetadataRawFunc),
 			),
 		),
 	)
@@ -152,7 +153,7 @@ func (l *Login) runPostExternalAuthenticationActions(
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx, l.httpClient), actions.WithUUID(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
@@ -201,6 +202,7 @@ func (l *Login) runPostInternalAuthenticationActions(
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
+				actions.SetFields("appendMetadataRaw", metadataList.AppendMetadataRawFunc),
 			),
 		),
 	)
@@ -226,7 +228,7 @@ func (l *Login) runPostInternalAuthenticationActions(
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx, l.httpClient), actions.WithUUID(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
@@ -304,6 +306,7 @@ func (l *Login) runPreCreationActions(
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
+				actions.SetFields("appendMetadataRaw", metadataList.AppendMetadataRawFunc),
 			),
 		),
 	)
@@ -346,7 +349,7 @@ func (l *Login) runPreCreationActions(
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx, l.httpClient), actions.WithUUID(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
@@ -423,7 +426,7 @@ func (l *Login) runPostCreationActions(
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx, l.httpClient), actions.WithUUID(actionCtx))...,
 		)
 		cancel()
 		if err != nil {

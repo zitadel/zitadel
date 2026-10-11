@@ -125,7 +125,10 @@ func oidcAppEvents(ctx context.Context, orgID, projectID, id, name, clientID str
 			"",
 			domain.LoginVersionUnspecified,
 			"",
-		),
+			"",
+			"",
+			"",
+			nil),
 	}
 }
 
@@ -334,6 +337,7 @@ func instanceElementsFilters() []expect {
 		expectFilter(),
 		expectFilter(),
 		expectFilter(),
+		expectFilter(),
 	}
 }
 
@@ -351,6 +355,7 @@ func instanceElementsEvents(ctx context.Context, instanceID, instanceName string
 		instance.NewSecretGeneratorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecretGeneratorTypeVerifyDomain, 32, 0, true, true, true, false),
 		instance.NewSecretGeneratorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecretGeneratorTypeOTPSMS, 8, 5*time.Minute, false, false, true, false),
 		instance.NewSecretGeneratorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecretGeneratorTypeOTPEmail, 8, 5*time.Minute, false, false, true, false),
+		instance.NewSecretGeneratorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecretGeneratorTypeInviteCode, 6, 72*time.Hour, false, true, true, false),
 	}
 }
 
@@ -365,6 +370,7 @@ func instanceElementsConfig() *SecretGenerators {
 		DomainVerification:       &crypto.GeneratorConfig{Length: 32, IncludeLowerLetters: true, IncludeUpperLetters: true, IncludeDigits: true},
 		OTPSMS:                   &crypto.GeneratorConfig{Length: 8, Expiry: 5 * time.Minute, IncludeDigits: true},
 		OTPEmail:                 &crypto.GeneratorConfig{Length: 8, Expiry: 5 * time.Minute, IncludeDigits: true},
+		InviteCode:               &crypto.GeneratorConfig{Length: 6, Expiry: 72 * time.Hour, IncludeUpperLetters: true, IncludeDigits: true},
 	}
 }
 
@@ -468,7 +474,10 @@ func generatedDomainFilters(instanceID, orgID, projectID, appID, generatedDomain
 				"",
 				domain.LoginVersionUnspecified,
 				"",
-			),
+				"",
+				"",
+				"",
+				nil),
 		),
 		expectFilter(
 			func() eventstore.Event {
@@ -657,8 +666,8 @@ func humanEvents(ctx context.Context, instanceID, orgID, userID string) []events
 	return []eventstore.Command{
 		addHumanEvent(ctx, orgID, userID),
 		user.NewHumanEmailVerifiedEvent(ctx, &agg.Aggregate),
-		org.NewMemberAddedEvent(ctx, &orgAgg.Aggregate, userID, domain.RoleOrgOwner),
-		instance.NewMemberAddedEvent(ctx, &instanceAgg.Aggregate, userID, domain.RoleIAMOwner),
+		org.NewMemberAddedEvent(ctx, &orgAgg.Aggregate, userID, domain.RoleOrgOwner).WithUserResourceOwner(orgID),
+		instance.NewMemberAddedEvent(ctx, &instanceAgg.Aggregate, userID, domain.RoleIAMOwner).WithUserResourceOwner(orgID),
 	}
 }
 
@@ -701,8 +710,8 @@ func machineEvents(ctx context.Context, instanceID, orgID, userID, patID string)
 		)
 	}
 	return append(events,
-		org.NewMemberAddedEvent(ctx, &orgAgg.Aggregate, userID, domain.RoleOrgOwner),
-		instance.NewMemberAddedEvent(ctx, &instanceAgg.Aggregate, userID, domain.RoleIAMOwner),
+		org.NewMemberAddedEvent(ctx, &orgAgg.Aggregate, userID, domain.RoleOrgOwner).WithUserResourceOwner(orgID),
+		instance.NewMemberAddedEvent(ctx, &instanceAgg.Aggregate, userID, domain.RoleIAMOwner).WithUserResourceOwner(orgID),
 	)
 }
 
@@ -724,7 +733,7 @@ func loginClientEvents(ctx context.Context, instanceID, orgID, userID, patID str
 	instanceAgg := instance.NewAggregate(instanceID)
 	events := []eventstore.Command{
 		addLoginClientEvent(ctx, orgID, userID),
-		instance.NewMemberAddedEvent(ctx, &instanceAgg.Aggregate, userID, domain.RoleIAMLoginClient),
+		instance.NewMemberAddedEvent(ctx, &instanceAgg.Aggregate, userID, domain.RoleIAMLoginClient).WithUserResourceOwner(orgID),
 	}
 	if patID != "" {
 		events = append(events,

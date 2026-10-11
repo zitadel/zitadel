@@ -94,7 +94,7 @@ An organization can have multiple domain names, but only one is configured as th
 * Which login name is displayed to the user in the UI.
 * What information is asserted in `access_tokens` (specifically the `preferred_username` claim).
 
-<Callout type="caution">
+<Callout type="warn">
 Setting an Organization Domain affects users.
 If a user `coyote` exists in the global organization with the login name `coyote@acme.ch`, and you subsequently verify `acme.ch` for a specific organization, the global user's login name will be replaced with `coyote@{randomvalue.tld}`. ZITADEL will notify users affected by this change.
 </Callout>
@@ -126,7 +126,7 @@ You can disable domain verification requirements in the [default settings](/guid
 5.  Once verified, click **Verify**.
 6.  (Optional) Click **Set as primary** to make this the default domain for user login names.
 
-<Callout type="caution">
+<Callout type="warn">
 Do not delete the DNS verification record after success. ZITADEL re-checks domain ownership periodically.
 </Callout>
 

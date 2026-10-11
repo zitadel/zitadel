@@ -95,6 +95,7 @@ type UserGrantPreConditionReadModel struct {
 	ProjectGrantID          string
 	FoundGrantID            string
 	ResourceOwner           string
+	UserResourceOwner       string
 	UserExists              bool
 	ProjectExists           bool
 	ExistingRoleKeysProject []string
@@ -121,12 +122,16 @@ func (wm *UserGrantPreConditionReadModel) Reduce() error {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:
 			wm.UserExists = true
+			wm.UserResourceOwner = e.Aggregate().ResourceOwner
 		case *user.HumanRegisteredEvent:
 			wm.UserExists = true
+			wm.UserResourceOwner = e.Aggregate().ResourceOwner
 		case *user.MachineAddedEvent:
 			wm.UserExists = true
+			wm.UserResourceOwner = e.Aggregate().ResourceOwner
 		case *user.UserRemovedEvent:
 			wm.UserExists = false
+			wm.UserResourceOwner = ""
 		case *project.ProjectAddedEvent:
 			if projectExistsOnOrganization(wm.ResourceOwner, e.Aggregate().ResourceOwner) {
 				wm.ProjectExists = true
@@ -134,6 +139,8 @@ func (wm *UserGrantPreConditionReadModel) Reduce() error {
 			// We store the organization of the project for later checks, e.g. in case of a project grant
 			wm.ProjectResourceOwner = e.Aggregate().ResourceOwner
 		case *project.ProjectRemovedEvent:
+			wm.ExistingRoleKeysProject = nil
+			wm.ExistingRoleKeysGrant = nil
 			wm.ProjectExists = false
 		case *project.GrantAddedEvent:
 			if projectGrantExistsOnOrganization(wm.ProjectGrantID, wm.ResourceOwner, e.GrantID, e.GrantedOrgID) {

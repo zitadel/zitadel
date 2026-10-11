@@ -60,7 +60,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Only proxy paths need to be rewritten to the ZITADEL backend
-  const proxyPaths = ["/.well-known/", "/oauth/", "/oidc/", "/idps/callback/", "/saml/"];
+  const proxyPaths = ["/.well-known/", "/oauth/", "/oidc/", "/idps/callback/", "/saml/", "/assets/"];
   const isMatched = proxyPaths.some((prefix) => request.nextUrl.pathname.startsWith(prefix));
 
   if (!isMatched) {

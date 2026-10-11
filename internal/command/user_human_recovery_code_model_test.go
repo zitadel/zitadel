@@ -309,7 +309,7 @@ func TestHumanRecoveryCodeWriteModel_Reduce(t *testing.T) {
 				},
 				State:          domain.MFAStateRemoved,
 				FailedAttempts: 0,
-				codes:          []string{"code1", "code2", "code3"},
+				codes:          nil,
 				userLocked:     false,
 			},
 		},

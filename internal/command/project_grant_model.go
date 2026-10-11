@@ -61,7 +61,7 @@ func (wm *ProjectGrantWriteModel) AppendEvents(events ...eventstore.Event) {
 				wm.FoundGrantID = ""
 				wm.WriteModel.AppendEvents(e)
 			}
-		case *project.ProjectRemovedEvent:
+		default:
 			wm.WriteModel.AppendEvents(e)
 		}
 	}
@@ -104,6 +104,10 @@ func (wm *ProjectGrantWriteModel) Reduce() error {
 			wm.State = domain.ProjectGrantStateRemoved
 		case *project.ProjectRemovedEvent:
 			wm.State = domain.ProjectGrantStateRemoved
+			wm.RoleKeys = nil
+		case *project.ProjectAddedEvent:
+			wm.State = domain.ProjectGrantStateUnspecified
+			wm.RoleKeys = nil
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -116,6 +120,7 @@ func (wm *ProjectGrantWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			project.ProjectAddedType,
 			project.GrantAddedType,
 			project.GrantChangedType,
 			project.GrantCascadeChangedType,

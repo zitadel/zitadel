@@ -91,7 +91,43 @@ func (wm *HumanWriteModel) Reduce() error {
 				wm.UserState = domain.UserStateActive
 			}
 		case *user.UserRemovedEvent:
+			wm.UserName = ""
+			wm.FirstName = ""
+			wm.LastName = ""
+			wm.NickName = ""
+			wm.DisplayName = ""
+			wm.PreferredLanguage = language.Und
+			wm.Gender = domain.GenderUnspecified
+			wm.Avatar = ""
+			wm.Email = ""
+			wm.IsEmailVerified = false
+			wm.Phone = ""
+			wm.IsPhoneVerified = false
+			wm.Country = ""
+			wm.Locality = ""
+			wm.PostalCode = ""
+			wm.Region = ""
+			wm.StreetAddress = ""
 			wm.UserState = domain.UserStateDeleted
+		case *user.MachineAddedEvent:
+			wm.UserName = ""
+			wm.FirstName = ""
+			wm.LastName = ""
+			wm.NickName = ""
+			wm.DisplayName = ""
+			wm.PreferredLanguage = language.Und
+			wm.Gender = domain.GenderUnspecified
+			wm.Avatar = ""
+			wm.Email = ""
+			wm.IsEmailVerified = false
+			wm.Phone = ""
+			wm.IsPhoneVerified = false
+			wm.Country = ""
+			wm.Locality = ""
+			wm.PostalCode = ""
+			wm.Region = ""
+			wm.StreetAddress = ""
+			wm.UserState = domain.UserStateUnspecified
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -106,6 +142,7 @@ func (wm *HumanWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			user.HumanAddedType,
 			user.HumanRegisteredType,
+			user.MachineAddedEventType,
 			user.HumanInitialCodeAddedType,
 			user.HumanInitializedCheckSucceededType,
 			user.UserUserNameChangedType,
@@ -143,8 +180,11 @@ func (wm *HumanWriteModel) reduceHumanAddedEvent(e *user.HumanAddedEvent) {
 	wm.DisplayName = e.DisplayName
 	wm.PreferredLanguage = e.PreferredLanguage
 	wm.Gender = e.Gender
+	wm.Avatar = ""
 	wm.Email = e.EmailAddress
+	wm.IsEmailVerified = false
 	wm.Phone = e.PhoneNumber
+	wm.IsPhoneVerified = false
 	wm.Country = e.Country
 	wm.Locality = e.Locality
 	wm.PostalCode = e.PostalCode
@@ -161,8 +201,11 @@ func (wm *HumanWriteModel) reduceHumanRegisteredEvent(e *user.HumanRegisteredEve
 	wm.DisplayName = e.DisplayName
 	wm.PreferredLanguage = e.PreferredLanguage
 	wm.Gender = e.Gender
+	wm.Avatar = ""
 	wm.Email = e.EmailAddress
+	wm.IsEmailVerified = false
 	wm.Phone = e.PhoneNumber
+	wm.IsPhoneVerified = false
 	wm.Country = e.Country
 	wm.Locality = e.Locality
 	wm.PostalCode = e.PostalCode

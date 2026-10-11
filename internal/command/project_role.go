@@ -193,7 +193,7 @@ func (c *Commands) RemoveProjectRole(ctx context.Context, projectID, key, resour
 	}
 
 	for _, grantID := range cascadeUserGrantIDs {
-		event, err := c.removeRoleFromUserGrant(ctx, grantID, []string{key}, true)
+		event, err := c.removeRoleFromUserGrant(ctx, grantID, map[string]bool{key:true}, true)
 		if err != nil {
 			logging.LogWithFields("COMMAND-mK0of", "usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
 			continue

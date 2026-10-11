@@ -25,12 +25,14 @@ type MachineAddedEvent struct {
 	AccessTokenType domain.OIDCTokenType `json:"accessTokenType,omitempty"`
 }
 
+func (*MachineAddedEvent) EnforceResourceOwner() {}
+
 func (e *MachineAddedEvent) Payload() interface{} {
 	return e
 }
 
 func (e *MachineAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.orgScopedUsername)}
+	return []*eventstore.UniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.orgScopedUsername).WithOwners(usernameOwnerTags(e.Aggregate())...)}
 }
 
 func NewMachineAddedEvent(

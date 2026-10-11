@@ -8,7 +8,6 @@ import AppJWT from '../imports/_app_jwt.mdx';
 import ServiceAccountJWT from '../imports/_serviceaccount_jwt.mdx';
 import ServiceAccountRole from '../imports/_serviceaccount_role.mdx';
 import SetupPython from '../imports/_setup_python.mdx';
-import { GithubCodeBlock } from '@/components/github-code-block';
 
 This integration guide demonstrates the recommended way to incorporate ZITADEL into your Django Python application.
 It explains how to check the token validity in the API and how to check for permissions.
@@ -63,7 +62,7 @@ For this example we need the following dependencies:
 
 For the dependencies we need a requirements.txt-file with the following content:
 
-<GithubCodeBlock url="https://github.com/zitadel/example-python-django-oauth/blob/main/requirements.txt"></GithubCodeBlock>
+<GithubCodeBlock url="https://github.com/zitadel/example-python-django-oauth/blob/main/requirements.txt" />
 
 Then install all dependencies with:
 ```bash
@@ -81,7 +80,7 @@ django-admin startproject myapi .
 
 There is info needed for the introspection calls, which we put into the settings.py:
 
-<GithubCodeBlock url="https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/settings.py#L125-L133"></GithubCodeBlock>
+<GithubCodeBlock url="https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/settings.py#L125-L133" />
 
 and create a ".env"-file in the root folder with the settings as an example:
 ```bash
@@ -103,16 +102,16 @@ API_PRIVATE_KEY_FILE_PATH = '/tmp/example/250719519163548112.json'
 To validate the tokens, we need a validator which can be called in the event of API-calls.
 
 validator.py:
-<GithubCodeBlock url="https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/validator.py"></GithubCodeBlock>
+<GithubCodeBlock url="https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/validator.py" />
 
 ### Requests and URLs
 
 We define 3 different endpoints which differ in terms of requirements.
 views.py:
-<GithubCodeBlock url="https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/views.py"></GithubCodeBlock>
+<GithubCodeBlock url="https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/views.py" />
 
 To handle endpoints the urls have to be added to the urls.py:
-<GithubCodeBlock url="https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/urls.py"></GithubCodeBlock>
+<GithubCodeBlock url="https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/urls.py" />
 
 ### DB
 

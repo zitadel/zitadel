@@ -1,5 +1,18 @@
 Instrumentation:
   ServiceName: "zitadel" # ZITADEL_INSTRUMENTATION_SERVICENAME
+  # Resource detectors describe the platform ZITADEL runs on. Their attributes
+  # are attached to every exported trace, metric and log, and telemetry backends
+  # use them to tell instances apart instead of merging them into one series.
+  # Detection is off by default: each detector probes its platform on startup and
+  # the attributes it finds identify the account and host to whichever backend
+  # you export to. Enable one or more of:
+  #   "google": Detects Cloud Run, GKE, GCE, App Engine and Cloud Functions by
+  #             querying the Google Cloud metadata server. Required when
+  #             exporting to Google Cloud: without it every instance reports as
+  #             the same empty generic_node and the series overlap.
+  # Leave the list empty to disable detection. An empty or unknown entry is a
+  # config error and fails startup.
+  Detectors: [] # ZITADEL_INSTRUMENTATION_DETECTORS (comma separated list)
   Trace:
     Fraction: 1.0 # ZITADEL_INSTRUMENTATION_TRACE_FRACTION
     # Trust incoming trace context from remote services for distributed tracing.
@@ -536,6 +549,11 @@ Projections:
   Customizations:
     custom_texts:
       BulkLimit: 400
+    # The sessions projection processes the highest event volume.
+    # A higher bulk limit amortizes the fixed cost per batch over more events,
+    # which shortens catch-up after the projection fell behind.
+    sessions:
+      BulkLimit: 1000 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_SESSIONS_BULKLIMIT
     project_grant_fields:
       TransactionDuration: 0s
       BulkLimit: 2000
@@ -598,16 +616,11 @@ Executions:
   MaxTtl: 5m  # ZITADEL_EXECUTIONS_MAXTTL
   # List of domains and IPs that are not valid execution target's endpoints
   # Wildcard sub domains are currently unsupported
+
+  # Deprecated: use HTTPClient.DenyList instead. If both are set, this list will be merged into the HTTPClient.DenyList.
   DenyList: # ZITADEL_EXECUTIONS_DENYLIST (comma separated list)
-    - localhost
-    - "127.0.0.0/8"
-    - "::1"
-    - "0.0.0.0"
-    - "::"
 
 Auth:
-  # See Projections.BulkLimit
-  SearchLimit: 1000 # ZITADEL_AUTH_SEARCHLIMIT
   Spooler:
     # See Projections.TransationDuration
     TransactionDuration: 10s #ZITADEL_AUTH_SPOOLER_TRANSACTIONDURATION
@@ -620,8 +633,6 @@ Auth:
   AmountOfCachedAuthRequests: 0 #ZITADEL_AUTH_AMOUNTOFCACHEDAUTHREQUESTS
 
 Admin:
-  # See Projections.BulkLimit
-  SearchLimit: 1000 # ZITADEL_ADMIN_SEARCHLIMIT
   Spooler:
     # See Projections.TransationDuration
     TransactionDuration: 10s
@@ -672,6 +683,10 @@ OIDC:
       Path: /oauth/v2/keys # ZITADEL_OIDC_CUSTOMENDPOINTS_KEYS_PATH
     DeviceAuth:
       Path: /oauth/v2/device_authorization # ZITADEL_OIDC_CUSTOMENDPOINTS_DEVICEAUTH_PATH
+    # OAuth 2.0 Dynamic Client Registration (RFC 7591). The endpoint is only served and
+    # advertised when it is enabled in the instance's security settings.
+    Registration:
+      Path: /oauth/v2/register # ZITADEL_OIDC_CUSTOMENDPOINTS_REGISTRATION_PATH
   DeviceAuth:
     Lifetime: 5m # ZITADEL_OIDC_DEVICEAUTH_LIFETIME
     PollInterval: 5s # ZITADEL_OIDC_DEVICEAUTH_POLLINTERVAL
@@ -859,7 +874,7 @@ SystemDefaults:
       # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2", "sha2"
       # Depending on the algorithm, different configuration options take effect.
       Algorithm: bcrypt # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
-      # Cost takes effect for the algorithms bcrypt and scrypt
+      # Cost takes effect for bcrypt (work factor) and scrypt (LN, log2 of N)
       Cost: 14 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_COST
       # Time takes effect for the algorithms argon2i and argon2id
       Time: 3 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_TIME
@@ -873,6 +888,40 @@ SystemDefaults:
       # Can be "sha1", "sha224", "sha256", "sha384" or "sha512" for pbkdf2
       # Can be "sha256" or "sha512" for sha2
       Hash: sha256 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_HASH
+    # Limits bound cost parameters of imported or pre-encoded password hashes.
+    Limits:
+      Bcrypt:
+        MinCost: 10 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_BCRYPT_MINCOST
+        MaxCost: 16 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_BCRYPT_MAXCOST
+      Argon2:
+        MinTime: 1 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_ARGON2_MINTIME
+        MaxTime: 10 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_ARGON2_MAXTIME
+        MinMemory: 8192 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_ARGON2_MINMEMORY
+        MaxMemory: 524288 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_ARGON2_MAXMEMORY
+        MinThreads: 1 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_ARGON2_MINTHREADS
+        MaxThreads: 16 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_ARGON2_MAXTHREADS
+      Scrypt:
+        MinLN: 14 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MINLN
+        MaxLN: 20 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MAXLN
+        MinR: 8 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MINR
+        MaxR: 32 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MAXR
+        MinP: 1 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MINP
+        MaxP: 16 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SCRYPT_MAXP
+      PBKDF2:
+        # FIPS mode: MinRounds below 1000 (NIST SP 800-132) logs a startup warning; primary Hasher Rounds must be >= 1000.
+        MinRounds: 1000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_PBKDF2_MINROUNDS
+        MaxRounds: 10000000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_PBKDF2_MAXROUNDS
+      Sha2:
+        MinSha256Rounds: 1000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SHA2_MINSHA256ROUNDS
+        MaxSha256Rounds: 999999999 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SHA2_MAXSHA256ROUNDS
+        MinSha512Rounds: 1000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SHA2_MINSHA512ROUNDS
+        MaxSha512Rounds: 999999999 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_SHA2_MAXSHA512ROUNDS
+      PHPass:
+        MinRounds: 7 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_PHPASS_MINROUNDS
+        MaxRounds: 31 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_PHPASS_MAXROUNDS
+      Drupal7:
+        MinIterations: 1000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_DRUPAL7_MINITERATIONS
+        MaxIterations: 500000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_LIMITS_DRUPAL7_MAXITERATIONS
 
     # Verifiers enable the possibility of verifying
     # passwords that are previously hashed using another
@@ -903,7 +952,7 @@ SystemDefaults:
       # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2"
       # Depending on the algorithm, different configuration options take effect.
       Algorithm: bcrypt # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_ALGORITHM
-      # Cost takes effect for the algorithms bcrypt and scrypt
+      # Cost takes effect for bcrypt (work factor) and scrypt (LN, log2 of N)
       Cost: 4 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_COST
       # Time takes effect for the algorithms argon2i and argon2id
       Time: 3 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_TIME
@@ -916,6 +965,40 @@ SystemDefaults:
       # Hash takes effect for the algorithm pbkdf2
       # Can be "sha1", "sha224", "sha256", "sha384" or "sha512"
       Hash: sha256 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_HASH
+    # Limits bound cost parameters of imported or pre-encoded secret hashes.
+    Limits:
+      Bcrypt:
+        MinCost: 4 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_BCRYPT_MINCOST
+        MaxCost: 16 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_BCRYPT_MAXCOST
+      Argon2:
+        MinTime: 1 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_ARGON2_MINTIME
+        MaxTime: 10 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_ARGON2_MAXTIME
+        MinMemory: 8192 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_ARGON2_MINMEMORY
+        MaxMemory: 524288 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_ARGON2_MAXMEMORY
+        MinThreads: 1 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_ARGON2_MINTHREADS
+        MaxThreads: 16 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_ARGON2_MAXTHREADS
+      Scrypt:
+        MinLN: 14 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MINLN
+        MaxLN: 20 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MAXLN
+        MinR: 8 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MINR
+        MaxR: 32 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MAXR
+        MinP: 1 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MINP
+        MaxP: 16 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SCRYPT_MAXP
+      PBKDF2:
+        # FIPS mode: MinRounds below 1000 (NIST SP 800-132) logs a startup warning; primary Hasher Rounds must be >= 1000.
+        MinRounds: 1000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_PBKDF2_MINROUNDS
+        MaxRounds: 10000000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_PBKDF2_MAXROUNDS
+      Sha2:
+        MinSha256Rounds: 1000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SHA2_MINSHA256ROUNDS
+        MaxSha256Rounds: 999999999 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SHA2_MAXSHA256ROUNDS
+        MinSha512Rounds: 1000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SHA2_MINSHA512ROUNDS
+        MaxSha512Rounds: 999999999 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_SHA2_MAXSHA512ROUNDS
+      PHPass:
+        MinRounds: 7 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_PHPASS_MINROUNDS
+        MaxRounds: 31 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_PHPASS_MAXROUNDS
+      Drupal7:
+        MinIterations: 1000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_DRUPAL7_MINITERATIONS
+        MaxIterations: 500000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_LIMITS_DRUPAL7_MAXITERATIONS
     Verifiers: # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_VERIFIERS
   Multifactors:
     OTP:
@@ -956,9 +1039,15 @@ SystemDefaults:
     PublicKeyLifetime: 30h # ZITADEL_SYSTEMDEFAULTS_KEYCONFIG_PUBLICKEYLIFETIME
     # 8766h are 1 year
     CertificateLifetime: 8766h # ZITADEL_SYSTEMDEFAULTS_KEYCONFIG_CERTIFICATELIFETIME
-  # DefaultQueryLimit limits the number of items that can be queried in a single v3 API search request without explicitly passing a limit.
+  # DefaultQueryLimit limits the number of items returned by a single v2 (or newer) API list request without explicitly passing a limit.
+  # 0 disables the default and returns all items.
   DefaultQueryLimit: 100 # ZITADEL_SYSTEMDEFAULTS_DEFAULTQUERYLIMIT
-  # MaxQueryLimit limits the number of items that can be queried in a single v3 API search request with explicitly passing a limit.
+  # MaxQueryLimit is the highest limit that can be explicitly passed in a single API list request,
+  # including the list and change history requests of the v1 APIs.
+  # Requests exceeding it fail with an InvalidArgument error. 0 disables the maximum.
+  # The v1 APIs also use it as default if no limit is passed, as well as the limit for the refresh tokens
+  # listed and revoked by the auth API (ListMyRefreshTokens, RevokeAllMyRefreshTokens).
+  # The events API (ListEvents) is not affected and always returns at most 1000 events.
   MaxQueryLimit: 1000 # ZITADEL_SYSTEMDEFAULTS_MAXQUERYLIMIT
   # The maximum duration of the IDP intent lifetime after which the IDP intent expires and can not be retrieved or used anymore.
   # Note that this time is measured only after the IdP intent was successful and not after the IDP intent was created.
@@ -967,12 +1056,8 @@ SystemDefaults:
 Actions:
   HTTP:
     # Wildcard sub domains are currently unsupported
+    # Deprecated: use HTTPClient.DenyList instead. If both are set, this list will be merged into the HTTPClient.DenyList.
     DenyList: # ZITADEL_ACTIONS_HTTP_DENYLIST (comma separated list)
-      - localhost
-      - "127.0.0.0/8"
-      - "::1"
-      - "0.0.0.0"
-      - "::"
 
 LogStore:
   Access:
@@ -1005,6 +1090,55 @@ Eventstore:
   PushTimeout: 15s #ZITADEL_EVENTSTORE_PUSHTIMEOUT
   # Maximum amount of push retries in case of primary key violation on the sequence
   MaxRetries: 5 #ZITADEL_EVENTSTORE_MAXRETRIES
+  # Autovacuum tunes PostgreSQL's autovacuum and autoanalyze behavior of the
+  # eventstore.events2 table. As the table grows, PostgreSQL's default,
+  # percentage-based scale factors delay vacuum and analyze runs more and
+  # more, which can degrade read performance on large instances. Enabling
+  # this replaces the scale factors with static thresholds, so vacuum and
+  # analyze keep running at a predictable cadence regardless of table size.
+  # Settings are (re-)applied to the table as a repeatable step during `zitadel setup`.
+  Autovacuum:
+    # If enabled, the thresholds below are applied to the eventstore.events2 table
+    # and the default, percentage-based autovacuum scale factors are disabled.
+    # If disabled, the table is reset to the cluster's default autovacuum settings.
+    Enabled: false # ZITADEL_EVENTSTORE_AUTOVACUUM_ENABLED
+    # Number of modified rows that triggers an autovacuum run, regardless of table size (applied in both autovacuum_vacuum_threshold and autovacuum_vacuum_insert_threshold settings).
+    # Must be greater than 10000.
+    VacuumThreshold: 50000 # ZITADEL_EVENTSTORE_AUTOVACUUM_VACUUMTHRESHOLD
+    # Number of changed rows that triggers an autoanalyze run, regardless of table size.
+    # Must be greater than 10000.
+    AnalyzeThreshold: 50000 # ZITADEL_EVENTSTORE_AUTOVACUUM_ANALYZETHRESHOLD
+
+HTTPClient:
+  # Sets the limit of the response body size in bytes, which will be processed by the HTTP client.
+  # If the response body exceeds this limit, the client will return an error.
+  # The default value is 20MB.
+  MaxBodySize: 20971520 # ZITADEL_HTTPCLIENT_MAXBODYSIZE
+  # Sets the timeout for the HTTP client.
+  Timeout: 30s # ZITADEL_HTTPCLIENT_TIMEOUT
+  # Sets the number of allowed redirects for the HTTP client.
+  MaxRedirects: 5 # ZITADEL_HTTPCLIENT_MAXREDIRECTS
+  # Specifies if the HTTP client should follow redirects from HTTPS to HTTP.
+  AllowHTTPSDowngrade: false # ZITADEL_HTTPCLIENT_ALLOWHTTPSDOWNGRADE
+  # Specifies the list of IP addresses or CIDR ranges that are not allowed to be called by the HTTP client.
+  # Note that hosts / domains are matched best-case and wildcards are not supported.
+  # CRITICAL SECURITY NOTE: Domain rules (like "localhost") protect application-layer string matches.
+  # Underneath, the network dialer relies exclusively on the CIDR ranges below to block resolved IPs and prevent DNS Rebinding.
+  # Do not remove the CIDR subnets even if a domain mapping exists.
+  DenyList: # ZITADEL_HTTPCLIENT_DENYLIST (comma separated list)
+    - localhost
+    - "0.0.0.0/8"       # Unspecified IPv4 address range / Local network routing trick protection
+    - "10.0.0.0/8"      # Class A private networks
+    - "100.64.0.0/10"   # Carrier-Grade NAT space
+    - "127.0.0.0/8"     # Loopback addresses (IPv4)
+    - "169.254.0.0/16"  # Link-local subnets (Covers Cloud Metadata Endpoints like AWS/GCP 169.254.169.254)
+    - "172.16.0.0/12"   # Class B private networks
+    - "192.168.0.0/16"  # Class C private networks
+    - "198.18.0.0/15"   # Benchmark/inter-network communication testing
+    - "::/128"          # Unspecified IPv6 address
+    - "::1/128"         # IPv6 loopback address
+    - "fc00::/7"        # Unique local addresses / IPv6 equivalent to private IPv4 subnets
+    - "fe80::/10"       # Link-local addresses / IPv6 equivalent to cloud metadata subnets
 
 # The DefaultInstance section defines the default values for each new virtual instance that is created.
 # Check out https://zitadel.com/docs/concepts/structure/instance#multiple-virtual-instances for more information about virtual instances.
@@ -1120,12 +1254,12 @@ DefaultInstance:
       IncludeDigits: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPEMAIL_INCLUDEDIGITS
       IncludeSymbols: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPEMAIL_INCLUDESYMBOLS
     InviteCode:
-      Length: 6 # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_LENGTH
-      Expiry: "72h" # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_EXPIRY
-      IncludeLowerLetters: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDELOWERLETTERS
-      IncludeUpperLetters: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDEUPPERLETTERS
-      IncludeDigits: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDEDIGITS
-      IncludeSymbols: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDESYMBOLS
+      Length: 6 # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INVITECODE_LENGTH
+      Expiry: "72h" # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INVITECODE_EXPIRY
+      IncludeLowerLetters: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INVITECODE_INCLUDELOWERLETTERS
+      IncludeUpperLetters: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INVITECODE_INCLUDEUPPERLETTERS
+      IncludeDigits: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INVITECODE_INCLUDEDIGITS
+      IncludeSymbols: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INVITECODE_INCLUDESYMBOLS
     SigningKey:
       Length: 36 # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_SIGNINGKEY_LENGTH
       IncludeLowerLetters: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_SIGNINGKEY_INCLUDELOWERLETTERS
@@ -1557,6 +1691,7 @@ InternalAuthZ:
         - "project.role.delete"
         - "project.app.read"
         - "project.app.write"
+        - "project.app.register_dynamic"
         - "project.app.delete"
         - "project.grant.read"
         - "project.grant.write"
@@ -1672,6 +1807,7 @@ InternalAuthZ:
         - "project.role.delete"
         - "project.app.read"
         - "project.app.write"
+        - "project.app.register_dynamic"
         - "project.app.delete"
         - "project.grant.read"
         - "project.grant.write"
@@ -1774,6 +1910,7 @@ InternalAuthZ:
         - "project.role.delete"
         - "project.app.read"
         - "project.app.write"
+        - "project.app.register_dynamic"
         - "project.grant.read"
         - "project.grant.write"
         - "project.grant.delete"
@@ -1929,6 +2066,9 @@ InternalAuthZ:
         - "policy.read"
         - "project.read:self"
         - "project.create"
+    - Role: "ORG_DYNAMIC_CLIENT_REGISTRAR"
+      Permissions:
+        - "project.app.register_dynamic"
     - Role: "ORG_ADMIN_IMPERSONATOR"
       Permissions:
         - "admin.impersonation"
@@ -2150,6 +2290,7 @@ SystemAuthZ:
         - "project.role.delete"
         - "project.app.read"
         - "project.app.write"
+        - "project.app.register_dynamic"
         - "project.app.delete"
         - "project.grant.read"
         - "project.grant.write"
@@ -2265,6 +2406,7 @@ SystemAuthZ:
         - "project.role.delete"
         - "project.app.read"
         - "project.app.write"
+        - "project.app.register_dynamic"
         - "project.app.delete"
         - "project.grant.read"
         - "project.grant.write"

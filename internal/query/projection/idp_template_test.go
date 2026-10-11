@@ -4280,7 +4280,8 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
 	"isAutoUpdate": true,
-	"autoLinkingOption": 1
+	"autoLinkingOption": 1,
+	"audience": "audience"
 }`),
 					), instance.JWTIDPAddedEventMapper),
 			},
@@ -4311,7 +4312,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_jwt (idp_id, instance_id, issuer, jwt_endpoint, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_jwt (idp_id, instance_id, issuer, jwt_endpoint, keys_endpoint, header_name, audience) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -4319,6 +4320,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 								"jwt",
 								"keys",
 								"header",
+								"audience",
 							},
 						},
 					},
@@ -4342,7 +4344,8 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
 	"isAutoUpdate": true,
-	"autoLinkingOption": 1
+	"autoLinkingOption": 1,
+	"audience": "audience"
 }`),
 					), org.JWTIDPAddedEventMapper),
 			},
@@ -4373,7 +4376,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_jwt (idp_id, instance_id, issuer, jwt_endpoint, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_jwt (idp_id, instance_id, issuer, jwt_endpoint, keys_endpoint, header_name, audience) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -4381,6 +4384,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 								"jwt",
 								"keys",
 								"header",
+								"audience",
 							},
 						},
 					},
@@ -4442,6 +4446,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 	"jwtEndpoint": "jwt",
 	"keysEndpoint": "keys",
 	"headerName": "header",
+	"audience": "audience",
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
@@ -4471,12 +4476,13 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates6_jwt SET (jwt_endpoint, keys_endpoint, header_name, issuer) = ($1, $2, $3, $4) WHERE (idp_id = $5) AND (instance_id = $6)",
+							expectedStmt: "UPDATE projections.idp_templates6_jwt SET (jwt_endpoint, keys_endpoint, header_name, issuer, audience) = ($1, $2, $3, $4, $5) WHERE (idp_id = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								"jwt",
 								"keys",
 								"header",
 								"issuer",
+								"audience",
 								"idp-id",
 								"instance-id",
 							},
@@ -4796,6 +4802,352 @@ func TestIDPTemplateProjection_reducesZitadel(t *testing.T) {
 								anyArg{},
 								database.TextArray[string]{"profile"},
 								[]byte(`[{"organizationId":"org1","organizationDomain":"org1.com"},{"organizationId":"org2","organizationDomain":"org2.com"}]`),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceZitadelIDPChanged minimal",
+			args: args{
+				event: getEvent(
+					testEvent(
+						instance.ZitadelIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
+	"id": "idp-id",
+	"isCreationAllowed": true,
+	"clientId": "id"
+}`),
+					), eventstore.GenericEventMapper[instance.ZitadelIDPChangedEvent]),
+			},
+			reduce: (&idpTemplateProjection{}).reduceZitadelIDPChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateMinimalStmt,
+							expectedArgs: []interface{}{
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates6_zitadel SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"id",
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceZitadelIDPChanged",
+			args: args{
+				event: getEvent(
+					testEvent(
+						instance.ZitadelIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
+	"id": "idp-id",
+	"name": "name",
+	"issuer": "issuer",
+	"clientId": "client_id",
+	"clientSecret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"instanceRolesInfo": [{
+        "organizationId": "org3",
+        "organizationDomain": "org3.com"
+    }],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
+}`),
+					), eventstore.GenericEventMapper[instance.ZitadelIDPChangedEvent]),
+			},
+			reduce: (&idpTemplateProjection{}).reduceZitadelIDPChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateStmt,
+							expectedArgs: []interface{}{
+								"name",
+								true,
+								true,
+								true,
+								true,
+								domain.AutoLinkingOptionUsername,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates6_zitadel SET (client_id, client_secret, issuer, scopes, instance_roles_info) = ($1, $2, $3, $4, $5) WHERE (idp_id = $6) AND (instance_id = $7)",
+							expectedArgs: []interface{}{
+								"client_id",
+								anyArg{},
+								"issuer",
+								database.TextArray[string]{"profile"},
+								[]byte(`[{"organizationId":"org3","organizationDomain":"org3.com"}]`),
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceZitadelIDPChanged - unset scopes and instance roles info",
+			args: args{
+				event: getEvent(
+					testEvent(
+						instance.ZitadelIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
+	"id": "idp-id",
+	"name": "name",
+	"issuer": "issuer",
+	"clientId": "client_id",
+	"clientSecret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": [],
+	"instanceRolesInfo": [],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
+}`),
+					), eventstore.GenericEventMapper[instance.ZitadelIDPChangedEvent]),
+			},
+			reduce: (&idpTemplateProjection{}).reduceZitadelIDPChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateStmt,
+							expectedArgs: []interface{}{
+								"name",
+								true,
+								true,
+								true,
+								true,
+								domain.AutoLinkingOptionUsername,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates6_zitadel SET (client_id, client_secret, issuer, scopes, instance_roles_info) = ($1, $2, $3, $4, $5) WHERE (idp_id = $6) AND (instance_id = $7)",
+							expectedArgs: []interface{}{
+								"client_id",
+								anyArg{},
+								"issuer",
+								database.TextArray[string]{},
+								[]byte(`[]`),
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceZitadelIDPChanged minimal",
+			args: args{
+				event: getEvent(
+					testEvent(
+						org.ZitadelIDPChangedEventType,
+						org.AggregateType,
+						[]byte(`{
+	"id": "idp-id",
+	"isCreationAllowed": true,
+	"clientId": "id"
+}`),
+					), eventstore.GenericEventMapper[org.ZitadelIDPChangedEvent]),
+			},
+			reduce: (&idpTemplateProjection{}).reduceZitadelIDPChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateMinimalStmt,
+							expectedArgs: []interface{}{
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates6_zitadel SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"id",
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceZitadelIDPChanged",
+			args: args{
+				event: getEvent(
+					testEvent(
+						org.ZitadelIDPChangedEventType,
+						org.AggregateType,
+						[]byte(`{
+	"id": "idp-id",
+	"name": "name",
+	"issuer": "issuer",
+	"clientId": "client_id",
+	"clientSecret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"instanceRolesInfo": [{
+        "organizationId": "org3",
+        "organizationDomain": "org3.com"
+    }],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
+}`),
+					), eventstore.GenericEventMapper[org.ZitadelIDPChangedEvent]),
+			},
+			reduce: (&idpTemplateProjection{}).reduceZitadelIDPChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateStmt,
+							expectedArgs: []interface{}{
+								"name",
+								true,
+								true,
+								true,
+								true,
+								domain.AutoLinkingOptionUsername,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates6_zitadel SET (client_id, client_secret, issuer, scopes, instance_roles_info) = ($1, $2, $3, $4, $5) WHERE (idp_id = $6) AND (instance_id = $7)",
+							expectedArgs: []interface{}{
+								"client_id",
+								anyArg{},
+								"issuer",
+								database.TextArray[string]{"profile"},
+								[]byte(`[{"organizationId":"org3","organizationDomain":"org3.com"}]`),
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceZitadelIDPChanged - unset scopes and instance roles info",
+			args: args{
+				event: getEvent(
+					testEvent(
+						org.ZitadelIDPChangedEventType,
+						org.AggregateType,
+						[]byte(`{
+	"id": "idp-id",
+	"name": "name",
+	"issuer": "issuer",
+	"clientId": "client_id",
+	"clientSecret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": [],
+	"instanceRolesInfo": [],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
+}`),
+					), eventstore.GenericEventMapper[org.ZitadelIDPChangedEvent]),
+			},
+			reduce: (&idpTemplateProjection{}).reduceZitadelIDPChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateStmt,
+							expectedArgs: []interface{}{
+								"name",
+								true,
+								true,
+								true,
+								true,
+								domain.AutoLinkingOptionUsername,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates6_zitadel SET (client_id, client_secret, issuer, scopes, instance_roles_info) = ($1, $2, $3, $4, $5) WHERE (idp_id = $6) AND (instance_id = $7)",
+							expectedArgs: []interface{}{
+								"client_id",
+								anyArg{},
+								"issuer",
+								database.TextArray[string]{},
+								[]byte(`[]`),
+								"idp-id",
+								"instance-id",
 							},
 						},
 					},

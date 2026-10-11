@@ -14,10 +14,7 @@ type AddressChecker interface {
 func ParseDenyList(inputList []string) ([]AddressChecker, error) {
 	var toReturn []AddressChecker
 	for _, input := range inputList {
-		parsed, parseErr := NewHostChecker(input)
-		if parseErr != nil {
-			return nil, parseErr
-		}
+		parsed := NewHostChecker(input)
 		if parsed != nil {
 			toReturn = append(toReturn, parsed)
 		}

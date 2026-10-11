@@ -8,6 +8,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	object "github.com/zitadel/zitadel/internal/api/grpc/object/v2beta"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -30,7 +31,7 @@ func (s *Server) GetUserByID(ctx context.Context, req *connect.Request[user.GetU
 }
 
 func (s *Server) ListUsers(ctx context.Context, req *connect.Request[user.ListUsersRequest]) (*connect.Response[user.ListUsersResponse], error) {
-	queries, err := listUsersRequestToModel(req.Msg)
+	queries, err := listUsersRequestToModel(s.systemDefaults, req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -166,8 +167,11 @@ func accessTokenTypeToPb(accessTokenType domain.OIDCTokenType) user.AccessTokenT
 	}
 }
 
-func listUsersRequestToModel(req *user.ListUsersRequest) (*query.UserSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToQuery(req.Query)
+func listUsersRequestToModel(defaults systemdefaults.SystemDefaults, req *user.ListUsersRequest) (*query.UserSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToQuery(defaults, req.GetQuery())
+	if err != nil {
+		return nil, err
+	}
 	queries, err := userQueriesToQuery(req.Queries, 0 /*start from level 0*/)
 	if err != nil {
 		return nil, err

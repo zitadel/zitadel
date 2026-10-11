@@ -71,6 +71,10 @@ func (g *GroupWriteModel) Reduce() error {
 				g.Description = *e.Description
 			}
 		case *group.GroupRemovedEvent:
+			g.Name = ""
+			g.Description = ""
+			g.UserIDs = nil
+			g.existingUserIDs = make(map[string]struct{})
 			g.State = domain.GroupStateRemoved
 		case *group.GroupUsersAddedEvent:
 			for _, userID := range e.UserIDs {

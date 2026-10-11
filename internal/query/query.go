@@ -2,12 +2,12 @@ package query
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"regexp"
 	"sync"
 	"time"
 
-	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -36,6 +36,7 @@ type Queries struct {
 	smsEncryptionAlgorithm    crypto.EncryptionAlgorithm
 	sessionTokenVerifier      func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error)
 	checkPermission           domain.PermissionCheck
+	triggerMemberProjections  func(ctx context.Context) (context.Context, error)
 
 	DefaultLanguage                     language.Tag
 	mutex                               sync.Mutex
@@ -45,6 +46,7 @@ type Queries struct {
 	zitadelRoles                        []authz.RoleMapping
 	multifactors                        domain.MultifactorConfigs
 	defaultAuditLogRetention            time.Duration
+	defaultSecretGenerators             map[domain.SecretGeneratorType]*crypto.GeneratorConfig
 }
 
 func StartQueries(
@@ -62,6 +64,7 @@ func StartQueries(
 	defaultAuditLogRetention time.Duration,
 	systemAPIUsers map[string]*authz.SystemAPIUser,
 	startProjections bool,
+	secretGeneratorDefaults map[domain.SecretGeneratorType]*crypto.GeneratorConfig,
 ) (repo *Queries, err error) {
 	repo = &Queries{
 		eventstore:                          es,
@@ -77,6 +80,7 @@ func StartQueries(
 		smsEncryptionAlgorithm:              smsEncryptionAlgorithm,
 		smtpEncryptionAlgorithm:             smtpEncryptionAlgorithm,
 		sessionTokenVerifier:                sessionTokenVerifier,
+		triggerMemberProjections:            triggerMemberProjections,
 		multifactors: domain.MultifactorConfigs{
 			OTP: domain.OTPConfig{
 				CryptoMFA: otpEncryption,
@@ -84,6 +88,7 @@ func StartQueries(
 			},
 		},
 		defaultAuditLogRetention: defaultAuditLogRetention,
+		defaultSecretGenerators:  secretGeneratorDefaults,
 	}
 
 	repo.checkPermission = permissionCheck(repo)
@@ -135,25 +140,42 @@ func init() {
 	)
 }
 
+// triggerer is implemented by [handler.Handler] and allows
+// triggerBatch to be tested without a database.
+type triggerer interface {
+	ProjectionName() string
+	Trigger(ctx context.Context, opts ...handler.TriggerOpt) (_ context.Context, err error)
+}
+
 // triggerBatch calls Trigger on every handler in a separate Go routine.
 // The returned context is the context returned by the Trigger that finishes last.
-func triggerBatch(ctx context.Context, handlers ...*handler.Handler) {
-	var wg sync.WaitGroup
-	wg.Add(len(handlers))
+// When no handlers are passed, ctx is returned unchanged.
+// Errors are joined and returned as a single error.
+func triggerBatch(ctx context.Context, handlers ...triggerer) (context.Context, error) {
+	type result struct {
+		ctx context.Context
+		err error
+	}
+	results := make(chan result)
 
 	for _, h := range handlers {
-		go func(ctx context.Context, h *handler.Handler) {
+		go func(ctx context.Context, h triggerer, results chan<- result) {
 			name := h.ProjectionName()
-			_, traceSpan := tracing.NewNamedSpan(ctx, fmt.Sprintf("Trigger%s", name))
-			_, err := h.Trigger(ctx, handler.WithAwaitRunning())
-			logging.OnError(err).WithField("projection", name).Debug("trigger failed")
+			ctx, traceSpan := tracing.NewNamedSpan(ctx, fmt.Sprintf("Trigger%s", name))
+			newCtx, err := h.Trigger(ctx, handler.WithAwaitRunning())
 			traceSpan.EndWithError(err)
+			results <- result{ctx: newCtx, err: err}
 
-			wg.Done()
-		}(ctx, h)
+		}(ctx, h, results)
 	}
 
-	wg.Wait()
+	errs := make([]error, len(handlers))
+	for i := range handlers {
+		r := <-results
+		ctx = r.ctx
+		errs[i] = r.err // nil check done by join
+	}
+	return ctx, errors.Join(errs...)
 }
 
 func findTextEqualsQuery(column Column, queries []SearchQuery) (text string, ok bool) {

@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"encoding/xml"
 	"net/url"
@@ -95,11 +94,12 @@ func (c *Commands) GetProvider(ctx context.Context, idpID string, idpCallback st
 		return nil, err
 	}
 	if writeModel.IDPType != domain.IDPTypeSAML {
-		return writeModel.ToProvider(idpCallback, c.idpConfigEncryption)
+		return writeModel.ToProvider(idpCallback, c.idpConfigEncryption, c.httpClient)
 	}
 	return writeModel.ToSAMLProvider(
 		samlRootURL,
 		c.idpConfigEncryption,
+		c.httpClient,
 		func(ctx context.Context, intentID string) (*samlsp.TrackedRequest, error) {
 			intent, err := c.GetActiveIntent(ctx, intentID)
 			if err != nil {
@@ -240,11 +240,7 @@ func (c *Commands) RequestSAMLIDPIntent(ctx context.Context, writeModel *IDPInte
 }
 
 func (c *Commands) generateIntentToken(intentID string) (string, error) {
-	token, err := c.idpConfigEncryption.Encrypt([]byte(intentID))
-	if err != nil {
-		return "", err
-	}
-	return base64.RawURLEncoding.EncodeToString(token), nil
+	return c.idpConfigEncryption.EncryptToken(intentID)
 }
 
 func (c *Commands) SucceedLDAPIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, idpUser idp.User, userID string, session *ldap.Session) (string, error) {

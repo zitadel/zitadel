@@ -1,0 +1,124 @@
+---
+title: Adopt Login V2 on an existing installation
+description: "Deploy and enable Hosted Login V2 for self-hosted ZITADEL v4 instances that currently use Login V1"
+sidebar_label: Adopt Login V2
+---
+
+## Who this is for
+
+Self-hosted **ZITADEL v4** deployments with existing instances that still use **Login V1**.
+
+Login V2 was not the default on v3 and is not a supported cutover target there. If you are still on v3, [upgrade to v4](/self-hosting/manage/upgrade-v3-to-v4) first, then return here.
+
+New v4 installations may enable Login V2 by default. That does **not** rewrite existing instances.
+
+## Do you need to switch?
+
+**No — not for normal v4 operation.** Remaining on Login V1 is supported and is the right default unless you have a concrete reason to move.
+
+Consider Login V2 when you need capabilities that depend on it (including many **Actions V2** flows). Plan extra time if you rely on **Actions V1** or deep Login V1 customizations: those usually must be migrated, and some setups need careful validation because not every V1 pattern has an identical V2 equivalent yet.
+See [Migrate from Actions V1 to V2](/guides/integrate/actions/migrate-from-v1).
+
+If you do not urgently need Login V2, stay on Login V1 and revisit later.
+
+## Overview
+
+1. Deploy and route the Login UI (no production traffic yet)
+2. Authenticate login → API (PAT **or** system-user JWT / X.509)
+3. Smoke-test Login V2
+4. Cut over gradually (per app) or instance-wide
+5. Update IdP callbacks and related config
+
+<Callout type="warn">
+Before enabling Login V2 for production traffic, create a break-glass machine user with `IAM_OWNER` and a PAT.
+If login misconfiguration locks interactive access, use the PAT to revert the feature or fix routing.
+</Callout>
+
+## 1. Deploy and route
+
+1. Deploy `zitadel-login` (compose, Helm, or your own packaging).
+2. On your reverse proxy / ingress:
+   - `/ui/v2/login` → login service
+   - everything else → ZITADEL API
+
+See [Login UI routing](/self-hosting/manage/reverseproxy/reverse_proxy#login-ui-routing).
+
+## 2. Authenticate login to the API
+
+Pick **one** method. Login resolves credentials roughly as:
+
+1. System-user JWT (`AUDIENCE`, `SYSTEM_USER_ID`, `SYSTEM_USER_PRIVATE_KEY` / `_FILE`)
+2. `ZITADEL_LOGINCLIENT_KEYFILE` (subject `login-client`)
+3. Service-user PAT (`ZITADEL_SERVICE_USER_TOKEN` / `_FILE`)
+
+### Option A — PAT (classic)
+
+For **existing** instances the setup job does **not** auto-create the login client.
+
+1. Create a machine user
+2. Grant **Instance Login Client** (`IAM_LOGIN_CLIENT`)
+3. Create a PAT and provide it to the login UI
+
+Step-by-step: [Create a Login Client](/self-hosting/manage/login-client).
+
+### Option B — RSA / X.509 system user (recommended on recent Helm)
+
+On **Helm chart ≥ v10** with **ZITADEL ≥ v4.14**:
+
+- The chart generates an RSA keypair (or uses `login.loginServiceKeySecretName`)
+- Registers the public cert under `SystemAPIUsers` (login client)
+- Mounts the private key into the login container
+
+No login PAT is required for login↔API auth.
+Older `login-client` PAT secrets from chart v9 are unused after that switch and can be deleted.
+
+See the [Helm chart README](https://github.com/zitadel/zitadel-charts/blob/main/charts/zitadel/README.md) (Upgrade From V9 to V10) for chart-specific details.
+
+Manual equivalent: register a [System API user](/guides/integrate/zitadel-apis/access-zitadel-system-api) with `IAM_LOGIN_CLIENT` membership and configure the login env vars above.
+
+## 3. Smoke-test (feature still off)
+
+Open `https://<your-domain>/ui/v2/login` and verify health while production apps still use Login V1.
+
+Also prepare:
+
+- External IdP redirect / callback URLs for Login V2 paths
+- Trusted domains if login is hosted on a separate hostname
+
+## 4. Cut over
+
+### Gradual (recommended)
+
+With the instance Login V2 feature **disabled**:
+
+1. Open the application in Console
+2. Enable **Use new login UI**
+3. Optionally set a custom base URL for a separately hosted login UI
+
+Only that application uses Login V2. See [Application settings](/guides/manage/console/applications-overview#use-new-login-ui).
+
+### Instance-wide
+
+1. Enable the **loginV2** feature (Console → instance Features, or Feature API)
+2. Set the base URI, or leave empty to use `/ui/v2/login`
+
+When the instance feature is on, it takes precedence over per-app checkboxes and applies to every application.
+
+### Roll back
+
+Disable the per-app setting or the instance feature while Login V1 is still available.
+Use the break-glass `IAM_OWNER` PAT if interactive login is broken.
+
+## 5. After cutover checklist
+
+- IdP callbacks updated and tested
+- SAML / attribute mapping: review Actions V2 needs for Login V2 where applicable
+- Login V2 texts: customize via Settings API (not the old Console login text editor)
+- OIDC apps that already use your ZITADEL issuer usually need **no** code changes
+
+## Related
+
+- [Hosted Login](/guides/integrate/login/hosted-login)
+- [Create a Login Client](/self-hosting/manage/login-client)
+- [Access System API](/guides/integrate/zitadel-apis/access-zitadel-system-api)
+- [Upgrade from ZITADEL v3 to v4](/self-hosting/manage/upgrade-v3-to-v4)
