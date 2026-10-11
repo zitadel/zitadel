@@ -115,7 +115,7 @@ func (c *Commands) OTPEmailSent(ctx context.Context, sessionID, resourceOwner st
 
 func CheckOTPSMS(code string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) (_ []eventstore.Command, err error) {
-		humanWriteModel, err := cmd.getStateIndependentHumanWriteModel(ctx)
+		humanWriteModel, err := cmd.getHumanWriteModelWithAutoUnlock(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -164,7 +164,7 @@ func CheckOTPSMS(code string) SessionCommand {
 
 func CheckOTPEmail(code string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) (_ []eventstore.Command, err error) {
-		humanWriteModel, err := cmd.getStateIndependentHumanWriteModel(ctx)
+		humanWriteModel, err := cmd.getHumanWriteModelWithAutoUnlock(ctx)
 		if err != nil {
 			return nil, err
 		}

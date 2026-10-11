@@ -30,6 +30,7 @@ import (
 
 func TestSessionCommands_getHumanWriteModel(t *testing.T) {
 	userAggr := &user.NewAggregate("user1", "org1").Aggregate
+	orgAggr := &org.NewAggregate("org1").Aggregate
 
 	type fields struct {
 		eventstore        func(*testing.T) *eventstore.Eventstore
@@ -97,6 +98,106 @@ func TestSessionCommands_getHumanWriteModel(t *testing.T) {
 			res: res{
 				want: nil,
 				err:  zerrors.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.User.NotFound"),
+			},
+		},
+		{
+			name: "locked user, lock duration not exceeded",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								userAggr,
+								"", "", "", "", "", language.Georgian,
+								domain.GenderDiverse, "", true,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewUserLockedEvent(context.Background(), userAggr),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(context.Background(), orgAggr, 1, 1, false, 60, false, false)),
+					),
+				),
+				sessionWriteModel: &SessionWriteModel{
+					UserID: "user1",
+				},
+			},
+			res: res{
+				want: nil,
+				err:  zerrors.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.User.NotFound"),
+			},
+		},
+		{
+			name: "locked user, lock duration not exceeded, show remaining lockout time",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								userAggr,
+								"", "", "", "", "", language.Georgian,
+								domain.GenderDiverse, "", true,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewUserLockedEvent(context.Background(), userAggr),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(context.Background(), orgAggr, 1, 1, false, 60, true, false)),
+					),
+				),
+				sessionWriteModel: &SessionWriteModel{
+					UserID: "user1",
+				},
+			},
+			res: res{
+				want: nil,
+				err:  zerrors.ThrowPreconditionFailed(nil, "COMMAND-M4rp6", "Errors.User.LockDurationNotExceeded"),
+			},
+		},
+		{
+			name: "locked user, lock duration exceeded, unlocked",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								userAggr,
+								"", "", "", "", "", language.Georgian,
+								domain.GenderDiverse, "", true,
+							),
+						),
+						eventFromEventPusherWithCreationDate(
+							user.NewUserLockedEvent(context.Background(), userAggr),
+							time.Now().Add(-2*time.Hour),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(context.Background(), orgAggr, 1, 1, false, 60, false, false)),
+					),
+					expectPush(
+						user.NewUserUnlockedEvent(context.Background(), userAggr),
+					),
+				),
+				sessionWriteModel: &SessionWriteModel{
+					UserID: "user1",
+				},
+			},
+			res: res{
+				want: &HumanWriteModel{
+					WriteModel: eventstore.WriteModel{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+						Events:        []eventstore.Event{},
+					},
+					PreferredLanguage: language.Georgian,
+					Gender:            domain.GenderDiverse,
+					UserState:         domain.UserStateActive,
+				},
+				err: nil,
 			},
 		},
 		{
@@ -1283,6 +1384,7 @@ func TestCheckTOTP(t *testing.T) {
 					aggregate:     sessAgg,
 				},
 				eventstore: expectEventstore(
+					expectFilter(), // human write model check
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
@@ -1315,6 +1417,7 @@ func TestCheckTOTP(t *testing.T) {
 					aggregate:     sessAgg,
 				},
 				eventstore: expectEventstore(
+					expectFilter(), // human write model check
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
@@ -1348,6 +1451,7 @@ func TestCheckTOTP(t *testing.T) {
 					aggregate:     sessAgg,
 				},
 				eventstore: expectEventstore(
+					expectFilter(), // human write model check
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
@@ -1378,6 +1482,7 @@ func TestCheckTOTP(t *testing.T) {
 					aggregate:     sessAgg,
 				},
 				eventstore: expectEventstore(
+					expectFilter(), // human write model check
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
@@ -1398,6 +1503,76 @@ func TestCheckTOTP(t *testing.T) {
 				user.NewHumanOTPCheckReusedEvent(ctx, userAgg, nil),
 			},
 			wantErr: zerrors.ThrowInvalidArgument(nil, "TOTP-Auw0a", "Errors.User.MFA.OTP.Reused"),
+		},
+		{
+			name: "user locked, lock duration not exceeded",
+			code: code,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:        "user1",
+					UserCheckedAt: testNow,
+					aggregate:     sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusherWithCreationDateNow(
+							user.NewUserLockedEvent(ctx, userAgg),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 1, 1, false, 60, false, false)),
+					),
+				),
+				tarpit: expectTarpit(0),
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-M4rp5", "Errors.User.NotFound"),
+		},
+		{
+			name: "user locked, lock duration exceeded, unlocked and ok",
+			code: code,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:        "user1",
+					UserCheckedAt: testNow,
+					aggregate:     sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusherWithCreationDate(
+							user.NewUserLockedEvent(ctx, userAgg),
+							time.Now().Add(-2*time.Hour),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 1, 1, false, 60, false, false)),
+					),
+					expectPush(
+						user.NewUserUnlockedEvent(ctx, userAgg),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
+						),
+						eventFromEventPusher(
+							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
+						),
+						eventFromEventPusher(
+							user.NewUserLockedEvent(ctx, userAgg),
+						),
+						eventFromEventPusher(
+							user.NewUserUnlockedEvent(ctx, userAgg),
+						),
+					),
+					expectFilter(), // recheck
+				),
+				tarpit: expectTarpit(0),
+			},
+			wantEventCommands: []eventstore.Command{
+				// The code hash is salted randomly and therefore not predictable.
+				// It is asserted separately by assertTOTPCodeHash.
+				user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, nil),
+				session.NewTOTPCheckedEvent(ctx, sessAgg, testNow),
+			},
 		},
 		{
 			name: "ok, but locked in the meantime",
@@ -1487,7 +1662,7 @@ func TestCheckRecoveryCode(t *testing.T) {
 				eventstore: expectEventstore(),
 				hasher:     hasher,
 			},
-			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-4m9s2", "Errors.User.UserIDMissing"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-M4rp1", "Errors.User.UserIDMissing"),
 		},
 		{
 			name: "filter error",
@@ -1513,6 +1688,7 @@ func TestCheckRecoveryCode(t *testing.T) {
 					aggregate: sessAgg,
 				},
 				eventstore: expectEventstore(
+					expectFilter(), // human write model check
 					expectFilter(), // No codes added
 				),
 				hasher: hasher,
@@ -1528,6 +1704,7 @@ func TestCheckRecoveryCode(t *testing.T) {
 					aggregate: sessAgg,
 				},
 				eventstore: expectEventstore(
+					expectFilter(), // human write model check
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, nil),
@@ -1554,6 +1731,7 @@ func TestCheckRecoveryCode(t *testing.T) {
 					aggregate: sessAgg,
 				},
 				eventstore: expectEventstore(
+					expectFilter(), // human write model check
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, nil),
@@ -1582,6 +1760,14 @@ func TestCheckRecoveryCode(t *testing.T) {
 				},
 				eventstore: expectEventstore(
 					expectFilter(
+						eventFromEventPusherWithCreationDateNow(
+							user.NewUserLockedEvent(ctx, userAgg),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 1, 1, false, 0, false, false)),
+					),
+					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, nil),
 						),
@@ -1595,6 +1781,47 @@ func TestCheckRecoveryCode(t *testing.T) {
 			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-2w6oa", "Errors.User.Locked"),
 		},
 		{
+			name: "user locked, lock duration exceeded, unlocked and ok",
+			code: validCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:    "user1",
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusherWithCreationDate(
+							user.NewUserLockedEvent(ctx, userAgg),
+							time.Now().Add(-2*time.Hour),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 1, 1, false, 60, false, false)),
+					),
+					expectPush(
+						user.NewUserUnlockedEvent(ctx, userAgg),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, nil),
+						),
+						eventFromEventPusher(
+							user.NewUserLockedEvent(ctx, userAgg),
+						),
+						eventFromEventPusher(
+							user.NewUserUnlockedEvent(ctx, userAgg),
+						),
+					),
+					expectFilter(), // additional lock check
+				),
+				hasher: hasher,
+			},
+			wantEventCommands: []eventstore.Command{
+				user.NewHumanRecoveryCodeCheckSucceededEvent(ctx, userAgg, "$plain$x$"+validCode, nil),
+				session.NewRecoveryCodeCheckedEvent(ctx, sessAgg, testNow),
+			},
+		},
+		{
 			name: "ok",
 			code: validCode,
 			fields: fields{
@@ -1603,6 +1830,7 @@ func TestCheckRecoveryCode(t *testing.T) {
 					aggregate: sessAgg,
 				},
 				eventstore: expectEventstore(
+					expectFilter(), // human write model check
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, nil),
