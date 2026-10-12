@@ -17,6 +17,13 @@ declare namespace NodeJS {
     ZITADEL_API_URL: string;
 
     /**
+     * Optional: public URL of the Login app used to build absolute redirects and callbacks.
+     * Use this when reverse proxies do not provide stable host headers.
+     * Must be an absolute URL, for example: https://login.example.com
+     */
+    ZITADEL_PUBLIC_URL?: string;
+
+    /**
      * The service account token
      * If ZITADEL_SERVICE_USER_TOKEN is set, its value is used.
      * If ZITADEL_SERVICE_USER_TOKEN is not set but ZITADEL_SERVICE_USER_TOKEN_FILE is set, the application blocks until the file is created.
