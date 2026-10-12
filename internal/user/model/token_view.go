@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type TokenView struct {
@@ -59,14 +58,4 @@ type TokenSearchResponse struct {
 	Limit       uint64
 	TotalResult uint64
 	Result      []*Token
-}
-
-func (r *TokenSearchRequest) EnsureLimit(limit uint64) error {
-	if r.Limit > limit {
-		return zerrors.ThrowInvalidArgument(nil, "SEARCH-M0fse", "Errors.Limit.ExceedsDefault")
-	}
-	if r.Limit == 0 {
-		r.Limit = limit
-	}
-	return nil
 }

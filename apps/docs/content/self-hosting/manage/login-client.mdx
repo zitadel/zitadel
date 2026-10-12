@@ -34,6 +34,32 @@ For example:
 docker run -p 3000:3000 -v /path/on/your/host/login-client.pat:/path/in/container/login-client.pat:ro -e ZITADEL_SERVICE_USER_TOKEN_FILE=/path/in/container/login-client.pat ghcr.io/zitadel/zitadel-login:latest
 ```
 
+## Session cookie signing
+
+The Login UI stores the sessions of a browser in an `httpOnly` cookie and signs every entry, so that a tampered or guessed session ID is ignored.
+If no dedicated secret is configured, the signing key is derived from the API credential you configured above (`ZITADEL_SERVICE_USER_TOKEN`, `SYSTEM_USER_PRIVATE_KEY`, `SYSTEM_USER_PRIVATE_KEY_FILE` or `ZITADEL_LOGINCLIENT_KEYFILE`). **This fallback is deprecated and will be removed in a future major release; set a dedicated secret as described below.**
+The Login UI logs a warning at startup while it uses this fallback.
+
+The fallback has one consequence to be aware of: **rotating the value of that credential (for example creating a new PAT) invalidates all existing session cookies**, and users have to sign in to the Login UI again.
+Their application sessions and tokens are not affected.
+Switching from one credential type to another (for example from a PAT to a login client key) does not invalidate cookies as long as both credentials are configured during the migration.
+
+Set a dedicated secret with `ZITADEL_SESSION_COOKIE_SECRET` (at least 32 characters, for example `openssl rand -base64 32`). This is the recommended configuration and will become required in a future major release: it decouples the cookie lifetime from credential rotation.
+If a configured value is shorter than 32 characters, the Login UI does not fall back to the API credential: it logs an error and reports not ready on `/ready`.
+It accepts a comma-separated list, which allows rotating the secret without signing users out: the first value is used for signing, all values are accepted for verification.
+
+```bash
+# initial setup
+ZITADEL_SESSION_COOKIE_SECRET=$(openssl rand -base64 32)
+
+# rotate: sign with the new secret, still accept cookies signed with the old one
+ZITADEL_SESSION_COOKIE_SECRET=<new-secret>,<old-secret>
+# after the longest session lifetime has passed, drop the old secret
+ZITADEL_SESSION_COOKIE_SECRET=<new-secret>
+```
+
+All replicas of the Login UI must be configured with the same secret (or the same credential), otherwise cookies written by one replica are rejected by the others.
+
 ## Enable the Login UI for all users
 
 <Callout type="warn">

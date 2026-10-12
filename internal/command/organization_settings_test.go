@@ -103,7 +103,7 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 					expectPush(
 						settings.NewOrganizationSettingsAddedEvent(context.Background(),
 							&settings.NewAggregate("org1", "org1").Aggregate,
-							[]string{"username1", "username2", "username3"},
+							[]user.UsernameChange{{Username: "username1", UserID: "username1"}, {Username: "username2", UserID: "username2"}, {Username: "username3", UserID: "username3"}},
 							true,
 							false,
 						),
@@ -155,7 +155,7 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 					expectPush(
 						settings.NewOrganizationSettingsAddedEvent(context.Background(),
 							&settings.NewAggregate("org1", "org1").Aggregate,
-							[]string{"username1", "username2", "username3"},
+							[]user.UsernameChange{{Username: "username1", UserID: "username1"}, {Username: "username2", UserID: "username2"}, {Username: "username3", UserID: "username3"}},
 							true,
 							false,
 						),
@@ -209,7 +209,7 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 					expectPush(
 						settings.NewOrganizationSettingsAddedEvent(context.Background(),
 							&settings.NewAggregate("org1", "org1").Aggregate,
-							[]string{"username1", "username2", "username3"},
+							[]user.UsernameChange{{Username: "username1", UserID: "username1"}, {Username: "username2", UserID: "username2"}, {Username: "username3", UserID: "username3"}},
 							true,
 							true,
 						),
@@ -314,7 +314,7 @@ func TestCommandSide_DeleteSettingsOrganization(t *testing.T) {
 					expectPush(
 						settings.NewOrganizationSettingsRemovedEvent(context.Background(),
 							&settings.NewAggregate("org1", "org1").Aggregate,
-							[]string{"username1", "username2", "username3"},
+							[]user.UsernameChange{{Username: "username1", UserID: "username1"}, {Username: "username2", UserID: "username2"}, {Username: "username3", UserID: "username3"}},
 							false,
 							true,
 						),
@@ -342,7 +342,7 @@ func TestCommandSide_DeleteSettingsOrganization(t *testing.T) {
 					expectPush(
 						settings.NewOrganizationSettingsRemovedEvent(context.Background(),
 							&settings.NewAggregate("org1", "org1").Aggregate,
-							[]string{"username1", "username2", "username3"},
+							[]user.UsernameChange{{Username: "username1", UserID: "username1"}, {Username: "username2", UserID: "username2"}, {Username: "username3", UserID: "username3"}},
 							false,
 							false,
 						),
@@ -371,7 +371,7 @@ func TestCommandSide_DeleteSettingsOrganization(t *testing.T) {
 					expectPush(
 						settings.NewOrganizationSettingsRemovedEvent(context.Background(),
 							&settings.NewAggregate("org1", "org1").Aggregate,
-							[]string{"username1", "username2", "username3"},
+							[]user.UsernameChange{{Username: "username1", UserID: "username1"}, {Username: "username2", UserID: "username2"}, {Username: "username3", UserID: "username3"}},
 							true,
 							true,
 						),
@@ -399,7 +399,7 @@ func TestCommandSide_DeleteSettingsOrganization(t *testing.T) {
 					expectPush(
 						settings.NewOrganizationSettingsRemovedEvent(context.Background(),
 							&settings.NewAggregate("org1", "org1").Aggregate,
-							[]string{"username1", "username2", "username3"},
+							[]user.UsernameChange{{Username: "username1", UserID: "username1"}, {Username: "username2", UserID: "username2"}, {Username: "username3", UserID: "username3"}},
 							true,
 							true,
 						),
@@ -497,7 +497,7 @@ func expectFilterOrganizationSettingsEvents(ctx context.Context, orgID string, s
 			eventFromEventPusher(
 				settings.NewOrganizationSettingsAddedEvent(ctx,
 					&settings.NewAggregate(orgID, orgID).Aggregate,
-					[]string{},
+					nil,
 					orgScopedUsernames,
 					!orgScopedUsernames,
 				),

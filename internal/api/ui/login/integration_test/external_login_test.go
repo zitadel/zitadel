@@ -245,11 +245,26 @@ func doPostForm(t *testing.T, c *http.Client, rawURL string, form url.Values) st
 	return string(b)
 }
 
-// requireNeverUserByEmail fails if a user with the given email appears within waitFor.
-func requireNeverUserByEmail(t *testing.T, email string, waitFor, tick time.Duration) {
+// pollFor runs check every tick until waitFor elapses (and once more at the deadline). check should
+// require an invariant that must hold for the whole window; it fails the test on violation via
+// require.*. It proves a negative - that a forbidden change never appears even under projection lag -
+// without assert.Never, whose background goroutine can outlive the test and panic on CTX cancel.
+func pollFor(t *testing.T, waitFor, tick time.Duration, check func()) {
 	t.Helper()
 	deadline := time.Now().Add(waitFor)
 	for {
+		check()
+		if !time.Now().Before(deadline) {
+			return
+		}
+		time.Sleep(tick)
+	}
+}
+
+// requireNeverUserByEmail fails if a user with the given email appears within waitFor.
+func requireNeverUserByEmail(t *testing.T, email string, waitFor, tick time.Duration) {
+	t.Helper()
+	pollFor(t, waitFor, tick, func() {
 		resp, err := Instance.Client.UserV2.ListUsers(CTX, &user.ListUsersRequest{
 			Queries: []*user.SearchQuery{
 				{Query: &user.SearchQuery_EmailQuery{EmailQuery: &user.EmailQuery{EmailAddress: email}}},
@@ -258,9 +273,5 @@ func requireNeverUserByEmail(t *testing.T, email string, waitFor, tick time.Dura
 		require.NoError(t, err)
 		require.Empty(t, resp.GetResult(),
 			"a user was created for the attacker-forged external identity %q - account pre-hijack succeeded", email)
-		if !time.Now().Before(deadline) {
-			return
-		}
-		time.Sleep(tick)
-	}
+	})
 }
