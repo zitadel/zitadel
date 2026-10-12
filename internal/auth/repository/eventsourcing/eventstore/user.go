@@ -18,7 +18,6 @@ import (
 )
 
 type UserRepo struct {
-	SearchLimit    uint64
 	Eventstore     *eventstore.Eventstore
 	View           *view.View
 	Query          *query.Queries

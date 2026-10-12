@@ -81,8 +81,11 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 		limit = maxLimit
 	}
 
+	// The events API pages by creation date (from / range), so the events are ordered by it as well.
+	// This also allows postgres to serve the query from an index on created_at (see [eventstore.SearchQueryBuilder.OrderByCreationDate]).
 	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		OrderDesc().
+		OrderByCreationDate().
 		InstanceID(authz.GetInstance(ctx).InstanceID()).
 		Limit(limit).
 		AwaitOpenTransactions().

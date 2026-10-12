@@ -11,6 +11,8 @@ vi.mock("./lib/verify-credentials", async (importOriginal) => ({
 }));
 vi.mock("@/lib/service", () => ({ createServiceForHost: vi.fn() }));
 vi.mock("./instrumentation.node", () => ({ registerNode }));
+const startupLogger = { warn: vi.fn(), error: vi.fn() };
+vi.mock("./lib/logger", () => ({ createLogger: () => startupLogger }));
 
 async function loadRegister() {
   vi.resetModules();
@@ -32,6 +34,9 @@ describe("register", () => {
     verifyApiCredentials.mockReset().mockResolvedValue("ok");
     registerNode.mockReset().mockResolvedValue(null);
     exitSpy = vi.spyOn(process, "exit").mockImplementation((() => undefined) as never);
+    startupLogger.warn.mockReset();
+    startupLogger.error.mockReset();
+    vi.stubEnv("ZITADEL_SESSION_COOKIE_SECRET", "test-session-cookie-secret-at-least-32-chars");
   });
 
   afterEach(() => {
@@ -42,6 +47,7 @@ describe("register", () => {
         process.env[key] = value;
       }
     }
+    vi.unstubAllEnvs();
     vi.restoreAllMocks();
   });
 
@@ -107,5 +113,43 @@ describe("register", () => {
 
     expect(registerNode).not.toHaveBeenCalled();
     expect(verifyApiCredentials).toHaveBeenCalledTimes(1);
+  });
+
+  describe("session cookie secret notice", () => {
+    test("logs nothing when a dedicated secret is configured", async () => {
+      const register = await loadRegister();
+
+      await register();
+
+      expect(startupLogger.warn).not.toHaveBeenCalled();
+      expect(startupLogger.error).not.toHaveBeenCalled();
+    });
+
+    test("warns about the deprecated credential fallback, also in development", async () => {
+      vi.stubEnv("NODE_ENV", "development");
+      vi.stubEnv("ZITADEL_SESSION_COOKIE_SECRET", undefined);
+      vi.stubEnv("ZITADEL_SERVICE_USER_TOKEN", "service-user-token");
+      const register = await loadRegister();
+
+      await register();
+
+      expect(startupLogger.warn).toHaveBeenCalledWith(expect.stringMatching(/fallback is deprecated/));
+    });
+
+    test("logs an error for a too short secret before the credential check", async () => {
+      vi.stubEnv("ZITADEL_SESSION_COOKIE_SECRET", "too-short");
+      const calls: string[] = [];
+      startupLogger.error.mockImplementation(() => calls.push("notice"));
+      verifyApiCredentials.mockImplementation(async () => {
+        calls.push("credentials");
+        return "ok";
+      });
+      const register = await loadRegister();
+
+      await register();
+
+      expect(calls).toEqual(["notice", "credentials"]);
+      expect(startupLogger.error).toHaveBeenCalledWith(expect.stringMatching(/at least 32 characters/));
+    });
   });
 });
