@@ -34,6 +34,10 @@ VerifyEmailOTP:
   Text: "Kérlek, használd az OTP-t {{.OTP}} azonosításhoz az elkövetkező öt percben, vagy kattints az 'Azonosítás' gombra."
   ButtonText: "Azonosítás"
 VerifySMSOTP:
+  Title: "OTP ellenőrzése"
+  PreHeader: "OTP ellenőrzése"
+  Subject: "OTP ellenőrzése"
+  Greeting: "Kedves {{.DisplayName}},"
   Text: |-
     {{.OTP}} OTP azonosítód a(z) {{ .Domain }} oldalhoz. Eddig lesz érvényes: {{.Expiry}}.
     {{.Domain}} #{{.OTP}}
