@@ -1,7 +1,9 @@
 {
   "common": {
     "back": "Back",
-    "title": "Login with Zitadel"
+    "title": "Login with Zitadel",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "accounts": {
     "title": "Accounts",
