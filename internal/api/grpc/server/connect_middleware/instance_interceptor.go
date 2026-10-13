@@ -78,12 +78,13 @@ func addInstanceByID(ctx context.Context, req connect.AnyRequest, handler connec
 func addInstanceByDomain(ctx context.Context, req connect.AnyRequest, handler connect.UnaryFunc, verifier authz.InstanceVerifier, translator *i18n.Translator, domain string) (connect.AnyResponse, error) {
 	instance, err := verifier.InstanceByHost(ctx, domain, "")
 	if err != nil {
+		logging.WithFields("instanceDomain", domain).WithError(err).Error("unable to set instance by domain")
 		notFoundErr := new(zerrors.ZitadelError)
 		if errors.As(err, &notFoundErr) && notFoundErr.Kind == zerrors.KindNotFound {
 			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
 		}
-		code, _, _ := gerrors.ExtractZITADELError(err)
-		return nil, connect.NewError(connect.Code(code), fmt.Errorf("unable to set instance using domain %s: %w", domain, err))
+		code, message, id := gerrors.ExtractZITADELError(err)
+		return nil, connect.NewError(connect.Code(code), fmt.Errorf("unable to set instance using domain %s: ID=%s Message=%s", domain, id, message))
 	}
 	return handler(authz.WithInstance(ctx, instance), req)
 }
@@ -102,7 +103,8 @@ func addInstanceByRequestedHost(ctx context.Context, req connect.AnyRequest, han
 		code, _, _ := gerrors.ExtractZITADELError(err)
 		if errors.As(err, &zErr) {
 			zErr.SetMessage(translator.LocalizeFromCtx(ctx, zErr.GetMessage(), nil))
-			return nil, connect.NewError(connect.Code(code), fmt.Errorf("unable to set instance using origin %s (ExternalDomain is %s): %s", origin, externalDomain, zErr.Error()))
+			_, message, id := gerrors.ExtractZITADELError(err)
+			return nil, connect.NewError(connect.Code(code), fmt.Errorf("unable to set instance using origin %s (ExternalDomain is %s): ID=%s Message=%s", origin, externalDomain, id, message))
 		}
 		return nil, connect.NewError(connect.Code(code), fmt.Errorf("unable to set instance using origin %s (ExternalDomain is %s)", origin, externalDomain))
 	}

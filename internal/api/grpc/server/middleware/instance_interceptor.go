@@ -66,12 +66,13 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 func addInstanceByID(ctx context.Context, req interface{}, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, id string) (interface{}, error) {
 	instance, err := verifier.InstanceByID(ctx, id)
 	if err != nil {
+		logging.WithFields("instanceID", id).WithError(err).Error("unable to set instance by id")
 		notFoundErr := new(zerrors.ZitadelError)
 		if errors.As(err, &notFoundErr) {
 			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
 		}
-		code, _, _ := gerrors.ExtractZITADELError(err)
-		return nil, status.Error(code, fmt.Errorf("unable to set instance using id %s: %w", id, err).Error())
+		code, message, errorID := gerrors.ExtractZITADELError(err)
+		return nil, status.Errorf(code, "unable to set instance using id %s: ID=%s Message=%s", id, errorID, message)
 	}
 	return handler(authz.WithInstance(ctx, instance), req)
 }
@@ -79,12 +80,13 @@ func addInstanceByID(ctx context.Context, req interface{}, handler grpc.UnaryHan
 func addInstanceByDomain(ctx context.Context, req interface{}, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, domain string) (interface{}, error) {
 	instance, err := verifier.InstanceByHost(ctx, domain, "")
 	if err != nil {
+		logging.WithFields("instanceDomain", domain).WithError(err).Error("unable to set instance by domain")
 		notFoundErr := new(zerrors.ZitadelError)
 		if errors.As(err, &notFoundErr) && notFoundErr.Kind == zerrors.KindNotFound {
 			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
 		}
-		code, _, _ := gerrors.ExtractZITADELError(err)
-		return nil, status.Error(code, fmt.Errorf("unable to set instance using domain %s: %w", domain, err).Error())
+		code, message, errorID := gerrors.ExtractZITADELError(err)
+		return nil, status.Errorf(code, "unable to set instance using domain %s: ID=%s Message=%s", domain, errorID, message)
 	}
 	return handler(authz.WithInstance(ctx, instance), req)
 }
@@ -103,7 +105,8 @@ func addInstanceByRequestedHost(ctx context.Context, req interface{}, handler gr
 		zErr := new(zerrors.ZitadelError)
 		if errors.As(err, &zErr) {
 			zErr.SetMessage(translator.LocalizeFromCtx(ctx, zErr.GetMessage(), nil))
-			return nil, status.Error(code, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s): %s", origin, externalDomain, zErr.Error()))
+			_, message, id := gerrors.ExtractZITADELError(err)
+			return nil, status.Errorf(code, "unable to set instance using origin %s (ExternalDomain is %s): ID=%s Message=%s", origin, externalDomain, id, message)
 		}
 		return nil, status.Error(code, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s)", origin, externalDomain))
 	}

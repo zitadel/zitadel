@@ -3,6 +3,7 @@ package connect_middleware
 import (
 	"context"
 	"errors"
+	"strings"
 	"testing"
 
 	"connectrpc.com/connect"
@@ -57,6 +58,14 @@ func Test_setInstance_errorCodes(t *testing.T) {
 			if got := connectErr.Code(); got != tc.wantCode {
 				t.Errorf("got code %v, want %v", got, tc.wantCode)
 			}
+			message := connectErr.Message()
+			if !strings.Contains(message, tc.err.(*zerrors.ZitadelError).GetID()) ||
+				!strings.Contains(message, tc.err.(*zerrors.ZitadelError).GetMessage()) {
+				t.Errorf("response message does not preserve the stable error fields: %q", message)
+			}
+			if strings.Contains(message, "Parent=(") || strings.Contains(message, "SQLSTATE") {
+				t.Errorf("response message leaks the parent error: %q", message)
+			}
 		})
 
 		t.Run("byDomain/"+tc.name, func(t *testing.T) {
@@ -77,6 +86,14 @@ func Test_setInstance_errorCodes(t *testing.T) {
 			}
 			if got := connectErr.Code(); got != tc.wantCode {
 				t.Errorf("got code %v, want %v", got, tc.wantCode)
+			}
+			message := connectErr.Message()
+			if !strings.Contains(message, tc.err.(*zerrors.ZitadelError).GetID()) ||
+				!strings.Contains(message, tc.err.(*zerrors.ZitadelError).GetMessage()) {
+				t.Errorf("response message does not preserve the stable error fields: %q", message)
+			}
+			if strings.Contains(message, "Parent=(") || strings.Contains(message, "SQLSTATE") {
+				t.Errorf("response message leaks the parent error: %q", message)
 			}
 		})
 	}
