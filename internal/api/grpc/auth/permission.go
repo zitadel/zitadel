@@ -44,7 +44,7 @@ func (s *Server) ListMyProjectPermissions(ctx context.Context, _ *auth_pb.ListMy
 }
 
 func (s *Server) ListMyMemberships(ctx context.Context, req *auth_pb.ListMyMembershipsRequest) (*auth_pb.ListMyMembershipsResponse, error) {
-	request, err := ListMyMembershipsRequestToModel(ctx, req)
+	request, err := ListMyMembershipsRequestToModel(ctx, s.defaults, req)
 	if err != nil {
 		return nil, err
 	}
