@@ -534,18 +534,31 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
     const emailVerified =
       createUserData?.email?.verification?.case === "isVerified" && createUserData?.email?.verification?.value;
 
+    // The lookups below are case insensitive, so they can return several users when case variants
+    // of the same address or username exist. Linking a verified IDP identity to an arbitrary one of
+    // them would be an account takeover, so only link when the match is unambiguous. Falling through
+    // with `null` leaves the user on the regular linking/creation flow.
+    const onlyMatch = <T>(response: { result?: T[] }): T | null => {
+      if (!response.result?.length) {
+        return null;
+      }
+
+      if (response.result.length > 1) {
+        logger.warn("Auto-linking skipped: user lookup was ambiguous", { matches: response.result.length });
+        return null;
+      }
+
+      return response.result[0];
+    };
+
     if (options.autoLinking === AutoLinkingOption.EMAIL && email && emailVerified) {
-      foundUser = await listUsers({ serviceConfig, email, organizationId: organization }).then((response) => {
-        return response.result ? response.result[0] : null;
-      });
+      foundUser = await listUsers({ serviceConfig, email, organizationId: organization }).then(onlyMatch);
     } else if (options.autoLinking === AutoLinkingOption.USERNAME) {
       foundUser = await listUsers({
         serviceConfig,
         userName: idpInformation!.userName,
         organizationId: organization,
-      }).then((response) => {
-        return response.result ? response.result[0] : null;
-      });
+      }).then(onlyMatch);
     }
 
     if (foundUser) {
