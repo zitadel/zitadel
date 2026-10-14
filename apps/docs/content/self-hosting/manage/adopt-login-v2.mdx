@@ -32,6 +32,11 @@ If you do not urgently need Login V2, stay on Login V1 and revisit later.
 <Callout type="warn">
 Before enabling Login V2 for production traffic, create a break-glass machine user with `IAM_OWNER` and a PAT.
 If login misconfiguration locks interactive access, use the PAT to revert the feature or fix routing.
+
+**Important Notes:**
+1. The `zitadel-login` container is mandatory when `loginV2.required=true`, even if your custom apps do not use the hosted UI, because the console depends on it.
+2. There is no supported way to keep the console on V1 while apps use V2 auth requests—the per-app setting only works when the instance flag is disabled.
+3. The recommended deployment is path-based routing on a single origin, not separate ports.
 </Callout>
 
 ## 1. Deploy and route
