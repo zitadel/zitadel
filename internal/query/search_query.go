@@ -229,12 +229,16 @@ func (q *NotQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (notQ NotQuery) ToSql() (sql string, args []interface{}, err error) {
-	querySql, queryArgs, queryErr := notQ.query.comp().ToSql()
-	// Handle the error from the query's ToSql() function.
+	inner := notQ.query.comp()
+	// Empty pattern filters compile to nil (no constraint). NOT of that
+	// previously meant NOT (LIKE '%') → match nothing; keep that meaning.
+	if inner == nil {
+		return "FALSE", nil, nil
+	}
+	querySql, queryArgs, queryErr := inner.ToSql()
 	if queryErr != nil {
 		return "", queryArgs, queryErr
 	}
-	// Construct the SQL statement.
 	sql = fmt.Sprintf("NOT (%s)", querySql)
 	return sql, queryArgs, nil
 }
@@ -647,11 +651,7 @@ func (q *or) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (q *or) comp() sq.Sqlizer {
-	queries := make([]sq.Sqlizer, 0)
-	for _, query := range q.queries {
-		queries = append(queries, query.comp())
-	}
-	return sq.Or(queries)
+	return combineSearchQueryComps[sq.Or](q.queries)
 }
 
 func (q *or) Col() Column {

@@ -2179,6 +2179,7 @@ func TestNotQuery_comp(t *testing.T) {
 }
 func TestNotQuery_ToSql(t *testing.T) {
 	q, _ := NewTextQuery(testCol, "hello1", TextEquals)
+	emptyContains, _ := NewTextQuery(testCol, "", TextContains)
 	type fields struct {
 		query SearchQuery
 	}
@@ -2196,7 +2197,25 @@ func TestNotQuery_ToSql(t *testing.T) {
 				query: q,
 			},
 			want: want{
-				query: "NOT (test_table.test_col = hello1)",
+				query: "NOT (test_table.test_col = ?)",
+			},
+		},
+		{
+			name: "empty pattern is false",
+			fields: fields{
+				query: emptyContains,
+			},
+			want: want{
+				query: "FALSE",
+			},
+		},
+		{
+			name: "noop search query is false",
+			fields: fields{
+				query: noopSearchQuery{},
+			},
+			want: want{
+				query: "FALSE",
 			},
 		},
 	}
@@ -2207,10 +2226,10 @@ func TestNotQuery_ToSql(t *testing.T) {
 			}
 			queryStr, _, err := s.ToSql()
 			if err != nil {
-				t.Error("an error raised ")
+				t.Fatalf("ToSql() unexpected error: %v", err)
 			}
-			if queryStr == tt.want.query {
-				t.Errorf("wrong query: want: %v, (%T), got: %v, (%T)", tt.want.query, tt.want.query, queryStr, queryStr)
+			if queryStr != tt.want.query {
+				t.Errorf("wrong query: want: %v, got: %v", tt.want.query, queryStr)
 			}
 		})
 	}
