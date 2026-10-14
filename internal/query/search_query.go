@@ -126,11 +126,7 @@ func (q *OrQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (q *OrQuery) comp() sq.Sqlizer {
-	or := make(sq.Or, len(q.queries))
-	for i, query := range q.queries {
-		or[i] = query.comp()
-	}
-	return or
+	return combineSearchQueryComps(q.queries, true)
 }
 
 type AndQuery struct {
@@ -152,11 +148,60 @@ func (q *AndQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (q *AndQuery) comp() sq.Sqlizer {
-	and := make(sq.And, len(q.queries))
-	for i, query := range q.queries {
-		and[i] = query.comp()
+	return combineSearchQueryComps(q.queries, false)
+}
+
+// combineSearchQueryComps skips nil comps from empty pattern filters.
+// Zero remaining → nil; one → that comp; else Or or And of the rest.
+func combineSearchQueryComps(queries []SearchQuery, or bool) sq.Sqlizer {
+	parts := make([]sq.Sqlizer, 0, len(queries))
+	for _, query := range queries {
+		if c := query.comp(); c != nil {
+			parts = append(parts, c)
+		}
 	}
-	return and
+	switch len(parts) {
+	case 0:
+		return nil
+	case 1:
+		return parts[0]
+	default:
+		if or {
+			return sq.Or(parts)
+		}
+		return sq.And(parts)
+	}
+}
+
+// noopSearchQuery adds no WHERE clause. Used when an empty pattern filter
+// would otherwise leave only non-selective SubSelect correlates.
+type noopSearchQuery struct{}
+
+func (noopSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query
+}
+
+func (noopSearchQuery) comp() sq.Sqlizer {
+	return nil
+}
+
+func (noopSearchQuery) Col() Column {
+	return Column{}
+}
+
+func isTextPatternComparison(comparison TextComparison) bool {
+	switch comparison {
+	case TextStartsWith,
+		TextStartsWithIgnoreCase,
+		TextEndsWith,
+		TextEndsWithIgnoreCase,
+		TextContains,
+		TextContainsIgnoreCase,
+		TextListContains:
+		return true
+	default:
+		return false
+	}
 }
 
 func (q *AndQuery) Prepend(queries ...SearchQuery) {

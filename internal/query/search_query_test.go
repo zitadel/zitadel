@@ -1384,6 +1384,72 @@ func TestTextQuery_comp(t *testing.T) {
 			},
 		},
 		{
+			name: "starts with empty",
+			fields: fields{
+				Column:  testCol,
+				Text:    "",
+				Compare: TextStartsWith,
+			},
+			want: want{
+				isNil: true,
+			},
+		},
+		{
+			name: "starts with ignore case empty",
+			fields: fields{
+				Column:  testCol,
+				Text:    "",
+				Compare: TextStartsWithIgnoreCase,
+			},
+			want: want{
+				isNil: true,
+			},
+		},
+		{
+			name: "ends with empty",
+			fields: fields{
+				Column:  testCol,
+				Text:    "",
+				Compare: TextEndsWith,
+			},
+			want: want{
+				isNil: true,
+			},
+		},
+		{
+			name: "ends with ignore case empty",
+			fields: fields{
+				Column:  testCol,
+				Text:    "",
+				Compare: TextEndsWithIgnoreCase,
+			},
+			want: want{
+				isNil: true,
+			},
+		},
+		{
+			name: "contains empty",
+			fields: fields{
+				Column:  testCol,
+				Text:    "",
+				Compare: TextContains,
+			},
+			want: want{
+				isNil: true,
+			},
+		},
+		{
+			name: "contains ignore case empty",
+			fields: fields{
+				Column:  testCol,
+				Text:    "",
+				Compare: TextContainsIgnoreCase,
+			},
+			want: want{
+				isNil: true,
+			},
+		},
+		{
 			name: "list contains",
 			fields: fields{
 				Column:  testCol,
@@ -1395,6 +1461,17 @@ func TestTextQuery_comp(t *testing.T) {
 					col:  testCol,
 					args: []interface{}{"Hurst"},
 				},
+			},
+		},
+		{
+			name: "list contains empty",
+			fields: fields{
+				Column:  testCol,
+				Text:    "",
+				Compare: TextListContains,
+			},
+			want: want{
+				isNil: true,
 			},
 		},
 		{
@@ -1793,6 +1870,7 @@ func TestOrQuery_comp(t *testing.T) {
 	q2, _ := NewTextQuery(testCol, "hello2", TextEquals)
 	q3, _ := NewTextQuery(testCol2, "world1", TextEquals)
 	q4, _ := NewTextQuery(testCol2, "world2", TextEquals)
+	emptyContains, _ := NewTextQuery(testCol, "", TextContains)
 	orq, _ := NewOrQuery(q3, q4)
 
 	type fields struct {
@@ -1813,7 +1891,7 @@ func TestOrQuery_comp(t *testing.T) {
 				queries: []SearchQuery{q1},
 			},
 			want: want{
-				query: sq.Or{sq.Eq{"test_table.test_col": "hello1"}},
+				query: sq.Eq{"test_table.test_col": "hello1"},
 			},
 		},
 		{
@@ -1832,6 +1910,24 @@ func TestOrQuery_comp(t *testing.T) {
 			},
 			want: want{
 				query: sq.Or{sq.Eq{"test_table.test_col": "hello1"}, sq.Or{sq.Eq{"test_table2.test_col2": "world1"}, sq.Eq{"test_table2.test_col2": "world2"}}},
+			},
+		},
+		{
+			name: "skips empty pattern arm",
+			fields: fields{
+				queries: []SearchQuery{emptyContains, q1},
+			},
+			want: want{
+				query: sq.Eq{"test_table.test_col": "hello1"},
+			},
+		},
+		{
+			name: "all empty patterns",
+			fields: fields{
+				queries: []SearchQuery{emptyContains},
+			},
+			want: want{
+				isNil: true,
 			},
 		},
 	}
@@ -1908,6 +2004,7 @@ func TestAndQuery_comp(t *testing.T) {
 	q2, _ := NewTextQuery(testCol, "hello2", TextEquals)
 	q3, _ := NewTextQuery(testCol2, "world1", TextEquals)
 	q4, _ := NewTextQuery(testCol2, "world2", TextEquals)
+	emptyContains, _ := NewTextQuery(testCol, "", TextContains)
 	andq, _ := NewAndQuery(q3, q4)
 
 	type fields struct {
@@ -1928,7 +2025,7 @@ func TestAndQuery_comp(t *testing.T) {
 				queries: []SearchQuery{q1},
 			},
 			want: want{
-				query: sq.And{sq.Eq{"test_table.test_col": "hello1"}},
+				query: sq.Eq{"test_table.test_col": "hello1"},
 			},
 		},
 		{
@@ -1947,6 +2044,24 @@ func TestAndQuery_comp(t *testing.T) {
 			},
 			want: want{
 				query: sq.And{sq.Eq{"test_table.test_col": "hello1"}, sq.And{sq.Eq{"test_table2.test_col2": "world1"}, sq.Eq{"test_table2.test_col2": "world2"}}},
+			},
+		},
+		{
+			name: "skips empty pattern arm",
+			fields: fields{
+				queries: []SearchQuery{emptyContains, q1},
+			},
+			want: want{
+				query: sq.Eq{"test_table.test_col": "hello1"},
+			},
+		},
+		{
+			name: "all empty patterns",
+			fields: fields{
+				queries: []SearchQuery{emptyContains},
+			},
+			want: want{
+				isNil: true,
 			},
 		},
 	}
