@@ -126,7 +126,7 @@ func (q *OrQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (q *OrQuery) comp() sq.Sqlizer {
-	return combineSearchQueryComps(q.queries, true)
+	return combineSearchQueryComps[sq.Or](q.queries)
 }
 
 type AndQuery struct {
@@ -148,12 +148,12 @@ func (q *AndQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (q *AndQuery) comp() sq.Sqlizer {
-	return combineSearchQueryComps(q.queries, false)
+	return combineSearchQueryComps[sq.And](q.queries)
 }
 
 // combineSearchQueryComps skips nil comps from empty pattern filters.
 // Zero remaining → nil; one → that comp; else Or or And of the rest.
-func combineSearchQueryComps(queries []SearchQuery, or bool) sq.Sqlizer {
+func combineSearchQueryComps[T sq.And | sq.Or](queries []SearchQuery) sq.Sqlizer {
 	parts := make([]sq.Sqlizer, 0, len(queries))
 	for _, query := range queries {
 		if c := query.comp(); c != nil {
@@ -166,10 +166,7 @@ func combineSearchQueryComps(queries []SearchQuery, or bool) sq.Sqlizer {
 	case 1:
 		return parts[0]
 	default:
-		if or {
-			return sq.Or(parts)
-		}
-		return sq.And(parts)
+		return sq.Sqlizer(T(parts))
 	}
 }
 
