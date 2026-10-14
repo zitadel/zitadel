@@ -30,16 +30,21 @@ If you do not urgently need Login V2, stay on Login V1 and revisit later.
 5. Update IdP callbacks and related config
 
 <Callout type="warn">
-Before enabling Login V2 for production traffic, create a break-glass machine user with `IAM_OWNER` and a PAT.
-If login misconfiguration locks interactive access, use the PAT to revert the feature or fix routing.
+Setting the instance-level `loginV2.required=true` flag makes **every application, including the management console**, use Login V2. You must deploy and route `zitadel-login` before enabling it, even if your own applications use a custom UI with the Session API and `POST /v2/oidc/auth_requests` and never use the hosted UI.
+
+Without a reachable login service, console login fails at `/ui/v2/login` (unless you configured another base URI). An existing console session may temporarily hide the problem, but you will lose interactive access when that session expires. This is a known issue tracked in [GitHub #11134](https://github.com/zitadel/zitadel/issues/11134).
+
+Before enabling the flag, create a break-glass machine user with `IAM_OWNER` and a PAT. Keep this credential available securely so you can use the API to disable the instance feature if console login is broken.
 </Callout>
 
 ## 1. Deploy and route
 
 1. Deploy `zitadel-login` (compose, Helm, or your own packaging).
-2. On your reverse proxy / ingress:
-   - `/ui/v2/login` → login service
+2. Use **path-based routing on a single public origin** on your reverse proxy / ingress:
+   - `/ui/v2/login` and its subpaths → login service
    - everything else → ZITADEL API
+
+The login service and API can listen on different internal ports, but the recommended deployment exposes both through the same public scheme, hostname, and port. Merely starting the login container on a separate port does not make `/ui/v2/login` reachable on the ZITADEL origin. Do not assume that pointing the base URI at a separate public port is equivalent to this routing setup.
 
 See [Login UI routing](/self-hosting/manage/reverseproxy/reverse_proxy#login-ui-routing).
 
@@ -99,15 +104,19 @@ Only that application uses Login V2. See [Application settings](/guides/manage/c
 
 ### Instance-wide
 
-1. Enable the **loginV2** feature (Console → instance Features, or Feature API)
-2. Set the base URI, or leave empty to use `/ui/v2/login`
+1. Verify that the deployed login service is reachable through the configured public routing.
+2. Enable the **loginV2** feature with `required=true` (Console → instance Features, or Feature API).
+3. Set the base URI, or leave empty to use `/ui/v2/login`.
 
-When the instance feature is on, it takes precedence over per-app checkboxes and applies to every application.
+When the instance feature is on, it takes precedence over per-app checkboxes and applies to every application, including the management console.
+
+There is **no supported way to keep the console on Login V1 while using instance-required Login V2 auth requests for your applications**. The per-app setting only has an effect while the instance flag is disabled; it cannot exempt the console after `loginV2.required=true` is enabled. For gradual adoption, leave the instance flag disabled and use the per-app settings described above.
 
 ### Roll back
 
 Disable the per-app setting or the instance feature while Login V1 is still available.
-Use the break-glass `IAM_OWNER` PAT if interactive login is broken.
+
+If you are locked out of the console, authenticate to the Feature API with the previously created break-glass `IAM_OWNER` PAT and set the instance Login V2 `required` flag to `false`. Alternatively, restore the login service and its routing so console login can complete. Disabling an application's Login V2 setting alone does not undo an instance-wide requirement.
 
 ## 5. After cutover checklist
 
