@@ -129,6 +129,35 @@ func Test_mapExternalNotFoundOptionFormDataToLoginUser(t *testing.T) {
 			},
 		},
 		{
+			// Genuine flow where the form value differs from the IDP-verified email
+			// only in capitalization (e.g. Entra "user@DOMAINE.com" pre-filled/edited
+			// as "user@domaine.com"). It is the same address, so the verified flag
+			// must survive rather than force re-verification.
+			"verified email preserved when only casing differs from the IDP value",
+			args{
+				formData: &externalNotFoundOptionFormData{
+					externalRegisterFormData: externalRegisterFormData{
+						Email:    domain.EmailAddress("user@domaine.com"),
+						Language: "en",
+					},
+				},
+				linkingUser: &domain.ExternalUser{
+					IDPConfigID:     "real-idp",
+					ExternalUserID:  "real-callback-user-id",
+					Email:           domain.EmailAddress("user@DOMAINE.com"),
+					IsEmailVerified: true,
+				},
+			},
+			&domain.ExternalUser{
+				IDPConfigID:       "real-idp",
+				ExternalUserID:    "real-callback-user-id",
+				DisplayName:       "user@domaine.com",
+				Email:             domain.EmailAddress("user@domaine.com"),
+				IsEmailVerified:   true, // same address, only casing differs
+				PreferredLanguage: language.English,
+			},
+		},
+		{
 			// Genuine flow but the user edits the email away from the IDP-verified one:
 			// the new address is unverified until proven, so the flag must drop.
 			"verified email drops when user edits it away from the IDP value",
