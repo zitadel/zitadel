@@ -346,18 +346,39 @@ func (q *textQuery) comp() sq.Sqlizer {
 	case TextNotEqualsIgnoreCase:
 		return sq.NotEq{"LOWER(" + q.Column.identifier() + ")": strings.ToLower(q.Text)}
 	case TextStartsWith:
+		if q.Text == "" {
+			return nil
+		}
 		return sq.Like{q.Column.identifier(): q.Text + "%"}
 	case TextStartsWithIgnoreCase:
+		if q.Text == "" {
+			return nil
+		}
 		return sq.Like{"LOWER(" + q.Column.identifier() + ")": strings.ToLower(q.Text) + "%"}
 	case TextEndsWith:
+		if q.Text == "" {
+			return nil
+		}
 		return sq.Like{q.Column.identifier(): "%" + q.Text}
 	case TextEndsWithIgnoreCase:
+		if q.Text == "" {
+			return nil
+		}
 		return sq.Like{"LOWER(" + q.Column.identifier() + ")": "%" + strings.ToLower(q.Text)}
 	case TextContains:
+		if q.Text == "" {
+			return nil
+		}
 		return sq.Like{q.Column.identifier(): "%" + q.Text + "%"}
 	case TextContainsIgnoreCase:
+		if q.Text == "" {
+			return nil
+		}
 		return sq.Like{"LOWER(" + q.Column.identifier() + ")": "%" + strings.ToLower(q.Text) + "%"}
 	case TextListContains:
+		if q.Text == "" {
+			return nil
+		}
 		return &listContains{col: q.Column, args: []any{q.Text}}
 	case textCompareMax:
 		return nil
