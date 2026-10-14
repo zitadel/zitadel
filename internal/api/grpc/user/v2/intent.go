@@ -46,7 +46,7 @@ func (s *Server) StartIdentityProviderIntent(ctx context.Context, req *connect.R
 }
 
 func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs, loginHint string) (*connect.Response[user.StartIdentityProviderIntentResponse], error) {
-	state, session, err := s.command.AuthFromProvider(ctx, idpID, s.idpCallback(ctx), s.samlRootURL(ctx, idpID), loginHint)
+	state, session, err := s.command.AuthFromProvider(ctx, idpID, s.idpCallback(ctx), s.samlRootURL(ctx, idpID), loginHint, urls.GetAuthRequestId())
 	if err != nil {
 		return nil, err
 	}

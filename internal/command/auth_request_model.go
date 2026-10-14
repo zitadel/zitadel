@@ -38,6 +38,8 @@ type AuthRequestWriteModel struct {
 	NeedRefreshToken bool
 	Issuer           string
 	OrganizationID   string
+	ACRValues        []string
+	Claims           string
 }
 
 func NewAuthRequestWriteModel(ctx context.Context, id string) *AuthRequestWriteModel {
@@ -72,6 +74,8 @@ func (m *AuthRequestWriteModel) Reduce() error {
 			m.NeedRefreshToken = e.NeedRefreshToken
 			m.Issuer = e.Issuer
 			m.OrganizationID = e.OrganizationID
+			m.ACRValues = e.ACRValues
+			m.Claims = e.Claims
 		case *authrequest.SessionLinkedEvent:
 			m.SessionID = e.SessionID
 			m.UserID = e.UserID

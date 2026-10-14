@@ -30,6 +30,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml"
+	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	rep_idp "github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -752,7 +753,7 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 				idpConfigEncryption: tt.fields.secretCrypto,
 				idGenerator:         tt.fields.idGenerator,
 			}
-			_, session, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.callbackURL, tt.args.samlRootURL, tt.args.loginHint)
+			_, session, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.callbackURL, tt.args.samlRootURL, tt.args.loginHint, "")
 			require.ErrorIs(t, err, tt.res.err)
 
 			var got idp.Auth
@@ -1018,7 +1019,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 				idpConfigEncryption: tt.fields.secretCrypto,
 				idGenerator:         tt.fields.idGenerator,
 			}
-			_, session, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.callbackURL, tt.args.samlRootURL, tt.args.loginHint)
+			_, session, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.callbackURL, tt.args.samlRootURL, tt.args.loginHint, "")
 			require.ErrorIs(t, err, tt.res.err)
 
 			auth, err := session.GetAuth(tt.args.ctx)
@@ -1757,6 +1758,131 @@ func Test_tokensForSucceededIDPIntent(t *testing.T) {
 			assert.Equal(t, tt.res.accessToken, gotAccessToken)
 			assert.Equal(t, tt.res.refreshToken, refreshToken)
 			assert.Equal(t, tt.res.idToken, gotIDToken)
+		})
+	}
+}
+
+func TestCommands_authRequestIDPParams(t *testing.T) {
+	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient")
+	addedEvent := func(prompt []domain.Prompt, uiLocales, acrValues []string, claims string) *authrequest.AddedEvent {
+		e := authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("id", "instanceID").Aggregate,
+			"loginClient",
+			"clientID",
+			"redirectURI",
+			"state",
+			"nonce",
+			[]string{"openid"},
+			[]string{"audience"},
+			domain.OIDCResponseTypeCode,
+			domain.OIDCResponseModeQuery,
+			nil,
+			prompt,
+			uiLocales,
+			nil,
+			nil,
+			nil,
+			false,
+			"issuer",
+			"",
+		)
+		e.ACRValues = acrValues
+		e.Claims = claims
+		return e
+	}
+	type fields struct {
+		eventstore      func(*testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		ctx     context.Context
+		want    []idp.Parameter
+		wantErr error
+	}{
+		{
+			name: "auth request not existing",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			ctx:     mockCtx,
+			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-Ohp6o", "Errors.AuthRequest.NotExisting"),
+		},
+		{
+			name: "auth request already handled",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(addedEvent(nil, nil, nil, "")),
+						eventFromEventPusher(
+							authrequest.NewFailedEvent(mockCtx, &authrequest.NewAggregate("id", "instanceID").Aggregate,
+								domain.OIDCErrorReasonUnspecified),
+						),
+					),
+				),
+			},
+			ctx:     mockCtx,
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Wr5ep", "Errors.AuthRequest.AlreadyHandled"),
+		},
+		{
+			name: "other login client, missing permission",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(addedEvent(nil, nil, nil, "")),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			ctx:     authz.NewMockContext("instanceID", "orgID", "otherLoginClient"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+		},
+		{
+			name: "no params, removes default prompt",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(addedEvent(nil, nil, nil, "")),
+					),
+				),
+			},
+			ctx:  mockCtx,
+			want: []idp.Parameter{idp.PromptParam{}},
+		},
+		{
+			name: "all params",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(addedEvent(
+							[]domain.Prompt{domain.PromptNone, domain.PromptLogin, domain.PromptCreate},
+							[]string{"it", "de"},
+							[]string{"loa-2", "loa-3"},
+							`{"userinfo":{"urn:swissid:qor":{"value":"qor2"}}}`,
+						)),
+					),
+				),
+			},
+			ctx: mockCtx,
+			want: []idp.Parameter{
+				idp.PromptParam{"none", "login", "create"},
+				idp.AuthURLParam{Key: "acr_values", Value: "loa-2 loa-3"},
+				idp.AuthURLParam{Key: "claims", Value: `{"userinfo":{"urn:swissid:qor":{"value":"qor2"}}}`},
+				idp.AuthURLParam{Key: "ui_locales", Value: "it de"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
+			}
+			got, err := c.authRequestIDPParams(tt.ctx, "id")
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

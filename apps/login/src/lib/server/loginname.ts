@@ -171,6 +171,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
               new URLSearchParams(params),
             loginHint: concatLoginname,
           },
+          requestId: command.requestId,
         });
 
         if (!response || !response.url) {
@@ -233,6 +234,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           // IdP knows the user by over the ZITADEL login name (same as Login V1).
           loginHint: identityProviders[0].userName || concatLoginname,
         },
+        requestId: command.requestId,
       });
 
       if (!response || !response.url) {

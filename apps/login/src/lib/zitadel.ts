@@ -932,9 +932,13 @@ export async function startIdentityProviderFlow({
   serviceConfig,
   idpId,
   urls,
+  requestId,
 }: WithServiceConfig<{
   idpId: string;
   urls: RedirectURLsJson;
+  // POC: if the flow belongs to an OIDC auth request, selected parameters of it
+  // (acr_values, claims, prompt, ui_locales) are forwarded to the IdP by the API.
+  requestId?: string;
 }>): Promise<{ url: string; fields?: Record<string, string> } | null> {
   // Use empty publicHost to avoid issues with redirect URIs pointing to the login UI instead of the zitadel API
   const userService: Client<typeof UserService> = await createServiceForHost(UserService, {
@@ -948,6 +952,9 @@ export async function startIdentityProviderFlow({
   const { loginHint, ...redirectUrls } = urls;
   const content: RedirectURLsJson =
     loginHint && loginHint.length <= MAX_LOGIN_HINT_LENGTH ? { ...redirectUrls, loginHint } : redirectUrls;
+  if (requestId?.startsWith("oidc_")) {
+    content.authRequestId = requestId.replace("oidc_", "");
+  }
 
   return userService
     .startIdentityProviderIntent({

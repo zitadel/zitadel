@@ -220,6 +220,7 @@ func NewServer(
 			accessHandler.HandleWithPublicAuthPathPrefixes(publicAuthPathPrefixes(config.CustomEndpoints)),
 			middleware.ActivityHandler,
 			op.NewIssuerInterceptor(server.IssuerFromRequest).Handler,
+			authRequestClaimsHandler(server.Endpoints().Authorization.Relative()),
 		),
 		op.WithSetRouter(func(r chi.Router) {
 			r.HandleFunc(server.Endpoints().Authorization.Relative()+authCallbackPathSuffix, server.authorizeCallbackHandler)

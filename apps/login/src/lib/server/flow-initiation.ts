@@ -331,6 +331,7 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
             failureUrl: constructUrl(request, `/idp/${provider}/failure?${params.toString()}`).toString(),
             loginHint: authRequest.loginHint,
           },
+          requestId,
         });
 
         if (!response || !response.url) {

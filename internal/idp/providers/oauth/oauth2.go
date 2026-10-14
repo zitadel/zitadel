@@ -93,16 +93,27 @@ func (p *Provider) Name() string {
 // It will create a [Session] with an OAuth2.0 authorization request as AuthURL.
 func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Parameter) (idp.Session, error) {
 	opts := make([]rp.AuthURLOpt, 0)
-	var loginHintSet bool
+	var skipDefaultPrompt bool
+	// additional params are applied last, so they can overwrite the provider's defaults
+	additionalParams := make([]rp.AuthURLOpt, 0)
 	for _, param := range params {
-		if username, ok := param.(idp.LoginHintParam); ok {
-			loginHintSet = true
-			opts = append(opts, loginHint(string(username)))
+		switch param := param.(type) {
+		case idp.LoginHintParam:
+			skipDefaultPrompt = true
+			opts = append(opts, loginHint(string(param)))
+		case idp.PromptParam:
+			skipDefaultPrompt = true
+			if len(param) > 0 {
+				opts = append(opts, rp.WithPrompt(param...))
+			}
+		case idp.AuthURLParam:
+			additionalParams = append(additionalParams, authURLParam(param))
 		}
 	}
-	if !loginHintSet {
+	if !skipDefaultPrompt {
 		opts = append(opts, rp.WithPrompt(oidc.PromptSelectAccount))
 	}
+	opts = append(opts, additionalParams...)
 
 	var codeVerifier string
 	if p.RelyingParty.IsPKCE() {
@@ -112,6 +123,12 @@ func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Pa
 
 	url := rp.AuthURL(state, p.RelyingParty, opts...)
 	return &Session{AuthURL: url, Provider: p, CodeVerifier: codeVerifier}, nil
+}
+
+func authURLParam(param idp.AuthURLParam) rp.AuthURLOpt {
+	return func() []oauth2.AuthCodeOption {
+		return []oauth2.AuthCodeOption{oauth2.SetAuthURLParam(param.Key, param.Value)}
+	}
 }
 
 func loginHint(hint string) rp.AuthURLOpt {

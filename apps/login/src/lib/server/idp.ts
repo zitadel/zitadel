@@ -74,6 +74,7 @@ export async function redirectToIdp(prevState: RedirectToIdpState, formData: For
     successUrl: `/idp/${provider}/process?` + params.toString(),
     failureUrl: `/idp/${provider}/failure?` + params.toString(),
     loginHint: loginHint || undefined,
+    requestId: requestId || undefined,
   });
 
   if (!response) {
@@ -102,6 +103,7 @@ export type StartIDPFlowCommand = {
   successUrl: string;
   failureUrl: string;
   loginHint?: string;
+  requestId?: string;
 };
 
 async function startIDPFlow(command: StartIDPFlowCommand) {
@@ -115,6 +117,7 @@ async function startIDPFlow(command: StartIDPFlowCommand) {
       failureUrl: `${command.host.includes("localhost") ? "http://" : "https://"}${command.host}${basePath}${command.failureUrl}`,
       loginHint: command.loginHint,
     },
+    requestId: command.requestId,
   });
 
   if (!response || !response.url) {

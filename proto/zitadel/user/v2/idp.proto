@@ -57,6 +57,17 @@ message RedirectURLs {
       example: "\"someone@example.com\"";
     }
   ];
+  // POC: ID of the OIDC auth request the intent is started for.
+  // If set, selected parameters of the auth request (acr_values, claims, prompt, ui_locales)
+  // are forwarded to the identity provider.
+  string auth_request_id = 4 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of the OIDC auth request. If set, acr_values, claims, prompt and ui_locales of the auth request are forwarded to the identity provider."
+      max_length: 200;
+      example: "\"V2_163840776835432705\"";
+    }
+  ];
 }
 
 message IDPIntent {

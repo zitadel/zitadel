@@ -29,6 +29,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 	tests := []struct {
 		name   string
 		fields fields
+		params []idp.Parameter
 		want   idp.Session
 	}{
 		{
@@ -81,6 +82,84 @@ func TestProvider_BeginAuth(t *testing.T) {
 			},
 			want: &Session{AuthURL: "https://issuer.com/authorize?client_id=clientID&code_challenge=2ZoH_a01aprzLkwVbjlPsBo4m8mJ_zOKkaDqYM7Oh5w&code_challenge_method=S256&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState"},
 		},
+		{
+			name: "prompt param replaces select_account",
+			fields: fields{
+				name:         "oidc",
+				issuer:       "https://issuer.com",
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
+				userMapper:   DefaultMapper,
+				httpMock: func(issuer string) {
+					gock.New(issuer).
+						Get(oidc.DiscoveryEndpoint).
+						Reply(200).
+						JSON(&oidc.DiscoveryConfiguration{
+							Issuer:                issuer,
+							AuthorizationEndpoint: issuer + "/authorize",
+							TokenEndpoint:         issuer + "/token",
+							UserinfoEndpoint:      issuer + "/userinfo",
+						})
+				},
+				opts: []ProviderOpts{WithSelectAccount()},
+			},
+			params: []idp.Parameter{idp.PromptParam{"login"}},
+			want:   &Session{AuthURL: "https://issuer.com/authorize?client_id=clientID&prompt=login&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState"},
+		},
+		{
+			name: "empty prompt param removes select_account",
+			fields: fields{
+				name:         "oidc",
+				issuer:       "https://issuer.com",
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
+				userMapper:   DefaultMapper,
+				httpMock: func(issuer string) {
+					gock.New(issuer).
+						Get(oidc.DiscoveryEndpoint).
+						Reply(200).
+						JSON(&oidc.DiscoveryConfiguration{
+							Issuer:                issuer,
+							AuthorizationEndpoint: issuer + "/authorize",
+							TokenEndpoint:         issuer + "/token",
+							UserinfoEndpoint:      issuer + "/userinfo",
+						})
+				},
+				opts: []ProviderOpts{WithSelectAccount()},
+			},
+			params: []idp.Parameter{idp.PromptParam{}},
+			want:   &Session{AuthURL: "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState"},
+		},
+		{
+			name: "additional auth url params",
+			fields: fields{
+				name:         "oidc",
+				issuer:       "https://issuer.com",
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
+				userMapper:   DefaultMapper,
+				httpMock: func(issuer string) {
+					gock.New(issuer).
+						Get(oidc.DiscoveryEndpoint).
+						Reply(200).
+						JSON(&oidc.DiscoveryConfiguration{
+							Issuer:                issuer,
+							AuthorizationEndpoint: issuer + "/authorize",
+							TokenEndpoint:         issuer + "/token",
+							UserinfoEndpoint:      issuer + "/userinfo",
+						})
+				},
+				opts: []ProviderOpts{WithSelectAccount()},
+			},
+			params: []idp.Parameter{idp.AuthURLParam{Key: "acr_values", Value: "loa-2"}, idp.AuthURLParam{Key: "claims", Value: `{"userinfo":{}}`}},
+			want:   &Session{AuthURL: "https://issuer.com/authorize?acr_values=loa-2&claims=%7B%22userinfo%22%3A%7B%7D%7D&client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -96,7 +175,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 			}
 
 			ctx := context.Background()
-			session, err := provider.BeginAuth(ctx, "testState")
+			session, err := provider.BeginAuth(ctx, "testState", tt.params...)
 			r.NoError(err)
 
 			wantAuth, wantErr := tt.want.GetAuth(ctx)

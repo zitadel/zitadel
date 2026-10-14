@@ -24,7 +24,7 @@ type Provider struct {
 	isAutoUpdate      bool
 	useIDToken        bool
 	userInfoMapper    func(info *oidc.UserInfo) idp.User
-	authOptions       []func(bool) rp.AuthURLOpt
+	authOptions       []func(skipDefaultPrompt bool) rp.AuthURLOpt
 	generateVerifier  func() string
 }
 
@@ -73,11 +73,11 @@ func WithRelyingPartyOption(option rp.Option) ProviderOpts {
 	}
 }
 
-// WithSelectAccount adds the select_account prompt to the auth request (if no login_hint is set)
+// WithSelectAccount adds the select_account prompt to the auth request (if no login_hint or explicit prompt is set)
 func WithSelectAccount() ProviderOpts {
 	return func(p *Provider) {
-		p.authOptions = append(p.authOptions, func(loginHintSet bool) rp.AuthURLOpt {
-			if loginHintSet {
+		p.authOptions = append(p.authOptions, func(skipDefaultPrompt bool) rp.AuthURLOpt {
+			if skipDefaultPrompt {
 				return nil
 			}
 			return rp.WithPrompt(oidc.PromptSelectAccount)
@@ -142,18 +142,29 @@ func (p *Provider) Name() string {
 // It will create a [Session] with an OIDC authorization request as AuthURL.
 func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Parameter) (idp.Session, error) {
 	opts := make([]rp.AuthURLOpt, 0)
-	var loginHintSet bool
+	var skipDefaultPrompt bool
+	// additional params are applied last, so they can overwrite the provider's defaults
+	additionalParams := make([]rp.AuthURLOpt, 0)
 	for _, param := range params {
-		if username, ok := param.(idp.LoginHintParam); ok {
-			loginHintSet = true
-			opts = append(opts, loginHint(string(username)))
+		switch param := param.(type) {
+		case idp.LoginHintParam:
+			skipDefaultPrompt = true
+			opts = append(opts, loginHint(string(param)))
+		case idp.PromptParam:
+			skipDefaultPrompt = true
+			if len(param) > 0 {
+				opts = append(opts, rp.WithPrompt(param...))
+			}
+		case idp.AuthURLParam:
+			additionalParams = append(additionalParams, authURLParam(param))
 		}
 	}
 	for _, option := range p.authOptions {
-		if opt := option(loginHintSet); opt != nil {
+		if opt := option(skipDefaultPrompt); opt != nil {
 			opts = append(opts, opt)
 		}
 	}
+	opts = append(opts, additionalParams...)
 
 	var codeVerifier string
 	if p.RelyingParty.IsPKCE() {
@@ -163,6 +174,12 @@ func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Pa
 
 	url := rp.AuthURL(state, p.RelyingParty, opts...)
 	return &Session{AuthURL: url, Provider: p, CodeVerifier: codeVerifier}, nil
+}
+
+func authURLParam(param idp.AuthURLParam) rp.AuthURLOpt {
+	return func() []oauth2.AuthCodeOption {
+		return []oauth2.AuthCodeOption{oauth2.SetAuthURLParam(param.Key, param.Value)}
+	}
 }
 
 func loginHint(hint string) rp.AuthURLOpt {

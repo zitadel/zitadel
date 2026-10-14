@@ -49,3 +49,20 @@ func (p UserAgentID) setValue() {}
 type LoginHintParam string
 
 func (p LoginHintParam) setValue() {}
+
+// PromptParam allows to pass the prompt values for the authorization request to BeginAuth.
+// If passed, it replaces the provider's default prompt (`select_account`), even if empty.
+// It is currently only supported by OAuth and OIDC based providers.
+type PromptParam []string
+
+func (p PromptParam) setValue() {}
+
+// AuthURLParam allows to pass an additional query parameter for the authorization request to BeginAuth.
+// It takes precedence over parameters set by the provider itself (e.g. the default `prompt`).
+// It is currently only supported by OAuth and OIDC based providers.
+type AuthURLParam struct {
+	Key   string
+	Value string
+}
+
+func (p AuthURLParam) setValue() {}

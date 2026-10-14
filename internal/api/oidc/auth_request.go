@@ -124,6 +124,8 @@ func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.
 		MaxAge:           MaxAgeToBusiness(req.MaxAge),
 		Issuer:           o.contextToIssuer(ctx),
 		OrganizationID:   orgID,
+		ACRValues:        req.ACRValues,
+		Claims:           authRequestClaimsFromContext(ctx),
 	}
 	if req.LoginHint != "" {
 		authRequest.LoginHint = &req.LoginHint

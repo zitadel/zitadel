@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"net/url"
+	"strings"
 
 	"github.com/crewjam/saml/samlsp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -136,7 +138,10 @@ func (c *Commands) GetActiveIntent(ctx context.Context, intentID string) (*IDPIn
 	return intent, nil
 }
 
-func (c *Commands) AuthFromProvider(ctx context.Context, idpID, idpCallback, samlRootURL string, loginHint string) (state string, session idp.Session, err error) {
+// AuthFromProvider starts the authentication on the IdP.
+// If an authRequestID is provided, selected parameters of the (OIDC) auth request are forwarded to the IdP,
+// see [Commands.authRequestIDPParams].
+func (c *Commands) AuthFromProvider(ctx context.Context, idpID, idpCallback, samlRootURL, loginHint, authRequestID string) (state string, session idp.Session, err error) {
 	state, err = c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
@@ -149,8 +154,72 @@ func (c *Commands) AuthFromProvider(ctx context.Context, idpID, idpCallback, sam
 	if loginHint != "" {
 		params = append(params, idp.LoginHintParam(loginHint))
 	}
+	if authRequestID != "" {
+		authRequestParams, err := c.authRequestIDPParams(ctx, authRequestID)
+		if err != nil {
+			return "", nil, err
+		}
+		params = append(params, authRequestParams...)
+	}
 	session, err = provider.BeginAuth(ctx, state, params...)
 	return state, session, err
+}
+
+// authRequestIDPParams returns the parameters of the auth request, which are forwarded to the IdP:
+// acr_values, claims, prompt and ui_locales.
+// The prompt of the auth request always replaces the provider's default `select_account`,
+// so if the auth request has no prompt, none is sent to the IdP.
+//
+// POC: the list of parameters is fixed and not configurable per IdP.
+func (c *Commands) authRequestIDPParams(ctx context.Context, authRequestID string) ([]idp.Parameter, error) {
+	writeModel, err := c.getAuthRequestWriteModel(ctx, authRequestID)
+	if err != nil {
+		return nil, err
+	}
+	if writeModel.AuthRequestState == domain.AuthRequestStateUnspecified {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Ohp6o", "Errors.AuthRequest.NotExisting")
+	}
+	if writeModel.AuthRequestState != domain.AuthRequestStateAdded {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Wr5ep", "Errors.AuthRequest.AlreadyHandled")
+	}
+	if authz.GetCtxData(ctx).UserID != writeModel.LoginClient {
+		if err := c.checkPermission(ctx, domain.PermissionSessionRead, authz.GetInstance(ctx).InstanceID(), ""); err != nil {
+			return nil, err
+		}
+	}
+	params := make([]idp.Parameter, 0, 4)
+	params = append(params, idp.PromptParam(idpPrompts(writeModel.Prompt)))
+	if len(writeModel.ACRValues) > 0 {
+		params = append(params, idp.AuthURLParam{Key: "acr_values", Value: strings.Join(writeModel.ACRValues, " ")})
+	}
+	if writeModel.Claims != "" {
+		params = append(params, idp.AuthURLParam{Key: "claims", Value: writeModel.Claims})
+	}
+	if len(writeModel.UILocales) > 0 {
+		params = append(params, idp.AuthURLParam{Key: "ui_locales", Value: strings.Join(writeModel.UILocales, " ")})
+	}
+	return params, nil
+}
+
+// idpPrompts maps the (parsed) prompts of the auth request back to their OIDC values to forward them to the IdP.
+func idpPrompts(prompts []domain.Prompt) []string {
+	idpPrompts := make([]string, 0, len(prompts))
+	for _, prompt := range prompts {
+		switch prompt {
+		case domain.PromptNone:
+			idpPrompts = append(idpPrompts, oidc.PromptNone)
+		case domain.PromptLogin:
+			idpPrompts = append(idpPrompts, oidc.PromptLogin)
+		case domain.PromptConsent:
+			idpPrompts = append(idpPrompts, oidc.PromptConsent)
+		case domain.PromptSelectAccount:
+			idpPrompts = append(idpPrompts, oidc.PromptSelectAccount)
+		case domain.PromptCreate:
+			idpPrompts = append(idpPrompts, "create") // not (yet) defined in the oidc lib
+		case domain.PromptUnspecified:
+		}
+	}
+	return idpPrompts
 }
 
 func getIDPIntentWriteModel(ctx context.Context, writeModel *IDPIntentWriteModel, filter preparation.FilterToQueryReducer) error {

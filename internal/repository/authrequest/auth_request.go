@@ -40,6 +40,9 @@ type AddedEvent struct {
 	NeedRefreshToken bool                      `json:"need_refresh_token,omitempty"`
 	Issuer           string                    `json:"issuer,omitempty"`
 	OrganizationID   string                    `json:"organization_id,omitempty"`
+	// POC: ACRValues and Claims are only stored to forward them to an IdP.
+	ACRValues []string `json:"acr_values,omitempty"`
+	Claims    string   `json:"claims,omitempty"`
 }
 
 func (e *AddedEvent) Payload() interface{} {

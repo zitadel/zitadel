@@ -31,6 +31,9 @@ type AuthRequest struct {
 	NeedRefreshToken bool
 	Issuer           string
 	OrganizationID   string
+	// POC: ACRValues and Claims are only stored to forward them to an IdP.
+	ACRValues []string
+	Claims    string
 }
 
 type CurrentAuthRequest struct {
@@ -56,7 +59,7 @@ func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest)
 	if writeModel.AuthRequestState != domain.AuthRequestStateUnspecified {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sf3gt", "Errors.AuthRequest.AlreadyExisting")
 	}
-	err = c.pushAppendAndReduce(ctx, writeModel, authrequest.NewAddedEvent(
+	addedEvent := authrequest.NewAddedEvent(
 		ctx,
 		&authrequest.NewAggregate(authRequest.ID, authz.GetInstance(ctx).InstanceID()).Aggregate,
 		authRequest.LoginClient,
@@ -77,7 +80,10 @@ func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest)
 		authRequest.NeedRefreshToken,
 		authRequest.Issuer,
 		authRequest.OrganizationID,
-	))
+	)
+	addedEvent.ACRValues = authRequest.ACRValues
+	addedEvent.Claims = authRequest.Claims
+	err = c.pushAppendAndReduce(ctx, writeModel, addedEvent)
 	if err != nil {
 		return nil, err
 	}
