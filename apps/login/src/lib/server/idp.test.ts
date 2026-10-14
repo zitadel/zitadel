@@ -103,6 +103,7 @@ describe("redirectToIdp", () => {
           successUrl: expect.stringContaining("postErrorRedirectUrl=https%3A%2F%2Fapp.example.com%2Ferror"),
           failureUrl: expect.stringContaining("postErrorRedirectUrl=https%3A%2F%2Fapp.example.com%2Ferror"),
         },
+        requestId: "req123",
       });
 
       // Verify both URLs contain all expected parameters
@@ -142,6 +143,7 @@ describe("redirectToIdp", () => {
           successUrl: expect.not.stringContaining("postErrorRedirectUrl"),
           failureUrl: expect.not.stringContaining("postErrorRedirectUrl"),
         },
+        requestId: "req123",
       });
 
       const callArgs = mockStartIdentityProviderFlow.mock.calls[0][0];
