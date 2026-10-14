@@ -199,9 +199,14 @@ func isTextPatternComparison(comparison TextComparison) bool {
 		TextContainsIgnoreCase,
 		TextListContains:
 		return true
-	default:
+	case TextEquals,
+		TextEqualsIgnoreCase,
+		TextNotEquals,
+		TextNotEqualsIgnoreCase,
+		textCompareMax:
 		return false
 	}
+	return false
 }
 
 func (q *AndQuery) Prepend(queries ...SearchQuery) {
