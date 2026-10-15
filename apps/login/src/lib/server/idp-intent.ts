@@ -29,10 +29,10 @@ import {
   UpdateUserRequest,
   UpdateUserRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import crypto from "crypto";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { getFingerprintIdCookie } from "../fingerprint";
+import { isIdpLinkProofValid } from "../idp-link-proof";
 import { getEnrollmentAuthorizationError } from "./enrollment-guard";
 import { createNewSessionFromIdpIntent } from "./idp";
 import { syncInstanceRolesFromIdpIntent } from "./instance-roles";
@@ -358,12 +358,7 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
       return { redirect: `/idp/${provider}/linking-failed?error=session_mismatch` };
     }
 
-    const expectedHash = crypto
-      .createHash("sha256")
-      .update(sessionId + fingerprintCookie.value)
-      .digest("hex");
-
-    if (linkFingerprint !== expectedHash) {
+    if (!isIdpLinkProofValid(linkFingerprint, sessionId, fingerprintCookie.value)) {
       logger.warn("Session linking fingerprint mismatch");
       return { redirect: `/idp/${provider}/linking-failed?error=session_mismatch` };
     }
