@@ -701,6 +701,10 @@ func TestCommandSide_RemoveApplicationOwnerDeleteReady(t *testing.T) {
 		checkPermission:  newMockPermissionCheckAllowed(),
 		ownerDeleteReady: func(context.Context) (bool, error) { return true, nil },
 	}
+	assertOwnerOnlyUniqueConstraints(t, project.NewApplicationRemovedByOwnerEvent(context.Background(),
+		&project.NewAggregate("project1", "org1").Aggregate,
+		"app1",
+	), eventstore.UniqueConstraintOwnerApp, "app1")
 	got, err := r.RemoveApplication(context.Background(), "project1", "app1", "org1")
 	require.NoError(t, err)
 	assertObjectDetails(t, &domain.ObjectDetails{ResourceOwner: "org1"}, got)

@@ -449,8 +449,9 @@ func GrantReactivatedEventMapper(event eventstore.Event) (eventstore.Event, erro
 type GrantRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	GrantID      string `json:"grantId,omitempty"`
-	grantedOrgID string
+	GrantID       string `json:"grantId,omitempty"`
+	grantedOrgID  string
+	removeByOwner bool
 }
 
 func (e *GrantRemovedEvent) Payload() interface{} {
@@ -458,9 +459,13 @@ func (e *GrantRemovedEvent) Payload() interface{} {
 }
 
 func (e *GrantRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	if e.removeByOwner {
+		return []*eventstore.UniqueConstraint{
+			eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerGrant, e.GrantID),
+		}
+	}
 	return []*eventstore.UniqueConstraint{
 		NewRemoveProjectGrantUniqueConstraint(e.grantedOrgID, e.Aggregate().ID),
-		eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerGrant, e.GrantID),
 	}
 }
 
@@ -502,6 +507,17 @@ func NewGrantRemovedEvent(
 		GrantID:      grantID,
 		grantedOrgID: grantedOrgID,
 	}
+}
+
+func NewGrantRemovedByOwnerEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	grantID,
+	grantedOrgID string,
+) *GrantRemovedEvent {
+	removed := NewGrantRemovedEvent(ctx, aggregate, grantID, grantedOrgID)
+	removed.removeByOwner = true
+	return removed
 }
 
 func GrantRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {

@@ -467,7 +467,7 @@
     "noUserCode": "Geen gebruikerscode opgegeven!",
     "noDeviceRequest": "Geen apparaatverzoek gevonden.",
     "unknownContext": "Kon de context van de gebruiker niet ophalen. Zorg ervoor dat u eerst de gebruikersnaam invoert of een loginName als zoekparameter opgeeft.",
-    "sessionExpired": "Uw huidige sessie is verlopen. Log opnieuw in.",
+    "sessionExpired": "Uw sessie is verlopen of vereist opnieuw authenticatie. Log opnieuw in.",
     "failedLoading": "Gegevens laden mislukt. Probeer het opnieuw.",
     "tryagain": "Opnieuw proberen",
     "couldNotContinueSession": "Kon de sessie niet voortzetten - ontbrekende gebruikersinformatie",

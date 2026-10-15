@@ -2,26 +2,26 @@ package setup
 
 import (
 	"context"
-	_ "embed"
-
-	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
+	"embed"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-//go:embed 80_saml_metadata_url.sql
-var samlMetadataURLColumn string
+var (
+	//go:embed 80/*.sql
+	users14InstanceResourceOwnerIndex embed.FS
+)
 
-type SAMLMetadataURL struct {
+const users14InstanceResourceOwnerIdx = "users14_instance_resource_owner_idx"
+
+type Users14InstanceResourceOwnerIndex struct {
 	dbClient *database.DB
 }
 
-func (mig *SAMLMetadataURL) Execute(ctx context.Context, _ eventstore.Event) error {
-	logging.Info(ctx, "add SAML metadata URL column", "migration", mig.String())
-	_, err := mig.dbClient.ExecContext(ctx, samlMetadataURLColumn)
-	return err
+func (mig *Users14InstanceResourceOwnerIndex) Execute(ctx context.Context, _ eventstore.Event) error {
+	return executeConcurrentIndexSQL(ctx, mig.dbClient, mig.String(), users14TableExistsQuery, []string{users14InstanceResourceOwnerIdx}, users14InstanceResourceOwnerIndex, "80")
 }
 
-func (mig *SAMLMetadataURL) String() string {
-	return "80_saml_metadata_url"
+func (mig *Users14InstanceResourceOwnerIndex) String() string {
+	return "80_users14_instance_resource_owner_idx"
 }

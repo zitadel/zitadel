@@ -11,8 +11,32 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/migration"
+	"github.com/zitadel/zitadel/internal/repository/usergrant"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
+
+func assertOwnerOnlyUniqueConstraints(t *testing.T, cmd eventstore.Command, kind, id string) {
+	t.Helper()
+	constraints := cmd.UniqueConstraints()
+	require.Len(t, constraints, 1)
+	assert.Equal(t, eventstore.UniqueConstraintRemoveByOwner, constraints[0].Action)
+	assert.Equal(t, []string{eventstore.OwnerTag(kind, id)}, constraints[0].Owners)
+}
+
+func TestSkipCascadeUniqueConstraints(t *testing.T) {
+	cmd := usergrant.NewUserGrantCascadeRemovedEvent(
+		t.Context(),
+		&usergrant.NewAggregate("grant-row", "org-1").Aggregate,
+		"user-1",
+		"project-1",
+		"grant-1",
+	)
+	require.NotEmpty(t, cmd.UniqueConstraints())
+	skipCascadeUniqueConstraints(false, cmd)
+	require.NotEmpty(t, cmd.UniqueConstraints())
+	skipCascadeUniqueConstraints(true, cmd)
+	assert.Empty(t, cmd.UniqueConstraints())
+}
 
 func TestIsUniqueConstraintOwnerDeleteReady(t *testing.T) {
 	t.Run("nil checker is not ready", func(t *testing.T) {

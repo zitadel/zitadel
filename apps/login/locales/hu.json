@@ -467,7 +467,7 @@
     "noUserCode": "Nincs megadva felhasználói kód!",
     "noDeviceRequest": "Nem található eszközkérés.",
     "unknownContext": "Nem sikerült meghatározni a felhasználó kontextusát. Győződj meg róla, hogy előbb megadtad a felhasználónevet, vagy add meg a bejelentkezési nevet keresési paraméterként.",
-    "sessionExpired": "A munkameneted lejárt. Kérjük, jelentkezz be újra.",
+    "sessionExpired": "A munkameneted lejárt, vagy újbóli hitelesítést igényel. Kérjük, jelentkezz be újra.",
     "failedLoading": "Nem sikerült betölteni az adatokat. Kérjük, próbáld újra.",
     "tryagain": "Próbáld újra",
     "couldNotContinueSession": "Nem sikerült folytatni a munkamenetet - hiányzó felhasználói információk",

@@ -132,9 +132,9 @@ func TestBackfillUniqueConstraintOwners_CheckAndFinalize(t *testing.T) {
 			wantFinalized: true,
 		},
 		{
-			name:          "version changed keeps finalized true",
+			name:          "version changed after finalize skips",
 			lastRun:       map[string]interface{}{"version": "v1.0.0", "finalized": true},
-			wantRun:       true,
+			wantRun:       false,
 			wantFinalized: true,
 		},
 	}
@@ -164,9 +164,7 @@ func TestBackfillUniqueConstraintOwners_SequentialVersionChanges(t *testing.T) {
 
 	lastRun = map[string]interface{}{"version": mig.Version, "finalized": mig.Finalized}
 	mig = &BackfillUniqueConstraintOwners{Version: "v3.0.0"}
-	require.True(t, mig.Check(lastRun))
-	mig.finalizeAfterSuccess()
-	assert.True(t, mig.Finalized)
+	assert.False(t, mig.Check(lastRun), "later version must skip after previous run finalized")
 }
 
 func TestBackfillUniqueConstraintOwners_ForceFinalizeRestart(t *testing.T) {
@@ -216,4 +214,51 @@ func TestBackfillUniqueConstraintOwnersJSONOmitsForceFinalize(t *testing.T) {
 	assert.NotContains(t, payload, "lastVersion")
 	assert.NotContains(t, payload, "lastFinalized")
 	assert.False(t, strings.Contains(string(data), "v1.0.0"))
+}
+
+func TestUnmatchedOwnerCounts(t *testing.T) {
+	tests := []struct {
+		name      string
+		byType    map[string]int64
+		wantTotal int64
+		wantWarn  bool
+	}{
+		{
+			name:      "empty",
+			byType:    map[string]int64{},
+			wantTotal: 0,
+			wantWarn:  false,
+		},
+		{
+			name:      "project roles only",
+			byType:    map[string]int64{"project_role": 12, "appname": 3},
+			wantTotal: 15,
+			wantWarn:  false,
+		},
+		{
+			name:      "unmatched usernames warn",
+			byType:    map[string]int64{"usernames": 2, "project_role": 1},
+			wantTotal: 3,
+			wantWarn:  true,
+		},
+		{
+			name:      "unmatched org name warn",
+			byType:    map[string]int64{"org_name": 1},
+			wantTotal: 1,
+			wantWarn:  true,
+		},
+		{
+			name:      "zero usernames does not warn",
+			byType:    map[string]int64{"usernames": 0, "org_name": 0, "appname": 4},
+			wantTotal: 4,
+			wantWarn:  false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotTotal, gotWarn := unmatchedOwnerCounts(tt.byType)
+			assert.Equal(t, tt.wantTotal, gotTotal)
+			assert.Equal(t, tt.wantWarn, gotWarn)
+		})
+	}
 }

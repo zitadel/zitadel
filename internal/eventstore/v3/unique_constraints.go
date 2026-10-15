@@ -31,15 +31,18 @@ func handleUniqueConstraints(ctx context.Context, tx database.Transaction, comma
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	deletePlaceholders := make([]string, 0)
-	deleteArgs := make([]any, 0)
+	keyedPlaceholders := make([]string, 0)
+	keyedArgs := make([]any, 0)
+	ownerPlaceholders := make([]string, 0)
+	ownerArgs := make([]any, 0)
 
 	addWithOwnersPlaceholders := make([]string, 0)
 	addWithOwnersArgs := make([]any, 0)
 	addWithoutOwnersPlaceholders := make([]string, 0)
 	addWithoutOwnersArgs := make([]any, 0)
 	addConstraints := map[string]*eventstore.UniqueConstraint{}
-	deleteConstraints := map[string]*eventstore.UniqueConstraint{}
+	keyedDeleteConstraints := map[string]*eventstore.UniqueConstraint{}
+	ownerDeleteConstraints := map[string]*eventstore.UniqueConstraint{}
 
 	for _, command := range commands {
 		for _, constraint := range command.UniqueConstraints() {
@@ -59,40 +62,51 @@ func handleUniqueConstraints(ctx context.Context, tx database.Transaction, comma
 					addWithOwnersArgs = append(addWithOwnersArgs, instanceID, constraint.UniqueType, constraint.UniqueField, constraint.Owners)
 				}
 			case eventstore.UniqueConstraintRemove:
-				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf(deleteConstraintPlaceholdersStmt, len(deleteArgs)+1, len(deleteArgs)+2, len(deleteArgs)+3))
-				deleteArgs = append(deleteArgs, instanceID, constraint.UniqueType, constraint.UniqueField)
-				deleteConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, instanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
+				keyedPlaceholders = append(keyedPlaceholders, fmt.Sprintf(deleteConstraintPlaceholdersStmt, len(keyedArgs)+1, len(keyedArgs)+2, len(keyedArgs)+3))
+				keyedArgs = append(keyedArgs, instanceID, constraint.UniqueType, constraint.UniqueField)
+				keyedDeleteConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, instanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			case eventstore.UniqueConstraintInstanceRemove:
-				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf("(instance_id = $%d)", len(deleteArgs)+1))
-				deleteArgs = append(deleteArgs, instanceID)
-				deleteConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, instanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
+				keyedPlaceholders = append(keyedPlaceholders, fmt.Sprintf("(instance_id = $%d)", len(keyedArgs)+1))
+				keyedArgs = append(keyedArgs, instanceID)
+				keyedDeleteConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, instanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			case eventstore.UniqueConstraintRemoveByOwner:
 				if len(constraint.Owners) == 0 {
 					continue
 				}
 				tag := constraint.Owners[0]
-				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf("(instance_id = $%d AND owners @> ARRAY[$%d]::text[])", len(deleteArgs)+1, len(deleteArgs)+2))
-				deleteArgs = append(deleteArgs, instanceID, tag)
-				deleteConstraints[fmt.Sprintf("%s:%s", instanceID, tag)] = constraint
+				ownerPlaceholders = append(ownerPlaceholders, fmt.Sprintf("(instance_id = $%d AND owners @> ARRAY[$%d]::text[])", len(ownerArgs)+1, len(ownerArgs)+2))
+				ownerArgs = append(ownerArgs, instanceID, tag)
+				ownerDeleteConstraints[fmt.Sprintf("%s:%s", instanceID, tag)] = constraint
 			}
 		}
 	}
 
-	if len(deletePlaceholders) > 0 {
-		_, err := tx.Exec(ctx, fmt.Sprintf(deleteConstraintStmt, strings.Join(deletePlaceholders, " OR ")), deleteArgs...)
-		if err != nil {
-			logging.WithError(err).Warn("delete unique constraint failed")
-			errMessage := "Errors.Internal"
-			if constraint := constraintFromErr(err, deleteConstraints); constraint != nil {
-				errMessage = constraint.ErrorMessage
-			}
-			return zerrors.ThrowInternal(err, "V3-C8l3V", errMessage)
-		}
+	if err := execDeleteConstraints(ctx, tx, keyedPlaceholders, keyedArgs, keyedDeleteConstraints); err != nil {
+		return err
+	}
+	if err := execDeleteConstraints(ctx, tx, ownerPlaceholders, ownerArgs, ownerDeleteConstraints); err != nil {
+		return err
 	}
 	if err := execAddConstraints(ctx, tx, addConstraintWithoutOwnersStmt, addWithoutOwnersPlaceholders, addWithoutOwnersArgs, addConstraints); err != nil {
 		return err
 	}
 	return execAddConstraints(ctx, tx, addConstraintStmt, addWithOwnersPlaceholders, addWithOwnersArgs, addConstraints)
+}
+
+func execDeleteConstraints(ctx context.Context, tx database.Transaction, placeholders []string, args []any, deleteConstraints map[string]*eventstore.UniqueConstraint) error {
+	if len(placeholders) == 0 {
+		return nil
+	}
+	_, err := tx.Exec(ctx, fmt.Sprintf(deleteConstraintStmt, strings.Join(placeholders, " OR ")), args...)
+	if err != nil {
+		logging.WithError(err).Warn("delete unique constraint failed")
+		errMessage := "Errors.Internal"
+		if constraint := constraintFromErr(err, deleteConstraints); constraint != nil {
+			errMessage = constraint.ErrorMessage
+		}
+		return zerrors.ThrowInternal(err, "V3-C8l3V", errMessage)
+	}
+	return nil
 }
 
 func execAddConstraints(ctx context.Context, tx database.Transaction, stmt string, placeholders []string, args []any, addConstraints map[string]*eventstore.UniqueConstraint) error {

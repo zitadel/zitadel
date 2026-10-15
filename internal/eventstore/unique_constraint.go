@@ -125,6 +125,18 @@ func NewRemoveUniqueConstraintsByOwner(kind, id string) *UniqueConstraint {
 	return constraint
 }
 
+type uniqueConstraintSkipper interface {
+	SkipUniqueConstraints()
+}
+
+// SkipCommandUniqueConstraints omits unique-constraint deletes on cascade events
+// when a parent owner-delete already covers those rows.
+func SkipCommandUniqueConstraints(cmd Command) {
+	if s, ok := cmd.(uniqueConstraintSkipper); ok {
+		s.SkipUniqueConstraints()
+	}
+}
+
 func NewAddGlobalUniqueConstraint(
 	uniqueType,
 	uniqueField,

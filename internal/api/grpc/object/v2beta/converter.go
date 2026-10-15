@@ -6,6 +6,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
@@ -36,11 +37,10 @@ func ToListDetails(response query.SearchResponse) *object.ListDetails {
 	return details
 }
 
-func ListQueryToQuery(query *object.ListQuery) (offset, limit uint64, asc bool) {
-	if query == nil {
-		return 0, 0, false
-	}
-	return query.Offset, uint64(query.Limit), query.Asc
+// ListQueryToQuery converts the list query into offset, limit and sorting order.
+// The limit is defaulted and checked by [systemdefaults.SystemDefaults.QueryLimit].
+func ListQueryToQuery(defaults systemdefaults.SystemDefaults, query *object.ListQuery) (offset, limit uint64, asc bool, err error) {
+	return defaults.PaginationToQuery(query)
 }
 
 func ResourceOwnerFromReq(ctx context.Context, req *object.RequestContext) string {
@@ -74,13 +74,6 @@ func TextMethodToQuery(method object.TextQueryMethod) query.TextComparison {
 	default:
 		return -1
 	}
-}
-
-func ListQueryToModel(query *object.ListQuery) (offset, limit uint64, asc bool) {
-	if query == nil {
-		return 0, 0, false
-	}
-	return query.Offset, uint64(query.Limit), query.Asc
 }
 
 func DomainsToPb(domains []*query.Domain) []*org_pb.Domain {
