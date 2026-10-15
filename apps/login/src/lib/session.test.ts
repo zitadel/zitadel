@@ -18,7 +18,7 @@ import { timestampDate } from "@zitadel/client";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import * as cookiesModule from "./cookies";
-import { isSessionValid, loadMostRecentSession } from "./session";
+import { isSessionValid, loadMostRecentSession, loadSessionById } from "./session";
 import * as verifyHelperModule from "./verify-helper";
 import * as zitadelModule from "./zitadel";
 
@@ -35,6 +35,7 @@ vi.mock("./zitadel", () => ({
 
 vi.mock("./cookies", () => ({
   getMostRecentCookieWithLoginname: vi.fn(),
+  getSessionCookieById: vi.fn(),
 }));
 
 vi.mock("./verify-helper", () => ({
@@ -1652,7 +1653,7 @@ describe("loadMostRecentSession", () => {
     const result = await loadMostRecentSession({ serviceConfig, sessionParams });
 
     expect(result).toBeUndefined();
-    expect(consoleSpy).toHaveBeenCalledWith("[Session] Could not load most recent session", notFound);
+    expect(consoleSpy).toHaveBeenCalledWith("[Session] Could not load session", notFound);
     consoleSpy.mockRestore();
   });
 
@@ -1679,5 +1680,30 @@ describe("loadMostRecentSession", () => {
     await expect(loadMostRecentSession({ serviceConfig, sessionParams })).rejects.toBe(unexpected);
     expect(consoleSpy).not.toHaveBeenCalled();
     consoleSpy.mockRestore();
+  });
+});
+
+describe("loadSessionById", () => {
+  const serviceConfig = { baseUrl: "https://zitadel-abc123.zitadel.cloud" };
+  const cookie = { id: "session-id", token: "session-token", loginName: "test@example.com", organization: "test-org-id" };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(cookiesModule.getSessionCookieById).mockResolvedValue(cookie as any);
+  });
+
+  test("returns undefined when getSession rejects with NotFound (stale cookie)", async () => {
+    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.mocked(zitadelModule.getSession).mockRejectedValue(new ConnectError("Session does not exist", Code.NotFound));
+
+    await expect(loadSessionById(serviceConfig, "session-id", "test-org-id")).resolves.toBeUndefined();
+    consoleSpy.mockRestore();
+  });
+
+  test("re-throws other errors", async () => {
+    const unavailable = new ConnectError("backend unavailable", Code.Unavailable);
+    vi.mocked(zitadelModule.getSession).mockRejectedValue(unavailable);
+
+    await expect(loadSessionById(serviceConfig, "session-id")).rejects.toBe(unavailable);
   });
 });
