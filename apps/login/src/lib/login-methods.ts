@@ -1,6 +1,6 @@
 import { LoginSettings, PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { getActiveIdentityProviders, listIDPLinks, ServiceConfig } from "./zitadel";
+import { getActiveIdentityProviders, getDefaultOrg, getLoginSettings, listIDPLinks, ServiceConfig } from "./zitadel";
 
 export async function getLoginMethods({
   serviceConfig,
@@ -15,6 +15,14 @@ export async function getLoginMethods({
   authMethods?: AuthenticationMethodType[];
   loginSettings: LoginSettings;
 }) {
+  // Match /loginname: provider availability without an explicit scope uses the default organization.
+  if (!userId && !organization) {
+    const defaultOrg = await getDefaultOrg({ serviceConfig });
+    if (defaultOrg) {
+      organization = defaultOrg.id;
+      loginSettings = (await getLoginSettings({ serviceConfig, organization })) ?? loginSettings;
+    }
+  }
   const password =
     !!loginSettings.allowLocalAuthentication && (!authMethods || authMethods.includes(AuthenticationMethodType.PASSWORD));
   const passkey =

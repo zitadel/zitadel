@@ -2,8 +2,13 @@ import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_
 import { AuthenticationMethodType as Method } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { beforeEach, expect, test, vi } from "vitest";
 import { getLoginMethods } from "./login-methods";
-import { getActiveIdentityProviders, listIDPLinks } from "./zitadel";
-vi.mock("./zitadel", () => ({ getActiveIdentityProviders: vi.fn(), listIDPLinks: vi.fn() }));
+import { getActiveIdentityProviders, getDefaultOrg, getLoginSettings, listIDPLinks } from "./zitadel";
+vi.mock("./zitadel", () => ({
+  getActiveIdentityProviders: vi.fn(),
+  getDefaultOrg: vi.fn(),
+  getLoginSettings: vi.fn(),
+  listIDPLinks: vi.fn(),
+}));
 const options = {
   serviceConfig: {} as any,
   userId: "user",
@@ -13,6 +18,7 @@ const options = {
 };
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.mocked(getDefaultOrg).mockResolvedValue(null);
   vi.mocked(getActiveIdentityProviders).mockResolvedValue({
     identityProviders: [{ id: "google", name: "Google" }, { id: "unlinked" }],
   } as any);
@@ -59,5 +65,15 @@ test("protected choices are based only on policy and do not inspect user links",
   expect(result.count).toBe(4);
   expect(result.identityProviders.map((p) => p.id)).toEqual(["google", "unlinked"]);
   expect(result.identityProviders.every((p) => p.loginHint === undefined)).toBe(true);
+  expect(listIDPLinks).not.toHaveBeenCalled();
+});
+
+test("uses default-organization policy and providers when no organization was specified", async () => {
+  vi.mocked(getDefaultOrg).mockResolvedValue({ id: "default-org" } as any);
+  vi.mocked(getLoginSettings).mockResolvedValue(options.loginSettings);
+  const result = await getLoginMethods({ ...options, userId: undefined, organization: undefined, authMethods: undefined });
+  expect(result.count).toBe(4);
+  expect(getLoginSettings).toHaveBeenCalledWith({ serviceConfig: {}, organization: "default-org" });
+  expect(getActiveIdentityProviders).toHaveBeenCalledWith({ serviceConfig: {}, orgId: "default-org" });
   expect(listIDPLinks).not.toHaveBeenCalled();
 });

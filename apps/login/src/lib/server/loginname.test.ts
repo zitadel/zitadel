@@ -25,6 +25,7 @@ vi.mock("../idp", () => ({
 
 vi.mock("../zitadel", () => ({
   getActiveIdentityProviders: vi.fn(),
+  getDefaultOrg: vi.fn().mockResolvedValue(null),
   getIDPByID: vi.fn(),
   getLoginSettings: vi.fn(),
   getOrgsByDomain: vi.fn(),
