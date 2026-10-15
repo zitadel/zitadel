@@ -2385,7 +2385,8 @@
       "HEADERNAME": "请求头名称",
       "JWTENDPOINT": "JWT 端点",
       "JWTKEYSENDPOINT": "JWT Keys 端点",
-      "AUDIENCE": "受众"
+      "AUDIENCE": "受众",
+      "AUDIENCE_EMPTY_WARNING": "如果未设置受众，ZITADEL 将接受该 Issuer 签发的任何有效令牌，无论其是为哪个应用签发的。强烈建议设置受众。"
     },
     "APPLE": {
       "TEAMID": "Team ID",

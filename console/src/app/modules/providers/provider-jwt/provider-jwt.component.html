@@ -60,6 +60,11 @@
           <cnsl-label>{{ 'IDP.JWT.AUDIENCE' | translate }}</cnsl-label>
           <input cnslInput formControlName="audience" placeholder="my-client" />
         </cnsl-form-field>
+        @if (!audience?.value) {
+          <cnsl-info-section [type]="InfoSectionType.WARN" data-e2e="audience-empty-warning">
+            {{ 'IDP.JWT.AUDIENCE_EMPTY_WARNING' | translate }}
+          </cnsl-info-section>
+        }
       </div>
 
       <div class="identity-provider-optional-h-wrapper">
