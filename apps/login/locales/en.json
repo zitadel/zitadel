@@ -453,6 +453,7 @@
       "title": "{appName} would like to connect",
       "description": "{appName} will have access to:",
       "disclaimer": "By clicking Allow, you allow {appName} and Zitadel to use your information in accordance with their respective terms of service and privacy policies. You can revoke this access at any time.",
+      "usercode": "Code displayed on your device:",
       "submit": "Allow",
       "deny": "Deny"
     },
