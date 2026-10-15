@@ -189,6 +189,65 @@ func Test_composeOrigin(t *testing.T) {
 			InstanceHost: "forwarded.host",
 			Protocol:     "https",
 		},
+	}, {
+		name: "public host",
+		args: args{
+			h: http.Header{
+				"X-Zitadel-Public-Host": []string{"public.host"},
+			},
+		},
+		want: &http_util.DomainCtx{
+			InstanceHost: "host.header",
+			PublicHost:   "public.host",
+			Protocol:     "http",
+		},
+	}, {
+		name: "public host with port",
+		args: args{
+			h: http.Header{
+				"X-Zitadel-Public-Host": []string{"public.host:8080"},
+			},
+		},
+		want: &http_util.DomainCtx{
+			InstanceHost: "host.header",
+			PublicHost:   "public.host:8080",
+			Protocol:     "http",
+		},
+	}, {
+		name: "invalid public host (non-numeric port) is kept to be rejected by the trusted domain check",
+		args: args{
+			h: http.Header{
+				"X-Zitadel-Public-Host": []string{"evil.com:443/"},
+			},
+		},
+		want: &http_util.DomainCtx{
+			InstanceHost: "host.header",
+			PublicHost:   "evil.com:443/",
+			Protocol:     "http",
+		},
+	}, {
+		name: "invalid public host (userinfo) is kept to be rejected by the trusted domain check",
+		args: args{
+			h: http.Header{
+				"X-Zitadel-Public-Host": []string{"a:b@evil.com"},
+			},
+		},
+		want: &http_util.DomainCtx{
+			InstanceHost: "host.header",
+			PublicHost:   "a:b@evil.com",
+			Protocol:     "http",
+		},
+	}, {
+		name: "invalid instance host is ignored",
+		args: args{
+			h: http.Header{
+				"X-Forwarded-Host": []string{"localhost:@attacker.com"},
+			},
+		},
+		want: &http_util.DomainCtx{
+			InstanceHost: "host.header",
+			Protocol:     "http",
+		},
 	},
 	}
 	for _, tt := range tests {
