@@ -67,10 +67,12 @@ test("requires a browser-owned session even for a direct URL", async () => {
   await expect(page()).rejects.toThrow("/loginname?");
   expect(getLoginMethods).not.toHaveBeenCalled();
 });
-test("does not discover methods under enumeration protection", async () => {
+test("offers policy-level choices without looking up a protected username", async () => {
   vi.mocked(getLoginSettings).mockResolvedValue({ ignoreUnknownUsernames: true } as any);
-  await expect(page()).rejects.toThrow("/loginname?");
+  render(await page());
   expect(listAuthenticationMethodTypes).not.toHaveBeenCalled();
+  expect(loadMostRecentSession).not.toHaveBeenCalled();
+  expect(getLoginMethods).toHaveBeenCalledWith(expect.objectContaining({ userId: undefined, authMethods: undefined }));
 });
 test("rejects a session for a different login name", async () => {
   await expect(page({ loginName: "other@example.org" })).rejects.toThrow("/loginname?");

@@ -24,27 +24,38 @@ export default async function Page(props: { searchParams: Promise<Record<string,
   if (organization) params.set("organization", organization);
   if (requestId) params.set("requestId", requestId);
 
-  const session = loginName
-    ? await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } })
-    : undefined;
-  const user = session?.factors?.user;
-  if (!user?.id || user.loginName !== loginName || (organization && organization !== user.organizationId))
-    redirect("/loginname?" + params);
-
+  if (!loginName) redirect("/loginname?" + params);
   const contextSettings = await getLoginSettings({ serviceConfig, organization });
-  if (!contextSettings || contextSettings.ignoreUnknownUsernames) redirect("/loginname?" + params);
+  if (!contextSettings) redirect("/loginname?" + params);
 
-  const loginSettings = await getLoginSettings({ serviceConfig, organization: user.organizationId });
-  // A direct visit must not reveal methods when username enumeration protection is enabled.
-  if (!loginSettings || loginSettings.ignoreUnknownUsernames) redirect("/loginname?" + params);
-
-  params.set("organization", user.organizationId);
-  const methods = await listAuthenticationMethodTypes({ serviceConfig, userId: user.id });
+  let user: { id?: string; loginName?: string; displayName?: string; organizationId?: string } = {
+    loginName,
+    organizationId: organization,
+  };
+  let loginSettings = contextSettings;
+  let authMethods;
+  // Protected flows offer policy-level choices without looking up whether this user exists.
+  if (!contextSettings.ignoreUnknownUsernames) {
+    const session = await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } });
+    const sessionUser = session?.factors?.user;
+    if (
+      !sessionUser?.id ||
+      sessionUser.loginName !== loginName ||
+      (organization && organization !== sessionUser.organizationId)
+    )
+      redirect("/loginname?" + params);
+    user = sessionUser;
+    const settings = await getLoginSettings({ serviceConfig, organization: user.organizationId });
+    if (!settings || settings.ignoreUnknownUsernames) redirect("/loginname?" + params);
+    loginSettings = settings;
+    authMethods = (await listAuthenticationMethodTypes({ serviceConfig, userId: sessionUser.id })).authMethodTypes;
+  }
+  if (user.organizationId) params.set("organization", user.organizationId);
   const options = await getLoginMethods({
     serviceConfig,
     userId: user.id,
     organization: user.organizationId,
-    authMethods: methods.authMethodTypes,
+    authMethods,
     loginSettings,
   });
   if (!options.count) redirect("/loginname?" + params);

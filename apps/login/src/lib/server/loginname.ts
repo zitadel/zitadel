@@ -60,6 +60,22 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   // indistinguishable while protection applies.
   const ignoreUnknownUsernames = !!loginSettingsByContext.ignoreUnknownUsernames;
 
+  // Under enumeration protection, offer the same policy-level choices for every identifier.
+  if (loginSettingsByContext.ignoreUnknownUsernames) {
+    const options = await getLoginMethods({
+      serviceConfig,
+      organization: command.organization,
+      loginSettings: loginSettingsByContext,
+    });
+    if (options.count > 1) {
+      const loginName = command.suffix ? `${command.loginName}@${command.suffix}` : command.loginName;
+      const params = new URLSearchParams({ loginName });
+      if (command.organization) params.set("organization", command.organization);
+      if (command.requestId) params.set("requestId", command.requestId);
+      return { redirect: "/login-method?" + params };
+    }
+  }
+
   let searchUsersRequest: SearchUsersCommand = {
     serviceConfig,
     searchValue: command.loginName,

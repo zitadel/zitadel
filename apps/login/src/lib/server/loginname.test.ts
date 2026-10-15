@@ -1426,7 +1426,7 @@ describe("sendLoginname", () => {
       expect((result as any).redirect).not.toContain("loginName=user%40example.com");
     });
 
-    test("should redirect to passkey with INPUT loginName when ignoreUnknownUsernames is true", async () => {
+    test("should offer policy-level choices with INPUT loginName when ignoreUnknownUsernames is true", async () => {
       const mockUser = {
         userId: "user123",
         preferredLoginName: "user@example.com",
@@ -1462,12 +1462,12 @@ describe("sendLoginname", () => {
       });
 
       expect(result).toHaveProperty("redirect");
-      expect((result as any).redirect).toMatch(/^\/passkey\?/);
+      expect((result as any).redirect).toMatch(/^\/login-method\?/);
       expect((result as any).redirect).toContain("loginName=user");
       expect((result as any).redirect).not.toContain("loginName=user%40example.com");
     });
 
-    test("should redirect to passkey with INPUT loginName when ignoreUnknownUsernames is true (multi-method)", async () => {
+    test("should offer policy-level choices with INPUT loginName when ignoreUnknownUsernames is true (multi-method)", async () => {
       const mockUser = {
         userId: "user123",
         preferredLoginName: "user@example.com",
@@ -1503,7 +1503,7 @@ describe("sendLoginname", () => {
       });
 
       expect(result).toHaveProperty("redirect");
-      expect((result as any).redirect).toMatch(/^\/passkey\?/);
+      expect((result as any).redirect).toMatch(/^\/login-method\?/);
       expect((result as any).redirect).toContain("loginName=user");
       expect((result as any).redirect).not.toContain("loginName=user%40example.com");
     });
@@ -1600,5 +1600,19 @@ describe("sendLoginname", () => {
       // Should result in resolved name because context says SHOW
       expect((result as any).redirect).toContain("loginName=user%40example.com");
     });
+  });
+  test("protected choices do not depend on whether the identifier exists", async () => {
+    mockGetLoginSettings.mockResolvedValue({
+      ignoreUnknownUsernames: true,
+      allowLocalAuthentication: true,
+      passkeysType: PasskeysType.ALLOWED,
+    });
+    const known = await sendLoginname({ loginName: "known@example.org", requestId: "req", organization: "org" });
+    const unknown = await sendLoginname({ loginName: "unknown@example.org", requestId: "req", organization: "org" });
+    expect(known).toEqual({ redirect: "/login-method?loginName=known%40example.org&organization=org&requestId=req" });
+    expect(unknown).toEqual({ redirect: "/login-method?loginName=unknown%40example.org&organization=org&requestId=req" });
+    expect(mockSearchUsers).not.toHaveBeenCalled();
+    expect(mockListIDPLinks).not.toHaveBeenCalled();
+    expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
   });
 });

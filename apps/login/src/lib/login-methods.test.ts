@@ -53,3 +53,11 @@ test("does not hide provider lookup failures", async () => {
   vi.mocked(listIDPLinks).mockRejectedValue(new Error("unavailable"));
   await expect(getLoginMethods(options)).rejects.toThrow("unavailable");
 });
+
+test("protected choices are based only on policy and do not inspect user links", async () => {
+  const result = await getLoginMethods({ ...options, userId: undefined, authMethods: undefined });
+  expect(result.count).toBe(4);
+  expect(result.identityProviders.map((p) => p.id)).toEqual(["google", "unlinked"]);
+  expect(result.identityProviders.every((p) => p.loginHint === undefined)).toBe(true);
+  expect(listIDPLinks).not.toHaveBeenCalled();
+});

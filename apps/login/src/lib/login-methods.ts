@@ -10,25 +10,26 @@ export async function getLoginMethods({
   loginSettings,
 }: {
   serviceConfig: ServiceConfig;
-  userId: string;
-  organization: string;
-  authMethods: AuthenticationMethodType[];
+  userId?: string;
+  organization?: string;
+  authMethods?: AuthenticationMethodType[];
   loginSettings: LoginSettings;
 }) {
-  const password = !!loginSettings.allowLocalAuthentication && authMethods.includes(AuthenticationMethodType.PASSWORD);
+  const password =
+    !!loginSettings.allowLocalAuthentication && (!authMethods || authMethods.includes(AuthenticationMethodType.PASSWORD));
   const passkey =
     !!loginSettings.allowLocalAuthentication &&
     loginSettings.passkeysType === PasskeysType.ALLOWED &&
-    authMethods.includes(AuthenticationMethodType.PASSKEY);
+    (!authMethods || authMethods.includes(AuthenticationMethodType.PASSKEY));
   const identityProviders = [];
-  if (loginSettings.allowExternalIdp && authMethods.includes(AuthenticationMethodType.IDP)) {
+  if (loginSettings.allowExternalIdp && (!authMethods || authMethods.includes(AuthenticationMethodType.IDP))) {
     const [active, links] = await Promise.all([
       getActiveIdentityProviders({ serviceConfig, orgId: organization }),
-      listIDPLinks({ serviceConfig, userId }),
+      userId ? listIDPLinks({ serviceConfig, userId }) : Promise.resolve(undefined),
     ]);
     for (const provider of active.identityProviders) {
-      const link = links.result.find((link) => link.idpId === provider.id);
-      if (link) identityProviders.push({ ...provider, loginHint: link.userName });
+      const link = links?.result.find((link) => link.idpId === provider.id);
+      if (!userId || link) identityProviders.push({ ...provider, loginHint: link?.userName });
     }
   }
   return { password, passkey, identityProviders, count: Number(password) + Number(passkey) + identityProviders.length };
