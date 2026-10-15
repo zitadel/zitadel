@@ -8,13 +8,27 @@ import { LANGS } from "@/lib/i18n";
  * Check if a language code is valid (supported by the login UI)
  */
 export function isValidLanguage(code: string): boolean {
+  return LANGS.some((lang) => lang.code.toLowerCase() === code.trim().toLowerCase());
+}
+
+export function resolveLanguage(code: string): string | null {
   const normalized = code.trim().toLowerCase();
-  return LANGS.some((lang) => lang.code === normalized);
+  const exact = LANGS.find((lang) => lang.code.toLowerCase() === normalized);
+  if (exact) return exact.code;
+
+  try {
+    const locale = new Intl.Locale(normalized);
+    if (locale.language === "zh" && locale.maximize().script === "Hant") return "zh-TW";
+  } catch {
+    return null;
+  }
+
+  return LANGS.find((lang) => lang.code === normalized.split("-")[0])?.code ?? null;
 }
 
 /**
  * Extract a valid language code from uiLocales array.
- * Returns the first valid language code (normalized to lowercase), or null if none found.
+ * Returns the first supported language code, or null if none is found.
  */
 export function getValidLocaleFromUILocales(uiLocales: string[] | undefined): string | null {
   if (!uiLocales || uiLocales.length === 0) {
@@ -22,23 +36,8 @@ export function getValidLocaleFromUILocales(uiLocales: string[] | undefined): st
   }
 
   for (const locale of uiLocales) {
-    const normalized = locale.trim().toLowerCase();
-
-    // Check if the full locale is a valid language code (e.g., "de", "EN")
-    if (isValidLanguage(normalized)) {
-      return normalized;
-    }
-
-    // uiLocales may contain language tags like "en-US" or "de-CH"
-    // Extract the language code (part before the hyphen)
-    // Note: this strips any regional specifier
-    // e.g., de-CH and de-AT both become just de
-    // zh-Hans-CN (Simplified) and zh-Hant-TW (Traditional) both become zh
-    // As of time of writing, this is expected behaviour, since there is only one translation for all languages
-    const languageCode = normalized.split("-")[0];
-    if (isValidLanguage(languageCode)) {
-      return languageCode;
-    }
+    const language = resolveLanguage(locale);
+    if (language) return language;
   }
 
   return null;
