@@ -2,6 +2,7 @@
 
 import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { createLogger } from "@/lib/logger";
+import { getLoginMethods } from "@/lib/login-methods";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
@@ -393,6 +394,23 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       }
 
       return { redirect: `/verify?` + params };
+    }
+
+    // Keep method discovery out of the enumeration-protected flow.
+    if (!ignoreUnknownUsernames && session && userLoginSettings && !userLoginSettings.ignoreUnknownUsernames) {
+      const options = await getLoginMethods({
+        serviceConfig,
+        userId,
+        organization: session.factors!.user!.organizationId,
+        authMethods: methods.authMethodTypes,
+        loginSettings: userLoginSettings,
+      });
+      if (options.count > 1) {
+        const params = new URLSearchParams({ loginName: redirectLoginName as string });
+        if (organization) params.set("organization", organization);
+        if (command.requestId) params.set("requestId", command.requestId);
+        return { redirect: "/login-method?" + params };
+      }
     }
 
     if (methods.authMethodTypes.length == 1) {

@@ -495,7 +495,8 @@ describe("sendLoginname", () => {
     });
 
     describe("Multiple authentication methods", () => {
-      test("should prefer passkey when multiple methods available", async () => {
+      test("should offer a choice when password and passkey are allowed", async () => {
+        mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: true, passkeysType: PasskeysType.ALLOWED });
         mockListAuthenticationMethodTypes.mockResolvedValue({
           authMethodTypes: [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.PASSKEY],
         });
@@ -505,8 +506,30 @@ describe("sendLoginname", () => {
         });
 
         expect(result).toHaveProperty("redirect");
-        expect((result as any).redirect).toMatch(/^\/passkey\?/);
-        expect((result as any).redirect).toContain("altPassword=true"); // password is allowed
+        expect((result as any).redirect).toMatch(/^\/login-method\?/);
+        expect((result as any).redirect).toContain("loginName=user%40example.com");
+      });
+
+      test("offers password, passkey and a linked active provider without starting a flow", async () => {
+        mockGetLoginSettings.mockResolvedValue({
+          allowLocalAuthentication: true,
+          allowExternalIdp: true,
+          passkeysType: PasskeysType.ALLOWED,
+        });
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [
+            AuthenticationMethodType.PASSWORD,
+            AuthenticationMethodType.PASSKEY,
+            AuthenticationMethodType.IDP,
+          ],
+        });
+        mockListIDPLinks.mockResolvedValue({ result: [{ idpId: "google", userName: "external@example.org" }] });
+        mockGetActiveIdentityProviders.mockResolvedValue({ identityProviders: [{ id: "google" }] });
+        const result = await sendLoginname({ loginName: "user@example.com", requestId: "req123", organization: "org123" });
+        expect(result).toEqual({
+          redirect: "/login-method?loginName=user%40example.com&organization=org123&requestId=req123",
+        });
+        expect(mockStartIdentityProviderFlow).not.toHaveBeenCalled();
       });
 
       test("should return error when allowLocalAuthentication is false (disabling both password and passkey)", async () => {
