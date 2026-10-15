@@ -8,12 +8,12 @@ import {
   startIdentityProviderFlow,
   startLDAPIdentityProviderFlow,
 } from "@/lib/zitadel";
-import crypto from "crypto";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById } from "../cookies";
 import { getOrSetFingerprintId } from "../fingerprint";
+import { createIdpLinkProof } from "../idp-link-proof";
 import { getServiceConfig } from "../service-url";
 import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
@@ -45,11 +45,8 @@ export async function redirectToIdp(prevState: RedirectToIdpState, formData: For
       // Get fingerprint (ensure it exists)
       const fingerprintId = await getOrSetFingerprintId();
 
-      // Create hash to verify intent upon return
-      const linkFingerprint = crypto
-        .createHash("sha256")
-        .update(sessionId + fingerprintId)
-        .digest("hex");
+      // Signed proof (server-only secret) to verify the intent upon return
+      const linkFingerprint = createIdpLinkProof(sessionId, fingerprintId);
 
       params.set("linkToSessionId", sessionId);
       params.set("linkFingerprint", linkFingerprint);

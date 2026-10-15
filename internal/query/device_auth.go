@@ -59,9 +59,16 @@ var (
 )
 
 // DeviceAuthRequestByUserCode finds a Device Authorization request by User-Code from the `device_auth_requests` projection.
-func (q *Queries) DeviceAuthRequestByUserCode(ctx context.Context, userCode string) (authReq *domain.AuthRequestDevice, err error) {
+// If checkPermission is set, the caller needs the instance wide `session.read` permission.
+func (q *Queries) DeviceAuthRequestByUserCode(ctx context.Context, userCode string, checkPermission bool) (authReq *domain.AuthRequestDevice, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	if checkPermission {
+		if err = q.checkPermission(ctx, domain.PermissionSessionRead, authz.GetInstance(ctx).InstanceID(), ""); err != nil {
+			return nil, err
+		}
+	}
 
 	stmt, scan := prepareDeviceAuthQuery()
 	eq := sq.Eq{

@@ -84,6 +84,7 @@ func (c *Commands) ApproveDeviceAuthWithSession(
 	deviceCode,
 	sessionID,
 	sessionToken string,
+	projectPermissionCheck domain.ProjectPermissionCheck,
 ) (*domain.ObjectDetails, error) {
 	model, err := c.getDeviceAuthWriteModelByDeviceCode(ctx, deviceCode)
 	if err != nil {
@@ -109,6 +110,11 @@ func (c *Commands) ApproveDeviceAuthWithSession(
 	}
 	if err := c.sessionTokenVerifier(ctx, sessionToken, sessionWriteModel.AggregateID, sessionWriteModel.TokenID); err != nil {
 		return nil, err
+	}
+	if projectPermissionCheck != nil {
+		if err := projectPermissionCheck(ctx, model.ClientID, sessionWriteModel.UserID); err != nil {
+			return nil, err
+		}
 	}
 	if model.OrganizationID != "" && model.OrganizationID != sessionWriteModel.UserResourceOwner {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-D2j34", "Errors.User.NotAllowedOrg")
