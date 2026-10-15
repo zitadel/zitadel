@@ -190,13 +190,10 @@ func TestExternalNotFoundOption_ForgedRegistration_IsRejected(t *testing.T) {
 	assert.Contains(t, body, "LOGIN-Dju3f",
 		"forged registration should be rejected by the LinkingUsers guard; got a page without that rejection (attack likely succeeded)")
 
-	// The load-bearing assertion: no account may exist for the attacker's forged identity. We use
-	// assert.Never (not Eventually) so that if the account IS created but its projection lags, the user
-	// still surfaces within the window and fails the test - which is exactly the unpatched behavior.
-	assert.Never(t, func() bool {
-		return userCountByEmail(t, forgedEmail) > 0
-	}, 5*time.Second, 250*time.Millisecond,
-		"a user was created for the attacker-forged external identity %q - account pre-hijack succeeded", forgedEmail)
+	// No account may exist for the forged identity. Poll on the test goroutine for a window so a
+	// late-projected user still fails the test (assert.Never is unsafe here: its condition runs in a
+	// background goroutine that can outlive the test and panic on CTX cancel from TestMain).
+	requireNeverUserByEmail(t, forgedEmail, 5*time.Second, 250*time.Millisecond)
 }
 
 // --- helpers ------------------------------------------------------------------------------------
@@ -248,14 +245,33 @@ func doPostForm(t *testing.T, c *http.Client, rawURL string, form url.Values) st
 	return string(b)
 }
 
-// userCountByEmail returns how many users match the given email address (via the User v2 API).
-func userCountByEmail(t *testing.T, email string) int {
+// pollFor runs check every tick until waitFor elapses (and once more at the deadline). check should
+// require an invariant that must hold for the whole window; it fails the test on violation via
+// require.*. It proves a negative - that a forbidden change never appears even under projection lag -
+// without assert.Never, whose background goroutine can outlive the test and panic on CTX cancel.
+func pollFor(t *testing.T, waitFor, tick time.Duration, check func()) {
 	t.Helper()
-	resp, err := Instance.Client.UserV2.ListUsers(CTX, &user.ListUsersRequest{
-		Queries: []*user.SearchQuery{
-			{Query: &user.SearchQuery_EmailQuery{EmailQuery: &user.EmailQuery{EmailAddress: email}}},
-		},
+	deadline := time.Now().Add(waitFor)
+	for {
+		check()
+		if !time.Now().Before(deadline) {
+			return
+		}
+		time.Sleep(tick)
+	}
+}
+
+// requireNeverUserByEmail fails if a user with the given email appears within waitFor.
+func requireNeverUserByEmail(t *testing.T, email string, waitFor, tick time.Duration) {
+	t.Helper()
+	pollFor(t, waitFor, tick, func() {
+		resp, err := Instance.Client.UserV2.ListUsers(CTX, &user.ListUsersRequest{
+			Queries: []*user.SearchQuery{
+				{Query: &user.SearchQuery_EmailQuery{EmailQuery: &user.EmailQuery{EmailAddress: email}}},
+			},
+		})
+		require.NoError(t, err)
+		require.Empty(t, resp.GetResult(),
+			"a user was created for the attacker-forged external identity %q - account pre-hijack succeeded", email)
 	})
-	require.NoError(t, err)
-	return len(resp.GetResult())
 }

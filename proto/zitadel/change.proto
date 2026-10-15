@@ -69,7 +69,7 @@ message ChangeQuery {
     uint32 limit = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "20";
-            description: "Maximum amount of events returned. The default is set to 1000 in https://github.com/zitadel/zitadel/blob/new-eventstore/cmd/zitadel/startup.yaml. If no limit is set or the limit exceeds the maximum configured Zitadel will throw an error. If no limit is present the default is taken.";
+            description: "Maximum amount of events returned. If no limit is present, the configured maximum (SystemDefaults.MaxQueryLimit, 1000 by default) is taken. If the limit exceeds the configured maximum, ZITADEL returns an InvalidArgument error.";
         }
     ];
     bool asc = 3 [

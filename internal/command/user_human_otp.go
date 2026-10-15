@@ -211,7 +211,19 @@ func checkTOTP(
 
 	// the OTP check succeeded and the user was not locked in the meantime
 	if verifyErr == nil {
-		return []eventstore.Command{user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, optionalAuthRequestInfo)}, nil
+		// A replay is reported as a distinct event, so that it remains observable
+		// through the events API, without counting towards the lockout policy.
+		// Otherwise anyone who captured a code could replay it to lock the user out.
+		if reuseErr := existingOTP.History.CheckReuse(code); reuseErr != nil {
+			return []eventstore.Command{user.NewHumanOTPCheckReusedEvent(ctx, userAgg, optionalAuthRequestInfo)}, reuseErr
+		}
+
+		return []eventstore.Command{user.NewHumanOTPCheckSucceededEvent(
+			ctx,
+			userAgg,
+			optionalAuthRequestInfo,
+			crypto.NewHMACValue(code),
+		)}, nil
 	}
 
 	// the OTP check failed, therefore check if the limit was reached and the user must additionally be locked

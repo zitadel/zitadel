@@ -505,7 +505,7 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *connec
 	return idpIntentToIDPIntentPb(intent, s.idpAlg)
 }
 
-func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.EncryptionAlgorithm) (_ *connect.Response[user.RetrieveIdentityProviderIntentResponse], err error) {
+func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.AuthEncryptionAlgorithm) (_ *connect.Response[user.RetrieveIdentityProviderIntentResponse], err error) {
 	rawInformation := new(structpb.Struct)
 	err = rawInformation.UnmarshalJSON(intent.IDPUser)
 	if err != nil {
@@ -547,7 +547,7 @@ func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.Encr
 	return connect.NewResponse(information), nil
 }
 
-func idpOAuthTokensToPb(idpIDToken string, idpAccessToken, idpRefreshToken *crypto.CryptoValue, alg crypto.EncryptionAlgorithm) (_ *user.IDPInformation_Oauth, err error) {
+func idpOAuthTokensToPb(idpIDToken string, idpAccessToken, idpRefreshToken *crypto.CryptoValue, alg crypto.AuthEncryptionAlgorithm) (_ *user.IDPInformation_Oauth, err error) {
 	var idToken *string
 	if idpIDToken != "" {
 		idToken = &idpIDToken

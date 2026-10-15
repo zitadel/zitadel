@@ -14,6 +14,9 @@ type SecurityPolicy struct {
 	EnableIframeEmbedding bool
 	AllowedOrigins        []string
 	EnableImpersonation   bool
+
+	EnableDynamicClientRegistration               bool
+	AllowUnauthenticatedDynamicClientRegistration bool
 }
 
 func (c *Commands) SetSecurityPolicy(ctx context.Context, policy *SecurityPolicy) (*domain.ObjectDetails, error) {

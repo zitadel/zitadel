@@ -7,19 +7,22 @@ import (
 )
 
 const (
-	IAMRolePrefix            = "IAM"
-	OrgRolePrefix            = "ORG"
-	ProjectRolePrefix        = "PROJECT"
-	ProjectGrantRolePrefix   = "PROJECT_GRANT"
-	RoleOrgOwner             = "ORG_OWNER"
-	RoleOrgProjectCreator    = "ORG_PROJECT_CREATOR"
-	RoleIAMOwner             = "IAM_OWNER"
-	RoleIAMOwnerViewer       = "IAM_OWNER_VIEWER"
-	RoleIAMLoginClient       = "IAM_LOGIN_CLIENT"
-	RoleProjectOwner         = "PROJECT_OWNER"
-	RoleProjectOwnerGlobal   = "PROJECT_OWNER_GLOBAL"
-	RoleProjectGrantOwner    = "PROJECT_GRANT_OWNER"
-	RoleSelfManagementGlobal = "SELF_MANAGEMENT_GLOBAL"
+	IAMRolePrefix          = "IAM"
+	OrgRolePrefix          = "ORG"
+	ProjectRolePrefix      = "PROJECT"
+	ProjectGrantRolePrefix = "PROJECT_GRANT"
+	RoleOrgOwner           = "ORG_OWNER"
+	RoleOrgProjectCreator  = "ORG_PROJECT_CREATOR"
+	// RoleOrgDynamicClientRegistrar is a least-privilege role for service users that only
+	// need to register OAuth 2.0 clients through the RFC 7591 endpoint.
+	RoleOrgDynamicClientRegistrar = "ORG_DYNAMIC_CLIENT_REGISTRAR"
+	RoleIAMOwner                  = "IAM_OWNER"
+	RoleIAMOwnerViewer            = "IAM_OWNER_VIEWER"
+	RoleIAMLoginClient            = "IAM_LOGIN_CLIENT"
+	RoleProjectOwner              = "PROJECT_OWNER"
+	RoleProjectOwnerGlobal        = "PROJECT_OWNER_GLOBAL"
+	RoleProjectGrantOwner         = "PROJECT_GRANT_OWNER"
+	RoleSelfManagementGlobal      = "SELF_MANAGEMENT_GLOBAL"
 )
 
 func CheckForInvalidRoles(roles []string, rolePrefix string, validRoles []authz.RoleMapping) []string {

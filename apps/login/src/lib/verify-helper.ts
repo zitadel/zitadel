@@ -2,11 +2,9 @@ import { timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { PasswordExpirySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { HumanUser } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import crypto from "crypto";
 import moment from "moment";
-import { cookies } from "next/headers";
-import { getFingerprintIdCookie } from "./fingerprint";
 import { trySendVerification } from "./server/verify";
+import { hasValidUserVerificationCheckCookie } from "./verification-check";
 
 export function checkPasswordChangeRequired(
   expirySettings: PasswordExpirySettings | undefined,
@@ -111,29 +109,13 @@ export async function checkEmailVerification(
 export { checkMFAFactors, shouldEnforceMFA } from "./mfa-helper";
 
 export async function checkUserVerification(userId: string): Promise<boolean> {
-  // check if a verification was done earlier
-  const cookiesList = await cookies();
+  // check if a verification was done earlier in this browser. The cookie value is an HMAC keyed with a
+  // server-only secret (see verification-check.ts), so it can't be computed by the client.
+  const valid = await hasValidUserVerificationCheckCookie(userId);
 
-  // only read cookie to prevent issues on page.tsx
-  const fingerPrintCookie = await getFingerprintIdCookie();
-
-  if (!fingerPrintCookie || !fingerPrintCookie.value) {
-    return false;
+  if (!valid) {
+    console.warn("User verification check failed.");
   }
 
-  const verificationCheck = crypto.createHash("sha256").update(`${userId}:${fingerPrintCookie.value}`).digest("hex");
-
-  const cookieValue = await cookiesList.get("verificationCheck")?.value;
-
-  if (!cookieValue) {
-    console.warn("User verification check cookie not found. User verification check failed.");
-    return false;
-  }
-
-  if (cookieValue !== verificationCheck) {
-    console.warn(`User verification check failed. Expected ${verificationCheck} but got ${cookieValue}`);
-    return false;
-  }
-
-  return true;
+  return valid;
 }

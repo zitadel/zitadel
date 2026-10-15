@@ -43,7 +43,7 @@ otp_session: ensure_key_pair ensure_modules bundle
 
 .PHONY: password_session
 password_session: ensure_key_pair ensure_modules bundle
-	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/password_session.js --vus ${VUS} --duration ${DURATION} --out csv=output/otp_session_${DATE}.csv
+	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/password_session.js --vus ${VUS} --duration ${DURATION} --out csv=output/password_session_${DATE}.csv
 
 .PHONY: add_session
 add_session: ensure_key_pair ensure_modules bundle
@@ -77,6 +77,10 @@ users_by_metadata_value: ensure_modules bundle
 .PHONY: users_by_login_name
 users_by_login_name: ensure_modules bundle
 	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/users_by_login_name.js --vus ${VUS} --duration ${DURATION} --out csv=output/users_by_login_name_${DATE}.csv
+
+.PHONY: create_humans
+create_humans: ensure_modules ensure_key_pair bundle
+	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/create_humans.js --vus ${VUS} --duration ${DURATION}
 
 .PHONY: lint
 lint:

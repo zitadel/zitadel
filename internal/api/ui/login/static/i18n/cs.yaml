@@ -369,6 +369,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Externí uživatel nenalezen
   Description: Externí uživatel nebyl nalezen. Chcete propojit svého uživatele nebo automaticky zaregistrovat nového?
+  NoOptionAvailable: Nebyl nalezen žádný účet odpovídající vašemu externímu uživateli a nový účet nelze vytvořit. Obraťte se prosím na svého administrátora nebo na podporu.
   LinkButtonText: Propojit
   AutoRegisterButtonText: Registrovat
   TosAndPrivacyLabel: Obchodní podmínky
@@ -504,6 +505,7 @@ Errors:
         AlreadyReady: Vícefaktorové OTP (jednorázové heslo) je již nastaveno
         NotExisting: Vícefaktorové OTP (jednorázové heslo) neexistuje
         InvalidCode: Neplatný kód
+        Reused: Tento kód již byl použit. Počkejte prosím na nový kód
         NotReady: Vícefaktorové OTP (jednorázové heslo) není připraveno
     Locked: Uživatel je uzamčen
     SomethingWentWrong: Něco se pokazilo

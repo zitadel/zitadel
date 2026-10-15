@@ -332,6 +332,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Pengguna Eksternal Tidak Ditemukan
   Description: 'Pengguna eksternal tidak ditemukan. '
+  NoOptionAvailable: Tidak ditemukan akun yang cocok dengan pengguna eksternal Anda dan akun baru tidak dapat dibuat. Silakan hubungi administrator atau dukungan Anda.
   LinkButtonText: Link
   AutoRegisterButtonText: Daftar
   TosAndPrivacyLabel: Syarat dan Ketentuan
@@ -464,6 +465,7 @@ Errors:
         AlreadyReady: OTP multifaktor (OneTimePassword) sudah disiapkan
         NotExisting: OTP multifaktor (OneTimePassword) tidak ada
         InvalidCode: Kode tidak valid
+        Reused: Kode ini sudah digunakan. Silakan tunggu kode baru
         NotReady: OTP multifaktor (OneTimePassword) belum siap
     Locked: Pengguna terkunci
     SomethingWentWrong: Ada yang tidak beres

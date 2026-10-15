@@ -1,7 +1,9 @@
 package repository_test
 
 import (
+	"fmt"
 	"net/url"
+	"strings"
 	"testing"
 	"time"
 
@@ -5177,4 +5179,27 @@ func TestSecretGeneratorSettingsInviteCodeRoundTrip(t *testing.T) {
 	require.Len(t, list, 1)
 	require.NotNil(t, list[0].InviteCode)
 	assert.EqualExportedValues(t, want.InviteCode, list[0].InviteCode)
+}
+
+// A security settings event may carry only the dynamic client registration fields, because
+// the command emits just the members that actually changed. Every field must therefore be
+// mapped in SetSettingFields: an unmapped one yields an empty change set, and
+// jsonChanges.Write only guards against a nil slice, so it panics on an empty one.
+func TestSetSecuritySettingsFields_dynamicClientRegistrationOnly(t *testing.T) {
+	t.Parallel()
+
+	change := repository.SecuritySettingsRepository().SetSettingFields(domain.SecuritySettingsAttributes{
+		EnableDynamicClientRegistration:               gu.Ptr(true),
+		AllowUnauthenticatedDynamicClientRegistration: gu.Ptr(true),
+	})
+
+	builder := database.NewStatementBuilder("")
+	require.NotPanics(t, func() {
+		require.NoError(t, change.Write(builder))
+	})
+	// The field paths are bound as arguments, so assert on those rather than on the SQL.
+	assert.Equal(t, 2, strings.Count(builder.String(), "jsonb_set_lax"))
+	args := fmt.Sprint(builder.Args()...)
+	assert.Contains(t, args, "enableDynamicClientRegistration")
+	assert.Contains(t, args, "allowUnauthenticatedDynamicClientRegistration")
 }

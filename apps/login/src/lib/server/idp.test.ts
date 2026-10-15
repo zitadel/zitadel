@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { isIdpLinkProofValid } from "../idp-link-proof";
 import { redirectToIdp } from "./idp";
 
 // Mock all the dependencies
@@ -43,6 +44,7 @@ describe("redirectToIdp", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    vi.stubEnv("ZITADEL_SESSION_COOKIE_SECRET", "test-session-cookie-secret-at-least-32-chars");
 
     // Import mocked modules
     const { headers } = await import("next/headers");
@@ -76,6 +78,7 @@ describe("redirectToIdp", () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllEnvs();
   });
 
   describe("postErrorRedirectUrl parameter handling", () => {
@@ -239,9 +242,10 @@ describe("redirectToIdp", () => {
       // Both parameters should be present
       // Both parameters should be present
       expect(successUrl).toContain("linkToSessionId=session123");
-      // We can't easily predict the exact fingerprint hash without mocking crypto in this test,
-      // but we can check if the parameter key exists
-      expect(successUrl).toContain("linkFingerprint=");
+      // The linkFingerprint is a signed proof bound to the session and this browser's fingerprint
+      const linkFingerprint = new URL(successUrl).searchParams.get("linkFingerprint") ?? undefined;
+      expect(isIdpLinkProofValid(linkFingerprint, "session123", "fp123")).toBe(true);
+      expect(isIdpLinkProofValid(linkFingerprint, "other-session", "fp123")).toBe(false);
       expect(successUrl).toContain("postErrorRedirectUrl=%2Fcustom-error");
       expect(failureUrl).toContain("linkToSessionId=session123");
       expect(failureUrl).toContain("linkFingerprint=");
@@ -266,6 +270,55 @@ describe("redirectToIdp", () => {
       const callArgs = mockStartIdentityProviderFlow.mock.calls[0][0];
       expect(callArgs.urls.successUrl).toContain("postErrorRedirectUrl=%2Floginname");
       expect(callArgs.urls.failureUrl).toContain("postErrorRedirectUrl=%2Floginname");
+    });
+  });
+
+  describe("loginHint parameter handling", () => {
+    test("should forward the loginHint to the IDP flow when provided", async () => {
+      const formData = new FormData();
+      formData.append("id", "idp123");
+      formData.append("provider", "google");
+      formData.append("loginHint", "user@example.com");
+
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
+
+      try {
+        await redirectToIdp(undefined, formData);
+      } catch (error: any) {
+        // Redirect throws in tests
+        expect(error.message).toContain("REDIRECT:");
+      }
+
+      expect(mockStartIdentityProviderFlow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          idpId: "idp123",
+          urls: expect.objectContaining({ loginHint: "user@example.com" }),
+        }),
+      );
+    });
+
+    test("should not set a loginHint when it is missing or empty", async () => {
+      for (const loginHint of [undefined, ""]) {
+        mockStartIdentityProviderFlow.mockReset();
+        mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
+
+        const formData = new FormData();
+        formData.append("id", "idp123");
+        formData.append("provider", "google");
+        if (loginHint !== undefined) {
+          formData.append("loginHint", loginHint);
+        }
+
+        try {
+          await redirectToIdp(undefined, formData);
+        } catch (error: any) {
+          // Redirect throws in tests
+          expect(error.message).toContain("REDIRECT:");
+        }
+
+        const callArgs = mockStartIdentityProviderFlow.mock.calls[0][0];
+        expect(callArgs.urls.loginHint).toBeUndefined();
+      }
     });
   });
 

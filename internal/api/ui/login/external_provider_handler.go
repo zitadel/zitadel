@@ -757,10 +757,11 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	if !idpTemplate.IsCreationAllowed && !idpTemplate.IsLinkingAllowed {
-		if err == nil {
-			err = zerrors.ThrowPreconditionFailed(nil, "LOGIN-3kl44", "Errors.User.ExternalIDP.NoOptionAllowed")
+		if err != nil {
+			l.renderError(w, r, authReq, err)
+			return
 		}
-		l.renderError(w, r, authReq, err)
+		l.renderExternalNotFoundNoOption(w, r, authReq, idpTemplate)
 		return
 	}
 
@@ -800,6 +801,26 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 		},
 	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalNotFoundOption], data, funcs)
+}
+
+// renderExternalNotFoundNoOption renders a page informing the user that their external user does not
+// match any existing ZITADEL user and that neither creating nor linking a user is possible.
+// The message can be customized per instance and organization with the ExternalNotFound.NoOptionAvailable
+// login text.
+func (l *Login) renderExternalNotFoundNoOption(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpTemplate *query.IDPTemplate) {
+	ctx := r.Context()
+	logging.WithFields(
+		"instance", authz.GetInstance(ctx).InstanceID(),
+		"authReq", authReq.ID,
+		"idpConfigID", idpTemplate.ID,
+	).Info("external user not found and neither creation nor linking is possible")
+
+	providerName := domain.IDPName(idpTemplate.Name, idpTemplate.Type)
+	translator := l.getTranslator(ctx, authReq)
+	data := l.getBaseData(r, authReq, translator, "ExternalNotFound.Title", "", nil)
+	data.ErrMessage = l.renderer.LocalizeFromRequest(translator, r, domain.LoginKeyExternalNotFoundNoOptionAvailable,
+		map[string]interface{}{"ProviderName": providerName})
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplError], data, nil)
 }
 
 // handleExternalNotFoundOptionCheck takes the data from the submitted externalNotFound page
@@ -852,11 +873,11 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 	}
 	linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
 	externalUser := mapExternalNotFoundOptionFormDataToLoginUser(data, linkingUser)
-  // the form only carries the editable profile fields, so preserve the ZITADEL project
+	// the form only carries the editable profile fields, so preserve the ZITADEL project
 	// roles captured at authentication (stored on the linking user) to keep the
 	// support-user instance membership grant working on the manual creation path.
 	preserveProjectRoles(externalUser, authReq.LinkingUsers)
-  l.registerExternalUser(w, r, authReq, externalUser)
+	l.registerExternalUser(w, r, idpTemplate, authReq, externalUser)
 }
 
 // registerExternalUser creates an externalUser with the provided data

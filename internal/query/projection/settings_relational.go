@@ -1385,6 +1385,9 @@ func (p *relationalTablesProjection) reduceSecurityPolicySet(event eventstore.Ev
 				EnableIframeEmbedding: policyEvent.EnableIframeEmbedding,
 				AllowedOrigins:        allowedOrigins,
 				EnableImpersonation:   policyEvent.EnableImpersonation,
+
+				EnableDynamicClientRegistration:               policyEvent.EnableDynamicClientRegistration,
+				AllowUnauthenticatedDynamicClientRegistration: policyEvent.AllowUnauthenticatedDynamicClientRegistration,
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
