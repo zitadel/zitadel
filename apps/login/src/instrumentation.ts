@@ -37,6 +37,10 @@ export async function register(): Promise<void> {
     _loggerProvider = await registerNode();
   }
 
+  // Logged after the SDK is registered so the logger is instrumented, and before the
+  // credential check so it is visible even if that check exits the process.
+  await logSessionCookieSecretNotice();
+
   // Verify the configured API credentials once at startup (fail fast).
   // Connectivity problems are only logged; reachability is covered by the
   // readiness probe (/ready) and ZITADEL_API_AWAITINITIALCONN.
@@ -54,6 +58,20 @@ function isOtelEnabled(): boolean {
   }
   // Explicit check for disabled env variable
   return process.env.OTEL_SDK_DISABLED !== "true";
+}
+
+/**
+ * Logs once at startup if session cookies are signed via the deprecated API credential fallback
+ * or cannot be signed at all (see lib/session-cookie-signature.ts).
+ */
+async function logSessionCookieSecretNotice(): Promise<void> {
+  const { getSessionCookieSecretStartupNotice } = await import("./lib/session-cookie-signature");
+  const notice = getSessionCookieSecretStartupNotice();
+  if (!notice) {
+    return;
+  }
+  const { createLogger } = await import("./lib/logger");
+  createLogger("startup")[notice.level](notice.message);
 }
 
 export function getLoggerProvider(): LoggerProvider | null {

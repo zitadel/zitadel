@@ -135,16 +135,6 @@ const (
 	GenderDiverse
 )
 
-func (r *UserSearchRequest) EnsureLimit(limit uint64) error {
-	if r.Limit > limit {
-		return zerrors.ThrowInvalidArgument(nil, "SEARCH-zz62F", "Errors.Limit.ExceedsDefault")
-	}
-	if r.Limit == 0 {
-		r.Limit = limit
-	}
-	return nil
-}
-
 func (r *UserSearchRequest) AppendMyOrgQuery(orgID string) {
 	r.Queries = append(r.Queries, &UserSearchQuery{Key: UserSearchKeyResourceOwner, Method: domain.SearchMethodEquals, Value: orgID})
 }

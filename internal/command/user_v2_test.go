@@ -1479,3 +1479,50 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 		})
 	}
 }
+
+func TestCommandSide_RemoveUserV2OwnerDeleteReady(t *testing.T) {
+	ctxUserID := "ctxUserID"
+	ctx := authz.SetCtxData(context.Background(), authz.CtxData{UserID: ctxUserID})
+	userAgg := &user.NewAggregate("user1", "org1").Aggregate
+	orgAgg := &org.NewAggregate("org1").Aggregate
+	r := &Commands{
+		eventstore: expectEventstore(
+			expectFilter(
+				eventFromEventPusher(
+					user.NewHumanAddedEvent(ctx,
+						userAgg,
+						"username",
+						"firstname",
+						"lastname",
+						"nickname",
+						"displayname",
+						language.German,
+						domain.GenderUnspecified,
+						"email@test.ch",
+						true,
+					),
+				),
+			),
+			expectFilter(
+				eventFromEventPusher(
+					org.NewDomainPolicyAddedEvent(context.Background(),
+						orgAgg,
+						true,
+						true,
+						true,
+					),
+				),
+			),
+			expectFilterOrganizationSettings("org1", false, false),
+			expectPush(
+				user.NewUserRemovedByOwnerEvent(ctx, userAgg),
+			),
+		)(t),
+		checkPermission:  newMockPermissionCheckAllowed(),
+		ownerDeleteReady: func(context.Context) (bool, error) { return true, nil },
+	}
+	assertOwnerOnlyUniqueConstraints(t, user.NewUserRemovedByOwnerEvent(ctx, userAgg), eventstore.UniqueConstraintOwnerUser, "user1")
+	got, err := r.RemoveUserV2(ctx, "user1", "", nil, nil, nil)
+	assert.NoError(t, err)
+	assertObjectDetails(t, &domain.ObjectDetails{ResourceOwner: "org1"}, got)
+}

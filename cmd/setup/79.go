@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"embed"
 	"errors"
+	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/jackc/pgx/v5/pgconn"
@@ -26,6 +28,7 @@ type BackfillUniqueConstraintOwners struct {
 	Version       string `json:"version"`
 	Finalized     bool   `json:"finalized"`
 	ForceFinalize bool   `json:"-"` // YAML/env only; not persisted on lastRun
+	BatchSize     uint16 `json:"-"` // YAML/env only; not persisted on lastRun
 
 	lastVersion   string `json:"-"`
 	lastFinalized bool   `json:"-"`
@@ -40,9 +43,12 @@ func (mig *BackfillUniqueConstraintOwners) Check(lastRun map[string]interface{})
 
 	versionChanged := mig.lastVersion != mig.Version
 	if mig.lastVersion == "" {
-		return true
+		return true // first run
 	}
-	return versionChanged || (mig.ForceFinalize && !mig.lastFinalized)
+	if mig.lastFinalized {
+		return false // never re-run after finalize, even on a new binary
+	}
+	return versionChanged || mig.ForceFinalize
 }
 
 func (mig *BackfillUniqueConstraintOwners) finalizeAfterSuccess() {
@@ -55,27 +61,64 @@ func (mig *BackfillUniqueConstraintOwners) Execute(ctx context.Context, _ events
 		return err
 	}
 	for _, stmt := range statements {
-		logging.Info(ctx, "backfill unique constraint owners", "file", stmt.file, "migration", mig.String())
-		if _, err := mig.dbClient.ExecContext(ctx, stmt.query); err != nil {
-			if isUndefinedTable(err) {
-				logging.Info(ctx, "skip unique constraint owners backfill, relation missing", "file", stmt.file, "migration", mig.String())
-				continue
+		var cursor database.TextArray[string]
+		for page := 1; ; page++ {
+			var next database.TextArray[string]
+			var updated int64
+			err := mig.dbClient.QueryRowContext(ctx, func(row *sql.Row) error {
+				return row.Scan(&next, &updated)
+			}, stmt.query, cursor, mig.BatchSize)
+			if err != nil {
+				if isUndefinedTable(err) {
+					logging.Info(ctx, "skip unique constraint owners backfill, relation missing", "file", stmt.file, "migration", mig.String())
+					break
+				}
+				return fmt.Errorf("backfill unique constraint owners %s: %w", stmt.file, err)
 			}
-			return err
+			if len(next) == 0 {
+				break
+			}
+			if slices.Equal(cursor, next) {
+				return fmt.Errorf("backfill unique constraint owners %s: cursor did not advance", stmt.file)
+			}
+			logging.Info(ctx, "backfill unique constraint owners page", "file", stmt.file, "page", page, "updated", updated, "migration", mig.String())
+			cursor = next
 		}
 	}
 
-	var unmatched int64
-	err = mig.dbClient.QueryRowContext(ctx, func(row *sql.Row) error {
-		return row.Scan(&unmatched)
-	}, `SELECT COUNT(*) FROM eventstore.unique_constraints WHERE unique_type = ANY($1) AND owners = '{}'`,
+	unmatchedByType := make(map[string]int64)
+	err = mig.dbClient.QueryContext(ctx, func(rows *sql.Rows) error {
+		for rows.Next() {
+			var uniqueType string
+			var count int64
+			if scanErr := rows.Scan(&uniqueType, &count); scanErr != nil {
+				return scanErr
+			}
+			unmatchedByType[uniqueType] = count
+		}
+		return nil
+	}, `SELECT unique_type, COUNT(*) FROM eventstore.unique_constraints WHERE unique_type = ANY($1) AND owners = '{}' GROUP BY unique_type`,
 		database.TextArray[string](eventstore.UniqueTypesWithOwners))
 	if err != nil {
 		return err
 	}
+	unmatched, warnUnmatched := unmatchedOwnerCounts(unmatchedByType)
 	mig.finalizeAfterSuccess()
-	logging.Info(ctx, "unique constraint owners backfill complete", "unmatched", unmatched, "finalized", mig.Finalized, "migration", mig.String())
+	logging.Info(ctx, "unique constraint owners backfill complete", "unmatched", unmatched, "unmatched_by_type", unmatchedByType, "finalized", mig.Finalized, "migration", mig.String())
+	if warnUnmatched {
+		logging.Warn(ctx, "unique constraint owners unmatched usernames or org names remain after backfill; owner-only deletes will leave those names blocked", "unmatched_by_type", unmatchedByType, "migration", mig.String())
+	}
 	return nil
+}
+
+func unmatchedOwnerCounts(byType map[string]int64) (total int64, warn bool) {
+	for uniqueType, count := range byType {
+		total += count
+		if count > 0 && (uniqueType == "usernames" || uniqueType == "org_name") {
+			warn = true
+		}
+	}
+	return total, warn
 }
 
 func (mig *BackfillUniqueConstraintOwners) String() string {
@@ -125,6 +168,8 @@ func backfillUniqueConstraintOwnersStatements() ([]statement, error) {
 }
 
 // BackfillUniqueConstraintOwnersQuery returns the interpolated SQL for a setup 79 file.
+// The statement reads one projection page: $1 is a text[] primary-key cursor (nil starts at the beginning) and $2 is the page size.
+// It returns the next cursor and the number of unique-constraint rows updated.
 func BackfillUniqueConstraintOwnersQuery(file string) (string, error) {
 	statements, err := backfillUniqueConstraintOwnersStatements()
 	if err != nil {

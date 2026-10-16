@@ -18,12 +18,15 @@ function mockApiReady(status = 200) {
 
 describe("GET /ready", () => {
   let savedApiUrl: string | undefined;
+  let savedCookieSecret: string | undefined;
   let savedCustomHeaders: string | undefined;
 
   beforeEach(() => {
     savedApiUrl = process.env.ZITADEL_API_URL;
+    savedCookieSecret = process.env.ZITADEL_SESSION_COOKIE_SECRET;
     savedCustomHeaders = process.env.CUSTOM_REQUEST_HEADERS;
     process.env.ZITADEL_API_URL = "http://localhost:8080";
+    process.env.ZITADEL_SESSION_COOKIE_SECRET = "test-session-cookie-secret-at-least-32-chars";
     delete process.env.CUSTOM_REQUEST_HEADERS;
   });
 
@@ -33,11 +36,17 @@ describe("GET /ready", () => {
     } else {
       process.env.ZITADEL_API_URL = savedApiUrl;
     }
+    if (savedCookieSecret === undefined) {
+      delete process.env.ZITADEL_SESSION_COOKIE_SECRET;
+    } else {
+      process.env.ZITADEL_SESSION_COOKIE_SECRET = savedCookieSecret;
+    }
     if (savedCustomHeaders === undefined) {
       delete process.env.CUSTOM_REQUEST_HEADERS;
     } else {
       process.env.CUSTOM_REQUEST_HEADERS = savedCustomHeaders;
     }
+    vi.unstubAllEnvs();
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
@@ -71,6 +80,37 @@ describe("GET /ready", () => {
 
     expect(response.status).toBe(503);
     expect(await response.text()).toBe("Service unavailable");
+  });
+
+  test("should return 503 when no session cookie signing secret is available", async () => {
+    for (const name of [
+      "ZITADEL_SESSION_COOKIE_SECRET",
+      "ZITADEL_SERVICE_USER_TOKEN",
+      "SYSTEM_USER_PRIVATE_KEY",
+      "SYSTEM_USER_PRIVATE_KEY_FILE",
+      "ZITADEL_LOGINCLIENT_KEYFILE",
+    ]) {
+      vi.stubEnv(name, undefined);
+    }
+    const fetchMock = mockApiReady();
+
+    const response = await GET();
+
+    expect(response.status).toBe(503);
+    expect(await response.text()).toBe("Service unavailable");
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  test("should return 503 when the dedicated session cookie secret is too short", async () => {
+    vi.stubEnv("ZITADEL_SESSION_COOKIE_SECRET", "too-short");
+    vi.stubEnv("ZITADEL_SERVICE_USER_TOKEN", "service-user-token");
+    const fetchMock = mockApiReady();
+
+    const response = await GET();
+
+    expect(response.status).toBe(503);
+    expect(await response.text()).toBe("Service unavailable");
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   test("should return 503 when ZITADEL_API_URL is not set", async () => {

@@ -32,6 +32,7 @@ const (
 	UniqueConstraintOwnerIDP     = "idp"
 	UniqueConstraintOwnerProject = "project"
 	UniqueConstraintOwnerGrant   = "grant"
+	UniqueConstraintOwnerApp     = "app"
 
 	// UniqueConstraintOwnersBackfillStep is the setup migration that stamps owners from projections.
 	UniqueConstraintOwnersBackfillStep = "79_backfill_unique_constraint_owners"
@@ -122,6 +123,18 @@ func NewRemoveUniqueConstraintsByOwner(kind, id string) *UniqueConstraint {
 		constraint.Owners = []string{tag}
 	}
 	return constraint
+}
+
+type uniqueConstraintSkipper interface {
+	SkipUniqueConstraints()
+}
+
+// SkipCommandUniqueConstraints omits unique-constraint deletes on cascade events
+// when a parent owner-delete already covers those rows.
+func SkipCommandUniqueConstraints(cmd Command) {
+	if s, ok := cmd.(uniqueConstraintSkipper); ok {
+		s.SkipUniqueConstraints()
+	}
 }
 
 func NewAddGlobalUniqueConstraint(

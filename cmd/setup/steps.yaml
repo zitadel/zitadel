@@ -191,3 +191,5 @@ BackfillUniqueConstraintOwners:
   # backfill leftover empty owners and enable owner-only unique-constraint delete.
   # Default false: owner-delete waits until the next release runs 79 again.
   ForceFinalize: false # ZITADEL_BACKFILLUNIQUECONSTRAINTOWNERS_FORCEFINALIZE
+  # Rows read from each projection per statement. Each page commits on its own.
+  BatchSize: 5000 # ZITADEL_BACKFILLUNIQUECONSTRAINTOWNERS_BATCHSIZE

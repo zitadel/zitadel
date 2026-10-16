@@ -60,6 +60,10 @@ func projectOwnerTags(agg *eventstore.Aggregate) []string {
 	}
 }
 
+func appOwnerTags(agg *eventstore.Aggregate, appID string) []string {
+	return append(projectOwnerTags(agg), eventstore.OwnerTag(eventstore.UniqueConstraintOwnerApp, appID))
+}
+
 func grantOwnerTags(agg *eventstore.Aggregate, grantID, grantedOrgID string) []string {
 	return []string{
 		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, agg.ResourceOwner),
@@ -367,6 +371,7 @@ type ProjectRemovedEvent struct {
 
 	Name                     string
 	entityIDUniqueContraints []*eventstore.UniqueConstraint
+	removeByOwner            bool
 }
 
 func (e *ProjectRemovedEvent) Payload() interface{} {
@@ -374,9 +379,13 @@ func (e *ProjectRemovedEvent) Payload() interface{} {
 }
 
 func (e *ProjectRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	if e.removeByOwner {
+		return []*eventstore.UniqueConstraint{
+			eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerProject, e.Aggregate().ID),
+		}
+	}
 	constraints := []*eventstore.UniqueConstraint{
 		NewRemoveProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner),
-		eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerProject, e.Aggregate().ID),
 	}
 	constraints = append(constraints, e.entityIDUniqueContraints...)
 	return constraints
@@ -403,6 +412,16 @@ func NewProjectRemovedEvent(
 		Name:                     name,
 		entityIDUniqueContraints: entityIDUniqueContraints,
 	}
+}
+
+func NewProjectRemovedByOwnerEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	name string,
+) *ProjectRemovedEvent {
+	removed := NewProjectRemovedEvent(ctx, aggregate, name, nil)
+	removed.removeByOwner = true
+	return removed
 }
 
 func ProjectRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
