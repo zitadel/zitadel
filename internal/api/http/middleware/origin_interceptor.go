@@ -30,10 +30,16 @@ func WithOrigin(enforceHttps bool, http1Header, http2Header string, instanceHost
 }
 
 func composeDomainContext(r *http.Request, enforceHttps bool, instanceDomainHeaders, publicDomainHeaders []string) (_ *http_util.DomainCtx) {
-	instanceHost, instanceProto := hostFromRequest(r, instanceDomainHeaders)
-	publicHost, publicProto := hostFromRequest(r, publicDomainHeaders)
+	instanceHost, instanceProto, _ := hostFromRequest(r, instanceDomainHeaders)
+	publicHost, publicProto, rawPublicHost := hostFromRequest(r, publicDomainHeaders)
 	if instanceHost == "" {
 		instanceHost = r.Host
+	}
+	// An invalid public host must not be dropped: an empty public host falls back to the instance host
+	// and skips the trusted domain check, which would allow building links (e.g. password reset) with an untrusted host.
+	// Keep the raw value so the trusted domain check rejects the request.
+	if publicHost == "" && rawPublicHost != "" {
+		publicHost = rawPublicHost
 	}
 	return http_util.NewDomainCtx(instanceHost, publicHost, protocolFromRequest(instanceProto, publicProto, enforceHttps))
 }
@@ -51,7 +57,7 @@ func protocolFromRequest(instanceProto, publicProto string, enforceHttps bool) s
 	return "http"
 }
 
-func hostFromRequest(r *http.Request, headers []string) (host, proto string) {
+func hostFromRequest(r *http.Request, headers []string) (host, proto, rawHost string) {
 	var hostFromHeader, protoFromHeader string
 	for _, header := range headers {
 		switch http.CanonicalHeaderKey(header) {
@@ -66,6 +72,9 @@ func hostFromRequest(r *http.Request, headers []string) (host, proto string) {
 		default:
 			hostFromHeader = r.Header.Get(header)
 		}
+		if rawHost == "" {
+			rawHost = hostFromHeader
+		}
 		if host == "" {
 			host = sanitizeHost(hostFromHeader)
 		}
@@ -73,7 +82,7 @@ func hostFromRequest(r *http.Request, headers []string) (host, proto string) {
 			proto = protoFromHeader
 		}
 	}
-	return host, proto
+	return host, proto, rawHost
 }
 
 func sanitizeHost(rawHost string) (host string) {
