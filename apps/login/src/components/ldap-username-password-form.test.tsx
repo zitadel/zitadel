@@ -21,4 +21,9 @@ describe("LDAPUsernamePasswordForm", () => {
     const { getByTestId } = render(<LDAPUsernamePasswordForm idpId="idp-1" link={false} />);
     expect(getByTestId("username-text-input")).toHaveFocus();
   });
+
+  test("should set autocomplete=current-password on the password input", () => {
+    const { getByTestId } = render(<LDAPUsernamePasswordForm idpId="idp-1" link={false} />);
+    expect(getByTestId("password-text-input")).toHaveAttribute("autocomplete", "current-password");
+  });
 });
