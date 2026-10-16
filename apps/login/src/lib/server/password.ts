@@ -589,6 +589,10 @@ export async function checkSessionAndSetPassword({
     if (isClassifiedError(error) && error.code === Code.FailedPrecondition && error.message) {
       return { error: t("errors.failedPrecondition") };
     }
-    return { error: "Could not set password" };
+    // surface the reason for a rejected password (ex. a message forwarded by an Action)
+    if (isClassifiedError(error) && error.code === Code.InvalidArgument && error.rawMessage) {
+      return { error: error.rawMessage };
+    }
+    return { error: t("set.errors.couldNotSetPassword") };
   });
 }
