@@ -11,6 +11,28 @@ type Props = {
   children: ReactNode;
 };
 
+// Tells the browser which color schemes the page supports. Chrome on Android and
+// Samsung Internet darken pages that don't declare one ("Auto Dark Theme"), which
+// inverts a forced light theme and hides checked checkboxes. "only light" / "only dark"
+// is the documented opt-out. Without a forced theme nothing is declared, so the
+// browser keeps following the system preference.
+//
+// Rendered as JSX so React hoists the tag into <head> already during server
+// rendering; a client effect would only run after the browser painted (and
+// possibly darkened) the initial HTML. The login layout renders it in its
+// Suspense fallback as well, so the streamed shell is covered before the page
+// with its organization-specific branding arrives.
+export function ColorSchemeMeta({ themeMode }: { themeMode: ThemeMode | undefined }) {
+  switch (themeMode) {
+    case ThemeMode.LIGHT:
+      return <meta name="color-scheme" content="only light" />;
+    case ThemeMode.DARK:
+      return <meta name="color-scheme" content="only dark" />;
+    default:
+      return null;
+  }
+}
+
 export const ThemeWrapper = ({ children, branding }: Props) => {
   const { setTheme: setNextTheme } = useTheme();
 
@@ -117,5 +139,10 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [branding?.themeMode]);
 
-  return <div>{children}</div>;
+  return (
+    <>
+      <ColorSchemeMeta themeMode={branding?.themeMode} />
+      <div>{children}</div>
+    </>
+  );
 };
