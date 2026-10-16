@@ -1,5 +1,10 @@
 "use server";
 
+import {
+  AddHumanUserRequest,
+  AddHumanUserRequestSchema,
+  UpdateHumanUserRequestSchema,
+} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getSessionCookieById } from "@/lib/cookies";
 import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { createLogger } from "@/lib/logger";
@@ -30,6 +35,7 @@ import {
   UpdateUserRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getTranslations } from "next-intl/server";
+import crypto from "node:crypto";
 import { headers } from "next/headers";
 import { getFingerprintIdCookie } from "../fingerprint";
 import { isIdpLinkProofValid } from "../idp-link-proof";
@@ -186,6 +192,16 @@ function buildUpdateUserRequest(intent: IDPIntentResult, userId: string): Update
   }
 
   return undefined;
+}
+
+/**
+ * Gets a valid userName from IDP information.
+ * Falls back to userId if userName is empty or undefined.
+ * This ensures we always have a valid userName (1-200 characters) as required by the API.
+ */
+function getValidUserName(idpInformation: { userName?: string; userId: string }): string {
+  const userName = idpInformation.userName?.trim();
+  return userName && userName.length > 0 ? userName : idpInformation.userId;
 }
 
 async function resolveOrganizationForUser({
@@ -409,7 +425,7 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
         idp: {
           id: intent.idpInformation!.idpId,
           userId: intent.idpInformation!.userId,
-          userName: intent.idpInformation!.userName,
+          userName: getValidUserName(intent.idpInformation!),
         },
         userId: resolvedUserId,
       });
@@ -569,7 +585,7 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
           idp: {
             id: idpInformation!.idpId,
             userId: idpInformation!.userId,
-            userName: idpInformation!.userName,
+            userName: getValidUserName(idpInformation!),
           },
           userId: foundUser.userId,
         });
