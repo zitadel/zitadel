@@ -25,6 +25,7 @@ vi.mock("../idp", () => ({
 
 vi.mock("../zitadel", () => ({
   getActiveIdentityProviders: vi.fn(),
+  getDefaultOrg: vi.fn().mockResolvedValue(null),
   getIDPByID: vi.fn(),
   getLoginSettings: vi.fn(),
   getOrgsByDomain: vi.fn(),
@@ -495,7 +496,8 @@ describe("sendLoginname", () => {
     });
 
     describe("Multiple authentication methods", () => {
-      test("should prefer passkey when multiple methods available", async () => {
+      test("should offer a choice when password and passkey are allowed", async () => {
+        mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: true, passkeysType: PasskeysType.ALLOWED });
         mockListAuthenticationMethodTypes.mockResolvedValue({
           authMethodTypes: [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.PASSKEY],
         });
@@ -505,8 +507,30 @@ describe("sendLoginname", () => {
         });
 
         expect(result).toHaveProperty("redirect");
-        expect((result as any).redirect).toMatch(/^\/passkey\?/);
-        expect((result as any).redirect).toContain("altPassword=true"); // password is allowed
+        expect((result as any).redirect).toMatch(/^\/login-method\?/);
+        expect((result as any).redirect).toContain("loginName=user%40example.com");
+      });
+
+      test("offers password, passkey and a linked active provider without starting a flow", async () => {
+        mockGetLoginSettings.mockResolvedValue({
+          allowLocalAuthentication: true,
+          allowExternalIdp: true,
+          passkeysType: PasskeysType.ALLOWED,
+        });
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [
+            AuthenticationMethodType.PASSWORD,
+            AuthenticationMethodType.PASSKEY,
+            AuthenticationMethodType.IDP,
+          ],
+        });
+        mockListIDPLinks.mockResolvedValue({ result: [{ idpId: "google", userName: "external@example.org" }] });
+        mockGetActiveIdentityProviders.mockResolvedValue({ identityProviders: [{ id: "google" }] });
+        const result = await sendLoginname({ loginName: "user@example.com", requestId: "req123", organization: "org123" });
+        expect(result).toEqual({
+          redirect: "/login-method?loginName=user%40example.com&organization=org123&requestId=req123",
+        });
+        expect(mockStartIdentityProviderFlow).not.toHaveBeenCalled();
       });
 
       test("should return error when allowLocalAuthentication is false (disabling both password and passkey)", async () => {
@@ -1403,7 +1427,7 @@ describe("sendLoginname", () => {
       expect((result as any).redirect).not.toContain("loginName=user%40example.com");
     });
 
-    test("should redirect to passkey with INPUT loginName when ignoreUnknownUsernames is true", async () => {
+    test("should offer policy-level choices with INPUT loginName when ignoreUnknownUsernames is true", async () => {
       const mockUser = {
         userId: "user123",
         preferredLoginName: "user@example.com",
@@ -1439,12 +1463,12 @@ describe("sendLoginname", () => {
       });
 
       expect(result).toHaveProperty("redirect");
-      expect((result as any).redirect).toMatch(/^\/passkey\?/);
+      expect((result as any).redirect).toMatch(/^\/login-method\?/);
       expect((result as any).redirect).toContain("loginName=user");
       expect((result as any).redirect).not.toContain("loginName=user%40example.com");
     });
 
-    test("should redirect to passkey with INPUT loginName when ignoreUnknownUsernames is true (multi-method)", async () => {
+    test("should offer policy-level choices with INPUT loginName when ignoreUnknownUsernames is true (multi-method)", async () => {
       const mockUser = {
         userId: "user123",
         preferredLoginName: "user@example.com",
@@ -1480,7 +1504,7 @@ describe("sendLoginname", () => {
       });
 
       expect(result).toHaveProperty("redirect");
-      expect((result as any).redirect).toMatch(/^\/passkey\?/);
+      expect((result as any).redirect).toMatch(/^\/login-method\?/);
       expect((result as any).redirect).toContain("loginName=user");
       expect((result as any).redirect).not.toContain("loginName=user%40example.com");
     });
@@ -1577,5 +1601,19 @@ describe("sendLoginname", () => {
       // Should result in resolved name because context says SHOW
       expect((result as any).redirect).toContain("loginName=user%40example.com");
     });
+  });
+  test("protected choices do not depend on whether the identifier exists", async () => {
+    mockGetLoginSettings.mockResolvedValue({
+      ignoreUnknownUsernames: true,
+      allowLocalAuthentication: true,
+      passkeysType: PasskeysType.ALLOWED,
+    });
+    const known = await sendLoginname({ loginName: "known@example.org", requestId: "req", organization: "org" });
+    const unknown = await sendLoginname({ loginName: "unknown@example.org", requestId: "req", organization: "org" });
+    expect(known).toEqual({ redirect: "/login-method?loginName=known%40example.org&organization=org&requestId=req" });
+    expect(unknown).toEqual({ redirect: "/login-method?loginName=unknown%40example.org&organization=org&requestId=req" });
+    expect(mockSearchUsers).not.toHaveBeenCalled();
+    expect(mockListIDPLinks).not.toHaveBeenCalled();
+    expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
   });
 });
