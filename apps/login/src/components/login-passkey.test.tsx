@@ -172,6 +172,54 @@ describe("LoginPasskey Component", () => {
       return mockPublicKey;
     };
 
+    test.each([undefined, "expired-session"])(
+      "verifies the challenge session instead of the original session %s",
+      async (originalSessionId) => {
+        setupSuccessfulChallenge();
+        mockUpdateSession.mockResolvedValue({
+          sessionId: "challenge-session",
+          challenges: {
+            webAuthN: {
+              publicKeyCredentialRequestOptions: {
+                publicKey: { challenge: new Uint8Array([1, 2, 3]), allowCredentials: [] },
+              },
+            },
+          },
+        });
+        mockCredentialsGet.mockResolvedValue({
+          id: "credential-id",
+          rawId: new ArrayBuffer(8),
+          type: "public-key",
+          response: {
+            authenticatorData: new ArrayBuffer(8),
+            clientDataJSON: new ArrayBuffer(8),
+            signature: new ArrayBuffer(8),
+            userHandle: new ArrayBuffer(8),
+          },
+        });
+        mockSendPasskey.mockResolvedValue({ redirect: "/success" });
+
+        renderWithIntl(
+          <LoginPasskey
+            loginName="test@example.com"
+            sessionId={originalSessionId}
+            organization="freightcheck"
+            altPassword={false}
+          />,
+        );
+
+        await waitFor(() => {
+          expect(mockSendPasskey).toHaveBeenCalledWith(
+            expect.objectContaining({
+              loginName: "test@example.com",
+              organization: "freightcheck",
+              sessionId: "challenge-session",
+            }),
+          );
+        });
+      },
+    );
+
     test("should redirect on successful verification", async () => {
       setupSuccessfulChallenge();
 
