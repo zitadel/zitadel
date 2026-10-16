@@ -66,7 +66,7 @@ For the dependencies we need a requirements.txt-file with the following content:
 
 Then install all dependencies with:
 ```bash
-python -m pip install -U requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 Then in your folder of choice, call the following command to create a Django base:
@@ -89,7 +89,7 @@ ZITADEL_DOMAIN = 'Domain used as audience in the token verification'
 API_PRIVATE_KEY_FILE_PATH = 'Path to the key.json created in ZITADEL'
 ```
 
-I should look something like this:
+It should look something like this:
 
 ```bash
 ZITADEL_INTROSPECTION_URL = 'https://example.zitadel.cloud/oauth/v2/introspect'
