@@ -212,6 +212,7 @@ export class UserCreateV2Component implements OnInit {
         case: 'password',
         value: {
           password,
+          changeRequired: true,
         },
       };
     }
