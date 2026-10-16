@@ -416,6 +416,10 @@ Errors:
       NotFound: "Impostazioni di notifica predefinite non trovate"
       NotChanged: "Impostazioni di notifica predefinite non è stato cambiato"
       AlreadyExists: "Impostazioni di notifica predefinite già esistente"
+    SecurityPolicy:
+      ClientIDMetadataDocumentAllowedURL:
+        Invalid: "L'URL del documento di metadati dell'ID client non è valido"
+        AlreadyExists: "L'URL del documento di metadati dell'ID client è già consentito"
   Policy:
     AlreadyExists: "Impostazioni già esistenti"
     Label:
