@@ -255,6 +255,7 @@
       "smsDescription": "Add meg a telefonszámodat, hogy SMS-ben elküldhessük az ellenőrző kódot.",
       "emailDescription": "Add meg az e-mail címedet, hogy e-mailben elküldhessük az ellenőrző kódot.",
       "totpRegisterDescription": "Olvasd be a QR-kódot, vagy navigálj az URL-re manuálisan.",
+      "manualSetupDescription": "Nem tudod beolvasni a QR-kódot? Add meg helyette ezt a kulcsot a hitelesítő alkalmazásodban.",
       "submit": "Tovább",
       "labels": {
         "code": "Kód"
