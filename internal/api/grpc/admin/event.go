@@ -80,9 +80,6 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 	if limit == 0 || limit > maxLimit {
 		limit = maxLimit
 	}
-	// We ignore the deprecation warning here because we still need to support the deprecated field.
-	//nolint:staticcheck
-	sequence := req.Sequence
 
 	// The events API pages by creation date (from / range), so the events are ordered by it as well.
 	// This also allows postgres to serve the query from an index on created_at (see [eventstore.SearchQueryBuilder.OrderByCreationDate]).
@@ -94,7 +91,7 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 		AwaitOpenTransactions().
 		ResourceOwner(req.ResourceOwner).
 		EditorUser(req.EditorUserId).
-		SequenceGreater(sequence).
+		SequenceGreater(req.Sequence).
 		CreationDateAfter(sinceTime).
 		CreationDateBefore(untilTime)
 
