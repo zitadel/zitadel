@@ -655,6 +655,7 @@
     "IAM_OWNER_VIEWER": "Jogosultsága van az egész példány átnézésére, beleértve minden szervezetet",
     "IAM_ORG_MANAGER": "Jogosultsága van szervezetek létrehozására és kezelésére",
     "IAM_USER_MANAGER": "Jogosultsága van felhasználók létrehozására és kezelésére",
+    "IAM_USER_VIEWER": "Jogosultsága van felhasználók megtekintésére",
     "IAM_ADMIN_IMPERSONATOR": "Jogosultsága van adminok és végfelhasználók megszemélyesítésére minden szervezetből",
     "IAM_END_USER_IMPERSONATOR": "Engedélye van az összes szervezet véghasználóinak megszemélyesítésére",
     "IAM_LOGIN_CLIENT": "Jogosultsága van a bejelentkezési alkalmazások kezelésére",

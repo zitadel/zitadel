@@ -654,6 +654,7 @@
     "IAM_OWNER_VIEWER": "Hat die Leseberechtigung, die gesamte Instanz einschließlich aller Organisationen zu überprüfen",
     "IAM_ORG_MANAGER": "Hat die Berechtigung zum Erstellen und Verwalten von Organisationen",
     "IAM_USER_MANAGER": "Hat die Berechtigung zum Erstellen und Verwalten von Benutzern",
+    "IAM_USER_VIEWER": "Hat die Berechtigung zum Anzeigen von Benutzern",
     "IAM_ADMIN_IMPERSONATOR": "Hat die Berechtigung, sich als Administrator und Endbenutzer aller Organisationen auszugeben",
     "IAM_END_USER_IMPERSONATOR": "Hat die Berechtigung, sich als Endbenutzer aller Organisationen auszugeben",
     "IAM_LOGIN_CLIENT": "Hat die Berechtigung, Anmeldeanwendungen zu verwalten",
