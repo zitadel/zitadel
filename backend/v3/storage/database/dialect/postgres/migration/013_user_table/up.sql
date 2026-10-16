@@ -44,6 +44,7 @@ CREATE TABLE zitadel.users(
     , password_verification_id              TEXT        CHECK ((type = 'machine' AND password_verification_id IS NULL)              OR (type = 'human')) -- used for reset password flow
     , password_last_successful_check        TIMESTAMPTZ CHECK ((type = 'machine' AND password_last_successful_check IS NULL)        OR (type = 'human'))
     , password_failed_attempts              SMALLINT    CHECK ((type = 'machine' AND password_failed_attempts IS NULL)              OR (type = 'human') AND (password_failed_attempts >= 0))
+    , password_locked_at                    TIMESTAMPTZ CHECK ((type = 'machine' AND password_locked_at IS NULL)                    OR (type = 'human'))
 
     , email                                 TEXT        CHECK ((type = 'machine' AND email IS NULL)                                 OR (type = 'human'))
     , unverified_email                      TEXT        CHECK ((type = 'machine' AND unverified_email IS NULL)                      OR (type = 'human' AND unverified_email <> '')) -- after successful verification this column is not cleared.

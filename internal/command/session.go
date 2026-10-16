@@ -90,6 +90,16 @@ func CheckPassword(password string) SessionCommand {
 // CheckIntent defines a check for a succeeded intent to be executed for a session update
 func CheckIntent(intentID, token string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) ([]eventstore.Command, error) {
+
+		humanWriteModel, err := cmd.getHumanWriteModelWithAutoUnlock(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		if humanWriteModel.UserState == domain.UserStateLocked {
+			return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-M4rp4", "Errors.User.NotFound")
+		}
+
 		if cmd.sessionWriteModel.UserID == "" {
 			return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sfw3r", "Errors.User.UserIDMissing")
 		}
@@ -97,7 +107,7 @@ func CheckIntent(intentID, token string) SessionCommand {
 			return nil, err
 		}
 		cmd.intentWriteModel = NewIDPIntentWriteModel(intentID, "", cmd.maxIdPIntentLifetime)
-		err := cmd.eventstore.FilterToQueryReducer(ctx, cmd.intentWriteModel)
+		err = cmd.eventstore.FilterToQueryReducer(ctx, cmd.intentWriteModel)
 		if err != nil {
 			return nil, err
 		}
@@ -128,6 +138,14 @@ func CheckIntent(intentID, token string) SessionCommand {
 
 func CheckTOTP(code string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) (_ []eventstore.Command, err error) {
+		writeModel, err := cmd.getHumanWriteModelWithAutoUnlock(ctx)
+		if err != nil {
+			return nil, err
+		}
+		if writeModel.UserState == domain.UserStateLocked {
+			return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-M4rp5", "Errors.User.NotFound")
+		}
+
 		commands, err := checkTOTP(
 			ctx,
 			cmd.sessionWriteModel.UserID,
@@ -267,13 +285,53 @@ func (s *SessionCommands) gethumanWriteModel(ctx context.Context) (*HumanWriteMo
 	if s.sessionWriteModel.UserID == "" {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-eeR2e", "Errors.User.UserIDMissing")
 	}
-	humanWriteModel := NewHumanWriteModel(s.sessionWriteModel.UserID, s.sessionWriteModel.UserResourceOwner)
-	err := s.eventstore.FilterToQueryReducer(ctx, humanWriteModel)
+	humanWriteModel, err := s.getHumanWriteModelWithAutoUnlock(ctx)
 	if err != nil {
 		return nil, err
 	}
 	if humanWriteModel.UserState != domain.UserStateActive {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.User.NotFound")
+	}
+	return humanWriteModel, nil
+}
+
+func (s *SessionCommands) getStateIndependentHumanWriteModel(ctx context.Context) (*HumanWriteModel, error) {
+	if s.sessionWriteModel.UserID == "" {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-M4rp1", "Errors.User.UserIDMissing")
+	}
+	humanWriteModel := NewHumanWriteModel(s.sessionWriteModel.UserID, s.sessionWriteModel.UserResourceOwner)
+	err := s.eventstore.FilterToQueryReducer(ctx, humanWriteModel)
+	if err != nil {
+		return nil, err
+	}
+	return humanWriteModel, nil
+}
+
+// getHumanWriteModelWithAutoUnlock returns the human write model of the session user.
+// If the user is locked and the lock duration of the lockout policy has been exceeded,
+// the user is unlocked right away, so that the following factor checks (which re-read
+// their own write models) see an active user.
+func (s *SessionCommands) getHumanWriteModelWithAutoUnlock(ctx context.Context) (*HumanWriteModel, error) {
+	humanWriteModel, err := s.getStateIndependentHumanWriteModel(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if humanWriteModel.UserState != domain.UserStateLocked {
+		return humanWriteModel, nil
+	}
+	autoUnlock, err := evaluateLockoutPolicy(ctx, humanWriteModel.LockedAt, humanWriteModel.ResourceOwner, s.eventstore.FilterToQueryReducer)
+	if err != nil {
+		return nil, err
+	}
+	if !autoUnlock {
+		return humanWriteModel, nil
+	}
+	events, err := s.eventstore.Push(ctx, user.NewUserUnlockedEvent(ctx, UserAggregateFromWriteModel(&humanWriteModel.WriteModel)))
+	if err != nil {
+		return nil, err
+	}
+	if err = AppendAndReduce(humanWriteModel, events...); err != nil {
+		return nil, err
 	}
 	return humanWriteModel, nil
 }

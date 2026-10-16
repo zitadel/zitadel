@@ -7,3 +7,11 @@ type WrongPasswordError struct {
 func (wpe *WrongPasswordError) Error() string {
 	return ""
 }
+
+type LockDurationNotExceededError struct {
+	RemainingTime int32
+}
+
+func (ldne *LockDurationNotExceededError) Error() string {
+	return ""
+}
