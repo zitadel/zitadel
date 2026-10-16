@@ -310,6 +310,28 @@
       "submit": "继续"
     }
   },
+  "recoveryCode": {
+    "verify": {
+      "title": "验证双因素",
+      "description": "请输入您的一个恢复码。每个恢复码只能使用一次。",
+      "useRecoveryCode": "使用恢复码",
+      "submit": "继续",
+      "labels": {
+        "code": "恢复码"
+      },
+      "required": {
+        "code": "此字段为必填项"
+      },
+      "errors": {
+        "invalidCode": "恢复码无效或已被使用。",
+        "userLocked": "您的帐户已被锁定。请联系管理员。",
+        "notReady": "此帐户尚未设置恢复码。",
+        "couldNotFindSession": "找不到会话",
+        "couldNotVerifyCode": "无法验证恢复码",
+        "couldNotDetermineRedirect": "验证后无法确定重定向地址"
+      }
+    }
+  },
   "register": {
     "methods": {
       "passkey": "密钥",
@@ -434,7 +456,8 @@
       "otpEmail": "通过电子邮件接收验证码",
       "otpSms": "通过短信接收验证码",
       "passkey": "密钥",
-      "password": "密码"
+      "password": "密码",
+      "recoveryCode": "恢复码"
     }
   },
   "device": {

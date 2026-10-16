@@ -310,6 +310,28 @@
       "submit": "Doorgaan"
     }
   },
+  "recoveryCode": {
+    "verify": {
+      "title": "Verifieer 2-Factor",
+      "description": "Voer een van je herstelcodes in. Elke code kan maar één keer worden gebruikt.",
+      "useRecoveryCode": "Gebruik herstelcode",
+      "submit": "Verder",
+      "labels": {
+        "code": "Herstelcode"
+      },
+      "required": {
+        "code": "Dit veld is verplicht"
+      },
+      "errors": {
+        "invalidCode": "De herstelcode is ongeldig of is al gebruikt.",
+        "userLocked": "Je account is geblokkeerd. Neem contact op met je beheerder.",
+        "notReady": "Er zijn geen herstelcodes ingesteld voor dit account.",
+        "couldNotFindSession": "Sessie niet gevonden",
+        "couldNotVerifyCode": "Kon de herstelcode niet verifiëren",
+        "couldNotDetermineRedirect": "Kon de doorverwijs-URL na verificatie niet bepalen"
+      }
+    }
+  },
   "register": {
     "methods": {
       "passkey": "Passkey",
@@ -434,7 +456,8 @@
       "otpEmail": "Code via e-mail",
       "otpSms": "Code via sms",
       "passkey": "Passkeys",
-      "password": "Wachtwoord"
+      "password": "Wachtwoord",
+      "recoveryCode": "Herstelcode"
     }
   },
   "device": {

@@ -150,6 +150,11 @@ export async function addTOTP(userId: string): Promise<string> {
   return response.secret;
 }
 
+export async function addRecoveryCodes(userId: string, count: number = 5): Promise<string[]> {
+  const response = await listCall(`${process.env.ZITADEL_API_URL}/v2/users/${userId}/recovery_codes`, { count: count });
+  return response.recoveryCodes;
+}
+
 export function totp(secret: string) {
   const authenticator = new Authenticator({
     createDigest,
