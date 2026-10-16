@@ -193,13 +193,13 @@ func isTextPatternComparison(comparison TextComparison) bool {
 		TextEndsWith,
 		TextEndsWithIgnoreCase,
 		TextContains,
-		TextContainsIgnoreCase,
-		TextListContains:
+		TextContainsIgnoreCase:
 		return true
 	case TextEquals,
 		TextEqualsIgnoreCase,
 		TextNotEquals,
 		TextNotEqualsIgnoreCase,
+		TextListContains,
 		textCompareMax:
 		return false
 	}
@@ -427,9 +427,6 @@ func (q *textQuery) comp() sq.Sqlizer {
 		}
 		return sq.Like{"LOWER(" + q.Column.identifier() + ")": "%" + strings.ToLower(q.Text) + "%"}
 	case TextListContains:
-		if q.Text == "" {
-			return nil
-		}
 		return &listContains{col: q.Column, args: []any{q.Text}}
 	case textCompareMax:
 		return nil
