@@ -230,8 +230,9 @@ func (q *NotQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 
 func (notQ NotQuery) ToSql() (sql string, args []interface{}, err error) {
 	inner := notQ.query.comp()
-	// Empty pattern filters compile to nil (no constraint). NOT of that
-	// previously meant NOT (LIKE '%') → match nothing; keep that meaning.
+	// Empty LIKE patterns omit the filter (no constraint) outside NOT.
+	// Inside NOT that would be wrong: keep FALSE deliberately so we still
+	// match nothing, same as the old NOT (LIKE '%') behaviour.
 	if inner == nil {
 		return "FALSE", nil, nil
 	}

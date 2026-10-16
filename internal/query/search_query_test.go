@@ -1471,7 +1471,10 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextListContains,
 			},
 			want: want{
-				isNil: true,
+				query: &listContains{
+					col:  testCol,
+					args: []interface{}{""},
+				},
 			},
 		},
 		{
