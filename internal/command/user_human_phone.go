@@ -198,6 +198,28 @@ func (c *Commands) HumanPhoneVerificationCodeSent(ctx context.Context, orgID, us
 	return err
 }
 
+// PhoneChangeSent notification sent that user changed phone
+func (c *Commands) PhoneChangeSent(ctx context.Context, orgID, userID string) (err error) {
+	if userID == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-vPh1a", "Errors.User.UserIDMissing")
+	}
+
+	existingPhone, err := c.phoneWriteModelByID(ctx, userID, orgID)
+	if err != nil {
+		return err
+	}
+	if !existingPhone.UserState.Exists() {
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-aB8fK", "Errors.User.NotFound")
+	}
+	if !existingPhone.State.Exists() {
+		return zerrors.ThrowNotFound(nil, "COMMAND-jQ2mZ", "Errors.User.Phone.NotFound")
+	}
+
+	userAgg := UserAggregateFromWriteModel(&existingPhone.WriteModel)
+	_, err = c.eventstore.Push(ctx, user.NewHumanPhoneChangeSentEvent(ctx, userAgg))
+	return err
+}
+
 func (c *Commands) RemoveHumanPhone(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-6M0ds", "Errors.User.UserIDMissing")
