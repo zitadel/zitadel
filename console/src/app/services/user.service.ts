@@ -93,7 +93,7 @@ export class UserService {
     return computed(() => {
       try {
         // split jwt and get base64 encoded payload
-        const unparsedPayload = atob((idToken() ?? '').split('.')[1]);
+        const unparsedPayload = atob((idToken() ?? '').split('.')[1].replace(/-/g, '+').replace(/_/g, '/'));
         // parse payload
         return JSON.parse(unparsedPayload) as unknown;
       } catch {
