@@ -1,5 +1,7 @@
-import { startIdentityProviderFlow } from "@/lib/server/zitadel";
+import { createServiceForHost } from "@/lib/server/service";
+import { addHumanUser, startIdentityProviderFlow } from "@/lib/server/zitadel";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
+import { getLocale } from "next-intl/server";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 vi.mock("@/lib/server/service", () => ({
@@ -7,12 +9,40 @@ vi.mock("@/lib/server/service", () => ({
 }));
 
 vi.mock("next-intl/server", () => ({
+  getLocale: vi.fn(),
   getTranslations: vi.fn(() => (key: string) => key),
 }));
 
 vi.mock("@/lib/server/fingerprint", () => ({
   getUserAgent: vi.fn(),
 }));
+
+describe("addHumanUser", () => {
+  const add = vi.fn().mockResolvedValue({ userId: "user123" });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(createServiceForHost).mockResolvedValue({ addHumanUser: add } as any);
+  });
+
+  test.each(["de", "fr"])("saves the selected %s locale as the user's preferred language", async (locale) => {
+    vi.mocked(getLocale).mockResolvedValue(locale);
+
+    await addHumanUser({
+      serviceConfig: { baseUrl: "https://api.example.com" },
+      email: "user@example.com",
+      firstName: "Test",
+      lastName: "User",
+      organization: "test-org",
+    });
+
+    expect(add).toHaveBeenCalledWith(
+      expect.objectContaining({
+        profile: expect.objectContaining({ givenName: "Test", familyName: "User", preferredLanguage: locale }),
+      }),
+    );
+  });
+});
 
 describe("zitadel queries are case insensitive", () => {
   const serviceConfig = { serviceUrl: "https://api.example.com" } as any;
