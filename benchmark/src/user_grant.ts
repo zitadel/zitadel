@@ -36,9 +36,14 @@ export async function addUserGrant(
     );
 
     response.then((res) => {
-      check(res, {
-        'add User Grant status ok': (r) => r.status >= 200 && r.status < 300,
-      }) || reject(`unable to add User Grant status: ${res.status} body: ${res.body}`);
+      if (
+        !check(res, {
+          'add User Grant status ok': (r) => r.status >= 200 && r.status < 300,
+        })
+      ) {
+        reject(`unable to add User Grant status: ${res.status} body: ${String(res.body).slice(0, 200)}`);
+        return;
+      }
 
       addUserGrantTrend.add(res.timings.duration);
       resolve(res.json() as UserGrant);
