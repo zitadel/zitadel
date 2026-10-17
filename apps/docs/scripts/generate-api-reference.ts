@@ -4,6 +4,7 @@ import { writeFileSync, mkdirSync, readdirSync, lstatSync, readFileSync, existsS
 import path, { join, dirname, basename } from 'path';
 import { fileURLToPath } from 'url';
 import { glob } from 'glob';
+import { execSync } from 'child_process';
 
 // Suppress "Generated: ..." logs to avoid Vercel log limits
 const originalLog = console.log;
@@ -327,6 +328,18 @@ async function run() {
 
   if (runAll || onlyFix) {
     await fixAllGeneratedLinks();
+    console.log('Post-processing: Appending traced endpoint error responses...');
+    // This step is additive (per-endpoint "Possible error responses"
+    // sections) — a failure here shouldn't take down the whole docs build.
+    // Warn loudly and continue rather than letting it propagate to the
+    // top-level run().catch(), which would exit(1) and fail the deploy over
+    // what's ultimately an enhancement, not core doc generation.
+    try {
+      execSync('pnpm exec tsx scripts/generate-endpoint-errors.ts', { cwd: ROOT_DIR, stdio: 'inherit' });
+    } catch (err) {
+      console.error('Post-processing: generate-endpoint-errors.ts failed — continuing without updated endpoint error tables.');
+      console.error(err);
+    }
   }
 }
 
