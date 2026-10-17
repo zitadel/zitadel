@@ -1,5 +1,6 @@
 {
   "APP_NAME": "Zitadel",
+  "CONSOLE_TITLE": "管理控制台",
   "DESCRIPTIONS": {
     "METADATA_TITLE": "元数据",
     "HOME": {
@@ -1560,7 +1561,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "sl": "Slovenščina"
       }
     },
     "SMTP": {
@@ -1809,7 +1811,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "sl": "Slovenščina"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -2829,7 +2832,8 @@
     "ro": "Română",
     "tr": "Türkçe",
     "uk": "Українська",
-    "ar": "العربية"
+    "ar": "العربية",
+    "sl": "Slovenščina"
   },
   "MEMBER": {
     "ADD": "添加管理员",

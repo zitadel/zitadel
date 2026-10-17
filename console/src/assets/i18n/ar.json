@@ -1,5 +1,6 @@
 {
   "APP_NAME": "ZITADEL",
+  "CONSOLE_TITLE": "وحدة التحكم",
   "DESCRIPTIONS": {
     "METADATA_TITLE": "البيانات الوصفية",
     "HOME": {
@@ -1551,7 +1552,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "ar": "العربية"
+        "ar": "العربية",
+        "sl": "Slovenščina"
       }
     },
     "SMTP": {
@@ -1799,7 +1801,8 @@
         "ko": "한국어",
         "ro": "Română",
         "tr": "Türkçe",
-        "ar": "العربية"
+        "ar": "العربية",
+        "sl": "Slovenščina"
       },
       "KEYS": {
         "emailVerificationDoneText": "تم التحقق من البريد الإلكتروني",
@@ -2814,7 +2817,8 @@
     "ko": "한국어",
     "ro": "Română",
     "tr": "Türkçe",
-    "ar": "العربية"
+    "ar": "العربية",
+    "sl": "Slovenščina"
   },
   "MEMBER": {
     "ADD": "إضافة مسؤول النظام",

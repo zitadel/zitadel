@@ -1,5 +1,6 @@
 {
   "APP_NAME": "Zitadel",
+  "CONSOLE_TITLE": "консоль керування",
   "DESCRIPTIONS": {
     "METADATA_TITLE": "Метадані",
     "HOME": {
@@ -1560,7 +1561,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "sl": "Slovenščina"
       }
     },
     "SMTP": {
@@ -1809,7 +1811,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "sl": "Slovenščina"
       },
       "KEYS": {
         "emailVerificationDoneText": "Верифікація електронної пошти завершена",
@@ -2827,7 +2830,8 @@
     "ro": "Română",
     "tr": "Türkçe",
     "uk": "Українська",
-    "ar": "العربية"
+    "ar": "العربية",
+    "sl": "Slovenščina"
   },
   "MEMBER": {
     "ADD": "Додати адміністратора",
