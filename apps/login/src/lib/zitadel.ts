@@ -31,7 +31,7 @@ import {
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { getUserAgent } from "./fingerprint";
 
@@ -472,7 +472,7 @@ export async function addHumanUser({ serviceConfig, email, firstName, lastName, 
       },
     },
     username: email,
-    profile: { givenName: firstName, familyName: lastName },
+    profile: { givenName: firstName, familyName: lastName, preferredLanguage: await getLocale() },
     passwordType: password ? { case: "password", value: { password } } : undefined,
   });
 
