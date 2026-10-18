@@ -73,3 +73,15 @@ func NewEmailCode(emailGenerator crypto.Generator) (*EmailCode, string, error) {
 		Expiry: emailGenerator.Expiry(),
 	}, code, nil
 }
+
+type ConfirmURLData struct {
+	UserID string
+	Code   string
+	OrgID  string
+}
+
+// RenderConfirmURLTemplate parses and renders tmpl.
+// userID, code and orgID are passed into the [ConfirmURLData].
+func RenderConfirmURLTemplate(w io.Writer, tmpl, userID, code, orgID string) error {
+	return renderURLTemplate(w, tmpl, &ConfirmURLData{userID, code, orgID})
+}
