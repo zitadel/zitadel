@@ -131,8 +131,8 @@ func TestRenderConfirmURLTemplate(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		wantErr error
 		want    string
+		wantErr error
 	}{
 		{
 			name: "invalid template",
