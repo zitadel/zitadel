@@ -423,6 +423,14 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 	if subjectToken != actorToken {
 		reason = domain.TokenReasonImpersonation
 		actor = actorToken.nestedActor()
+
+		admin, err := s.query.IsUserAdmin(ctx, subjectToken.userID)
+		if err != nil {
+			return nil, err
+		}
+		if admin {
+			reason = domain.TokenReasonAdminImpersonation
+		}
 	}
 
 	var sessionID string

@@ -2100,3 +2100,46 @@ func TestCommandSide_DeleteProjectGrant(t *testing.T) {
 		})
 	}
 }
+
+func TestCommandSide_RemoveProjectGrantOwnerDeleteReady(t *testing.T) {
+	removed := project.NewGrantRemovedByOwnerEvent(context.Background(),
+		&project.NewAggregate("project1", "org1").Aggregate,
+		"projectgrant1",
+		"grantedorg1",
+	)
+	assertOwnerOnlyUniqueConstraints(t, removed, eventstore.UniqueConstraintOwnerGrant, "projectgrant1")
+
+	cascade := usergrant.NewUserGrantCascadeRemovedEvent(context.Background(),
+		&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+		"user1",
+		"project1",
+		"projectgrant1",
+	)
+	eventstore.SkipCommandUniqueConstraints(cascade)
+
+	r := &Commands{
+		eventstore: expectEventstore(
+			expectFilter(
+				eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
+					&project.NewAggregate("project1", "org1").Aggregate,
+					"projectgrant1",
+					"grantedorg1",
+					[]string{"key1"},
+				)),
+			),
+			expectFilter(
+				eventFromEventPusher(usergrant.NewUserGrantAddedEvent(context.Background(),
+					&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+					"user1",
+					"project1",
+					"projectgrant1",
+					[]string{"key1"}))),
+			expectPush(removed, cascade),
+		)(t),
+		checkPermission:  newMockPermissionCheckAllowed(),
+		ownerDeleteReady: func(context.Context) (bool, error) { return true, nil },
+	}
+	got, err := r.RemoveProjectGrant(context.Background(), "project1", "projectgrant1", "org1", "usergrant1")
+	assert.NoError(t, err)
+	assertObjectDetails(t, &domain.ObjectDetails{ResourceOwner: "org1"}, got)
+}

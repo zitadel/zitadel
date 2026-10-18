@@ -79,7 +79,7 @@ func init() {
 	)
 	RegisterSentHandler(user.HumanInviteCodeAddedType,
 		func(ctx context.Context, commands Commands, id, orgID string, _ *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.InviteCodeSent(ctx, orgID, id)
+			return commands.InviteCodeSent(ctx, id, orgID)
 		},
 	)
 }

@@ -742,6 +742,18 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 	}
 }
 
+// expectImpersonationPermission asserts that the impersonation permission check is
+// executed with the expected permission and that it is scoped to the subject user and
+// its organization. The returned err is passed back to the command.
+func expectImpersonationPermission(t *testing.T, wantPermission string, err error) domain.PermissionCheck {
+	return func(_ context.Context, permission, orgID, userID string) error {
+		assert.Equal(t, wantPermission, permission)
+		assert.Equal(t, "org1", orgID)
+		assert.Equal(t, "userID", userID)
+		return err
+	}
+}
+
 func TestCommands_CreateOIDCSession(t *testing.T) {
 	type fields struct {
 		eventstore                      func(*testing.T) *eventstore.Eventstore
@@ -1477,9 +1489,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
 				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
 				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				checkPermission: domain.PermissionCheck(func(_ context.Context, _, _, _ string) (err error) {
-					return zerrors.ThrowPermissionDenied(nil, "test", "test")
-				}),
+				checkPermission:                 expectImpersonationPermission(t, "impersonation", zerrors.ThrowPermissionDenied(nil, "test", "test")),
 			},
 			args: args{
 				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
@@ -1559,9 +1569,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
 				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
 				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				checkPermission: domain.PermissionCheck(func(_ context.Context, _, _, _ string) (err error) {
-					return nil
-				}),
+				checkPermission:                 expectImpersonationPermission(t, "impersonation", nil),
 			},
 			args: args{
 				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
@@ -1606,6 +1614,164 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 					Header:        http.Header{"foo": []string{"bar"}},
 				},
 				Reason: domain.TokenReasonImpersonation,
+				Actor: &domain.TokenActor{
+					UserID: "user2",
+					Issuer: "foo.com",
+				},
+			},
+		},
+		{
+			name: "admin impersonation not allowed",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						user.NewHumanAddedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.Afrikaans,
+							domain.GenderUnspecified,
+							"email",
+							false,
+						),
+					),
+					expectFilterActiveOrg("org1"),
+					expectFilter(), // token lifetime
+				),
+				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID"),
+				defaultAccessTokenLifetime:      time.Hour,
+				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
+				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
+				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				checkPermission:                 expectImpersonationPermission(t, "admin.impersonation", zerrors.ThrowPermissionDenied(nil, "test", "test")),
+			},
+			args: args{
+				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
+				userID:            "userID",
+				resourceOwner:     "org1",
+				clientID:          "clientID",
+				audience:          []string{"audience"},
+				scope:             []string{"openid", "offline_access"},
+				authMethods:       []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				authTime:          testNow,
+				nonce:             "nonce",
+				preferredLanguage: &language.Afrikaans,
+				userAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				reason: domain.TokenReasonAdminImpersonation,
+				actor: &domain.TokenActor{
+					UserID: "user2",
+					Issuer: "foo.com",
+				},
+				needRefreshToken: false,
+				responseType:     domain.OIDCResponseTypeUnspecified,
+			},
+			wantErr: zerrors.ThrowPermissionDenied(nil, "test", "test"),
+		},
+		{
+			name: "admin impersonation allowed",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						user.NewHumanAddedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.Afrikaans,
+							domain.GenderUnspecified,
+							"email",
+							false,
+						),
+					),
+					expectFilterActiveOrg("org1"),
+					expectFilter(), // token lifetime
+					expectPush(
+						user.NewUserImpersonatedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "clientID", &domain.TokenActor{
+							UserID: "user2",
+							Issuer: "foo.com",
+						}),
+						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"userID", "org1", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
+							&domain.UserAgent{
+								FingerprintID: gu.Ptr("fp1"),
+								IP:            net.ParseIP("1.2.3.4"),
+								Description:   gu.Ptr("firefox"),
+								Header:        http.Header{"foo": []string{"bar"}},
+							},
+						),
+						oidcsession.NewAccessTokenAddedEvent(context.Background(),
+							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAdminImpersonation,
+							&domain.TokenActor{
+								UserID: "user2",
+								Issuer: "foo.com",
+							},
+						),
+					),
+				),
+				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID", "accessTokenID"),
+				defaultAccessTokenLifetime:      time.Hour,
+				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
+				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
+				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				checkPermission:                 expectImpersonationPermission(t, "admin.impersonation", nil),
+			},
+			args: args{
+				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
+				userID:            "userID",
+				resourceOwner:     "org1",
+				clientID:          "clientID",
+				audience:          []string{"audience"},
+				scope:             []string{"openid", "offline_access"},
+				authMethods:       []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				authTime:          testNow,
+				nonce:             "nonce",
+				preferredLanguage: &language.Afrikaans,
+				userAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				reason: domain.TokenReasonAdminImpersonation,
+				actor: &domain.TokenActor{
+					UserID: "user2",
+					Issuer: "foo.com",
+				},
+				needRefreshToken: false,
+				responseType:     domain.OIDCResponseTypeUnspecified,
+			},
+			want: &OIDCSession{
+				TokenID:           "V2_oidcSessionID-at_accessTokenID",
+				ClientID:          "clientID",
+				UserID:            "userID",
+				Audience:          []string{"audience"},
+				Expiration:        time.Time{}.Add(time.Hour),
+				Scope:             []string{"openid", "offline_access"},
+				AuthMethods:       []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				AuthTime:          testNow,
+				Nonce:             "nonce",
+				PreferredLanguage: &language.Afrikaans,
+				UserAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				Reason: domain.TokenReasonAdminImpersonation,
 				Actor: &domain.TokenActor{
 					UserID: "user2",
 					Issuer: "foo.com",

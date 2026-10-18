@@ -162,11 +162,8 @@ func (c *Commands) CreateOIDCSession(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	if reason == domain.TokenReasonImpersonation {
-		if err := c.checkPermission(ctx, "impersonation", resourceOwner, userID); err != nil {
-			return nil, err
-		}
-		cmd.UserImpersonated(ctx, userID, resourceOwner, clientID, actor)
+	if err = cmd.checkPermission(ctx, userID, resourceOwner, clientID, reason, actor); err != nil {
+		return nil, err
 	}
 
 	cmd.AddSession(ctx, userID, resourceOwner, sessionID, clientID, audience, scope, authMethods, authTime, nonce, preferredLanguage, userAgent)
@@ -486,8 +483,46 @@ func (c *OIDCSessionEvents) RenewRefreshToken(ctx context.Context) (err error) {
 	return nil
 }
 
-func (c *OIDCSessionEvents) UserImpersonated(ctx context.Context, userID, resourceOwner, clientID string, actor *domain.TokenActor) {
-	c.events = append(c.events, user.NewUserImpersonatedEvent(ctx, &user.NewAggregate(userID, resourceOwner).Aggregate, clientID, actor))
+// checkPermission verifies that the caller may create a session for the passed reason.
+// The userID and resourceOwner are the ones of the session's subject, so the permission
+// is evaluated on the subject's organization. They are passed explicitly because the
+// oidcSessionWriteModel is not reduced yet at this point and therefore still empty.
+func (c *OIDCSessionEvents) checkPermission(ctx context.Context, userID, resourceOwner, clientID string, reason domain.TokenReason, actor *domain.TokenActor) error {
+	var requiredPermission string
+	switch reason {
+	// Satisfy the linter.
+	// These reasons do not require a permission check.
+	case domain.TokenReasonAuthRequest,
+		domain.TokenReasonRefresh,
+		domain.TokenReasonJWTProfile,
+		domain.TokenReasonClientCredentials,
+		domain.TokenReasonExchange:
+	case domain.TokenReasonImpersonation:
+		requiredPermission = "impersonation"
+		c.userImpersonated(ctx, clientID, actor)
+	case domain.TokenReasonAdminImpersonation:
+		requiredPermission = "admin.impersonation"
+		c.userImpersonated(ctx, clientID, actor)
+	default:
+		// should never happen, but have a failsafe for invalid reasons.
+		return zerrors.ThrowInternal(nil, "COMMAND-Woo8E", "Error.Internal")
+	}
+	if requiredPermission != "" {
+		if err := c.commands.checkPermission(ctx, requiredPermission, resourceOwner, userID); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *OIDCSessionEvents) userImpersonated(ctx context.Context, clientID string, actor *domain.TokenActor) {
+	c.events = append(c.events,
+		user.NewUserImpersonatedEvent(ctx,
+			&c.userStateModel.Aggregate().Aggregate,
+			clientID,
+			actor,
+		),
+	)
 }
 
 func (c *OIDCSessionEvents) generateRefreshToken(userID string) (refreshTokenID, refreshToken string, err error) {

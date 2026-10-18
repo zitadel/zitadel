@@ -49,13 +49,13 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
       return;
     }
 
-    return router.push(
-      `/device/consent?` +
-        new URLSearchParams({
-          requestId: `device_${response.deviceAuthorizationRequest.id}`,
-          user_code: value.userCode,
-        }).toString(),
-    );
+    // the server picks /accounts (live session in this browser) or /loginname; consent follows on /device/consent
+    if (!response.nextUrl) {
+      setError("Could not continue the request");
+      return;
+    }
+
+    return router.push(response.nextUrl);
   }
 
   return (
