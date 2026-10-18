@@ -27,6 +27,12 @@ func (e EmailAddress) Validate() error {
 	if p.Name != "" {
 		return zerrors.ThrowInvalidArgument(errEmailNameProvided, "EMAIL-599GV", "Errors.User.Email.Invalid")
 	}
+	// #3919: the domain part must contain a dot (rejects single-label
+	// domains like test@test which net/mail.ParseAddress accepts)
+	if at := strings.LastIndex(p.Address, "@"); at < 0 ||
+		!strings.Contains(p.Address[at+1:], ".") {
+		return zerrors.ThrowInvalidArgument(nil, "EMAIL-bb39i", "Errors.User.Email.Invalid")
+	}
 	return nil
 }
 
@@ -66,16 +72,4 @@ func NewEmailCode(emailGenerator crypto.Generator) (*EmailCode, string, error) {
 		Code:   emailCodeCrypto,
 		Expiry: emailGenerator.Expiry(),
 	}, code, nil
-}
-
-type ConfirmURLData struct {
-	UserID string
-	Code   string
-	OrgID  string
-}
-
-// RenderConfirmURLTemplate parses and renders tmpl.
-// userID, code and orgID are passed into the [ConfirmURLData].
-func RenderConfirmURLTemplate(w io.Writer, tmpl, userID, code, orgID string) error {
-	return renderURLTemplate(w, tmpl, &ConfirmURLData{userID, code, orgID})
 }
