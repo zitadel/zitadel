@@ -107,14 +107,12 @@ As long as the instance Login V2 feature stays disabled, the console and all oth
 This is also how you use Login V2 auth requests with your own login UI (Session API and `POST /v2/oidc/auth_requests/{auth_request_id}`) without deploying `zitadel-login`: enable **Use new login UI** on your applications and set their custom base URL to your UI.
 
 ### Instance-wide
+1. Verify that the login UI is reachable through your public routing (see [Deploy and route](#1-deploy-and-route)).
+2. Enable the **loginV2** feature (Console → instance Features, or [Feature API](/reference/api/feature/zitadel.feature.v2.FeatureService.SetInstanceFeatures) with `required=true`). If the login UI is not served at `/ui/v2/login`, set the base URI in the same step; otherwise leave it empty.
 
-1. Verify that the deployed login service is reachable through the configured public routing.
-2. Enable the **loginV2** feature with `required=true` (Console → instance Features, or Feature API).
-3. Set the base URI, or leave empty to use `/ui/v2/login`.
+When the instance feature is on, it takes precedence over per-app settings and applies to every application, including the management console. Per-app custom base URLs are ignored as well: all applications use the instance base URI, or `/ui/v2/login` if none is set.
 
-When the instance feature is on, it takes precedence over per-app checkboxes and applies to every application, including the management console.
-
-There is **no supported way to keep the console on Login V1 while using instance-required Login V2 auth requests for your applications**. The per-app setting only has an effect while the instance flag is disabled; it cannot exempt the console after `loginV2.required=true` is enabled. For gradual adoption, leave the instance flag disabled and use the per-app settings described above.
+The console cannot be exempted from the instance feature. To keep the console on Login V1, leave the instance feature disabled and enable Login V2 per application instead.
 
 ### Roll back
 
