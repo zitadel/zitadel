@@ -116,9 +116,16 @@ The console cannot be exempted from the instance feature. To keep the console on
 
 ### Roll back
 
-Disable the per-app setting or the instance feature while Login V1 is still available.
+Disable the per-app setting or the instance feature while Login V1 is still available. Disabling an application's setting has no effect while the instance feature is enabled.
 
-If you are locked out of the console, authenticate to the Feature API with the previously created break-glass `IAM_OWNER` PAT and set the instance Login V2 `required` flag to `false`. Alternatively, restore the login service and its routing so console login can complete. Disabling an application's Login V2 setting alone does not undo an instance-wide requirement.
+If you are locked out of the console, either restore the login UI and its routing, or use the break-glass `IAM_OWNER` PAT to disable the instance feature:
+
+```bash
+curl -X PUT "https://<your-domain>/v2/features/instance" \
+  -H "Authorization: Bearer <break-glass-pat>" \
+  -H "Content-Type: application/json" \
+  -d '{"loginV2": {"required": false}}'
+```
 
 ## 5. After cutover checklist
 
