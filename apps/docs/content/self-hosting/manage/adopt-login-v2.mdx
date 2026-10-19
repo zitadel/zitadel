@@ -30,16 +30,21 @@ If you do not urgently need Login V2, stay on Login V1 and revisit later.
 5. Update IdP callbacks and related config
 
 <Callout type="warn">
-Before enabling Login V2 for production traffic, create a break-glass machine user with `IAM_OWNER` and a PAT.
-If login misconfiguration locks interactive access, use the PAT to revert the feature or fix routing.
+Enabling the instance-level Login V2 feature (`required=true`) sends **every application, including the management console**, to Login V2. Before enabling it, make sure a Login V2 UI that can complete the console's OIDC login (for example `zitadel-login`) is reachable at `/ui/v2/login`, or at the base URI you configure.
+
+If the login UI is not reachable, console login fails. An existing console session can hide the problem until it expires.
+
+Before enabling the feature, create a break-glass machine user with `IAM_OWNER` and a PAT, and store it securely. If interactive login breaks, use it to [disable the instance feature](#roll-back).
 </Callout>
 
 ## 1. Deploy and route
 
 1. Deploy `zitadel-login` (compose, Helm, or your own packaging).
-2. On your reverse proxy / ingress:
-   - `/ui/v2/login` → login service
+2. On your reverse proxy / ingress, route by path on the same public origin as the API (recommended):
+   - `/ui/v2/login` and its subpaths → login service
    - everything else → ZITADEL API
+
+Starting the login container on its own port is not enough. It must either be reachable under `/ui/v2/login` on your ZITADEL domain, or you must set a base URI pointing to where it is publicly reachable (see [Cut over](#4-cut-over)). If you host the login UI on a separate hostname, also add it to your trusted domains.
 
 See [Login UI routing](/self-hosting/manage/reverseproxy/reverse_proxy#login-ui-routing).
 
@@ -97,17 +102,30 @@ With the instance Login V2 feature **disabled**:
 
 Only that application uses Login V2. See [Application settings](/guides/manage/console/applications-overview#use-new-login-ui).
 
+As long as the instance Login V2 feature stays disabled, the console and all other applications keep using Login V1. Enabling Login V2 in the instance settings switches every application, including the console, to Login V2 (see [Instance-wide](#instance-wide)).
+
+This is also how you use Login V2 auth requests with your own login UI (Session API and `POST /v2/oidc/auth_requests/{auth_request_id}`) without deploying `zitadel-login`: enable **Use new login UI** on your applications and set their custom base URL to your UI.
+
 ### Instance-wide
+1. Verify that the login UI is reachable through your public routing (see [Deploy and route](#1-deploy-and-route)).
+2. Enable the **loginV2** feature (Console → instance Features, or [Feature API](/reference/api/feature/zitadel.feature.v2.FeatureService.SetInstanceFeatures) with `required=true`). If the login UI is not served at `/ui/v2/login`, set the base URI in the same step; otherwise leave it empty.
 
-1. Enable the **loginV2** feature (Console → instance Features, or Feature API)
-2. Set the base URI, or leave empty to use `/ui/v2/login`
+When the instance feature is on, it takes precedence over per-app settings and applies to every application, including the management console. Per-app custom base URLs are ignored as well: all applications use the instance base URI, or `/ui/v2/login` if none is set.
 
-When the instance feature is on, it takes precedence over per-app checkboxes and applies to every application.
+The console cannot be exempted from the instance feature. To keep the console on Login V1, leave the instance feature disabled and enable Login V2 per application instead.
 
 ### Roll back
 
-Disable the per-app setting or the instance feature while Login V1 is still available.
-Use the break-glass `IAM_OWNER` PAT if interactive login is broken.
+Disable the per-app setting or the instance feature while Login V1 is still available. Disabling an application's setting has no effect while the instance feature is enabled.
+
+If you are locked out of the console, either restore the login UI and its routing, or use the break-glass `IAM_OWNER` PAT to disable the instance feature:
+
+```bash
+curl -X PUT "https://<your-domain>/v2/features/instance" \
+  -H "Authorization: Bearer <break-glass-pat>" \
+  -H "Content-Type: application/json" \
+  -d '{"loginV2": {"required": false}}'
+```
 
 ## 5. After cutover checklist
 
