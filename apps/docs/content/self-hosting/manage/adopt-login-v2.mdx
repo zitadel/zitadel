@@ -40,11 +40,11 @@ Before enabling the feature, create a break-glass machine user with `IAM_OWNER` 
 ## 1. Deploy and route
 
 1. Deploy `zitadel-login` (compose, Helm, or your own packaging).
-2. Use **path-based routing on a single public origin** on your reverse proxy / ingress:
+2. On your reverse proxy / ingress, route by path on the same public origin as the API (recommended):
    - `/ui/v2/login` and its subpaths → login service
    - everything else → ZITADEL API
 
-The login service and API can listen on different internal ports, but the recommended deployment exposes both through the same public scheme, hostname, and port. Merely starting the login container on a separate port does not make `/ui/v2/login` reachable on the ZITADEL origin. Do not assume that pointing the base URI at a separate public port is equivalent to this routing setup.
+Starting the login container on its own port is not enough. It must either be reachable under `/ui/v2/login` on your ZITADEL domain, or you must set a base URI pointing to where it is publicly reachable (see [Cut over](#4-cut-over)). If you host the login UI on a separate hostname, also add it to your trusted domains.
 
 See [Login UI routing](/self-hosting/manage/reverseproxy/reverse_proxy#login-ui-routing).
 
