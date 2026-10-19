@@ -30,11 +30,11 @@ If you do not urgently need Login V2, stay on Login V1 and revisit later.
 5. Update IdP callbacks and related config
 
 <Callout type="warn">
-Setting the instance-level `loginV2.required=true` flag makes **every application, including the management console**, use Login V2. Before enabling it, deploy and route a Login V2 UI that supports the console's OIDC login flow, such as `zitadel-login`. Your own applications using the Session API and `POST /v2/oidc/auth_requests/{auth_request_id}` do not remove this console dependency; a custom UI must also support console login if it replaces the hosted UI.
+Enabling the instance-level Login V2 feature (`required=true`) sends **every application, including the management console**, to Login V2. Before enabling it, make sure a Login V2 UI that can complete the console's OIDC login (for example `zitadel-login`) is reachable at `/ui/v2/login`, or at the base URI you configure.
 
-Without a reachable login service, console login fails at `/ui/v2/login` (unless you configured another base URI). An existing console session may temporarily hide the problem, but you will lose interactive access when that session expires.
+If the login UI is not reachable, console login fails. An existing console session can hide the problem until it expires.
 
-Before enabling the flag, create a break-glass machine user with `IAM_OWNER` and a PAT. Keep this credential available securely so you can use the API to disable the instance feature if console login is broken.
+Before enabling the feature, create a break-glass machine user with `IAM_OWNER` and a PAT, and store it securely. If interactive login breaks, use it to [disable the instance feature](#roll-back).
 </Callout>
 
 ## 1. Deploy and route
