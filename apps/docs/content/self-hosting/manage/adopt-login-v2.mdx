@@ -102,6 +102,10 @@ With the instance Login V2 feature **disabled**:
 
 Only that application uses Login V2. See [Application settings](/guides/manage/console/applications-overview#use-new-login-ui).
 
+As long as the instance Login V2 feature stays disabled, the console and all other applications keep using Login V1. Enabling Login V2 in the instance settings switches every application, including the console, to Login V2 (see [Instance-wide](#instance-wide)).
+
+This is also how you use Login V2 auth requests with your own login UI (Session API and `POST /v2/oidc/auth_requests/{auth_request_id}`) without deploying `zitadel-login`: enable **Use new login UI** on your applications and set their custom base URL to your UI.
+
 ### Instance-wide
 
 1. Verify that the deployed login service is reachable through the configured public routing.
