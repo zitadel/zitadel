@@ -1,0 +1,14 @@
+{
+  "Direct": {
+    "handler": "internal/tools/errortrace/testdata/direct/handler.go:14",
+    "errors": [
+      {
+        "id": "TEST-d1r3ct",
+        "file": "internal/tools/errortrace/testdata/direct/handler.go",
+        "line": 15,
+        "reasoning": "Direct"
+      }
+    ],
+    "unresolved": 0
+  }
+}

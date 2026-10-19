@@ -1,0 +1,14 @@
+{
+  "ViaField": {
+    "handler": "internal/tools/errortrace/testdata/knownindirection/handler.go:25",
+    "errors": [
+      {
+        "id": "TEST-p3rm1t",
+        "file": "internal/tools/errortrace/testdata/knownindirection/handler.go",
+        "line": 31,
+        "reasoning": "IndirectTarget (via github.com/zitadel/zitadel/internal/tools/errortrace/testdata/knownindirection.PermCheck)"
+      }
+    ],
+    "unresolved": 0
+  }
+}

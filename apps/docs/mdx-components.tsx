@@ -5,6 +5,7 @@ import { TerminologyUpdate } from '@/components/terminology-update';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
+import EndpointErrors from '@/components/EndpointErrors';
 import Admonition from '@/components/docusaurus/admonition';
 import { GithubCodeBlock } from '@/components/github-code-block';
 import { PreventLockout } from '@/components/prevent-lockout';
@@ -18,6 +19,7 @@ export function useMDXComponents(components?: MDXComponents): MDXComponents {
     Tabs,
     Step,
     Steps,
+    EndpointErrors,
     APIPage,
     TerminologyUpdate,
     GithubCodeBlock,
