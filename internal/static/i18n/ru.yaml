@@ -410,6 +410,10 @@ Errors:
       NotFound: "Политика уведомлений по умолчанию не найдена"
       NotChanged: "Политика уведомлений по умолчанию не изменена"
       AlreadyExists: "Политика уведомлений по умолчанию уже существует"
+    SecurityPolicy:
+      ClientIDMetadataDocumentAllowedURL:
+        Invalid: "URL документа метаданных идентификатора клиента недействителен"
+        AlreadyExists: "URL документа метаданных идентификатора клиента уже разрешён"
   Policy:
     AlreadyExists: "Политика уже существует"
     Label:

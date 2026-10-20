@@ -417,6 +417,10 @@ Errors:
       NotFound: "没有找到默认的通知政策"
       NotChanged: "默认的通知政策没有改变"
       AlreadyExists: "默认的通知政策已经存在"
+    SecurityPolicy:
+      ClientIDMetadataDocumentAllowedURL:
+        Invalid: "客户端 ID 元数据文档 URL 无效"
+        AlreadyExists: "客户端 ID 元数据文档 URL 已被允许"
   Policy:
     AlreadyExists: "策略已存在"
     Label:

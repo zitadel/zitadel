@@ -159,7 +159,7 @@ func (s *Server) GetSecuritySettings(ctx context.Context, req *connect.Request[s
 }
 
 func (s *Server) SetSecuritySettings(ctx context.Context, req *connect.Request[settings.SetSecuritySettingsRequest]) (*connect.Response[settings.SetSecuritySettingsResponse], error) {
-	details, err := s.command.SetSecurityPolicy(ctx, securitySettingsToCommand(req.Msg))
+	details, err := s.command.SetLegacySecurityPolicy(ctx, securitySettingsToCommand(req.Msg))
 	if err != nil {
 		return nil, err
 	}

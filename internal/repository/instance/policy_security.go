@@ -2,6 +2,8 @@ package instance
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -10,7 +12,48 @@ import (
 const (
 	securityPolicyPrefix       = "policy.security."
 	SecurityPolicySetEventType = instanceEventTypePrefix + securityPolicyPrefix + "set"
+
+	securityPolicyClientIDMetadataDocumentAllowedURLPrefix           = securityPolicyPrefix + "client_id_metadata_document.allowed_url."
+	SecurityPolicyClientIDMetadataDocumentAllowedURLAddedEventType   = instanceEventTypePrefix + securityPolicyClientIDMetadataDocumentAllowedURLPrefix + "added"
+	SecurityPolicyClientIDMetadataDocumentAllowedURLRemovedEventType = instanceEventTypePrefix + securityPolicyClientIDMetadataDocumentAllowedURLPrefix + "removed"
+
+	UniqueClientIDMetadataDocumentAllowedURL = "client_id_metadata_document_allowed_url"
+
+	// clientIDMetadataDocumentAllowedURLOwner tags the allowed URL constraints of an instance, so
+	// replacing the list can release all of them without knowing which URLs they belong to.
+	clientIDMetadataDocumentAllowedURLOwner = "client_id_metadata_document_allowed_urls"
 )
+
+// clientIDMetadataDocumentAllowedURLField is the unique field of an allowed client_id URL: the
+// SHA-256 of the URL in hex. The eventstore lowercases unique fields, and client_id URLs are
+// compared case-sensitively, so the URL itself cannot be the field.
+func clientIDMetadataDocumentAllowedURLField(allowedURL string) string {
+	sum := sha256.Sum256([]byte(allowedURL))
+	return hex.EncodeToString(sum[:])
+}
+
+// NewAddClientIDMetadataDocumentAllowedURLUniqueConstraint takes the constraint of allowedURL in
+// the instance, tagged so that NewRemoveClientIDMetadataDocumentAllowedURLUniqueConstraints
+// releases it.
+func NewAddClientIDMetadataDocumentAllowedURLUniqueConstraint(instanceID, allowedURL string) *eventstore.UniqueConstraint {
+	return eventstore.NewAddEventUniqueConstraint(
+		UniqueClientIDMetadataDocumentAllowedURL,
+		clientIDMetadataDocumentAllowedURLField(allowedURL),
+		"Errors.Instance.SecurityPolicy.ClientIDMetadataDocumentAllowedURL.AlreadyExists",
+	).WithOwners(eventstore.OwnerTag(clientIDMetadataDocumentAllowedURLOwner, instanceID))
+}
+
+// NewRemoveClientIDMetadataDocumentAllowedURLUniqueConstraints releases the constraints of every
+// allowed URL of the instance.
+func NewRemoveClientIDMetadataDocumentAllowedURLUniqueConstraints(instanceID string) *eventstore.UniqueConstraint {
+	return eventstore.NewRemoveUniqueConstraintsByOwner(clientIDMetadataDocumentAllowedURLOwner, instanceID)
+}
+
+func NewRemoveClientIDMetadataDocumentAllowedURLUniqueConstraint(allowedURL string) *eventstore.UniqueConstraint {
+	return eventstore.NewRemoveUniqueConstraint(
+		UniqueClientIDMetadataDocumentAllowedURL,
+		clientIDMetadataDocumentAllowedURLField(allowedURL))
+}
 
 type SecurityPolicySetEvent struct {
 	eventstore.BaseEvent `json:"-"`
@@ -28,6 +71,16 @@ type SecurityPolicySetEvent struct {
 	// AllowUnauthenticatedDynamicClientRegistration additionally allows registration
 	// without an access token. It only has an effect if EnableDynamicClientRegistration.
 	AllowUnauthenticatedDynamicClientRegistration *bool `json:"allow_unauthenticated_dynamic_client_registration,omitempty"`
+
+	// EnableClientIDMetadataDocument resolves a client_id that is an absolute HTTPS URL as a
+	// Client ID Metadata Document instead of looking it up in the database.
+	EnableClientIDMetadataDocument *bool `json:"enable_client_id_metadata_document,omitempty"`
+	// ClientIDMetadataDocumentAllowedURLs replaces the client_id URLs the instance resolves as
+	// Client ID Metadata Documents.
+	ClientIDMetadataDocumentAllowedURLs *[]string `json:"client_id_metadata_document_allowed_urls,omitempty"`
+	// ClientIDMetadataDocumentAllowAnyURL lets the instance resolve every client_id URL the
+	// system allows, regardless of ClientIDMetadataDocumentAllowedURLs.
+	ClientIDMetadataDocumentAllowAnyURL *bool `json:"client_id_metadata_document_allow_any_url,omitempty"`
 }
 
 func NewSecurityPolicySetEvent(
@@ -86,12 +139,46 @@ func ChangeSecurityPolicyAllowUnauthenticatedDynamicClientRegistration(allow boo
 	}
 }
 
+func ChangeSecurityPolicyEnableClientIDMetadataDocument(enabled bool) func(event *SecurityPolicySetEvent) {
+	return func(e *SecurityPolicySetEvent) {
+		e.EnableClientIDMetadataDocument = &enabled
+	}
+}
+
+func ChangeSecurityPolicyClientIDMetadataDocumentAllowedURLs(allowedURLs []string) func(event *SecurityPolicySetEvent) {
+	return func(e *SecurityPolicySetEvent) {
+		if len(allowedURLs) == 0 {
+			allowedURLs = []string{}
+		}
+		e.ClientIDMetadataDocumentAllowedURLs = &allowedURLs
+	}
+}
+
+func ChangeSecurityPolicyClientIDMetadataDocumentAllowAnyURL(allow bool) func(event *SecurityPolicySetEvent) {
+	return func(e *SecurityPolicySetEvent) {
+		e.ClientIDMetadataDocumentAllowAnyURL = &allow
+	}
+}
+
 func (e *SecurityPolicySetEvent) Payload() interface{} {
 	return e
 }
 
+// UniqueConstraints replaces the allowed URL constraints of the instance when the event replaces
+// the list: it releases all of them and takes one per URL in the new list. They are derived from
+// the list alone, not from the list the command read before, so a push that is retried after a
+// concurrent change to the policy still leaves exactly the constraints of the list it stores.
 func (e *SecurityPolicySetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
+	if e.ClientIDMetadataDocumentAllowedURLs == nil {
+		return nil
+	}
+	instanceID := e.Aggregate().InstanceID
+	constraints := make([]*eventstore.UniqueConstraint, 0, len(*e.ClientIDMetadataDocumentAllowedURLs)+1)
+	constraints = append(constraints, NewRemoveClientIDMetadataDocumentAllowedURLUniqueConstraints(instanceID))
+	for _, allowedURL := range *e.ClientIDMetadataDocumentAllowedURLs {
+		constraints = append(constraints, NewAddClientIDMetadataDocumentAllowedURLUniqueConstraint(instanceID, allowedURL))
+	}
+	return constraints
 }
 
 func SecurityPolicySetEventMapper(event eventstore.Event) (eventstore.Event, error) {
@@ -104,4 +191,75 @@ func SecurityPolicySetEventMapper(event eventstore.Event) (eventstore.Event, err
 	}
 
 	return securityPolicyAdded, nil
+}
+
+// SecurityPolicyClientIDMetadataDocumentAllowedURLAddedEvent adds a client_id URL the instance
+// resolves as a Client ID Metadata Document. It is a separate event rather than a set of the
+// whole list, so concurrent additions do not overwrite each other.
+type SecurityPolicyClientIDMetadataDocumentAllowedURLAddedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	URL string `json:"url"`
+}
+
+func (e *SecurityPolicyClientIDMetadataDocumentAllowedURLAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewSecurityPolicyClientIDMetadataDocumentAllowedURLAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	url string,
+) *SecurityPolicyClientIDMetadataDocumentAllowedURLAddedEvent {
+	return &SecurityPolicyClientIDMetadataDocumentAllowedURLAddedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			SecurityPolicyClientIDMetadataDocumentAllowedURLAddedEventType,
+		),
+		URL: url,
+	}
+}
+
+func (e *SecurityPolicyClientIDMetadataDocumentAllowedURLAddedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *SecurityPolicyClientIDMetadataDocumentAllowedURLAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewAddClientIDMetadataDocumentAllowedURLUniqueConstraint(e.Aggregate().InstanceID, e.URL)}
+}
+
+// SecurityPolicyClientIDMetadataDocumentAllowedURLRemovedEvent removes a client_id URL the
+// instance resolves as a Client ID Metadata Document.
+type SecurityPolicyClientIDMetadataDocumentAllowedURLRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	URL string `json:"url"`
+}
+
+func (e *SecurityPolicyClientIDMetadataDocumentAllowedURLRemovedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewSecurityPolicyClientIDMetadataDocumentAllowedURLRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	url string,
+) *SecurityPolicyClientIDMetadataDocumentAllowedURLRemovedEvent {
+	return &SecurityPolicyClientIDMetadataDocumentAllowedURLRemovedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			SecurityPolicyClientIDMetadataDocumentAllowedURLRemovedEventType,
+		),
+		URL: url,
+	}
+}
+
+func (e *SecurityPolicyClientIDMetadataDocumentAllowedURLRemovedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *SecurityPolicyClientIDMetadataDocumentAllowedURLRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewRemoveClientIDMetadataDocumentAllowedURLUniqueConstraint(e.URL)}
 }

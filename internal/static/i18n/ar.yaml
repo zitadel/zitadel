@@ -417,6 +417,10 @@ Errors:
       NotFound: "سياسة الإشعارات الافتراضية غير موجودة"
       NotChanged: "سياسة الإشعارات الافتراضية لم تتغير"
       AlreadyExists: "سياسة الإشعارات الافتراضية موجودة بالفعل"
+    SecurityPolicy:
+      ClientIDMetadataDocumentAllowedURL:
+        Invalid: "عنوان URL لمستند بيانات تعريف معرّف العميل غير صالح"
+        AlreadyExists: "عنوان URL لمستند بيانات تعريف معرّف العميل مسموح به بالفعل"
   Policy:
     AlreadyExists: "السياسة موجودة بالفعل"
     Label:

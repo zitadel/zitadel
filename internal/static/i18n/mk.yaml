@@ -415,6 +415,10 @@ Errors:
       NotFound: "Стандардната политика за известување не е пронајдена"
       NotChanged: "Стандардната политика за известување не е променета"
       AlreadyExists: "Стандардната политика за известување веќе постои"
+    SecurityPolicy:
+      ClientIDMetadataDocumentAllowedURL:
+        Invalid: "URL-адресата на документот со метаподатоци за ID на клиентот е невалидна"
+        AlreadyExists: "URL-адресата на документот со метаподатоци за ID на клиентот е веќе дозволена"
   Policy:
     AlreadyExists: "Политиката веќе постои"
     Label:

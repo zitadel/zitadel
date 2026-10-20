@@ -35,7 +35,7 @@ require (
 	github.com/fergusstrange/embedded-postgres v1.34.0
 	github.com/gabriel-vasile/mimetype v1.4.13
 	github.com/georgysavva/scany/v2 v2.1.4
-	github.com/go-chi/chi/v5 v5.2.5
+	github.com/go-chi/chi/v5 v5.3.1
 	github.com/go-jose/go-jose/v4 v4.1.4
 	github.com/go-ldap/ldap/v3 v3.4.13
 	github.com/go-resty/resty/v2 v2.17.2
@@ -100,7 +100,7 @@ require (
 	github.com/veqryn/slog-context/otel v0.9.0
 	github.com/zitadel/exifremove v0.1.0
 	github.com/zitadel/logging v0.7.0
-	github.com/zitadel/oidc/v3 v3.47.5
+	github.com/zitadel/oidc/v3 v3.48.0
 	github.com/zitadel/passwap v0.12.1
 	github.com/zitadel/saml v0.4.1
 	github.com/zitadel/schema v1.3.2
@@ -135,6 +135,7 @@ require (
 	golang.org/x/sync v0.22.0
 	golang.org/x/sys v0.47.0
 	golang.org/x/text v0.41.0
+	golang.org/x/time v0.15.0
 	google.golang.org/api v0.276.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260526163538-3dc84a4a5aaa
 	google.golang.org/grpc v1.83.2
@@ -266,7 +267,6 @@ require (
 	go.uber.org/goleak v1.3.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/time v0.15.0 // indirect
 	google.golang.org/genproto v0.0.0-20260420184626-e10c466a9529 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260831171406-18b4a7587f8a // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

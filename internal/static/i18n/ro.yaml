@@ -607,6 +607,10 @@ Errors:
         Duplicate: "ID-ul cheii web nu este unic"
         NoActive: "Nu a fost găsită nicio cheie web activă"
         NotFound: "Cheia web nu a fost găsită"
+    SecurityPolicy:
+      ClientIDMetadataDocumentAllowedURL:
+        Invalid: "URL-ul documentului de metadate al ID-ului clientului este invalid"
+        AlreadyExists: "URL-ul documentului de metadate al ID-ului clientului este deja permis"
   IDP:
     InvalidSearchQuery: "Interogare de căutare invalidă"
     ClientIDMissing: "ClientID lipsă"

@@ -55,6 +55,18 @@ var (
 		name:  projection.SecurityPolicyColumnAllowUnauthenticatedDynamicClientRegistration,
 		table: securityPolicyTable,
 	}
+	SecurityPolicyColumnEnableClientIDMetadataDocument = Column{
+		name:  projection.SecurityPolicyColumnEnableClientIDMetadataDocument,
+		table: securityPolicyTable,
+	}
+	SecurityPolicyColumnClientIDMetadataDocumentAllowedURLs = Column{
+		name:  projection.SecurityPolicyColumnClientIDMetadataDocumentAllowedURLs,
+		table: securityPolicyTable,
+	}
+	SecurityPolicyColumnClientIDMetadataDocumentAllowAnyURL = Column{
+		name:  projection.SecurityPolicyColumnClientIDMetadataDocumentAllowAnyURL,
+		table: securityPolicyTable,
+	}
 )
 
 type SecurityPolicy struct {
@@ -70,6 +82,10 @@ type SecurityPolicy struct {
 
 	EnableDynamicClientRegistration               bool
 	AllowUnauthenticatedDynamicClientRegistration bool
+
+	EnableClientIDMetadataDocument      bool
+	ClientIDMetadataDocumentAllowedURLs database.TextArray[string]
+	ClientIDMetadataDocumentAllowAnyURL bool
 }
 
 func (q *Queries) SecurityPolicy(ctx context.Context) (policy *SecurityPolicy, err error) {
@@ -99,7 +115,10 @@ func prepareSecurityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*SecurityPo
 			SecurityPolicyColumnAllowedOrigins.identifier(),
 			SecurityPolicyColumnEnableImpersonation.identifier(),
 			SecurityPolicyColumnEnableDynamicClientRegistration.identifier(),
-			SecurityPolicyColumnAllowUnauthenticatedDynamicClientRegistration.identifier()).
+			SecurityPolicyColumnAllowUnauthenticatedDynamicClientRegistration.identifier(),
+			SecurityPolicyColumnEnableClientIDMetadataDocument.identifier(),
+			SecurityPolicyColumnClientIDMetadataDocumentAllowedURLs.identifier(),
+			SecurityPolicyColumnClientIDMetadataDocumentAllowAnyURL.identifier()).
 			From(securityPolicyTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*SecurityPolicy, error) {
@@ -115,6 +134,9 @@ func prepareSecurityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*SecurityPo
 				&securityPolicy.EnableImpersonation,
 				&securityPolicy.EnableDynamicClientRegistration,
 				&securityPolicy.AllowUnauthenticatedDynamicClientRegistration,
+				&securityPolicy.EnableClientIDMetadataDocument,
+				&securityPolicy.ClientIDMetadataDocumentAllowedURLs,
+				&securityPolicy.ClientIDMetadataDocumentAllowAnyURL,
 			)
 			if err != nil && !errors.Is(err, sql.ErrNoRows) { // ignore not found errors
 				return nil, zerrors.ThrowInternal(err, "QUERY-Dfrt2", "Errors.Internal")

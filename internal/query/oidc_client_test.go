@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	_ "embed"
+	"encoding/json"
 	"net/url"
 	"regexp"
 	"testing"
@@ -278,4 +279,25 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 			})
 		})
 	}
+}
+
+func TestURL_JSONRoundTrip(t *testing.T) {
+	type holder struct {
+		URL *URL `json:"url,omitempty"`
+	}
+	u, err := url.Parse("https://login.example.com/ui/v2/login?x=1")
+	require.NoError(t, err)
+
+	data, err := json.Marshal(holder{URL: (*URL)(u)})
+	require.NoError(t, err)
+	assert.JSONEq(t, `{"url":"https://login.example.com/ui/v2/login?x=1"}`, string(data))
+
+	var got holder
+	require.NoError(t, json.Unmarshal(data, &got))
+	require.NotNil(t, got.URL)
+	assert.Equal(t, u.String(), got.URL.URL().String())
+
+	data, err = json.Marshal(holder{})
+	require.NoError(t, err)
+	assert.JSONEq(t, `{}`, string(data))
 }

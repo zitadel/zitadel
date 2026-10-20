@@ -415,6 +415,10 @@ Errors:
       NotFound: "Política de Notificação Padrão não encontrada"
       NotChanged: "Política de Notificação Padrão não foi alterada"
       AlreadyExists: "Política de Notificação Padrão já existe"
+    SecurityPolicy:
+      ClientIDMetadataDocumentAllowedURL:
+        Invalid: "A URL do documento de metadados do ID do cliente é inválida"
+        AlreadyExists: "A URL do documento de metadados do ID do cliente já é permitida"
   Policy:
     AlreadyExists: "Política já existe"
     Label:
