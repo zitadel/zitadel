@@ -1,7 +1,9 @@
 {
   "common": {
     "back": "返回",
-    "title": "使用 Zitadel 登录"
+    "title": "使用 Zitadel 登录",
+    "showPassword": "显示密码",
+    "hidePassword": "隐藏密码"
   },
   "accounts": {
     "title": "账户",
