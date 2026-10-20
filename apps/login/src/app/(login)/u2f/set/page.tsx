@@ -1,6 +1,6 @@
-import { Alert } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterU2f } from "@/components/register-u2f";
+import { SessionExpiredAlert } from "@/components/session-expired-alert";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getEnrollmentAuthorizationError } from "@/lib/server/enrollment-guard";
@@ -70,12 +70,12 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
       <div className="w-full">
         {(!sessionFactors || !enrollmentAuthorized) && (
-          <div className="py-4">
-            <Alert>
-              {/* a loginName was provided but the session could not be resolved (cookie missing, invalid or expired) */}
-              <Translated i18nKey={!sessionFactors && loginName ? "sessionExpired" : "unknownContext"} namespace="error" />
-            </Alert>
-          </div>
+          <SessionExpiredAlert
+            hasContext={!!(!sessionFactors && loginName)}
+            loginName={loginName}
+            requestId={requestId}
+            organization={organization}
+          />
         )}
 
         {sessionFactors?.id && enrollmentAuthorized && (

@@ -1,7 +1,7 @@
-import { Alert } from "@/components/alert";
 import { BackButton } from "@/components/back-button";
 import { ChooseAuthenticatorToSetup } from "@/components/choose-authenticator-to-setup";
 import { DynamicTheme } from "@/components/dynamic-theme";
+import { SessionExpiredAlert } from "@/components/session-expired-alert";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
@@ -88,10 +88,12 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   if (!sessionWithData || !sessionWithData.factors || !sessionWithData.factors.user) {
     return (
-      <Alert>
-        {/* context was provided but the session could not be resolved (cookie missing, invalid or expired) */}
-        <Translated i18nKey={loginName || sessionId ? "sessionExpired" : "unknownContext"} namespace="error" />
-      </Alert>
+      <SessionExpiredAlert
+        hasContext={!!(loginName || sessionId)}
+        loginName={loginName}
+        requestId={requestId}
+        organization={organization}
+      />
     );
   }
 

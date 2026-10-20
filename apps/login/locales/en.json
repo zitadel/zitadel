@@ -472,6 +472,7 @@
     "failedLoading": "Failed to load data. Please try again.",
     "tryagain": "Try Again",
     "couldNotContinueSession": "Could not continue with session - missing user information",
-    "couldNotClearSession": "Could not end the session. Please try again."
+    "couldNotClearSession": "Could not end the session. Please try again.",
+    "signInAgain": "Sign in again"
   }
 }

@@ -471,6 +471,7 @@
     "failedLoading": "Gegevens laden mislukt. Probeer het opnieuw.",
     "tryagain": "Opnieuw proberen",
     "couldNotContinueSession": "Kon de sessie niet voortzetten - ontbrekende gebruikersinformatie",
-    "couldNotClearSession": "De sessie kon niet worden beëindigd. Probeer het opnieuw."
+    "couldNotClearSession": "De sessie kon niet worden beëindigd. Probeer het opnieuw.",
+    "signInAgain": "Opnieuw inloggen"
   }
 }

@@ -471,6 +471,7 @@
     "failedLoading": "Impossibile caricare i dati. Riprova.",
     "tryagain": "Riprova",
     "couldNotContinueSession": "Impossibile continuare con la sessione - informazioni utente mancanti",
-    "couldNotClearSession": "Impossibile terminare la sessione. Riprova."
+    "couldNotClearSession": "Impossibile terminare la sessione. Riprova.",
+    "signInAgain": "Accedi di nuovo"
   }
 }
