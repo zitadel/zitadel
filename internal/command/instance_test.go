@@ -663,8 +663,8 @@ func humanEvents(ctx context.Context, instanceID, orgID, userID string) []events
 	return []eventstore.Command{
 		addHumanEvent(ctx, orgID, userID),
 		user.NewHumanEmailVerifiedEvent(ctx, &agg.Aggregate),
-		org.NewMemberAddedEvent(ctx, &orgAgg.Aggregate, userID, domain.RoleOrgOwner),
-		instance.NewMemberAddedEvent(ctx, &instanceAgg.Aggregate, userID, domain.RoleIAMOwner),
+		org.NewMemberAddedEvent(ctx, &orgAgg.Aggregate, userID, domain.RoleOrgOwner).WithUserResourceOwner(orgID),
+		instance.NewMemberAddedEvent(ctx, &instanceAgg.Aggregate, userID, domain.RoleIAMOwner).WithUserResourceOwner(orgID),
 	}
 }
 
@@ -707,8 +707,8 @@ func machineEvents(ctx context.Context, instanceID, orgID, userID, patID string)
 		)
 	}
 	return append(events,
-		org.NewMemberAddedEvent(ctx, &orgAgg.Aggregate, userID, domain.RoleOrgOwner),
-		instance.NewMemberAddedEvent(ctx, &instanceAgg.Aggregate, userID, domain.RoleIAMOwner),
+		org.NewMemberAddedEvent(ctx, &orgAgg.Aggregate, userID, domain.RoleOrgOwner).WithUserResourceOwner(orgID),
+		instance.NewMemberAddedEvent(ctx, &instanceAgg.Aggregate, userID, domain.RoleIAMOwner).WithUserResourceOwner(orgID),
 	)
 }
 
@@ -730,7 +730,7 @@ func loginClientEvents(ctx context.Context, instanceID, orgID, userID, patID str
 	instanceAgg := instance.NewAggregate(instanceID)
 	events := []eventstore.Command{
 		addLoginClientEvent(ctx, orgID, userID),
-		instance.NewMemberAddedEvent(ctx, &instanceAgg.Aggregate, userID, domain.RoleIAMLoginClient),
+		instance.NewMemberAddedEvent(ctx, &instanceAgg.Aggregate, userID, domain.RoleIAMLoginClient).WithUserResourceOwner(orgID),
 	}
 	if patID != "" {
 		events = append(events,

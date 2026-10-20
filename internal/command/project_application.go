@@ -139,13 +139,23 @@ func (c *Commands) RemoveApplication(ctx context.Context, projectID, appID, reso
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 
-	entityID := ""
-	samlWriteModel, err := c.getSAMLAppWriteModel(ctx, projectID, appID, resourceOwner)
-	if err == nil && samlWriteModel.State != domain.AppStateUnspecified && samlWriteModel.State != domain.AppStateRemoved && samlWriteModel.saml {
-		entityID = samlWriteModel.EntityID
+	ownerDeleteReady, err := c.isUniqueConstraintOwnerDeleteReady(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var removedEvent *project.ApplicationRemovedEvent
+	if ownerDeleteReady {
+		removedEvent = project.NewApplicationRemovedByOwnerEvent(ctx, projectAgg, appID)
+	} else {
+		entityID := ""
+		samlWriteModel, err := c.getSAMLAppWriteModel(ctx, projectID, appID, resourceOwner)
+		if err == nil && samlWriteModel.State != domain.AppStateUnspecified && samlWriteModel.State != domain.AppStateRemoved && samlWriteModel.saml {
+			entityID = samlWriteModel.EntityID
+		}
+		removedEvent = project.NewApplicationRemovedEvent(ctx, projectAgg, appID, existingApp.Name, entityID)
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, project.NewApplicationRemovedEvent(ctx, projectAgg, appID, existingApp.Name, entityID))
+	pushedEvents, err := c.eventstore.Push(ctx, removedEvent)
 	if err != nil {
 		return nil, err
 	}

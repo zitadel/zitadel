@@ -467,7 +467,7 @@
     "noUserCode": "Aucun code utilisateur fourni !",
     "noDeviceRequest": "Aucune demande d'appareil trouvée.",
     "unknownContext": "Impossible d'obtenir le contexte de l'utilisateur. Assurez-vous d'abord de saisir le nom d'utilisateur ou de fournir un loginName comme paramètre de recherche.",
-    "sessionExpired": "Votre session actuelle a expiré. Veuillez vous reconnecter.",
+    "sessionExpired": "Votre session a expiré ou nécessite une nouvelle authentification. Veuillez vous reconnecter.",
     "failedLoading": "Échec du chargement des données. Veuillez réessayer.",
     "tryagain": "Réessayer",
     "couldNotContinueSession": "Impossible de continuer la session - informations utilisateur manquantes",

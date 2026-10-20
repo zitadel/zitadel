@@ -467,7 +467,7 @@
     "noUserCode": "未提供用户代码！",
     "noDeviceRequest": "没有找到设备请求。",
     "unknownContext": "无法获取用户的上下文。请先输入用户名或提供 loginName 作为搜索参数。",
-    "sessionExpired": "当前会话已过期，请重新登录。",
+    "sessionExpired": "会话已过期或需要重新验证身份，请重新登录。",
     "failedLoading": "加载数据失败，请再试一次。",
     "tryagain": "重试",
     "couldNotContinueSession": "无法继续会话 - 缺少用户信息",

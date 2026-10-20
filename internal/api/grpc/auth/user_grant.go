@@ -6,12 +6,16 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/api/grpc/user"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/query"
 	auth_pb "github.com/zitadel/zitadel/pkg/grpc/auth"
 )
 
-func ListMyUserGrantsRequestToQuery(ctx context.Context, req *auth_pb.ListMyUserGrantsRequest) (*query.UserGrantsQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func ListMyUserGrantsRequestToQuery(ctx context.Context, defaults systemdefaults.SystemDefaults, req *auth_pb.ListMyUserGrantsRequest) (*query.UserGrantsQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	userGrantUserID, err := query.NewUserGrantUserIDSearchQuery(authz.GetCtxData(ctx).UserID)
 	if err != nil {
 		return nil, err
