@@ -51,8 +51,8 @@ vi.mock("../service-url", () => ({
   getServiceConfig: vi.fn(() => ({ serviceConfig: {} })),
 }));
 
-vi.mock("../fingerprint", () => ({
-  getOrSetFingerprintId: vi.fn(),
+vi.mock("../verification-check", () => ({
+  setUserVerificationCheckCookie: vi.fn(),
 }));
 
 vi.mock("./host", () => ({
@@ -131,6 +131,9 @@ describe("sendVerification", () => {
     expect(mockGetSession).toHaveBeenCalled();
     // Verify creation was attempted
     expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
+    // The signed verification check is issued for the verified user
+    const { setUserVerificationCheckCookie } = await import("../verification-check");
+    expect(setUserVerificationCheckCookie).toHaveBeenCalledWith("user-1");
   });
 
   test("should include requestId in /authenticator/set redirect when provided", async () => {

@@ -190,7 +190,7 @@ export function SetPasswordForm({
                   <Translated i18nKey="set.noCodeReceived" namespace="password" />
                 </span>
                 <button
-                  aria-label="Resend OTP Code"
+                  aria-label={t("set.resend")}
                   disabled={loading}
                   type="button"
                   className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"

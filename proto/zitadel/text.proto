@@ -379,6 +379,9 @@ message ExternalUserNotFoundScreenText {
     reserved "tos_confirm_and";
     string title = 1 [(validate.rules).string = {max_len: 200}];
     string description = 2 [(validate.rules).string = {max_len: 500}];
+    // Message shown if the external user does not match an existing ZITADEL user and
+    // it can neither be created nor linked to an existing one.
+    string no_option_available = 11 [(validate.rules).string = {max_len: 500}];
     string link_button_text = 3 [(validate.rules).string = {max_len: 100}];
     string auto_register_button_text = 4 [(validate.rules).string = {max_len: 100}];
     string tos_and_privacy_label = 5 [(validate.rules).string = {max_len: 200}];

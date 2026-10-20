@@ -1,10 +1,15 @@
 package instrumentation
 
 import (
+	"context"
+	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/otel/metric"
+	sdk_metric "go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 	"go.opentelemetry.io/otel/sdk/resource"
 )
 
@@ -199,6 +204,49 @@ func Test_newMeterProvider(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestMeter_RegisterCounterObserver(t *testing.T) {
+	reader := sdk_metric.NewManualReader()
+	provider := sdk_metric.NewMeterProvider(sdk_metric.WithReader(reader))
+	m := &Meter{Meter: provider.Meter(t.Name())}
+
+	callback := func(_ context.Context, o metric.Int64Observer) error {
+		o.Observe(42)
+		return nil
+	}
+
+	err := m.RegisterCounterObserver("test.counter.observer", "test counter observer", callback)
+	require.NoError(t, err)
+
+	// registering the same name again is a no-op, not an error.
+	err = m.RegisterCounterObserver("test.counter.observer", "test counter observer", callback)
+	require.NoError(t, err)
+
+	_, exists := m.CounterObservers.Load("test.counter.observer")
+	assert.True(t, exists)
+
+	var rm metricdata.ResourceMetrics
+	require.NoError(t, reader.Collect(t.Context(), &rm))
+
+	got := findMetric(t, rm, "test.counter.observer")
+	sum, ok := got.Data.(metricdata.Sum[int64])
+	require.True(t, ok, "expected an observable counter (Sum[int64]), got %T", got.Data)
+	assert.True(t, sum.IsMonotonic)
+	require.Len(t, sum.DataPoints, 1)
+	assert.Equal(t, int64(42), sum.DataPoints[0].Value)
+}
+
+// findMetric locates a metric by name across all scopes collected from a reader.
+func findMetric(t *testing.T, rm metricdata.ResourceMetrics, name string) metricdata.Metrics {
+	t.Helper()
+	for _, sm := range rm.ScopeMetrics {
+		if i := slices.IndexFunc(sm.Metrics, func(m metricdata.Metrics) bool { return m.Name == name }); i >= 0 {
+			return sm.Metrics[i]
+		}
+	}
+	t.Fatalf("metric %q not found in collected data", name)
+	return metricdata.Metrics{}
 }
 
 func Test_newMeterProvider_autoexport(t *testing.T) {

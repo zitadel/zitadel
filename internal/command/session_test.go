@@ -421,15 +421,14 @@ func TestCommands_UpdateSession(t *testing.T) {
 }
 
 func TestCommands_updateSession(t *testing.T) {
-	decryption := func(err error) crypto.EncryptionAlgorithm {
-		mCrypto := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
-		mCrypto.EXPECT().EncryptionKeyID().Return("id")
-		mCrypto.EXPECT().DecryptString(gomock.Any(), gomock.Any()).DoAndReturn(
-			func(code []byte, keyID string) (string, error) {
+	decryption := func(err error) crypto.AuthEncryptionAlgorithm {
+		mCrypto := crypto.NewMockAuthEncryptionAlgorithm(gomock.NewController(t))
+		mCrypto.EXPECT().DecryptToken(gomock.Any()).DoAndReturn(
+			func(token string) (string, error) {
 				if err != nil {
 					return "", err
 				}
-				return string(code), nil
+				return token, nil
 			})
 		return mCrypto
 	}
@@ -705,7 +704,7 @@ func TestCommands_updateSession(t *testing.T) {
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
 						CheckUser("userID", "org1", &language.Afrikaans),
-						CheckIntent("intent", "aW50ZW50"),
+						CheckIntent("intent", "intent"),
 					},
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
@@ -756,7 +755,7 @@ func TestCommands_updateSession(t *testing.T) {
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
 						CheckUser("userID", "org1", &language.Afrikaans),
-						CheckIntent("intent", "aW50ZW50"),
+						CheckIntent("intent", "intent"),
 					},
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
@@ -843,7 +842,7 @@ func TestCommands_updateSession(t *testing.T) {
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
 						CheckUser("userID", "org1", &language.Afrikaans),
-						CheckIntent("intent", "aW50ZW50"),
+						CheckIntent("intent", "intent"),
 					},
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
@@ -894,7 +893,7 @@ func TestCommands_updateSession(t *testing.T) {
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
 						CheckUser("userID", "org1", &language.Afrikaans),
-						CheckIntent("intent", "aW50ZW50"),
+						CheckIntent("intent", "intent"),
 					},
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
@@ -956,7 +955,7 @@ func TestCommands_updateSession(t *testing.T) {
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
 						CheckUser("userID", "org1", &language.Afrikaans),
-						CheckIntent("intent", "aW50ZW50"),
+						CheckIntent("intent", "intent"),
 					},
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
@@ -1037,7 +1036,7 @@ func TestCommands_updateSession(t *testing.T) {
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
 						CheckUser("userID", "org1", &language.Afrikaans),
-						CheckIntent("intent", "aW50ZW50"),
+						CheckIntent("intent", "intent"),
 					},
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",

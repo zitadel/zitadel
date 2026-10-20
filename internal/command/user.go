@@ -200,7 +200,15 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 	}
 	var events []eventstore.Command
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
-	events = append(events, user.NewUserRemovedEvent(ctx, userAgg, existingUser.UserName, existingUser.IDPLinks, domainPolicy.UserLoginMustBeDomain || orgScopedUsername))
+	ownerDeleteReady, err := c.isUniqueConstraintOwnerDeleteReady(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if ownerDeleteReady {
+		events = append(events, user.NewUserRemovedByOwnerEvent(ctx, userAgg))
+	} else {
+		events = append(events, user.NewUserRemovedEvent(ctx, userAgg, existingUser.UserName, existingUser.IDPLinks, domainPolicy.UserLoginMustBeDomain || orgScopedUsername))
+	}
 
 	for _, grantID := range cascadingGrantIDs {
 		removeEvent, _, err := c.removeUserGrant(ctx, grantID, "", true, false, nil)
@@ -208,6 +216,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 			logging.WithFields("usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
 			continue
 		}
+		skipCascadeUniqueConstraints(ownerDeleteReady, removeEvent)
 		events = append(events, removeEvent)
 	}
 
@@ -216,6 +225,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 		if err != nil {
 			return nil, err
 		}
+		skipCascadeUniqueConstraints(ownerDeleteReady, membershipEvents...)
 		events = append(events, membershipEvents...)
 	}
 
@@ -387,6 +397,11 @@ func (c *Commands) userWriteModelByID(ctx context.Context, userID, resourceOwner
 }
 
 func ExistsUser(ctx context.Context, filter preparation.FilterToQueryReducer, id, resourceOwner string, machineOnly bool) (exists bool, err error) {
+	_, exists, err = existingUser(ctx, filter, id, resourceOwner, machineOnly)
+	return exists, err
+}
+
+func existingUser(ctx context.Context, filter preparation.FilterToQueryReducer, id, resourceOwner string, machineOnly bool) (userResourceOwner string, exists bool, err error) {
 	eventTypes := []eventstore.EventType{
 		user.MachineAddedEventType,
 		user.UserRemovedType,
@@ -408,19 +423,21 @@ func ExistsUser(ctx context.Context, filter preparation.FilterToQueryReducer, id
 		EventTypes(eventTypes...).
 		Builder())
 	if err != nil {
-		return false, err
+		return "", false, err
 	}
 
 	for _, event := range events {
 		switch event.(type) {
 		case *user.HumanRegisteredEvent, *user.HumanAddedEvent, *user.MachineAddedEvent:
 			exists = true
+			userResourceOwner = event.Aggregate().ResourceOwner
 		case *user.UserRemovedEvent:
 			exists = false
+			userResourceOwner = ""
 		}
 	}
 
-	return exists, nil
+	return userResourceOwner, exists, nil
 }
 
 func (c *Commands) newUserInitCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*EncryptedCode, error) {

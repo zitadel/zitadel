@@ -368,6 +368,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Externes Benutzerkonto nicht gefunden
   Description: Externes Benutzerkonto konnte nicht gefunden werden. Möchtest du deinen Benutzer mit einem bestehenden Benutzer verknüpfen oder ihn als neuen Benutzer registrieren?
+  NoOptionAvailable: Es wurde kein Konto gefunden, das zu Ihrem externen Benutzer passt, und es kann kein neues Konto erstellt werden. Bitte wenden Sie sich an Ihren Administrator oder an den Support.
   LinkButtonText: Verknüpfen
   AutoRegisterButtonText: Registrieren
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz

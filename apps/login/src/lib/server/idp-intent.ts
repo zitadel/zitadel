@@ -29,10 +29,11 @@ import {
   UpdateUserRequest,
   UpdateUserRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import crypto from "crypto";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { getFingerprintIdCookie } from "../fingerprint";
+import { isIdpLinkProofValid } from "../idp-link-proof";
+import { getEnrollmentAuthorizationError } from "./enrollment-guard";
 import { createNewSessionFromIdpIntent } from "./idp";
 import { syncInstanceRolesFromIdpIntent } from "./instance-roles";
 
@@ -312,6 +313,29 @@ async function resolveUserIdFromSession({
       return { redirect: `/idp/${provider}/linking-failed?error=session_invalid` };
     }
 
+    // Explicit linking must be authorized the same way credential enrollment is. An
+    // "identify-only" session — produced by only submitting a login name, with no verified
+    // primary factor (password / passkey / IDP intent) — must NOT be trusted on its own:
+    // otherwise an unauthenticated attacker who merely knows a victim's login name could bind
+    // their own external identity to the victim's account (account takeover). The fingerprint
+    // check above only proves the link request originated from the same browser that started
+    // the flow, not that the session was ever authenticated.
+    //
+    // getEnrollmentAuthorizationError authorizes when the session has a verified, non-expired
+    // primary factor, OR the user has no authentication methods yet AND passed a
+    // user-verification check (the email/invite-code proof bound to this browser's
+    // fingerprint). The latter preserves the legitimate "link an IDP as the first
+    // authenticator" onboarding flow, which isSessionValid would have rejected.
+    const enrollmentError = await getEnrollmentAuthorizationError({
+      serviceConfig,
+      session,
+      userId: session.factors.user.id,
+    });
+    if (enrollmentError) {
+      logger.warn("Session for linking is not authorized", { enrollmentError });
+      return { redirect: `/idp/${provider}/linking-failed?error=session_invalid` };
+    }
+
     return { userId: session.factors.user.id };
   } catch (error) {
     logger.warn("Error retrieving session for linking", { error });
@@ -334,12 +358,7 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
       return { redirect: `/idp/${provider}/linking-failed?error=session_mismatch` };
     }
 
-    const expectedHash = crypto
-      .createHash("sha256")
-      .update(sessionId + fingerprintCookie.value)
-      .digest("hex");
-
-    if (linkFingerprint !== expectedHash) {
+    if (!isIdpLinkProofValid(linkFingerprint, sessionId, fingerprintCookie.value)) {
       logger.warn("Session linking fingerprint mismatch");
       return { redirect: `/idp/${provider}/linking-failed?error=session_mismatch` };
     }

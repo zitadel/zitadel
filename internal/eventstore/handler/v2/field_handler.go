@@ -141,17 +141,11 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 	if err != nil {
 		return additionalIteration, err
 	}
-	// stop execution if currentState.eventTimestamp >= config.maxCreatedAt
-	if !config.maxPosition.IsZero() && currentState.position.GreaterThanOrEqual(config.maxPosition) {
+	if !config.maxPosition.IsZero() && currentState.cursor.Position.GreaterThanOrEqual(config.maxPosition) {
 		return false, nil
 	}
 
-	if config.minPosition.GreaterThan(decimal.NewFromInt(0)) {
-		currentState.position = config.minPosition
-		currentState.offset = 0
-	}
-
-	events, additionalIteration, err := h.fetchEvents(ctx, tx, currentState)
+	events, additionalIteration, err := h.fetchEvents(ctx, tx, currentState, config.minPosition)
 	if err != nil {
 		return additionalIteration, err
 	}
@@ -170,59 +164,20 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 	return additionalIteration, err
 }
 
-func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState *state) (_ []eventstore.FillFieldsEvent, additionalIteration bool, err error) {
-	events, err := h.es.Filter(ctx, h.eventQuery(currentState).SetTx(tx))
+func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState *state, minPosition decimal.Decimal) (_ []eventstore.FillFieldsEvent, additionalIteration bool, err error) {
+	events, err := h.es.Filter(ctx, h.eventQuery(currentState, minPosition).SetTx(tx))
 	if err != nil || len(events) == 0 {
 		logging.OnError(ctx, err).Debug("filter eventstore failed")
 		return nil, false, err
 	}
-	eventAmount := len(events)
 
-	idx, offset := skipPreviouslyReducedEvents(events, currentState)
-
-	if currentState.position.Equal(events[len(events)-1].Position()) {
-		offset += currentState.offset
-	}
-	currentState.position = events[len(events)-1].Position()
-	currentState.offset = offset
-	currentState.aggregateID = events[len(events)-1].Aggregate().ID
-	currentState.aggregateType = events[len(events)-1].Aggregate().Type
-	currentState.sequence = events[len(events)-1].Sequence()
-	currentState.eventTimestamp = events[len(events)-1].CreatedAt()
-
-	if idx+1 == len(events) {
-		return nil, false, nil
-	}
-	events = events[idx+1:]
-
-	additionalIteration = eventAmount == int(h.bulkLimit)
+	currentState.applyEvent(events[len(events)-1])
+	additionalIteration = len(events) == int(h.bulkLimit)
 
 	fillFieldsEvents := make([]eventstore.FillFieldsEvent, len(events))
-	highestPosition := events[len(events)-1].Position()
 	for i, event := range events {
-		if event.Position().Equal(highestPosition) {
-			offset++
-		}
 		fillFieldsEvents[i] = event.(eventstore.FillFieldsEvent)
 	}
 
 	return fillFieldsEvents, additionalIteration, nil
-}
-
-func skipPreviouslyReducedEvents(events []eventstore.Event, currentState *state) (index int, offset uint32) {
-	var position decimal.Decimal
-	for i, event := range events {
-		if !event.Position().Equal(position) {
-			offset = 0
-			position = event.Position()
-		}
-		offset++
-		if event.Position().Equal(currentState.position) &&
-			event.Aggregate().ID == currentState.aggregateID &&
-			event.Aggregate().Type == currentState.aggregateType &&
-			event.Sequence() == currentState.sequence {
-			return i, offset
-		}
-	}
-	return -1, 0
 }

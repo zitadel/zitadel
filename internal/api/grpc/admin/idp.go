@@ -20,7 +20,7 @@ func (s *Server) GetIDPByID(ctx context.Context, req *admin_pb.GetIDPByIDRequest
 }
 
 func (s *Server) ListIDPs(ctx context.Context, req *admin_pb.ListIDPsRequest) (*admin_pb.ListIDPsResponse, error) {
-	queries, err := listIDPsToModel(authz.GetInstance(ctx).InstanceID(), req)
+	queries, err := listIDPsToModel(s.systemDefaults, authz.GetInstance(ctx).InstanceID(), req)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ func (s *Server) GetProviderByID(ctx context.Context, req *admin_pb.GetProviderB
 }
 
 func (s *Server) ListProviders(ctx context.Context, req *admin_pb.ListProvidersRequest) (*admin_pb.ListProvidersResponse, error) {
-	queries, err := listProvidersToQuery(authz.GetInstance(ctx).InstanceID(), req)
+	queries, err := listProvidersToQuery(s.systemDefaults, authz.GetInstance(ctx).InstanceID(), req)
 	if err != nil {
 		return nil, err
 	}
