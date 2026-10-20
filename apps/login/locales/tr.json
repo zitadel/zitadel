@@ -257,7 +257,8 @@
       "totpRegisterDescription": "QR Kodunu tarayın veya URL'ye manuel olarak gidin.",
       "submit": "Devam",
       "labels": {
-        "code": "Kod"
+        "code": "Kod",
+        "secret": "Gizli anahtar"
       },
       "required": {
         "code": "Bu alan zorunludur"
