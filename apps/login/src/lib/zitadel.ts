@@ -19,12 +19,14 @@ import { SendInviteCodeSchema } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import {
   AddHumanUserRequest,
   AddHumanUserRequestSchema,
+  CreateUserRequest,
   ResendEmailCodeRequest,
   ResendEmailCodeRequestSchema,
   SendEmailCodeRequestSchema,
   SetPasswordRequest,
   SetPasswordRequestSchema,
   UpdateHumanUserRequest,
+  UpdateUserRequest,
   UserService,
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
@@ -149,6 +151,26 @@ export async function getBrandingSettings({
     instanceCacheKey(serviceConfig, `getBrandingSettings-${organization || "instance"}`),
     fetcher,
     getTTLForKey("getBrandingSettings", longCacheTTL),
+  );
+}
+
+/**
+ * Resolves the ID of the instance the login is serving. The default login
+ * settings (queried without organization context) are always owned by the
+ * instance, so the response details carry the instance ID. Cached per
+ * instance like the other settings lookups.
+ */
+export async function getInstanceId({ serviceConfig }: WithServiceConfig) {
+  const fetcher = async () => {
+    const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
+
+    return settingsService.getLoginSettings({ ctx: makeReqCtx(undefined) }, {}).then((resp) => resp.details?.resourceOwner);
+  };
+
+  return freshCache(
+    instanceCacheKey(serviceConfig, "getInstanceId"),
+    fetcher,
+    getTTLForKey("getLoginSettings", defaultCacheTTL),
   );
 }
 
@@ -483,6 +505,22 @@ export async function updateHuman({
   const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceConfig);
 
   return userService.updateHumanUser(request);
+}
+
+// createUser calls the non-deprecated CreateUser endpoint, which supports user metadata
+// (unlike the deprecated addHumanUser/AddHumanUserRequest flow).
+export async function createUser({ serviceConfig, request }: WithServiceConfig<{ request: CreateUserRequest }>) {
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceConfig);
+
+  return userService.createUser(request);
+}
+
+// updateUser calls the non-deprecated UpdateUser endpoint, which supports updating user
+// metadata in the same request (unlike the deprecated updateHuman/UpdateHumanUserRequest flow).
+export async function updateUser({ serviceConfig, request }: WithServiceConfig<{ request: UpdateUserRequest }>) {
+  const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceConfig);
+
+  return userService.updateUser(request);
 }
 
 export async function verifyTOTPRegistration({
@@ -887,6 +925,9 @@ export async function getOrgsByDomain({ serviceConfig, domain }: WithServiceConf
   );
 }
 
+// RedirectURLs.login_hint is validated with max_len 200 by the API.
+const MAX_LOGIN_HINT_LENGTH = 200;
+
 export async function startIdentityProviderFlow({
   serviceConfig,
   idpId,
@@ -901,12 +942,19 @@ export async function startIdentityProviderFlow({
     publicHost: "",
   });
 
+  // The login hint only improves the UX at the IdP, so a hint the API would
+  // reject (e.g. an overlong login_hint sent by the RP) is dropped instead of
+  // failing the whole IdP flow.
+  const { loginHint, ...redirectUrls } = urls;
+  const content: RedirectURLsJson =
+    loginHint && loginHint.length <= MAX_LOGIN_HINT_LENGTH ? { ...redirectUrls, loginHint } : redirectUrls;
+
   return userService
     .startIdentityProviderIntent({
       idpId,
       content: {
         case: "urls",
-        value: urls,
+        value: content,
       },
     })
     .then(async (resp) => {

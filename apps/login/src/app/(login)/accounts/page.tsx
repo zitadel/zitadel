@@ -1,11 +1,13 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SessionsList } from "@/components/sessions-list";
 import { Translated } from "@/components/translated";
-import { getAllSessionCookieIds } from "@/lib/cookies";
+import { getAllSessions } from "@/lib/cookies";
 import { getServiceConfig } from "@/lib/service-url";
 import { getBrandingSettings, getDefaultOrg, listSessions, ServiceConfig } from "@/lib/zitadel";
 import { UserPlusIcon } from "@heroicons/react/24/outline";
+import { create } from "@zitadel/client";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { Session, SessionSchema } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 // import { getLocale } from "next-intl/server";
@@ -18,24 +20,52 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 async function loadSessions({ serviceConfig, organization }: { serviceConfig: ServiceConfig; organization?: string }) {
-  const cookieIds = await getAllSessionCookieIds();
+  // Deliberately no cleanup: expired cookie entries are still listed (as invalid
+  // accounts) so the user can re-authenticate with one click, like Login V1.
+  const sessionCookies = await getAllSessions();
 
-  if (cookieIds && cookieIds.length) {
-    const response = await listSessions({
-      serviceConfig,
-      ids: cookieIds.filter((id) => !!id) as string[],
-    });
-
-    let sessions = response?.sessions ?? [];
-    if (organization) {
-      sessions = sessions.filter((s) => s.factors?.user?.organizationId === organization);
-    }
-
-    return sessions;
-  } else {
+  if (!sessionCookies || !sessionCookies.length) {
     console.info("No session cookie found.");
     return [];
   }
+
+  // listSessions is a plain search: ids of terminated or unknown sessions are
+  // simply absent from the response, it does not fail. Transport failures are
+  // deliberately not caught here, they must surface instead of downgrading
+  // live sessions to invalid cards.
+  const ids = sessionCookies.map((s) => s.id).filter((id) => !!id) as string[];
+  let liveSessions: Session[] = [];
+  if (ids.length) {
+    const response = await listSessions({ serviceConfig, ids });
+    liveSessions = response?.sessions ?? [];
+  }
+
+  // For cookie entries whose server-side session no longer exists (e.g. after
+  // an RP-initiated logout) synthesize an invalid Session so the account stays
+  // selectable and the user can re-authenticate with one click.
+  const liveIds = new Set(liveSessions.map((s) => s.id));
+  const synthesized: Session[] = sessionCookies
+    .filter((c) => !!c.id && !!c.loginName && !liveIds.has(c.id))
+    .map((c) =>
+      create(SessionSchema, {
+        id: c.id,
+        factors: {
+          user: {
+            loginName: c.loginName,
+            // No displayName: the cookie does not carry one, and reusing the
+            // loginName would render it twice and break the avatar initials.
+            organizationId: c.organization ?? "",
+          },
+        },
+      }),
+    );
+
+  let sessions = [...liveSessions, ...synthesized];
+  if (organization) {
+    sessions = sessions.filter((s) => s.factors?.user?.organizationId === organization);
+  }
+
+  return sessions;
 }
 
 export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {

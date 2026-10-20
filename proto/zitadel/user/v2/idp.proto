@@ -72,7 +72,7 @@ message IDPIntent {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "token of the IDP intent"
       min_length: 1;
-      max_length: 200;
+      max_length: 500;
       example: "\"SJKL3ioIDpo342ioqw98fjp3sdf32wahb=\"";
     }
   ];

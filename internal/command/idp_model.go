@@ -26,6 +26,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	saml2 "github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml/requesttracker"
+	"github.com/zitadel/zitadel/internal/idp/providers/zitadel"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -2279,6 +2280,8 @@ func NewAllIDPWriteModel(resourceOwner string, instanceBool bool, id string, idp
 			writeModel.model = NewGoogleInstanceIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeApple:
 			writeModel.model = NewAppleInstanceIDPWriteModel(resourceOwner, id)
+		case domain.IDPTypeZitadel:
+			writeModel.model = NewInstanceZitadelIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeSAML:
 			writeModel.samlModel = NewSAMLInstanceIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeUnspecified:
@@ -2310,6 +2313,8 @@ func NewAllIDPWriteModel(resourceOwner string, instanceBool bool, id string, idp
 			writeModel.model = NewGoogleOrgIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeApple:
 			writeModel.model = NewAppleOrgIDPWriteModel(resourceOwner, id)
+		case domain.IDPTypeZitadel:
+			writeModel.model = NewZitadelOrgIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeSAML:
 			writeModel.samlModel = NewSAMLOrgIDPWriteModel(resourceOwner, id)
 		case domain.IDPTypeUnspecified:
@@ -2480,4 +2485,38 @@ func (wm *ZitadelIDPWriteModel) NewChanges(
 		changes = append(changes, idp.ChangeZitadelIDPOptions(opts))
 	}
 	return changes, nil
+}
+
+func (wm *ZitadelIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, httpClient *http.Client) (providers.Provider, error) {
+	secret, err := crypto.DecryptString(wm.ClientSecret, idpAlg)
+	if err != nil {
+		return nil, err
+	}
+	opts := make([]oidc.ProviderOpts, 1, 7)
+	opts[0] = oidc.WithSelectAccount()
+	if wm.IsCreationAllowed {
+		opts = append(opts, oidc.WithCreationAllowed())
+	}
+	if wm.IsLinkingAllowed {
+		opts = append(opts, oidc.WithLinkingAllowed())
+	}
+	if wm.IsAutoCreation {
+		opts = append(opts, oidc.WithAutoCreation())
+	}
+	if wm.IsAutoUpdate {
+		opts = append(opts, oidc.WithAutoUpdate())
+	}
+	return zitadel.New(
+		wm.Issuer,
+		wm.ClientID,
+		secret,
+		callbackURL,
+		wm.Scopes,
+		httpClient,
+		opts...,
+	)
+}
+
+func (wm *ZitadelIDPWriteModel) GetProviderOptions() idp.Options {
+	return wm.Options
 }

@@ -240,8 +240,7 @@
                 "commands": [
                     "wait-on --verbose --interval 2000 --simultaneous 1 --timeout 30m \"${ZITADEL_API_URL}/debug/ready\"",
                     "bash -c 'go test -race -count 1 -tags integration -timeout 60m -parallel 1 $(go list -tags integration ./... | grep -e \"integration_test\")'",
-                    "go tool covdata textfmt -i=$GOCOVERDIR -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/... -o profile.api.test-integration.cov",
-                    "nx run @zitadel/api:test-integration-stop"
+                    "go tool covdata textfmt -i=$GOCOVERDIR -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/... -o profile.api.test-integration.cov"
                 ]
             },
             "inputs": [

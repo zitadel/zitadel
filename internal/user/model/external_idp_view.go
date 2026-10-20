@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type ExternalIDPView struct {
@@ -52,16 +51,6 @@ type ExternalIDPSearchResponse struct {
 	Result      []*ExternalIDPView
 	Sequence    uint64
 	Timestamp   time.Time
-}
-
-func (r *ExternalIDPSearchRequest) EnsureLimit(limit uint64) error {
-	if r.Limit > limit {
-		return zerrors.ThrowInvalidArgument(nil, "SEARCH-3n8fM", "Errors.Limit.ExceedsDefault")
-	}
-	if r.Limit == 0 {
-		r.Limit = limit
-	}
-	return nil
 }
 
 func (r *ExternalIDPSearchRequest) AppendUserQuery(userID string) {

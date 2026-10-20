@@ -17,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	providers "github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
+	"github.com/zitadel/zitadel/internal/idp/providers/zitadel"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -164,6 +165,19 @@ func TestCommands_AllIDPWriteModel(t *testing.T) {
 			},
 			res: res{
 				writeModelType: &InstanceGoogleIDPWriteModel{},
+				err:            nil,
+			},
+		},
+		{
+			name: "writemodel instance zitadel",
+			args: args{
+				resourceOwner: "owner",
+				instanceBool:  true,
+				id:            "id",
+				idpType:       domain.IDPTypeZitadel,
+			},
+			res: res{
+				writeModelType: &InstanceZitadelIDPWriteModel{},
 				err:            nil,
 			},
 		},
@@ -323,6 +337,19 @@ func TestCommands_AllIDPWriteModel(t *testing.T) {
 			},
 		},
 		{
+			name: "writemodel org zitadel",
+			args: args{
+				resourceOwner: "owner",
+				instanceBool:  false,
+				id:            "id",
+				idpType:       domain.IDPTypeZitadel,
+			},
+			res: res{
+				writeModelType: &OrgZitadelIDPWriteModel{},
+				err:            nil,
+			},
+		},
+		{
 			name: "writemodel org saml",
 			args: args{
 				resourceOwner: "owner",
@@ -421,6 +448,48 @@ func TestOIDCIDPWriteModel_ToProvider_WithPKCE(t *testing.T) {
 	require.NoError(t, err)
 	require.True(t, discoveryRequested.Load(), "expected OIDC discovery to be requested")
 
+	assertProviderUsesPKCE(t, provider)
+}
+
+func TestZitadelIDPWriteModel_ToProvider(t *testing.T) {
+	var (
+		issuer             string
+		discoveryRequested atomic.Bool
+	)
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != oidc_pkg.DiscoveryEndpoint {
+			http.NotFound(w, r)
+			return
+		}
+		discoveryRequested.Store(true)
+		w.Header().Set("Content-Type", "application/json")
+		// assert, not require: FailNow must not be called from the server's handler goroutine
+		assert.NoError(t, json.NewEncoder(w).Encode(&oidc_pkg.DiscoveryConfiguration{
+			Issuer:                issuer,
+			AuthorizationEndpoint: issuer + "/authorize",
+			TokenEndpoint:         issuer + "/token",
+			UserinfoEndpoint:      issuer + "/userinfo",
+		}))
+	}
+
+	server := httptest.NewServer(http.HandlerFunc(handler))
+	t.Cleanup(server.Close)
+	issuer = server.URL
+
+	wm := &ZitadelIDPWriteModel{
+		Name:         "ZITADEL",
+		Issuer:       issuer,
+		ClientID:     "clientID",
+		ClientSecret: &crypto.CryptoValue{Algorithm: "plain", Crypted: []byte("clientSecret"), KeyID: "keyID"},
+		Scopes:       []string{"openid"},
+	}
+
+	provider, err := wm.ToProvider("https://zitadel.example.com/idps/callback", plainTextEncryption{}, http.DefaultClient)
+	require.NoError(t, err)
+	require.IsType(t, &zitadel.Provider{}, provider)
+	require.True(t, discoveryRequested.Load(), "expected OIDC discovery to be requested")
+
+	// the ZITADEL provider always enforces PKCE
 	assertProviderUsesPKCE(t, provider)
 }
 

@@ -11,7 +11,7 @@ try {
     cacheConfig = JSON.parse(process.env.API_CACHE_CONFIG);
   }
 } catch (e) {
-  console.error("Failed to parse API_CACHE_CONFIG", e);
+  logger.error("Failed to parse API_CACHE_CONFIG", { error: e });
 }
 
 /** Cache TTL: defaults to longMinutes (1 hour). Security settings rarely change. */

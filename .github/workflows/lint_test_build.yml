@@ -55,6 +55,17 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Set SHAs for nx affected commands
         uses: nrwl/nx-set-shas@v4
+      # The Depot runner image points /etc/resolv.conf directly at public DNS (8.8.8.8),
+      # bypassing the systemd-resolved stub, so *.integration.localhost (synthesized by
+      # systemd-resolved) no longer resolves and all API integration tests hang.
+      # Route DNS back through the stub until the image is fixed or the tests stop
+      # depending on wildcard localhost DNS.
+      - name: Restore systemd-resolved stub for *.localhost resolution
+        run: |
+          set -ex
+          test -e /run/systemd/resolve/stub-resolv.conf
+          sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+          getent hosts foo.integration.localhost
       - name: Lint, Test and Build
         env:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}

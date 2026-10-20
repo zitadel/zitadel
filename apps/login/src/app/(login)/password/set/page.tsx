@@ -108,8 +108,10 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           <Translated i18nKey="set.description" namespace="password" />
         </p>
 
-        {/* show error only if usernames should be shown to be unknown */}
-        {loginName && !session && !loginSettings?.ignoreUnknownUsernames && (
+        {/* Only warn when there is neither a loginName nor a userId to continue with.
+            A missing session is expected here: the set/reset flow works via code +
+            userId, and under enumeration protection no session exists by design. */}
+        {!loginName && !userId && (
           <div className="py-4">
             <Alert>
               <Translated i18nKey="unknownContext" namespace="error" />
