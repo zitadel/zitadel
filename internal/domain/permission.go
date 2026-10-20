@@ -37,6 +37,7 @@ const (
 	PermissionSessionRead               = "session.read"
 	PermissionSessionLink               = "session.link"
 	PermissionSessionDelete             = "session.delete"
+	PermissionOrganizationCreate        = "org.create"
 	PermissionOrgRead                   = "org.read"
 	PermissionOrganizationWrite         = "org.write"
 	PermissionOrganizationDelete        = "org.delete"
