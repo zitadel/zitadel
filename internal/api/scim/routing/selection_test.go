@@ -4,11 +4,11 @@ import "testing"
 
 func TestSelect(t *testing.T) {
 	tests := []struct {
-		name string
-		configured []string
-		active []string
+		name                 string
+		configured           []string
+		active               []string
 		externalLoginAllowed bool
-		want Decision
+		want                 Decision
 	}{
 		{name: "trusted single provider", configured: []string{"entra"}, active: []string{"entra", "okta"}, externalLoginAllowed: true, want: Decision{ProviderID: "entra", Allowed: true}},
 		{name: "no mapping", active: []string{"entra"}, externalLoginAllowed: true},
