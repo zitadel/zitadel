@@ -39,6 +39,7 @@ func initScimContext(ctx context.Context, q *query.Queries) (context.Context, er
 	metadataKeys := []smetadata.Key{
 		smetadata.KeyProvisioningDomain,
 		smetadata.KeyIgnorePasswordOnCreate,
+		smetadata.KeyPreferredIDP,
 	}
 	queries := sresources.BuildMetadataQueries(ctx, metadataKeys)
 
@@ -61,6 +62,8 @@ func initScimContext(ctx context.Context, q *query.Queries) (context.Context, er
 			if data.ProvisioningDomain != "" {
 				data.ExternalIDScopedMetadataKey = smetadata.ScopeExternalIdKey(data.ProvisioningDomain)
 			}
+		case string(smetadata.KeyPreferredIDP):
+			data.PreferredIDP = strings.TrimSpace(string(metadata.Value))
 		case string(smetadata.KeyIgnorePasswordOnCreate):
 			ignorePasswordOnCreate, parseErr := strconv.ParseBool(strings.TrimSpace(string(metadata.Value)))
 			if parseErr != nil {
