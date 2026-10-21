@@ -10860,8 +10860,10 @@ message RemoveProjectGrantResponse {
 }
 
 message ListProjectGrantMemberRolesRequest {
-    zitadel.v1.ListQuery query = 1;
-    repeated string result = 2;
+    // Deprecated: not used, all roles are always returned
+    zitadel.v1.ListQuery query = 1 [deprecated = true];
+    // Deprecated: not used, all roles are always returned
+    repeated string result = 2 [deprecated = true];
 }
 
 message ListProjectGrantMemberRolesResponse {

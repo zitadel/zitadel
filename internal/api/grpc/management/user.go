@@ -59,7 +59,7 @@ func (s *Server) GetUserByLoginNameGlobal(ctx context.Context, req *mgmt_pb.GetU
 }
 
 func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (*mgmt_pb.ListUsersResponse, error) {
-	queries, err := ListUsersRequestToModel(req)
+	queries, err := ListUsersRequestToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -80,15 +80,9 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 }
 
 func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChangesRequest) (*mgmt_pb.ListUserChangesResponse, error) {
-	var (
-		limit    uint64
-		sequence uint64
-		asc      bool
-	)
-	if req.Query != nil {
-		limit = uint64(req.Query.Limit)
-		sequence = req.Query.Sequence
-		asc = req.Query.Asc
+	limit, sequence, asc, err := change_grpc.ChangeQueryToModel(s.systemDefaults, req.Query)
+	if err != nil {
+		return nil, err
 	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
@@ -134,7 +128,7 @@ func (s *Server) IsUserUnique(ctx context.Context, req *mgmt_pb.IsUserUniqueRequ
 }
 
 func (s *Server) ListUserMetadata(ctx context.Context, req *mgmt_pb.ListUserMetadataRequest) (*mgmt_pb.ListUserMetadataResponse, error) {
-	metadataQueries, err := ListUserMetadataToDomain(req)
+	metadataQueries, err := ListUserMetadataToDomain(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -765,7 +759,7 @@ func (s *Server) GetMachineKeyByIDs(ctx context.Context, req *mgmt_pb.GetMachine
 }
 
 func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKeysRequest) (*mgmt_pb.ListMachineKeysResponse, error) {
-	q, err := ListMachineKeysRequestToQuery(ctx, req)
+	q, err := ListMachineKeysRequestToQuery(ctx, s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -861,7 +855,7 @@ func (s *Server) GetPersonalAccessTokenByIDs(ctx context.Context, req *mgmt_pb.G
 }
 
 func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *mgmt_pb.ListPersonalAccessTokensRequest) (*mgmt_pb.ListPersonalAccessTokensResponse, error) {
-	queries, err := ListPersonalAccessTokensRequestToQuery(ctx, req)
+	queries, err := ListPersonalAccessTokensRequestToQuery(ctx, s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -900,7 +894,7 @@ func (s *Server) RemovePersonalAccessToken(ctx context.Context, req *mgmt_pb.Rem
 }
 
 func (s *Server) ListHumanLinkedIDPs(ctx context.Context, req *mgmt_pb.ListHumanLinkedIDPsRequest) (*mgmt_pb.ListHumanLinkedIDPsResponse, error) {
-	queries, err := ListHumanLinkedIDPsRequestToQuery(ctx, req)
+	queries, err := ListHumanLinkedIDPsRequestToQuery(ctx, s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -925,7 +919,7 @@ func (s *Server) RemoveHumanLinkedIDP(ctx context.Context, req *mgmt_pb.RemoveHu
 }
 
 func (s *Server) ListUserMemberships(ctx context.Context, req *mgmt_pb.ListUserMembershipsRequest) (*mgmt_pb.ListUserMembershipsResponse, error) {
-	request, err := ListUserMembershipsRequestToModel(ctx, req)
+	request, err := ListUserMembershipsRequestToModel(ctx, s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
