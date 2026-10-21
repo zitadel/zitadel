@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -48,6 +49,37 @@ func oidcError(ctx context.Context, err error) error {
 	oidcErr := newOidcErr().WithParent(err)
 	oidcErr.Description = zError.GetMessage()
 	return op.NewStatusError(oidcErr, statusCode)
+}
+
+// asInvalidGrant maps errors which mean that the grant presented at the token
+// endpoint - an authorization code or a refresh token - is unknown, malformed,
+// expired or revoked, to an [*oidc.Error] with the invalid_grant error code.
+// RFC 6749, section 5.2 defines invalid_grant for exactly those cases, and
+// clients rely on it to tell a grant they have to renew from a request of their
+// own that was malformed. Without this mapping [oidcError] reports them as
+// invalid_request, because it maps every error below status 500 to that code.
+// Any other error is returned unchanged, so that internal failures keep their
+// status instead of telling the client its grant is gone.
+func asInvalidGrant(ctx context.Context, err error, description string) error {
+	if err == nil || !isInvalidGrant(err) {
+		return err
+	}
+	oidcErr := oidc.ErrInvalidGrant().
+		WithParent(err).
+		WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
+	oidcErr.Description = description
+	return oidcErr
+}
+
+func isInvalidGrant(err error) bool {
+	return errors.Is(err, op.ErrInvalidRefreshToken) ||
+		errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "", "Errors.OIDCSession.RefreshTokenInvalid")) ||
+		errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "", "Errors.OIDCSession.Token.Invalid")) ||
+		errors.Is(err, zerrors.ThrowInvalidArgument(nil, "", "Errors.User.RefreshToken.Invalid")) ||
+		errors.Is(err, zerrors.ThrowNotFound(nil, "", "Errors.User.RefreshToken.Invalid")) ||
+		errors.Is(err, zerrors.ThrowInvalidArgument(nil, "", "Errors.User.Code.Invalid")) ||
+		errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "", "Errors.AuthRequest.InvalidCode")) ||
+		errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "", "Errors.AuthRequest.NoCode"))
 }
 
 func writeRecoverError(w http.ResponseWriter, r *http.Request, err error) {

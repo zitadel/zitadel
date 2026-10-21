@@ -424,6 +424,18 @@ func Test_ZITADEL_API_terminated_session_user_disabled(t *testing.T) {
 	}
 }
 
+// Test_RefreshToken_invalid_grant asserts that a refresh token which cannot be
+// used - here one that never existed - is reported as invalid_grant, so that a
+// client knows the grant is gone instead of reading it as a malformed request.
+// RFC 6749, section 5.2.
+func Test_RefreshToken_invalid_grant(t *testing.T) {
+	clientID, _ := createClient(t, Instance)
+
+	_, err := refreshTokens(t, clientID, "refresh-token-that-does-not-exist")
+	require.Error(t, err)
+	assert.ErrorIs(t, err, oidc.ErrInvalidGrant().WithDescription("refresh token invalid, expired or revoked"))
+}
+
 func createClient(t testing.TB, instance *integration.Instance) (clientID, projectID string) {
 	return createClientWithOpts(t, instance, clientOpts{
 		redirectURI:  redirectURI,
