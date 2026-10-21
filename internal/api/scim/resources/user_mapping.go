@@ -49,6 +49,12 @@ func (h *UsersHandler) mapToAddHuman(ctx context.Context, scimUser *ScimUser) (*
 	// comes from service-account metadata, never from a SCIM request attribute.
 	// Do not add it to the SCIM update metadata list: a later PUT/PATCH must not
 	// silently reassign a user's provisioning provenance.
+	if preferredIDP := metadata.GetScimContextData(ctx).PreferredIDP; preferredIDP != "" {
+		human.Metadata = append(human.Metadata, &command.AddMetadataEntry{
+			Key: string(metadata.KeyPreferredIDP),
+			Value: []byte(preferredIDP),
+		})
+	}
 	if provisioningDomain := metadata.GetScimContextData(ctx).ProvisioningDomain; provisioningDomain != "" {
 		human.Metadata = append(human.Metadata, &command.AddMetadataEntry{
 			Key: string(metadata.KeyProvisioningDomain),
