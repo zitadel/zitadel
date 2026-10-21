@@ -1,7 +1,7 @@
 version: "2"
 run:
   concurrency: 4
-  go: "1.24"
+  go: "1.26"
   skip-dirs:
     - apps/docs
 linters:
