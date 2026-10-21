@@ -1,0 +1,26 @@
+name: SCIM IdP routing unit tests
+on:
+  push:
+    branches:
+      - design/scim-idp-routing-10535
+  pull_request:
+    paths:
+      - 'internal/api/scim/routing/**'
+      - '.github/workflows/scim-routing-10535.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Format
+        run: test -z "$(gofmt -l internal/api/scim/routing)"
+      - name: Unit tests
+        run: go test -v ./internal/api/scim/routing
