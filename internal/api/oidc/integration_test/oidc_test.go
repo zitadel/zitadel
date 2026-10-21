@@ -424,10 +424,9 @@ func Test_ZITADEL_API_terminated_session_user_disabled(t *testing.T) {
 	}
 }
 
-// Test_RefreshToken_invalid_grant asserts that a refresh token which cannot be
-// used - here one that never existed - is reported as invalid_grant, so that a
-// client knows the grant is gone instead of reading it as a malformed request.
-// RFC 6749, section 5.2.
+// Test_RefreshToken_invalid_grant shows that the token endpoint sends the code
+// invalid_grant for a refresh token that it cannot use. The client must then do
+// the authorization again. RFC 6749, section 5.2.
 func Test_RefreshToken_invalid_grant(t *testing.T) {
 	clientID, _ := createClient(t, Instance)
 

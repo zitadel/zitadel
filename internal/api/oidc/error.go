@@ -51,15 +51,13 @@ func oidcError(ctx context.Context, err error) error {
 	return op.NewStatusError(oidcErr, statusCode)
 }
 
-// asInvalidGrant maps errors which mean that the grant presented at the token
-// endpoint - an authorization code or a refresh token - is unknown, malformed,
-// expired or revoked, to an [*oidc.Error] with the invalid_grant error code.
-// RFC 6749, section 5.2 defines invalid_grant for exactly those cases, and
-// clients rely on it to tell a grant they have to renew from a request of their
-// own that was malformed. Without this mapping [oidcError] reports them as
-// invalid_request, because it maps every error below status 500 to that code.
-// Any other error is returned unchanged, so that internal failures keep their
-// status instead of telling the client its grant is gone.
+// asInvalidGrant changes an error that shows an unusable grant into an
+// [*oidc.Error] with the code invalid_grant. The grant is the authorization
+// code or the refresh token in the request. It is unusable when it is unknown,
+// malformed, expired or revoked. RFC 6749, section 5.2 gives invalid_grant for
+// these conditions. Without this function, [oidcError] sends invalid_request,
+// which tells the client that its own request is bad. All other errors stay
+// unchanged. Thus an internal failure keeps its status.
 func asInvalidGrant(ctx context.Context, err error, description string) error {
 	if err == nil || !isInvalidGrant(err) {
 		return err
