@@ -1,0 +1,2910 @@
+{
+  "APP_NAME": "Zitadel",
+  "DESCRIPTIONS": {
+    "METADATA_TITLE": "Metadatat",
+    "HOME": {
+      "TITLE": "Filloni me Zitadel",
+      "NEXT": {
+        "TITLE": "Hapat tuaj të ardhshëm",
+        "DESCRIPTION": "Përfundoni hapat e mëposhtëm për të siguruar aplikacionin tuaj.",
+        "CREATE_PROJECT": {
+          "TITLE": "Krijoni një projekt",
+          "DESCRIPTION": "Shtoni një projekt dhe përcaktoni rolet e tij dhe caktimet e roleve."
+        }
+      },
+      "MORE_SHORTCUTS": {
+        "GET_STARTED": {
+          "TITLE": "Fillimi",
+          "DESCRIPTION": "Ndiqni udhëzuesin e shpejtë hap pas hapi dhe filloni të ndërtoni menjëherë."
+        },
+        "DOCS": {
+          "TITLE": "Dokumentacioni",
+          "DESCRIPTION": "Eksploroni bazën e njohurive të Zitadel për t'u njohur me konceptet dhe idetë kryesore. Mësoni si funksionon Zitadel dhe si ta përdorni."
+        },
+        "EXAMPLES": {
+          "TITLE": "Shembuj dhe SDK",
+          "DESCRIPTION": "Shfletoni shembujt dhe SDK-të tona për ta përdorur Zitadel me gjuhët dhe mjetet tuaja të preferuara të programimit."
+        }
+      }
+    },
+    "ORG": {
+      "TITLE": "Organizata",
+      "DESCRIPTION": "Një organizatë përmban përdorues, projekte me aplikacione, ofrues identiteti dhe cilësime si pamja e markës së kompanisë. Dëshironi t'i ndani cilësimet mes disa organizatave? Konfiguroni cilësimet e parazgjedhura.",
+      "METADATA": "Shtoni atribute të personalizuara për organizatën, si vendndodhja ose një identifikues në një sistem tjetër. Këtë informacion mund ta përdorni në Actions tuaja."
+    },
+    "PROJECTS": {
+      "TITLE": "Projektet",
+      "DESCRIPTION": "Një projekt përmban një ose më shumë aplikacione që mund t'i përdorni për të vërtetuar përdoruesit tuaj. Për shembull, mund të keni një projekt të vetëm me 3 aplikacione: një për frontend-in e uebit, një për aplikacionin celular dhe një për shërbimet backend. Përmes projekteve mund t'i autorizoni gjithashtu përdoruesit tuaj. Që përdoruesit nga organizata të tjera të hyjnë në aplikacionet tuaja, jepuni akses në projektin tuaj.<br/><br/>Nëse nuk e gjeni një projekt, kontaktoni pronarin e projektit ose dikë me të drejtat përkatëse për të marrë akses.",
+      "OWNED": {
+        "TITLE": "Projektet në pronësi",
+        "DESCRIPTION": "Këto janë projektet që zotëroni. Mund të menaxhoni cilësimet, caktimet e roleve dhe aplikacionet e këtyre projekteve."
+      },
+      "GRANTED": {
+        "TITLE": "Projektet e dhëna",
+        "DESCRIPTION": "Këto janë projektet që organizata të tjera ju kanë dhënë. Me projektet e dhëna mund t'u jepni përdoruesve tuaj akses në aplikacionet e organizatave të tjera."
+      }
+    },
+    "USERS": {
+      "TITLE": "Përdoruesit",
+      "DESCRIPTION": "Përdoruesi është një person ose një llogari shërbimi që mund të ketë akses në aplikacionet tuaja.",
+      "HUMANS": {
+        "TITLE": "Përdoruesit",
+        "DESCRIPTION": "Përdoruesit vërtetohen në mënyrë ndërvepruese në një sesion shfletuesi me një formular hyrjeje.",
+        "METADATA": "Shtoni atribute të personalizuara për përdoruesin, si departamenti. Këtë informacion mund ta përdorni në Actions tuaja."
+      },
+      "MACHINES": {
+        "TITLE": "Llogaritë e shërbimit",
+        "DESCRIPTION": "Llogaritë e shërbimit vërtetohen pa ndërveprim me një JWT bearer token të nënshkruar me një çelës privat. Mund të përdorin gjithashtu një token aksesi personal.",
+        "METADATA": "Shtoni atribute të personalizuara për llogarinë, si sistemi që vërteton. Këtë informacion mund ta përdorni në Actions tuaja."
+      },
+      "SELF": {
+        "METADATA": "Shtoni atribute të personalizuara për përdoruesin tuaj, si departamenti. Këtë informacion mund ta përdorni në Actions e organizatës suaj."
+      }
+    },
+    "ROLE_ASSIGNMENTS": {
+      "TITLE": "Caktimet e roleve",
+      "DESCRIPTION": "Caktimet e roleve përcaktojnë të drejtat e aksesit të një përdoruesi në një projekt. Mund t'i jepni një përdoruesi akses në një projekt dhe të përcaktoni rolet e tij brenda atij projekti."
+    },
+    "ACTIONS": {
+      "TITLE": "Actions",
+      "DESCRIPTION": "Ekzekutoni kod të personalizuar në ngjarjet që ndodhin kur përdoruesit tuaj vërtetohen në Zitadel. Automatizoni proceset, pasuroni metadatat e përdoruesve dhe token-at e tyre ose njoftoni sisteme të jashtme.",
+      "SCRIPTS": {
+        "TITLE": "Skriptet",
+        "DESCRIPTION": "Shkruani kodin tuaj JavaScript një herë dhe aktivizojeni në disa rrjedha."
+      },
+      "FLOWS": {
+        "TITLE": "Rrjedhat",
+        "DESCRIPTION": "Zgjidhni një rrjedhë vërtetimi dhe aktivizoni Action-in tuaj në një ngjarje të caktuar brenda kësaj rrjedhe."
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, një version i ri dhe i përmirësuar i Actions, tani është i disponueshëm. Versioni aktual mbetet i aksesueshëm, por zhvillimi ynë i ardhshëm do të përqendrohet te versioni i ri, i cili përfundimisht do ta zëvendësojë versionin aktual."
+    },
+    "SETTINGS": {
+      "INSTANCE": {
+        "TITLE": "Cilësimet e instancës",
+        "DESCRIPTION": "Cilësimet e parazgjedhura për të gjitha organizatat. Me lejet e duhura, disa prej tyre mund të mbishkruhen në cilësimet e organizatës."
+      },
+      "ORG": {
+        "TITLE": "Cilësimet e organizatës",
+        "DESCRIPTION": "Personalizoni cilësimet e organizatës suaj."
+      },
+      "FEATURES": {
+        "TITLE": "Cilësimet e veçorive",
+        "DESCRIPTION": "Zhbllokoni veçori për instancën tuaj."
+      },
+      "IDPS": {
+        "TITLE": "Ofruesit e identitetit",
+        "DESCRIPTION": "Krijoni dhe aktivizoni ofrues të jashtëm identiteti. Zgjidhni një ofrues të njohur ose konfiguroni çdo ofrues tjetër të përputhshëm me OIDC, OAuth ose SAML sipas zgjedhjes suaj. Madje mund t'i përdorni token-at tuaj ekzistues JWT si identitete të federuara duke konfiguruar një ofrues identiteti JWT.",
+        "NEXT": "Po tani?",
+        "SAML": {
+          "TITLE": "Konfiguroni ofruesin tuaj të identitetit SAML",
+          "DESCRIPTION": "Zitadel është konfiguruar. Tani ofruesi juaj i identitetit SAML ka nevojë për disa konfigurime. Shumica e ofruesve ju lejojnë thjesht të ngarkoni të gjithë XML-në e metadatave të Zitadel. Ofrues të tjerë kërkojnë vetëm disa URL të caktuara, për shembull entity ID (URL-ja e metadatave), URL-në e Assertion Consumer Service (ACS) ose URL-në e Single Logout."
+        },
+        "CALLBACK": {
+          "TITLE": "Konfiguroni ofruesin tuaj të identitetit {{ provider }}",
+          "DESCRIPTION": "Para se të konfiguroni Zitadel, jepini këtë URL ofruesit tuaj të identitetit për të mundësuar ridrejtimin e shfletuesit përsëri te Zitadel pas vërtetimit."
+        },
+        "JWT": {
+          "TITLE": "Përdorni JWT si identitete të federuara",
+          "DESCRIPTION": "Ofruesi i identitetit JWT ju mundëson të përdorni token-at tuaj ekzistues JWT si identitete të federuara. Kjo veçori është e dobishme nëse keni tashmë një lëshues JWT. Me një IdP JWT, mund t'i përdorni këto JWT për të krijuar dhe përditësuar përdorues në Zitadel në çast."
+        },
+        "LDAP": {
+          "TITLE": "Konfiguroni Zitadel për t'u lidhur me ofruesin tuaj të identitetit LDAP",
+          "DESCRIPTION": "Jepni të dhënat e lidhjes me serverin tuaj LDAP dhe konfiguroni përputhjen e atributeve LDAP me atributet e Zitadel."
+        },
+        "AUTOFILL": {
+          "TITLE": "Plotësimi automatik i të dhënave të përdoruesit",
+          "DESCRIPTION": "Përdorni një Action për të përmirësuar përvojën e përdoruesve tuaj. Mund ta plotësoni paraprakisht formularin e regjistrimit të Zitadel me vlera nga ofruesi i identitetit."
+        },
+        "ACTIVATE": {
+          "TITLE": "Aktivizo IdP-në",
+          "DESCRIPTION": "IdP-ja juaj nuk është ende aktive. Aktivizojeni që përdoruesit tuaj të mund të hyjnë."
+        }
+      },
+      "PW_COMPLEXITY": {
+        "TITLE": "Kompleksiteti i fjalëkalimit",
+        "DESCRIPTION": "Siguroni që përdoruesit tuaj të përdorin fjalëkalime të forta duke përcaktuar rregulla kompleksiteti."
+      },
+      "BRANDING": {
+        "TITLE": "Pamja e markës",
+        "DESCRIPTION": "Personalizoni pamjen e formularit tuaj të hyrjes. Mos harroni të aplikoni cilësimet kur të keni mbaruar."
+      },
+      "PRIVACY_POLICY": {
+        "TITLE": "Lidhjet e jashtme",
+        "DESCRIPTION": "Drejtojini përdoruesit tuaj te burime të jashtme të personalizuara që shfaqen në faqen e hyrjes. Përdoruesit duhet të pranojnë Kushtet e shërbimit dhe Politikën e privatësisë para se të regjistrohen. Ndryshoni lidhjen drejt dokumentacionit tuaj ose vendosni një varg bosh për ta fshehur butonin e dokumentacionit nga konsola e menaxhimit. Shtoni një lidhje të jashtme të personalizuar dhe një tekst të personalizuar për të në konsolën e menaxhimit, ose lërini bosh për ta fshehur atë buton."
+      },
+      "SMTP_PROVIDER": {
+        "TITLE": "Cilësimet SMTP",
+        "DESCRIPTION": "Konfiguroni serverin tuaj SMTP për të përdorur për adresën e dërguesit një domen që përdoruesit tuaj e njohin dhe i besojnë."
+      },
+      "SMS_PROVIDER": {
+        "TITLE": "Cilësimet SMS",
+        "DESCRIPTION": "Për të zhbllokuar të gjitha veçoritë e Zitadel, konfiguroni Twilio për t'u dërguar mesazhe SMS përdoruesve tuaj."
+      },
+      "IAM_EVENTS": {
+        "TITLE": "Ngjarjet",
+        "DESCRIPTION": "Kjo faqe shfaq të gjitha ndryshimet e gjendjes në instancën tuaj, aq larg në kohë sa lejon kufiri i gjurmës së auditimit të instancës. Filtrojeni listën sipas intervalit kohor për korrigjim gabimesh ose sipas një agregati për qëllime auditimi."
+      },
+      "IAM_FAILED_EVENTS": {
+        "TITLE": "Ngjarjet e dështuara",
+        "DESCRIPTION": "Kjo faqe shfaq të gjitha ngjarjet e dështuara në instancën tuaj. Nëse Zitadel nuk sillet siç e prisni, kontrolloni gjithmonë së pari këtë listë."
+      },
+      "IAM_VIEWS": {
+        "TITLE": "Pamjet",
+        "DESCRIPTION": "Kjo faqe shfaq të gjitha pamjet e bazës së të dhënave dhe kur e përpunuan ngjarjen e tyre të fundit. Nëse ju mungojnë disa të dhëna, kontrolloni nëse pamja është e përditësuar."
+      },
+      "LANGUAGES": {
+        "TITLE": "Gjuhët",
+        "DESCRIPTION": "Kufizoni gjuhët në të cilat përkthehen formulari i hyrjes dhe mesazhet e njoftimeve. Nëse dëshironi të çaktivizoni disa gjuhë, tërhiqini te seksioni Gjuhët e palejuara. Mund të caktoni një gjuhë të lejuar si gjuhë të parazgjedhur. Nëse gjuha e preferuar e një përdoruesi nuk lejohet, përdoret gjuha e parazgjedhur."
+      },
+      "SECRET_GENERATORS": {
+        "TITLE": "Gjeneruesit e sekreteve",
+        "DESCRIPTION": "Përcaktoni kompleksitetin dhe jetëgjatësinë e sekreteve tuaja. Kompleksiteti dhe jetëgjatësia më e lartë përmirësojnë sigurinë, ndërsa kompleksiteti dhe jetëgjatësia më e ulët përmirësojnë shpejtësinë e deshifrimit."
+      },
+      "SECURITY": {
+        "TITLE": "Cilësimet e sigurisë",
+        "DESCRIPTION": "Aktivizoni veçori të Zitadel që mund të ndikojnë në siguri. Duhet ta dini mirë çfarë po bëni para se t'i ndryshoni këto cilësime."
+      },
+      "OIDC": {
+        "TITLE": "Cilësimet e OpenID Connect",
+        "DESCRIPTION": "Konfiguroni jetëgjatësinë e token-ave OIDC. Përdorni jetëgjatësi më të shkurtra për të rritur sigurinë e përdoruesve tuaj dhe më të gjata për të rritur komoditetin e tyre.",
+        "LABEL_HOURS": "Jetëgjatësia maksimale në orë",
+        "LABEL_DAYS": "Jetëgjatësia maksimale në ditë",
+        "ACCESS_TOKEN": {
+          "TITLE": "Access token",
+          "DESCRIPTION": "Access token-i përdoret për të vërtetuar një përdorues. Është një token jetëshkurtër që përdoret për të aksesuar të dhënat e përdoruesit. Përdorni një jetëgjatësi të shkurtër për të minimizuar rrezikun e aksesit të paautorizuar. Access token-at mund të rifreskohen automatikisht me një refresh token."
+        },
+        "ID_TOKEN": {
+          "TITLE": "ID token",
+          "DESCRIPTION": "ID token-i është një JSON Web Token (JWT) që përmban claims për përdoruesin. Jetëgjatësia e ID token-it nuk duhet të kalojë atë të access token-it."
+        },
+        "REFRESH_TOKEN": {
+          "TITLE": "Refresh token",
+          "DESCRIPTION": "Refresh token-i përdoret për të marrë një access token të ri. Është një token jetëgjatë që përdoret për të rifreskuar access token-in. Kur refresh token-i skadon, përdoruesi duhet të vërtetohet sërish manualisht."
+        },
+        "REFRESH_TOKEN_IDLE": {
+          "TITLE": "Refresh token joaktiv",
+          "DESCRIPTION": "Jetëgjatësia e refresh token-it joaktiv është koha maksimale që një refresh token mund të mbetet i papërdorur."
+        }
+      },
+      "WEB_KEYS": {
+        "DESCRIPTION": "Menaxhoni Web Keys OIDC për të nënshkruar dhe validuar në mënyrë të sigurt token-at për instancën tuaj Zitadel.",
+        "TABLE": {
+          "TITLE": "Web Keys aktive dhe të ardhshme",
+          "DESCRIPTION": "Web keys tuaja aktive dhe të ardhshme. Aktivizimi i një çelësi të ri çaktivizon atë aktual.",
+          "NOTE": "Shënim: endpoint-i OIDC i JWKs kthen një përgjigje që mund të ruhet në cache (parazgjedhje 5 min). Mos e aktivizoni një çelës shumë shpejt, pasi mund të mos jetë ende i disponueshëm për cache-t dhe aplikacionet.",
+          "ACTIVATE": "Aktivizo Web Key-n e radhës",
+          "ACTIVE": "Aktualisht aktiv",
+          "NEXT": "I radhës",
+          "FUTURE": "I ardhshëm",
+          "WARNING": "Web Key-i është më pak se 5 min i vjetër"
+        },
+        "CREATE": {
+          "TITLE": "Krijo Web Key të ri",
+          "DESCRIPTION": "Krijimi i një web key të ri e shton atë në listën tuaj. Si parazgjedhje, Zitadel përdor çelësa RSA2048 me hasher SHA256.",
+          "KEY_TYPE": "Lloji i çelësit",
+          "BITS": "Bit",
+          "HASHER": "Hasher",
+          "CURVE": "Kurba"
+        },
+        "PREVIOUS_TABLE": {
+          "TITLE": "Web Keys e mëparshme",
+          "DESCRIPTION": "Këto janë web keys tuaja të mëparshme që nuk janë më aktive.",
+          "DEACTIVATED_ON": "Çaktivizuar më"
+        }
+      },
+      "MESSAGE_TEXTS": {
+        "TITLE": "Tekstet e mesazheve",
+        "DESCRIPTION": "Personalizoni tekstet e mesazheve tuaja të njoftimeve me email ose SMS. Nëse dëshironi të çaktivizoni disa gjuhë, kufizojini në cilësimet e gjuhëve të instancës.",
+        "TYPE_DESCRIPTIONS": {
+          "DC": "Kur deklaroni një domen për organizatën tuaj, përdoruesve që nuk e përdorin këtë domen në emrin e hyrjes do t'u kërkohet ta ndryshojnë emrin e hyrjes që të përputhet me domenin e deklaruar.",
+          "INIT": "Kur krijohet një përdorues, ai merr një email me një lidhje për të vendosur fjalëkalimin.",
+          "PC": "Kur një përdorues ndryshon fjalëkalimin, merr një njoftim për ndryshimin nëse e keni aktivizuar këtë në cilësimet e njoftimeve.",
+          "PL": "Kur një përdorues shton passkey si metodë vërtetimi, duhet ta aktivizojë duke klikuar një lidhje në një email.",
+          "PR": "Kur një përdorues rivendos fjalëkalimin, merr një email me një lidhje për të vendosur një fjalëkalim të ri.",
+          "VE": "Kur një përdorues ndryshon adresën e emailit, merr një email me një lidhje për të verifikuar adresën e re.",
+          "VP": "Kur një përdorues ndryshon numrin e telefonit, merr një SMS me një kod për të verifikuar numrin e ri.",
+          "VEO": "Kur një përdorues shton metodën OTP me email, duhet ta aktivizojë duke vendosur një kod të dërguar në adresën e tij të emailit.",
+          "VSO": "Kur një përdorues shton metodën OTP me SMS, duhet ta aktivizojë duke vendosur një kod të dërguar në numrin e tij të telefonit.",
+          "IU": "Kur krijohet një kod ftese për një përdorues, ai merr një email me një lidhje për të vendosur metodën e vërtetimit."
+        }
+      },
+      "LOGIN_TEXTS": {
+        "TITLE": "Tekstet e ndërfaqes së hyrjes",
+        "DESCRIPTION": "Personalizoni tekstet e formularit tuaj të hyrjes. Nëse një tekst është bosh, fusha shfaq vlerën e parazgjedhur. Nëse dëshironi të çaktivizoni disa gjuhë, kufizojini në cilësimet e gjuhëve të instancës."
+      },
+      "DOMAINS": {
+        "TITLE": "Cilësimet e domeneve",
+        "DESCRIPTION": "Përcaktoni kufizime për domenet tuaja dhe konfiguroni modelet e emrave të hyrjes.",
+        "REQUIRE_VERIFICATION": {
+          "TITLE": "Kërko verifikimin e domeneve të personalizuara",
+          "DESCRIPTION": "Nëse aktivizohet, domenet e organizatës duhet të verifikohen para se të përdoren për zbulimin e domenit ose si prapashtesë e emrit të përdoruesit."
+        },
+        "LOGIN_NAME_PATTERN": {
+          "TITLE": "Modeli i emrit të hyrjes",
+          "DESCRIPTION": "Kontrolloni modelin e emrave të hyrjes së përdoruesve tuaj. Zitadel zgjedh organizatën e përdoruesit sapo ai vendos emrin e hyrjes. Prandaj emrat e hyrjes duhet të jenë unikë në të gjitha organizatat. Nëse keni përdorues me llogari në disa domene, mund ta siguroni unicitetin duke u shtuar emrave të hyrjes domenin e organizatës si prapashtesë."
+        },
+        "DOMAIN_VERIFICATION": {
+          "TITLE": "Verifikimi i domenit",
+          "DESCRIPTION": "Lejojini organizatës suaj të përdorë vetëm domenet që kontrollon realisht. Nëse aktivizohet, domenet e organizatës verifikohen periodikisht me sfidë DNS ose HTTP para se të përdoren. Kjo është një veçori sigurie për të parandaluar rrëmbimin e domeneve."
+        },
+        "SMTP_SENDER_ADDRESS": {
+          "TITLE": "Adresa e dërguesit SMTP",
+          "DESCRIPTION": "Lejo një adresë dërguesi SMTP vetëm nëse përputhet me një nga domenet e instancës suaj."
+        }
+      },
+      "LOGIN": {
+        "LIFETIMES": {
+          "TITLE": "Jetëgjatësitë e hyrjes",
+          "DESCRIPTION": "Forconi sigurinë duke ulur disa jetëgjatësi maksimale që lidhen me hyrjen.",
+          "LABEL": "Jetëgjatësia maksimale në orë",
+          "PW_CHECK": {
+            "TITLE": "Kontrolli i fjalëkalimit",
+            "DESCRIPTION": "Pas kësaj periudhe, përdoruesve do t'u kërkohet të vërtetohen sërish me fjalëkalimin e tyre."
+          },
+          "EXT_LOGIN_CHECK": {
+            "TITLE": "Kontrolli i hyrjes së jashtme",
+            "DESCRIPTION": "Pas kësaj periudhe, përdoruesit tuaj ridrejtohen te ofruesit e tyre të jashtëm të identitetit."
+          },
+          "MULTI_FACTOR_INIT": {
+            "TITLE": "Kontrolli i konfigurimit të MFA",
+            "DESCRIPTION": "Pas kësaj periudhe, përdoruesve tuaj do t'u kërkohet të konfigurojnë një faktor të dytë ose MFA, nëse nuk e kanë bërë ende. Një jetëgjatësi prej 0 e çaktivizon këtë kërkesë."
+          },
+          "SECOND_FACTOR_CHECK": {
+            "TITLE": "Kontrolli i faktorit të dytë",
+            "DESCRIPTION": "Përdoruesit tuaj duhet ta verifikojnë sërish faktorin e dytë brenda këtyre periudhave."
+          },
+          "MULTI_FACTOR_CHECK": {
+            "TITLE": "Kontrolli i MFA",
+            "DESCRIPTION": "Përdoruesit tuaj duhet ta verifikojnë sërish MFA-në brenda këtyre periudhave."
+          }
+        },
+        "FORM": {
+          "TITLE": "Formulari i hyrjes",
+          "DESCRIPTION": "Personalizoni formularin e hyrjes.",
+          "LOCAL_AUTHENTICATION_ALLOWED": {
+            "TITLE": "Lejohet vërtetimi lokal",
+            "DESCRIPTION": "Lejojini përdoruesit tuaj të hyjnë me emrin e përdoruesit dhe fjalëkalimin ose me passkey. Nëse çaktivizohet, përdoruesit tuaj mund të hyjnë vetëm përmes një ofruesi të jashtëm identiteti."
+          },
+          "USER_REGISTRATION_ALLOWED": {
+            "TITLE": "Lejohet regjistrimi i përdoruesve",
+            "DESCRIPTION": "Lejojini përdoruesit anonimë të krijojnë një llogari."
+          },
+          "ORG_REGISTRATION_ALLOWED": {
+            "TITLE": "Lejohet regjistrimi i organizatave",
+            "DESCRIPTION": "Lejojini përdoruesit anonimë të krijojnë një organizatë."
+          },
+          "EXTERNAL_LOGIN_ALLOWED": {
+            "TITLE": "Lejohet hyrja e jashtme",
+            "DESCRIPTION": "Lejojini përdoruesit tuaj të hyjnë përmes një ofruesi të jashtëm identiteti në vend të përdoruesit të Zitadel."
+          },
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Rivendosja e fjalëkalimit e fshehur",
+            "DESCRIPTION": "Mos i lejoni përdoruesit tuaj të rivendosin fjalëkalimin."
+          },
+          "DOMAIN_DISCOVERY_ALLOWED": {
+            "TITLE": "Lejohet zbulimi i domenit",
+            "DESCRIPTION": "Gjeni organizatat e përdoruesve tuaj sipas domenit të emrit të tyre të hyrjes, për shembull adresës së emailit."
+          },
+          "IGNORE_UNKNOWN_USERNAMES": {
+            "TITLE": "Injoro emrat e panjohur të përdoruesve",
+            "DESCRIPTION": "Nëse aktivizohet, formulari i hyrjes nuk shfaq mesazh gabimi kur emri i përdoruesit është i panjohur. Kjo ndihmon të parandalohet hamendësimi i emrave të përdoruesve."
+          },
+          "DISABLE_EMAIL_LOGIN": {
+            "TITLE": "Çaktivizo hyrjen me email",
+            "DESCRIPTION": "Nëse aktivizohet, përdoruesit tuaj nuk mund të hyjnë me adresën e emailit. Kini parasysh se, nëse e çaktivizoni këtë, adresat e emailit të përdoruesve duhet të jenë unike në të gjitha organizatat që ata të mund të hyjnë."
+          },
+          "DISABLE_PHONE_LOGIN": {
+            "TITLE": "Çaktivizo hyrjen me telefon",
+            "DESCRIPTION": "Nëse aktivizohet, përdoruesit tuaj nuk mund të hyjnë me numrin e telefonit. Kini parasysh se, nëse e çaktivizoni këtë, numrat e telefonit të përdoruesve duhet të jenë unikë në të gjitha organizatat që ata të mund të hyjnë."
+          }
+        }
+      }
+    }
+  },
+  "PAGINATOR": {
+    "PREVIOUS": "E mëparshmja",
+    "NEXT": "Tjetra",
+    "COUNT": "Rezultatet gjithsej",
+    "MORE": "Më shumë"
+  },
+  "FOOTER": {
+    "LINKS": {
+      "CONTACT": "Kontakti",
+      "TOS": "Kushtet e shërbimit",
+      "PP": "Politika e privatësisë"
+    },
+    "THEME": {
+      "DARK": "E errët",
+      "LIGHT": "E çelët"
+    }
+  },
+  "HOME": {
+    "WELCOME": "Filloni me Zitadel",
+    "DISCLAIMER": "Zitadel i trajton të dhënat tuaja në mënyrë konfidenciale dhe të sigurt.",
+    "DISCLAIMERLINK": "Më shumë informacion",
+    "DOCUMENTATION": {
+      "DESCRIPTION": "Filloni shpejt me Zitadel."
+    },
+    "GETSTARTED": {
+      "DESCRIPTION": "Filloni shpejt me Zitadel."
+    },
+    "QUICKSTARTS": {
+      "LABEL": "Hapat e parë",
+      "DESCRIPTION": "Filloni shpejt me Zitadel."
+    },
+    "SHORTCUTS": {
+      "SHORTCUTS": "Shkurtoret",
+      "SETTINGS": "Shkurtoret e disponueshme",
+      "PROJECTS": "Projektet",
+      "REORDER": "Mbani të shtypur dhe tërhiqni pllakën për ta lëvizur",
+      "ADD": "Mbani të shtypur dhe tërhiqni një pllakë për ta shtuar"
+    }
+  },
+  "ONBOARDING": {
+    "DESCRIPTION": "Hapat tuaj të ardhshëm",
+    "MOREDESCRIPTION": "më shumë shkurtore",
+    "COMPLETED": "përfunduar",
+    "DISMISS": "Jo, faleminderit, jam profesionist.",
+    "CARD": {
+      "TITLE": "Vini në punë Zitadel",
+      "DESCRIPTION": "Kjo listë kontrolli ju ndihmon të konfiguroni instancën dhe ju udhëheq nëpër hapat më thelbësorë"
+    },
+    "MILESTONES": {
+      "instance.policy.label.added": {
+        "title": "Konfiguroni markën tuaj",
+        "description": "Përcaktoni ngjyrat dhe formën e hyrjes dhe ngarkoni logon dhe ikonat tuaja.",
+        "action": "Konfiguro pamjen e markës"
+      },
+      "instance.smtp.config.added": {
+        "title": "Konfiguroni cilësimet SMTP",
+        "description": "Vendosni cilësimet e serverit tuaj të postës.",
+        "action": "Konfiguro SMTP"
+      },
+      "PROJECT_CREATED": {
+        "title": "Krijoni një projekt",
+        "description": "Shtoni një projekt dhe përcaktoni rolet e tij dhe caktimet e roleve.",
+        "action": "Krijo projekt"
+      },
+      "APPLICATION_CREATED": {
+        "title": "Regjistroni aplikacionin tuaj",
+        "description": "Regjistroni aplikacionin tuaj web, native, API ose SAML dhe konfiguroni një rrjedhë vërtetimi.",
+        "action": "Regjistro aplikacionin"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Hyni në aplikacionin tuaj",
+        "description": "Integroni aplikacionin tuaj me Zitadel për vërtetimin dhe testojeni duke hyrë me përdoruesin tuaj administrator.",
+        "action": "Hyr"
+      },
+      "user.human.added": {
+        "title": "Shtoni përdorues",
+        "description": "Shtoni përdoruesit e aplikacionit tuaj",
+        "action": "Shto përdorues"
+      },
+      "user.grant.added": {
+        "title": "Caktoni role për përdoruesit",
+        "description": "Lejojini përdoruesit të kenë akses në aplikacionin tuaj dhe konfiguroni rolin e tyre.",
+        "action": "Cakto role për përdoruesit"
+      }
+    }
+  },
+  "MENU": {
+    "INSTANCE": "Cilësimet e parazgjedhura",
+    "DASHBOARD": "Kreu",
+    "PERSONAL_INFO": "Informacioni personal",
+    "DOCUMENTATION": "Dokumentacioni",
+    "INSTANCEOVERVIEW": "Instanca",
+    "ORGS": "Organizatat",
+    "VIEWS": "Pamjet",
+    "EVENTS": "Ngjarjet",
+    "FAILEDEVENTS": "Ngjarjet e dështuara",
+    "ORGANIZATION": "Organizata",
+    "PROJECT": "Projektet",
+    "PROJECTOVERVIEW": "Përmbledhja",
+    "PROJECTGRANTS": "Dhëniet e aksesit në projekt",
+    "ROLES": "Rolet",
+    "GRANTEDPROJECT": "Projektet e dhëna",
+    "HUMANUSERS": "Përdoruesit",
+    "MACHINEUSERS": "Llogaritë e shërbimit",
+    "LOGOUT": "Nxirr të gjithë përdoruesit",
+    "NEWORG": "Organizatë e re",
+    "IAMADMIN": "Jeni administrator IAM. Kini parasysh se keni leje të zgjeruara.",
+    "SHOWORGS": "Shfaq të gjitha organizatat",
+    "GRANTS": "Caktimet e roleve",
+    "ACTIONS": "Actions",
+    "TARGETS": "Targets",
+    "PRIVACY": "Privatësia",
+    "TOS": "Kushtet e shërbimit",
+    "OPENSHORTCUTSTOOLTIP": "Shtypni ? për të shfaqur shkurtoret e tastierës",
+    "SETTINGS": "Cilësimet",
+    "CUSTOMERPORTAL": "Portali i klientit"
+  },
+  "QUICKSTART": {
+    "TITLE": "Integroni Zitadel në aplikacionin tuaj",
+    "DESCRIPTION": "Integroni Zitadel në aplikacionin tuaj ose përdorni një nga shembujt tanë për të filluar brenda pak minutash.",
+    "BTN_START": "Krijo aplikacion",
+    "BTN_LEARNMORE": "Mëso më shumë",
+    "CREATEPROJECTFORAPP": "Krijo projektin {{value}}",
+    "SELECT_FRAMEWORK": "Zgjidh framework-un",
+    "FRAMEWORK": "Framework",
+    "FRAMEWORK_OTHER": "Tjetër (OIDC, SAML, API)",
+    "ALMOSTDONE": "Pothuajse keni mbaruar.",
+    "REVIEWCONFIGURATION": "Rishiko cilësimet",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Kemi krijuar një konfigurim bazë për aplikacionet {{value}}. Pas krijimit mund t'i përshtatni këto cilësime sipas nevojave tuaja.",
+    "REDIRECTS": "Konfiguro ridrejtimet",
+    "DEVMODEWARN": "Modaliteti i zhvillimit është aktiv si parazgjedhje. Vlerat për prodhim mund t'i përditësoni më vonë.",
+    "GUIDE": "Udhëzuesi",
+    "BROWSEEXAMPLES": "Shfleto shembujt dhe SDK-të",
+    "DUPLICATEAPPRENAME": "Ekziston tashmë një aplikacion me të njëjtin emër. Zgjidhni një emër tjetër.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Ndrysho framework-un",
+        "DESCRIPTION": "Zgjidhni një nga framework-et e disponueshme për konfigurimin e shpejtë të aplikacionit tuaj."
+      }
+    }
+  },
+  "ACTIONS": {
+    "ACTIONS": "Veprimet",
+    "FILTER": "Filtro",
+    "RENAME": "Riemërto",
+    "SET": "Vendos",
+    "COPY": "Kopjo në clipboard",
+    "COPIED": "U kopjua në clipboard.",
+    "RESET": "Rivendos",
+    "RESETDEFAULT": "Rivendos parazgjedhjen",
+    "RESETTO": "Rivendos në: ",
+    "RESETCURRENT": "Rivendos në vlerën aktuale",
+    "SHOW": "Shfaq",
+    "HIDE": "Fshih",
+    "SAVE": "Ruaj",
+    "SAVENOW": "Ruaj tani",
+    "NEW": "I ri",
+    "ADD": "Shto",
+    "CREATE": "Krijo",
+    "CONTINUE": "Vazhdo",
+    "CONTINUEWITH": "Vazhdo me {{value}}",
+    "BACK": "Mbrapa",
+    "CLOSE": "Mbyll",
+    "CLEAR": "Pastro",
+    "CANCEL": "Anulo",
+    "INFO": "Info",
+    "OK": "OK",
+    "SELECT": "Zgjidh",
+    "VIEW": "Shfaq",
+    "SELECTIONDELETE": "Fshi përzgjedhjen",
+    "DELETE": "Fshi",
+    "REMOVE": "Hiq",
+    "VERIFY": "Verifiko",
+    "FINISH": "Përfundo",
+    "FINISHED": "Mbyll",
+    "CHANGE": "Ndrysho",
+    "REACTIVATE": "Riaktivizo",
+    "ACTIVATE": "Aktivizo",
+    "DEACTIVATE": "Çaktivizo",
+    "REFRESH": "Rifresko",
+    "LOGIN": "Hyr",
+    "EDIT": "Ndrysho",
+    "PIN": "Fikso / Hiq fiksimin",
+    "CONFIGURE": "Konfiguro",
+    "SEND": "Dërgo",
+    "NEWVALUE": "Vlerë e re",
+    "RESTORE": "Rikthe",
+    "CONTINUEWITHOUTSAVE": "Vazhdo pa ruajtur",
+    "OF": "nga",
+    "PREVIOUS": "E mëparshmja",
+    "NEXT": "Tjetra",
+    "MORE": "më shumë",
+    "STEP": "Hapi",
+    "SETUP": "Konfiguro",
+    "TEST": "Testo",
+    "UNSAVEDCHANGES": "Ndryshime të paruajtura",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Jeni i sigurt që dëshironi ta hidhni poshtë këtë Action të ri? Action-i juaj do të humbasë",
+        "CANCEL": "Anulo",
+        "DISCARD": "Hidh poshtë"
+      }
+    },
+    "TABLE": {
+      "SHOWUSER": "Shfaq përdoruesin {{value}}"
+    },
+    "DOWNLOAD": "Shkarko",
+    "APPLY": "Apliko"
+  },
+  "ACTIONSTWO": {
+    "BETA_NOTE": "Aktualisht po përdorni Actions V2 të reja, që janë në version beta. Versioni 1 i mëparshëm është ende i disponueshëm, por do të ndërpritet në të ardhmen. Ju lutemi raportoni çdo problem ose koment.",
+    "EXECUTION": {
+      "TITLE": "Actions",
+      "DESCRIPTION": "Actions ju lejojnë të ekzekutoni kod të personalizuar si përgjigje ndaj kërkesave API, ngjarjeve ose funksioneve të caktuara. Përdorini për të zgjeruar Zitadel, për të automatizuar rrjedhat e punës dhe për t'u integruar me sisteme të tjera.",
+      "TYPES": {
+        "request": "Kërkesë",
+        "response": "Përgjigje",
+        "event": "Ngjarje",
+        "function": "Funksion"
+      },
+      "DIALOG": {
+        "CREATE_TITLE": "Krijo një Action",
+        "UPDATE_TITLE": "Përditëso një Action",
+        "TYPE": {
+          "DESCRIPTION": "Zgjidhni kur dëshironi të ekzekutohet ky Action",
+          "REQUEST": {
+            "TITLE": "Kërkesë",
+            "DESCRIPTION": "Kërkesa që ndodhin brenda Zitadel. Mund të jetë, për shembull, një thirrje kërkese hyrjeje."
+          },
+          "RESPONSE": {
+            "TITLE": "Përgjigje",
+            "DESCRIPTION": "Përgjigje ndaj një kërkese brenda Zitadel. Mendoni për përgjigjen që merrni kur lexoni një përdorues."
+          },
+          "EVENTS": {
+            "TITLE": "Ngjarje",
+            "DESCRIPTION": "Ngjarje që ndodhin brenda Zitadel. Mund të jetë çdo gjë, si krijimi i një llogarie nga një përdorues, një hyrje e suksesshme etj."
+          },
+          "FUNCTIONS": {
+            "TITLE": "Funksionet",
+            "DESCRIPTION": "Funksione që mund t'i thërrisni brenda Zitadel. Mund të jetë çdo gjë, nga dërgimi i një emaili te krijimi i një përdoruesi."
+          }
+        },
+        "CONDITION": {
+          "REQ_RESP_DESCRIPTION": "Zgjidhni nëse ky Action zbatohet për të gjitha kërkesat, për një shërbim të caktuar (p.sh. menaxhimi i përdoruesve) apo për një kërkesë të vetme (p.sh. krijimi i përdoruesit).",
+          "ALL": {
+            "TITLE": "Të gjitha",
+            "DESCRIPTION": "Zgjidhni këtë nëse dëshironi ta ekzekutoni Action-in në çdo kërkesë"
+          },
+          "ALL_EVENTS": "Zgjidhni këtë nëse dëshironi ta ekzekutoni Action-in në çdo ngjarje",
+          "SELECT_SERVICE": {
+            "TITLE": "Zgjidh shërbimin",
+            "DESCRIPTION": "Zgjidhni një shërbim të Zitadel për Action-in tuaj."
+          },
+          "SELECT_METHOD": {
+            "TITLE": "Zgjidh metodën",
+            "DESCRIPTION": "Nëse dëshironi ta ekzekutoni vetëm në një kërkesë të caktuar, zgjidheni këtu",
+            "NOTE": "Nëse nuk zgjidhni një metodë, Action-i juaj do të ekzekutohet në çdo kërkesë të shërbimit të zgjedhur."
+          },
+          "FUNCTIONNAME": {
+            "TITLE": "Emri i funksionit",
+            "DESCRIPTION": "Zgjidhni funksionin që dëshironi të ekzekutoni"
+          },
+          "SELECT_GROUP": {
+            "TITLE": "Vendos grupin",
+            "DESCRIPTION": "Nëse dëshironi ta ekzekutoni vetëm në një grup ngjarjesh, vendoseni grupin këtu"
+          },
+          "SELECT_EVENT": {
+            "TITLE": "Zgjidh ngjarjen",
+            "DESCRIPTION": "Nëse dëshironi ta ekzekutoni vetëm në një ngjarje të caktuar, specifikojeni këtu"
+          }
+        },
+        "TARGET": {
+          "DESCRIPTION": "Mund të zgjidhni të ekzekutoni një target ose ta ekzekutoni atë me të njëjtat kushte si target-et e tjerë.",
+          "TARGET": {
+            "DESCRIPTION": "Target-i që dëshironi të ekzekutoni për këtë Action"
+          },
+          "CONDITIONS": {
+            "DESCRIPTION": "Kushtet e ekzekutimit"
+          }
+        }
+      },
+      "TABLE": {
+        "CONDITION": "Kushti",
+        "TYPE": "Lloji",
+        "TARGET": "Target",
+        "CREATIONDATE": "Data e krijimit"
+      }
+    },
+    "TARGET": {
+      "TITLE": "Targets",
+      "DESCRIPTION": "Target-i është destinacioni i kodit që dëshironi të ekzekutoni nga një Action. Krijoni këtu një target dhe shtojeni te Actions tuaja.",
+      "CREATE": {
+        "TITLE": "Krijoni target-in tuaj",
+        "DESCRIPTION": "Krijoni target-in tuaj jashtë Zitadel",
+        "NAME": "Emri",
+        "NAME_DESCRIPTION": "Jepini target-it tuaj një emër të qartë dhe përshkrues, që ta identifikoni lehtë më vonë",
+        "TYPE": "Lloji",
+        "TYPES": {
+          "restWebhook": "REST Webhook",
+          "restCall": "REST Call",
+          "restAsync": "REST Async"
+        },
+        "TYPES_DESCRIPTION": "Webhook: thirrja trajton kodin e statusit, por përgjigja nuk ka rëndësi\nCall: thirrja trajton kodin e statusit dhe përgjigjen\nAsync: thirrja nuk trajton as kodin e statusit, as përgjigjen, por mund të thirret paralelisht me Targets të tjerë",
+        "PAYLOAD_TYPE": "Lloji i payload-it",
+        "PAYLOAD_TYPES": {
+          "UNSPECIFIED": "I papërcaktuar",
+          "JSON": "JSON",
+          "JWT": "JSON Web Token (JWT)",
+          "JWE": "JSON Web Token i enkriptuar (JWE)"
+        },
+        "PAYLOAD_TYPE_DESCRIPTION": "JSON: payload standard JSON me një header nënshkrimi për verifikim.\nJWT: payload-i dërgohet si JWT i nënshkruar. Verifikimi është i pavarur dhe bëhet me nënshkrimin JWT.\nJWE: JWT-ja enkriptohet gjithashtu për të parandaluar aksesin e paautorizuar në informacionin e payload-it.",
+        "ENDPOINT": "Endpoint",
+        "ENDPOINT_DESCRIPTION": "Vendosni endpoint-in ku është hostuar kodi juaj. Sigurohuni që të jetë i aksesueshëm për ne!",
+        "TIMEOUT": "Koha e pritjes",
+        "TIMEOUT_DESCRIPTION": "Vendosni kohën maksimale brenda së cilës target-i juaj duhet të përgjigjet. Nëse zgjat më shumë, do ta ndalojmë kërkesën.",
+        "INTERRUPT_ON_ERROR": "Ndërprit në rast gabimi",
+        "INTERRUPT_ON_ERROR_DESCRIPTION": "Ndalo të gjitha ekzekutimet kur target-i kthen një gabim",
+        "INTERRUPT_ON_ERROR_WARNING": "Kujdes: “Ndërprit në rast gabimi” i ndal operacionet kur ka dështim, me rrezik bllokimi. Testojeni me këtë opsion të çaktivizuar për të mos bllokuar hyrjen/krijimin.",
+        "AWAIT_RESPONSE": "Prit përgjigjen",
+        "AWAIT_RESPONSE_DESCRIPTION": "Do të presim një përgjigje para se të bëjmë diçka tjetër. E dobishme nëse synoni të përdorni disa target-e për një Action të vetëm"
+      },
+      "TABLE": {
+        "NAME": "Emri",
+        "ENDPOINT": "Endpoint",
+        "CREATIONDATE": "Data e krijimit",
+        "REORDER": "Rirendit"
+      }
+    }
+  },
+  "MEMBERROLES": {
+    "IAM_OWNER": "Ka kontroll mbi të gjithë instancën, përfshirë të gjitha organizatat",
+    "IAM_OWNER_VIEWER": "Ka leje të shqyrtojë të gjithë instancën, përfshirë të gjitha organizatat",
+    "IAM_ORG_MANAGER": "Ka leje të krijojë dhe menaxhojë organizata",
+    "IAM_USER_MANAGER": "Ka leje të krijojë dhe menaxhojë përdorues",
+    "IAM_ADMIN_IMPERSONATOR": "Ka leje të veprojë në emër të administratorëve dhe përdoruesve fundorë të të gjitha organizatave",
+    "IAM_END_USER_IMPERSONATOR": "Ka leje të veprojë në emër të përdoruesve fundorë të të gjitha organizatave",
+    "IAM_LOGIN_CLIENT": "Ka leje të menaxhojë aplikacionet e hyrjes",
+    "ORG_OWNER": "Ka leje mbi të gjithë organizatën",
+    "ORG_USER_MANAGER": "Ka leje të krijojë dhe menaxhojë përdoruesit e organizatës",
+    "ORG_OWNER_VIEWER": "Ka leje të shqyrtojë të gjithë organizatën",
+    "ORG_SETTINGS_MANAGER": "Ka leje të menaxhojë cilësimet e organizatës",
+    "ORG_USER_PERMISSION_EDITOR": "Ka leje të menaxhojë caktimet e roleve",
+    "ORG_PROJECT_PERMISSION_EDITOR": "Ka leje të menaxhojë dhëniet e aksesit në projekte",
+    "ORG_PROJECT_CREATOR": "Ka leje të krijojë projektet e veta dhe cilësimet përkatëse",
+    "ORG_DYNAMIC_CLIENT_REGISTRAR": "Ka leje të regjistrojë në mënyrë dinamike klientë OAuth 2.0",
+    "ORG_ADMIN_IMPERSONATOR": "Ka leje të veprojë në emër të administratorëve dhe përdoruesve fundorë të organizatës",
+    "ORG_END_USER_IMPERSONATOR": "Ka leje të veprojë në emër të përdoruesve fundorë të organizatës",
+    "ORG_USER_SELF_MANAGER": "Ka leje të menaxhojë përdoruesin e vet",
+    "PROJECT_OWNER": "Ka leje mbi të gjithë projektin",
+    "PROJECT_OWNER_VIEWER": "Ka leje të shqyrtojë të gjithë projektin",
+    "PROJECT_OWNER_GLOBAL": "Ka leje mbi të gjithë projektin",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "Ka leje të shqyrtojë të gjithë projektin",
+    "PROJECT_GRANT_OWNER": "Ka leje të menaxhojë dhënien e aksesit në projekt",
+    "PROJECT_GRANT_OWNER_VIEWER": "Ka leje të shqyrtojë dhënien e aksesit në projekt"
+  },
+  "OVERLAYS": {
+    "ORGSWITCHER": {
+      "TEXT": "Të gjitha cilësimet dhe tabelat e organizatës në konsolën e menaxhimit bazohen në një organizatë të zgjedhur. Klikoni këtë buton për të ndërruar organizatën ose për të krijuar një të re."
+    },
+    "INSTANCE": {
+      "TEXT": "Klikoni këtu për të shkuar te cilësimet e parazgjedhura. Kini parasysh se keni akses në këtë buton vetëm nëse keni leje të zgjeruara."
+    },
+    "PROFILE": {
+      "TEXT": "Këtu mund të kaloni nga një llogari përdoruesi te tjetra dhe të menaxhoni sesionet dhe profilin tuaj."
+    },
+    "NAV": {
+      "TEXT": "Ky navigim ndryshon sipas organizatës së zgjedhur më sipër ose sipas instancës suaj"
+    },
+    "CONTEXTCHANGED": {
+      "TEXT": "Konteksti i organizatës ka ndryshuar."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "Pamja sapo kaloi te instanca!"
+    }
+  },
+  "FILTER": {
+    "TITLE": "Filtri",
+    "ORGNAME": "Emri i organizatës",
+    "ORGID": "ID-ja e organizatës",
+    "STATE": "Gjendja",
+    "PRIMARYDOMAIN": "Domeni i organizatës",
+    "DISPLAYNAME": "Emri i shfaqur i përdoruesit",
+    "EMAIL": "Email",
+    "USERNAME": "Emri i përdoruesit",
+    "PROJECTNAME": "Emri i projektit",
+    "RESOURCEOWNER": "Pronari i burimit",
+    "METHODS": {
+      "5": "përmban",
+      "7": "mbaron me",
+      "1": "është i barabartë me"
+    }
+  },
+  "KEYBOARDSHORTCUTS": {
+    "TITLE": "Shkurtoret e tastierës",
+    "UNDERORGCONTEXT": "Brenda faqeve të organizatës",
+    "SIDEWIDE": "Shkurtoret për të gjithë faqen",
+    "SHORTCUTS": {
+      "HOME": "Shko te kreu (<strong>G</strong> <strong>H</strong>)",
+      "INSTANCE": "Shko te instanca (<strong>G</strong> <strong>I</strong>)",
+      "ORG": "Shko te organizata (<strong>G</strong> <strong>O</strong>)",
+      "ORGSETTINGS": "Shko te cilësimet e organizatës (<strong>G</strong> <strong>S</strong>)",
+      "ORGSWITCHER": "Ndrysho organizatën",
+      "ME": "Shko te profili juaj",
+      "PROJECTS": "Shko te projektet (<strong>G</strong> <strong>P</strong>)",
+      "USERS": "Shko te përdoruesit (<strong>G</strong> <strong>U</strong>)",
+      "ROLEASSIGNMENTS": "Shko te caktimet e roleve (<strong>G</strong> <strong>R</strong>)",
+      "ACTIONS": "Shko te Actions dhe rrjedhat (<strong>G</strong> <strong>F</strong>)",
+      "DOMAINS": "Shko te domenet (<strong>G</strong> <strong>D</strong>)"
+    }
+  },
+  "INSTANCEID": "ID-ja e instancës",
+  "RESOURCEID": "ID-ja e burimit",
+  "NAME": "Emri",
+  "VERSION": "Versioni",
+  "TABLE": {
+    "NOROWS": "Nuk ka të dhëna"
+  },
+  "ERRORS": {
+    "REQUIRED": "Plotësoni këtë fushë.",
+    "ATLEASTONE": "Jepni të paktën një vlerë.",
+    "TOKENINVALID": {
+      "TITLE": "Token-i juaj i autorizimit ka skaduar.",
+      "DESCRIPTION": "Klikoni butonin më poshtë për të hyrë sërish."
+    },
+    "EXHAUSTED": {
+      "TITLE": "Instanca juaj është e bllokuar.",
+      "DESCRIPTION": "Kërkojini administratorit të instancës suaj Zitadel të përditësojë abonimin."
+    },
+    "INVALID_FORMAT": "Formati është i pavlefshëm.",
+    "NOTANEMAIL": "Vlera e dhënë nuk është adresë emaili.",
+    "MINLENGTH": "Duhet të ketë të paktën {{requiredLength}} karaktere.",
+    "MAXLENGTH": "Duhet të ketë më pak se {{requiredLength}} karaktere.",
+    "UPPERCASEMISSING": "Duhet të përmbajë një shkronjë të madhe.",
+    "LOWERCASEMISSING": "Duhet të përmbajë një shkronjë të vogël.",
+    "SYMBOLERROR": "Duhet të përmbajë një simbol ose shenjë pikësimi.",
+    "NUMBERERROR": "Duhet të përmbajë një shifër.",
+    "PWNOTEQUAL": "Fjalëkalimet e dhëna nuk përputhen.",
+    "PHONE": "Numri i telefonit duhet të fillojë me +."
+  },
+  "USER": {
+    "SETTINGS": {
+      "TITLE": "Cilësimet",
+      "GENERAL": "Të përgjithshme",
+      "IDP": "Ofruesit e identitetit",
+      "SECURITY": "Fjalëkalimi dhe siguria",
+      "KEYS": "Çelësat",
+      "PAT": "Token-at e aksesit personal",
+      "ROLEASSIGNMENTS": "Caktimet e roleve",
+      "MEMBERSHIPS": "Rolet e administratorit",
+      "METADATA": "Metadatat"
+    },
+    "TITLE": "Informacioni personal",
+    "DESCRIPTION": "Menaxhoni informacionin dhe cilësimet e sigurisë.",
+    "PAGES": {
+      "TITLE": "Përdoruesi",
+      "DETAIL": "Detajet",
+      "CREATE": "Krijo",
+      "MY": "Informacioni im",
+      "LOGINNAMES": "Emrat e hyrjes",
+      "LOGINMETHODS": "Metodat e hyrjes",
+      "LOGINNAMESDESC": "Këto janë emrat tuaj të hyrjes:",
+      "NOUSER": "Nuk ka përdorues të lidhur.",
+      "REACTIVATE": "Riaktivizo",
+      "DEACTIVATE": "Çaktivizo",
+      "FILTER": "Filtro",
+      "STATE": "Statusi",
+      "DELETE": "Fshi përdoruesin",
+      "UNLOCK": "Zhblloko përdoruesin",
+      "GENERATESECRET": "Gjenero client secret",
+      "REMOVESECRET": "Hiq client secret",
+      "LOCKEDDESCRIPTION": "Ky përdorues është bllokuar sepse ka tejkaluar numrin maksimal të përpjekjeve për hyrje dhe duhet zhbllokuar që të përdoret sërish.",
+      "DELETEACCOUNT": "Fshi llogarinë",
+      "DELETEACCOUNT_DESC": "Nëse e kryeni këtë veprim, do të dilni nga llogaria dhe nuk do të keni më akses në të. Ky veprim është i pakthyeshëm, prandaj vazhdoni me kujdes.",
+      "DELETEACCOUNT_BTN": "Fshi llogarinë",
+      "DELETEACCOUNT_SUCCESS": "Llogaria u fshi me sukses!"
+    },
+    "DETAILS": {
+      "DATECREATED": "Krijuar",
+      "DATECHANGED": "Ndryshuar"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Fshi përdoruesin",
+      "DELETE_SELF_TITLE": "Fshi llogarinë",
+      "DELETE_DESCRIPTION": "Jeni gati të fshini përgjithmonë një përdorues. Jeni i sigurt?",
+      "DELETE_SELF_DESCRIPTION": "Jeni gati të fshini përgjithmonë llogarinë tuaj personale. Kjo do t'ju nxjerrë nga llogaria dhe do ta fshijë përdoruesin tuaj. Ky veprim nuk mund të zhbëhet!",
+      "DELETE_AUTH_DESCRIPTION": "Jeni gati të fshini përgjithmonë llogarinë tuaj personale. Jeni i sigurt?",
+      "TYPEUSERNAME": "Shkruani '{{value}}' për të konfirmuar dhe fshirë përdoruesin.",
+      "USERNAME": "Emri i hyrjes",
+      "DELETE_BTN": "Fshi përgjithmonë"
+    },
+    "SENDEMAILDIALOG": {
+      "TITLE": "Dërgo njoftim me email",
+      "DESCRIPTION": "Klikoni butonin më poshtë për të dërguar një njoftim në adresën aktuale të emailit ose ndryshoni adresën e emailit në fushë.",
+      "NEWEMAIL": "Adresa e re e emailit"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Client secret",
+      "CLIENTSECRET_DESCRIPTION": "Ruajeni client secret-in në një vend të sigurt, sepse do të zhduket sapo të mbyllet dritarja."
+    },
+    "TABLE": {
+      "DEACTIVATE": "Çaktivizo",
+      "ACTIVATE": "Aktivizo",
+      "CHANGEDATE": "Ndryshuar së fundi",
+      "CREATIONDATE": "Krijuar më",
+      "FILTER": {
+        "0": "Filtro sipas emrit të shfaqur",
+        "1": "Filtro sipas emrit të përdoruesit",
+        "2": "filtro sipas emrit të shfaqur",
+        "3": "filtro sipas emrit të përdoruesit",
+        "4": "filtro sipas emailit",
+        "5": "filtro sipas emrit të shfaqur",
+        "10": "filtro sipas emrit të organizatës",
+        "12": "filtro sipas emrit të projektit"
+      },
+      "EMPTY": "Nuk ka regjistrime"
+    },
+    "PASSWORDLESS": {
+      "SEND": "Dërgo lidhjen e regjistrimit",
+      "TABLETYPE": "Lloji",
+      "TABLESTATE": "Statusi",
+      "NAME": "Emri",
+      "EMPTY": "Nuk është vendosur asnjë pajisje",
+      "TITLE": "Vërtetimi me passkey",
+      "DESCRIPTION": "Shtoni metoda vërtetimi të bazuara në WebAuthn për të hyrë në Zitadel me një passkey.",
+      "MANAGE_DESCRIPTION": "Menaxhoni metodat e faktorit të dytë të përdoruesve tuaj.",
+      "U2F": "Shto metodë",
+      "U2F_DIALOG_TITLE": "Verifiko vërtetuesin",
+      "U2F_DIALOG_DESCRIPTION": "Vendosni një emër për hyrjen me passkey që përdorni",
+      "U2F_SUCCESS": "Vërtetimi me passkey u krijua me sukses!",
+      "U2F_ERROR": "Ndodhi një gabim gjatë konfigurimit!",
+      "U2F_NAME": "Emri i vërtetuesit",
+      "TYPE": {
+        "0": "Nuk është përcaktuar MFA",
+        "1": "OTP",
+        "2": "Passkey"
+      },
+      "STATE": {
+        "0": "Pa gjendje",
+        "1": "Jo gati",
+        "2": "Gati",
+        "3": "Fshirë"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Hiq passkey-n",
+        "DELETE_DESCRIPTION": "Jeni gati të fshini një passkey. Jeni i sigurt?",
+        "ADD_TITLE": "Vërtetimi me passkey",
+        "ADD_DESCRIPTION": "Zgjidhni një nga opsionet e disponueshme për krijimin e një passkey.",
+        "SEND_DESCRIPTION": "Dërgoni vetes një lidhje regjistrimi në adresën tuaj të emailit.",
+        "SEND": "Dërgo lidhjen e regjistrimit",
+        "SENT": "Emaili u dërgua me sukses. Kontrolloni kutinë postare për të vazhduar me konfigurimin.",
+        "QRCODE_DESCRIPTION": "Gjeneroni një kod QR për ta skanuar me një pajisje tjetër.",
+        "QRCODE": "Gjenero kodin QR",
+        "QRCODE_SCAN": "Skanoni këtë kod QR për të vazhduar konfigurimin në pajisjen tuaj.",
+        "NEW_DESCRIPTION": "Përdorni këtë pajisje për të konfiguruar passkey.",
+        "NEW": "Shto të re"
+      }
+    },
+    "MFA": {
+      "TABLETYPE": "Lloji",
+      "TABLESTATE": "Statusi",
+      "NAME": "Emri",
+      "EMPTY": "Nuk ka faktorë shtesë",
+      "TITLE": "Vërtetimi me shumë faktorë",
+      "DESCRIPTION": "Shtoni një faktor të dytë për të siguruar mbrojtje optimale për llogarinë tuaj.",
+      "MANAGE_DESCRIPTION": "Menaxhoni metodat e faktorit të dytë të përdoruesve tuaj.",
+      "ADD": "Shto faktor",
+      "OTP": "Aplikacion vërtetimi për TOTP",
+      "OTP_DIALOG_TITLE": "Shto OTP",
+      "OTP_DIALOG_DESCRIPTION": "Skanoni kodin QR me një aplikacion vërtetimi dhe vendosni kodin më poshtë për të verifikuar dhe aktivizuar metodën TOTP.",
+      "U2F": "Passkey",
+      "U2F_DIALOG_TITLE": "Verifiko faktorin",
+      "U2F_DIALOG_DESCRIPTION": "Vendosni një emër për faktorin universal që përdorni.",
+      "U2F_SUCCESS": "Faktori u shtua me sukses!",
+      "U2F_ERROR": "Ndodhi një gabim gjatë konfigurimit!",
+      "U2F_NAME": "Emri i vërtetuesit",
+      "OTPSMS": "OTP me SMS",
+      "OTPEMAIL": "OTP me email",
+      "SETUPOTPSMSDESCRIPTION": "Dëshironi ta konfiguroni këtë numër telefoni si faktor të dytë OTP?",
+      "OTPSMSSUCCESS": "Faktori OTP u konfigurua me sukses.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Telefoni juaj duhet të jetë i verifikuar për të përdorur këtë metodë.",
+      "OTPEMAILSUCCESS": "Faktori OTP u konfigurua me sukses.",
+      "TYPE": {
+        "0": "Nuk është përcaktuar MFA",
+        "1": "OTP",
+        "2": "Passkey"
+      },
+      "STATE": {
+        "0": "Pa gjendje",
+        "1": "Jo gati",
+        "2": "Gati",
+        "3": "Fshirë"
+      },
+      "DIALOG": {
+        "MFA_DELETE_TITLE": "Hiq faktorin e dytë",
+        "MFA_DELETE_DESCRIPTION": "Jeni gati të fshini një faktor të dytë. Jeni i sigurt?",
+        "ADD_MFA_TITLE": "Shto faktor të dytë",
+        "ADD_MFA_DESCRIPTION": "Zgjidhni një nga opsionet e mëposhtme."
+      }
+    },
+    "EXTERNALIDP": {
+      "TITLE": "Ofruesit e jashtëm të identitetit",
+      "DESC": "",
+      "IDPCONFIGID": "ID-ja e konfigurimit të IdP",
+      "IDPNAME": "Emri i IdP",
+      "USERDISPLAYNAME": "Emri i jashtëm",
+      "EXTERNALUSERID": "ID-ja e jashtme e përdoruesit",
+      "EMPTY": "Nuk u gjet asnjë IdP e jashtme",
+      "DIALOG": {
+        "DELETE_TITLE": "Hiq IdP-në",
+        "DELETE_DESCRIPTION": "Jeni gati të hiqni një ofrues identiteti nga një përdorues. Dëshironi vërtet të vazhdoni?"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Krijo një përdorues të ri",
+      "DESCRIPTION": "Jepni informacionin e nevojshëm.",
+      "NAMEANDEMAILSECTION": "Emri dhe emaili",
+      "GENDERLANGSECTION": "Gjinia dhe gjuha",
+      "PHONESECTION": "Numrat e telefonit",
+      "PASSWORDSECTION": "Fjalëkalimi fillestar",
+      "ADDRESSANDPHONESECTION": "Numri i telefonit",
+      "INITMAILDESCRIPTION": "Nëse zgjidhen të dy opsionet, nuk dërgohet email inicializimi. Nëse zgjidhet vetëm një nga opsionet, dërgohet një email për të dhënë / verifikuar të dhënat.",
+      "SETUPAUTHENTICATIONLATER": "Konfiguro vërtetimin më vonë për këtë përdorues.",
+      "INVITATION": "Dërgo një email ftese për konfigurimin e vërtetimit dhe verifikimin e emailit.",
+      "INITIALPASSWORD": "Vendos një fjalëkalim fillestar për përdoruesin."
+    },
+    "CODEDIALOG": {
+      "TITLE": "Verifiko numrin e telefonit",
+      "DESCRIPTION": "Vendosni kodin që morët me SMS për të verifikuar numrin tuaj të telefonit.",
+      "CODE": "Kodi"
+    },
+    "DATA": {
+      "STATE": "Statusi",
+      "STATE0": "I panjohur",
+      "STATE1": "Aktiv",
+      "STATE2": "Joaktiv",
+      "STATE3": "Fshirë",
+      "STATE4": "I bllokuar",
+      "STATE5": "I pezulluar",
+      "STATE6": "Fillestar"
+    },
+    "PROFILE": {
+      "TITLE": "Profili",
+      "EMAIL": "Email",
+      "PHONE": "Numri i telefonit",
+      "PHONE_HINT": "Përdorni simbolin + të ndjekur nga prefiksi i shtetit, ose zgjidhni shtetin nga lista dhe në fund vendosni numrin e telefonit",
+      "PHONE_VERIFIED": "Numri i telefonit u verifikua",
+      "SEND_SMS": "Dërgo SMS verifikimi",
+      "SEND_EMAIL": "Dërgo email",
+      "USERNAME": "Emri i përdoruesit",
+      "CHANGEUSERNAME": "ndrysho",
+      "CHANGEUSERNAME_TITLE": "Ndrysho emrin e përdoruesit",
+      "CHANGEUSERNAME_DESC": "Vendosni emrin e ri në fushën më poshtë.",
+      "FIRSTNAME": "Emri",
+      "LASTNAME": "Mbiemri",
+      "NICKNAME": "Pseudonimi",
+      "DISPLAYNAME": "Emri i shfaqur",
+      "PREFERREDLOGINNAME": "Emri i preferuar i hyrjes",
+      "PREFERRED_LANGUAGE": "Gjuha",
+      "GENDER": "Gjinia",
+      "PASSWORD": "Fjalëkalimi",
+      "AVATAR": {
+        "UPLOADTITLE": "Ngarkoni foton e profilit",
+        "UPLOADBTN": "Zgjidh skedarin",
+        "UPLOAD": "Ngarko",
+        "CURRENT": "Fotoja aktuale",
+        "PREVIEW": "Paraafishimi",
+        "DELETESUCCESS": "U fshi me sukses!",
+        "CROPPERERROR": "Ndodhi një gabim gjatë ngarkimit të skedarit. Nëse është e nevojshme, provoni një format dhe madhësi tjetër."
+      },
+      "COUNTRY": "Shteti"
+    },
+    "MACHINE": {
+      "TITLE": "Detajet e llogarisë së shërbimit",
+      "USERNAME": "Emri i përdoruesit",
+      "NAME": "Emri",
+      "DESCRIPTION": "Përshkrimi",
+      "KEYSTITLE": "Çelësat",
+      "KEYSDESC": "Përcaktoni çelësat tuaj dhe shtoni një datë skadimi opsionale.",
+      "TOKENSTITLE": "Token-at e aksesit personal",
+      "TOKENSDESC": "Token-at e aksesit personal funksionojnë si access token-at e zakonshëm OAuth.",
+      "ID": "ID-ja e çelësit",
+      "TYPE": "Lloji",
+      "EXPIRATIONDATE": "Data e skadimit",
+      "CHOOSEDATEAFTER": "Vendosni një datë skadimi të vlefshme pas",
+      "CHOOSEEXPIRY": "Zgjidhni një datë skadimi",
+      "CREATIONDATE": "Data e krijimit",
+      "KEYDETAILS": "Detajet e çelësit",
+      "ACCESSTOKENTYPE": "Lloji i access token-it",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
+      "ADD": {
+        "TITLE": "Shto çelës",
+        "DESCRIPTION": "Zgjidhni llojin e çelësit dhe një datë skadimi opsionale."
+      },
+      "ADDED": {
+        "TITLE": "Çelësi u krijua",
+        "DESCRIPTION": "Shkarkojeni çelësin, sepse nuk do të jetë i dukshëm pasi të mbyllni këtë dritare!"
+      },
+      "KEYTYPES": {
+        "1": "JSON"
+      },
+      "DIALOG": {
+        "DELETE_KEY": {
+          "TITLE": "Fshi çelësin",
+          "DESCRIPTION": "Dëshironi ta fshini çelësin e zgjedhur? Ky veprim nuk mund të zhbëhet."
+        }
+      }
+    },
+    "PASSWORD": {
+      "TITLE": "Fjalëkalimi",
+      "LABEL": "Një fjalëkalim i sigurt ndihmon në mbrojtjen e llogarisë",
+      "DESCRIPTION": "Vendosni fjalëkalimin e ri sipas politikës më poshtë.",
+      "OLD": "Fjalëkalimi aktual",
+      "NEW": "Fjalëkalimi i ri",
+      "CONFIRM": "Konfirmo fjalëkalimin e ri",
+      "NEWINITIAL": "Fjalëkalimi",
+      "CONFIRMINITIAL": "Konfirmo fjalëkalimin",
+      "RESET": "Rivendos fjalëkalimin aktual",
+      "SET": "Vendos fjalëkalim të ri",
+      "RESENDNOTIFICATION": "Dërgo lidhjen e rivendosjes së fjalëkalimit",
+      "REQUIRED": "Mungojnë disa fusha të detyrueshme.",
+      "MINLENGTHERROR": "Duhet të ketë të paktën {{value}} karaktere.",
+      "MAXLENGTHERROR": "Duhet të ketë më pak se {{value}} karaktere."
+    },
+    "ID": "ID-ja e përdoruesit",
+    "EMAIL": "Email",
+    "PHONE": "Numri i telefonit",
+    "PHONEEMPTY": "Nuk është përcaktuar numër telefoni",
+    "PHONEVERIFIED": "Numri i telefonit u verifikua.",
+    "EMAILVERIFIED": "Emaili u verifikua",
+    "NOTVERIFIED": "i paverifikuar",
+    "PREFERRED_LOGINNAME": "Emri i preferuar i hyrjes",
+    "ISINITIAL": "Përdoruesi nuk është ende aktiv.",
+    "LOGINMETHODS": {
+      "TITLE": "Informacioni i kontaktit",
+      "DESCRIPTION": "Informacioni i dhënë përdoret për t'ju dërguar informacion të rëndësishëm, si emailet e rivendosjes së fjalëkalimit.",
+      "EMAIL": {
+        "TITLE": "Email",
+        "VALID": "i validuar",
+        "ISVERIFIED": "Emaili u verifikua",
+        "ISVERIFIEDDESC": "Nëse emaili shënohet si i verifikuar, nuk do të kërkohet verifikim i emailit.",
+        "RESEND": "Ridërgo emailin e verifikimit",
+        "EDITTITLE": "Ndrysho emailin",
+        "EDITDESC": "Vendosni emailin e ri në fushën më poshtë."
+      },
+      "PHONE": {
+        "TITLE": "Telefoni",
+        "VALID": "i validuar",
+        "RESEND": "Ridërgo SMS-në e verifikimit",
+        "EDITTITLE": "Ndrysho numrin",
+        "EDITVALUE": "Numri i telefonit",
+        "EDITDESC": "Vendosni numrin e ri të telefonit në fushën më poshtë.",
+        "DELETETITLE": "Fshi numrin e telefonit",
+        "DELETEDESC": "Dëshironi vërtet ta fshini numrin e telefonit",
+        "OTPSMSREMOVALWARNING": "Kjo llogari e përdor këtë numër telefoni si faktor të dytë. Nuk do të mund ta përdorni më pasi të vazhdoni."
+      },
+      "RESENDCODE": "Ridërgo kodin",
+      "ENTERCODE": "Verifiko",
+      "ENTERCODE_DESC": "Verifiko kodin"
+    },
+    "GRANTS": {
+      "TITLE": "Caktimet e roleve",
+      "DESCRIPTION": "Jepini këtij përdoruesi akses në projekte të caktuara",
+      "CREATE": {
+        "TITLE": "Krijo caktim roli",
+        "DESCRIPTION": "Kërkoni organizatën, projektin dhe rolet përkatëse të projektit."
+      },
+      "PROJECTNAME": "Emri i projektit",
+      "PROJECT-OWNED": "Projekti",
+      "PROJECT-GRANTED": "Projekt i dhënë",
+      "FILTER": {
+        "0": "filtro sipas përdoruesit",
+        "1": "filtro sipas domenit",
+        "2": "filtro sipas emrit të projektit",
+        "3": "filtro sipas emrit të rolit"
+      }
+    },
+    "STATE": {
+      "0": "I panjohur",
+      "1": "Aktiv",
+      "2": "Joaktiv",
+      "3": "Fshirë",
+      "4": "I bllokuar",
+      "5": "I pezulluar",
+      "6": "Fillestar"
+    },
+    "STATEV2": {
+      "0": "I panjohur",
+      "1": "Aktiv",
+      "2": "Joaktiv",
+      "3": "Fshirë",
+      "4": "I bllokuar",
+      "5": "Fillestar"
+    },
+    "SEARCH": {
+      "ADDITIONAL": "Emri i hyrjes (organizata aktuale)",
+      "ADDITIONAL-EXTERNAL": "Emri i hyrjes (organizatë e jashtme)"
+    },
+    "TARGET": {
+      "SELF": "Nëse dëshironi t'i caktoni një rol një përdoruesi nga një organizatë tjetër",
+      "EXTERNAL": "Për t'i caktuar një rol një përdoruesi nga organizata juaj",
+      "CLICKHERE": "klikoni këtu"
+    },
+    "SIGNEDOUT": "Keni dalë nga llogaria. Klikoni butonin \"Hyr\" për të hyrë sërish.",
+    "SIGNEDOUT_BTN": "Hyr",
+    "EDITACCOUNT": "Ndrysho llogarinë",
+    "ADDACCOUNT": "Hyr me një llogari tjetër",
+    "RESENDINITIALEMAIL": "Ridërgo emailin e aktivizimit",
+    "RESENDEMAILNOTIFICATION": "Ridërgo njoftimin me email",
+    "TOAST": {
+      "CREATED": "Përdoruesi u krijua me sukses.",
+      "SAVED": "Profili u ruajt me sukses.",
+      "USERNAMECHANGED": "Emri i përdoruesit u ndryshua.",
+      "EMAILSAVED": "Emaili u ruajt me sukses.",
+      "INITEMAILSENT": "Emaili i inicializimit u dërgua.",
+      "PHONESAVED": "Telefoni u ruajt me sukses.",
+      "PHONEREMOVED": "Telefoni u hoq.",
+      "PHONEVERIFIED": "Telefoni u verifikua me sukses.",
+      "PHONEVERIFICATIONSENT": "Kodi i verifikimit të telefonit u dërgua.",
+      "EMAILVERIFICATIONSENT": "Kodi i verifikimit të emailit u dërgua.",
+      "OTPREMOVED": "OTP u hoq.",
+      "U2FREMOVED": "Faktori u hoq.",
+      "PASSWORDLESSREMOVED": "Passkey-ja u hoq.",
+      "INITIALPASSWORDSET": "Fjalëkalimi fillestar u vendos.",
+      "PASSWORDNOTIFICATIONSENT": "Njoftimi për ndryshimin e fjalëkalimit u dërgua.",
+      "PASSWORDCHANGED": "Fjalëkalimi u ndryshua me sukses.",
+      "REACTIVATED": "Përdoruesi u riaktivizua.",
+      "DEACTIVATED": "Përdoruesi u çaktivizua.",
+      "SELECTEDREACTIVATED": "Përdoruesit e zgjedhur u riaktivizuan.",
+      "SELECTEDDEACTIVATED": "Përdoruesit e zgjedhur u çaktivizuan.",
+      "SELECTEDKEYSDELETED": "Çelësat e zgjedhur u fshinë.",
+      "KEYADDED": "Çelësi u shtua!",
+      "MACHINEADDED": "Llogaria e shërbimit u krijua!",
+      "DELETED": "Përdoruesi u fshi me sukses!",
+      "UNLOCKED": "Përdoruesi u zhbllokua me sukses!",
+      "PASSWORDLESSREGISTRATIONSENT": "Lidhja e regjistrimit u dërgua me sukses.",
+      "SECRETGENERATED": "Sekreti u gjenerua me sukses!",
+      "SECRETREMOVED": "Sekreti u hoq me sukses!"
+    },
+    "MEMBERSHIPS": {
+      "TITLE": "Rolet e administratorit në Zitadel",
+      "DESCRIPTION": "Këto janë të gjitha rolet e administratorit të përdoruesit. Mund t'i ndryshoni edhe në faqet e detajeve të organizatës, projektit ose IAM.",
+      "ORGCONTEXT": "Shihni të gjitha organizatat dhe projektet që lidhen me organizatën e zgjedhur aktualisht.",
+      "USERCONTEXT": "Shihni të gjitha organizatat dhe projektet për të cilat jeni i autorizuar, përfshirë organizata të tjera.",
+      "CREATIONDATE": "Data e krijimit",
+      "CHANGEDATE": "Ndryshuar së fundi",
+      "DISPLAYNAME": "Emri i shfaqur",
+      "REMOVE": "Hiq",
+      "TYPE": "Lloji",
+      "ORGID": "ID-ja e organizatës",
+      "UPDATED": "Roli i administratorit u përditësua.",
+      "NOPERMISSIONTOEDIT": "Ju mungojnë lejet e nevojshme për të ndryshuar rolet!",
+      "TYPES": {
+        "UNKNOWN": "I panjohur",
+        "ORG": "Organizata",
+        "PROJECT": "Projekti",
+        "GRANTEDPROJECT": "Projekt i dhënë"
+      }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "ID",
+      "TOKEN": "Token",
+      "ADD": {
+        "TITLE": "Gjenero një token të ri aksesi personal",
+        "DESCRIPTION": "Përcaktoni një skadim të personalizuar për token-in.",
+        "CHOOSEEXPIRY": "Zgjidhni një datë skadimi",
+        "CHOOSEDATEAFTER": "Vendosni një datë skadimi të vlefshme pas"
+      },
+      "ADDED": {
+        "TITLE": "Token aksesi personal",
+        "DESCRIPTION": "Sigurohuni që ta kopjoni token-in tuaj të aksesit personal. Nuk do të mund ta shihni më!"
+      },
+      "DELETE": {
+        "TITLE": "Fshi token-in",
+        "DESCRIPTION": "Jeni gati të fshini token-in e aksesit personal. Jeni i sigurt?"
+      },
+      "DELETED": "Token-i u fshi me sukses."
+    }
+  },
+  "METADATA": {
+    "TITLE": "Metadatat",
+    "KEY": "Çelësi",
+    "VALUE": "Vlera",
+    "ADD": "Hyrje e re",
+    "SAVE": "Ruaj",
+    "EMPTY": "Nuk ka metadata",
+    "SETSUCCESS": "Elementi u ruajt me sukses",
+    "REMOVESUCCESS": "Elementi u fshi me sukses"
+  },
+  "FLOWS": {
+    "ID": "ID",
+    "NAME": "Emri",
+    "STATE": "Gjendja",
+    "STATES": {
+      "0": "pa status",
+      "1": "joaktiv",
+      "2": "aktiv"
+    },
+    "ADDTRIGGER": "Shto trigger",
+    "FLOWCHANGED": "Rrjedha u ndryshua me sukses",
+    "FLOWCLEARED": "Rrjedha u rivendos me sukses",
+    "TIMEOUT": "Koha e pritjes",
+    "TIMEOUTINSEC": "Koha e pritjes në sekonda",
+    "ALLOWEDTOFAIL": "Lejohet të dështojë",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Paralajmërim",
+      "DESCRIPTION": "Nëse e çaktivizoni këtë cilësim, përdoruesit e organizatës suaj mund të mos jenë në gjendje të hyjnë. Për më tepër, nuk do të keni më akses në konsolën e menaxhimit për ta çaktivizuar Action-in. Ju rekomandojmë të krijoni një përdorues administrator në një organizatë të veçantë ose t'i testoni skriptet së pari në një mjedis zhvillimi ose në një organizatë zhvillimi."
+    },
+    "SCRIPT": "Skripti",
+    "FLOWTYPE": "Lloji i rrjedhës",
+    "TRIGGERTYPE": "Lloji i trigger-it",
+    "ACTIONS": "Actions",
+    "ACTIONSMAX": "Sipas nivelit tuaj, keni në dispozicion një numër të kufizuar Actions ({{value}}). Sigurohuni t'i çaktivizoni ato që nuk ju nevojiten ose merrni parasysh kalimin në një nivel më të lartë.",
+    "DIALOG": {
+      "ADD": {
+        "TITLE": "Krijo një Action"
+      },
+      "UPDATE": {
+        "TITLE": "Përditëso Action-in"
+      },
+      "DELETEACTION": {
+        "TITLE": "Të fshihet Action-i?",
+        "DESCRIPTION": "Jeni gati të fshini një Action. Ky veprim nuk mund të zhbëhet. Jeni i sigurt?",
+        "DELETE_SUCCESS": "Action-i u fshi me sukses."
+      },
+      "CLEAR": {
+        "TITLE": "Të pastrohet rrjedha?",
+        "DESCRIPTION": "Jeni gati të rivendosni rrjedhën bashkë me trigger-at dhe Actions e saj. Ky ndryshim nuk mund të rikthehet. Jeni i sigurt?"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Të fshihen Actions e zgjedhura?",
+        "DESCRIPTION": "Jeni i sigurt që dëshironi t'i fshini Actions e zgjedhura nga rrjedha?"
+      },
+      "ABOUTNAME": "Emri i Action-it dhe emri i funksionit në JavaScript duhet të jenë të njëjtë"
+    },
+    "TOAST": {
+      "ACTIONSSET": "Actions u vendosën",
+      "ACTIONREACTIVATED": "Actions u riaktivizuan me sukses",
+      "ACTIONDEACTIVATED": "Actions u çaktivizuan me sukses"
+    }
+  },
+  "IAM": {
+    "POLICIES": {
+      "TITLE": "Politikat e sistemit dhe cilësimet e aksesit",
+      "DESCRIPTION": "Menaxhoni politikat globale dhe cilësimet e aksesit të menaxhimit."
+    },
+    "EVENTSTORE": {
+      "TITLE": "Administrimi i ruajtjes IAM",
+      "DESCRIPTION": "Menaxhoni pamjet dhe ngjarjet e dështuara të Zitadel."
+    },
+    "MEMBER": {
+      "TITLE": "Administratorët",
+      "DESCRIPTION": "Këta administratorë lejohen të bëjnë ndryshime në instancën tuaj."
+    },
+    "PAGES": {
+      "STATE": "Statusi",
+      "DOMAINLIST": "Domenet e personalizuara"
+    },
+    "STATE": {
+      "0": "I papërcaktuar",
+      "1": "Duke u krijuar",
+      "2": "Në ekzekutim",
+      "3": "Duke u ndalur",
+      "4": "I ndalur"
+    },
+    "VIEWS": {
+      "VIEWNAME": "Emri",
+      "DATABASE": "Baza e të dhënave",
+      "SEQUENCE": "Sekuenca",
+      "EVENTTIMESTAMP": "Vula kohore",
+      "LASTSPOOL": "Spool i suksesshëm",
+      "ACTIONS": "Veprimet",
+      "CLEAR": "Pastro",
+      "CLEARED": "Pamja u pastrua me sukses!",
+      "DIALOG": {
+        "VIEW_CLEAR_TITLE": "Pastro pamjen",
+        "VIEW_CLEAR_DESCRIPTION": "Jeni gati të pastroni një pamje. Pastrimi i një pamjeje nis një proces gjatë të cilit të dhënat mund të mos jenë të disponueshme për përdoruesit fundorë. Jeni vërtet i sigurt?"
+      }
+    },
+    "FAILEDEVENTS": {
+      "VIEWNAME": "Emri",
+      "DATABASE": "Baza e të dhënave",
+      "FAILEDSEQUENCE": "Sekuenca e dështuar",
+      "FAILURECOUNT": "Numri i dështimeve",
+      "LASTFAILED": "Dështoi së fundi më",
+      "ERRORMESSAGE": "Mesazhi i gabimit",
+      "ACTIONS": "Veprimet",
+      "DELETE": "Hiq",
+      "DELETESUCCESS": "Ngjarjet e dështuara u hoqën."
+    },
+    "EVENTS": {
+      "EDITOR": "Redaktori",
+      "EDITORID": "ID-ja e redaktorit",
+      "AGGREGATE": "Agregati",
+      "AGGREGATEID": "ID-ja e agregatit",
+      "AGGREGATETYPE": "Lloji i agregatit",
+      "RESOURCEOWNER": "Pronari i burimit",
+      "SEQUENCE": "Sekuenca",
+      "CREATIONDATE": "Krijuar më",
+      "TYPE": "Lloji",
+      "PAYLOAD": "Payload",
+      "FILTERS": {
+        "BTN": "Filtro",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtro sipas redaktorit"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Lloji i agregatit",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtro sipas agregatit"
+        },
+        "TYPE": {
+          "TYPELABEL": "Lloji",
+          "CHECKBOX": "Filtro sipas llojit"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Filtro sipas pronarit të burimit"
+        },
+        "SEQUENCE": {
+          "LABEL": "Sekuenca",
+          "CHECKBOX": "Filtro sipas sekuencës"
+        },
+        "SORT": "Rendit",
+        "ASC": "Në rritje",
+        "DESC": "Në zbritje",
+        "CREATIONDATE": {
+          "RADIO_FROM": "Nga",
+          "RADIO_RANGE": "Intervali",
+          "LABEL_SINCE": "Që nga",
+          "LABEL_UNTIL": "Deri më"
+        },
+        "OTHER": "tjetër",
+        "OTHERS": "të tjera"
+      },
+      "DIALOG": {
+        "TITLE": "Detajet e ngjarjes"
+      }
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Administratori u hoq.",
+      "MEMBERSADDED": "Administratorët u shtuan.",
+      "MEMBERADDED": "Administratori u shtua.",
+      "MEMBERCHANGED": "Administratori u ndryshua.",
+      "ROLEREMOVED": "Roli u hoq.",
+      "ROLECHANGED": "Roli u ndryshua.",
+      "REACTIVATED": "U riaktivizua",
+      "DEACTIVATED": "U çaktivizua"
+    }
+  },
+  "ORG": {
+    "PAGES": {
+      "NAME": "Emri",
+      "ID": "ID-ja e organizatës",
+      "CREATIONDATE": "Data e krijimit",
+      "DATECHANGED": "Ndryshuar",
+      "FILTER": "Filtro",
+      "FILTERPLACEHOLDER": "Filtro sipas emrit",
+      "LIST": "Organizatat",
+      "LISTDESCRIPTION": "Zgjidhni një organizatë.",
+      "ACTIVE": "Aktive",
+      "CREATE": "Krijo organizatë",
+      "DEACTIVATE": "Çaktivizo organizatën",
+      "REACTIVATE": "Riaktivizo organizatën",
+      "NOPERMISSION": "Nuk keni leje për të aksesuar cilësimet e organizatës.",
+      "USERSELFACCOUNT": "Përdorni llogarinë tuaj personale si pronar të organizatës",
+      "ORGDETAIL_TITLE": "Vendosni emrin dhe domenin e organizatës suaj të re.",
+      "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Vendosni emrin e organizatës suaj të re.",
+      "ORGDETAILUSER_TITLE": "Konfiguro pronarin e organizatës",
+      "DELETE": "Fshi organizatën",
+      "DEFAULTLABEL": "Parazgjedhje",
+      "SETASDEFAULT": "Cakto si organizatë të parazgjedhur",
+      "DEFAULTORGSET": "Organizata e parazgjedhur u ndryshua me sukses",
+      "RENAME": {
+        "ACTION": "Riemërto",
+        "TITLE": "Riemërto organizatën",
+        "DESCRIPTION": "Vendosni emrin e ri për organizatën tuaj",
+        "BTN": "Riemërto"
+      },
+      "ORGDOMAIN": {
+        "TITLE": "Verifiko pronësinë e {{value}}",
+        "VERIFICATION": "Ju ofrojmë dy metoda për të validuar manualisht domenin tuaj:",
+        "VERIFICATION_HTML": "- HTTP. Vendosni përkohësisht një skedar verifikimi në faqen tuaj të internetit",
+        "VERIFICATION_DNS": "- DNS. Krijoni një regjistrim DNS të llojit TXT",
+        "VERIFICATION_DNS_DESC": "Nëse e menaxhoni {{ value }} dhe keni akses në regjistrimet DNS, mund të krijoni një regjistrim të ri TXT me vlerat e mëposhtme:",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Përdorni këtë kod si vlerë të regjistrimit TXT:",
+        "VERIFICATION_HTTP_DESC": "Nëse keni akses në hostimin e faqes suaj të internetit, thjesht shkarkoni skedarin e verifikimit dhe ngarkojeni në URL-në e dhënë",
+        "VERIFICATION_HTTP_URL_LABEL": "URL-ja e pritur:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Skedari i verifikimit:",
+        "VERIFICATION_SKIP": "Mund ta anashkaloni verifikimin për momentin dhe të vazhdoni me krijimin e organizatës, por për ta përdorur domenin tuaj ky hap duhet të përfundojë!",
+        "VERIFICATION_VALIDATION_DESC": "Mos e fshini kodin e verifikimit, sepse Zitadel do ta rikontrollojë herë pas here pronësinë e domenit tuaj.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Kërko token të ri",
+        "VERIFICATION_VALIDATION_ONGOING": "Për verifikimin e domenit të organizatës suaj është zgjedhur metoda {{ value }}. Klikoni butonin për të nisur një kontroll verifikimi ose për të rivendosur procesin e verifikimit.",
+        "VERIFICATION_SUCCESSFUL": "Domeni u verifikua me sukses!",
+        "RESETMETHOD": "Rivendos metodën e verifikimit"
+      },
+      "DOWNLOAD_FILE": "Shkarko skedarin",
+      "SELECTORGTOOLTIP": "Zgjidhni këtë organizatë.",
+      "PRIMARYDOMAIN": "Domeni i organizatës",
+      "STATE": "Gjendja",
+      "USEPASSWORD": "Vendos fjalëkalimin fillestar",
+      "USEPASSWORDDESC": "Përdoruesi nuk duhet ta vendosë fjalëkalimin gjatë inicializimit."
+    },
+    "LIST": {
+      "TITLE": "Organizatat",
+      "DESCRIPTION": "Këto janë organizatat në instancën tuaj"
+    },
+    "DOMAINS": {
+      "NEW": "Shto domen",
+      "TITLE": "Domenet e organizatës",
+      "DESCRIPTION": "Konfiguroni domenet e organizatës suaj. Ky domen mund të përdoret për zbulimin e domenit dhe si prapashtesë e emrit të përdoruesit.",
+      "SETPRIMARY": "Cakto si domen të organizatës",
+      "DELETE": {
+        "TITLE": "Fshi domenin",
+        "DESCRIPTION": "Jeni gati të fshini një nga domenet tuaja."
+      },
+      "ADD": {
+        "TITLE": "Shto domen",
+        "DESCRIPTION": "Jeni gati të shtoni një domen për organizatën tuaj. Pas përfundimit me sukses të procesit, domeni mund të përdoret për zbulimin e domenit dhe si prapashtesë për përdoruesit tuaj."
+      }
+    },
+    "STATE": {
+      "0": "I papërcaktuar",
+      "1": "Aktive",
+      "2": "E çaktivizuar"
+    },
+    "MEMBER": {
+      "TITLE": "Administratorët e organizatës",
+      "DESCRIPTION": "Përcaktoni përdoruesit që mund të ndryshojnë preferencat e organizatës suaj."
+    },
+    "TOAST": {
+      "UPDATED": "Organizata u përditësua me sukses.",
+      "DEACTIVATED": "Organizata u çaktivizua.",
+      "REACTIVATED": "Organizata u riaktivizua.",
+      "DOMAINADDED": "Domeni u shtua.",
+      "DOMAINREMOVED": "Domeni u hoq.",
+      "MEMBERADDED": "Administratori u shtua.",
+      "MEMBERREMOVED": "Administratori u hoq.",
+      "MEMBERCHANGED": "Administratori u ndryshua.",
+      "SETPRIMARY": "Domeni i organizatës u caktua me sukses.",
+      "DELETED": "Organizata u fshi me sukses",
+      "DEFAULTORGNOTFOUND": "Organizata e parazgjedhur nuk u gjet",
+      "ORG_WAS_DELETED": "Organizata është fshirë."
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Çaktivizo organizatën",
+        "DESCRIPTION": "Jeni gati të çaktivizoni organizatën tuaj. Më pas përdoruesit nuk do të mund të hyjnë. Jeni i sigurt që dëshironi të vazhdoni?"
+      },
+      "REACTIVATE": {
+        "TITLE": "Riaktivizo organizatën",
+        "DESCRIPTION": "Jeni gati të riaktivizoni organizatën tuaj. Përdoruesit do të mund të hyjnë sërish. Jeni i sigurt që dëshironi të vazhdoni?"
+      },
+      "DELETE": {
+        "TITLE": "Fshi organizatën",
+        "DESCRIPTION": "Jeni gati të fshini organizatën tuaj. Kjo nis një proces gjatë të cilit do të fshihen të gjitha të dhënat që lidhen me organizatën. Për momentin ky veprim nuk mund të zhbëhet.",
+        "TYPENAME": "Shkruani '{{value}}' për të fshirë organizatën tuaj.",
+        "ORGNAME": "Emri",
+        "BTN": "Fshi"
+      }
+    }
+  },
+  "SETTINGS": {
+    "LIST": {
+      "ORGS": "Organizatat",
+      "FEATURESETTINGS": "Veçoritë",
+      "LANGUAGES": "Gjuhët",
+      "LOGIN": "Sjellja e hyrjes dhe siguria",
+      "LOCKOUT": "Bllokimi",
+      "AGE": "Skadimi i fjalëkalimit",
+      "COMPLEXITY": "Kompleksiteti i fjalëkalimit",
+      "NOTIFICATIONS": "Njoftimet",
+      "SMTP_PROVIDER": "Ofruesi SMTP",
+      "SMS_PROVIDER": "Ofruesi SMS/telefonik",
+      "NOTIFICATIONS_DESC": "Cilësimet SMTP dhe SMS",
+      "MESSAGETEXTS": "Tekstet e mesazheve",
+      "IDP": "Ofruesit e identitetit",
+      "VERIFIED_DOMAINS": "Domenet e organizatës",
+      "DOMAIN": "Cilësimet e domenit",
+      "LOGINTEXTS": "Tekstet e ndërfaqes së hyrjes",
+      "BRANDING": "Pamja e markës",
+      "PRIVACYPOLICY": "Lidhjet e jashtme",
+      "OIDC": "Jetëgjatësia dhe skadimi i token-ave OIDC",
+      "WEB_KEYS": "Web Keys OIDC",
+      "SECRETS": "Gjeneruesi i sekreteve",
+      "SECURITY": "Cilësimet e sigurisë",
+      "EVENTS": "Ngjarjet",
+      "FAILEDEVENTS": "Ngjarjet e dështuara",
+      "VIEWS": "Pamjet",
+      "ACTIONS": "Actions",
+      "TARGETS": "Targets"
+    },
+    "GROUPS": {
+      "GENERAL": "Informacion i përgjithshëm",
+      "NOTIFICATIONS": "Njoftimet",
+      "LOGIN": "Hyrja dhe aksesi",
+      "DOMAIN": "Domeni",
+      "TEXTS": "Tekstet dhe gjuhët",
+      "APPEARANCE": "Pamja",
+      "OTHER": "Të tjera",
+      "STORAGE": "Ruajtja",
+      "ACTIONS": "Actions"
+    },
+    "BETA": "BETA"
+  },
+  "SETTING": {
+    "LANGUAGES": {
+      "DEFAULT": "Gjuha e parazgjedhur",
+      "ALLOWED": "Gjuhët e lejuara",
+      "NOT_ALLOWED": "Gjuhët e palejuara",
+      "ALLOW_ALL": "Lejo të gjitha",
+      "DISALLOW_ALL": "Mos lejo asnjë",
+      "SETASDEFAULT": "Cakto si gjuhë të parazgjedhur",
+      "DEFAULT_SAVED": "Gjuha e parazgjedhur u ruajt",
+      "ALLOWED_SAVED": "Gjuhët e lejuara u ruajtën",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands",
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Türkçe",
+        "uk": "Українська",
+        "ar": "العربية",
+        "sq": "Shqip"
+      }
+    },
+    "SMTP": {
+      "TITLE": "Ofruesi SMTP",
+      "DESCRIPTION": "Përshkrimi",
+      "SENDERADDRESS": "Adresa e emailit të dërguesit",
+      "SENDERNAME": "Emri i dërguesit",
+      "REPLYTOADDRESS": "Adresa për përgjigje",
+      "HOSTANDPORT": "Host-i dhe porta",
+      "USER": "Përdoruesi",
+      "PASSWORD": "Fjalëkalimi",
+      "SETPASSWORD": "Vendos fjalëkalimin SMTP",
+      "PASSWORDSET": "Fjalëkalimi SMTP u vendos me sukses.",
+      "TLS": "Transport Layer Security (TLS)",
+      "SAVED": "U ruajt me sukses!",
+      "NOCHANGES": "Nuk ka ndryshime!",
+      "REQUIREDWARN": "Për të dërguar njoftime nga domeni juaj, duhet të vendosni të dhënat tuaja SMTP."
+    },
+    "SMS": {
+      "PROVIDERS": "Ofruesit",
+      "PROVIDER": "Ofruesi SMS",
+      "ADDPROVIDER": "Shto ofrues SMS",
+      "ADDPROVIDERDESCRIPTION": "Zgjidhni një nga ofruesit e disponueshëm dhe vendosni të dhënat e kërkuara.",
+      "REMOVEPROVIDER": "Hiq ofruesin",
+      "REMOVEPROVIDER_DESC": "Jeni gati të fshini një ofrues. Dëshironi të vazhdoni?",
+      "SMSPROVIDERSTATE": {
+        "0": "I papërcaktuar",
+        "1": "Aktiv",
+        "2": "Joaktiv"
+      },
+      "ACTIVATED": "Ofruesi u aktivizua.",
+      "DEACTIVATED": "Ofruesi u çaktivizua.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Token",
+        "SENDERNUMBER": "Numri i dërguesit",
+        "VERIFYSERVICESID": "Sid i shërbimit të verifikimit",
+        "VERIFYSERVICESID_DESCRIPTION": "Vendosja e një Sid të shërbimit të verifikimit lejon përdorimin e Twilio Verify Service në vend të Messages Service për verifikimin e numrave të telefonit dhe OTP me SMS",
+        "ADDED": "Twilio u shtua me sukses.",
+        "UPDATED": "Twilio u përditësua me sukses.",
+        "REMOVED": "Twilio u hoq",
+        "CHANGETOKEN": "Ndrysho token-in",
+        "SETTOKEN": "Vendos token-in",
+        "TOKENSET": "Token-i u vendos me sukses."
+      }
+    },
+    "SECRETS": {
+      "TYPES": "Llojet e sekreteve",
+      "TYPE": {
+        "1": "Emaili i inicializimit",
+        "2": "Verifikimi i emailit",
+        "3": "Verifikimi i telefonit",
+        "4": "Rivendosja e fjalëkalimit",
+        "5": "Inicializimi i passkey",
+        "6": "Sekreti i aplikacionit",
+        "7": "OTP - SMS",
+        "8": "OTP - email",
+        "9": "Kodi i ftesës"
+      },
+      "EXPIRY": "Skadimi (në minuta)",
+      "INCLUDEDIGITS": "Përfshi numra",
+      "INCLUDESYMBOLS": "Përfshi simbole",
+      "INCLUDELOWERLETTERS": "Përfshi shkronja të vogla",
+      "INCLUDEUPPERLETTERS": "Përfshi shkronja të mëdha",
+      "LENGTH": "Gjatësia",
+      "UPDATED": "Cilësimet u përditësuan."
+    },
+    "SECURITY": {
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Ky cilësim e vendos CSP-në që të lejojë përfshirjen në frame nga një grup domenesh të lejuara. Kini parasysh se, duke aktivizuar përdorimin e iFrame, rrezikoni të lejoni clickjacking.",
+      "IFRAMEENABLED": "Lejo iFrame",
+      "ALLOWEDORIGINS": "URL-të e lejuara",
+      "IMPERSONATIONTITLE": "Veprimi në emër të tjetrit",
+      "IMPERSONATIONENABLED": "Lejo veprimin në emër të tjetrit",
+      "IMPERSONATIONDESCRIPTION": "Ky cilësim lejon në parim veprimin në emër të një përdoruesi tjetër (impersonation). Kini parasysh se edhe ai që vepron në emër të tjetrit duhet të ketë të caktuar rolet përkatëse `*_IMPERSONATOR`."
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "Organizata e parazgjedhur e hyrjes",
+      "LOGINDEFAULTORG_DESCRIPTION": "Ndërfaqja e hyrjes do të përdorë cilësimet e organizatës së parazgjedhur (dhe jo ato të instancës) nëse nuk është caktuar kontekst organizate",
+      "USERSCHEMA": "Skema e përdoruesit",
+      "USERSCHEMA_DESCRIPTION": "Skemat e përdoruesve lejojnë menaxhimin e skemave të të dhënave të përdoruesve. Nëse flag-u aktivizohet, do të mund të përdorni API-në e re dhe veçoritë e saj.",
+      "ACTIONS": "Actions",
+      "ACTIONS_DESCRIPTION": "Actions v2 lejojnë menaxhimin e ekzekutimeve dhe target-eve. Nëse flag-u aktivizohet, do të mund të përdorni API-në e re dhe veçoritë e saj.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "Përfundimi i një sesioni të vetëm OIDC V1",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Nëse flag-u aktivizohet, do të mund të përfundoni një sesion të vetëm nga ndërfaqja e hyrjes duke dhënë një id_token me claim-in `sid` si id_token_hint në endpoint-in end_session. Kini parasysh se aktualisht në ndërfaqen e hyrjes përfundohen të gjitha sesionet e të njëjtit user agent (shfletues). Sesionet e menaxhuara përmes Session API e lejojnë tashmë përfundimin e sesioneve të vetme.",
+      "DEBUGOIDCPARENTERROR": "Korrigjo gabimin prind OIDC",
+      "DEBUGOIDCPARENTERROR_DESCRIPTION": "Nëse flag-u aktivizohet, gabimi prind OIDC do të regjistrohet në konsolë.",
+      "PERMISSIONCHECKV2": "Kontrolli i lejeve V2",
+      "PERMISSIONCHECKV2_DESCRIPTION": "Nëse flag-u aktivizohet, do të mund të përdorni API-në e re dhe veçoritë e saj.",
+      "STATES": {
+        "INHERITED": "Trashëgo",
+        "ENABLED": "Aktivizuar",
+        "DISABLED": "Çaktivizuar"
+      },
+      "INHERITED_DESCRIPTION": "Kjo e vendos vlerën në vlerën e parazgjedhur të sistemit.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Aktivizuar\" është trashëguar",
+        "DISABLED": "\"Çaktivizuar\" është trashëguar"
+      },
+      "RESET": "Vendosi të gjitha në trashëgim",
+      "CONSOLEUSEV2USERAPI": "Përdor API V2 në konsolën e menaxhimit për krijimin e përdoruesve",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Kur ky flag aktivizohet, konsola e menaxhimit përdor User API V2 për të krijuar përdorues të rinj. Me API V2, përdoruesit e sapokrijuar nisin pa gjendje fillestare.",
+      "LOGINV2": "Hyrja V2",
+      "LOGINV2_DESCRIPTION": "Aktivizimi i kësaj ndez ndërfaqen e re të hyrjes të bazuar në TypeScript, me siguri, performancë dhe personalizim të përmirësuar.",
+      "LOGINV2_BASEURI": "URI-ja bazë",
+      "ENABLERELATIONALTABLES": "Tabelat relacionale",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Aktivizojeni këtë për të përdorur tabela relacionale në vend të projeksioneve për ruajtjen e të dhënave. Aktualisht ky çelës nuk bën asgjë."
+    },
+    "DIALOG": {
+      "RESET": {
+        "DEFAULTTITLE": "Rivendos cilësimin",
+        "DEFAULTDESCRIPTION": "Jeni gati të rivendosni cilësimet tuaja në cilësimet e parazgjedhura të instancës. Jeni i sigurt që dëshironi të vazhdoni?",
+        "LOGINPOLICY_DESCRIPTION": "Paralajmërim: nëse vazhdoni, edhe cilësimet e ofruesve të identitetit do të rivendosen në cilësimet e instancës."
+      }
+    }
+  },
+  "POLICY": {
+    "APPLIEDTO": "Zbatuar për",
+    "PWD_COMPLEXITY": {
+      "TITLE": "Kompleksiteti i fjalëkalimit",
+      "DESCRIPTION": "Siguron që të gjitha fjalëkalimet e vendosura të përputhen me një model të caktuar",
+      "SYMBOLANDNUMBERERROR": "Duhet të përmbajë një shifër dhe një simbol/shenjë pikësimi.",
+      "SYMBOLERROR": "Duhet të përmbajë një simbol/shenjë pikësimi.",
+      "NUMBERERROR": "Duhet të përmbajë një shifër.",
+      "PATTERNERROR": "Fjalëkalimi nuk plotëson modelin e kërkuar."
+    },
+    "NOTIFICATION": {
+      "TITLE": "Njoftimi",
+      "DESCRIPTION": "Përcakton për cilat ndryshime do të dërgohen njoftime.",
+      "PASSWORDCHANGE": "Fjalëkalimi u ndryshua"
+    },
+    "PRIVATELABELING": {
+      "DESCRIPTION": "Jepini hyrjes stilin tuaj të personalizuar dhe ndryshoni sjelljen e saj.",
+      "PREVIEW_DESCRIPTION": "Ndryshimet e politikës do të publikohen automatikisht në mjedisin e paraafishimit.",
+      "BTN": "Zgjidh skedarin",
+      "ACTIVATEPREVIEW": "Apliko cilësimet",
+      "DARK": "Modaliteti i errët",
+      "LIGHT": "Modaliteti i çelët",
+      "CHANGEVIEW": "Ndrysho pamjen",
+      "ACTIVATED": "Ndryshimet e politikës tani janë LIVE",
+      "THEME": "Tema",
+      "COLORS": "Ngjyrat",
+      "FONT": "Fonti",
+      "ADVANCEDBEHAVIOR": "Sjellja e avancuar",
+      "DROP": "Lëshojeni imazhin këtu ose",
+      "RELEASE": "Lëshojeni",
+      "DROPFONT": "Lëshojeni skedarin e fontit këtu",
+      "RELEASEFONT": "Lëshojeni",
+      "USEOFLOGO": "Logoja juaj do të përdoret në hyrje dhe në emaile, ndërsa ikona përdoret për elemente më të vogla të ndërfaqes, si në ndërruesin e organizatës në konsolën e menaxhimit",
+      "MAXSIZE": "Madhësia maksimale është e kufizuar në 524kB",
+      "EMAILNOSVG": "Formati SVG nuk mbështetet në emaile. Prandaj ngarkojeni logon tuaj në PNG ose në një format tjetër të mbështetur.",
+      "MAXSIZEEXCEEDED": "U tejkalua madhësia maksimale prej 524kB.",
+      "NOSVGSUPPORTED": "SVG nuk mbështetet!",
+      "FONTINLOGINONLY": "Aktualisht fonti shfaqet vetëm në ndërfaqen e hyrjes.",
+      "BACKGROUNDCOLOR": "Ngjyra e sfondit",
+      "PRIMARYCOLOR": "Ngjyra kryesore",
+      "WARNCOLOR": "Ngjyra e paralajmërimit",
+      "FONTCOLOR": "Ngjyra e fontit",
+      "VIEWS": {
+        "PREVIEW": "Paraafishimi",
+        "CURRENT": "Cilësimet aktuale"
+      },
+      "PREVIEW": {
+        "TITLE": "Hyrja",
+        "SECOND": "hyni me llogarinë tuaj Zitadel.",
+        "ERROR": "Përdoruesi nuk u gjet!",
+        "PRIMARYBUTTON": "tjetra",
+        "SECONDARYBUTTON": "regjistrohu"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Modaliteti automatik",
+        "THEME_MODE_LIGHT": "Vetëm modaliteti i çelët",
+        "THEME_MODE_DARK": "Vetëm modaliteti i errët"
+      }
+    },
+    "PWD_AGE": {
+      "TITLE": "Skadimi i fjalëkalimit",
+      "DESCRIPTION": "Mund të vendosni një politikë për skadimin e fjalëkalimeve. Kjo politikë e detyron përdoruesin ta ndryshojë fjalëkalimin në hyrjen e parë pas skadimit. Nuk ka paralajmërime dhe njoftime automatike."
+    },
+    "PWD_LOCKOUT": {
+      "TITLE": "Politika e bllokimit",
+      "DESCRIPTION": "Vendosni një numër maksimal përpjekjesh për fjalëkalimin, pas të cilave llogaritë bllokohen."
+    },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "Pamja e markës",
+      "BTN": "Zgjidh skedarin",
+      "DESCRIPTION": "Personalizoni pamjen e hyrjes",
+      "ACTIVATEPREVIEW": "Aktivizo cilësimet"
+    },
+    "LOGIN_POLICY": {
+      "TITLE": "Cilësimet e hyrjes",
+      "DESCRIPTION": "Përcaktoni si mund të vërtetohen përdoruesit dhe konfiguroni ofruesit e identitetit",
+      "DESCRIPTIONCREATEADMIN": "Përdoruesit mund të zgjedhin nga ofruesit e identitetit të disponueshëm më poshtë.",
+      "DESCRIPTIONCREATEMGMT": "Përdoruesit mund të zgjedhin nga ofruesit e identitetit të disponueshëm më poshtë. Shënim: mund të përdorni ofrues të vendosur nga sistemi, si dhe ofrues të vendosur vetëm për organizatën tuaj.",
+      "LIFETIME_INVALID": "Formulari përmban vlerë/vlera të pavlefshme.",
+      "SAVED": "U ruajt me sukses!",
+      "PROVIDER_ADDED": "Ofruesi i identitetit u aktivizua."
+    },
+    "PRIVACY_POLICY": {
+      "DESCRIPTION": "Vendosni lidhjet e Politikës së privatësisë dhe Kushteve të shërbimit",
+      "TOSLINK": "Lidhja për Kushtet e shërbimit",
+      "POLICYLINK": "Lidhja për Politikën e privatësisë",
+      "HELPLINK": "Lidhja për ndihmën",
+      "SUPPORTEMAIL": "Emaili i mbështetjes",
+      "DOCSLINK": "Lidhja e dokumentacionit (konsola e menaxhimit)",
+      "CUSTOMLINK": "Lidhje e personalizuar (konsola e menaxhimit)",
+      "CUSTOMLINKTEXT": "Teksti i lidhjes së personalizuar (konsola e menaxhimit)",
+      "SAVED": "U ruajt me sukses!",
+      "RESET_TITLE": "Rikthe vlerat e parazgjedhura",
+      "RESET_DESCRIPTION": "Jeni gati të riktheni lidhjet e parazgjedhura për Kushtet e shërbimit dhe Politikën e privatësisë. Dëshironi vërtet të vazhdoni?"
+    },
+    "LOGIN_TEXTS": {
+      "TITLE": "Tekstet e ndërfaqes së hyrjes",
+      "DESCRIPTION": "Përcaktoni tekstet tuaja për ndërfaqet e hyrjes. Nëse tekstet janë bosh, do të përdoret vlera e parazgjedhur që shfaqet në fushë.",
+      "DESCRIPTION_SHORT": "Përcaktoni tekstet tuaja për ndërfaqet e hyrjes.",
+      "NEWERVERSIONEXISTS": "Ekziston një version më i ri",
+      "CURRENTDATE": "Cilësimet aktuale",
+      "CHANGEDATE": "Version më i ri nga",
+      "KEYNAME": "Ekrani / ndërfaqja e hyrjes",
+      "RESET_TITLE": "Rikthe vlerat e parazgjedhura",
+      "RESET_DESCRIPTION": "Jeni gati të riktheni të gjitha vlerat e parazgjedhura. Të gjitha ndryshimet që keni bërë do të fshihen përgjithmonë. Dëshironi vërtet të vazhdoni?",
+      "UNSAVED_TITLE": "Të vazhdohet pa ruajtur?",
+      "UNSAVED_DESCRIPTION": "Keni bërë ndryshime pa i ruajtur. Dëshironi t'i ruani tani?",
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Keni zgjedhur një gjuhë që nuk lejohet. Mund të vazhdoni t'i ndryshoni tekstet, por nëse dëshironi që përdoruesit tuaj ta përdorin realisht këtë gjuhë, ndryshoni kufizimet e instancës suaj.",
+      "LANGUAGES_NOT_ALLOWED": "Nuk lejohen:",
+      "LANGUAGE": "Gjuha",
+      "LANGUAGES": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands",
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar",
+        "ko": "한국어",
+        "ro": "Română",
+        "tr": "Türkçe",
+        "uk": "Українська",
+        "ar": "العربية",
+        "sq": "Shqip"
+      },
+      "KEYS": {
+        "emailVerificationDoneText": "Verifikimi i emailit përfundoi",
+        "emailVerificationText": "Verifikimi i emailit",
+        "externalUserNotFoundText": "Përdoruesi i jashtëm nuk u gjet",
+        "footerText": "Fundi i faqes",
+        "initMfaDoneText": "Inicializimi i MFA përfundoi",
+        "initMfaOtpText": "Inicializo MFA",
+        "initMfaPromptText": "Kërkesa për inicializimin e MFA",
+        "initMfaU2fText": "Inicializo faktorin e dytë universal",
+        "initPasswordDoneText": "Inicializimi i fjalëkalimit përfundoi",
+        "initPasswordText": "Inicializo fjalëkalimin",
+        "initializeDoneText": "Inicializimi i përdoruesit përfundoi",
+        "initializeUserText": "Inicializo përdoruesin",
+        "linkingUserDoneText": "Lidhja e përdoruesit përfundoi",
+        "loginText": "Hyrja",
+        "logoutText": "Dalja",
+        "mfaProvidersText": "Ofruesit e MFA",
+        "passwordChangeDoneText": "Ndryshimi i fjalëkalimit përfundoi",
+        "passwordChangeText": "Ndryshimi i fjalëkalimit",
+        "passwordResetDoneText": "Rivendosja e fjalëkalimit përfundoi",
+        "passwordText": "Fjalëkalimi",
+        "registrationOptionText": "Opsionet e regjistrimit",
+        "registrationOrgText": "Regjistro organizatë",
+        "registrationUserText": "Regjistro përdorues",
+        "selectAccountText": "Zgjidh llogarinë",
+        "successLoginText": "Hyrje e suksesshme",
+        "usernameChangeDoneText": "Ndryshimi i emrit të përdoruesit përfundoi",
+        "usernameChangeText": "Ndryshimi i emrit të përdoruesit",
+        "verifyMfaOtpText": "Verifiko OTP",
+        "verifyMfaU2fText": "Verifiko faktorin e dytë universal",
+        "passwordlessPromptText": "Kërkesa për passkey",
+        "passwordlessRegistrationDoneText": "Regjistrimi i passkey përfundoi",
+        "passwordlessRegistrationText": "Regjistrimi i passkey",
+        "passwordlessText": "Passkey",
+        "externalRegistrationUserOverviewText": "Përmbledhja e përdoruesit në regjistrimin e jashtëm"
+      }
+    },
+    "MESSAGE_TEXTS": {
+      "TYPE": "Njoftimi",
+      "TYPES": {
+        "INIT": "Inicializimi",
+        "VE": "Verifiko emailin",
+        "VP": "Verifiko telefonin",
+        "VSO": "Verifiko OTP me SMS",
+        "VEO": "Verifiko OTP me email",
+        "PR": "Rivendosja e fjalëkalimit",
+        "DC": "Deklarimi i domenit",
+        "PL": "Passkey",
+        "PC": "Ndryshimi i fjalëkalimit",
+        "IU": "Fto përdorues"
+      },
+      "CHIPS": {
+        "firstname": "Emri",
+        "lastname": "Mbiemri",
+        "code": "Kodi",
+        "preferredLoginName": "Emri i preferuar i hyrjes",
+        "displayName": "Emri i shfaqur",
+        "nickName": "Pseudonimi",
+        "loginnames": "Emrat e hyrjes",
+        "domain": "Domeni",
+        "lastEmail": "Emaili i fundit",
+        "lastPhone": "Telefoni i fundit",
+        "verifiedEmail": "Emaili i verifikuar",
+        "verifiedPhone": "Telefoni i verifikuar",
+        "changedate": "Data e ndryshimit",
+        "username": "Emri i përdoruesit",
+        "tempUsername": "Emri i përkohshëm i përdoruesit",
+        "otp": "OTP",
+        "verifyUrl": "URL-ja e verifikimit të OTP",
+        "expiry": "Skadimi",
+        "applicationName": "Emri i aplikacionit"
+      },
+      "TOAST": {
+        "UPDATED": "Tekstet e personalizuara u ruajtën."
+      }
+    },
+    "DEFAULTLABEL": "Cilësimet aktuale përputhen me standardin e instancës suaj.",
+    "BTN_INSTALL": "Konfiguro",
+    "BTN_EDIT": "Ndrysho",
+    "DATA": {
+      "DESCRIPTION": "Përshkrimi",
+      "MINLENGTH": "duhet të ketë gjatësinë minimale",
+      "HASNUMBER": "duhet të përmbajë një numër",
+      "HASSYMBOL": "duhet të përmbajë një simbol",
+      "HASLOWERCASE": "duhet të përmbajë një shkronjë të vogël",
+      "HASUPPERCASE": "duhet të përmbajë një shkronjë të madhe",
+      "SHOWLOCKOUTFAILURES": "shfaq dështimet e bllokimit",
+      "MAXPASSWORDATTEMPTS": "Numri maksimal i përpjekjeve për fjalëkalimin",
+      "MAXOTPATTEMPTS": "Numri maksimal i përpjekjeve për OTP",
+      "EXPIREWARNDAYS": "Paralajmërimi për skadim pas ditësh",
+      "MAXAGEDAYS": "Vlefshmëria maksimale në ditë",
+      "USERLOGINMUSTBEDOMAIN": "Shto domenin e organizatës si prapashtesë te emrat e hyrjes",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Nëse e aktivizoni këtë cilësim, të gjitha emrave të hyrjes do t'u shtohet domeni i organizatës si prapashtesë. Nëse ky cilësim është i çaktivizuar, duhet të siguroheni që emrat e përdoruesve të jenë unikë në të gjitha organizatat.",
+      "VALIDATEORGDOMAINS": "Kërkohet verifikimi i domenit të organizatës (sfidë DNS ose HTTP)",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "Adresa e dërguesit SMTP përputhet me domenin e instancës",
+      "ALLOWUSERNAMEPASSWORD_DESC": "Lejohet hyrja e zakonshme me emër përdoruesi dhe fjalëkalim.",
+      "ALLOWEXTERNALIDP_DESC": "Hyrja lejohet për ofruesit përkatës të identitetit",
+      "ALLOWREGISTER_DESC": "Nëse zgjidhet ky opsion, në hyrje shfaqet një hap shtesë për regjistrimin e një përdoruesi.",
+      "FORCEMFA": "Detyro MFA për të gjithë përdoruesit",
+      "FORCEMFALOCALONLY": "Detyro MFA vetëm për përdoruesit e vërtetuar lokalisht",
+      "FORCEMFALOCALONLY_DESC": "Nëse zgjidhet ky opsion, përdoruesit e vërtetuar lokalisht duhet të konfigurojnë një faktor të dytë për hyrjen.",
+      "HIDEPASSWORDRESET_DESC": "Nëse zgjidhet ky opsion, përdoruesi nuk mund ta rivendosë fjalëkalimin gjatë procesit të hyrjes.",
+      "HIDELOGINNAMESUFFIX": "Fshih prapashtesën e emrit të hyrjes",
+      "HIDELOGINNAMESUFFIX_DESC": "Fsheh prapashtesën e emrit të hyrjes në ndërfaqen e hyrjes",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "Nëse zgjidhet ky opsion, ekrani i fjalëkalimit shfaqet gjatë procesit të hyrjes edhe nëse përdoruesi nuk u gjet. Gabimi në kontrollin e fjalëkalimit nuk zbulon nëse ishte gabim emri i përdoruesit apo fjalëkalimi.",
+      "ALLOWDOMAINDISCOVERY_DESC": "Nëse zgjidhet ky opsion, prapashtesa (@domain.com) e një emri përdoruesi të panjohur të vendosur në ekranin e hyrjes krahasohet me domenet e organizatave dhe, në rast suksesi, ridrejton te regjistrimi i asaj organizate.",
+      "DEFAULTREDIRECTURI": "URI-ja e parazgjedhur e ridrejtimit",
+      "DEFAULTREDIRECTURI_DESC": "Përcakton ku ridrejtohet përdoruesi nëse hyrja ka nisur pa kontekst aplikacioni (p.sh. nga emaili)",
+      "ERRORMSGPOPUP": "Shfaq gabimin në dritare dialogu",
+      "DISABLEWATERMARK": "Fshih shenjën ujore",
+      "DISABLEWATERMARK_DESC": "Fsheh shenjën ujore \"Powered by Zitadel\" në ndërfaqen e hyrjes"
+    },
+    "RESET": "Rivendos në parazgjedhjen e instancës",
+    "CREATECUSTOM": "Krijo politikë të personalizuar",
+    "TOAST": {
+      "SET": "Politika u vendos me sukses!",
+      "RESETSUCCESS": "Politika u rivendos me sukses!",
+      "UPLOADSUCCESS": "U ngarkua me sukses!",
+      "DELETESUCCESS": "U fshi me sukses!",
+      "UPLOADFAILED": "Ngarkimi dështoi!"
+    }
+  },
+  "ORG_DETAIL": {
+    "TITLE": "Organizata",
+    "DESCRIPTION": "Këtu mund të ndryshoni cilësimet e organizatës suaj dhe të menaxhoni anëtarët.",
+    "DETAIL": {
+      "TITLE": "Detajet",
+      "NAME": "Emri",
+      "DOMAIN": "Domeni",
+      "STATE": {
+        "0": "I papërcaktuar",
+        "1": "Aktive",
+        "2": "Joaktive"
+      }
+    },
+    "MEMBER": {
+      "TITLE": "Administratorët",
+      "USERNAME": "Emri i përdoruesit",
+      "DISPLAYNAME": "Emri i shfaqur",
+      "LOGINNAME": "Emri i hyrjes",
+      "EMAIL": "Email",
+      "ROLES": "Rolet",
+      "ADD": "Shto një administrator",
+      "ADDDESCRIPTION": "Vendosni emrat e përdoruesve që do të shtohen."
+    },
+    "TABLE": {
+      "TOTAL": "Regjistrime gjithsej",
+      "SELECTION": "Elementet e zgjedhura",
+      "DEACTIVATE": "Çaktivizo përdoruesin",
+      "ACTIVATE": "Aktivizo përdoruesin",
+      "DELETE": "Fshi përdoruesin",
+      "CLEAR": "Pastro përzgjedhjen"
+    }
+  },
+  "PROJECT": {
+    "PAGES": {
+      "ID": "ID-ja e projektit",
+      "TITLE": "Projekti",
+      "DESCRIPTION": "Këtu mund të përcaktoni aplikacione, të menaxhoni role dhe t'u jepni organizatave të tjera akses për të përdorur projektin tuaj.",
+      "DELETE": "Fshi projektin",
+      "DETAIL": "Detajet",
+      "CREATE": "Krijo projekt",
+      "CREATE_DESC": "Vendosni emrin e projektit tuaj.",
+      "ROLE": "Roli",
+      "NOITEMS": "Nuk ka projekte",
+      "ZITADELPROJECT": "Ky i përket projektit Zitadel. Kujdes: nëse bëni ndryshime, Zitadel mund të mos sillet siç duhet.",
+      "TYPE": {
+        "OWNED": "Projektet në pronësi",
+        "OWNED_SINGULAR": "Projekt në pronësi",
+        "GRANTED_SINGULAR": "Projekt i dhënë nga {{name}}"
+      },
+      "PRIVATELABEL": {
+        "TITLE": "Cilësimi i pamjes së markës",
+        "0": {
+          "TITLE": "I papërcaktuar",
+          "DESC": "Sapo përdoruesi identifikohet, shfaqet pamja e markës së organizatës së përdoruesit të identifikuar; para kësaj shfaqet parazgjedhja e sistemit."
+        },
+        "1": {
+          "TITLE": "Përdor cilësimin e projektit",
+          "DESC": "Do të shfaqet pamja e markës së organizatës që zotëron projektin"
+        },
+        "2": {
+          "TITLE": "Përdor cilësimin e organizatës së përdoruesit",
+          "DESC": "Do të shfaqet pamja e markës së organizatës së projektit, por sapo përdoruesi identifikohet, do të shfaqet cilësimi i organizatës së përdoruesit të identifikuar."
+        },
+        "DIALOG": {
+          "TITLE": "Cilësimi i pamjes së markës",
+          "DESCRIPTION": "Zgjidhni sjelljen e hyrjes kur përdoret projekti."
+        }
+      },
+      "PINNED": "Të fiksuara",
+      "ALL": "Të gjitha",
+      "CREATEDON": "Krijuar më",
+      "LASTMODIFIED": "Ndryshuar së fundi më",
+      "ADDNEW": "Krijo projekt të ri",
+      "DIALOG": {
+        "REACTIVATE": {
+          "TITLE": "Riaktivizo projektin",
+          "DESCRIPTION": "Dëshironi vërtet ta riaktivizoni projektin tuaj?"
+        },
+        "DEACTIVATE": {
+          "TITLE": "Çaktivizo projektin",
+          "DESCRIPTION": "Dëshironi vërtet ta çaktivizoni projektin tuaj?"
+        },
+        "DELETE": {
+          "TITLE": "Fshi projektin",
+          "DESCRIPTION": "Dëshironi vërtet ta fshini projektin tuaj?",
+          "TYPENAME": "Shkruani emrin e projektit për ta fshirë përgjithmonë."
+        }
+      }
+    },
+    "SETTINGS": {
+      "TITLE": "Cilësimet",
+      "DESCRIPTION": ""
+    },
+    "STATE": {
+      "TITLE": "Statusi",
+      "0": "I papërcaktuar",
+      "1": "Aktiv",
+      "2": "Joaktiv"
+    },
+    "TYPE": {
+      "TITLE": "Lloji",
+      "0": "Lloj i panjohur",
+      "1": "Në pronësi",
+      "2": "I dhënë"
+    },
+    "NAME": "Emri",
+    "NAMEDIALOG": {
+      "TITLE": "Riemërto projektin",
+      "DESCRIPTION": "Vendosni emrin e ri për projektin tuaj",
+      "NAME": "Emri i ri"
+    },
+    "MEMBER": {
+      "TITLE": "Administratorët",
+      "TITLEDESC": "Administratorët mund të bëjnë ndryshime në këtë projekt sipas rolit të tyre.",
+      "DESCRIPTION": "Këta administratorë mund të kenë mundësi ta ndryshojnë projektin tuaj.",
+      "USERNAME": "Emri i përdoruesit",
+      "DISPLAYNAME": "Emri i shfaqur",
+      "LOGINNAME": "Emri i hyrjes",
+      "EMAIL": "Email",
+      "ROLES": "Rolet",
+      "USERID": "ID-ja e përdoruesit"
+    },
+    "GRANT": {
+      "EMPTY": "Nuk ka organizata me akses të dhënë.",
+      "TITLE": "Dhëniet e aksesit në projekt",
+      "DESCRIPTION": "Lejojini një organizate tjetër të përdorë projektin tuaj.",
+      "EDITTITLE": "Ndrysho rolet",
+      "CREATE": {
+        "TITLE": "Krijo dhënie aksesi në projekt",
+        "SEL_USERS": "Zgjidhni përdoruesit të cilëve dëshironi t'u jepni akses",
+        "SEL_PROJECT": "Kërkoni një projekt",
+        "SEL_ROLES": "Zgjidhni rolet që dëshironi t'i shtoni në dhënien e aksesit në projekt",
+        "SEL_USER": "Zgjidh përdoruesit",
+        "SEL_ORG": "Kërkoni një organizatë",
+        "SEL_ORG_DESC": "Kërkoni organizatën së cilës do t'i jepet akses.",
+        "ORG_DESCRIPTION": "Jeni gati t'i jepni akses një përdoruesi për organizatën {{name}}.",
+        "ORG_DESCRIPTION_DESC": "Ndryshoni kontekstin në kokën e faqes më sipër për t'i dhënë akses një përdoruesi për një organizatë tjetër.",
+        "SEL_ORG_FORMFIELD": "Organizata",
+        "FOR_ORG": "Dhënia e aksesit në projekt krijohet për:"
+      },
+      "DETAIL": {
+        "TITLE": "Dhënia e aksesit në projekt",
+        "DESC": "Mund të zgjidhni cilat role mund të përdoren nga organizata e specifikuar dhe të caktoni administratorë",
+        "MEMBERTITLE": "Administratorët",
+        "MEMBERDESC": "Këta janë administratorët e organizatës me akses të dhënë. Shtoni këtu përdoruesit që duhet të kenë akses për të ndryshuar të dhënat e projektit.",
+        "PROJECTNAME": "Emri i projektit",
+        "GRANTEDORG": "Organizata me akses të dhënë",
+        "RESOURCEOWNER": "Pronari i burimit"
+      },
+      "STATE": "Statusi",
+      "STATES": {
+        "1": "Aktiv",
+        "2": "Joaktiv"
+      },
+      "ALL": "Të gjitha",
+      "SHOWDETAIL": "Shfaq detajet",
+      "USER": "Përdoruesi",
+      "MEMBERS": "Administratorët",
+      "ORG": "Organizata",
+      "PROJECTNAME": "Emri i projektit",
+      "GRANTEDORG": "Organizata me akses të dhënë",
+      "GRANTEDORGDOMAIN": "Domeni",
+      "RESOURCEOWNER": "Pronari i burimit",
+      "GRANTEDORGNAME": "Emri i organizatës",
+      "GRANTID": "ID-ja e dhënies së aksesit",
+      "CREATIONDATE": "Data e krijimit",
+      "CHANGEDATE": "Ndryshuar së fundi",
+      "DATES": "Datat",
+      "ROLENAMESLIST": "Rolet",
+      "NOROLES": "Nuk ka role",
+      "TYPE": "Lloji",
+      "TOAST": {
+        "PROJECTGRANTUSERGRANTADDED": "Dhënia e aksesit në projekt u krijua.",
+        "PROJECTGRANTADDED": "Dhënia e aksesit në projekt u krijua.",
+        "PROJECTGRANTCHANGED": "Dhënia e aksesit në projekt u ndryshua.",
+        "PROJECTGRANTMEMBERADDED": "Administratori i dhënies së aksesit u shtua.",
+        "PROJECTGRANTMEMBERCHANGED": "Administratori i dhënies së aksesit u ndryshua.",
+        "PROJECTGRANTMEMBERREMOVED": "Administratori i dhënies së aksesit u hoq.",
+        "PROJECTGRANTUPDATED": "Dhënia e aksesit në projekt u përditësua"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Fshi dhënien e aksesit në projekt",
+        "DELETE_DESCRIPTION": "Jeni gati të fshini një dhënie aksesi në projekt. Jeni i sigurt?"
+      },
+      "ROLES": "Rolet e projektit"
+    },
+    "APP": {
+      "TITLE": "Aplikacionet",
+      "NAME": "Emri",
+      "NAMEREQUIRED": "Emri është i detyrueshëm."
+    },
+    "ROLE": {
+      "EMPTY": "Ende nuk është krijuar asnjë rol.",
+      "ADDNEWLINE": "Shto një rol tjetër",
+      "KEY": "Çelësi",
+      "TITLE": "Rolet",
+      "DESCRIPTION": "Përcaktoni disa role që mund të përdoren për të krijuar dhënie aksesi në projekt.",
+      "NAME": "Emri",
+      "DISPLAY_NAME": "Emri i shfaqur",
+      "GROUP": "Grupi",
+      "ACTIONS": "Veprimet",
+      "ADDTITLE": "Krijo rol",
+      "ADDDESCRIPTION": "Vendosni të dhënat për rolin e ri.",
+      "EDITTITLE": "Ndrysho rolin",
+      "EDITDESCRIPTION": "Vendosni të dhënat e reja për rolin.",
+      "DELETE": "Fshi rolin",
+      "CREATIONDATE": "Krijuar",
+      "CHANGEDATE": "Ndryshuar së fundi",
+      "SELECTGROUPTOOLTIP": "Zgjidh të gjitha rolet e grupit {{group}}.",
+      "OPTIONS": "Opsionet",
+      "ASSERTION": "Kthe rolet e përdoruesit gjatë vërtetimit",
+      "ASSERTION_DESCRIPTION": "Kur një përdorues vërtetohet, informacioni për rolet e tij i jepet aplikacionit tuaj. Për OpenID Connect, rolet mund të kërkohen nga endpoint-i UserInfo ose të dërgohen në ID token ose Access Token, sipas cilësimeve të aplikacionit tuaj.",
+      "CHECK": "Vetëm përdoruesit e autorizuar mund të vërtetohen",
+      "CHECK_DESCRIPTION": "Refuzo vërtetimin nëse përdoruesi nuk ka role të caktuara në këtë projekt. Aksesi në projekt pa një rol të caktuar për përdoruesin lejohet.",
+      "DIALOG": {
+        "DELETE_TITLE": "Fshi rolin",
+        "DELETE_DESCRIPTION": "Jeni gati të fshini një rol projekti. Jeni i sigurt?"
+      }
+    },
+    "HAS_PROJECT": "Vërtetimi kufizohet te përdoruesit nga organizatat që kanë marrë akses në këtë projekt",
+    "HAS_PROJECT_DESCRIPTION": "Para se një përdorues të vërtetohet, verifikohet që organizata e tij të ketë marrë akses në këtë projekt. Vërtetimi nuk lejohet për përdoruesit nga organizata të paautorizuara.",
+    "TABLE": {
+      "TOTAL": "Regjistrime gjithsej:",
+      "SELECTION": "Elementet e zgjedhura",
+      "DEACTIVATE": "Çaktivizo projektin",
+      "ACTIVATE": "Aktivizo projektin",
+      "DELETE": "Fshi projektin",
+      "ORGNAME": "Emri i organizatës",
+      "ORGID": "ID-ja e organizatës",
+      "ORGDOMAIN": "Domeni i organizatës",
+      "STATE": "Statusi",
+      "TYPE": "Lloji",
+      "CREATIONDATE": "Krijuar më",
+      "CHANGEDATE": "Ndryshuar së fundi",
+      "RESOURCEOWNER": "Pronari",
+      "SHOWTABLE": "Shfaq tabelën",
+      "SHOWGRID": "Shfaq rrjetën",
+      "EMPTY": "Nuk u gjet asnjë projekt"
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Administratori u hoq.",
+      "MEMBERSADDED": "Administratorët u shtuan.",
+      "MEMBERADDED": "Administratori u shtua.",
+      "MEMBERCHANGED": "Administratori u ndryshua.",
+      "ROLESCREATED": "Rolet u krijuan.",
+      "ROLEREMOVED": "Roli u hoq.",
+      "ROLECHANGED": "Roli u ndryshua.",
+      "REACTIVATED": "U riaktivizua.",
+      "DEACTIVATED": "U çaktivizua.",
+      "CREATED": "Projekti u krijua.",
+      "UPDATED": "Projekti u ndryshua.",
+      "GRANTUPDATED": "Dhënia e aksesit në projekt u ndryshua.",
+      "DELETED": "Projekti u fshi."
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Fshi rolin",
+      "DELETE_DESCRIPTION": "Jeni gati të fshini një rol. Jeni i sigurt?"
+    }
+  },
+  "NEXTSTEPS": {
+    "TITLE": "Hapat e ardhshëm"
+  },
+  "IDP": {
+    "LIST": {
+      "ACTIVETITLE": "Ofruesit aktivë të identitetit"
+    },
+    "CREATE": {
+      "TITLE": "Shto ofrues",
+      "DESCRIPTION": "Zgjidhni një ose më shumë nga ofruesit e mëposhtëm.",
+      "STEPPERTITLE": "Krijo ofrues",
+      "OIDC": {
+        "TITLE": "Ofrues OIDC",
+        "DESCRIPTION": "Vendosni të dhënat e kërkuara për ofruesin tuaj OIDC."
+      },
+      "OAUTH": {
+        "TITLE": "Ofrues OAuth",
+        "DESCRIPTION": "Vendosni të dhënat e kërkuara për ofruesin tuaj OAuth."
+      },
+      "JWT": {
+        "TITLE": "Ofrues JWT",
+        "DESCRIPTION": "Vendosni të dhënat e kërkuara për ofruesin tuaj JWT."
+      },
+      "GOOGLE": {
+        "TITLE": "Ofrues Google",
+        "DESCRIPTION": "Vendosni kredencialet për ofruesin tuaj të identitetit Google"
+      },
+      "GITLAB": {
+        "TITLE": "Ofrues GitLab",
+        "DESCRIPTION": "Vendosni kredencialet për ofruesin tuaj të identitetit GitLab"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Ofrues GitLab Self Hosted",
+        "DESCRIPTION": "Vendosni kredencialet për ofruesin tuaj të identitetit GitLab Self Hosted"
+      },
+      "GITHUBES": {
+        "TITLE": "Ofrues GitHub Enterprise Server",
+        "DESCRIPTION": "Vendosni kredencialet për ofruesin tuaj të identitetit GitHub Enterprise Server"
+      },
+      "GITHUB": {
+        "TITLE": "Ofrues GitHub",
+        "DESCRIPTION": "Vendosni kredencialet për ofruesin tuaj të identitetit GitHub"
+      },
+      "AZUREAD": {
+        "TITLE": "Ofrues Microsoft",
+        "DESCRIPTION": "Vendosni kredencialet për ofruesin tuaj të identitetit Microsoft"
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Vendosni kredencialet për ofruesin tuaj LDAP"
+      },
+      "APPLE": {
+        "TITLE": "Hyr me Apple",
+        "DESCRIPTION": "Vendosni kredencialet për ofruesin tuaj Apple"
+      },
+      "SAML": {
+        "TITLE": "Hyr me SAML",
+        "DESCRIPTION": "Vendosni kredencialet për ofruesin tuaj SAML"
+      },
+      "ZITADEL": {
+        "TITLE": "ZITADEL",
+        "DESCRIPTION": "Vendosni të dhënat e kërkuara që përdoruesit e një instance tjetër ZITADEL të mund të vërtetohen."
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Ofruesi i identitetit",
+      "DESCRIPTION": "Përditësoni cilësimet e ofruesit tuaj",
+      "DATECREATED": "Krijuar",
+      "DATECHANGED": "Ndryshuar"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Krijim automatik",
+      "ISAUTOCREATION_DESC": "Nëse zgjidhet, krijohet një llogari nëse ajo nuk ekziston ende.",
+      "ISAUTOUPDATE": "Përditësim automatik",
+      "ISAUTOUPDATE_DESC": "Nëse zgjidhet, llogaritë përditësohen gjatë rivërtetimit.",
+      "ISCREATIONALLOWED": "Lejohet krijimi i llogarisë (manualisht)",
+      "ISCREATIONALLOWED_DESC": "Përcakton nëse mund të krijohen llogari duke përdorur një llogari të jashtme. Çaktivizojeni nëse përdoruesit nuk duhet të mund të ndryshojnë informacionin e llogarisë kur auto_creation është aktiv.",
+      "ISLINKINGALLOWED": "Lejohet lidhja e llogarisë (manualisht)",
+      "ISLINKINGALLOWED_DESC": "Përcakton nëse një identitet mund të lidhet manualisht me një llogari ekzistuese. Çaktivizojeni nëse përdoruesit duhet të lejohen të lidhin vetëm llogarinë e propozuar kur auto_linking është aktiv.",
+      "AUTOLINKING_DESC": "Përcakton nëse një identitetit do t'i kërkohet të lidhet me një llogari ekzistuese.",
+      "AUTOLINKINGTYPE": {
+        "0": "Çaktivizuar",
+        "1": "Kontrollo për emër përdoruesi ekzistues",
+        "2": "Kontrollo për email ekzistues"
+      }
+    },
+    "OWNERTYPES": {
+      "0": "i panjohur",
+      "1": "Instanca",
+      "2": "Organizata"
+    },
+    "STATES": {
+      "1": "aktiv",
+      "2": "joaktiv"
+    },
+    "AZUREADTENANTTYPES": {
+      "3": "ID-ja e tenant-it",
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Consumers"
+    },
+    "AZUREADTENANTTYPE": "Lloji i tenant-it",
+    "AZUREADTENANTID": "ID-ja e tenant-it",
+    "EMAILVERIFIED": "Emaili u verifikua",
+    "NAMEHINT": "Nëse specifikohet, do të shfaqet në ndërfaqen e hyrjes.",
+    "OPTIONAL": "opsionale",
+    "LDAPATTRIBUTES": "Atributet LDAP",
+    "UPDATEBINDPASSWORD": "përditëso fjalëkalimin e Bind",
+    "UPDATECLIENTSECRET": "përditëso client secret-in",
+    "ADD": "Shto ofrues identiteti",
+    "TYPE": "Lloji",
+    "OWNER": "Pronari",
+    "ID": "ID-ja e ofruesit të identitetit",
+    "NAME": "Emri",
+    "AUTHORIZATIONENDPOINT": "Endpoint-i i autorizimit",
+    "TOKENENDPOINT": "Endpoint-i i token-it",
+    "USERENDPOINT": "Endpoint-i i përdoruesit",
+    "IDATTRIBUTE": "Atributi ID",
+    "AVAILABILITY": "Disponueshmëria",
+    "AVAILABLE": "i disponueshëm",
+    "AVAILABLEBUTINACTIVE": "i disponueshëm, por joaktiv",
+    "SETAVAILABLE": "cakto si të disponueshëm",
+    "SETUNAVAILABLE": "cakto si të padisponueshëm",
+    "CONFIG": "Cilësimet",
+    "STATE": "Statusi",
+    "ISSUER": "Lëshuesi",
+    "SCOPESLIST": "Lista e scopes",
+    "INSTANCEROLESINFO": "Përputhja e roleve të instancës",
+    "INSTANCEROLESINFO_DESC": "Përdoruesve që vërtetohen me këtë ofrues u jepen rolet e anëtarit të instancës (prefiksi IAM_) që kanë në organizatat e listuara të instancës së largët ZITADEL. ID-ja e organizatës dhe domeni kryesor duhet të përputhen të dyja.",
+    "ORGANIZATIONID": "ID-ja e organizatës",
+    "ORGANIZATIONDOMAIN": "Domeni i organizatës",
+    "CLIENTID": "Client ID",
+    "CLIENTSECRET": "Client secret",
+    "LDAPCONNECTION": "Lidhja",
+    "LDAPUSERBINDING": "Lidhja e përdoruesit (binding)",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Fjalëkalimi i Bind",
+    "SERVERS": "Serverët",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Koha e pritjes në sekonda",
+    "USERBASE": "Baza e përdoruesve",
+    "USERFILTERS": "Filtrat e përdoruesve",
+    "USEROBJECTCLASSES": "Klasat e objekteve të përdoruesit",
+    "REQUIRED": "i detyrueshëm",
+    "LDAPIDATTRIBUTE": "Atributi ID",
+    "AVATARURLATTRIBUTE": "Atributi URL i avatarit",
+    "DISPLAYNAMEATTRIBUTE": "Atributi i emrit të shfaqur",
+    "EMAILATTRIBUTEATTRIBUTE": "Atributi i emailit",
+    "EMAILVERIFIEDATTRIBUTE": "Atributi i emailit të verifikuar",
+    "FIRSTNAMEATTRIBUTE": "Atributi i emrit",
+    "LASTNAMEATTRIBUTE": "Atributi i mbiemrit",
+    "NICKNAMEATTRIBUTE": "Atributi i pseudonimit",
+    "PHONEATTRIBUTE": "Atributi i telefonit",
+    "PHONEVERIFIEDATTRIBUTE": "Atributi i telefonit të verifikuar",
+    "PREFERREDLANGUAGEATTRIBUTE": "Atributi i gjuhës së preferuar",
+    "PREFERREDUSERNAMEATTRIBUTE": "Atributi i emrit të preferuar të përdoruesit",
+    "PROFILEATTRIBUTE": "Atributi i profilit",
+    "IDPDISPLAYNAMMAPPING": "Përputhja e emrit të shfaqur të IdP",
+    "USERNAMEMAPPING": "Përputhja e emrit të përdoruesit",
+    "DATES": "Datat",
+    "CREATIONDATE": "Krijuar më",
+    "CHANGEDATE": "Ndryshuar së fundi",
+    "DEACTIVATE": "Çaktivizo",
+    "ACTIVATE": "Aktivizo",
+    "DELETE": "Fshi",
+    "DELETE_TITLE": "Fshi IdP-në",
+    "DELETE_DESCRIPTION": "Jeni gati të fshini një ofrues identiteti. Ndryshimet që pasojnë janë të pakthyeshme. Dëshironi vërtet ta bëni këtë?",
+    "REMOVE_WARN_TITLE": "Hiq IdP-në",
+    "REMOVE_WARN_DESCRIPTION": "Jeni gati të hiqni një ofrues identiteti. Kjo e heq IdP-në nga opsionet e disponueshme për përdoruesit tuaj dhe përdoruesit e regjistruar tashmë nuk do të mund të hyjnë më. Jeni i sigurt që dëshironi të vazhdoni?",
+    "DELETE_SELECTION_TITLE": "Fshi IdP-në",
+    "DELETE_SELECTION_DESCRIPTION": "Jeni gati të fshini një ofrues identiteti. Ndryshimet që pasojnë janë të pakthyeshme. Dëshironi vërtet ta bëni këtë?",
+    "FEDERATEDLOGOUTENABLED": "Dalja e federuar e aktivizuar",
+    "FEDERATEDLOGOUTENABLED_DESC": "Nëse aktivizohet, përdoruesi del edhe nga IdP-ja kur e përfundon sesionin në Zitadel.",
+    "EMPTY": "Nuk ka IdP të disponueshme",
+    "OIDC": {
+      "GENERAL": "Informacion i përgjithshëm",
+      "TITLE": "Cilësimet OIDC",
+      "DESCRIPTION": "Vendosni të dhënat për ofruesin e identitetit OIDC."
+    },
+    "JWT": {
+      "TITLE": "Cilësimet JWT",
+      "DESCRIPTION": "Vendosni të dhënat për ofruesin e identitetit JWT.",
+      "HEADERNAME": "Emri i header-it",
+      "JWTENDPOINT": "Endpoint-i JWT",
+      "JWTKEYSENDPOINT": "Endpoint-i i çelësave JWT",
+      "AUDIENCE": "Audienca"
+    },
+    "APPLE": {
+      "TEAMID": "Team ID",
+      "KEYID": "ID-ja e çelësit",
+      "PRIVATEKEY": "Çelësi privat",
+      "UPDATEPRIVATEKEY": "Përditëso çelësin privat",
+      "UPLOADPRIVATEKEY": "Ngarko çelësin privat",
+      "KEYMAXSIZEEXCEEDED": "U tejkalua madhësia maksimale prej 5kB."
+    },
+    "SAML": {
+      "METADATAXML": "XML-ja e metadatave",
+      "METADATAURL": "URL-ja e metadatave",
+      "BINDING": "Binding",
+      "SIGNEDREQUEST": "Kërkesë e nënshkruar",
+      "SIGNATUREALGORITHM": "Algoritmi i nënshkrimit",
+      "NAMEIDFORMAT": "Formati NameID",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "Emri i atributit të përputhjes së personalizuar",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Emër alternativ atributi për përputhjen e përdoruesit në rast se `nameid-format` i kthyer është `transient`, p.sh. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    },
+    "TOAST": {
+      "SAVED": "U ruajt me sukses.",
+      "REACTIVATED": "IdP-ja u riaktivizua.",
+      "DEACTIVATED": "IdP-ja u çaktivizua.",
+      "SELECTEDREACTIVATED": "IdP-të e zgjedhura u riaktivizuan.",
+      "SELECTEDDEACTIVATED": "IdP-të e zgjedhura u çaktivizuan.",
+      "SELECTEDKEYSDELETED": "IdP-të e zgjedhura u fshinë.",
+      "DELETED": "IdP-ja u hoq me sukses!",
+      "ADDED": "U shtua me sukses.",
+      "REMOVED": "U hoq me sukses."
+    },
+    "ISIDTOKENMAPPING": "Përputh nga ID token-i",
+    "ISIDTOKENMAPPING_DESC": "Nëse zgjidhet, informacioni i ofruesit përputhet nga ID token-i, jo nga endpoint-i userinfo.",
+    "USEPKCE": "Përdor PKCE",
+    "USEPKCE_DESC": "Përcakton nëse parametrat code_challenge dhe code_challenge_method përfshihen në kërkesën e vërtetimit"
+  },
+  "MFA": {
+    "LIST": {
+      "MULTIFACTORTITLE": "Passkey",
+      "MULTIFACTORDESCRIPTION": "Përcaktoni këtu faktorët e shumëfishtë për passkey-n tuaj.",
+      "SECONDFACTORTITLE": "Vërtetimi me shumë faktorë",
+      "SECONDFACTORDESCRIPTION": "Përcaktoni faktorë të tjerë të mundshëm me të cilët mund ta siguroni vërtetimin me fjalëkalim."
+    },
+    "CREATE": {
+      "TITLE": "Faktor i ri",
+      "DESCRIPTION": "Zgjidhni llojin e faktorit të ri."
+    },
+    "DELETE": {
+      "TITLE": "Fshi faktorin",
+      "DESCRIPTION": "Jeni gati të fshini një faktor nga cilësimet e hyrjes. Jeni i sigurt?"
+    },
+    "TOAST": {
+      "ADDED": "U shtua me sukses.",
+      "SAVED": "U ruajt me sukses.",
+      "DELETED": "U hoq me sukses"
+    },
+    "TYPE": "Lloji",
+    "MULTIFACTORTYPES": {
+      "0": "I panjohur",
+      "1": "Passkey"
+    },
+    "SECONDFACTORTYPES": {
+      "0": "I panjohur",
+      "1": "TOTP (aplikacion vërtetimi)",
+      "2": "Passkey",
+      "3": "OTP me email (OTP Email)",
+      "4": "OTP me SMS (OTP SMS)",
+      "5": "Kodet e rikuperimit"
+    }
+  },
+  "LOGINPOLICY": {
+    "CREATE": {
+      "TITLE": "Cilësimet e hyrjes",
+      "DESCRIPTION": "Përcaktoni si mund të vërtetohen përdoruesit tuaj në organizatën tuaj."
+    },
+    "IDPS": "Ofruesit e identitetit",
+    "ADDIDP": {
+      "TITLE": "Shto ofrues identiteti",
+      "DESCRIPTION": "Mund të zgjidhni ofrues të paracaktuar ose të krijuar nga ju për vërtetimin.",
+      "SELECTIDPS": "Ofruesit e identitetit"
+    },
+    "PASSWORDLESS": "Hyrja me passkey",
+    "PASSWORDLESSTYPE": {
+      "0": "Nuk lejohet",
+      "1": "Lejohet"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "Ofruesi SMTP",
+      "DESCRIPTION": "Këta janë ofruesit SMTP për instancën tuaj Zitadel. Aktivizoni atë që dëshironi të përdorni për t'u dërguar njoftime përdoruesve tuaj.",
+      "EMPTY": "Nuk ka ofrues SMTP të disponueshëm",
+      "ACTIVATED": "Aktivizuar",
+      "ACTIVATE": "Aktivizo ofruesin",
+      "DEACTIVATE": "Çaktivizo ofruesin",
+      "TEST": "Testo ofruesin",
+      "TYPE": "Lloji",
+      "DIALOG": {
+        "ACTIVATED": "Ofruesi SMTP u aktivizua",
+        "ACTIVATE_WARN_TITLE": "Aktivizo cilësimet SMTP",
+        "ACTIVATE_WARN_DESCRIPTION": "Jeni gati të aktivizoni një ofrues SMTP. Së pari do të çaktivizojmë ofruesin aktual aktiv dhe më pas do të aktivizojmë këtë. Jeni i sigurt?",
+        "DEACTIVATE_WARN_TITLE": "Çaktivizo cilësimet SMTP",
+        "DEACTIVATE_WARN_DESCRIPTION": "Jeni gati të çaktivizoni një ofrues SMTP. Jeni i sigurt?",
+        "DEACTIVATED": "Ofruesi SMTP u çaktivizua",
+        "DELETE_TITLE": "Fshi ofruesin SMTP",
+        "DELETE_DESCRIPTION": "Jeni gati të fshini një ofrues. Konfirmojeni këtë veprim duke shkruar emrin e dërguesit",
+        "DELETED": "Ofruesi SMTP u fshi",
+        "SENDER": "Shkruani {{value}} për të fshirë këtë ofrues SMTP.",
+        "TEST_TITLE": "Testoni cilësimet SMTP",
+        "TEST_DESCRIPTION": "Specifikoni një adresë emaili për të testuar cilësimet SMTP",
+        "TEST_EMAIL": "Adresa e emailit",
+        "TEST_RESULT": "Rezultati i testit"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Shto ofrues SMTP",
+      "DESCRIPTION": "Zgjidhni një ose më shumë nga ofruesit e mëposhtëm.",
+      "STEPS": {
+        "TITLE": "Shto ofruesin SMTP {{ value }}",
+        "CREATE_DESC_TITLE": "Vendosni hap pas hapi cilësimet SMTP të {{ value }}",
+        "CURRENT_DESC_TITLE": "Këto janë cilësimet tuaja SMTP",
+        "PROVIDER_SETTINGS": "Cilësimet e ofruesit SMTP",
+        "SENDER_SETTINGS": "Cilësimet e dërguesit",
+        "NEXT_STEPS": "Hapat e ardhshëm",
+        "ACTIVATE": {
+          "TITLE": "Aktivizoni ofruesin tuaj SMTP",
+          "DESCRIPTION": "Zitadel nuk mund ta përdorë këtë ofrues SMTP për të dërguar njoftime derisa ta aktivizoni. Nëse e aktivizoni këtë ofrues, çdo ofrues tjetër që ishte aktiv do të çaktivizohet."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Çaktivizoni ofruesin tuaj SMTP",
+          "DESCRIPTION": "Nëse e çaktivizoni këtë ofrues SMTP, Zitadel nuk mund ta përdorë për të dërguar njoftime derisa ta aktivizoni sërish."
+        },
+        "SAVE_SETTINGS": "Ruani cilësimet tuaja",
+        "TEST": {
+          "TITLE": "Testoni cilësimet tuaja",
+          "DESCRIPTION": "Mund t'i testoni cilësimet e ofruesit SMTP dhe të kontrolloni rezultatin e testit para se t'i ruani",
+          "RESULT": "Emaili juaj u dërgua me sukses"
+        }
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Cilësimet e ofruesit SMTP"
+    },
+    "EMPTY": "Nuk ka ofrues SMTP të disponueshëm",
+    "STEPS": {
+      "SENDGRID": {}
+    }
+  },
+  "APP": {
+    "LIST": "Aplikacionet",
+    "COMPLIANCE": "Përputhshmëria me OIDC",
+    "URLS": "URL-të",
+    "CONFIGURATION": "Cilësimet",
+    "TOKEN": "Cilësimet e token-it",
+    "PAGES": {
+      "TITLE": "Aplikacioni",
+      "ID": "ID-ja e aplikacionit",
+      "DESCRIPTION": "Këtu mund të ndryshoni të dhënat e aplikacionit tuaj dhe cilësimet e tij.",
+      "CREATE": "Krijo aplikacion",
+      "CREATE_SELECT_PROJECT": "Së pari zgjidhni projektin tuaj",
+      "CREATE_NEW_PROJECT": "ose vendosni emrin e projektit tuaj të ri",
+      "CREATE_DESC_TITLE": "Vendosni hap pas hapi detajet e aplikacionit tuaj",
+      "CREATE_DESC_SUB": "Do të gjenerohet automatikisht një konfigurim i rekomanduar.",
+      "STATE": "Statusi",
+      "DATECREATED": "Krijuar",
+      "DATECHANGED": "Ndryshuar",
+      "URLS": "URL-të",
+      "DELETE": "Fshi aplikacionin",
+      "JUMPTOPROJECT": "Për të konfiguruar rolet, caktimet e roleve dhe të tjera, shkoni te projekti.",
+      "DETAIL": {
+        "TITLE": "Detajet",
+        "STATE": {
+          "0": "I papërcaktuar",
+          "1": "Aktiv",
+          "2": "Joaktiv"
+        }
+      },
+      "DIALOG": {
+        "CONFIG": {
+          "TITLE": "Ndrysho cilësimet OIDC"
+        },
+        "DELETE": {
+          "TITLE": "Fshi aplikacionin",
+          "DESCRIPTION": "Dëshironi vërtet ta fshini këtë aplikacion?"
+        }
+      },
+      "NEXTSTEPS": {
+        "TITLE": "Hapat e ardhshëm",
+        "0": {
+          "TITLE": "Shtoni role",
+          "DESC": "Vendosni rolet e projektit tuaj"
+        },
+        "1": {
+          "TITLE": "Shtoni përdorues",
+          "DESC": "Shtoni përdorues të rinj të organizatës suaj"
+        },
+        "2": {
+          "TITLE": "Ndihma dhe mbështetja",
+          "DESC": "Lexoni dokumentacionin tonë për krijimin e aplikacioneve ose kontaktoni mbështetjen tonë"
+        }
+      }
+    },
+    "NAMEDIALOG": {
+      "TITLE": "Riemërto aplikacionin",
+      "DESCRIPTION": "Vendosni emrin e ri për aplikacionin tuaj",
+      "NAME": "Emri i ri"
+    },
+    "NAME": "Emri",
+    "TYPE": "Lloji i aplikacionit",
+    "AUTHMETHOD": "Metoda e vërtetimit",
+    "AUTHMETHODSECTION": "Metoda e vërtetimit",
+    "GRANT": "Llojet e grant-it",
+    "ADDITIONALORIGINS": "Origjina shtesë",
+    "ADDITIONALORIGINSDESC": "Nëse dëshironi t'i shtoni aplikacionit tuaj origjina shtesë që nuk përdoren si ridrejtim, mund ta bëni këtu.",
+    "ORIGINS": "Origjinat",
+    "NOTANORIGIN": "Vlera e vendosur nuk është origjinë",
+    "PROSWITCH": "Jam profesionist. Kapërce këtë udhëzues.",
+    "NAMEANDTYPESECTION": "Emri dhe lloji",
+    "TITLEFIRST": "Emri i aplikacionit",
+    "TYPETITLE": "Lloji i aplikacionit",
+    "OIDC": {
+      "WELLKNOWN": "Lidhje të tjera mund të merren nga <a href='{{url}}' title='Discovery endpoint' target='_blank'>discovery endpoint</a>.",
+      "INFO": {
+        "ISSUER": "Lëshuesi",
+        "CLIENTID": "Client ID"
+      },
+      "CURRENT": "Konfigurimi aktual",
+      "TOKENSECTIONTITLE": "Opsionet e AuthToken",
+      "REDIRECTSECTIONTITLE": "Cilësimet e ridrejtimit",
+      "REDIRECTTITLE": "Specifikoni URI-të ku do të ridrejtojë hyrja.",
+      "POSTREDIRECTTITLE": "Kjo është URI-ja e ridrejtimit pas daljes.",
+      "REDIRECTDESCRIPTIONWEB": "URI-të e ridrejtimit duhet të fillojnë me https://. http:// është i vlefshëm vetëm me modalitetin e zhvillimit të aktivizuar.",
+      "REDIRECTDESCRIPTIONNATIVE": "URI-të e ridrejtimit duhet të fillojnë me protokollin tuaj, http://127.0.0.1, http://[::1] ose http://localhost.",
+      "REDIRECTNOTVALID": "Kjo URI ridrejtimi nuk është e vlefshme.",
+      "COMMAORENTERSEPERATION": "ndani me ↵",
+      "TYPEREQUIRED": "Lloji është i detyrueshëm.",
+      "TITLE": "Cilësimet OIDC",
+      "CLIENTID": "Client ID",
+      "CLIENTDETAILS": "Detajet e klientit",
+      "CLIENTSECRET_NOSECRET": "Me rrjedhën e vërtetimit që keni zgjedhur, nuk nevojitet asnjë sekret, prandaj ai nuk është i disponueshëm.",
+      "CLIENTSECRET_DESCRIPTION": "Ruajeni client secret-in në një vend të sigurt, sepse do të zhduket sapo të mbyllet dritarja.",
+      "REGENERATESECRET": "Rigjenero client secret-in",
+      "DEVMODE": "Modaliteti i zhvillimit",
+      "DEVMODE_ENABLED": "Aktivizuar",
+      "DEVMODE_DISABLED": "Çaktivizuar",
+      "DEVMODEDESC": "Kujdes: me modalitetin e zhvillimit të aktivizuar, URI-të e ridrejtimit nuk do të validohen.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Kapërce faqen e hyrjes së suksesshme",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Kapërceni faqen e suksesit pas hyrjes për këtë aplikacion native.",
+      "APPLINKSSECTION": "Lidhjet e aplikacionit native",
+      "APPLINKSDESC": "Konfiguroni lidhjen me iOS dhe Android që kjo instancë të mund të shërbejë skedarët e besimit të passkey për aplikacionet tuaja native.",
+      "IOSTITLE": "iOS",
+      "IOSDESC": "Shërbehet në apple-app-site-association si hyrje webcredentials TEAMID.BUNDLEID.",
+      "TEAMID": "Team ID",
+      "TEAMIDPLACEHOLDER": "ABCDE12345",
+      "TEAMIDDESC": "Apple Team ID duhet të ketë saktësisht 10 karaktere alfanumerike, p.sh. ABCDE12345.",
+      "TEAMIDLENGTH": "Team ID duhet të ketë saktësisht 10 karaktere alfanumerike.",
+      "BUNDLEID": "Bundle ID",
+      "BUNDLEIDPLACEHOLDER": "com.example.app",
+      "BUNDLEIDDESC": "Identifikuesi i paketës iOS (CFBundleIdentifier), p.sh. com.example.app. Mos përfshini prefiksin e Team ID.",
+      "ANDROIDTITLE": "Android",
+      "ANDROIDDESC": "Shërbehet në assetlinks.json për Digital Asset Links / kredencialet e passkey.",
+      "PACKAGENAME": "Emri i paketës",
+      "PACKAGENAMEPLACEHOLDER": "com.example.app",
+      "PACKAGENAMEDESC": "applicationId / emri i paketës Android, p.sh. com.example.app.",
+      "FINGERPRINTS": "Gjurmët SHA-256 të certifikatës",
+      "FINGERPRINTSPLACEHOLDER": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99",
+      "FINGERPRINTSDESC": "Një gjurmë për rresht (64 karaktere heksadecimale, dy pikat opsionale). Përfshini debug dhe release sipas nevojës.",
+      "IOSAPPLINKINCOMPLETE": "Team ID dhe Bundle ID për iOS duhet të vendosen të dyja ose të lihen të dyja bosh.",
+      "ANDROIDPACKAGEREQUIRED": "Emri i paketës Android është i detyrueshëm kur vendosen gjurmët e certifikatës.",
+      "REDIRECT": "URI-të e ridrejtimit",
+      "REDIRECTSECTION": "URI-të e ridrejtimit",
+      "POSTLOGOUTREDIRECT": "URI-të pas daljes",
+      "RESPONSESECTION": "Llojet e përgjigjes",
+      "GRANTSECTION": "Llojet e grant-it",
+      "GRANTTITLE": "Zgjidhni llojet e grant-it. Shënim: Implicit është i disponueshëm vetëm për aplikacionet që ekzekutohen në shfletues.",
+      "APPTYPE": {
+        "0": "Web",
+        "1": "User Agent",
+        "2": "Native"
+      },
+      "RESPONSETYPE": "Llojet e përgjigjes",
+      "RESPONSE": {
+        "0": "Code",
+        "1": "ID Token",
+        "2": "Token-ID Token"
+      },
+      "REFRESHTOKEN": "Refresh token",
+      "GRANTTYPE": "Llojet e grant-it",
+      "GRANT": {
+        "0": "Authorization Code",
+        "1": "Implicit",
+        "2": "Refresh Token",
+        "3": "Device Code",
+        "4": "Token Exchange"
+      },
+      "AUTHMETHOD": {
+        "0": "Basic",
+        "1": "Post",
+        "2": "Asnjë",
+        "3": "Private Key JWT"
+      },
+      "TOKENTYPE": "Lloji i Auth token-it",
+      "TOKENTYPE0": "Bearer token",
+      "TOKENTYPE1": "JWT",
+      "UNSECUREREDIRECT": "Shpresojmë shumë ta dini se çfarë po bëni.",
+      "OVERVIEWSECTION": "Përmbledhja",
+      "OVERVIEWTITLE": "Mbaruat. Rishikoni cilësimet tuaja.",
+      "ACCESSTOKENROLEASSERTION": "Shto rolet e përdoruesit në access token",
+      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Nëse zgjidhet, rolet e kërkuara të përdoruesit të vërtetuar shtohen në access token.",
+      "IDTOKENROLEASSERTION": "Rolet e përdoruesit brenda ID token-it",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "Kur ky opsion aktivizohet, rolet e caktuara të përdoruesit të vërtetuar shtohen drejtpërdrejt në ID token-in e tij. Sigurohuni të aktivizoni cilësimin e projektit 'Kthe rolet e përdoruesit gjatë vërtetimit' ose kërkojini përmes një scope të personalizuar.",
+      "IDTOKENUSERINFOASSERTION": "Përfshi informacionin e profilit të përdoruesit në ID token",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "U mundëson aplikacioneve të marrin nga ID token-i claims për profilin, emailin, telefonin dhe adresën.",
+      "CLOCKSKEW": "U mundëson aplikacioneve të trajtojnë mospërputhjen e orës mes OP-së dhe aplikacionit. Kohëzgjatja (0-5s) i shtohet claim-it exp dhe i zbritet iats, auth_time dhe nbf.",
+      "RECOMMENDED": "rekomandohet",
+      "NOTRECOMMENDED": "nuk rekomandohet",
+      "SELECTION": {
+        "APPTYPE": {
+          "WEB": {
+            "TITLE": "Web",
+            "DESCRIPTION": "Aplikacione të zakonshme web si .net, PHP, Node.js, Java etj."
+          },
+          "NATIVE": {
+            "TITLE": "Native",
+            "DESCRIPTION": "Aplikacione celulare, desktop, pajisje inteligjente etj."
+          },
+          "USERAGENT": {
+            "TITLE": "User Agent",
+            "DESCRIPTION": "Aplikacione me një faqe (SPA) dhe në përgjithësi të gjitha framework-et JS që ekzekutohen në shfletues"
+          }
+        }
+      },
+      "BACKCHANNELLOOGOUTURI": "URI-ja e daljes Back-Channel"
+    },
+    "API": {
+      "INFO": {
+        "CLIENTID": "Client ID"
+      },
+      "REGENERATESECRET": "Rigjenero client secret-in",
+      "SELECTION": {
+        "TITLE": "API",
+        "DESCRIPTION": "API në përgjithësi"
+      },
+      "AUTHMETHOD": {
+        "0": "Basic",
+        "1": "Private Key JWT"
+      }
+    },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "Aplikacione SAML"
+      },
+      "CONFIGSECTION": "Cilësimet SAML",
+      "CHOOSEMETADATASOURCE": "Jepni cilësimet tuaja SAML me një nga opsionet e mëposhtme:",
+      "METADATAOPT1": "Opsioni 1. Specifikoni URL-në ku ndodhet skedari i metadatave",
+      "METADATAOPT2": "Opsioni 2. Ngarkoni një skedar që përmban XML-në e metadatave tuaja",
+      "METADATAOPT3": "Opsioni 3. Krijoni në çast një skedar minimal metadatash duke dhënë ENTITYID dhe URL-në ACS",
+      "UPLOAD": "Ngarko skedarin XML",
+      "METADATA": "Metadatat",
+      "METADATAFROMFILE": "Metadatat nga skedari",
+      "CERTIFICATE": "Certifikata SAML",
+      "DOWNLOADCERT": "Shkarko certifikatën SAML",
+      "CREATEMETADATA": "Krijo metadatat",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "URL-ja e endpoint-it ACS"
+    },
+    "AUTHMETHODS": {
+      "CODE": {
+        "TITLE": "Code",
+        "DESCRIPTION": "Shkëmbe kodin e autorizimit me token-at"
+      },
+      "PKCE": {
+        "TITLE": "PKCE",
+        "DESCRIPTION": "Përdor një hash të rastësishëm në vend të një client secret statik për më shumë siguri"
+      },
+      "POST": {
+        "TITLE": "POST",
+        "DESCRIPTION": "Dërgo client_id dhe client_secret si pjesë të formularit"
+      },
+      "PK_JWT": {
+        "TITLE": "Private Key JWT",
+        "DESCRIPTION": "Përdor një çelës privat për të autorizuar aplikacionin tuaj"
+      },
+      "BASIC": {
+        "TITLE": "Basic",
+        "DESCRIPTION": "Vërtetim me emër përdoruesi dhe fjalëkalim"
+      },
+      "IMPLICIT": {
+        "TITLE": "Implicit",
+        "DESCRIPTION": "Merr token-at drejtpërdrejt nga endpoint-i i autorizimit"
+      },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "Autorizo pajisjen në një kompjuter ose smartphone."
+      },
+      "CUSTOM": {
+        "TITLE": "I personalizuar",
+        "DESCRIPTION": "Cilësimi juaj nuk përputhet me asnjë opsion tjetër."
+      }
+    },
+    "TOAST": {
+      "REACTIVATED": "Aplikacioni u riaktivizua.",
+      "DEACTIVATED": "Aplikacioni u çaktivizua.",
+      "OIDCUPDATED": "Aplikacioni u përditësua.",
+      "APIUPDATED": "Aplikacioni u përditësua",
+      "UPDATED": "Aplikacioni u përditësua.",
+      "CREATED": "Aplikacioni u krijua.",
+      "CLIENTSECRETREGENERATED": "Client secret-i u gjenerua.",
+      "DELETED": "Aplikacioni u fshi.",
+      "CONFIGCHANGED": "U zbuluan ndryshime!"
+    },
+    "LOGINV2": {
+      "USEV2": "Përdor ndërfaqen e re të hyrjes",
+      "BASEURL": "URL bazë e personalizuar për ndërfaqen e re të hyrjes"
+    }
+  },
+  "GENDERS": {
+    "0": "E panjohur",
+    "1": "Femër",
+    "2": "Mashkull",
+    "3": "Tjetër"
+  },
+  "LANGUAGES": {
+    "de": "Deutsch",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文",
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский",
+    "nl": "Nederlands",
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia",
+    "hu": "Magyar",
+    "ko": "한국어",
+    "ro": "Română",
+    "tr": "Türkçe",
+    "uk": "Українська",
+    "ar": "العربية",
+    "sq": "Shqip"
+  },
+  "MEMBER": {
+    "ADD": "Shto një administrator",
+    "CREATIONTYPE": "Lloji i krijimit",
+    "CREATIONTYPES": {
+      "3": "IAM",
+      "2": "Organizata",
+      "0": "Projekt në pronësi",
+      "1": "Projekt i dhënë",
+      "4": "Projekti"
+    },
+    "EDITROLE": "Ndrysho rolet",
+    "EDITFOR": "Ndryshoni rolet për përdoruesin: {{value}}",
+    "DIALOG": {
+      "DELETE_TITLE": "Hiq administratorin",
+      "DELETE_DESCRIPTION": "Jeni gati të hiqni një administrator. Jeni i sigurt?"
+    },
+    "SHOWDETAILS": "Klikoni për të shfaqur detajet."
+  },
+  "ROLESLABEL": "Rolet",
+  "GRANTS": {
+    "TITLE": "Caktimet e roleve",
+    "DESC": "Këto janë të gjitha caktimet e roleve në organizatën tuaj.",
+    "DELETE": "Fshi caktimin e rolit",
+    "EMPTY": "Nuk u gjet asnjë caktim roli",
+    "ADD": "Krijo caktim roli",
+    "ADD_BTN": "I ri",
+    "PROJECT": {
+      "TITLE": "Caktimi i rolit",
+      "DESCRIPTION": "Përcaktoni caktimet e roleve për projektin e specifikuar. Kini parasysh se mund të shihni vetëm regjistrimet e projekteve dhe përdoruesve për të cilët keni leje."
+    },
+    "USER": {
+      "TITLE": "Caktimi i rolit",
+      "DESCRIPTION": "Përcaktoni caktimet e roleve për përdoruesin e specifikuar. Kini parasysh se mund të shihni vetëm regjistrimet e projekteve dhe përdoruesve për të cilët keni leje."
+    },
+    "CREATE": {
+      "TITLE": "Krijo caktim roli",
+      "DESCRIPTION": "Kërkoni organizatën, projektin dhe rolet përkatëse."
+    },
+    "EDIT": {
+      "TITLE": "Ndrysho caktimin e rolit"
+    },
+    "DETAIL": {
+      "TITLE": "Detajet e caktimit të rolit",
+      "DESCRIPTION": "Këtu mund të shihni të gjitha detajet e caktimit të rolit."
+    },
+    "TOAST": {
+      "UPDATED": "Caktimi i rolit u përditësua.",
+      "REMOVED": "Caktimi i rolit u hoq",
+      "BULKREMOVED": "Caktimet e roleve u hoqën.",
+      "CANTSHOWINFO": "Nuk mund ta shihni profilin e këtij përdoruesi, sepse nuk jeni administrator i organizatës ku bën pjesë ky përdorues"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Fshi caktimin e rolit",
+      "DELETE_DESCRIPTION": "Jeni gati të fshini një caktim roli. Dëshironi të vazhdoni?",
+      "BULK_DELETE_TITLE": "Fshi caktimet e roleve",
+      "BULK_DELETE_DESCRIPTION": "Jeni gati të fshini disa caktime rolesh. Dëshironi të vazhdoni?"
+    }
+  },
+  "CHANGES": {
+    "LISTTITLE": "Ndryshimet e fundit",
+    "BOTTOM": "Keni arritur në fund të listës.",
+    "LOADMORE": "Ngarko më shumë",
+    "ORG": {
+      "TITLE": "Aktiviteti",
+      "DESCRIPTION": "Këtu mund të shihni ngjarjet më të fundit që kanë shkaktuar një ndryshim në organizatë."
+    },
+    "PROJECT": {
+      "TITLE": "Aktiviteti",
+      "DESCRIPTION": "Këtu mund të shihni ngjarjet më të fundit që kanë shkaktuar një ndryshim në projekt."
+    },
+    "USER": {
+      "TITLE": "Aktiviteti",
+      "DESCRIPTION": "Këtu mund të shihni ngjarjet më të fundit që kanë shkaktuar një ndryshim te përdoruesi."
+    }
+  }
+}
