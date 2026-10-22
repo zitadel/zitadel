@@ -1,16 +1,22 @@
 server {
-  listen 8080;
-  server_name _;
+  listen 8080 default_server;
+  server_name conta.ailton.dev.br localhost 127.0.0.1;
+  if ($host !~* ^(conta\.ailton\.dev\.br|localhost|127\.0\.0\.1)$) { return 404; }
   root /usr/share/nginx/html;
   index index.html;
+  error_page 404 /assets/404.html;
   add_header X-Content-Type-Options nosniff always;
   add_header Referrer-Policy no-referrer always;
   add_header X-Frame-Options DENY always;
   add_header Content-Security-Policy "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: ${ACCOUNT_API}; font-src 'self' ${ACCOUNT_API}; connect-src 'self' ${ACCOUNT_ISSUER} ${ACCOUNT_API}; base-uri 'self'; frame-ancestors 'none'; form-action 'none'; object-src 'none'" always;
   add_header Cache-Control no-store always;
+
   location = /healthz { access_log off; return 200 'ok'; }
+  location = / { try_files /index.html =404; }
+  location ~ ^/(perfil|aplicativos|atividade|seguranca|seguranca/senha|seguranca/passkeys|seguranca/mfa|auth/callback|auth/error|signedout)/?$ { try_files /index.html =404; }
+
   location = /assets/environment.json { try_files $uri =404; }
   location /assets/ { try_files $uri =404; }
   location ~* \.(js|css|woff2?|ttf|ico|png|svg|json)$ { try_files $uri =404; }
-  location / { try_files $uri /index.html; }
+  location / { return 404; }
 }

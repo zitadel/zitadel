@@ -18,6 +18,8 @@ export class AccountBranding {
     private oauth: OAuthService,
     private nativeTheme: ThemeService,
   ) {
+    const saved = localStorage.getItem('account:theme');
+    if (saved === 'light' || saved === 'dark') this.dark = saved === 'dark';
     this.apply();
   }
   async load(): Promise<void> {
@@ -31,6 +33,7 @@ export class AccountBranding {
   }
   toggle(): void {
     this.dark = !this.dark;
+    localStorage.setItem('account:theme', this.dark ? 'dark' : 'light');
     this.apply();
   }
   private asset(value: string | undefined): string {

@@ -1,4 +1,16 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, registerLocaleData } from '@angular/common';
+import localePt from '@angular/common/locales/pt';
+import localeEn from '@angular/common/locales/en';
+import localeEs from '@angular/common/locales/es';
+import 'moment/locale/es';
+import { MatMenuModule } from '@angular/material/menu';
+import { AssetService } from 'src/app/services/asset.service';
+import { AccountAssetService } from './avatar-compression';
+import { AccountApplicationsComponent } from './applications';
+import { AccountActivityComponent } from './activity';
+import { accountLocale } from './preferences';
+import 'moment/locale/pt-br';
+import 'moment/locale/pt';
 import { HttpClient, provideHttpClient } from '@angular/common/http';
 import { inject, NgModule, provideAppInitializer } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -24,6 +36,7 @@ import { CountryCallingCodesService } from 'src/app/services/country-calling-cod
 import * as countries from 'i18n-iso-countries';
 import ptCountries from 'i18n-iso-countries/langs/pt.json';
 import enCountries from 'i18n-iso-countries/langs/en.json';
+import esCountries from 'i18n-iso-countries/langs/es.json';
 import { ExternalIdpsComponent } from 'src/app/pages/users/user-detail/external-idps/external-idps.component';
 import { GrpcService } from 'src/app/services/grpc.service';
 import { AuthenticationService } from 'src/app/services/authentication.service';
@@ -34,6 +47,9 @@ import { AccountStorage } from './storage';
 import { AccountSignatureHandler } from './signature';
 import { AccountComponent, AccountPageComponent, AccountPasswordPageComponent } from './shell';
 import { AccountBranding } from './branding';
+import { AccountPasskeysComponent, AccountMfaComponent, AccountPasskeyDialog } from './native-security';
+import { AccountNativeActions, AccountNativeCard, AccountNativeFields } from './native-presentation';
+import { TypeSafeCellDefModule } from 'src/app/directives/type-safe-cell-def/type-safe-cell-def.module';
 import { PasswordComponent } from 'src/app/pages/users/user-detail/password/password.component';
 import { AuthUserMfaComponent } from 'src/app/pages/users/user-detail/auth-user-detail/auth-user-mfa/auth-user-mfa.component';
 import { AuthPasswordlessComponent } from 'src/app/pages/users/user-detail/auth-user-detail/auth-passwordless/auth-passwordless.component';
@@ -61,15 +77,41 @@ import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy
 
 countries.registerLocale(ptCountries);
 countries.registerLocale(enCountries);
+countries.registerLocale(esCountries);
+registerLocaleData(localePt);
+registerLocaleData(localeEn);
+registerLocaleData(localeEs);
 
 export class AccountTranslations implements TranslateLoader {
   constructor(private http: HttpClient) {}
+  private languageNames(values: TranslationObject, locale: string): TranslationObject {
+    const names = new Intl.DisplayNames([locale], { type: 'language' });
+    return Object.fromEntries(
+      Object.entries(values).map(([key, value]) => {
+        try {
+          const name = names.of(key);
+          return [key, name ? name[0].toLocaleUpperCase(locale) + name.slice(1) : value];
+        } catch {
+          return [key, value];
+        }
+      }),
+    );
+  }
   getTranslation(lang: string) {
-    const locale = lang === 'pt' ? 'pt' : 'en';
+    const locale = accountLocale(lang);
     return forkJoin([
       this.http.get<TranslationObject>(`/assets/native-i18n/${locale}.json`),
       this.http.get<TranslationObject>(`/assets/i18n/${locale}.json`),
-    ]).pipe(map(([native, account]) => ({ ...native, ...account })));
+    ]).pipe(
+      map(([native, account]) => ({
+        ...native,
+        ...account,
+        LANGUAGES: {
+          ...this.languageNames(native['LANGUAGES'] as TranslationObject, locale),
+          ...(account['LANGUAGES'] as TranslationObject),
+        },
+      })),
+    );
   }
 }
 const authenticated: CanActivateFn = async (_route, state) => {
@@ -87,6 +129,8 @@ export const accountRoutes: Routes = [
     component: AccountPageComponent,
     canActivate: [authenticated],
   })),
+  { path: 'atividade', component: AccountActivityComponent, canActivate: [authenticated] },
+  { path: 'aplicativos', component: AccountApplicationsComponent, canActivate: [authenticated] },
   { path: 'seguranca/senha', component: AccountPasswordPageComponent, canActivate: [authenticated] },
   { path: 'auth/callback', component: AccountPageComponent },
   { path: 'auth/error', component: AccountPageComponent },
@@ -96,8 +140,16 @@ export const accountRoutes: Routes = [
 @NgModule({
   declarations: [
     AccountComponent,
+    AccountApplicationsComponent,
+    AccountActivityComponent,
     AccountPageComponent,
     AccountPasswordPageComponent,
+    AccountPasskeysComponent,
+    AccountMfaComponent,
+    AccountPasskeyDialog,
+    AccountNativeActions,
+    AccountNativeCard,
+    AccountNativeFields,
     ExternalIdpsComponent,
     PasswordComponent,
     AuthUserMfaComponent,
@@ -126,6 +178,7 @@ export const accountRoutes: Routes = [
       },
     }),
     MatDialogModule,
+    MatMenuModule,
     MatButtonModule,
     MatIconModule,
     MatTableModule,
@@ -136,6 +189,7 @@ export const accountRoutes: Routes = [
     MatSelectModule,
     MatSnackBarModule,
     QRCodeComponent,
+    TypeSafeCellDefModule,
     CardModule,
     RefreshTableModule,
     TableActionsModule,
@@ -153,6 +207,7 @@ export const accountRoutes: Routes = [
   ],
   providers: [
     CountryCallingCodesService,
+    { provide: AssetService, useClass: AccountAssetService },
     provideHttpClient(),
     provideTanStackQuery(new QueryClient()),
     ThemeService,

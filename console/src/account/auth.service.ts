@@ -27,6 +27,7 @@ export class AccountAuthService {
   environment!: AccountEnvironment;
   error = false;
   private ready?: Promise<void>;
+  private resumePath = safeAccountPath(location.pathname);
   constructor(
     private oauth: OAuthService,
     private http: HttpClient,
@@ -51,8 +52,7 @@ export class AccountAuthService {
       const env = await firstValueFrom(this.http.get<AccountEnvironment>('/assets/environment.json'));
       for (const value of [env.api, env.issuer]) {
         const url = new URL(value);
-        if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash || url.pathname !== '/')
-          throw new Error('configuration');
+        if (url.protocol !== 'https:' || url.origin !== value) throw new Error('configuration');
       }
       if (!env.clientid || !/^\d+$/.test(env.loginOrgId)) throw new Error('configuration');
       this.environment = env;
@@ -70,13 +70,27 @@ export class AccountAuthService {
         clearHashAfterLogin: true,
         disablePKCE: false,
         showDebugInformation: false,
+        timeoutFactor: 1,
       });
+      if (location.pathname === '/signedout') {
+        this.oauth.logOut(true);
+        this.storage.clear();
+        return;
+      }
       await this.oauth.loadDiscoveryDocument();
       if (location.pathname === '/auth/callback') {
         const saved = this.storage.getItem('transaction');
         this.storage.removeItem('transaction'); // consume even on error; never replay a failed callback
         const tx: Transaction | undefined = saved ? JSON.parse(saved) : undefined;
-        if (!tx || Date.now() - tx.created > 600000 || Date.now() < tx.created) throw new Error('transaction');
+        if (
+          !tx ||
+          typeof tx.id !== 'string' ||
+          !Number.isFinite(tx.created) ||
+          Date.now() - tx.created > 600000 ||
+          Date.now() < tx.created
+        )
+          throw new Error('transaction');
+        this.resumePath = safeAccountPath(tx.path);
         await this.oauth.tryLoginCodeFlow(); // library verifies state, nonce, issuer, audience, expiry, signature handler
         if (this.oauth.state !== tx.id || !this.valid()) throw new Error('context');
         this.storage.removeItem('nonce');
@@ -84,11 +98,19 @@ export class AccountAuthService {
         history.replaceState(null, '', safeAccountPath(tx.path));
       }
       if (this.oauth.hasValidIdToken() && !this.valid()) throw new Error('context');
+      // The native password form calls history.back() on success. Seed an internal
+      // predecessor for a direct entry/callback so it never returns to the IdP.
+      if (this.valid() && location.pathname === '/seguranca/senha') {
+        history.replaceState(null, '', '/seguranca');
+        history.pushState(null, '', '/seguranca/senha');
+      }
       this.authenticationChanged.next(this.valid());
       this.oauth.events.subscribe((event) => {
         if (event.type === 'token_expires' || event.type === 'session_terminated') {
+          this.resumePath = safeAccountPath(location.pathname);
           this.error = true;
           this.oauth.logOut(true);
+          this.storage.clear();
           this.authenticationChanged.next(false);
           this.dialogs.closeAll();
           this.queries.clear();
@@ -120,10 +142,10 @@ export class AccountAuthService {
   async authenticate(_partial?: Partial<AuthConfig>, force = false): Promise<boolean> {
     await this.initialize();
     if (this.valid() && !force) return true;
-    if (!this.error) this.login(location.pathname);
+    if (!this.error) this.login(location.pathname, force);
     return false;
   }
-  login(path = '/'): void {
+  login(path = '/', force = false): void {
     if (!this.environment) return;
     const existing = this.storage.getItem('transaction');
     if (existing) {
@@ -131,14 +153,15 @@ export class AccountAuthService {
       location.assign('/auth/error');
       return;
     }
-    const tx: Transaction = { id: crypto.randomUUID(), path: safeAccountPath(path), created: Date.now() };
+    this.resumePath = safeAccountPath(path);
+    const tx: Transaction = { id: crypto.randomUUID(), path: this.resumePath, created: Date.now() };
     this.storage.setItem('transaction', JSON.stringify(tx));
-    this.oauth.initCodeFlow(tx.id);
+    this.oauth.initCodeFlow(tx.id, force ? { prompt: 'login', max_age: '0' } : {});
   }
   retry(): void {
     this.storage.removeItem('transaction');
-    this.error = false;
-    this.login('/');
+    // A new bootstrap retries discovery/configuration and creates a fresh transaction.
+    location.assign(this.resumePath);
   }
   signout(): void {
     this.authenticationChanged.next(false);

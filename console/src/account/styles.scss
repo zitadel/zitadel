@@ -1,4 +1,9 @@
 @use '@angular/material' as mat;
+@forward 'flag-icons/sass/variables' with (
+  $flag-icons-use-square: false
+);
+@use 'flag-icons/sass/flag-icons-base';
+@use 'flag-icons/sass/flag-icons-list';
 @import 'material-design-icons-iconfont/dist/material-design-icons.css';
 @import '../assets/icons/line-awesome/css/line-awesome.min.css';
 @include mat.core();
@@ -131,7 +136,7 @@ button:disabled {
   border-bottom: 1px solid var(--account-line);
   overflow-wrap: anywhere;
 }
-.brand img {
+.brand > img {
   display: block;
   max-width: 100%;
   max-height: 43px;
@@ -415,9 +420,14 @@ p {
 }
 .account-profile-form .usernamediv .edit {
   border: 0;
-  padding-left: 0;
+  padding: 0 8px;
   margin-top: 0;
+  min-width: 40px;
 }
+.account-profile-form .usernamediv .edit .las {
+  font-size: 18px;
+}
+
 .account-profile-form .btn-container {
   justify-content: flex-start;
   margin-top: 26px;
@@ -430,7 +440,7 @@ p {
   border: 0;
 }
 .account-profile-form .submit-button::after {
-  content: '→';
+  content: '>';
   margin-left: 12px;
 }
 cnsl-detail-form .user-grid {
@@ -470,8 +480,23 @@ textarea[cnslInput] {
   color: var(--account-muted);
 }
 .avatar-circle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  font-family: var(--account-font);
   background: var(--account-accent) !important;
   color: var(--account-brand) !important;
+}
+.avatar-circle img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 cnsl-card {
   display: block;
@@ -482,16 +507,6 @@ cnsl-card .card {
   background: transparent !important;
   border-radius: 0;
   padding-inline: 0;
-}
-cnsl-card .card .header .row .title {
-  font-family: var(--account-font);
-  text-transform: none;
-  font-size: 18px;
-  letter-spacing: normal;
-  font-weight: 600;
-}
-cnsl-card .header .desc {
-  font-size: 12px;
 }
 .table-wrapper {
   overflow-x: auto;
@@ -557,7 +572,7 @@ footer span {
     line-height: 26px;
     margin: 0;
   }
-  .brand img {
+  .brand > img {
     max-width: 70%;
     max-height: 40px;
     margin: 0;
@@ -648,7 +663,7 @@ footer span {
     font-size: 0;
   }
   .task > span:last-child::after {
-    content: '›';
+    content: '>';
     font-size: 25px;
     color: var(--account-muted);
     line-height: 30px;
@@ -699,4 +714,544 @@ footer span {
   .mobile-signout {
     display: inline-flex;
   }
+}
+
+// Native components normally receive these structural rules through Console theme mixins.
+// Account supplies its own presentation, using only effective Organization colors.
+body cnsl-detail-form.account-profile-form .user-grid {
+  gap: 18px 28px;
+}
+body cnsl-detail-form.account-profile-form .btn-container {
+  justify-content: flex-start;
+  margin-top: 20px;
+}
+body cnsl-detail-form.account-profile-form .user-form-content .usernamediv {
+  margin-top: 18px !important;
+}
+body .account-profile-form .cnsl-form-field-wrapper {
+  margin-bottom: 10px;
+}
+body .account-profile-form .user-grid mat-select {
+  min-height: 38px;
+  border-bottom: 1px solid var(--account-line);
+  padding-block: 7px;
+  font-size: 13px;
+}
+input[cnslInput].ng-invalid.ng-touched {
+  border-color: var(--account-warn);
+}
+.form-error {
+  color: var(--account-warn);
+}
+cnsl-contact .contact-method-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding-block: 18px;
+  border-bottom: 1px solid var(--account-line);
+}
+cnsl-contact .left {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+cnsl-contact .right {
+  display: flex;
+  flex-shrink: 0;
+}
+cnsl-contact .label,
+cnsl-contact .name,
+cnsl-phone-detail {
+  display: block;
+}
+cnsl-contact .label {
+  margin-bottom: 7px;
+  font-size: 11px;
+  color: var(--account-muted);
+}
+cnsl-contact .name {
+  font-size: 13px;
+}
+cnsl-contact .block,
+cnsl-contact .contact-state {
+  margin-top: 7px;
+  font-size: 11px;
+  color: var(--account-muted);
+}
+cnsl-contact .verify {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  margin-left: 12px;
+  color: var(--account-brand);
+  cursor: pointer;
+}
+cnsl-contact .las {
+  font-size: 19px;
+}
+// Scoped native card styles are injected after global styles; override only the editorial slots.
+cnsl-card .card .header .row .title {
+  font-family: var(--account-font) !important;
+  text-transform: none !important;
+  font-size: 18px !important;
+  letter-spacing: normal !important;
+  font-weight: 600 !important;
+  line-height: 29px;
+}
+cnsl-card .card .header .desc {
+  font: 12px/1.65 var(--account-font);
+  color: var(--account-muted);
+}
+cnsl-card .card {
+  padding-inline: 0 !important;
+  margin-inline: 0;
+  min-width: 0 !important;
+}
+cnsl-card .no-content-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 22px 12px;
+  color: var(--account-muted);
+  border-bottom: 1px solid var(--account-line);
+}
+cnsl-card .no-content-row .las {
+  font-size: 20px;
+}
+cnsl-card .refresh-table-header-row,
+.cnsl-action-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+cnsl-card .refresh-table-header-row {
+  padding-block: 0 20px;
+}
+.fill-space {
+  flex: 1;
+}
+cnsl-card table.mat-mdc-table {
+  background: transparent;
+  --mat-table-background-color: transparent;
+  --mat-table-row-item-label-text-color: var(--account-text);
+  --mat-table-header-headline-color: var(--account-muted);
+  --mat-table-row-item-outline-color: var(--account-line);
+}
+.mat-mdc-select,
+.mat-mdc-option,
+.mat-mdc-button-base,
+.mat-mdc-dialog-container,
+.mat-mdc-table {
+  font-family: var(--account-font) !important;
+}
+.cdk-overlay-pane {
+  --mat-dialog-container-color: var(--account-background);
+  --mat-dialog-subhead-color: var(--account-text);
+  --mat-dialog-supporting-text-color: var(--account-muted);
+  --mat-select-panel-background-color: var(--account-background);
+  --mat-option-label-text-color: var(--account-text);
+}
+.info-section-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  background: var(--account-panel);
+  border-left: 2px solid var(--account-line);
+  color: var(--account-muted);
+}
+.info-section-row .info-section-content {
+  min-width: 0;
+}
+.password-back {
+  min-height: 36px;
+}
+@media (max-width: 850px) {
+  body cnsl-detail-form.account-profile-form .user-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  body cnsl-detail-form.account-profile-form .cnsl-form-field-wrapper {
+    margin-bottom: 14px;
+  }
+  cnsl-contact .contact-method-row {
+    gap: 8px;
+  }
+  cnsl-contact .verify {
+    display: flex;
+    margin-left: 0;
+    width: fit-content;
+  }
+  cnsl-card .paginator-wrapper {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  cnsl-card .paginator-wrapper .col {
+    flex-basis: 100%;
+  }
+  cnsl-card .card .header .row {
+    align-items: flex-start;
+  }
+  cnsl-card .card .header .row .title {
+    white-space: normal;
+    font-size: 16px !important;
+  }
+  .topbar {
+    min-height: 48px;
+  }
+  .theme-control {
+    min-height: 40px;
+    min-width: 40px;
+  }
+}
+cnsl-account-mfa,
+cnsl-account-passkeys,
+cnsl-external-idps {
+  display: block;
+}
+cnsl-card .card {
+  margin-block: 0 !important;
+  padding-block: 0 !important;
+}
+.password-back {
+  margin-bottom: 8px;
+}
+
+// Account preferences live behind the identity trigger, consistently on desktop and mobile.
+.mobile-account {
+  display: none;
+}
+.account-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 24px;
+}
+.account-trigger .trigger-name {
+  font-size: 12px;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--account-text);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.account-trigger mat-icon {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+}
+.account-menu.mat-mdc-menu-panel {
+  min-width: 280px;
+  max-width: min(350px, calc(100vw - 24px));
+  background: var(--account-background);
+  color: var(--account-text);
+}
+.account-menu .mat-mdc-menu-item,
+.account-menu .mat-mdc-menu-item mat-icon {
+  color: var(--account-text);
+}
+.account-menu .mat-mdc-menu-item {
+  font-family: var(--account-font);
+}
+.account-menu .mat-mdc-menu-item-text {
+  font: 12px/1.5 var(--account-font) !important;
+}
+.account-menu-identity {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--account-line);
+  margin-bottom: 6px;
+  overflow-wrap: anywhere;
+}
+.account-menu-identity strong,
+.account-menu-identity span {
+  display: block;
+}
+.account-menu-identity span {
+  font-size: 11px;
+  color: var(--account-muted);
+  margin-top: 4px;
+}
+.profile-columns {
+  grid-template-areas: 'details photo';
+}
+.profile-details {
+  grid-area: details;
+  min-width: 0;
+}
+.profile-visibility {
+  grid-area: photo;
+  min-width: 0;
+}
+.photo-hint {
+  font-size: 11px;
+}
+.passkey-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 16px;
+}
+.passkey-actions button {
+  margin: 0 !important;
+}
+.passkey-alternative {
+  padding: 0 24px 20px;
+  text-align: right;
+}
+.passkey-alternative button {
+  font-size: 11px;
+  min-height: 36px;
+}
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+.application-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-width: 1000px;
+}
+.application-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 24px 0;
+  border-top: 1px solid var(--account-line);
+}
+.application-row:last-child {
+  border-bottom: 1px solid var(--account-line);
+}
+.application-monogram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 49px;
+  height: 49px;
+  flex-shrink: 0;
+  border-radius: 7px;
+  color: var(--account-brand);
+  background: var(--account-accent);
+  font-size: 20px;
+  font-weight: 600;
+}
+.application-details {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.application-details h3 {
+  margin: 0 0 5px;
+}
+.application-details p {
+  margin: 0 0 12px;
+  color: var(--account-muted);
+}
+.role-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+}
+.role-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0 auto;
+  flex: 0 0 auto;
+}
+.role-list li {
+  border: 1px solid var(--account-line);
+  padding: 4px 12px;
+  border-radius: 999px;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.access-state {
+  color: var(--account-muted);
+  font-size: 11px;
+}
+.context-note {
+  max-width: 900px;
+  margin-top: 28px;
+  color: var(--account-muted);
+}
+.empty-state {
+  border-block: 1px solid var(--account-line);
+  padding: 28px 0;
+}
+@media (max-width: 850px) {
+  .desktop-account,
+  .topbar {
+    display: none;
+  }
+  .mobile-account {
+    display: block;
+  }
+  .brand {
+    min-height: 76px;
+    padding: 16px 24px;
+  }
+  .brand > img {
+    max-width: calc(100% - 90px);
+  }
+  .account-trigger .trigger-name {
+    display: none;
+  }
+  main {
+    padding-top: 30px;
+  }
+  nav {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-inline: 12px;
+  }
+  nav a {
+    flex: 1 0 auto;
+    padding-inline: 12px;
+    white-space: nowrap;
+    font-size: 11px;
+  }
+  .profile-columns {
+    grid-template-areas: 'photo' 'details';
+    gap: 28px;
+  }
+  .profile-visibility {
+    border-top: 0;
+    border-bottom: 1px solid var(--account-line);
+    padding: 0 0 24px;
+    display: grid;
+    grid-template-columns: 83px minmax(0, 1fr);
+    gap: 4px 16px;
+    align-items: start;
+  }
+  .profile-visibility .eyebrow {
+    display: none;
+  }
+  .profile-visibility .section-title {
+    grid-column: 2;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    font-size: 16px;
+  }
+  .profile-visibility cnsl-avatar {
+    grid-column: 1;
+    grid-row: 1 / 4;
+  }
+  .profile-visibility .photo-action {
+    grid-column: 2;
+    margin: 0;
+    text-align: left;
+    justify-self: start;
+  }
+  .profile-visibility p:not(.eyebrow) {
+    grid-column: 1 / -1;
+    margin: 12px 0 0;
+  }
+  .profile-visibility .photo-hint {
+    margin-top: 4px !important;
+  }
+  .passkey-actions {
+    flex-wrap: nowrap !important;
+    align-items: stretch;
+  }
+  .passkey-actions button {
+    min-width: 0;
+    height: auto;
+    min-height: 44px;
+  }
+  .passkey-actions .mdc-button__label {
+    white-space: normal;
+    line-height: 1.4;
+  }
+  .application-row {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .application-details {
+    flex-basis: calc(100% - 61px);
+  }
+  .access-state {
+    margin-left: 61px;
+  }
+}
+
+.activity-list {
+  list-style: none;
+  padding: 0;
+  margin: 32px 0;
+}
+.activity-day {
+  list-style: none;
+  margin: 22px 0 0;
+  padding: 0;
+}
+.activity-date {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.activity-day li {
+  display: flex;
+  gap: 14px;
+  padding: 10px 0;
+  overflow-wrap: anywhere;
+}
+.activity-day cnsl-avatar {
+  flex: 0 0 32px;
+}
+.activity-day .activity-fallback {
+  width: 32px;
+  flex: 0 0 32px;
+}
+.activity-day .activity-message {
+  flex: 1;
+}
+
+.activity-list mat-icon {
+  flex-shrink: 0;
+  color: var(--account-muted);
+}
+.activity-list p {
+  margin: 0 0 6px;
+}
+.activity-list time,
+.activity-editor {
+  display: block;
+  font-size: 12px;
+  color: var(--account-muted);
+}
+
+/* Keep the native username action on the value row in the Account profile. */
+body cnsl-detail-form.account-profile-form .user-form-content .usernamediv {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  width: 100%;
+}
+body cnsl-detail-form.account-profile-form .user-form-content .usernamediv .formfield {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+body cnsl-detail-form.account-profile-form .user-form-content .usernamediv button.edit {
+  display: inline-flex;
+  flex: 0 0 40px;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  margin: 0 0 10px !important;
+}
+
+.security-columns {
+  grid-template-columns: minmax(0, 1fr);
 }

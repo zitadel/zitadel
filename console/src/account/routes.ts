@@ -2,6 +2,8 @@
 export const accountPaths = [
   '/',
   '/perfil',
+  '/aplicativos',
+  '/atividade',
   '/seguranca',
   '/seguranca/senha',
   '/seguranca/passkeys',

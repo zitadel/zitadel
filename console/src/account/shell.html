@@ -7,13 +7,14 @@
       } @else if (branding.name) {
       <strong>{{ branding.name }}</strong>
       }
-      <span>{{ 'ACCOUNT.ACCOUNT' | translate }}</span>
+      <div class="mobile-account"><ng-container *ngTemplateOutlet="accountTrigger"></ng-container></div>
     </div>
     <p class="nav-caption eyebrow">{{ 'ACCOUNT.PERSONAL_ACCOUNT' | translate }}</p>
     <nav [attr.aria-label]="'ACCOUNT.NAV' | translate">
       @for (item of nav; track item.path) {
       <a
         [routerLink]="item.path"
+        [attr.aria-label]="'ACCOUNT.' + item.key | translate"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{exact: item.path === '/'}"
         ariaCurrentWhenActive="page"
@@ -34,22 +35,6 @@
       >
       }
     </div>
-    } @if (auth.authenticated) {
-    <div class="active-identity">
-      @if (native.user | async; as user) {
-      <cnsl-avatar
-        [name]="user.human?.profile?.displayName || user.userName"
-        [avatarUrl]="user.human?.profile?.avatarUrl || ''"
-        [size]="33"
-      ></cnsl-avatar>
-      <div class="active-identity-text">
-        <strong>{{ user.human?.profile?.displayName || user.userName }}</strong
-        ><button type="button" (click)="auth.signout()">
-          {{ 'ACCOUNT.LOGOUT' | translate }} <span aria-hidden="true">→</span>
-        </button>
-      </div>
-      }
-    </div>
     }
   </aside>
   <div class="workspace">
@@ -57,34 +42,7 @@
       <p class="breadcrumb">
         {{ 'ACCOUNT.ACCOUNT' | translate }} <span aria-hidden="true">/</span> {{ 'ACCOUNT.' + breadcrumb | translate }}
       </p>
-      <div class="display-preferences">
-        <label class="language-control"
-          ><span class="visually-hidden">{{ 'ACCOUNT.LANGUAGE' | translate }}</span
-          ><select [value]="translate.getCurrentLang()" (change)="language($any($event.target).value)">
-            <option value="pt">Português</option>
-            <option value="en">English</option>
-          </select></label
-        >
-        <button
-          class="theme-control"
-          type="button"
-          (click)="branding.toggle()"
-          [attr.aria-label]="(branding.dark ? 'ACCOUNT.LIGHT' : 'ACCOUNT.DARK') | translate"
-          [attr.title]="(branding.dark ? 'ACCOUNT.LIGHT' : 'ACCOUNT.DARK') | translate"
-        >
-          <mat-icon aria-hidden="true">{{ branding.dark ? 'light_mode' : 'dark_mode' }}</mat-icon>
-        </button>
-        @if (auth.authenticated) {
-        <button
-          class="theme-control mobile-signout"
-          type="button"
-          (click)="auth.signout()"
-          [attr.aria-label]="'ACCOUNT.LOGOUT' | translate"
-        >
-          <mat-icon aria-hidden="true">logout</mat-icon>
-        </button>
-        }
-      </div>
+      <div class="desktop-account"><ng-container *ngTemplateOutlet="accountTrigger"></ng-container></div>
     </header>
     <main id="content" tabindex="-1">
       @if (branding.unavailable && auth.authenticated) {
@@ -93,10 +51,75 @@
       <router-outlet></router-outlet>
       @if (auth.authenticated) {
       <footer>
-        <p>{{ 'ACCOUNT.IDENTITY_DESC' | translate }}</p>
+        <p>{{ 'ACCOUNT.FOOTER' | translate }}</p>
         <span>{{ branding.name }}</span>
       </footer>
       }
     </main>
   </div>
 </div>
+
+<ng-template #accountTrigger>
+  @if (auth.authenticated) { @if (identity.user | async; as user) {
+  <button
+    type="button"
+    class="account-trigger"
+    [matMenuTriggerFor]="accountMenu"
+    [attr.aria-label]="'ACCOUNT.OPEN_MENU' | translate"
+  >
+    <cnsl-avatar
+      [name]="user.human?.profile?.displayName || user.userName"
+      [avatarUrl]="user.human?.profile?.avatarUrl || ''"
+      [size]="36"
+    ></cnsl-avatar>
+    <span class="trigger-name">{{ user.human?.profile?.displayName || user.userName }}</span>
+    <mat-icon aria-hidden="true">expand_more</mat-icon>
+  </button>
+  } }
+</ng-template>
+<mat-menu #accountMenu="matMenu" class="account-menu">
+  @if (identity.user | async; as user) {
+  <div class="account-menu-identity">
+    <strong>{{ user.human?.profile?.displayName || user.userName }}</strong><span>{{ user.human?.email?.email }}</span>
+  </div>
+  }
+  <button mat-menu-item [matMenuTriggerFor]="languageMenu">
+    <mat-icon>language</mat-icon>{{ 'ACCOUNT.LANGUAGE' | translate }}: {{
+    preferences.languageName(translate.getCurrentLang()) }}
+  </button>
+  <button mat-menu-item [matMenuTriggerFor]="themeMenu">
+    <mat-icon>{{ branding.dark ? 'dark_mode' : 'light_mode' }}</mat-icon>{{ 'ACCOUNT.THEME' | translate }}
+  </button>
+  <button mat-menu-item (click)="auth.signout()"><mat-icon>logout</mat-icon>{{ 'ACCOUNT.LOGOUT' | translate }}</button>
+</mat-menu>
+<mat-menu #languageMenu="matMenu" class="account-menu">
+  @for (locale of preferences.languages; track locale) {
+  <button
+    mat-menu-item
+    role="menuitemradio"
+    [attr.aria-checked]="translate.getCurrentLang() === locale"
+    (click)="language(locale)"
+  >
+    <mat-icon aria-hidden="true">{{ translate.getCurrentLang() === locale ? 'check' : '' }}</mat-icon>{{
+    preferences.languageName(locale) }}
+  </button>
+  }
+</mat-menu>
+<mat-menu #themeMenu="matMenu" class="account-menu">
+  <button
+    mat-menu-item
+    role="menuitemradio"
+    [attr.aria-checked]="!branding.dark"
+    (click)="branding.dark && branding.toggle()"
+  >
+    <mat-icon>light_mode</mat-icon>{{ 'ACCOUNT.LIGHT' | translate }}
+  </button>
+  <button
+    mat-menu-item
+    role="menuitemradio"
+    [attr.aria-checked]="branding.dark"
+    (click)="!branding.dark && branding.toggle()"
+  >
+    <mat-icon>dark_mode</mat-icon>{{ 'ACCOUNT.DARK' | translate }}
+  </button>
+</mat-menu>

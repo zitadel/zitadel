@@ -26,7 +26,7 @@
                 "output": "assets"
               },
               {
-                "glob": "{en,pt}.json",
+                "glob": "{en,pt,es}.json",
                 "input": "src/assets/i18n",
                 "output": "assets/native-i18n"
               }

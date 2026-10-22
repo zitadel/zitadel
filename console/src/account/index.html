@@ -7,8 +7,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="referrer" content="no-referrer" />
     <link id="account-icon" rel="icon" href="data:," />
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; background: #111722; color: #f3f5f8; font-family: Inter, system-ui, sans-serif; }
+      .boot-screen { min-height: 100vh; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; text-align: center; }
+      .boot-spinner { width: 38px; height: 38px; border: 3px solid #ffffff2e; border-top-color: #00c8ef; border-radius: 50%; animation: account-spin .8s linear infinite; }
+      .boot-title { font-size: 16px; font-weight: 600; }
+      .boot-detail { color: #a8b1bf; font-size: 13px; }
+      @keyframes account-spin { to { transform: rotate(360deg); } }
+      @media (prefers-reduced-motion: reduce) { .boot-spinner { animation-duration: 2s; } }
+    </style>
   </head>
   <body>
-    <cnsl-account></cnsl-account>
+    <cnsl-account>
+      <div class="boot-screen" role="status" aria-live="polite" aria-busy="true">
+        <span class="boot-spinner" aria-hidden="true"></span>
+        <span class="boot-title">Conectando à sua conta</span>
+        <span class="boot-detail">Aguarde enquanto carregamos seus dados com segurança.</span>
+      </div>
+    </cnsl-account>
   </body>
 </html>

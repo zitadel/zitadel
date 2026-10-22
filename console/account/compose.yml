@@ -1,6 +1,6 @@
 services:
   account:
-    image: ${ACCOUNT_IMAGE:-ailton-account:local}
+    image: ${ACCOUNT_IMAGE:-ghcr.io/ailtonacr/ailton-account-zitadel:latest}
     build:
       context: ../..
       dockerfile: console/account/Dockerfile
@@ -11,4 +11,10 @@ services:
       ACCOUNT_LOGIN_ORG_ID: ${ACCOUNT_LOGIN_ORG_ID:?Set ACCOUNT_LOGIN_ORG_ID}
     ports:
       - "127.0.0.1:${ACCOUNT_PORT:-8088}:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/healthz"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped

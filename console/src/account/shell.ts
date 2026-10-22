@@ -3,7 +3,7 @@ import { Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, from, timeout } from 'rxjs';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { User, Gender } from 'src/app/proto/generated/zitadel/user_pb';
@@ -15,9 +15,11 @@ import {
   EditDialogResult,
   EditDialogType,
 } from 'src/app/pages/users/user-detail/auth-user-detail/edit-dialog/edit-dialog.component';
-import { phoneValidator } from 'src/app/modules/form-field/validators/validators';
+import { phoneValidator, emailValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { AccountAuthService } from './auth.service';
 import { AccountBranding } from './branding';
+import { AccountIdentity } from './identity';
+import { AccountPreferences } from './preferences';
 
 @Component({ selector: 'cnsl-account', templateUrl: './shell.html', standalone: false })
 export class AccountComponent implements OnInit {
@@ -27,16 +29,18 @@ export class AccountComponent implements OnInit {
     { path: '/', key: 'HOME' },
     { path: '/perfil', key: 'PROFILE' },
     { path: '/seguranca', key: 'SECURITY' },
+    { path: '/aplicativos', key: 'APPS' },
   ];
   constructor(
     public auth: AccountAuthService,
     public branding: AccountBranding,
+    public identity: AccountIdentity,
+    public preferences: AccountPreferences,
     public native: GrpcAuthService,
     public translate: TranslateService,
     public router: Router,
   ) {
-    const lang = translate.getCurrentLang().startsWith('pt') ? 'pt' : 'en';
-    this.language(lang);
+    this.preferences.initialize();
   }
   get breadcrumb(): string {
     const path = this.router.url.split('?')[0];
@@ -45,6 +49,8 @@ export class AccountComponent implements OnInit {
         {
           '/': 'HOME',
           '/perfil': 'PROFILE',
+          '/aplicativos': 'APPS',
+          '/atividade': 'ACTIVITY',
           '/seguranca': 'SECURITY',
           '/seguranca/senha': 'PASSWORD',
           '/seguranca/passkeys': 'PASSKEYS',
@@ -78,8 +84,7 @@ export class AccountComponent implements OnInit {
     document.getElementById('content')?.focus();
   }
   language(value: string): void {
-    this.translate.use(value);
-    document.documentElement.lang = value === 'pt' ? 'pt-BR' : 'en';
+    this.preferences.language(value);
   }
 }
 @Component({ selector: 'cnsl-account-page', templateUrl: './page.html', standalone: false })
@@ -95,6 +100,9 @@ export class AccountPageComponent implements OnInit {
     public native: GrpcAuthService,
     private dialog: MatDialog,
     private toast: ToastService,
+    private identity: AccountIdentity,
+    private translate: TranslateService,
+    private preferences: AccountPreferences,
   ) {}
   get path(): string {
     return this.router.url.split('?')[0];
@@ -105,6 +113,8 @@ export class AccountPageComponent implements OnInit {
         {
           '/': 'HOME',
           '/perfil': 'PROFILE',
+          '/aplicativos': 'APPS',
+          '/atividade': 'ACTIVITY',
           '/seguranca': 'SECURITY',
           '/seguranca/mfa': 'MFA',
           '/seguranca/passkeys': 'PASSKEYS',
@@ -114,8 +124,15 @@ export class AccountPageComponent implements OnInit {
       )[this.path] ?? 'NOT_FOUND'
     );
   }
+  get crossOrigin(): boolean {
+    return location.origin !== this.auth.environment.issuer;
+  }
   get human() {
     return this.user?.human;
+  }
+  get profileLanguages(): string[] {
+    const current = this.profile?.preferredLanguage ?? '';
+    return [...new Set([current ? 'und' : '', 'pt', 'en', 'es', current])];
   }
   profile?: HumanProfile;
   ngOnInit(): void {
@@ -129,7 +146,7 @@ export class AccountPageComponent implements OnInit {
     this.loading = true;
     this.failed = false;
     try {
-      this.user = (await this.native.getMyUser()).user;
+      this.user = (await firstValueFrom(from(this.native.getMyUser()).pipe(timeout(15000)))).user;
       const p = this.human?.profile;
       this.profile = p
         ? create(HumanProfileSchema, {
@@ -142,29 +159,32 @@ export class AccountPageComponent implements OnInit {
             gender: Number(p.gender),
           })
         : undefined;
-      if (!this.human) throw new Error('Human account required');
+      if (!this.human || !this.user) throw new Error('Human account required');
+      this.identity.update(this.user);
     } catch {
       this.failed = true;
     } finally {
       this.loading = false;
     }
   }
-  async perform(operation: () => Promise<unknown>): Promise<void> {
-    if (this.saving || !this.auth.authenticated) return;
+  async perform(operation: () => Promise<unknown>): Promise<boolean> {
+    if (this.saving || !this.auth.authenticated) return false;
     this.saving = true;
     try {
       await operation();
       await this.refresh();
       this.toast.showInfo('USER.TOAST.SAVED', true);
+      return true;
     } catch (error) {
       this.toast.showError(error);
+      return false;
     } finally {
       this.saving = false;
     }
   }
-  save(profile: HumanProfile): void {
+  async save(profile: HumanProfile): Promise<void> {
     const genders = [Gender.GENDER_UNSPECIFIED, Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_DIVERSE];
-    void this.perform(() =>
+    const saved = await this.perform(() =>
       this.native.updateMyProfile(
         profile.givenName,
         profile.familyName,
@@ -174,6 +194,8 @@ export class AccountPageComponent implements OnInit {
         genders[profile.gender ?? 0],
       ),
     );
+    const language = profile.preferredLanguage;
+    if (saved && language && language !== 'und') this.preferences.language(language);
   }
   async edit(type: EditDialogType): Promise<void> {
     const email = type === EditDialogType.EMAIL;
@@ -185,7 +207,9 @@ export class AccountPageComponent implements OnInit {
       titleKey: email ? 'USER.LOGINMETHODS.EMAIL.EDITTITLE' : 'USER.LOGINMETHODS.PHONE.EDITTITLE',
       descriptionKey: email ? 'USER.LOGINMETHODS.EMAIL.EDITDESC' : 'USER.LOGINMETHODS.PHONE.EDITDESC',
       value: email ? this.human?.email?.email : this.human?.phone?.phone,
-      validator: email ? (Validators.compose([Validators.required, Validators.email]) ?? undefined) : phoneValidator,
+      validator: email
+        ? (Validators.compose([requiredValidator, emailValidator]) ?? undefined)
+        : (Validators.compose([requiredValidator, phoneValidator]) ?? undefined),
     };
     const result = await firstValueFrom(
       this.dialog
@@ -234,8 +258,7 @@ export class AccountPageComponent implements OnInit {
 @Component({
   selector: 'cnsl-account-password',
   standalone: false,
-  template: `<p class="eyebrow">{{ 'ACCOUNT.ACCOUNT' | translate }} / {{ 'ACCOUNT.PASSWORD' | translate }}</p>
-    <a class="password-back" routerLink="/seguranca">← {{ 'ACCOUNT.SECURITY' | translate }}</a>
+  template: `<a class="password-back" routerLink="/seguranca">‹ {{ 'ACCOUNT.SECURITY' | translate }}</a>
     <cnsl-password class="account-password-form"></cnsl-password>`,
 })
 export class AccountPasswordPageComponent {}
