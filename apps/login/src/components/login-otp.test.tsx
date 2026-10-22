@@ -66,4 +66,53 @@ describe("LoginOTP", () => {
       expect(screen.getByText("errors.couldNotRequestChallenge")).toBeInTheDocument();
     });
   });
+
+  describe("Resend cooldown", () => {
+    test("should start the cooldown after a successful initial challenge", async () => {
+      mockUpdateOrCreateSession.mockResolvedValueOnce({});
+
+      render(<LoginOTP host={null} method="sms" />);
+
+      await waitFor(() => {
+        expect(screen.getByRole("button", { name: "verify.resendCode (30s)" })).toBeDisabled();
+      });
+    });
+
+    test("should not start the cooldown when the initial challenge fails", async () => {
+      mockUpdateOrCreateSession.mockResolvedValueOnce({ error: "failed" });
+
+      render(<LoginOTP host={null} method="sms" />);
+
+      await waitFor(() => {
+        expect(screen.getByText("failed")).toBeInTheDocument();
+      });
+      expect(screen.getByRole("button", { name: "verify.resendCode" })).not.toBeDisabled();
+    });
+
+    test("should start the cooldown after a successful resend", async () => {
+      // code is provided, so no automatic initial challenge is sent
+      mockUpdateOrCreateSession.mockResolvedValueOnce({});
+
+      render(<LoginOTP host={null} method="sms" code="123456" />);
+
+      fireEvent.click(screen.getByTestId("resend-button"));
+
+      await waitFor(() => {
+        expect(screen.getByRole("button", { name: "verify.resendCode (30s)" })).toBeDisabled();
+      });
+    });
+
+    test("should not start the cooldown when a resend fails", async () => {
+      mockUpdateOrCreateSession.mockResolvedValueOnce({ error: "resend failed" });
+
+      render(<LoginOTP host={null} method="sms" code="123456" />);
+
+      fireEvent.click(screen.getByTestId("resend-button"));
+
+      await waitFor(() => {
+        expect(screen.getByText("resend failed")).toBeInTheDocument();
+      });
+      expect(screen.getByRole("button", { name: "verify.resendCode" })).not.toBeDisabled();
+    });
+  });
 });
