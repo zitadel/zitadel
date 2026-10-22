@@ -2380,7 +2380,8 @@
       "HEADERNAME": "Başlık Adı",
       "JWTENDPOINT": "JWT Uç Noktası",
       "JWTKEYSENDPOINT": "JWT Anahtarları Uç Noktası",
-      "AUDIENCE": "Audience"
+      "AUDIENCE": "Audience",
+      "AUDIENCE_EMPTY_WARNING": "Audience belirtilmediğinde ZITADEL, bu yayıncıdan gelen geçerli her tokenı, hangi uygulama için verildiğine bakmaksızın kabul eder. Bir Audience ayarlanması kesinlikle önerilir."
     },
     "APPLE": {
       "TEAMID": "Takım ID",
