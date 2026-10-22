@@ -1374,6 +1374,51 @@ EventTypes:
     activated: "Web Key aktivován"
     deactivated: "Web Key deaktivován"
     removed: "Odstraňte webový klíč"
+  session:
+    added: "Sezení vytvořeno"
+    user:
+      checked: "Uživatel sezení ověřen"
+    password:
+      checked: "Heslo sezení ověřeno"
+    intent:
+      checked: "Záměr poskytovatele identity sezení ověřen"
+    webAuthN:
+      challenged: "Výzva WebAuthN sezení vytvořena"
+      checked: "WebAuthN sezení ověřen"
+    totp:
+      checked: "TOTP sezení ověřen"
+    otp:
+      sms:
+        challenged: "Výzva OTP SMS sezení vytvořena"
+        sent: "Kód OTP SMS sezení odeslán"
+        checked: "OTP SMS sezení ověřen"
+      email:
+        challenged: "Výzva OTP e-mail sezení vytvořena"
+        sent: "Kód OTP e-mail sezení odeslán"
+        checked: "OTP e-mail sezení ověřen"
+    recoveryCode:
+      checked: "Kód pro obnovení sezení ověřen"
+    token:
+      set: "Token sezení nastaven"
+    metadata:
+      set: "Metadata sezení nastavena"
+    lifetime:
+      set: "Doba platnosti sezení nastavena"
+    terminated: "Sezení ukončeno"
+  oidc_session:
+    added: "OIDC sezení vytvořeno"
+    access_token:
+      added: "Přístupový token OIDC sezení vytvořen"
+      revoked: "Přístupový token OIDC sezení odvolán"
+    refresh_token:
+      added: "Obnovovací token OIDC sezení vytvořen"
+      renewed: "Obnovovací token OIDC sezení obnoven"
+      revoked: "Obnovovací token OIDC sezení odvolán"
+  saml_session:
+    added: "Relace SAML vytvořena"
+    saml_response:
+      added: "Odpověď SAML relace vytvořena"
+      revoked: "Odpověď SAML relace odvolána"
 Application:
   OIDC:
     UnsupportedVersion: "Vaše verze OIDC není podporována"

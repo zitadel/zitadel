@@ -1376,6 +1376,51 @@ EventTypes:
     activated: "Уеб ключът е активиран"
     deactivated: "Уеб ключът е деактивиран"
     removed: "Уеб ключът е премахнат"
+  session:
+    added: "Сесията е създадена"
+    user:
+      checked: "Потребителят на сесията е проверен"
+    password:
+      checked: "Паролата на сесията е проверена"
+    intent:
+      checked: "Intent на доставчика на идентичност на сесията е проверен"
+    webAuthN:
+      challenged: "WebAuthN предизвикателството на сесията е създадено"
+      checked: "WebAuthN на сесията е проверен"
+    totp:
+      checked: "TOTP на сесията е проверен"
+    otp:
+      sms:
+        challenged: "OTP SMS предизвикателството на сесията е създадено"
+        sent: "OTP SMS кодът на сесията е изпратен"
+        checked: "OTP SMS на сесията е проверен"
+      email:
+        challenged: "OTP имейл предизвикателството на сесията е създадено"
+        sent: "OTP имейл кодът на сесията е изпратен"
+        checked: "OTP имейл на сесията е проверен"
+    recoveryCode:
+      checked: "Кодът за възстановяване на сесията е проверен"
+    token:
+      set: "Токенът на сесията е зададен"
+    metadata:
+      set: "Метаданните на сесията са зададени"
+    lifetime:
+      set: "Продължителността на сесията е зададена"
+    terminated: "Сесията е прекратена"
+  oidc_session:
+    added: "OIDC сесията е създадена"
+    access_token:
+      added: "Токенът за достъп на OIDC сесията е създаден"
+      revoked: "Токенът за достъп на OIDC сесията е отменен"
+    refresh_token:
+      added: "Токенът за обновяване на OIDC сесията е създаден"
+      renewed: "Токенът за обновяване на OIDC сесията е подновен"
+      revoked: "Токенът за обновяване на OIDC сесията е отменен"
+  saml_session:
+    added: "SAML сесията е създадена"
+    saml_response:
+      added: "SAML отговорът на сесията е създаден"
+      revoked: "SAML отговорът на сесията е отменен"
 Application:
   OIDC:
     UnsupportedVersion: "Вашата OIDC версия не се поддържа"

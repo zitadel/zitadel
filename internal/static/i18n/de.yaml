@@ -1376,6 +1376,51 @@ EventTypes:
     activated: "Web Key aktiviert"
     deactivated: "Web Key deaktiviert"
     removed: "Web Key entfernen"
+  session:
+    added: "Session erstellt"
+    user:
+      checked: "Benutzer der Session geprüft"
+    password:
+      checked: "Passwort der Session geprüft"
+    intent:
+      checked: "IDP-Intent der Session geprüft"
+    webAuthN:
+      challenged: "WebAuthN-Challenge der Session erstellt"
+      checked: "WebAuthN der Session geprüft"
+    totp:
+      checked: "TOTP der Session geprüft"
+    otp:
+      sms:
+        challenged: "OTP SMS Challenge der Session erstellt"
+        sent: "OTP SMS Code der Session versendet"
+        checked: "OTP SMS der Session geprüft"
+      email:
+        challenged: "OTP Email Challenge der Session erstellt"
+        sent: "OTP Email Code der Session versendet"
+        checked: "OTP Email der Session geprüft"
+    recoveryCode:
+      checked: "Wiederherstellungscode der Session geprüft"
+    token:
+      set: "Token der Session gesetzt"
+    metadata:
+      set: "Metadaten der Session gesetzt"
+    lifetime:
+      set: "Lebensdauer der Session gesetzt"
+    terminated: "Session beendet"
+  oidc_session:
+    added: "OIDC Sitzung erstellt"
+    access_token:
+      added: "Access Token der OIDC Sitzung ausgestellt"
+      revoked: "Access Token der OIDC Sitzung widerrufen"
+    refresh_token:
+      added: "Refresh Token der OIDC Sitzung ausgestellt"
+      renewed: "Refresh Token der OIDC Sitzung erneuert"
+      revoked: "Refresh Token der OIDC Sitzung widerrufen"
+  saml_session:
+    added: "SAML Session erstellt"
+    saml_response:
+      added: "SAML Response der SAML Session erstellt"
+      revoked: "SAML Response der SAML Session widerrufen"
 Application:
   OIDC:
     UnsupportedVersion: "Deine OIDC Version wird nicht unterstützt"

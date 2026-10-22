@@ -1371,6 +1371,51 @@ EventTypes:
     activated: "تم تفعيل مفتاح الويب"
     deactivated: "تم تعطيل مفتاح الويب"
     removed: "تمت إزالة مفتاح الويب"
+  session:
+    added: "تم إنشاء الجلسة"
+    user:
+      checked: "تم فحص مستخدم الجلسة"
+    password:
+      checked: "تم فحص كلمة مرور الجلسة"
+    intent:
+      checked: "تم فحص intent موفر الهوية للجلسة"
+    webAuthN:
+      challenged: "تم إنشاء تحدي WebAuthN للجلسة"
+      checked: "تم فحص WebAuthN للجلسة"
+    totp:
+      checked: "تم فحص TOTP للجلسة"
+    otp:
+      sms:
+        challenged: "تم إنشاء تحدي OTP SMS للجلسة"
+        sent: "تم إرسال رمز OTP SMS للجلسة"
+        checked: "تم فحص OTP SMS للجلسة"
+      email:
+        challenged: "تم إنشاء تحدي OTP Email للجلسة"
+        sent: "تم إرسال رمز OTP Email للجلسة"
+        checked: "تم فحص OTP Email للجلسة"
+    recoveryCode:
+      checked: "تم فحص رمز الاسترداد للجلسة"
+    token:
+      set: "تم تعيين رمز الجلسة"
+    metadata:
+      set: "تم تعيين البيانات الوصفية للجلسة"
+    lifetime:
+      set: "تم تعيين مدة صلاحية الجلسة"
+    terminated: "تم إنهاء الجلسة"
+  oidc_session:
+    added: "تم إنشاء جلسة OIDC"
+    access_token:
+      added: "تم إنشاء رمز الوصول لجلسة OIDC"
+      revoked: "تم إبطال رمز الوصول لجلسة OIDC"
+    refresh_token:
+      added: "تم إنشاء رمز التحديث لجلسة OIDC"
+      renewed: "تم تجديد رمز التحديث لجلسة OIDC"
+      revoked: "تم إبطال رمز التحديث لجلسة OIDC"
+  saml_session:
+    added: "تم إنشاء جلسة SAML"
+    saml_response:
+      added: "تم إنشاء استجابة SAML للجلسة"
+      revoked: "تم إبطال استجابة SAML للجلسة"
 Application:
   OIDC:
     UnsupportedVersion: "إصدار OIDC الخاص بك غير مدعوم"

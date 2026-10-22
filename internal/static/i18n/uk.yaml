@@ -1370,6 +1370,51 @@ EventTypes:
     activated: "Веб-ключ активований"
     deactivated: "Веб-ключ деактивований"
     removed: "Веб-ключ видалений"
+  session:
+    added: "Сесію створено"
+    user:
+      checked: "Користувача сесії перевірено"
+    password:
+      checked: "Пароль сесії перевірено"
+    intent:
+      checked: "Intent постачальника ідентичності сесії перевірено"
+    webAuthN:
+      challenged: "Виклик WebAuthN сесії створено"
+      checked: "WebAuthN сесії перевірено"
+    totp:
+      checked: "TOTP сесії перевірено"
+    otp:
+      sms:
+        challenged: "Виклик OTP SMS сесії створено"
+        sent: "Код OTP SMS сесії відправлено"
+        checked: "OTP SMS сесії перевірено"
+      email:
+        challenged: "Виклик OTP Email сесії створено"
+        sent: "Код OTP Email сесії відправлено"
+        checked: "OTP Email сесії перевірено"
+    recoveryCode:
+      checked: "Код відновлення сесії перевірено"
+    token:
+      set: "Токен сесії встановлено"
+    metadata:
+      set: "Метадані сесії встановлено"
+    lifetime:
+      set: "Час життя сесії встановлено"
+    terminated: "Сесію завершено"
+  oidc_session:
+    added: "OIDC сесію створено"
+    access_token:
+      added: "Токен доступу OIDC сесії створено"
+      revoked: "Токен доступу OIDC сесії відкликано"
+    refresh_token:
+      added: "Токен оновлення OIDC сесії створено"
+      renewed: "Токен оновлення OIDC сесії оновлено"
+      revoked: "Токен оновлення OIDC сесії відкликано"
+  saml_session:
+    added: "SAML сесію створено"
+    saml_response:
+      added: "Відповідь SAML сесії створено"
+      revoked: "Відповідь SAML сесії відкликано"
 Application:
   OIDC:
     UnsupportedVersion: "Ваша версія OIDC не підтримується"
