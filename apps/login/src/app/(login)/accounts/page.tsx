@@ -3,7 +3,7 @@ import { SessionsList } from "@/components/sessions-list";
 import { Translated } from "@/components/translated";
 import { getAllSessions } from "@/lib/cookies";
 import { getServiceConfig } from "@/lib/service-url";
-import { getBrandingSettings, getDefaultOrg, listSessions, ServiceConfig } from "@/lib/zitadel";
+import { getAuthRequest, getBrandingSettings, getDefaultOrg, listSessions, ServiceConfig } from "@/lib/zitadel";
 import { UserPlusIcon } from "@heroicons/react/24/outline";
 import { create } from "@zitadel/client";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
@@ -79,16 +79,31 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const { serviceConfig } = getServiceConfig(_headers);
 
   let defaultOrganization;
+  let brandingOrganization;
   if (!organization) {
     const org: Organization | null = await getDefaultOrg({ serviceConfig });
     if (org) {
       defaultOrganization = org.id;
     }
+
+    // For an OIDC auth request, honor the project's private-labeling org for BRANDING ONLY.
+    if (requestId?.startsWith("oidc_")) {
+      const { authRequest } = await getAuthRequest({
+        serviceConfig,
+        authRequestId: requestId.replace("oidc_", ""),
+      });
+      if (authRequest?.privateLabelingOrganizationId) {
+        brandingOrganization = authRequest.privateLabelingOrganizationId;
+      }
+    }
   }
 
   let sessions = await loadSessions({ serviceConfig, organization });
 
-  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization });
+  const branding = await getBrandingSettings({
+    serviceConfig,
+    organization: organization ?? brandingOrganization ?? defaultOrganization,
+  });
 
   const params = new URLSearchParams();
 
