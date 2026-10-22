@@ -122,11 +122,17 @@ func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, 
 		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-59ljd", "Errors.User.NotAllowedOrg")
 	}
 
+	authTime := sessionWriteModel.AuthenticationTime()
+	// Anchor freshness to the request so max_age=0 still permits completing reauthentication.
+	if writeModel.MaxAge != nil && (authTime.IsZero() || authTime.Before(writeModel.CreationDate.Add(-*writeModel.MaxAge))) {
+		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Uw5gi", "Errors.AuthRequest.NotAuthenticated")
+	}
+
 	if err := c.pushAppendAndReduce(ctx, writeModel, authrequest.NewSessionLinkedEvent(
 		ctx, &authrequest.NewAggregate(id, authz.GetInstance(ctx).InstanceID()).Aggregate,
 		sessionID,
 		sessionWriteModel.UserID,
-		sessionWriteModel.AuthenticationTime(),
+		authTime,
 		sessionWriteModel.AuthMethodTypes(),
 	)); err != nil {
 		return nil, nil, err

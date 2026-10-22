@@ -743,6 +743,10 @@ describe("handleOIDCFlowInitiation — stale session cookie fallback (#12252)", 
 
   test("should not show the account picker for prompt=none even if the cookie references an account", async () => {
     const { Prompt } = await import("@zitadel/proto/zitadel/oidc/v2/authorization_pb");
+    const { createCallback } = await import("@/lib/zitadel");
+    vi.mocked(createCallback).mockResolvedValue({
+      callbackUrl: "https://rp.example.com/callback?error=login_required",
+    } as any);
     authRequestWith({ prompt: [Prompt.NONE] });
 
     const res = await handleOIDCFlowInitiation(makeBaseParams({ sessions: [], sessionCookies: [staleOrgCookie] }));

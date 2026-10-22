@@ -20,7 +20,7 @@ import {
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
-import { Prompt } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
+import { AuthorizationErrorSchema, ErrorReason, Prompt } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import { CreateCallbackRequestSchema, SessionSchema } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
@@ -51,6 +51,29 @@ function setCSPHeaders(
   if (!iframeOrigins) {
     response.headers.set("X-Frame-Options", "deny");
   }
+}
+
+async function loginRequiredResponse(
+  serviceConfig: ServiceConfig,
+  requestId: string,
+  securitySettings?: SecuritySettings,
+): Promise<NextResponse> {
+  const { callbackUrl } = await createCallback({
+    serviceConfig,
+    req: create(CreateCallbackRequestSchema, {
+      authRequestId: requestId.replace("oidc_", ""),
+      callbackKind: {
+        case: "error",
+        value: create(AuthorizationErrorSchema, { error: ErrorReason.LOGIN_REQUIRED }),
+      },
+    }),
+  });
+  if (!isSafeRedirectUri(callbackUrl)) {
+    return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
+  }
+  const response = NextResponse.redirect(callbackUrl);
+  setCSPHeaders(response, serviceConfig, securitySettings);
+  return response;
 }
 
 /**
@@ -428,17 +451,14 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       }
       const selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
 
-      const noSessionResponse = NextResponse.json({ error: "No active session found" }, { status: 400 });
-      setCSPHeaders(noSessionResponse, serviceConfig, securitySettings);
-
       if (!selectedSession || !selectedSession.id) {
-        return noSessionResponse;
+        return loginRequiredResponse(serviceConfig, requestId, securitySettings);
       }
 
       const cookie = sessionCookies.find((cookie) => cookie.id === selectedSession.id);
 
       if (!cookie || !cookie.id || !cookie.token) {
-        return noSessionResponse;
+        return loginRequiredResponse(serviceConfig, requestId, securitySettings);
       }
 
       const session = {
@@ -554,6 +574,10 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       }
     }
   } else {
+    if (authRequest?.prompt.includes(Prompt.NONE)) {
+      return loginRequiredResponse(serviceConfig, requestId);
+    }
+
     // No live sessions were resolved. If the sessions cookie still references a
     // previous account and the RP did not pass a login_hint, show account
     // selection (mirrors Login V1 behavior after RP-initiated logout, #12252).
