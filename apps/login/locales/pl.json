@@ -310,6 +310,28 @@
       "submit": "Kontynuuj"
     }
   },
+  "recoveryCode": {
+    "verify": {
+      "title": "Zweryfikuj uwierzytelnianie dwuskładnikowe",
+      "description": "Wprowadź jeden ze swoich kodów odzyskiwania. Każdy kod może być użyty tylko raz.",
+      "useRecoveryCode": "Użyj kodu odzyskiwania",
+      "submit": "Kontynuuj",
+      "labels": {
+        "code": "Kod odzyskiwania"
+      },
+      "required": {
+        "code": "To pole jest wymagane"
+      },
+      "errors": {
+        "invalidCode": "Kod odzyskiwania jest nieprawidłowy lub został już użyty.",
+        "userLocked": "Twoje konto zostało zablokowane. Skontaktuj się z administratorem.",
+        "notReady": "Dla tego konta nie skonfigurowano kodów odzyskiwania.",
+        "couldNotFindSession": "Nie można znaleźć sesji",
+        "couldNotVerifyCode": "Nie można zweryfikować kodu odzyskiwania",
+        "couldNotDetermineRedirect": "Nie można ustalić adresu przekierowania po weryfikacji"
+      }
+    }
+  },
   "register": {
     "methods": {
       "passkey": "Klucz dostępu",
@@ -434,7 +456,8 @@
       "otpEmail": "Kod przez e-mail",
       "otpSms": "Kod przez SMS",
       "passkey": "Klucz dostępu",
-      "password": "Hasło"
+      "password": "Hasło",
+      "recoveryCode": "Kod odzyskiwania"
     }
   },
   "device": {

@@ -29,13 +29,24 @@ type Props = {
   method: string;
   code?: string;
   loginSettings?: LoginSettings;
+  altRecoveryCode?: boolean;
 };
 
 type Inputs = {
   code: string;
 };
 
-export function LoginOTP({ host, loginName, sessionId, requestId, organization, method, code, loginSettings }: Props) {
+export function LoginOTP({
+  host,
+  loginName,
+  sessionId,
+  requestId,
+  organization,
+  method,
+  code,
+  loginSettings,
+  altRecoveryCode = false,
+}: Props) {
   const t = useTranslations("otp");
 
   const [error, setError] = useState<string>("");
@@ -257,7 +268,38 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
         )}
 
         <div className="mt-8 flex w-full flex-row items-center">
-          <BackButton data-testid="back-button" />
+          {altRecoveryCode ? (
+            <Button
+              type="button"
+              variant={ButtonVariants.Secondary}
+              onClick={() => {
+                const params = new URLSearchParams();
+
+                if (loginName) {
+                  params.append("loginName", loginName);
+                }
+
+                if (sessionId) {
+                  params.append("sessionId", sessionId);
+                }
+
+                if (requestId) {
+                  params.append("requestId", requestId);
+                }
+
+                if (organization) {
+                  params.append("organization", organization);
+                }
+
+                return router.push("/recovery-code?" + params);
+              }}
+              data-testid="recovery-code-button"
+            >
+              <Translated i18nKey="verify.useRecoveryCode" namespace="recoveryCode" />
+            </Button>
+          ) : (
+            <BackButton data-testid="back-button" />
+          )}
           <span className="flex-grow"></span>
           <Button
             type="submit"

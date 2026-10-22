@@ -1,6 +1,14 @@
 import { Page } from "@playwright/test";
 import { registerWithPasskey } from "./register";
-import { activateOTP, addTOTP, addUser, eventualNewUser, getUserByUsername, removeUser } from "./zitadel";
+import {
+  activateOTP,
+  addRecoveryCodes,
+  addTOTP,
+  addUser,
+  eventualNewUser,
+  getUserByUsername,
+  removeUser,
+} from "./zitadel";
 
 export interface userProps {
   email: string;
@@ -126,6 +134,36 @@ export class PasswordUserWithTOTP extends User {
 
   public getSecret(): string {
     return this.secret;
+  }
+}
+
+/**
+ * A user with TOTP as the primary second factor plus recovery codes as an alternative.
+ *
+ * Recovery codes are never routed to on their own, so a user whose only second factor is
+ * recovery codes would never see the recovery code page.
+ */
+export class PasswordUserWithRecoveryCodes extends User {
+  private secret: string;
+  private recoveryCodes: string[];
+
+  async ensure(page: Page) {
+    await super.ensure(page);
+    this.secret = await addTOTP(this.getUserId());
+    this.recoveryCodes = await addRecoveryCodes(this.getUserId(), 5);
+    await eventualNewUser(this.getUserId());
+  }
+
+  public getSecret(): string {
+    return this.secret;
+  }
+
+  public getRecoveryCodes(): string[] {
+    return this.recoveryCodes;
+  }
+
+  public getRecoveryCode(index: number = 0): string {
+    return this.recoveryCodes[index];
   }
 }
 
