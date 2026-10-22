@@ -1,0 +1,68 @@
+InitCode:
+  Title: 初始化使用者
+  PreHeader: 初始化使用者
+  Subject: 初始化使用者
+  Greeting: 您好，{{.DisplayName}}：
+  Text: 已建立您的使用者帳戶。請使用使用者名稱 {{.PreferredLoginName}} 登入，並點選下方按鈕完成設定。（驗證碼：{{.Code}}）若您未提出此要求，請忽略這封郵件。
+  ButtonText: 完成設定
+PasswordReset:
+  Title: 重設密碼
+  PreHeader: 重設密碼
+  Subject: 重設密碼
+  Greeting: 您好，{{.DisplayName}}：
+  Text: 我們收到重設密碼的要求。請點選下方按鈕重設密碼。（驗證碼：{{.Code}}）若您未提出此要求，請忽略這封郵件。
+  ButtonText: 重設密碼
+VerifyEmail:
+  Title: 驗證電子郵件地址
+  PreHeader: 驗證電子郵件地址
+  Subject: 驗證電子郵件地址
+  Greeting: 您好，{{.DisplayName}}：
+  Text: 您的帳戶新增了一個電子郵件地址。請點選下方按鈕完成驗證。（驗證碼：{{.Code}}）若您未新增電子郵件地址，請忽略這封郵件。
+  ButtonText: 驗證電子郵件地址
+VerifyPhone:
+  Title: 驗證電話號碼
+  PreHeader: 驗證電話號碼
+  Subject: 驗證電話號碼
+  Greeting: 您好，{{.DisplayName}}：
+  Text: 您的帳戶新增了一個電話號碼。請使用驗證碼 {{.Code}} 完成驗證。
+  ButtonText: 驗證電話號碼
+VerifyEmailOTP:
+  Title: 一次性密碼驗證
+  PreHeader: 一次性密碼驗證
+  Subject: 一次性密碼驗證
+  Greeting: 您好，{{.DisplayName}}：
+  Text: 請在五分鐘內輸入一次性密碼 {{.OTP}} 完成驗證，或點選「驗證」按鈕。
+  ButtonText: 驗證
+VerifySMSOTP:
+  Text: '{{.OTP}} 是您在 {{ .Domain }} 的一次性密碼。請在 {{.Expiry}} 內使用。
+
+
+    @{{.Domain}} #{{.OTP}}'
+DomainClaimed:
+  Title: 網域已由組織認領
+  PreHeader: 變更電子郵件地址或使用者名稱
+  Subject: 網域已由組織認領
+  Greeting: 您好，{{.DisplayName}}：
+  Text: 網域 {{.Domain}} 已由某個組織認領。您的使用者 {{.Username}} 不屬於該組織，因此登入時需要變更電子郵件地址。我們已為這次登入建立暫時使用者名稱（{{.TempUsername}}）。
+  ButtonText: 登入
+PasswordlessRegistration:
+  Title: 新增密碼金鑰登入
+  PreHeader: 新增密碼金鑰登入
+  Subject: 新增密碼金鑰登入
+  Greeting: 您好，{{.DisplayName}}：
+  Text: 我們收到新增密碼金鑰登入方式的要求。請點選下方按鈕，新增用於密碼金鑰登入的裝置。
+  ButtonText: 新增密碼金鑰
+PasswordChange:
+  Title: 密碼已變更
+  PreHeader: 密碼已變更
+  Subject: 密碼已變更
+  Greeting: 您好，{{.DisplayName}}：
+  Text: 您的帳戶密碼已變更。若這不是您本人操作，請立即重設密碼。
+  ButtonText: 登入
+InviteUser:
+  Title: '{{.ApplicationName}} 邀請函'
+  PreHeader: '{{.ApplicationName}} 邀請函'
+  Subject: '{{.ApplicationName}} 邀請函'
+  Greeting: 您好，{{.DisplayName}}：
+  Text: 您已受邀加入 {{.ApplicationName}}。請點選下方按鈕接受邀請。若您未預期收到這封郵件，請忽略它。
+  ButtonText: 接受邀請
