@@ -34,6 +34,10 @@ VerifyEmailOTP:
   Text: "Prosím použijte OTP {{.OTP}} k ověření během následujících pěti minut nebo klikněte na tlačítko \"Ověřit\"."
   ButtonText: "Ověřit"
 VerifySMSOTP:
+  Title: "Ověření OTP"
+  PreHeader: "Ověření OTP"
+  Subject: "Ověření OTP"
+  Greeting: "Dobrý den, {{.DisplayName}},"
   Text: |-
     {{.OTP}} je vaše OTP pro {{ .Domain }}. Použijte jej během následujících {{.Expiry}}.
     @{{.Domain}} #{{.OTP}}

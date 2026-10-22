@@ -34,6 +34,10 @@ VerifyEmailOTP:
   Text: "Vă rugăm să folosiți codul OTP {{.OTP}} pentru a vă autentifica în următoarele cinci minute sau dați clic pe butonul \"Autentificare\"."
   ButtonText: "Autentificare"
 VerifySMSOTP:
+  Title: "Verificare OTP"
+  PreHeader: "Verificare OTP"
+  Subject: "Verificare OTP"
+  Greeting: "Bună ziua, {{.DisplayName}},"
   Text: |-
     {{.OTP}} este codul dvs. OTP pentru {{ .Domain }}. Folosiți-l în următoarele {{.Expiry}}.
     @{{.Domain}} #{{.OTP}}
