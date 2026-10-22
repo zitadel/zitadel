@@ -112,6 +112,6 @@
     "ts-proto": "^2.11.8",
     "typescript": "^5.9.3",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.12"
   }
 }
