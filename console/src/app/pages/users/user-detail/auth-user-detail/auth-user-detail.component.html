@@ -67,7 +67,8 @@
                 (editType)="openEditDialog(humanUser, $event)"
                 (enteredPhoneCode)="enteredPhoneCode($event)"
                 (deletedPhone)="deletePhone(user)"
-                (resendEmailVerification)="resendEmailVerification(user)"
+                [emailVerificationPending]="emailVerificationPending()"
+                (resendEmailVerification)="resendEmailVerification()"
                 (resendPhoneVerification)="resendPhoneVerification(user)"
               >
               </cnsl-contact>
