@@ -1560,7 +1560,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "kk": "Қазақша"
       }
     },
     "SMTP": {
@@ -1809,7 +1810,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "kk": "Қазақша"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-postverifiering klar",
@@ -2824,7 +2826,8 @@
     "ro": "Română",
     "tr": "Türkçe",
     "uk": "Українська",
-    "ar": "العربية"
+    "ar": "العربية",
+    "kk": "Қазақша"
   },
   "MEMBER": {
     "ADD": "Lägg till en administratör",
