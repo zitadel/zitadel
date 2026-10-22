@@ -77,6 +77,24 @@ export async function loginWithOIDCAndSession({
         // handle already handled gracefully as these could come up if old emails with requestId are used (reset password, register emails etc.)
         console.error(error);
         if (isClassifiedError(error) && error.code === Code.FailedPrecondition) {
+          if (selectedSession.factors?.user?.loginName) {
+            const reauth: SendLoginnameCommand = {
+              loginName: selectedSession.factors.user.loginName,
+              organization: selectedSession.factors?.user?.organizationId,
+              requestId: `oidc_${authRequest}`,
+            };
+
+            try {
+              const reauthRes = await sendLoginname(reauth);
+
+              if (reauthRes && "redirect" in reauthRes && reauthRes?.redirect) {
+                return { redirect: reauthRes.redirect };
+              }
+            } catch (reauthError) {
+              console.error(reauthError);
+            }
+          }
+
           const loginSettings = await getLoginSettings({
             serviceConfig,
             organization: selectedSession.factors?.user?.organizationId,
