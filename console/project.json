@@ -66,6 +66,46 @@
       "description": "Runs the Management Console in development mode with hot-reloading",
       "continuous": true,
       "dependsOn": ["generate", "^build"]
+    },
+    "account-build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node account/build.mjs production",
+        "cwd": "console"
+      },
+      "dependsOn": [
+        "^build",
+        "generate"
+      ]
+    },
+    "account-dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node account/build.mjs development --serve",
+        "cwd": "console"
+      },
+      "dependsOn": [
+        "^build",
+        "generate"
+      ]
+    },
+    "account-typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p tsconfig.account.json",
+        "cwd": "console"
+      },
+      "dependsOn": [
+        "^build",
+        "generate"
+      ]
+    },
+    "account-lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint src/account",
+        "cwd": "console"
+      }
     }
   }
 }

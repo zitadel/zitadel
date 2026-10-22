@@ -1,0 +1,102 @@
+<a class="skip" href="#content" (click)="focusContent($event)">{{ 'ACCOUNT.SKIP' | translate }}</a>
+<div class="account-layout">
+  <aside class="sidebar">
+    <div class="brand">
+      @if (branding.logo) {
+      <img [src]="branding.logo" [alt]="branding.name" />
+      } @else if (branding.name) {
+      <strong>{{ branding.name }}</strong>
+      }
+      <span>{{ 'ACCOUNT.ACCOUNT' | translate }}</span>
+    </div>
+    <p class="nav-caption eyebrow">{{ 'ACCOUNT.PERSONAL_ACCOUNT' | translate }}</p>
+    <nav [attr.aria-label]="'ACCOUNT.NAV' | translate">
+      @for (item of nav; track item.path) {
+      <a
+        [routerLink]="item.path"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact: item.path === '/'}"
+        ariaCurrentWhenActive="page"
+        >{{ 'ACCOUNT.' + item.key | translate }}</a
+      >
+      }
+    </nav>
+    @if (helpUrl || privacyUrl) {
+    <div class="secondary-navigation">
+      <p class="eyebrow">{{ 'ACCOUNT.MANAGEMENT' | translate }}</p>
+      @if (helpUrl) {
+      <a [href]="helpUrl" target="_blank" rel="noopener noreferrer"
+        >{{ 'ACCOUNT.HELP' | translate }} <span aria-hidden="true">↗</span></a
+      >
+      } @if (privacyUrl) {
+      <a [href]="privacyUrl" target="_blank" rel="noopener noreferrer"
+        >{{ 'ACCOUNT.PRIVACY' | translate }} <span aria-hidden="true">↗</span></a
+      >
+      }
+    </div>
+    } @if (auth.authenticated) {
+    <div class="active-identity">
+      @if (native.user | async; as user) {
+      <cnsl-avatar
+        [name]="user.human?.profile?.displayName || user.userName"
+        [avatarUrl]="user.human?.profile?.avatarUrl || ''"
+        [size]="33"
+      ></cnsl-avatar>
+      <div class="active-identity-text">
+        <strong>{{ user.human?.profile?.displayName || user.userName }}</strong
+        ><button type="button" (click)="auth.signout()">
+          {{ 'ACCOUNT.LOGOUT' | translate }} <span aria-hidden="true">→</span>
+        </button>
+      </div>
+      }
+    </div>
+    }
+  </aside>
+  <div class="workspace">
+    <header class="topbar">
+      <p class="breadcrumb">
+        {{ 'ACCOUNT.ACCOUNT' | translate }} <span aria-hidden="true">/</span> {{ 'ACCOUNT.' + breadcrumb | translate }}
+      </p>
+      <div class="display-preferences">
+        <label class="language-control"
+          ><span class="visually-hidden">{{ 'ACCOUNT.LANGUAGE' | translate }}</span
+          ><select [value]="translate.getCurrentLang()" (change)="language($any($event.target).value)">
+            <option value="pt">Português</option>
+            <option value="en">English</option>
+          </select></label
+        >
+        <button
+          class="theme-control"
+          type="button"
+          (click)="branding.toggle()"
+          [attr.aria-label]="(branding.dark ? 'ACCOUNT.LIGHT' : 'ACCOUNT.DARK') | translate"
+          [attr.title]="(branding.dark ? 'ACCOUNT.LIGHT' : 'ACCOUNT.DARK') | translate"
+        >
+          <mat-icon aria-hidden="true">{{ branding.dark ? 'light_mode' : 'dark_mode' }}</mat-icon>
+        </button>
+        @if (auth.authenticated) {
+        <button
+          class="theme-control mobile-signout"
+          type="button"
+          (click)="auth.signout()"
+          [attr.aria-label]="'ACCOUNT.LOGOUT' | translate"
+        >
+          <mat-icon aria-hidden="true">logout</mat-icon>
+        </button>
+        }
+      </div>
+    </header>
+    <main id="content" tabindex="-1">
+      @if (branding.unavailable && auth.authenticated) {
+      <p class="status-message" role="status">{{ 'ACCOUNT.BRANDING_ERROR' | translate }}</p>
+      }
+      <router-outlet></router-outlet>
+      @if (auth.authenticated) {
+      <footer>
+        <p>{{ 'ACCOUNT.IDENTITY_DESC' | translate }}</p>
+        <span>{{ branding.name }}</span>
+      </footer>
+      }
+    </main>
+  </div>
+</div>

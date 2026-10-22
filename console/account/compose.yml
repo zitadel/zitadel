@@ -1,0 +1,14 @@
+services:
+  account:
+    image: ${ACCOUNT_IMAGE:-ailton-account:local}
+    build:
+      context: ../..
+      dockerfile: console/account/Dockerfile
+    environment:
+      ACCOUNT_ISSUER: ${ACCOUNT_ISSUER:?Set ACCOUNT_ISSUER}
+      ACCOUNT_API: ${ACCOUNT_API:?Set ACCOUNT_API}
+      ACCOUNT_CLIENT_ID: ${ACCOUNT_CLIENT_ID:?Set ACCOUNT_CLIENT_ID}
+      ACCOUNT_LOGIN_ORG_ID: ${ACCOUNT_LOGIN_ORG_ID:?Set ACCOUNT_LOGIN_ORG_ID}
+    ports:
+      - "127.0.0.1:${ACCOUNT_PORT:-8088}:8080"
+    restart: unless-stopped

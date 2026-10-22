@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "outDir": "./out-tsc/account", "types": ["node"] },
+  "files": ["src/account/main.ts"],
+  "include": ["src/**/*.d.ts"],
+  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"]
+}

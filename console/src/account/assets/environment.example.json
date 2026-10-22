@@ -1,0 +1,6 @@
+{
+  "api": "https://auth.example.com",
+  "issuer": "https://auth.example.com",
+  "clientid": "SET_ACCOUNT_SPA_CLIENT_ID",
+  "loginOrgId": "SET_ENVIRONMENT_LOGIN_ORG_ID"
+}

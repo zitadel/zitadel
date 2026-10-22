@@ -1,0 +1,112 @@
+{
+  "$schema": "../node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "projects": {
+    "account": {
+      "projectType": "application",
+      "root": "",
+      "sourceRoot": "src/account",
+      "prefix": "cnsl",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "outputPath": {
+              "base": "account/dist",
+              "browser": ""
+            },
+            "index": "src/account/index.html",
+            "polyfills": ["zone.js"],
+            "tsConfig": "tsconfig.account.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "src/account/assets",
+                "output": "assets"
+              },
+              {
+                "glob": "{en,pt}.json",
+                "input": "src/assets/i18n",
+                "output": "assets/native-i18n"
+              }
+            ],
+            "styles": ["src/account/styles.scss"],
+            "scripts": [],
+            "stylePreprocessorOptions": {
+              "sass": {
+                "silenceDeprecations": ["import", "mixed-decls"]
+              },
+              "includePaths": ["node_modules", "."]
+            },
+            "allowedCommonJsDependencies": [
+              "opentype.js",
+              "fast-sha256",
+              "buffer",
+              "moment",
+              "grpc-web",
+              "@angular/common/locales/de",
+              "codemirror/mode/javascript/javascript",
+              "codemirror/mode/xml/xml",
+              "file-saver",
+              "qrcode",
+              "codemirror"
+            ],
+            "browser": "src/account/main.ts",
+            "fileReplacements": [
+              {
+                "replace": "src/app/modules/policies/private-labeling-policy/private-labeling-policy.component.ts",
+                "with": "src/account/native-asset-theme.ts"
+              }
+            ]
+          },
+          "configurations": {
+            "production": {
+              "optimization": {
+                "fonts": {
+                  "inline": false
+                },
+                "styles": {
+                  "inlineCritical": false,
+                  "minify": false
+                }
+              },
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "8mb",
+                  "maximumError": "11mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "development": {
+              "buildTarget": "account:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        }
+      }
+    }
+  },
+  "cli": {
+    "analytics": false
+  }
+}

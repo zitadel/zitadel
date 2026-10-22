@@ -1,0 +1,16 @@
+.git
+.github
+**/node_modules
+**/.next
+**/dist
+.artifacts
+.nx
+**/.angular
+coverage
+**/*.log
+**/.env
+**/.env.*
+!**/.env.example
+**/*.pat
+.aws
+.codex

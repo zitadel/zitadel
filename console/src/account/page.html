@@ -1,0 +1,125 @@
+<p class="eyebrow">{{ 'ACCOUNT.ACCOUNT' | translate }} / {{ 'ACCOUNT.' + title | translate }}</p>
+<h1>{{ 'ACCOUNT.' + title | translate }}</h1>
+@if (path === '/auth/error') {
+<p role="alert">{{ 'ACCOUNT.AUTH_ERROR_DESC' | translate }}</p>
+<button (click)="auth.retry()">{{ 'ACCOUNT.LOGIN' | translate }} →</button>
+} @else if (path === '/signedout') {
+<p>{{ 'ACCOUNT.SIGNED_OUT_DESC' | translate }}</p>
+<button (click)="auth.login('/')">{{ 'ACCOUNT.LOGIN' | translate }} →</button>
+} @else if (title === 'NOT_FOUND') {
+<p>{{ 'ACCOUNT.NOT_FOUND_DESC' | translate }}</p>
+<a routerLink="/">{{ 'ACCOUNT.HOME' | translate }} →</a> } @else { @if (loading) {
+<p role="status">{{ 'ACCOUNT.LOADING' | translate }}</p>
+} @if (failed) {
+<p role="alert">{{ 'ACCOUNT.LOAD_ERROR' | translate }}</p>
+<button (click)="refresh()">{{ 'ACCOUNT.RETRY' | translate }}</button> } @if (!loading && !failed && human; as h) { @if (path
+=== '/') {
+<p class="intro">{{ 'ACCOUNT.INTRO' | translate }}</p>
+<section class="identity">
+  <div>
+    <h2>{{ h.profile?.displayName }}</h2>
+    <p>{{ h.email?.email }}</p>
+    <p>{{ (h.email?.isEmailVerified ? 'ACCOUNT.VERIFIED' : 'ACCOUNT.UNVERIFIED') | translate }}</p>
+  </div>
+  <cnsl-avatar [name]="h.profile?.displayName || ''" [avatarUrl]="h.profile?.avatarUrl || ''" [size]="80"></cnsl-avatar>
+</section>
+<div class="columns">
+  <section>
+    <p class="eyebrow">{{ 'ACCOUNT.MANAGE' | translate }}</p>
+    <h2>{{ 'ACCOUNT.ACCESS' | translate }}</h2>
+    <a class="task" routerLink="/perfil"
+      ><span>{{ 'ACCOUNT.PROFILE' | translate }}<small>{{ 'ACCOUNT.PROFILE_DESC' | translate }}</small></span
+      ><span>{{ 'ACCOUNT.MANAGE_ACTION' | translate }} →</span></a
+    >
+    <a class="task" routerLink="/seguranca"
+      ><span>{{ 'ACCOUNT.SECURITY' | translate }}<small>{{ 'ACCOUNT.SECURITY_DESC' | translate }}</small></span
+      ><span>{{ 'ACCOUNT.MANAGE_ACTION' | translate }} →</span></a
+    >
+  </section>
+  <section class="context">
+    <p class="eyebrow">{{ 'ACCOUNT.IDENTITY' | translate }}</p>
+    <h2>{{ 'ACCOUNT.YOUR_ACCOUNT' | translate }}</h2>
+    <p>{{ 'ACCOUNT.IDENTITY_DESC' | translate }}</p>
+  </section>
+</div>
+} @else if (path === '/perfil') {
+<p class="intro">{{ 'ACCOUNT.PROFILE_DESC' | translate }}</p>
+@if (profile; as profile) {
+<div class="columns profile-columns">
+  <section class="profile-details">
+    <p class="eyebrow">{{ 'ACCOUNT.IDENTITY' | translate }}</p>
+    <h2 class="section-title">{{ 'ACCOUNT.PERSONAL_DETAILS' | translate }}</h2>
+    <cnsl-detail-form
+      #profileForm
+      class="account-profile-form"
+      [profile]="profile"
+      [username]="user?.userName || ''"
+      [preferredLoginName]="user?.preferredLoginName || ''"
+      [showEditImage]="true"
+      [languages]="['pt', 'en']"
+      [genders]="genders"
+      [disabled]="saving"
+      (submitData)="save($event)"
+      (avatarChanged)="refresh()"
+      (changeUsernameClicked)="editUsername()"
+    >
+    </cnsl-detail-form>
+    <div class="contact-section">
+      <cnsl-contact
+        [human]="$any(h)"
+        [canWrite]="!saving"
+        (editType)="edit($event)"
+        (resendEmailVerification)="emailVerification()"
+        (resendPhoneVerification)="phoneVerification()"
+        (enteredPhoneCode)="verifyPhone($event)"
+        (deletedPhone)="deletePhone()"
+      ></cnsl-contact>
+    </div>
+  </section>
+  <section class="profile-visibility">
+    <p class="eyebrow">{{ 'ACCOUNT.YOUR_IDENTITY' | translate }}</p>
+    <h2 class="section-title">{{ 'ACCOUNT.PHOTO_VISIBILITY' | translate }}</h2>
+    <cnsl-avatar [name]="profile.displayName || ''" [avatarUrl]="profile.avatarUrl || ''" [size]="83"></cnsl-avatar>
+    <button
+      class="text-action photo-action"
+      type="button"
+      [disabled]="saving"
+      (click)="profileForm.openUploadDialog(profile)"
+    >
+      {{ 'ACCOUNT.CHANGE_PHOTO' | translate }} <span aria-hidden="true">→</span>
+    </button>
+    <p>{{ 'ACCOUNT.PHOTO_DESCRIPTION' | translate }}</p>
+  </section>
+</div>
+} } @else if (path === '/seguranca') {
+<p class="intro">{{ 'ACCOUNT.SECURITY_DESC' | translate }}</p>
+<div class="columns">
+  <section>
+    <p class="eyebrow">{{ 'ACCOUNT.METHODS' | translate }}</p>
+    <h2>{{ 'ACCOUNT.SIGNIN_METHODS' | translate }}</h2>
+    <a class="task" routerLink="/seguranca/senha"
+      ><span>{{ 'ACCOUNT.PASSWORD' | translate }}<small>{{ 'ACCOUNT.PASSWORD_DESC' | translate }}</small></span
+      ><span>{{ 'ACCOUNT.CHANGE' | translate }} →</span></a
+    >
+    <a class="task" routerLink="/seguranca/passkeys"
+      ><span>{{ 'ACCOUNT.PASSKEYS' | translate }}<small>{{ 'ACCOUNT.PASSKEYS_DESC' | translate }}</small></span
+      ><span>{{ 'ACCOUNT.MANAGE_ACTION' | translate }} →</span></a
+    >
+    <a class="task" routerLink="/seguranca/mfa"
+      ><span>{{ 'ACCOUNT.MFA' | translate }}<small>{{ 'ACCOUNT.MFA_DESC' | translate }}</small></span
+      ><span>{{ 'ACCOUNT.MANAGE_ACTION' | translate }} →</span></a
+    >
+  </section>
+  <section class="context">
+    <p class="eyebrow">{{ 'ACCOUNT.PROTECTION' | translate }}</p>
+    <h2>{{ 'ACCOUNT.REVIEW' | translate }}</h2>
+    <h3>{{ 'ACCOUNT.IN_CONTROL' | translate }}</h3>
+    <p>{{ 'ACCOUNT.REVIEW_DESC' | translate }}</p>
+  </section>
+</div>
+<cnsl-external-idps [service]="native" [displayedColumns]="['idpName', 'externalUserDisplayName']"></cnsl-external-idps>
+} @else if (path === '/seguranca/mfa') {
+<cnsl-auth-user-mfa [phoneVerified]="h.phone?.isPhoneVerified || false"></cnsl-auth-user-mfa>
+} @else if (path === '/seguranca/passkeys') {
+<cnsl-auth-passwordless></cnsl-auth-passwordless>
+} } }
