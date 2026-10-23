@@ -11,7 +11,7 @@ import { getServiceConfig } from "@/lib/service-url";
 import { getAllowedLanguages } from "@/lib/zitadel";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Lato } from "next/font/google";
 import { headers } from "next/headers";
 import React, { Suspense } from "react";
@@ -30,6 +30,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
+  // Same locale next-intl resolved for the messages, so the document language
+  // matches the text that is actually rendered.
+  const locale = await getLocale();
+
   let languages = LANGS;
   try {
     const settings = await getAllowedLanguages({ serviceConfig });
@@ -43,7 +47,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   }
 
   return (
-    <html className={`${lato.className}`} suppressHydrationWarning>
+    <html lang={locale} className={`${lato.className}`} suppressHydrationWarning>
       <head />
       <body>
         <ThemeProvider>
