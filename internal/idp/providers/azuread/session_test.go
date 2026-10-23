@@ -414,3 +414,29 @@ func TestSession_RetrievePreviousID(t *testing.T) {
 		})
 	}
 }
+
+func TestSession_FetchUser_PKCE(t *testing.T) {
+	defer gock.Off()
+	// the token request must contain the code_verifier stored on the intent / auth request
+	gock.New("https://login.microsoftonline.com").
+		Post("/common/oauth2/v2.0/token").
+		BodyString(".*code_verifier=verifier.*").
+		Reply(200).
+		JSON(map[string]any{
+			"access_token": "accessToken",
+			"token_type":   oidc.BearerToken,
+		})
+	gock.New("https://graph.microsoft.com").
+		Get("/v1.0/me").
+		Reply(200).
+		JSON(userinfo())
+
+	provider, err := New("name", "clientID", "clientSecret", "redirectURI", nil, http.DefaultClient)
+	require.NoError(t, err)
+
+	session := NewSession(provider, "code", map[string]any{oauth.CodeVerifier: "verifier"})
+	user, err := session.FetchUser(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, "id", user.GetID())
+	assert.True(t, gock.IsDone())
+}

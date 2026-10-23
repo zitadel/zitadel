@@ -3,6 +3,7 @@ package gitlab
 import (
 	"net/http"
 
+	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	openid "github.com/zitadel/oidc/v3/pkg/oidc"
 
 	"github.com/zitadel/zitadel/internal/idp"
@@ -37,11 +38,13 @@ func NewCustomIssuer(name, issuer, clientID, clientSecret, redirectURI string, s
 	}
 	// gitlab is currently not able to handle the prompt `select_account`:
 	// https://gitlab.com/gitlab-org/gitlab/-/issues/377368
-	rp, err := oidc.New(name, issuer, clientID, clientSecret, redirectURI, scopes, oidc.DefaultMapper, httpClient, options...)
+	// PKCE is used by default
+	options = append(options, oidc.WithRelyingPartyOption(rp.WithPKCE(nil)))
+	provider, err := oidc.New(name, issuer, clientID, clientSecret, redirectURI, scopes, oidc.DefaultMapper, httpClient, options...)
 	if err != nil {
 		return nil, err
 	}
 	return &Provider{
-		Provider: rp,
+		Provider: provider,
 	}, nil
 }
