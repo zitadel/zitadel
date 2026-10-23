@@ -49,7 +49,7 @@ var (
 		` projections.sessions8.user_agent_header,` +
 		` projections.sessions8.expiration` +
 		` FROM projections.sessions8` +
-		` LEFT JOIN projections.login_names3 ON projections.sessions8.user_id = projections.login_names3.user_id AND projections.sessions8.instance_id = projections.login_names3.instance_id` +
+		` LEFT JOIN projections.login_names3 ON projections.sessions8.user_id = projections.login_names3.user_id AND projections.sessions8.instance_id = projections.login_names3.instance_id AND projections.login_names3.is_primary = true` +
 		` LEFT JOIN projections.users14_humans ON projections.sessions8.user_id = projections.users14_humans.user_id AND projections.sessions8.instance_id = projections.users14_humans.instance_id` +
 		` LEFT JOIN projections.users14 ON projections.sessions8.user_id = projections.users14.id AND projections.sessions8.instance_id = projections.users14.instance_id`)
 	expectedSessionsQuery = regexp.QuoteMeta(`SELECT projections.sessions8.id,` +
@@ -80,7 +80,7 @@ var (
 		` projections.sessions8.expiration,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.sessions8` +
-		` LEFT JOIN projections.login_names3 ON projections.sessions8.user_id = projections.login_names3.user_id AND projections.sessions8.instance_id = projections.login_names3.instance_id` +
+		` LEFT JOIN projections.login_names3 ON projections.sessions8.user_id = projections.login_names3.user_id AND projections.sessions8.instance_id = projections.login_names3.instance_id AND projections.login_names3.is_primary = true` +
 		` LEFT JOIN projections.users14_humans ON projections.sessions8.user_id = projections.users14_humans.user_id AND projections.sessions8.instance_id = projections.users14_humans.instance_id` +
 		` LEFT JOIN projections.users14 ON projections.sessions8.user_id = projections.users14.id AND projections.sessions8.instance_id = projections.users14.instance_id`)
 
