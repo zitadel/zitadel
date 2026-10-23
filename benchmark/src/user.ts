@@ -265,9 +265,14 @@ export function addMachinePat(userId: string, org: Org, accessToken: string): Pr
       },
     });
     response.then((res) => {
-      check(res, {
-        'add pat status ok': (r) => r.status >= 200 && r.status < 300,
-      }) || reject(`unable to add pat (user id: ${userId}) status: ${res.status} body: ${res.body}`);
+      if (
+        !check(res, {
+          'add pat status ok': (r) => r.status >= 200 && r.status < 300,
+        })
+      ) {
+        reject(`unable to add pat (user id: ${userId}) status: ${res.status} body: ${String(res.body).slice(0, 200)}`);
+        return;
+      }
 
       addMachinePatTrend.add(res.timings.duration);
       resolve(res.json()! as MachinePat);
@@ -292,9 +297,16 @@ export function addMachineSecret(userId: string, org: Org, accessToken: string):
       },
     });
     response.then((res) => {
-      check(res, {
-        'generate machine secret status ok': (r) => r.status >= 200 && r.status < 300,
-      }) || reject(`unable to generate machine secret (user id: ${userId}) status: ${res.status} body: ${res.body}`);
+      if (
+        !check(res, {
+          'generate machine secret status ok': (r) => r.status >= 200 && r.status < 300,
+        })
+      ) {
+        reject(
+          `unable to generate machine secret (user id: ${userId}) status: ${res.status} body: ${String(res.body).slice(0, 200)}`,
+        );
+        return;
+      }
 
       addMachineSecretTrend.add(res.timings.duration);
       resolve(res.json()! as MachineSecret);
@@ -328,9 +340,16 @@ export function addMachineKey(userId: string, org: Org, accessToken: string, pub
       },
     );
     response.then((res) => {
-      check(res, {
-        'generate machine key status ok': (r) => r.status >= 200 && r.status < 300,
-      }) || reject(`unable to generate machine Key (user id: ${userId}) status: ${res.status} body: ${res.body}`);
+      if (
+        !check(res, {
+          'generate machine key status ok': (r) => r.status >= 200 && r.status < 300,
+        })
+      ) {
+        reject(
+          `unable to generate machine Key (user id: ${userId}) status: ${res.status} body: ${String(res.body).slice(0, 200)}`,
+        );
+        return;
+      }
 
       addMachineKeyTrend.add(res.timings.duration);
       resolve(res.json()! as MachineKey);
