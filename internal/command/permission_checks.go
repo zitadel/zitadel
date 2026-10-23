@@ -169,7 +169,13 @@ func (c *Commands) NewPermissionCheckUserGrantDelete(ctx context.Context) UserGr
 	return c.newUserGrantPermissionCheck(ctx, domain.PermissionUserGrantDelete)
 }
 
+// CheckPermissionOrganizationCreate resolves org.create in the organization of the request context,
+// as the v1 AddOrg endpoint does, because the new organization has no members yet.
+// org.write on the new organization is kept so existing callers are not affected.
 func (c *Commands) CheckPermissionOrganizationCreate(ctx context.Context, organizationID string) error {
+	if err := c.checkPermission(ctx, domain.PermissionOrganizationCreate, authz.GetCtxData(ctx).OrgID, organizationID); err == nil {
+		return nil
+	}
 	return c.newPermissionCheck(ctx, domain.PermissionOrganizationWrite, org.AggregateType)(organizationID, organizationID)
 }
 
