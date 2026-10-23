@@ -654,6 +654,7 @@
     "IAM_OWNER_VIEWER": "인스턴스와 모든 조직을 검토할 수 있는 권한이 있습니다",
     "IAM_ORG_MANAGER": "조직을 생성하고 관리할 수 있는 권한이 있습니다",
     "IAM_USER_MANAGER": "사용자를 생성하고 관리할 수 있는 권한이 있습니다",
+    "IAM_USER_VIEWER": "사용자를 조회할 수 있는 권한이 있습니다",
     "IAM_ADMIN_IMPERSONATOR": "모든 조직의 관리자와 최종 사용자를 대리할 수 있는 권한이 있습니다",
     "IAM_END_USER_IMPERSONATOR": "모든 조직의 최종 사용자를 대리할 수 있는 권한이 있습니다",
     "IAM_LOGIN_CLIENT": "로그인 애플리케이션을 관리할 수 있는 권한이 있습니다",
