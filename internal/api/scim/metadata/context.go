@@ -15,6 +15,7 @@ var scimContextKey scimContextKeyType
 
 type ScimContextData struct {
 	ProvisioningDomain          string
+	PreferredIDP               string
 	IgnorePasswordOnCreate      bool
 	ExternalIDScopedMetadataKey ScopedKey
 	bulkIDMapping               map[string]string
