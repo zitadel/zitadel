@@ -161,6 +161,7 @@ type AppleIDPTemplate struct {
 type SAMLIDPTemplate struct {
 	IDPID                         string
 	Metadata                      []byte
+	MetadataURL                   string
 	Key                           *crypto.CryptoValue
 	Certificate                   []byte
 	Binding                       string
@@ -717,6 +718,10 @@ var (
 		name:  projection.SAMLMetadataCol,
 		table: samlIdpTemplateTable,
 	}
+	SAMLMetadataURLCol = Column{
+		name:  projection.SAMLMetadataURLCol,
+		table: samlIdpTemplateTable,
+	}
 	SAMLKeyCol = Column{
 		name:  projection.SAMLKeyCol,
 		table: samlIdpTemplateTable,
@@ -1003,6 +1008,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			// saml
 			SAMLIDCol.identifier(),
 			SAMLMetadataCol.identifier(),
+			SAMLMetadataURLCol.identifier(),
 			SAMLKeyCol.identifier(),
 			SAMLCertificateCol.identifier(),
 			SAMLBindingCol.identifier(),
@@ -1133,6 +1139,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 
 			samlID := sql.NullString{}
 			var samlMetadata []byte
+			var samlMetadataURL sql.NullString
 			samlKey := new(crypto.CryptoValue)
 			var samlCertificate []byte
 			samlBinding := sql.NullString{}
@@ -1260,6 +1267,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 				// saml
 				&samlID,
 				&samlMetadata,
+				&samlMetadataURL,
 				&samlKey,
 				&samlCertificate,
 				&samlBinding,
@@ -1409,6 +1417,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 				idpTemplate.SAMLIDPTemplate = &SAMLIDPTemplate{
 					IDPID:                         samlID.String,
 					Metadata:                      samlMetadata,
+					MetadataURL:                   samlMetadataURL.String,
 					Key:                           samlKey,
 					Certificate:                   samlCertificate,
 					Binding:                       samlBinding.String,
@@ -1554,6 +1563,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			// saml
 			SAMLIDCol.identifier(),
 			SAMLMetadataCol.identifier(),
+			SAMLMetadataURLCol.identifier(),
 			SAMLKeyCol.identifier(),
 			SAMLCertificateCol.identifier(),
 			SAMLBindingCol.identifier(),
@@ -1689,6 +1699,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 
 				samlID := sql.NullString{}
 				var samlMetadata []byte
+				var samlMetadataURL sql.NullString
 				samlKey := new(crypto.CryptoValue)
 				var samlCertificate []byte
 				samlBinding := sql.NullString{}
@@ -1816,6 +1827,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 					// saml
 					&samlID,
 					&samlMetadata,
+					&samlMetadataURL,
 					&samlKey,
 					&samlCertificate,
 					&samlBinding,
@@ -1964,6 +1976,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 					idpTemplate.SAMLIDPTemplate = &SAMLIDPTemplate{
 						IDPID:                         samlID.String,
 						Metadata:                      samlMetadata,
+						MetadataURL:                   samlMetadataURL.String,
 						Key:                           samlKey,
 						Certificate:                   samlCertificate,
 						Binding:                       samlBinding.String,

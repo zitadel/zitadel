@@ -1,6 +1,7 @@
 package command
 
 import (
+	"bytes"
 	"context"
 	"crypto/x509"
 	"strings"
@@ -14,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/idp/providers/apple"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml"
+	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -554,6 +556,74 @@ func (c *Commands) UpdateInstanceSAMLProvider(ctx context.Context, id string, pr
 		return nil, err
 	}
 	return pushedEventsToObjectDetails(pushedEvents), nil
+}
+
+// RefreshInstanceSAMLProviderMetadata re-fetches the SAML metadata from the URL
+// configured for the provider and updates the provider if the metadata changed.
+// It is used by the periodic metadata refresh worker.
+func (c *Commands) RefreshInstanceSAMLProviderMetadata(ctx context.Context, id string) error {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	instanceAgg := instance.NewAggregate(instanceID)
+	writeModel := NewSAMLInstanceIDPWriteModel(instanceID, id)
+	events, err := c.eventstore.Filter(ctx, writeModel.Query())
+	if err != nil {
+		return err
+	}
+	writeModel.AppendEvents(events...)
+	if err = writeModel.Reduce(); err != nil {
+		return err
+	}
+	if !writeModel.State.Exists() {
+		return zerrors.ThrowNotFound(nil, "INST-4j2slp0q7e", "Errors.IDPConfig.NotExisting")
+	}
+	if writeModel.MetadataURL == "" {
+		return nil
+	}
+	data, err := xml.ReadMetadataFromURL(c.httpClient, writeModel.MetadataURL)
+	if err != nil {
+		return zerrors.ThrowInvalidArgument(err, "INST-x3n9vkb1lm", "Errors.Project.App.SAMLMetadataMissing")
+	}
+	if _, err := saml.ParseMetadata(data); err != nil {
+		return zerrors.ThrowInvalidArgument(err, "INST-9qmv2tpl4r", "Errors.Project.App.SAMLMetadataFormat")
+	}
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRefreshInstanceSAMLProviderMetadata(instanceAgg, id, data))
+	if err != nil {
+		return err
+	}
+	if len(cmds) == 0 {
+		return nil
+	}
+	_, err = c.eventstore.Push(ctx, cmds...)
+	return err
+}
+
+func (c *Commands) prepareRefreshInstanceSAMLProviderMetadata(a *instance.Aggregate, id string, metadata []byte) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel := NewSAMLInstanceIDPWriteModel(a.ID, id)
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if !writeModel.State.Exists() {
+				return nil, zerrors.ThrowNotFound(nil, "INST-D3r1s", "Errors.IDPConfig.NotExisting")
+			}
+			if bytes.Equal(writeModel.Metadata, metadata) {
+				return nil, nil
+			}
+			event, err := instance.NewSAMLIDPChangedEvent(ctx, &a.Aggregate, id, []idp.SAMLIDPChanges{
+				idp.ChangeSAMLMetadata(metadata),
+			})
+			if err != nil {
+				return nil, err
+			}
+			return []eventstore.Command{event}, nil
+		}, nil
+	}
 }
 
 func (c *Commands) RegenerateInstanceSAMLProviderCertificate(ctx context.Context, id string) (*domain.ObjectDetails, error) {
@@ -1800,6 +1870,7 @@ func (c *Commands) prepareAddInstanceSAMLProvider(a *instance.Aggregate, writeMo
 					writeModel.ID,
 					provider.Name,
 					provider.Metadata,
+					provider.MetadataURL,
 					keyEnc,
 					cert,
 					provider.Binding,
@@ -1854,6 +1925,7 @@ func (c *Commands) prepareUpdateInstanceSAMLProvider(a *instance.Aggregate, writ
 				writeModel.ID,
 				provider.Name,
 				provider.Metadata,
+				provider.MetadataURL,
 				nil,
 				nil,
 				c.idpConfigEncryption,
@@ -1901,6 +1973,7 @@ func (c *Commands) prepareRegenerateInstanceSAMLProviderCertificate(a *instance.
 				writeModel.ID,
 				writeModel.Name,
 				writeModel.Metadata,
+				writeModel.MetadataURL,
 				key,
 				cert,
 				c.idpConfigEncryption,
