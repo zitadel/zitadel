@@ -136,6 +136,55 @@ func TestConfig_DefaultEmailCodeURLTemplate(t *testing.T) {
 	}
 }
 
+func TestConfig_DefaultInviteCodeURLTemplate(t *testing.T) {
+	t.Parallel()
+
+	tt := []struct {
+		testName                  string
+		inputCtx                  context.Context
+		expectedInviteURLTemplate string
+	}{
+		{
+			testName: "when base path is empty should return empty invite url template",
+			inputCtx: http.WithDomainContext(
+				authz.NewMockContext("instance1", "org1", "user1",
+					authz.WithMockFeatures(feature.Features{LoginV2: feature.LoginV2{Required: false, BaseURI: &url.URL{}}}),
+				),
+				&http.DomainCtx{Protocol: "https", PublicHost: "origin"},
+			),
+			expectedInviteURLTemplate: "",
+		},
+		{
+			testName: "when base path is not empty should return expected url template",
+			inputCtx: http.WithDomainContext(
+				authz.NewMockContext("instance1", "org1", "user1",
+					authz.WithMockFeatures(feature.Features{LoginV2: feature.LoginV2{Required: true, BaseURI: &url.URL{}}}),
+				),
+				&http.DomainCtx{Protocol: "https", PublicHost: "origin"},
+			),
+			expectedInviteURLTemplate: "https://origin/basepath/verify?code={{.Code}}&invite=true&userId={{.UserID}}",
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+
+			// Given
+			c := &DefaultPaths{
+				BasePath:       &url.URL{Path: "/basepath"},
+				InviteCodePath: &url.URL{Path: "/verify", RawQuery: "code={{.Code}}&userId={{.UserID}}&invite=true"},
+			}
+
+			// Test
+			res := c.DefaultInviteCodeURLTemplate(tc.inputCtx)
+
+			// Verify
+			assert.Equal(t, tc.expectedInviteURLTemplate, res)
+		})
+	}
+}
+
 func TestConfig_DefaultPasswordSetURLTemplate(t *testing.T) {
 	t.Parallel()
 
