@@ -257,7 +257,8 @@
       "totpRegisterDescription": "امسح رمز الاستجابة السريعة أو انتقل إلى عنوان URL يدوياً.",
       "submit": "متابعة",
       "labels": {
-        "code": "الرمز"
+        "code": "الرمز",
+        "secret": "المفتاح السري"
       },
       "required": {
         "code": "هذا الحقل مطلوب"

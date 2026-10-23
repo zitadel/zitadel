@@ -257,7 +257,8 @@
       "totpRegisterDescription": "扫描二维码或手动导航到URL。",
       "submit": "继续",
       "labels": {
-        "code": "验证码"
+        "code": "验证码",
+        "secret": "密钥"
       },
       "required": {
         "code": "此字段为必填项"

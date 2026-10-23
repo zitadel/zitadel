@@ -257,7 +257,8 @@
       "totpRegisterDescription": "Escaneie o QR Code ou acesse a URL manualmente.",
       "submit": "Continuar",
       "labels": {
-        "code": "Código"
+        "code": "Código",
+        "secret": "Chave secreta"
       },
       "required": {
         "code": "Este campo é obrigatório"
