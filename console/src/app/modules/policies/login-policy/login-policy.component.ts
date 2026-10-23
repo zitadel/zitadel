@@ -56,11 +56,11 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
   public InfoSectionType: any = InfoSectionType;
   public PasswordlessType: any = PasswordlessType;
   public lifetimeForm: UntypedFormGroup = this.fb.group({
-    passwordCheckLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(1)]],
-    externalLoginCheckLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(1)]],
+    passwordCheckLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(0)]],
+    externalLoginCheckLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(0)]],
     mfaInitSkipLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(0)]],
-    secondFactorCheckLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(1)]],
-    multiFactorCheckLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(1)]],
+    secondFactorCheckLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(0)]],
+    multiFactorCheckLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(0)]],
   });
   private destroy$: Subject<void> = new Subject();
 
