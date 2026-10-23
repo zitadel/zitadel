@@ -741,7 +741,8 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 				callbackURL: "url",
 			},
 			res{
-				auth: &idp.RedirectAuth{RedirectURL: "https://login.microsoftonline.com/tenant/oauth2/v2.0/authorize?client_id=clientID&prompt=select_account&redirect_uri=url&response_type=code&scope=openid+profile+User.Read&state=id"},
+				auth:       &idp.RedirectAuth{RedirectURL: "https://login.microsoftonline.com/tenant/oauth2/v2.0/authorize?client_id=clientID&prompt=select_account&redirect_uri=url&response_type=code&scope=openid+profile+User.Read&state=id"},
+				expectPKCE: true,
 			},
 		},
 	}
