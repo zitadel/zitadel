@@ -76,7 +76,7 @@ func (c *Commands) createUserPasskey(ctx context.Context, userID, resourceOwner,
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	return c.addHumanWebAuthN(ctx, userID, resourceOwner, rpID, passwordlessTokens, authenticator, domain.UserVerificationRequirementRequired)
+	return c.addHumanWebAuthN(ctx, userID, resourceOwner, rpID, passwordlessTokens, authenticator, domain.UserVerificationRequirementRequired, domain.ResidentKeyRequirementRequired)
 }
 
 func (c *Commands) pushUserPasskey(ctx context.Context, wm *HumanWebAuthNWriteModel, userAgg *eventstore.Aggregate, webAuthN *domain.WebAuthNToken, events ...eventCallback) (*domain.WebAuthNRegistrationDetails, error) {
