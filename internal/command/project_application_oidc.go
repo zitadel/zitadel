@@ -69,6 +69,18 @@ func (c *Commands) AddOIDCAppCommand(app *addOIDCApp) preparation.Validation {
 			}
 		}
 
+		for _, redirectURI := range app.RedirectUris {
+			if _, err := url.Parse(strings.TrimSpace(redirectURI)); err != nil {
+				return nil, zerrors.ThrowInvalidArgument(err, "COMMAND-2n8ms", "Errors.Invalid.Argument")
+			}
+		}
+
+		for _, postLogoutRedirectURI := range app.PostLogoutRedirectUris {
+			if _, err := url.Parse(strings.TrimSpace(postLogoutRedirectURI)); err != nil {
+				return nil, zerrors.ThrowInvalidArgument(err, "COMMAND-2n9ms", "Errors.Invalid.Argument")
+			}
+		}
+
 		if !domain.ContainsRequiredGrantTypes(app.ResponseTypes, app.GrantTypes) {
 			return nil, zerrors.ThrowInvalidArgument(nil, "V2-sLpW1", "Errors.Invalid.Argument")
 		}
