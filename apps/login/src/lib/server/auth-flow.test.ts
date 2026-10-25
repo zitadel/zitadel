@@ -83,6 +83,18 @@ describe("completeAuthFlow", () => {
     expect(redirect).not.toHaveBeenCalled();
   });
 
+  test("returns a callback URL with a semicolon for client-side navigation", async () => {
+    const { loginWithOIDCAndSession } = await import("@/lib/oidc");
+    const { redirect } = await import("next/navigation");
+    const url = "https://app.example.com/callback;tenant=foo?code=abc&state=xyz";
+    vi.mocked(loginWithOIDCAndSession).mockResolvedValue({ redirect: url });
+
+    await expect(completeAuthFlow({ sessionId: "session", requestId: "oidc_request" })).resolves.toEqual({
+      redirect: url,
+    });
+    expect(redirect).not.toHaveBeenCalled();
+  });
+
   test("does not redirect to an unsafe URL", async () => {
     const { loginWithOIDCAndSession } = await import("@/lib/oidc");
     const { redirect } = await import("next/navigation");

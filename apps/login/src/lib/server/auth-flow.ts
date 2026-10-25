@@ -28,11 +28,13 @@ async function loadSessions({ serviceConfig, ids }: { serviceConfig: ServiceConf
 /**
  * Ends the server action with an HTTP redirect to an absolute callback URL.
  * Returning the URL instead makes Next.js stream a re-render of the page after it, which Firefox aborts on navigation.
+ * URLs with a literal semicolon keep the client-side navigation, because the client cuts the redirect header at the first semicolon.
  */
 function redirectToCallback(result: object) {
   if (
     "redirect" in result &&
     typeof result.redirect === "string" &&
+    !result.redirect.includes(";") &&
     isSafeRedirectUri(result.redirect) &&
     isExternalUrl(result.redirect)
   ) {
