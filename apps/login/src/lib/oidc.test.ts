@@ -72,7 +72,7 @@ describe("loginWithOIDCAndSession", () => {
     } as any);
 
     const result = await loginWithOIDCAndSession({
-      serviceUrl: mockServiceUrl,
+      serviceConfig: { baseUrl: mockServiceUrl },
       authRequest: mockAuthRequest,
       sessionId: mockSessionId,
       sessions: mockSessions,
@@ -89,7 +89,7 @@ describe("loginWithOIDCAndSession", () => {
     });
 
     const result = await loginWithOIDCAndSession({
-      serviceUrl: mockServiceUrl,
+      serviceConfig: { baseUrl: mockServiceUrl },
       authRequest: mockAuthRequest,
       sessionId: mockSessionId,
       sessions: mockSessions,
@@ -106,7 +106,7 @@ describe("loginWithOIDCAndSession", () => {
 
   it("should return error when session not found", async () => {
     const result = await loginWithOIDCAndSession({
-      serviceUrl: mockServiceUrl,
+      serviceConfig: { baseUrl: mockServiceUrl },
       authRequest: mockAuthRequest,
       sessionId: "nonexistent",
       sessions: mockSessions,
@@ -120,7 +120,7 @@ describe("loginWithOIDCAndSession", () => {
     vi.mocked(sessionModule.isSessionValid).mockResolvedValue(true);
 
     const result = await loginWithOIDCAndSession({
-      serviceUrl: mockServiceUrl,
+      serviceConfig: { baseUrl: mockServiceUrl },
       authRequest: mockAuthRequest,
       sessionId: mockSessionId,
       sessions: mockSessions,
@@ -139,7 +139,7 @@ describe("loginWithOIDCAndSession", () => {
     } as any);
 
     const result = await loginWithOIDCAndSession({
-      serviceUrl: mockServiceUrl,
+      serviceConfig: { baseUrl: mockServiceUrl },
       authRequest: mockAuthRequest,
       sessionId: mockSessionId,
       sessions: mockSessions,
@@ -156,7 +156,7 @@ describe("loginWithOIDCAndSession", () => {
     vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({} as any);
 
     const result = await loginWithOIDCAndSession({
-      serviceUrl: mockServiceUrl,
+      serviceConfig: { baseUrl: mockServiceUrl },
       authRequest: mockAuthRequest,
       sessionId: mockSessionId,
       sessions: mockSessions,
@@ -179,7 +179,7 @@ describe("loginWithOIDCAndSession", () => {
     });
 
     const result = await loginWithOIDCAndSession({
-      serviceUrl: mockServiceUrl,
+      serviceConfig: { baseUrl: mockServiceUrl },
       authRequest: mockAuthRequest,
       sessionId: mockSessionId,
       sessions: mockSessions,
@@ -198,7 +198,7 @@ describe("loginWithOIDCAndSession", () => {
     } as any);
 
     const result = await loginWithOIDCAndSession({
-      serviceUrl: mockServiceUrl,
+      serviceConfig: { baseUrl: mockServiceUrl },
       authRequest: mockAuthRequest,
       sessionId: mockSessionId,
       sessions: mockSessions,
@@ -222,7 +222,7 @@ describe("loginWithOIDCAndSession", () => {
     } as any);
 
     const result = await loginWithOIDCAndSession({
-      serviceUrl: mockServiceUrl,
+      serviceConfig: { baseUrl: mockServiceUrl },
       authRequest: mockAuthRequest,
       sessionId: mockSessionId,
       sessions: mockSessions,
