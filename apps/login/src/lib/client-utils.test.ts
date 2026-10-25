@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { isExternalUrl, isSafeRedirectUri } from "./client-utils";
+import { isExternalUrl, isRedirectError, isSafeRedirectUri } from "./client-utils";
 
 describe("isSafeRedirectUri", () => {
   beforeEach(() => {
@@ -72,5 +72,20 @@ describe("isExternalUrl", () => {
   test("should return true for protocol-relative URLs", () => {
     expect(isExternalUrl("//evil.com")).toBe(true);
     expect(isExternalUrl("//example.com/path")).toBe(true);
+  });
+});
+
+describe("isRedirectError", () => {
+  test("should return true for the error Next.js throws to redirect", () => {
+    const error = Object.assign(new Error("NEXT_REDIRECT"), {
+      digest: "NEXT_REDIRECT;push;https://app.example.com/callback;307;",
+    });
+    expect(isRedirectError(error)).toBe(true);
+  });
+
+  test("should return false for other errors", () => {
+    expect(isRedirectError(new Error("Could not verify password"))).toBe(false);
+    expect(isRedirectError(Object.assign(new Error("not found"), { digest: "NEXT_HTTP_ERROR_FALLBACK;404" }))).toBe(false);
+    expect(isRedirectError(undefined)).toBe(false);
   });
 });

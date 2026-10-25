@@ -1,7 +1,7 @@
 "use client";
 
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from "@/helpers/validators";
-import { handleServerActionResponse } from "@/lib/client-utils";
+import { handleServerActionResponse, isRedirectError } from "@/lib/client-utils";
 import { registerUser } from "@/lib/server/register";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useTranslations } from "next-intl";
@@ -71,7 +71,8 @@ export function SetRegisterPasswordForm({
       });
 
       handleServerActionResponse(response, router, setSamlData, setError);
-    } catch {
+    } catch (error) {
+      if (isRedirectError(error)) return;
       setError(t("errors.couldNotRegisterUser"));
     } finally {
       setLoading(false);

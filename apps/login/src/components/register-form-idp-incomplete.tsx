@@ -1,6 +1,6 @@
 "use client";
 
-import { handleServerActionResponse } from "@/lib/client-utils";
+import { handleServerActionResponse, isRedirectError } from "@/lib/client-utils";
 import { registerUserAndLinkToIDP } from "@/lib/server/register";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -81,7 +81,8 @@ export function RegisterFormIDPIncomplete({
       });
 
       handleServerActionResponse(response, router, setSamlData, setError);
-    } catch {
+    } catch (error) {
+      if (isRedirectError(error)) return;
       setError("Could not register user");
     } finally {
       setLoading(false);

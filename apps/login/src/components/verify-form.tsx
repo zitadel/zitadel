@@ -1,7 +1,7 @@
 "use client";
 
 import { Alert, AlertType } from "@/components/alert";
-import { handleServerActionResponse } from "@/lib/client-utils";
+import { handleServerActionResponse, isRedirectError } from "@/lib/client-utils";
 import { UNKNOWN_USER_ID } from "@/lib/constants";
 import { resendVerification, sendVerification } from "@/lib/server/verify";
 import { useTranslations } from "next-intl";
@@ -104,7 +104,8 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
         });
 
         handleServerActionResponse(response, router, setSamlData, setError);
-      } catch {
+      } catch (error) {
+        if (isRedirectError(error)) return;
         setError(t("errors.couldNotVerifyUser"));
       } finally {
         setLoading(false);

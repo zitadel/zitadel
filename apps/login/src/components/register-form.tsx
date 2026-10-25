@@ -1,6 +1,6 @@
 "use client";
 
-import { handleServerActionResponse } from "@/lib/client-utils";
+import { handleServerActionResponse, isRedirectError } from "@/lib/client-utils";
 import { registerUser } from "@/lib/server/register";
 import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
 import { LoginSettings, PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
@@ -79,7 +79,8 @@ export function RegisterForm({
       handleServerActionResponse(response, router, setSamlData, setError);
 
       return response;
-    } catch {
+    } catch (error) {
+      if (isRedirectError(error)) return;
       setError(t("errors.couldNotRegisterUser"));
     } finally {
       setLoading(false);

@@ -1,7 +1,7 @@
 "use client";
 
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
-import { handleServerActionResponse } from "@/lib/client-utils";
+import { handleServerActionResponse, isRedirectError } from "@/lib/client-utils";
 import { sendPasskey } from "@/lib/server/passkeys";
 import { updateOrCreateSession } from "@/lib/server/session";
 import { create, JsonObject } from "@zitadel/client";
@@ -129,7 +129,8 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
           setError(t("verify.errors.noRedirectProvided"));
         }
       }
-    } catch {
+    } catch (error) {
+      if (isRedirectError(error)) return;
       setError(t("verify.errors.couldNotVerifyPasskey"));
     } finally {
       setLoading(false);

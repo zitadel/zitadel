@@ -1,6 +1,6 @@
 "use client";
 
-import { handleServerActionResponse } from "@/lib/client-utils";
+import { handleServerActionResponse, isRedirectError } from "@/lib/client-utils";
 import { resetPassword, sendPassword } from "@/lib/server/password";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -60,7 +60,8 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
       });
 
       handleServerActionResponse(response, router, setSamlData, setError);
-    } catch {
+    } catch (error) {
+      if (isRedirectError(error)) return;
       setError(t("verify.errors.couldNotVerifyPassword"));
     } finally {
       setLoading(false);
