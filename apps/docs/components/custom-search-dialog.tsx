@@ -14,6 +14,7 @@ import {
     type SharedProps,
 } from 'fumadocs-ui/components/dialog/search';
 import { getVersionFromSlug } from '@/lib/versions';
+import { CircleAlert, Search } from 'lucide-react';
 
 type SearchResultItem = {
     id: string;
@@ -29,32 +30,36 @@ function escapeRegExp(string: string) {
 function formatBreadcrumb(url: string, searchType: 'docs' | 'api'): string[] {
     if (!url) return [];
 
-    let pathname = url;
-    try {
-        pathname = new URL(url).pathname;
-    } catch {
-        // Fallback if the URL is already a relative path
+    const base = typeof window !== 'undefined' ? window.location.origin : 'http://localhost';
+    const basePath = new URL(url, base).pathname;
+
+    // 1. Get all valid segments
+    const segments = basePath.split('/').filter(Boolean);
+
+    // 2. Remove leading 'docs' if present
+    if (segments.length > 0 && segments[0].toLowerCase() === 'docs') {
+        segments.shift();
     }
 
-    const basePath = pathname.split('#')[0];
+    // 3. Remove version segment (e.g., 'v4.17') if it immediately follows 'docs'
+    if (segments.length > 0 && /^v\d+\.\d+$/i.test(segments[0])) {
+        segments.shift();
+    }
 
-    const segments = basePath
-        .split('/')
-        .filter(segment => {
-            if (!segment) return false;
-            const lower = segment.toLowerCase();
+    // 4. For API searches, remove leading 'reference' or 'api'
+    if (searchType === 'api') {
+        while (
+            segments.length > 0 &&
+            (segments[0].toLowerCase() === 'reference' || segments[0].toLowerCase() === 'api')
+        ) {
+            segments.shift();
+        }
+    }
 
-            if (lower === 'docs') return false;
-
-            if (searchType === 'api' && (lower === 'reference' || lower === 'api')) {
-                return false;
-            }
-
-            return true;
-        });
-
-    return segments.map(segment =>
-        segment.split('-')
+    // Remove the last segment (the page itself), decode, and split by hyphens or underscores
+    return segments.slice(0, -1).map(segment =>
+        decodeURIComponent(segment)
+            .split(/[-_]/)
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
             .join(' ')
     );
@@ -175,6 +180,7 @@ export default function CustomSearchDialog(props: SharedProps) {
                     setResults([]);
                 }
             } finally {
+                // Fix: Only clear loading if this specific request wasn't superseded/aborted
                 if (!abortController.signal.aborted) {
                     setIsLoading(false);
                 }
@@ -237,7 +243,7 @@ export default function CustomSearchDialog(props: SharedProps) {
                 {errorMsg && !isLoading && (
                     <div className="flex flex-col items-center justify-center py-10 px-6 text-center">
                         <span className="text-red-500 bg-red-500/10 p-3 rounded-full mb-3">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+                            <CircleAlert className="w-6 h-6" />
                         </span>
                         <p className="text-sm text-foreground font-medium">{errorMsg}</p>
                     </div>
@@ -245,7 +251,7 @@ export default function CustomSearchDialog(props: SharedProps) {
 
                 {!debouncedQuery && !errorMsg && (
                     <div className="flex flex-col items-center justify-center py-12 px-6 text-center text-muted-foreground">
-                        <svg className="mb-4 text-muted-foreground/30" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                        <Search className="w-12 h-12 mb-4 text-muted-foreground/30" />
                         <p className="text-sm font-medium">Type a query to search {searchType === 'docs' ? 'Guides & Docs' : 'API Endpoints'}.</p>
                     </div>
                 )}
