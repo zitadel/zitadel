@@ -1,0 +1,94 @@
+---
+title: ZITADEL Management CLI
+description: "A command-line interface for managing ZITADEL resources via the v2 APIs."
+sidebar_label: Management CLI (zitadel-cli)
+---
+
+> **Not the server binary.** The `zitadel` binary starts and configures the ZITADEL IAM server (for self-hosters). This tool, `zitadel-cli`, is a **management client** — it communicates with a running ZITADEL instance (cloud or self-hosted) via the v2 APIs. Install `zitadel-cli` if you want to manage users, organizations, projects, and other resources.
+
+A command-line interface for managing ZITADEL resources via the v2 APIs. Designed for both humans and AI agents — every command supports JSON input/output, machine-readable discovery via `describe`, and structured error codes.
+
+## Installation
+
+### Build from source
+
+```bash
+pnpm nx run @zitadel/cli:build
+# Binary is output to: .artifacts/bin/<GOOS>/<GOARCH>/zitadel-cli
+```
+
+Or build manually:
+
+```bash
+cd apps/cli && go build -o zitadel-cli .
+```
+
+## Quick Start
+
+### Interactive Browser Login (Device Authorization)
+
+If you haven't configured a ZITADEL application for the CLI yet, run the setup guide:
+
+```bash
+zitadel-cli login setup
+```
+
+Once you have a **Native** application client ID (with **Device Code** grant enabled), run:
+
+```bash
+zitadel-cli login --instance mycompany.zitadel.cloud --client-id <native-app-client-id>
+```
+
+This will display a user code and a verification URL. Visit the URL on any device, enter the code, and authenticate. The CLI will poll for the token and store it locally. Refresh tokens are saved automatically — the CLI will transparently refresh expired access tokens without re-prompting.
+
+### Using a Personal Access Token (PAT)
+
+```bash
+export ZITADEL_TOKEN="your-pat-here"
+zitadel-cli context add --instance mycompany.zitadel.cloud --token "$ZITADEL_TOKEN"
+zitadel-cli users list
+```
+
+## Multiple Contexts
+
+The CLI supports multiple configured instances (contexts):
+
+```bash
+# After logging in, contexts are created automatically
+zitadel-cli login --instance prod.zitadel.cloud --client-id <id> --context prod
+zitadel-cli login --instance staging.zitadel.cloud --client-id <id> --context staging
+
+# Switch between contexts
+zitadel-cli context use prod
+
+# List all contexts
+zitadel-cli context list
+
+# Show current context
+zitadel-cli context current
+```
+
+## Self-Hosted Instances
+
+```bash
+zitadel-cli login --instance https://auth.internal --client-id <id> --context myinstance
+zitadel-cli context use myinstance
+zitadel-cli users list
+```
+
+## Agent-friendly workflows
+
+The CLI supports machine-driven discovery and request composition. Try the following commands to explore:
+
+```bash
+# Discover all command groups, commands, and global flags
+zitadel-cli describe
+
+# List all commands in a group with full metadata
+zitadel-cli describe users
+
+# Inspect one command (flags, types, enum values, and JSON template)
+zitadel-cli describe users create human
+```
+
+For more advanced workflows like JSON payloads and nested oneof flags, run `zitadel-cli --help`.
