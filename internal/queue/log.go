@@ -43,6 +43,11 @@ func (m *logMiddleware) InsertMany(
 	// Only do expensive operations if debug is enabled
 	if m.logger.Enabled(ctx, slog.LevelDebug) {
 		for _, result := range results {
+			// the fast insert path (e.g. InsertManyFastTx) does not return the inserted rows,
+			// so the results only contain nil entries
+			if result == nil || result.Job == nil {
+				continue
+			}
 			logging.Debug(ctx, "inserted job details", attributesFromJobInsertResult(result)...)
 		}
 	}
