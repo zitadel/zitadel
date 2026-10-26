@@ -13,6 +13,7 @@ import localeMk from '@angular/common/locales/mk';
 import localePl from '@angular/common/locales/pl';
 import localePt from '@angular/common/locales/pt';
 import localeZh from '@angular/common/locales/zh';
+import localeZhHant from '@angular/common/locales/zh-Hant';
 import localeRu from '@angular/common/locales/ru';
 import localeNl from '@angular/common/locales/nl';
 import localeSv from '@angular/common/locales/sv';
@@ -99,6 +100,9 @@ registerLocaleData(localePl);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/pl.json'));
 registerLocaleData(localeZh);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/zh.json'));
+// Traditional Chinese (Taiwan). i18n-iso-countries ships no Traditional Chinese
+// country names, CountryCallingCodesService falls back to Intl.DisplayNames.
+registerLocaleData(localeZhHant, 'zh-TW');
 registerLocaleData(localeBg);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/bg.json'));
 registerLocaleData(localePt);
