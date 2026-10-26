@@ -41,7 +41,7 @@ func (es *Eventstore) pushWithoutFunc(ctx context.Context, client database.Query
 		return nil, err
 	}
 	defer func() {
-		err = endPushTx(closeTx, err, recover())
+		err = closeTx(err)
 	}()
 
 	var (

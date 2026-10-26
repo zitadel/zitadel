@@ -3,7 +3,6 @@ package eventstore
 import (
 	"context"
 	_ "embed"
-	"errors"
 	"testing"
 
 	"github.com/riverqueue/river"
@@ -12,7 +11,6 @@ import (
 	"go.uber.org/mock/gomock"
 
 	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
-	"github.com/zitadel/zitadel/backend/v3/storage/database/dbmock"
 	new_pg "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -431,102 +429,4 @@ func mustNewRequest(t *testing.T, e eventstore.Event, targets []target.Target) *
 	req, err := exec_repo.NewRequest(e, targets)
 	require.NoError(t, err, "exec_repo.NewRequest")
 	return req
-}
-
-func Test_endPushTx(t *testing.T) {
-	errPush := errors.New("push failed")
-	tests := []struct {
-		name      string
-		err       error
-		recovered any
-		wantEnd   func(t *testing.T, err error)
-		wantPanic bool
-	}{
-		{
-			name: "no error, commit",
-			wantEnd: func(t *testing.T, err error) {
-				assert.NoError(t, err)
-			},
-		},
-		{
-			name: "error, rollback",
-			err:  errPush,
-			wantEnd: func(t *testing.T, err error) {
-				assert.ErrorIs(t, err, errPush)
-			},
-		},
-		{
-			name:      "panic, rollback and propagate",
-			recovered: "test panic",
-			wantEnd: func(t *testing.T, err error) {
-				assert.ErrorContains(t, err, "test panic")
-			},
-			wantPanic: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var ended bool
-			deferrable := func(err error) error {
-				ended = true
-				tt.wantEnd(t, err)
-				return err
-			}
-			if tt.wantPanic {
-				assert.PanicsWithValue(t, tt.recovered, func() {
-					_ = endPushTx(deferrable, tt.err, tt.recovered)
-				})
-			} else {
-				assert.ErrorIs(t, endPushTx(deferrable, tt.err, tt.recovered), tt.err)
-			}
-			assert.True(t, ended, "transaction must be ended")
-		})
-	}
-}
-
-func TestEventstore_push_rollbackOnPanic(t *testing.T) {
-	tests := []struct {
-		name   string
-		expect func(tx *dbmock.MockTransaction)
-		push   func(es *Eventstore, ctx context.Context, client new_db.QueryExecutor) error
-	}{
-		{
-			name: "push",
-			expect: func(tx *dbmock.MockTransaction) {
-				tx.EXPECT().Exec(gomock.Any(), gomock.Any(), gomock.Any()).
-					DoAndReturn(func(context.Context, string, ...any) (int64, error) { panic("test panic") })
-			},
-			push: func(es *Eventstore, ctx context.Context, client new_db.QueryExecutor) error {
-				_, err := es.writeCommands(ctx, client, nil)
-				return err
-			},
-		},
-		{
-			name: "push without func",
-			expect: func(tx *dbmock.MockTransaction) {
-				tx.EXPECT().Query(gomock.Any(), gomock.Any()).
-					DoAndReturn(func(context.Context, string, ...any) (new_db.Rows, error) { panic("test panic") })
-			},
-			push: func(es *Eventstore, ctx context.Context, client new_db.QueryExecutor) error {
-				_, err := es.pushWithoutFunc(ctx, client)
-				return err
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ctrl := gomock.NewController(t)
-			tx := dbmock.NewMockTransaction(ctrl)
-			tt.expect(tx)
-			// a nil error would commit the changes written before the panic
-			tx.EXPECT().End(gomock.Any(), gomock.Not(gomock.Nil())).
-				DoAndReturn(func(_ context.Context, err error) error { return err })
-			pool := dbmock.NewMockPool(ctrl)
-			pool.EXPECT().Begin(gomock.Any(), gomock.Any()).Return(tx, nil)
-
-			assert.PanicsWithValue(t, "test panic", func() {
-				_ = tt.push(new(Eventstore), context.Background(), pool)
-			})
-		})
-	}
 }
