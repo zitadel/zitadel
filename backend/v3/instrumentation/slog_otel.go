@@ -34,14 +34,16 @@ func (h *otelLogHandler) Enabled(ctx context.Context, level slog.Level) bool {
 }
 
 func (h *otelLogHandler) Handle(ctx context.Context, record slog.Record) error {
-	if h.replace == nil {
+	if h.replace == nil || record.NumAttrs() == 0 {
 		return h.next.Handle(ctx, record)
 	}
-	replaced := slog.NewRecord(record.Time, record.Level, record.Message, record.PC)
+	attrs := make([]slog.Attr, 0, record.NumAttrs())
 	record.Attrs(func(a slog.Attr) bool {
-		replaced.AddAttrs(h.replaceAttr(h.groups, a))
+		attrs = append(attrs, h.replaceAttr(h.groups, a))
 		return true
 	})
+	replaced := slog.NewRecord(record.Time, record.Level, record.Message, record.PC)
+	replaced.AddAttrs(attrs...)
 	return h.next.Handle(ctx, replaced)
 }
 

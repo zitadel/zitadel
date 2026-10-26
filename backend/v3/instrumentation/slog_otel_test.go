@@ -4,14 +4,18 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"log"
 	"log/slog"
 	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	slogctx "github.com/veqryn/slog-context"
 	"go.opentelemetry.io/otel/attribute"
 	sdk_log "go.opentelemetry.io/otel/sdk/log"
+
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func Test_otelLogHandler(t *testing.T) {
@@ -137,23 +141,21 @@ func Test_otelLogHandler(t *testing.T) {
 }
 
 func Test_setLogger_otelExporter(t *testing.T) {
-	defaultLogger := slog.Default()
-	t.Cleanup(func() {
-		slog.SetDefault(defaultLogger)
-	})
+	restoreGlobalLogger(t)
 
 	exporter := new(recordingExporter)
 	provider := sdk_log.NewLoggerProvider(sdk_log.WithProcessor(sdk_log.NewSimpleProcessor(exporter)))
 	setLogger(provider, LogConfig{
-		Level:  slog.LevelInfo,
-		Format: LogFormatDisabled,
+		Level:     slog.LevelInfo,
+		Format:    LogFormatDisabled,
+		AddSource: true,
 		Mask: MaskConfig{
-			Keys:  []string{"sensitive"},
+			Keys:  []string{"sensitive", "ctx_sensitive"},
 			Value: "masked",
 		},
 	})
 
-	ctx := context.Background()
+	ctx := slogctx.Prepend(context.Background(), "ctx_sensitive", "value", "ctx_key", "value")
 	assert.False(t, slog.Default().Enabled(ctx, slog.LevelDebug))
 	assert.True(t, slog.Default().Enabled(ctx, slog.LevelInfo))
 
@@ -162,8 +164,44 @@ func Test_setLogger_otelExporter(t *testing.T) {
 
 	records := exporter.get()
 	require.Len(t, records, 2) // the first is the "structured logger configured" record
-	assert.Equal(t, "info", records[1].body)
-	assert.Equal(t, map[string]string{"sensitive": "masked", "key": "value"}, records[1].attributes)
+	got := records[1]
+	assert.Equal(t, "info", got.body)
+	for key, want := range map[string]string{
+		"sensitive":     "masked",
+		"key":           "value",
+		"ctx_sensitive": "masked",
+		"ctx_key":       "value",
+	} {
+		assert.Equal(t, want, got.attributes[key], key)
+	}
+	assert.Contains(t, got.attributes, "code.function.name")
+}
+
+// restoreGlobalLogger restores the global state changed by [setLogger] after the test.
+func restoreGlobalLogger(t *testing.T) {
+	t.Helper()
+	defaultLogger := slog.Default()
+	logWriter, logFlags := log.Writer(), log.Flags()
+	addSource := addSourceEnabled.Load()
+	var streams []Stream
+	for _, stream := range StreamValues() {
+		if IsStreamEnabled(stream) {
+			streams = append(streams, stream)
+		}
+	}
+	t.Cleanup(func() {
+		// slog.SetDefault redirects the log package to the new handler,
+		// but restoring the default handler does not undo it.
+		slog.SetDefault(defaultLogger)
+		log.SetOutput(logWriter)
+		log.SetFlags(logFlags)
+		addSourceEnabled.Store(addSource)
+		EnableStreams(streams...)
+		// zerrors has no getters, reset to the package defaults.
+		zerrors.EnableReportLocation(false)
+		zerrors.EnableStackTrace(false)
+		zerrors.GCPErrorReportingEnabled(false)
+	})
 }
 
 type exportedRecord struct {

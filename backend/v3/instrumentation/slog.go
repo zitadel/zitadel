@@ -65,8 +65,8 @@ func (c *LogConfig) SetLegacyConfig(lc *old_logging.Config) {
 
 func (c LogConfig) replacer() replacer {
 	var replacers []replacer
-	if len(c.Mask.Keys) > 0 {
-		replacers = append(replacers, c.Mask.replacer())
+	if mask := c.Mask.replacer(); mask != nil {
+		replacers = append(replacers, mask)
 	}
 	if c.Format == LogFormatGCP {
 		replacers = append(replacers, sloggcp.ReplaceAttr)
@@ -86,7 +86,11 @@ type MaskConfig struct {
 // one of the configured keys with the configured value.
 // If a group key matches, all attribute values in that group are replaced.
 // Attribute structure is preserved, e.g. "password" is replaced with "masked" but still appears as "password" in the logs.
+// It returns nil when no keys are configured.
 func (c MaskConfig) replacer() replacer {
+	if len(c.Keys) == 0 {
+		return nil
+	}
 	keys := slices.Clone(c.Keys)
 	slices.Sort(keys)
 	return func(groups []string, a slog.Attr) slog.Attr {
@@ -153,8 +157,21 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 	zerrors.EnableReportLocation(cfg.Errors.ReportLocation)
 	zerrors.EnableStackTrace(cfg.Errors.StackTrace)
 
-	stdErrHandler = slogctx.NewHandler(
-		stdErrHandler,
+	// only masking applies to OTEL, the other replacers are specific to the standard error formats
+	otelHandler := newOTELLogHandler(
+		otelslog.NewHandler(
+			Name,
+			otelslog.WithLoggerProvider(provider),
+			otelslog.WithSource(cfg.AddSource),
+		),
+		cfg.Level,
+		cfg.Mask.replacer(),
+	)
+
+	// The context attributes are added before the fanout,
+	// so that both handlers receive and mask the same attributes.
+	handler := slogctx.NewHandler(
+		slogmulti.Fanout(stdErrHandler, otelHandler),
 		&slogctx.HandlerOptions{
 			Prependers: []slogctx.AttrExtractor{
 				causeExtractor,
@@ -165,21 +182,7 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 		},
 	)
 
-	// only masking applies to OTEL, the other replacers are specific to the standard error formats
-	var otelReplacer replacer
-	if len(cfg.Mask.Keys) > 0 {
-		otelReplacer = cfg.Mask.replacer()
-	}
-	otelHandler := newOTELLogHandler(
-		otelslog.NewHandler(
-			Name,
-			otelslog.WithLoggerProvider(provider),
-		),
-		cfg.Level,
-		otelReplacer,
-	)
-
-	logger := slog.New(slogmulti.Fanout(stdErrHandler, otelHandler))
+	logger := slog.New(handler)
 	logger.Info("structured logger configured", "config_level", cfg.Level, "format", cfg.Format)
 	slog.SetDefault(logger)
 }
