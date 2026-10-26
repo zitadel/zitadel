@@ -26,21 +26,43 @@ function escapeRegExp(string: string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+function formatBreadcrumb(url: string): string[] {
+    if (!url) return [];
+
+    let pathname = url;
+    try {
+        pathname = new URL(url).pathname;
+    } catch {
+        // If the URL is relative, we can still process it
+    }
+
+    const basePath = pathname.split('#')[0];
+    const segments = basePath
+        .split('/')
+        .filter(segment => segment && segment.toLowerCase() !== 'docs');
+
+    return segments.map(segment =>
+        segment.split('-')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ')
+    );
+}
+
 const HighlightMatch = ({ text, query }: { text: string; query: string }) => {
     if (!query || !text) {
-        return <span className="text-xs text-muted-foreground line-clamp-2">{text}</span>;
+        return <span className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">{text}</span>;
     }
 
     const safeRegex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
     const parts = text.split(safeRegex);
 
     return (
-        <span className="text-xs text-muted-foreground line-clamp-2">
+        <span className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
             {parts.map((part, i) =>
                 part.toLowerCase() === query.toLowerCase() ? (
                     <mark
                         key={i}
-                        className="bg-primary/20 text-primary font-semibold rounded-sm px-1 py-0.5"
+                        className="bg-primary/20 text-primary font-medium rounded-sm px-0.5 py-0.5"
                     >
                         {part}
                     </mark>
@@ -58,8 +80,6 @@ export default function CustomSearchDialog(props: SharedProps) {
     const [searchType, setSearchType] = useState<'docs' | 'api'>('docs');
     const [results, setResults] = useState<SearchResultItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-
-    // New error state to track backend failures
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     const params = useParams();
@@ -104,12 +124,25 @@ export default function CustomSearchDialog(props: SharedProps) {
 
                     if (!seenUrls.has(targetUrl)) {
                         seenUrls.add(targetUrl);
+                        const breadcrumbs = formatBreadcrumb(targetUrl);
 
                         formattedResults.push({
                             id: targetUrl,
                             content: (
-                                <div className="flex flex-col gap-1 py-0.5">
-                                    <span className="font-medium text-foreground">
+                                // UI Polish: Increased padding and gap for better readability
+                                <div className="flex flex-col gap-1.5 py-1">
+                                    {/* Breadcrumb Display */}
+                                    {breadcrumbs.length > 0 && (
+                                        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider">
+                                            {breadcrumbs.map((crumb, idx) => (
+                                                <span key={idx} className="flex items-center gap-1.5">
+                                                    {idx > 0 && <span className="text-muted-foreground/40">›</span>}
+                                                    <span className="truncate max-w-[120px]">{crumb}</span>
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+                                    <span className="font-semibold text-foreground text-base">
                                         {item.title || 'Documentation Page'}
                                     </span>
                                     <HighlightMatch text={item.description || ''} query={debouncedQuery} />
@@ -132,7 +165,6 @@ export default function CustomSearchDialog(props: SharedProps) {
                     setResults([]);
                 }
             } finally {
-                // Fix: Only clear loading if this specific request wasn't superseded/aborted
                 if (!abortController.signal.aborted) {
                     setIsLoading(false);
                 }
@@ -152,7 +184,7 @@ export default function CustomSearchDialog(props: SharedProps) {
         >
             <SearchDialogOverlay />
             <SearchDialogContent>
-                <SearchDialogHeader className="flex flex-col gap-2 border-b pb-2">
+                <SearchDialogHeader className="flex flex-col gap-3 border-b pb-3">
                     <div className="flex items-center gap-2 w-full">
                         <SearchDialogIcon />
                         <SearchDialogInput placeholder={searchType === 'docs' ? 'Search documentation...' : 'Search API endpoints...'} />
@@ -166,13 +198,13 @@ export default function CustomSearchDialog(props: SharedProps) {
                         <SearchDialogClose />
                     </div>
 
-                    <div className="flex justify-start w-full gap-1 px-3 pt-1">
+                    <div className="flex justify-start w-full gap-2 px-3">
                         <button
                             type="button"
                             onClick={() => setSearchType('docs')}
-                            className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${searchType === 'docs'
-                                ? 'bg-primary/10 text-primary border border-primary/20'
-                                : 'text-muted-foreground hover:bg-muted'
+                            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 ${searchType === 'docs'
+                                ? 'bg-primary text-primary-foreground shadow-sm'
+                                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                                 }`}
                         >
                             Guides & Docs
@@ -180,9 +212,9 @@ export default function CustomSearchDialog(props: SharedProps) {
                         <button
                             type="button"
                             onClick={() => setSearchType('api')}
-                            className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${searchType === 'api'
-                                ? 'bg-primary/10 text-primary border border-primary/20'
-                                : 'text-muted-foreground hover:bg-muted'
+                            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 ${searchType === 'api'
+                                ? 'bg-primary text-primary-foreground shadow-sm'
+                                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                                 }`}
                         >
                             API Endpoints
@@ -192,22 +224,28 @@ export default function CustomSearchDialog(props: SharedProps) {
 
                 {results.length > 0 && <SearchDialogList items={results} />}
 
-                {/* Explicit Error State */}
                 {errorMsg && !isLoading && (
-                    <div className="p-6 text-center text-sm text-red-500 font-medium">
-                        {errorMsg}
+                    <div className="flex flex-col items-center justify-center py-10 px-6 text-center">
+                        <span className="text-red-500 bg-red-500/10 p-3 rounded-full mb-3">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+                        </span>
+                        <p className="text-sm text-foreground font-medium">{errorMsg}</p>
                     </div>
                 )}
 
                 {!debouncedQuery && !errorMsg && (
-                    <div className="p-6 text-center text-sm text-muted-foreground">
-                        Type a query to search {searchType === 'docs' ? 'Guides & Docs' : 'API Endpoints'}.
+                    <div className="flex flex-col items-center justify-center py-12 px-6 text-center text-muted-foreground">
+                        <svg className="mb-4 text-muted-foreground/30" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                        <p className="text-sm font-medium">Type a query to search {searchType === 'docs' ? 'Guides & Docs' : 'API Endpoints'}.</p>
                     </div>
                 )}
 
                 {!isLoading && debouncedQuery && results.length === 0 && !errorMsg && (
-                    <div className="p-6 text-center text-sm text-muted-foreground">
-                        No results found in {searchType === 'docs' ? 'Docs' : 'API Endpoints'} for "<span className="font-semibold text-foreground">{debouncedQuery}</span>".
+                    <div className="flex flex-col items-center justify-center py-12 px-6 text-center text-muted-foreground">
+                        <p className="text-sm font-medium">
+                            No results found in {searchType === 'docs' ? 'Docs' : 'API Endpoints'} for "<span className="font-semibold text-foreground">{debouncedQuery}</span>".
+                        </p>
+                        <p className="text-xs mt-2">Try adjusting your search terms or checking for typos.</p>
                     </div>
                 )}
             </SearchDialogContent>
