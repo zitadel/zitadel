@@ -1,0 +1,1423 @@
+Errors:
+  Internal: "Vyskytla sa interná chyba"
+  NoChangesFound: "Žiadne zmeny"
+  OriginNotAllowed: "Tento „Origin“ nie je povolený"
+  IDMissing: "Chýba ID"
+  ResourceOwnerMissing: "Chýba organizácia vlastníka zdroja"
+  RemoveFailed: "Nepodarilo sa odstrániť"
+  PermissionDenied: "Prístup zamietnutý"
+  ProjectionName:
+    Invalid: "Neplatný názov projekcie"
+  Assets:
+    EmptyKey: "Kľúč assetu je prázdny"
+    Store:
+      NotInitialized: "Úložisko assetov nie je inicializované"
+      NotConfigured: "Úložisko assetov nie je nakonfigurované"
+    Bucket:
+      Internal: "Interná chyba pri vytváraní bucketu"
+      AlreadyExists: "Bucket už existuje"
+      CreateFailed: "Bucket nebol vytvorený"
+      ListFailed: "Buckety sa nepodarilo načítať"
+      RemoveFailed: "Bucket nebol odstránený"
+      SetPublicFailed: "Bucket sa nepodarilo nastaviť ako verejný"
+    Object:
+      PutFailed: "Objekt nebol vytvorený"
+      GetFailed: "Objekt sa nepodarilo načítať"
+      NotFound: "Objekt sa nepodarilo nájsť"
+      PresignedTokenFailed: "Podpísaný token sa nepodarilo vytvoriť"
+      ListFailed: "Zoznam objektov sa nepodarilo načítať"
+      RemoveFailed: "Objekt sa nepodarilo odstrániť"
+  Limit:
+    ExceedsDefault: "Limit prekračuje predvolený limit"
+  Limits:
+    NotFound: "Limity sa nenašli"
+    NoneSpecified: "Neboli zadané žiadne limity"
+    Instance:
+      Blocked: "Inštancia je zablokovaná"
+  Restrictions:
+    NoneSpecified: "Neboli zadané žiadne obmedzenia"
+    DefaultLanguageMustBeAllowed: "Predvolený jazyk musí byť povolený"
+  Language:
+    NotParsed: "Jazyk sa nepodarilo spracovať"
+    NotSupported: "Jazyk nie je podporovaný"
+    NotAllowed: "Jazyk nie je povolený"
+    Undefined: "Jazyk nie je určený"
+    Duplicate: "V jazykoch sú duplicity"
+  OIDCSettings:
+    NotFound: "Konfigurácia OIDC sa nenašla"
+    AlreadyExists: "Konfigurácia OIDC už existuje"
+  SecretGenerator:
+    AlreadyExists: "Generátor tajných kódov už existuje"
+    TypeMissing: "Chýba typ generátora tajných kódov"
+    NotFound: "Generátor tajných kódov sa nenašiel"
+  SMSConfig:
+    NotFound: "Konfigurácia SMS sa nenašla"
+    AlreadyActive: "Konfigurácia SMS je už aktívna"
+    AlreadyDeactivated: "Konfigurácia SMS je už deaktivovaná"
+    NotExternalVerification: "Konfigurácia SMS nepodporuje overovanie kódom"
+  SMTP:
+    NotEmailMessage: "správa nie je typu EmailMessage"
+    RequiredAttributes: "predmet, príjemcovia a obsah musia byť vyplnené, ale niektoré z nich alebo všetky sú prázdne"
+    CouldNotSplit: "nepodarilo sa rozdeliť hostiteľa a port pre pripojenie k SMTP"
+    CouldNotDial: "nepodarilo sa spojiť so SMTP serverom, skontrolujte port, prípadné problémy s firewallom..."
+    CouldNotDialTLS: "nepodarilo sa spojiť so SMTP serverom cez TLS, skontrolujte port, prípadné problémy s firewallom..."
+    CouldNotCreateClient: "nepodarilo sa vytvoriť SMTP klienta"
+    CouldNotStartTLS: "nepodarilo sa spustiť TLS"
+    CouldNotAuth: "nepodarilo sa pridať overenie SMTP, skontrolujte, či sú vaše používateľské meno aj heslo správne; ak sú správne, váš poskytovateľ možno vyžaduje metódu overenia, ktorú Zitadel nepodporuje"
+    CouldNotSetSender: "nepodarilo sa nastaviť odosielateľa"
+    CouldNotSetRecipient: "nepodarilo sa nastaviť príjemcu"
+  SMTPConfig:
+    TestPassword: "Heslo pre test sa nenašlo"
+    NotFound: "Konfigurácia SMTP sa nenašla"
+    AlreadyExists: "Konfigurácia SMTP už existuje"
+    AlreadyDeactivated: "Konfigurácia SMTP je už deaktivovaná"
+    SenderAdressNotCustomDomain: "Adresa odosielateľa musí byť na inštancii nastavená ako vlastná doména."
+    TestEmailNotFound: "E-mailová adresa pre test sa nenašla"
+  Notification:
+    NoDomain: "Pre správu sa nenašla žiadna doména"
+  User:
+    NotFound: "Používateľa sa nepodarilo nájsť"
+    AlreadyExists: "Používateľ už existuje"
+    NotFoundOnOrg: "Používateľa sa vo zvolenej organizácii nepodarilo nájsť"
+    NotAllowedOrg: "Používateľ nie je členom požadovanej organizácie"
+    UserIDMissing: "Chýba ID používateľa"
+    UserIDWrong: "Používateľ v požiadavke sa nezhoduje s prihláseným používateľom"
+    DomainPolicyNil: "Politika organizácie je prázdna"
+    EmailAsUsernameNotAllowed: "E-mail nie je povolený ako používateľské meno"
+    Invalid: "Používateľské údaje sú neplatné"
+    DomainNotAllowedAsUsername: "Doména je už rezervovaná a nedá sa použiť"
+    AlreadyInactive: "Používateľ je už neaktívny"
+    NotInactive: "Používateľ nie je neaktívny"
+    CantDeactivateInitial: "Používateľa v počiatočnom stave možno iba odstrániť, nie deaktivovať"
+    ShouldBeActiveOrInitial: "Používateľ nie je aktívny ani v počiatočnom stave"
+    AlreadyInitialised: "Používateľ je už inicializovaný"
+    NotInitialised: "Používateľ ešte nie je inicializovaný"
+    NotLocked: "Používateľ nie je zablokovaný"
+    NoChanges: "Nenašli sa žiadne zmeny"
+    InitCodeNotFound: "Inicializačný kód sa nenašiel"
+    UsernameNotChanged: "Používateľské meno sa nezmenilo"
+    InvalidURLTemplate: "Šablóna URL je neplatná"
+    Locked: "Používateľ je zablokovaný"
+    Profile:
+      NotFound: "Profil sa nenašiel"
+      NotChanged: "Profil sa nezmenil"
+      Empty: "Profil je prázdny"
+      FirstNameEmpty: "Meno v profile je prázdne"
+      LastNameEmpty: "Priezvisko v profile je prázdne"
+      IDMissing: "Chýba ID profilu"
+    Email:
+      NotFound: "E-mail sa nenašiel"
+      Invalid: "E-mail je neplatný"
+      AlreadyVerified: "E-mail je už overený"
+      NotChanged: "E-mail sa nezmenil"
+      Empty: "E-mail je prázdny"
+      IDMissing: "Chýba ID e-mailu"
+    Phone:
+      NotFound: "Telefónne číslo sa nenašlo"
+      Invalid: "Telefónne číslo je neplatné"
+      AlreadyVerified: "Telefónne číslo je už overené"
+      Empty: "Telefónne číslo je prázdne"
+      NotChanged: "Telefónne číslo sa nezmenilo"
+      VerifyingRemovalIsNotSupported: "Overovanie odstránenia telefónneho čísla nie je podporované"
+    Address:
+      NotFound: "Adresa sa nenašla"
+      NotChanged: "Adresa sa nezmenila"
+    Machine:
+      Key:
+        NotFound: "Kľúč technického používateľa sa nenašiel"
+        AlreadyExisting: "Kľúč technického používateľa už existuje"
+        Invalid: "Verejný kľúč nie je platný verejný RSA kľúč vo formáte PKIX s kódovaním PEM"
+      Secret:
+        NotExisting: "Tajný kľúč neexistuje"
+        Invalid: "Tajný kľúč je neplatný"
+        CouldNotGenerate: "Tajný kľúč sa nepodarilo vygenerovať"
+    PAT:
+      NotFound: "Osobný prístupový token sa nenašiel"
+    Metadata:
+      Conflicting: "Metadáta nesmú byť nastavené súčasne v poliach user aj human"
+    NotHuman: "Používateľ musí byť osobný"
+    NotMachine: "Používateľ musí byť technický"
+    WrongType: "Nie je povolené pre tento typ používateľa"
+    NotAllowedToLink: "Používateľ nesmie byť prepojený s externým poskytovateľom prihlásenia"
+    Username:
+      AlreadyExists: "Používateľské meno je už obsadené"
+      Reserved: "Používateľské meno je už obsadené"
+      Empty: "Používateľské meno je prázdne"
+    Code:
+      Empty: "Kód je prázdny"
+      NotFound: "Kód sa nenašiel"
+      Expired: "Platnosť kódu vypršala"
+      GeneratorAlgNotSupported: "Nepodporovaný algoritmus generátora"
+      Invalid: "Kód je neplatný"
+    Password:
+      NotFound: "Heslo sa nenašlo"
+      Empty: "Heslo je prázdne"
+      Invalid: "Heslo je neplatné"
+      NotSet: "Používateľ si nenastavil heslo"
+      NotChanged: "Nové heslo nemôže byť rovnaké ako vaše súčasné heslo"
+      NotSupported: "Kódovanie hashu hesla nie je podporované. Pozrite si https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets"
+    PasswordComplexityPolicy:
+      NotFound: "Politika hesiel sa nenašla"
+      MinLength: "Heslo je príliš krátke"
+      MinLengthNotAllowed: "Zadaná minimálna dĺžka nie je povolená"
+      HasLower: "Heslo musí obsahovať malé písmeno"
+      HasUpper: "Heslo musí obsahovať veľké písmeno"
+      HasNumber: "Heslo musí obsahovať číslicu"
+      HasSymbol: "Heslo musí obsahovať špeciálny znak"
+    ExternalIDP:
+      Invalid: "Externý poskytovateľ identity je neplatný"
+      IDPConfigNotExisting: "Poskytovateľ identity je pre túto organizáciu neplatný"
+      NotAllowed: "Externý poskytovateľ identity nie je povolený"
+      MinimumExternalIDPNeeded: "Musí byť pridaný aspoň jeden poskytovateľ identity"
+      AlreadyExists: "Externý poskytovateľ identity je už obsadený"
+      NotFound: "Externý poskytovateľ identity sa nenašiel"
+      LoginFailed: "Prihlásenie u externého poskytovateľa identity zlyhalo"
+    MFA:
+      OTP:
+        AlreadyReady: "Viacfaktorové OTP (OneTimePassword) je už nastavené"
+        NotExisting: "Viacfaktorové OTP (OneTimePassword) neexistuje"
+        NotReady: "Viacfaktorové OTP (OneTimePassword) nie je pripravené"
+        InvalidCode: "Neplatný kód"
+      U2F:
+        NotExisting: "U2F neexistuje"
+      Passwordless:
+        NotExisting: "Prístupový kľúč neexistuje"
+      RecoveryCodes:
+        Empty: "Obnovovací kód je prázdny"
+        InvalidCode: "Bol zadaný neplatný obnovovací kód"
+        MaxCountExceeded: "Bol prekročený maximálny počet obnovovacích kódov"
+        NotReady: "Obnovovacie kódy nie sú pripravené na použitie"
+        ConfigInvalid: "Konfigurácia obnovovacích kódov je neplatná"
+    WebAuthN:
+      NotFound: "Token WebAuthN sa nepodarilo nájsť"
+      BeginRegisterFailed: "Začiatok registrácie WebAuthN zlyhal"
+      MarshalError: "Chyba pri serializácii údajov"
+      ErrorOnParseCredential: "Chyba pri spracovaní údajov poverenia"
+      CreateCredentialFailed: "Chyba pri vytváraní poverení"
+      BeginLoginFailed: "Začiatok prihlásenia WebAuthN zlyhal"
+      ValidateLoginFailed: "Chyba pri overovaní prihlasovacích poverení"
+      CloneWarning: "Poverenia mohli byť naklonované"
+    RefreshToken:
+      Invalid: "Refresh token je neplatný"
+      NotFound: "Refresh token sa nenašiel"
+  Org:
+    AlreadyExists: "Názov alebo ID organizácie je už obsadené"
+    Invalid: "Organizácia je neplatná"
+    AlreadyDeactivated: "Organizácia je už deaktivovaná"
+    AlreadyActive: "Organizácia je už aktívna"
+    Empty: "Organizácia je prázdna"
+    NotFound: "Organizácia sa nenašla"
+    NotActive: "Organizácia nie je aktívna"
+    NotChanged: "Organizácia sa nezmenila"
+    DefaultOrgNotDeletable: "Predvolená organizácia sa nesmie odstrániť"
+    ZitadelOrgNotDeletable: "Organizácia s projektom Zitadel sa nesmie odstrániť"
+    InvalidDomain: "Neplatná doména"
+    DomainMissing: "Chýba doména"
+    DomainNotOnOrg: "Doména v organizácii neexistuje"
+    DomainNotVerified: "Doména nie je overená"
+    DomainAlreadyVerified: "Doména je už overená"
+    DomainVerificationTypeInvalid: "Typ overenia domény je neplatný"
+    DomainVerificationMissing: "Overenie domény sa ešte nezačalo"
+    DomainVerificationFailed: "Overenie domény zlyhalo"
+    DomainVerificationTXTNotFound: "TXT záznam _zitadel-challenge sa pre vašu doménu nenašiel. Skontrolujte, či ste ho pridali na svoj DNS server, alebo počkajte, kým sa nový záznam rozšíri"
+    DomainVerificationTXTNoMatch: "TXT záznam _zitadel-challenge sa pre vašu doménu našiel, ale neobsahuje správny text tokenu. Skontrolujte, či ste na svoj DNS server pridali správny token, alebo počkajte, kým sa nový záznam rozšíri"
+    DomainVerificationHTTPNotFound: "Súbor s výzvou sa na očakávanej URL adrese nenašiel. Skontrolujte, či ste ho nahrali na správne miesto a s právami na čítanie"
+    DomainVerificationHTTPNoMatch: "Súbor s výzvou sa na očakávanej URL adrese našiel, ale neobsahuje správny text tokenu. Skontrolujte jeho obsah"
+    DomainVerificationTimeout: "Pri dopyte na DNS server vypršal časový limit"
+    PrimaryDomainNotDeletable: "Doména organizácie sa nesmie odstrániť"
+    DomainNotFound: "Doména sa nenašla"
+    MemberIDMissing: "Chýba ID člena"
+    MemberNotFound: "Člen organizácie sa nenašiel"
+    InvalidMember: "Člen organizácie je neplatný"
+    UserIDMissing: "Chýba ID používateľa"
+    PolicyAlreadyExists: "Politika už existuje"
+    PolicyNotExisting: "Politika neexistuje"
+    IdpInvalid: "Konfigurácia poskytovateľa identity je neplatná"
+    IdpNotExisting: "Konfigurácia poskytovateľa identity neexistuje"
+    OIDCConfigInvalid: "Konfigurácia OIDC poskytovateľa identity je neplatná"
+    IdpIsNotOIDC: "Konfigurácia poskytovateľa identity nie je typu oidc"
+    Domain:
+      AlreadyExists: "Doména už existuje"
+      InvalidCharacter: "V doméne sú povolené iba alfanumerické znaky, . a -"
+      EmptyString: "Neplatné nečíselné a nepísmenové znaky boli nahradené prázdnymi medzerami a výsledná doména je prázdny reťazec"
+    LoginPolicy:
+      NotFound: "Politika prihlásenia sa nenašla"
+      Invalid: "Politika prihlásenia je neplatná"
+      RedirectURIInvalid: "Predvolená presmerovacia URI je neplatná"
+      NotExisting: "Politika prihlásenia neexistuje"
+      AlreadyExists: "Politika prihlásenia už existuje"
+      IdpProviderAlreadyExisting: "Poskytovateľ identity už existuje"
+      IdpProviderNotExisting: "Poskytovateľ identity neexistuje"
+      RegistrationNotAllowed: "Registrácia nie je povolená"
+      UsernamePasswordNotAllowed: "Prihlásenie používateľským menom a heslom nie je povolené"
+      MFA:
+        AlreadyExists: "Viacfaktorové overenie už existuje"
+        NotExisting: "Viacfaktorové overenie neexistuje"
+        Unspecified: "Viacfaktorové overenie je neplatné"
+    MailTemplate:
+      NotFound: "Predvolená e-mailová šablóna sa nenašla"
+      NotChanged: "Predvolená e-mailová šablóna sa nezmenila"
+      AlreadyExists: "Predvolená e-mailová šablóna už existuje"
+      Invalid: "Predvolená e-mailová šablóna je neplatná"
+    CustomMessageText:
+      NotFound: "Predvolený text správy sa nenašiel"
+      NotChanged: "Predvolený text správy sa nezmenil"
+      AlreadyExists: "Predvolený text správy už existuje"
+      Invalid: "Predvolený text správy je neplatný"
+    PasswordComplexityPolicy:
+      NotFound: "Politika zložitosti hesla sa nenašla"
+      Empty: "Politika zložitosti hesla je prázdna"
+      NotExisting: "Politika zložitosti hesla neexistuje"
+      AlreadyExists: "Politika zložitosti hesla už existuje"
+    PasswordLockoutPolicy:
+      NotFound: "Politika blokovania hesla sa nenašla"
+      Empty: "Politika blokovania hesla je prázdna"
+      NotExisting: "Politika blokovania hesla neexistuje"
+      AlreadyExists: "Politika blokovania hesla už existuje"
+    PasswordAgePolicy:
+      NotFound: "Politika veku hesla sa nenašla"
+      Empty: "Politika veku hesla je prázdna"
+      NotExisting: "Politika veku hesla neexistuje"
+      AlreadyExists: "Politika veku hesla už existuje"
+    NotificationPolicy:
+      NotFound: "Politika notifikácií sa nenašla"
+      NotChanged: "Politika notifikácií sa nezmenila"
+      AlreadyExists: "Politika notifikácií už existuje"
+    LabelPolicy:
+      NotFound: "Politika vlastného označenia sa nenašla"
+      NotChanged: "Politika vlastného označenia sa nezmenila"
+    IDPConfig:
+      NotExisting: "Konfigurácia poskytovateľa identity neexistuje"
+  Project:
+    ProjectIDMissing: "Chýba ID projektu"
+    AlreadyExists: "Projekt v organizácii už existuje"
+    OrgNotExisting: "Organizácia neexistuje"
+    UserNotExisting: "Používateľ neexistuje"
+    CouldNotGenerateClientSecret: "Tajný kľúč klienta sa nepodarilo vygenerovať"
+    Invalid: "Projekt je neplatný"
+    NotActive: "Projekt nie je aktívny"
+    NotInactive: "Projekt nie je deaktivovaný"
+    NotFound: "Projekt sa nenašiel"
+    UserIDMissing: "Chýba ID používateľa"
+    Member:
+      NotFound: "Člen projektu sa nenašiel"
+      Invalid: "Člen projektu je neplatný"
+      AlreadyExists: "Člen projektu už existuje"
+      NotExisting: "Člen projektu neexistuje"
+    MinimumOneRoleNeeded: "Musí byť pridaná aspoň jedna rola"
+    Role:
+      AlreadyExists: "Rola už existuje"
+      Invalid: "Rola je neplatná"
+      NotExisting: "Rola neexistuje"
+    IDMissing: "Chýba ID"
+    App:
+      AlreadyExists: "Aplikácia už existuje"
+      NotFound: "Aplikácia sa nenašla"
+      Invalid: "Aplikácia je neplatná"
+      NotExisting: "Aplikácia neexistuje"
+      NotActive: "Aplikácia nie je aktívna"
+      NotInactive: "Aplikácia nie je neaktívna"
+      OIDCConfigInvalid: "Konfigurácia OIDC je neplatná"
+      APIConfigInvalid: "Konfigurácia API je neplatná"
+      SAMLConfigInvalid: "Konfigurácia SAML je neplatná"
+      IsNotOIDC: "Aplikácia nie je typu OIDC"
+      IsNotAPI: "Aplikácia nie je typu API"
+      IsNotSAML: "Aplikácia nie je typu SAML"
+      SAMLMetadataMissing: "Chýbajú metadáta SAML"
+      SAMLMetadataFormat: "Chyba formátu metadát SAML"
+      SAMLEntityIDAlreadyExisting: "SAML EntityID už existuje"
+      OIDCAuthMethodNoSecret: "Zvolená metóda overenia OIDC nevyžaduje tajný kľúč"
+      APIAuthMethodNoSecret: "Zvolená metóda overenia API nevyžaduje tajný kľúč"
+      AuthMethodNoPrivateKeyJWT: "Zvolená metóda overenia nevyžaduje kľúč"
+      ClientSecretInvalid: "Tajný kľúč klienta je neplatný"
+      Key:
+        AlreadyExisting: "Kľúč aplikácie už existuje"
+        NotFound: "Kľúč aplikácie sa nenašiel"
+    RequiredFieldsMissing: "Chýbajú niektoré povinné polia"
+    Grant:
+      AlreadyExists: "Grant projektu už existuje"
+      NotFound: "Grant projektu sa nenašiel"
+      Invalid: "Grant projektu je neplatný"
+      NotExisting: "Grant projektu neexistuje"
+      HasNotExistingRole: "Jedna rola v projekte neexistuje"
+      NotActive: "Grant projektu nie je aktívny"
+      NotInactive: "Grant projektu nie je neaktívny"
+  Instance:
+    AlreadyExists: "Inštancia už existuje"
+    NotChanged: "Inštancia sa nezmenila"
+    NotFound: "Inštancia sa nenašla. Skontrolujte, či máte správnu doménu. Pozrite si https://zitadel.com/docs/apis/introduction#domains"
+    Member:
+      RolesNotChanged: "Roly sa nezmenili"
+    MemberInvalid: "Člen je neplatný"
+    MemberAlreadyExisting: "Člen už existuje"
+    MemberNotExisting: "Člen neexistuje"
+    IDMissing: "Chýba ID"
+    IdpInvalid: "Konfigurácia poskytovateľa identity je neplatná"
+    IdpNotExisting: "Konfigurácia poskytovateľa identity neexistuje"
+    OIDCConfigInvalid: "Konfigurácia OIDC poskytovateľa identity je neplatná"
+    IdpIsNotOIDC: "Konfigurácia poskytovateľa identity nie je typu oidc"
+    LoginPolicyInvalid: "Politika prihlásenia je neplatná"
+    LoginPolicyNotExisting: "Politika prihlásenia neexistuje"
+    IdpProviderInvalid: "Poskytovateľ identity je neplatný"
+    LoginPolicy:
+      NotFound: "Predvolená politika prihlásenia sa nenašla"
+      NotChanged: "Predvolená politika prihlásenia sa nezmenila"
+      NotExisting: "Predvolená politika prihlásenia neexistuje"
+      AlreadyExists: "Predvolená politika prihlásenia už existuje"
+      RedirectURIInvalid: "Predvolená presmerovacia URI je neplatná"
+      MFA:
+        AlreadyExists: "Viacfaktorové overenie už existuje"
+        NotExisting: "Viacfaktorové overenie neexistuje"
+        Unspecified: "Viacfaktorové overenie je neplatné"
+      IDP:
+        AlreadyExists: "Poskytovateľ identity už existuje"
+        NotExisting: "Poskytovateľ identity neexistuje"
+        Invalid: "Poskytovateľ identity je neplatný"
+      IDPConfig:
+        AlreadyExists: "Konfigurácia poskytovateľa identity už existuje"
+        NotInactive: "Konfigurácia poskytovateľa identity nie je neaktívna"
+        NotActive: "Konfigurácia poskytovateľa identity nie je aktívna"
+    LabelPolicy:
+      NotFound: "Predvolená politika vlastného označenia sa nenašla"
+      NotChanged: "Predvolená politika vlastného označenia sa nezmenila"
+    MailTemplate:
+      NotFound: "Predvolená e-mailová šablóna sa nenašla"
+      NotChanged: "Predvolená e-mailová šablóna sa nezmenila"
+      AlreadyExists: "Predvolená e-mailová šablóna už existuje"
+      Invalid: "Predvolená e-mailová šablóna je neplatná"
+    CustomMessageText:
+      NotFound: "Predvolený text správy sa nenašiel"
+      NotChanged: "Predvolený text správy sa nezmenil"
+      AlreadyExists: "Predvolený text správy už existuje"
+      Invalid: "Predvolený text správy je neplatný"
+    PasswordComplexityPolicy:
+      NotFound: "Predvolená politika zložitosti hesla sa nenašla"
+      NotExisting: "Predvolená politika zložitosti hesla neexistuje"
+      AlreadyExists: "Predvolená politika zložitosti hesla už existuje"
+      Empty: "Predvolená politika zložitosti hesla je prázdna"
+      NotChanged: "Predvolená politika zložitosti hesla sa nezmenila"
+    PasswordAgePolicy:
+      NotFound: "Predvolená politika veku hesla sa nenašla"
+      NotExisting: "Predvolená politika veku hesla neexistuje"
+      AlreadyExists: "Predvolená politika veku hesla už existuje"
+      Empty: "Predvolená politika veku hesla je prázdna"
+      NotChanged: "Predvolená politika veku hesla sa nezmenila"
+    PasswordLockoutPolicy:
+      NotFound: "Predvolená politika blokovania hesla sa nenašla"
+      NotExisting: "Predvolená politika blokovania hesla neexistuje"
+      AlreadyExists: "Predvolená politika blokovania hesla už existuje"
+      Empty: "Predvolená politika blokovania hesla je prázdna"
+      NotChanged: "Predvolená politika blokovania hesla sa nezmenila"
+    DomainPolicy:
+      NotFound: "Politika domén organizácie sa nenašla"
+      Empty: "Politika domén organizácie je prázdna"
+      NotExisting: "Politika domén organizácie neexistuje"
+      AlreadyExists: "Politika domén organizácie už existuje"
+      NotChanged: "Politika domén organizácie sa nezmenila"
+    NotificationPolicy:
+      NotFound: "Predvolená politika notifikácií sa nenašla"
+      NotChanged: "Predvolená politika notifikácií sa nezmenila"
+      AlreadyExists: "Predvolená politika notifikácií už existuje"
+  Policy:
+    AlreadyExists: "Politika už existuje"
+    Label:
+      Invalid:
+        PrimaryColor: "Primárna farba nie je platná hex hodnota farby"
+        BackgroundColor: "Farba pozadia nie je platná hex hodnota farby"
+        WarnColor: "Farba upozornenia nie je platná hex hodnota farby"
+        FontColor: "Farba písma nie je platná hex hodnota farby"
+        PrimaryColorDark: "Primárna farba (tmavý režim) nie je platná hex hodnota farby"
+        BackgroundColorDark: "Farba pozadia (tmavý režim) nie je platná hex hodnota farby"
+        WarnColorDark: "Farba upozornenia (tmavý režim) nie je platná hex hodnota farby"
+        FontColorDark: "Farba písma (tmavý režim) nie je platná hex hodnota farby"
+  UserGrant:
+    AlreadyExists: "Grant používateľa už existuje"
+    NotFound: "Grant používateľa sa nenašiel"
+    Invalid: "Grant používateľa je neplatný"
+    NotChanged: "Grant používateľa sa nezmenil"
+    IDMissing: "Chýba ID"
+    NoPermissionForProject: "Používateľ nemá k tomuto projektu žiadne oprávnenia"
+    RoleKeyNotFound: "Rola sa nenašla"
+  Member:
+    AlreadyExists: "Člen už existuje"
+  IDPConfig:
+    AlreadyExists: "Konfigurácia poskytovateľa identity s týmto názvom už existuje"
+    NotExisting: "Konfigurácia poskytovateľa identity neexistuje"
+  Changes:
+    NotFound: "Nenašla sa žiadna história"
+    AuditRetention: "História je mimo doby uchovávania auditného protokolu"
+  Token:
+    NotFound: "Token sa nenašiel"
+    Invalid: "Token je neplatný"
+  UserSession:
+    NotFound: "Relácia používateľa sa nenašla"
+  Key:
+    NotFound: "Kľúč sa nenašiel"
+    ExpireBeforeNow: "Dátum vypršania platnosti je v minulosti"
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: "Viacfaktorové overenie je nastavené ako povinné, ale nie sú nakonfigurovaní žiadni použiteľní poskytovatelia. Kontaktujte svojho systémového správcu."
+  Step:
+    Started:
+      AlreadyExists: "Krok „started“ už existuje"
+    Done:
+      AlreadyExists: "Krok „done“ už existuje"
+  CustomText:
+    AlreadyExists: "Vlastný text už existuje"
+    Invalid: "Vlastný text je neplatný"
+    NotFound: "Vlastný text sa nenašiel"
+  TranslationFile:
+    ReadError: "Chyba pri čítaní prekladového súboru"
+    MergeError: "Prekladový súbor sa nepodarilo zlúčiť s vlastnými prekladmi"
+    NotFound: "Prekladový súbor neexistuje"
+  Metadata:
+    NotFound: "Metadáta sa nenašli"
+    NoData: "Zoznam metadát je prázdny"
+    Invalid: "Metadáta sú neplatné"
+    KeyNotExisting: "Jeden alebo viac kľúčov neexistuje"
+  Action:
+    Invalid: "Akcia je neplatná"
+    NotFound: "Akcia sa nenašla"
+    NotActive: "Akcia nie je aktívna"
+    NotInactive: "Akcia nie je neaktívna"
+    MaxAllowed: "Nie sú povolené ďalšie aktívne akcie"
+    NotEnabled: "Funkcia „Action“ nie je zapnutá"
+  Flow:
+    FlowTypeMissing: "Chýba FlowType"
+    Empty: "Tok je už prázdny"
+    WrongTriggerType: "TriggerType je neplatný"
+    NoChanges: "Žiadne zmeny"
+    ActionIDsNotExist: "ActionIDs neexistujú"
+  Query:
+    CloseRows: "SQL príkaz sa nepodarilo dokončiť"
+    SQLStatement: "SQL príkaz sa nepodarilo vytvoriť"
+    InvalidRequest: "Požiadavka je neplatná"
+    TooManyNestingLevels: "Priveľa úrovní vnorenia dopytu (max. 20)"
+    LimitExceeded: "Limit bol prekročený"
+  Quota:
+    AlreadyExists: "Kvóta pre túto jednotku už existuje"
+    NotFound: "Kvóta pre túto jednotku sa nenašla"
+    Invalid:
+      CallURL: "URL adresa volania kvóty je neplatná"
+      Percent: "Percento kvóty je menšie ako 1"
+      Unimplemented: "Kvóty nie sú pre túto jednotku implementované"
+      Amount: "Hodnota kvóty je menšia ako 1"
+      ResetInterval: "Interval resetovania kvóty je kratší ako minúta"
+      Noop: "Neobmedzená kvóta bez notifikácií nemá žiadny účinok"
+    Access:
+      Exhausted: "Kvóta pre overené požiadavky je vyčerpaná"
+    Execution:
+      Exhausted: "Kvóta pre sekundy vykonávania je vyčerpaná"
+  LogStore:
+    Access:
+      StorageFailed: "Uloženie prístupového protokolu do databázy zlyhalo"
+      ScanFailed: "Dopyt na spotrebu overených požiadaviek zlyhal"
+    Execution:
+      StorageFailed: "Uloženie protokolu vykonávania akcií do databázy zlyhalo"
+      ScanFailed: "Dopyt na spotrebu sekúnd vykonávania akcií zlyhal"
+  Session:
+    IDMissing: "Chýba ID relácie"
+    NotFound: "Relácia sa nenašla"
+    NotExisting: "Relácia neexistuje"
+    Terminated: "Relácia už bola ukončená"
+    Expired: "Platnosť relácie vypršala"
+    PositiveLifetime: "Životnosť relácie nesmie byť menšia ako 0"
+    Token:
+      Invalid: "Token relácie je neplatný"
+    WebAuthN:
+      NoChallenge: "Relácia bez výzvy WebAuthN"
+  Intent:
+    IDPMissing: "V požiadavke chýba ID poskytovateľa identity"
+    IDPInvalid: "Poskytovateľ identity je pre túto požiadavku neplatný"
+    ResponseInvalid: "Odpoveď poskytovateľa identity je neplatná"
+    MissingSingleMappingAttribute: "Odpoveď poskytovateľa identity neobsahuje mapovací atribút alebo má viac ako jednu hodnotu"
+    SuccessURLMissing: "V požiadavke chýba URL adresa pre úspech"
+    FailureURLMissing: "V požiadavke chýba URL adresa pre zlyhanie"
+    StateMissing: "V požiadavke chýba parameter state"
+    NotStarted: "Zámer nebol spustený alebo už bol ukončený"
+    NotSucceeded: "Zámer nebol úspešný"
+    Expired: "Platnosť zámeru vypršala"
+    TokenCreationFailed: "Vytvorenie tokenu zlyhalo"
+    InvalidToken: "Token zámeru je neplatný"
+    OtherUser: "Zámer je určený pre iného používateľa"
+  AuthRequest:
+    AlreadyExists: "Autentifikačná požiadavka už existuje"
+    NotExisting: "Autentifikačná požiadavka neexistuje"
+    WrongLoginClient: "Autentifikačnú požiadavku vytvorila iná prihlasovacia aplikácia"
+    AlreadyHandled: "Autentifikačná požiadavka už bola spracovaná"
+  OIDCSession:
+    RefreshTokenInvalid: "Refresh token je neplatný"
+    Token:
+      Invalid: "Token je neplatný"
+      Expired: "Platnosť tokenu vypršala"
+    InvalidClient: "Token nebol vydaný pre túto aplikáciu"
+  SAMLRequest:
+    AlreadyExists: "SAMLRequest už existuje"
+    NotExisting: "SAMLRequest neexistuje"
+    WrongLoginClient: "SAMLRequest vytvorila iná prihlasovacia aplikácia"
+    AlreadyHandled: "SAMLRequest už bol spracovaný"
+  SAMLSession:
+    InvalidClient: "SAMLResponse nebol vydaný pre túto aplikáciu"
+  DeviceAuth:
+    NotFound: "Požiadavka na autorizáciu zariadenia neexistuje"
+    AlreadyHandled: "Požiadavka na autorizáciu zariadenia už bola spracovaná"
+  Feature:
+    NotExisting: "Funkcia neexistuje"
+    TypeNotSupported: "Typ funkcie nie je podporovaný"
+    InvalidValue: "Neplatná hodnota pre túto funkciu"
+  Target:
+    Invalid: "Cieľ je neplatný"
+    NoTimeout: "Cieľ nemá nastavený časový limit"
+    InvalidURL: "Cieľ má neplatnú URL adresu"
+    NotFound: "Cieľ sa nenašiel"
+    InvalidExpirationDate: "Dátum vypršania platnosti kľúča musí byť v budúcnosti"
+    PublicKeyExpired: "Platnosť verejného kľúča cieľa vypršala"
+    PublicKeyActive: "Aktívny verejný kľúč cieľa sa nedá odstrániť"
+    InvalidPublicKey: "Verejný kľúč je neplatný. Musí ísť o verejný RSA alebo ECDSA kľúč vo formáte PKCS#8 s kódovaním PEM"
+  Execution:
+    ConditionInvalid: "Podmienka vykonania je neplatná"
+    Invalid: "Vykonanie je neplatné"
+    NotFound: "Vykonanie sa nenašlo"
+    IncludeNotFound: "Include sa nenašiel"
+    NoTargets: "Nie sú definované žiadne ciele"
+    Failed: "Vykonanie zlyhalo"
+    ResponseIsNotValidJSON: "Odpoveď nie je platný JSON"
+    MissingEncryptionKey: "Pre cieľ sa nenašiel žiadny šifrovací kľúč"
+  UserSchema:
+    NotEnabled: "Funkcia „User Schema“ nie je zapnutá"
+    Type:
+      Missing: "Chýba typ schémy používateľa"
+      AlreadyExists: "Typ schémy používateľa už existuje"
+    Authenticator:
+      Invalid: "Neplatný typ autentifikátora"
+    NotActive: "Schéma používateľa nie je aktívna"
+    NotInactive: "Schéma používateľa nie je neaktívna"
+    NotExists: "Schéma používateľa neexistuje"
+    ID:
+      Missing: "Chýba ID schémy používateľa"
+    Invalid: "Schéma používateľa je neplatná"
+    Data:
+      Invalid: "Údaje sú pre schému používateľa neplatné"
+  TokenExchange:
+    Token:
+      Missing: "Chýba token"
+      Invalid: "Token je neplatný"
+      TypeMissing: "Chýba typ tokenu"
+      TypeNotAllowed: "Typ tokenu nie je povolený"
+      TypeNotSupported: "Typ tokenu nie je podporovaný"
+      NotForAPI: "Tokeny s prevzatím identity nie sú pre API povolené"
+    Impersonation:
+      PolicyDisabled: "Prevzatie identity je v bezpečnostnej politike inštancie vypnuté"
+  WebKey:
+    ActiveDelete: "Aktívny webový kľúč sa nedá odstrániť"
+    Config: "Neplatná konfigurácia webového kľúča"
+    Duplicate: "ID webového kľúča nie je jedinečné"
+    NoActive: "Nenašiel sa žiadny aktívny webový kľúč"
+    NotFound: "Webový kľúč sa nenašiel"
+  IDP:
+    InvalidSearchQuery: "Neplatný vyhľadávací dopyt"
+    ClientIDMissing: "Chýba ClientID"
+    TeamIDMissing: "Chýba TeamID"
+    KeyIDMissing: "Chýba KeyID"
+    PrivateKeyMissing: "Chýba privátny kľúč"
+    InvalidPrivateKey: "Neplatný formát privátneho kľúča"
+
+AggregateTypes:
+  action: "Akcia"
+  instance: "Inštancia"
+  key_pair: "Pár kľúčov"
+  org: "Organizácia"
+  project: "Projekt"
+  user: "Používateľ"
+  usergrant: "Grant používateľa"
+  quota: "Kvóta"
+  feature: "Funkcia"
+  target: "Cieľ"
+  execution: "Vykonanie"
+  user_schema: "Schéma používateľa"
+  auth_request: "Autentifikačná požiadavka"
+  device_auth: "Autorizácia zariadenia"
+  idpintent: "Zámer IDP"
+  limits: "Limity"
+  milestone: "Míľnik"
+  oidc_session: "Relácia OIDC"
+  restrictions: "Obmedzenia"
+  system: "Systém"
+  session: "Relácia"
+  web_key: "Webový kľúč"
+  saml_request: "Požiadavka SAML"
+  saml_session: "Relácia SAML"
+EventTypes:
+  execution:
+    set: "Vykonanie nastavené"
+    removed: "Vykonanie odstránené"
+  target:
+    added: "Cieľ vytvorený"
+    changed: "Cieľ zmenený"
+    removed: "Cieľ odstránený"
+  user:
+    added: "Používateľ pridaný"
+    selfregistered: "Používateľ sa zaregistroval sám"
+    initialization:
+      code:
+        added: "Inicializačný kód vygenerovaný"
+        sent: "Inicializačný kód odoslaný"
+      check:
+        succeeded: "Kontrola inicializácie úspešná"
+        failed: "Kontrola inicializácie zlyhala"
+    token:
+      added: "Prístupový token vytvorený"
+      v2.added: "Prístupový token vytvorený"
+      removed: "Prístupový token odstránený"
+    impersonated: "Prevzatá identita používateľa"
+    username:
+      reserved: "Používateľské meno rezervované"
+      released: "Používateľské meno uvoľnené"
+      changed: "Používateľské meno zmenené"
+    email:
+      reserved: "E-mailová adresa rezervovaná"
+      released: "E-mailová adresa uvoľnená"
+      changed: "E-mailová adresa zmenená"
+      verified: "E-mailová adresa overená"
+      verification:
+        failed: "Overenie e-mailovej adresy zlyhalo"
+      code:
+        added: "Overovací kód e-mailovej adresy vygenerovaný"
+        sent: "Overovací kód e-mailovej adresy odoslaný"
+    machine:
+      added: "Technický používateľ pridaný"
+      changed: "Technický používateľ zmenený"
+      key:
+        added: "Kľúč pridaný"
+        removed: "Kľúč odstránený"
+      secret:
+        set: "Tajný kľúč nastavený"
+        updated: "Hash tajného kľúča aktualizovaný"
+        removed: "Tajný kľúč odstránený"
+        check:
+          succeeded: "Kontrola tajného kľúča úspešná"
+          failed: "Kontrola tajného kľúča zlyhala"
+    human:
+      added: "Osoba pridaná"
+      selfregistered: "Osoba sa zaregistrovala sama"
+      avatar:
+        added: "Avatar pridaný"
+        removed: "Avatar odstránený"
+      initialization:
+        code:
+          added: "Inicializačný kód vygenerovaný"
+          sent: "Inicializačný kód odoslaný"
+        check:
+          succeeded: "Kontrola inicializácie úspešná"
+          failed: "Kontrola inicializácie zlyhala"
+      invite:
+        code:
+          added: "Kód pozvánky vygenerovaný"
+          sent: "Kód pozvánky odoslaný"
+        check:
+          succeeded: "Kontrola pozvánky úspešná"
+          failed: "Kontrola pozvánky zlyhala"
+      username:
+        reserved: "Používateľské meno rezervované"
+        released: "Používateľské meno uvoľnené"
+      email:
+        changed: "E-mailová adresa zmenená"
+        verified: "E-mailová adresa overená"
+        verification:
+          failed: "Overenie e-mailovej adresy zlyhalo"
+        code:
+          added: "Overovací kód e-mailovej adresy vygenerovaný"
+          sent: "Overovací kód e-mailovej adresy odoslaný"
+      password:
+        changed: "Heslo zmenené"
+        code:
+          added: "Kód hesla vygenerovaný"
+          sent: "Kód hesla odoslaný"
+        check:
+          succeeded: "Kontrola hesla úspešná"
+          failed: "Kontrola hesla zlyhala"
+        change:
+          sent: "Zmena hesla odoslaná"
+        hash:
+          updated: "Hash hesla aktualizovaný"
+      externallogin:
+        check:
+          succeeded: "Externé prihlásenie úspešné"
+      externalidp:
+        added: "Externý poskytovateľ identity pridaný"
+        removed: "Externý poskytovateľ identity odstránený"
+        cascade:
+          removed: "Externý poskytovateľ identity kaskádovo odstránený"
+        id:
+          migrated: "Externé ID používateľa u poskytovateľa identity bolo migrované"
+      phone:
+        changed: "Telefónne číslo zmenené"
+        verified: "Telefónne číslo overené"
+        verification:
+          failed: "Overenie telefónneho čísla zlyhalo"
+        code:
+          added: "Kód telefónneho čísla vygenerovaný"
+          sent: "Kód telefónneho čísla odoslaný"
+        removed: "Telefónne číslo odstránené"
+      profile:
+        changed: "Profil používateľa zmenený"
+      address:
+        changed: "Adresa používateľa zmenená"
+      mfa:
+        otp:
+          added: "Viacfaktorové OTP pridané"
+          verified: "Viacfaktorové OTP overené"
+          removed: "Viacfaktorové OTP odstránené"
+          check:
+            succeeded: "Kontrola viacfaktorového OTP úspešná"
+            failed: "Kontrola viacfaktorového OTP zlyhala"
+          sms:
+            added: "Viacfaktorové OTP cez SMS pridané"
+            removed: "Viacfaktorové OTP cez SMS odstránené"
+            code:
+              added: "Kód viacfaktorového OTP cez SMS pridaný"
+              sent: "Kód viacfaktorového OTP cez SMS odoslaný"
+            check:
+              succeeded: "Kontrola viacfaktorového OTP cez SMS úspešná"
+              failed: "Kontrola viacfaktorového OTP cez SMS zlyhala"
+          email:
+            added: "Viacfaktorové OTP cez e-mail pridané"
+            removed: "Viacfaktorové OTP cez e-mail odstránené"
+            code:
+              added: "Kód viacfaktorového OTP cez e-mail pridaný"
+              sent: "Kód viacfaktorového OTP cez e-mail odoslaný"
+            check:
+              succeeded: "Kontrola viacfaktorového OTP cez e-mail úspešná"
+              failed: "Kontrola viacfaktorového OTP cez e-mail zlyhala"
+        u2f:
+          token:
+            added: "Token viacfaktorového U2F pridaný"
+            verified: "Token viacfaktorového U2F overený"
+            removed: "Token viacfaktorového U2F odstránený"
+            begin:
+              login: "Kontrola viacfaktorového U2F začatá"
+            check:
+              succeeded: "Kontrola viacfaktorového U2F úspešná"
+              failed: "Kontrola viacfaktorového U2F zlyhala"
+            signcount:
+              changed: "Kontrolný súčet tokenu viacfaktorového U2F bol zmenený"
+        init:
+          skipped: "Inicializácia viacfaktorového overenia preskočená"
+      passwordless:
+        token:
+          added: "Token na prihlásenie prístupovým kľúčom pridaný"
+          verified: "Token na prihlásenie prístupovým kľúčom overený"
+          removed: "Token na prihlásenie prístupovým kľúčom odstránený"
+          begin:
+            login: "Kontrola prihlásenia prístupovým kľúčom začatá"
+          check:
+            succeeded: "Kontrola prihlásenia prístupovým kľúčom úspešná"
+            failed: "Kontrola prihlásenia prístupovým kľúčom zlyhala"
+          signcount:
+            changed: "Kontrolný súčet tokenu na prihlásenie prístupovým kľúčom bol zmenený"
+        initialization:
+          code:
+            added: "Inicializačný kód prístupového kľúča pridaný"
+            sent: "Inicializačný kód prístupového kľúča odoslaný"
+            requested: "Inicializačný kód prístupového kľúča vyžiadaný"
+            check:
+              succeeded: "Inicializačný kód prístupového kľúča úspešne skontrolovaný"
+              failed: "Kontrola inicializačného kódu prístupového kľúča zlyhala"
+      signed:
+        out: "Používateľ odhlásený"
+      refresh:
+        token:
+          added: "Refresh token vytvorený"
+          renewed: "Refresh token obnovený"
+          removed: "Refresh token odstránený"
+    locked: "Používateľ zablokovaný"
+    unlocked: "Používateľ odblokovaný"
+    deactivated: "Používateľ deaktivovaný"
+    reactivated: "Používateľ reaktivovaný"
+    removed: "Používateľ odstránený"
+    password:
+      changed: "Heslo zmenené"
+      code:
+        added: "Kód hesla vygenerovaný"
+        sent: "Kód hesla odoslaný"
+      check:
+        succeeded: "Kontrola hesla úspešná"
+        failed: "Kontrola hesla zlyhala"
+    phone:
+      changed: "Telefónne číslo zmenené"
+      verified: "Telefónne číslo overené"
+      verification:
+        failed: "Overenie telefónneho čísla zlyhalo"
+      code:
+        added: "Kód telefónneho čísla vygenerovaný"
+        sent: "Kód telefónneho čísla odoslaný"
+    profile:
+      changed: "Profil používateľa zmenený"
+    address:
+      changed: "Adresa používateľa zmenená"
+    mfa:
+      otp:
+        added: "Viacfaktorové OTP pridané"
+        verified: "Viacfaktorové OTP overené"
+        removed: "Viacfaktorové OTP odstránené"
+        check:
+          succeeded: "Kontrola viacfaktorového OTP úspešná"
+          failed: "Kontrola viacfaktorového OTP zlyhala"
+        init:
+          skipped: "Inicializácia viacfaktorového OTP preskočená"
+      init:
+        skipped: "Inicializácia viacfaktorového overenia preskočená"
+    signed:
+      out: "Používateľ odhlásený"
+    grant:
+      added: "Autorizácia pridaná"
+      changed: "Autorizácia zmenená"
+      removed: "Autorizácia odstránená"
+      deactivated: "Autorizácia deaktivovaná"
+      reactivated: "Autorizácia reaktivovaná"
+      reserved: "Autorizácia rezervovaná"
+      released: "Autorizácia uvoľnená"
+      cascade:
+        removed: "Autorizácia odstránená"
+        changed: "Autorizácia zmenená"
+    metadata:
+      set: "Metadáta používateľa nastavené"
+      removed: "Metadáta používateľa odstránené"
+      removed.all: "Všetky metadáta používateľa odstránené"
+    domain:
+      claimed: "Doména prevzatá"
+      claimed.sent: "Notifikácia o prevzatí domény odoslaná"
+    pat:
+      added: "Osobný prístupový token pridaný"
+      removed: "Osobný prístupový token odstránený"
+  org:
+    added: "Organizácia pridaná"
+    changed: "Organizácia zmenená"
+    deactivated: "Organizácia deaktivovaná"
+    reactivated: "Organizácia reaktivovaná"
+    removed: "Organizácia odstránená"
+    domain:
+      added: "Doména pridaná"
+      verification:
+        added: "Overenie domény pridané"
+        failed: "Overenie domény zlyhalo"
+      verified: "Doména overená"
+      removed: "Doména odstránená"
+      primary:
+        set: "Doména organizácie nastavená"
+      reserved: "Doména rezervovaná"
+      released: "Doména uvoľnená"
+    name:
+      reserved: "Názov organizácie rezervovaný"
+      released: "Názov organizácie uvoľnený"
+    member:
+      added: "Člen organizácie pridaný"
+      changed: "Člen organizácie zmenený"
+      removed: "Člen organizácie odstránený"
+      cascade:
+        removed: "Člen organizácie kaskádovo odstránený"
+    iam:
+      policy:
+        added: "Systémová politika pridaná"
+        changed: "Systémová politika zmenená"
+        removed: "Systémová politika odstránená"
+    idp:
+      config:
+        added: "Konfigurácia poskytovateľa identity pridaná"
+        changed: "Konfigurácia poskytovateľa identity zmenená"
+        removed: "Konfigurácia poskytovateľa identity odstránená"
+        deactivated: "Konfigurácia poskytovateľa identity deaktivovaná"
+        reactivated: "Konfigurácia poskytovateľa identity reaktivovaná"
+      oidc:
+        config:
+          added: "Konfigurácia OIDC poskytovateľa identity pridaná"
+          changed: "Konfigurácia OIDC poskytovateľa identity zmenená"
+      saml:
+        config:
+          added: "Konfigurácia SAML poskytovateľa identity pridaná"
+          changed: "Konfigurácia SAML poskytovateľa identity zmenená"
+      jwt:
+        config:
+          added: "Konfigurácia JWT poskytovateľa identity pridaná"
+          changed: "Konfigurácia JWT poskytovateľa identity zmenená"
+    customtext:
+      set: "Vlastný text nastavený"
+      removed: "Vlastný text odstránený"
+      template:
+        removed: "Šablóna vlastného textu odstránená"
+    policy:
+      login:
+        added: "Politika prihlásenia pridaná"
+        changed: "Politika prihlásenia zmenená"
+        removed: "Politika prihlásenia odstránená"
+        idpprovider:
+          added: "Poskytovateľ identity pridaný do politiky prihlásenia"
+          removed: "Poskytovateľ identity odstránený z politiky prihlásenia"
+          cascade:
+            removed: "Poskytovateľ identity kaskádovo odstránený z politiky prihlásenia"
+        secondfactor:
+          added: "Druhý faktor pridaný do politiky prihlásenia"
+          removed: "Druhý faktor odstránený z politiky prihlásenia"
+        multifactor:
+          added: "Viacfaktorové overenie pridané do politiky prihlásenia"
+          removed: "Viacfaktorové overenie odstránené z politiky prihlásenia"
+      password:
+        complexity:
+          added: "Politika zložitosti hesla pridaná"
+          changed: "Politika zložitosti hesla zmenená"
+          removed: "Politika zložitosti hesla odstránená"
+        age:
+          added: "Politika veku hesla pridaná"
+          changed: "Politika veku hesla zmenená"
+          removed: "Politika veku hesla odstránená"
+        lockout:
+          added: "Politika blokovania hesla pridaná"
+          changed: "Politika blokovania hesla zmenená"
+          removed: "Politika blokovania hesla odstránená"
+      label:
+        added: "Politika označenia pridaná"
+        changed: "Politika označenia zmenená"
+        activated: "Politika označenia aktivovaná"
+        removed: "Politika označenia odstránená"
+        logo:
+          added: "Logo pridané do politiky označenia"
+          removed: "Logo odstránené z politiky označenia"
+          dark:
+            added: "Logo (tmavý režim) pridané do politiky označenia"
+            removed: "Logo (tmavý režim) odstránené z politiky označenia"
+        icon:
+          added: "Ikona pridaná do politiky označenia"
+          removed: "Ikona odstránená z politiky označenia"
+          dark:
+            added: "Ikona (tmavý režim) pridaná do politiky označenia"
+            removed: "Ikona (tmavý režim) odstránená z politiky označenia"
+        font:
+          added: "Písmo pridané do politiky označenia"
+          removed: "Písmo odstránené z politiky označenia"
+        assets:
+          removed: "Assety odstránené z politiky označenia"
+      privacy:
+        added: "Zásady ochrany osobných údajov a podmienky používania pridané"
+        changed: "Zásady ochrany osobných údajov a podmienky používania zmenené"
+        removed: "Zásady ochrany osobných údajov a podmienky používania odstránené"
+      domain:
+        added: "Politika domén pridaná"
+        changed: "Politika domén zmenená"
+        removed: "Politika domén odstránená"
+      lockout:
+        added: "Politika blokovania pridaná"
+        changed: "Politika blokovania zmenená"
+        removed: "Politika blokovania odstránená"
+      notification:
+        added: "Politika notifikácií pridaná"
+        changed: "Politika notifikácií zmenená"
+        removed: "Politika notifikácií odstránená"
+    flow:
+      trigger_actions:
+        set: "Akcia nastavená"
+        cascade:
+          removed: "Akcie kaskádovo odstránené"
+        removed: "Akcie odstránené"
+      cleared: "Tok vymazaný"
+    mail:
+      template:
+        added: "E-mailová šablóna pridaná"
+        changed: "E-mailová šablóna zmenená"
+        removed: "E-mailová šablóna odstránená"
+      text:
+        added: "E-mailový text pridaný"
+        changed: "E-mailový text zmenený"
+        removed: "E-mailový text odstránený"
+    metadata:
+      removed: "Metadáta odstránené"
+      removed.all: "Všetky metadáta odstránené"
+      set: "Metadáta nastavené"
+  project:
+    added: "Projekt pridaný"
+    changed: "Projekt zmenený"
+    deactivated: "Projekt deaktivovaný"
+    reactivated: "Projekt reaktivovaný"
+    removed: "Projekt odstránený"
+    member:
+      added: "Člen projektu pridaný"
+      changed: "Člen projektu zmenený"
+      removed: "Člen projektu odstránený"
+      cascade:
+        removed: "Člen projektu kaskádovo odstránený"
+    role:
+      added: "Rola projektu pridaná"
+      changed: "Rola projektu zmenená"
+      removed: "Rola projektu odstránená"
+    grant:
+      added: "Manažérsky prístup pridaný"
+      changed: "Manažérsky prístup zmenený"
+      removed: "Manažérsky prístup odstránený"
+      deactivated: "Manažérsky prístup deaktivovaný"
+      reactivated: "Manažérsky prístup reaktivovaný"
+      cascade:
+        changed: "Manažérsky prístup zmenený"
+      member:
+        added: "Člen manažérskeho prístupu pridaný"
+        changed: "Člen manažérskeho prístupu zmenený"
+        removed: "Člen manažérskeho prístupu odstránený"
+        cascade:
+          removed: "Manažérsky prístup kaskádovo odstránený"
+    application:
+      added: "Aplikácia pridaná"
+      changed: "Aplikácia zmenená"
+      removed: "Aplikácia odstránená"
+      deactivated: "Aplikácia deaktivovaná"
+      reactivated: "Aplikácia reaktivovaná"
+      oidc:
+        secret:
+          check:
+            succeeded: "Kontrola tajného kľúča OIDC klienta úspešná"
+            failed: "Kontrola tajného kľúča OIDC klienta zlyhala"
+        key:
+          added: "Kľúč OIDC aplikácie pridaný"
+          removed: "Kľúč OIDC aplikácie odstránený"
+      api:
+        secret:
+          check:
+            succeeded: "Kontrola tajného kľúča API úspešná"
+            failed: "Kontrola tajného kľúča API zlyhala"
+        key:
+          added: "Kľúč aplikácie pridaný"
+          removed: "Kľúč aplikácie odstránený"
+      config:
+        saml:
+          added: "Konfigurácia SAML pridaná"
+          changed: "Konfigurácia SAML zmenená"
+        oidc:
+          added: "Konfigurácia OIDC pridaná"
+          changed: "Konfigurácia OIDC zmenená"
+          secret:
+            changed: "Tajný kľúč OIDC zmenený"
+            updated: "Hash tajného kľúča OIDC aktualizovaný"
+        api:
+          added: "Konfigurácia API pridaná"
+          changed: "Konfigurácia API zmenená"
+          secret:
+            changed: "Tajný kľúč API zmenený"
+            updated: "Hash tajného kľúča API aktualizovaný"
+  policy:
+    password:
+      complexity:
+        added: "Politika zložitosti hesla pridaná"
+        changed: "Politika zložitosti hesla zmenená"
+      age:
+        added: "Politika veku hesla pridaná"
+        changed: "Politika veku hesla zmenená"
+      lockout:
+        added: "Politika blokovania hesla pridaná"
+        changed: "Politika blokovania hesla zmenená"
+  iam:
+    setup:
+      started: "Nastavovanie Zitadel začaté"
+      done: "Nastavovanie Zitadel dokončené"
+    global:
+      org:
+        set: "Globálna organizácia nastavená"
+    project:
+      iam:
+        set: "Projekt Zitadel nastavený"
+    member:
+      added: "Člen Zitadel pridaný"
+      changed: "Člen Zitadel zmenený"
+      removed: "Člen Zitadel odstránený"
+      cascade:
+        removed: "Člen Zitadel kaskádovo odstránený"
+    idp:
+      config:
+        added: "Konfigurácia poskytovateľa identity pridaná"
+        changed: "Konfigurácia poskytovateľa identity zmenená"
+        removed: "Konfigurácia poskytovateľa identity odstránená"
+        deactivated: "Konfigurácia poskytovateľa identity deaktivovaná"
+        reactivated: "Konfigurácia poskytovateľa identity reaktivovaná"
+      oidc:
+        config:
+          added: "Konfigurácia OIDC poskytovateľa identity pridaná"
+          changed: "Konfigurácia OIDC poskytovateľa identity zmenená"
+      saml:
+        config:
+          added: "Konfigurácia SAML poskytovateľa identity pridaná"
+          changed: "Konfigurácia SAML poskytovateľa identity zmenená"
+      jwt:
+        config:
+          added: "Konfigurácia JWT pridaná k poskytovateľovi identity"
+          changed: "Konfigurácia JWT odstránená od poskytovateľa identity"
+    customtext:
+      set: "Text bol nastavený"
+      removed: "Text bol odstránený"
+    policy:
+      login:
+        added: "Predvolená politika prihlásenia pridaná"
+        changed: "Predvolená politika prihlásenia zmenená"
+        idpprovider:
+          added: "Poskytovateľ identity pridaný do predvolenej politiky prihlásenia"
+          removed: "Poskytovateľ identity odstránený z predvolenej politiky prihlásenia"
+      label:
+        added: "Politika označenia pridaná"
+        changed: "Politika označenia zmenená"
+        activated: "Politika označenia aktivovaná"
+        logo:
+          added: "Logo pridané do politiky označenia"
+          removed: "Logo odstránené z politiky označenia"
+          dark:
+            added: "Logo (tmavý režim) pridané do politiky označenia"
+            removed: "Logo (tmavý režim) odstránené z politiky označenia"
+        icon:
+          added: "Ikona pridaná do politiky označenia"
+          removed: "Ikona odstránená z politiky označenia"
+          dark:
+            added: "Ikona (tmavý režim) pridaná do politiky označenia"
+            removed: "Ikona (tmavý režim) odstránená z politiky označenia"
+        font:
+          added: "Písmo pridané do politiky označenia"
+          removed: "Písmo odstránené z politiky označenia"
+        assets:
+          removed: "Assety odstránené z politiky označenia"
+    default:
+      language:
+        set: "Predvolený jazyk nastavený"
+    oidc:
+      settings:
+        added: "Konfigurácia OIDC pridaná"
+        changed: "Konfigurácia OIDC zmenená"
+        removed: "Konfigurácia OIDC odstránená"
+    secret:
+      generator:
+        added: "Generátor tajných kódov pridaný"
+        changed: "Generátor tajných kódov zmenený"
+        removed: "Generátor tajných kódov odstránený"
+    smtp:
+      config:
+        added: "Konfigurácia SMTP pridaná"
+        changed: "Konfigurácia SMTP zmenená"
+        activated: "Konfigurácia SMTP aktivovaná"
+        deactivated: "Konfigurácia SMTP deaktivovaná"
+        removed: "Konfigurácia SMTP odstránená"
+        password:
+          changed: "Tajný kľúč konfigurácie SMTP zmenený"
+    sms:
+      config:
+        twilio:
+          added: "Poskytovateľ SMS Twilio pridaný"
+          changed: "Poskytovateľ SMS Twilio zmenený"
+          token:
+            changed: "Token poskytovateľa SMS Twilio zmenený"
+          removed: "Poskytovateľ SMS Twilio odstránený"
+          activated: "Poskytovateľ SMS Twilio aktivovaný"
+          deactivated: "Poskytovateľ SMS Twilio deaktivovaný"
+  key_pair:
+    added: "Pár kľúčov pridaný"
+    certificate:
+      added: "Certifikát pridaný"
+  action:
+    added: "Akcia pridaná"
+    changed: "Akcia zmenená"
+    deactivated: "Akcia deaktivovaná"
+    reactivated: "Akcia reaktivovaná"
+    removed: "Akcia odstránená"
+  instance:
+    added: "Inštancia pridaná"
+    changed: "Inštancia zmenená"
+    customtext:
+      removed: "Vlastný text odstránený"
+      set: "Vlastný text nastavený"
+      template:
+        removed: "Šablóna vlastného textu odstránená"
+    default:
+      language:
+        set: "Predvolený jazyk nastavený"
+      org:
+        set: "Predvolená organizácia nastavená"
+    domain:
+      added: "Doména pridaná"
+      primary:
+        set: "Primárna doména nastavená"
+      removed: "Doména odstránená"
+    iam:
+      console:
+        set: "Aplikácia Zitadel Management Console nastavená"
+      project:
+        set: "Projekt Zitadel nastavený"
+    mail:
+      template:
+        added: "E-mailová šablóna pridaná"
+        changed: "E-mailová šablóna zmenená"
+      text:
+        added: "E-mailový text pridaný"
+        changed: "E-mailový text zmenený"
+    member:
+      added: "Člen inštancie pridaný"
+      changed: "Člen inštancie zmenený"
+      removed: "Člen inštancie odstránený"
+      cascade:
+        removed: "Člen inštancie kaskádovo odstránený"
+    notification:
+      provider:
+        debug:
+          fileadded: "Súborový ladiaci poskytovateľ notifikácií pridaný"
+          filechanged: "Súborový ladiaci poskytovateľ notifikácií zmenený"
+          fileremoved: "Súborový ladiaci poskytovateľ notifikácií odstránený"
+          logadded: "Logovací ladiaci poskytovateľ notifikácií pridaný"
+          logchanged: "Logovací ladiaci poskytovateľ notifikácií zmenený"
+          logremoved: "Logovací ladiaci poskytovateľ notifikácií odstránený"
+    oidc:
+      settings:
+        added: "Nastavenia OIDC pridané"
+        changed: "Nastavenia OIDC zmenené"
+    policy:
+      domain:
+        added: "Politika domén pridaná"
+        changed: "Politika domén zmenená"
+      label:
+        activated: "Politika označenia aktivovaná"
+        added: "Politika označenia pridaná"
+        assets:
+          removed: "Asset odstránený z politiky označenia"
+        changed: "Politika označenia zmenená"
+        font:
+          added: "Písmo pridané do politiky označenia"
+          removed: "Písmo odstránené z politiky označenia"
+        icon:
+          added: "Ikona pridaná do politiky označenia"
+          removed: "Ikona odstránená z politiky označenia"
+          dark:
+            added: "Ikona pridaná do tmavej politiky označenia"
+            removed: "Ikona odstránená z tmavej politiky označenia"
+        logo:
+          added: "Logo pridané do politiky označenia"
+          removed: "Logo odstránené z politiky označenia"
+          dark:
+            added: "Logo pridané do tmavej politiky označenia"
+            removed: "Logo odstránené z tmavej politiky označenia"
+      lockout:
+        added: "Politika blokovania pridaná"
+        changed: "Politika blokovania zmenená"
+      login:
+        added: "Politika prihlásenia pridaná"
+        changed: "Politika prihlásenia zmenená"
+        idpprovider:
+          added: "Poskytovateľ identity pridaný do politiky prihlásenia"
+          cascade:
+            removed: "Poskytovateľ identity kaskádovo odstránený z politiky prihlásenia"
+          removed: "Poskytovateľ identity odstránený z politiky prihlásenia"
+        multifactor:
+          added: "Viacfaktorové overenie pridané do politiky prihlásenia"
+          removed: "Viacfaktorové overenie odstránené z politiky prihlásenia"
+        secondfactor:
+          added: "Druhý faktor pridaný do politiky prihlásenia"
+          removed: "Druhý faktor odstránený z politiky prihlásenia"
+      password:
+        age:
+          added: "Politika veku hesla pridaná"
+          changed: "Politika veku hesla zmenená"
+        complexity:
+          added: "Politika zložitosti hesla pridaná"
+          changed: "Politika zložitosti hesla odstránená"
+      privacy:
+        added: "Zásady ochrany osobných údajov pridané"
+        changed: "Zásady ochrany osobných údajov zmenené"
+      security:
+        set: "Bezpečnostná politika nastavená"
+    removed: "Inštancia odstránená"
+    secret:
+      generator:
+        added: "Generátor tajných kódov pridaný"
+        changed: "Generátor tajných kódov zmenený"
+        removed: "Generátor tajných kódov odstránený"
+    sms:
+      configtwilio:
+        activated: "Konfigurácia SMS Twilio aktivovaná"
+        added: "Konfigurácia SMS Twilio pridaná"
+        changed: "Konfigurácia SMS Twilio zmenená"
+        deactivated: "Konfigurácia SMS Twilio deaktivovaná"
+        removed: "Konfigurácia SMS Twilio odstránená"
+        token:
+          changed: "Token konfigurácie SMS Twilio zmenený"
+    smtp:
+      config:
+        added: "Konfigurácia SMTP pridaná"
+        changed: "Konfigurácia SMTP zmenená"
+        activated: "Konfigurácia SMTP aktivovaná"
+        deactivated: "Konfigurácia SMTP deaktivovaná"
+        password:
+          changed: "Heslo konfigurácie SMTP zmenené"
+        removed: "Konfigurácia SMTP odstránená"
+  user_schema:
+    created: "Schéma používateľa vytvorená"
+    updated: "Schéma používateľa aktualizovaná"
+    deactivated: "Schéma používateľa deaktivovaná"
+    reactivated: "Schéma používateľa reaktivovaná"
+    deleted: "Schéma používateľa odstránená"
+    user:
+      created: "Používateľ vytvorený"
+      updated: "Používateľ aktualizovaný"
+      deleted: "Používateľ odstránený"
+      email:
+        updated: "E-mailová adresa zmenená"
+        verified: "E-mailová adresa overená"
+        verification:
+          failed: "Overenie e-mailovej adresy zlyhalo"
+        code:
+          added: "Overovací kód e-mailovej adresy vygenerovaný"
+          sent: "Overovací kód e-mailovej adresy odoslaný"
+      phone:
+        updated: "Telefónne číslo zmenené"
+        verified: "Telefónne číslo overené"
+        verification:
+          failed: "Overenie telefónneho čísla zlyhalo"
+        code:
+          added: "Overovací kód telefónneho čísla vygenerovaný"
+          sent: "Overovací kód telefónneho čísla odoslaný"
+  web_key:
+    added: "Webový kľúč pridaný"
+    activated: "Webový kľúč aktivovaný"
+    deactivated: "Webový kľúč deaktivovaný"
+    removed: "Webový kľúč odstránený"
+Application:
+  OIDC:
+    UnsupportedVersion: "Vaša verzia OIDC nie je podporovaná"
+    V1:
+      NotCompliant: "Vaša konfigurácia nie je v súlade so štandardom OIDC 1.0 a líši sa od neho."
+      NoRedirectUris: "Musí byť zaregistrovaná aspoň jedna presmerovacia URI."
+      NotAllCombinationsAreAllowed: "Konfigurácia je v súlade so štandardom, ale nie sú povolené všetky možné kombinácie."
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: "Typ grantu „code“ povoľuje http presmerovacie URI iba pre typ aplikácie „web“."
+          CustomOnlyForNative: "Typ grantu „code“ povoľuje vlastné presmerovacie URI iba pre typ aplikácie „native“  (napr. appname:// )"
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: "Typ grantu implicit nepovoľuje vlastné presmerovacie URI"
+          HttpNotAllowed: "Typ grantu implicit nepovoľuje http presmerovacie URI"
+          HttpLocalhostOnlyForNative: "Presmerovacia URI http://localhost je povolená iba pre natívne aplikácie."
+      Native:
+        AuthMethodType:
+          NotNone: "Natívne aplikácie by mali mať authmethodtype none."
+        RedirectUris:
+          MustBeHttpLocalhost: "Presmerovacie URI musia začínať vaším vlastným protokolom, http://127.0.0.1, http://[::1] alebo http://localhost."
+      UserAgent:
+        AuthMethodType:
+          NotNone: "Aplikácia typu user agent by mala mať authmethodtype none."
+      GrantType:
+        Refresh:
+          NoAuthCode: "Refresh token je povolený iba v kombinácii s Authorization Code."
+Action:
+  Flow:
+    Type:
+      Unspecified: "Nešpecifikované"
+      ExternalAuthentication: "Externá autentifikácia"
+      CustomiseToken: "Doplnenie tokenu"
+      InternalAuthentication: "Interná autentifikácia"
+      CustomizeSAMLResponse: "Doplnenie SAMLResponse"
+  TriggerType:
+    Unspecified: "Nešpecifikované"
+    PostAuthentication: "Po autentifikácii"
+    PreCreation: "Pred vytvorením"
+    PostCreation: "Po vytvorení"
+    PreUserinfoCreation: "Pred vytvorením userinfo"
+    PreAccessTokenCreation: "Pred vytvorením prístupového tokenu"
+    PreSAMLResponseCreation: "Pred vytvorením SAMLResponse"
