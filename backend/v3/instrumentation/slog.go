@@ -165,9 +165,18 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 		},
 	)
 
-	otelHandler := otelslog.NewHandler(
-		Name,
-		otelslog.WithLoggerProvider(provider),
+	// only masking applies to OTEL, the other replacers are specific to the standard error formats
+	var otelReplacer replacer
+	if len(cfg.Mask.Keys) > 0 {
+		otelReplacer = cfg.Mask.replacer()
+	}
+	otelHandler := newOTELLogHandler(
+		otelslog.NewHandler(
+			Name,
+			otelslog.WithLoggerProvider(provider),
+		),
+		cfg.Level,
+		otelReplacer,
 	)
 
 	logger := slog.New(slogmulti.Fanout(stdErrHandler, otelHandler))
