@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"log/slog"
+	"strings"
 	"testing"
 
 	"github.com/riverqueue/river/rivertype"
@@ -23,17 +24,16 @@ func Test_logMiddleware_InsertMany(t *testing.T) {
 			// river's fast insert path returns a slice of nil results with the length of the inserted jobs
 			results:         make([]*rivertype.JobInsertResult, 2),
 			wantJobDetails:  0,
-			wantLogContains: []string{"jobs inserted"},
+			wantLogContains: []string{`"msg":"jobs inserted"`, `"count":2`},
 		},
 		{
 			name: "results with jobs",
 			results: []*rivertype.JobInsertResult{
 				{Job: &rivertype.JobRow{ID: 1, Kind: "kind1", Queue: "queue1"}},
-				nil,
 				{Job: &rivertype.JobRow{ID: 2, Kind: "kind2", Queue: "queue2"}},
 			},
 			wantJobDetails:  2,
-			wantLogContains: []string{"jobs inserted", "kind1", "kind2"},
+			wantLogContains: []string{`"msg":"jobs inserted"`, `"count":2`, "kind1", "kind2"},
 		},
 	}
 	for _, tt := range tests {
@@ -52,7 +52,7 @@ func Test_logMiddleware_InsertMany(t *testing.T) {
 			})
 			assert.Equal(t, tt.results, got)
 			logs := buf.String()
-			assert.Equal(t, tt.wantJobDetails, bytes.Count(buf.Bytes(), []byte("inserted job details")))
+			assert.Equal(t, tt.wantJobDetails, strings.Count(logs, "inserted job details"))
 			for _, want := range tt.wantLogContains {
 				assert.Contains(t, logs, want)
 			}
