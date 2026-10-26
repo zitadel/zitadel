@@ -18,6 +18,7 @@ import {
   RemoveMyAuthFactorOTPSMSResponse,
   ListMyMetadataResponse,
   VerifyMyPhoneResponse,
+  ResendMyEmailVerificationResponse,
   ListMyZitadelPermissionsResponse,
   ListMyProjectOrgsRequestSchema,
 } from '@zitadel/proto/zitadel/auth_pb';
@@ -32,6 +33,10 @@ export class NewAuthService {
     private readonly grpcService: GrpcService,
     private readonly userService: UserService,
   ) {}
+
+  public resendMyEmailVerification(): Promise<ResendMyEmailVerificationResponse> {
+    return this.grpcService.authNew.resendMyEmailVerification({});
+  }
 
   public verifyMyPhone(code: string): Promise<VerifyMyPhoneResponse> {
     return this.grpcService.authNew.verifyMyPhone({ code });
