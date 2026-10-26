@@ -2374,7 +2374,8 @@
       "HEADERNAME": "Nume antet",
       "JWTENDPOINT": "Punct final JWT",
       "JWTKEYSENDPOINT": "Punct final chei JWT",
-      "AUDIENCE": "Audiență"
+      "AUDIENCE": "Audiență",
+      "AUDIENCE_EMPTY_WARNING": "Fără o Audiență, ZITADEL acceptă orice token valid de la acest emitent, indiferent de aplicația pentru care a fost emis. Se recomandă insistent setarea unei Audiențe."
     },
     "APPLE": {
       "TEAMID": "ID echipă",

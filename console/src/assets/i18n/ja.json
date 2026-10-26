@@ -2377,7 +2377,8 @@
       "HEADERNAME": "ヘッダー名",
       "JWTENDPOINT": "JWTエンドポイント",
       "JWTKEYSENDPOINT": "JWTキーエンドポイント",
-      "AUDIENCE": "オーディエンス"
+      "AUDIENCE": "オーディエンス",
+      "AUDIENCE_EMPTY_WARNING": "オーディエンスを設定しない場合、ZITADEL はこの発行者による有効なトークンを、どのアプリケーション向けに発行されたかに関係なく受け入れます。オーディエンスの設定を強く推奨します。"
     },
     "APPLE": {
       "TEAMID": "チームID",

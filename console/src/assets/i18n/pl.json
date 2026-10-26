@@ -2373,7 +2373,8 @@
       "HEADERNAME": "Nazwa nagłówka",
       "JWTENDPOINT": "Punkt końcowy JWT",
       "JWTKEYSENDPOINT": "Punkt końcowy kluczy JWT",
-      "AUDIENCE": "Odbiorca"
+      "AUDIENCE": "Odbiorca",
+      "AUDIENCE_EMPTY_WARNING": "Bez ustawionego Odbiorcy ZITADEL akceptuje każdy prawidłowy token od tego emitenta, niezależnie od tego, dla której aplikacji został wystawiony. Zdecydowanie zalecamy ustawienie Odbiorcy."
     },
     "TOAST": {
       "SAVED": "Zapisano pomyślnie.",
