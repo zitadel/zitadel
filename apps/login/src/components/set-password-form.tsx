@@ -3,12 +3,13 @@
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from "@/helpers/validators";
 import { handleServerActionResponse } from "@/lib/client-utils";
 import { changePassword, resetPassword, sendPassword } from "@/lib/server/password";
+import { useResendCooldown } from "@/lib/use-resend-cooldown";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
 import { AutoSubmitForm } from "./auto-submit-form";
@@ -36,6 +37,8 @@ type Props = {
   defaultOrganization?: string;
   requestId?: string;
   codeRequired: boolean;
+  /** a reset code was just sent before arriving here, so start the resend cooldown */
+  codeSent?: boolean;
 };
 
 export function SetPasswordForm({
@@ -47,6 +50,7 @@ export function SetPasswordForm({
   userId,
   code,
   codeRequired,
+  codeSent,
 }: Props) {
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onChange",
@@ -62,6 +66,16 @@ export function SetPasswordForm({
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const router = useRouter();
+  const resendCooldown = useResendCooldown();
+
+  const { start: startResendCooldown } = resendCooldown;
+  useEffect(() => {
+    if (codeSent && codeRequired) {
+      startResendCooldown();
+    }
+    // only on arrival; later resends start the cooldown themselves
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function resendCode() {
     setError("");
@@ -84,6 +98,10 @@ export function SetPasswordForm({
     if (response && "error" in response && typeof response.error === "string") {
       setError(response.error);
       return;
+    }
+
+    if (response) {
+      resendCooldown.start();
     }
   }
 
@@ -190,8 +208,8 @@ export function SetPasswordForm({
                   <Translated i18nKey="set.noCodeReceived" namespace="password" />
                 </span>
                 <button
-                  aria-label={t("set.resend")}
-                  disabled={loading}
+                  aria-label={`${t("set.resend")}${resendCooldown.suffix}`}
+                  disabled={loading || resendCooldown.isCoolingDown}
                   type="button"
                   className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
                   onClick={() => {
@@ -200,6 +218,7 @@ export function SetPasswordForm({
                   data-testid="resend-button"
                 >
                   <Translated i18nKey="set.resend" namespace="password" />
+                  {resendCooldown.suffix}
                 </button>
               </div>
             </Alert>
