@@ -129,9 +129,7 @@ export default function CustomSearchDialog(props: SharedProps) {
                         formattedResults.push({
                             id: targetUrl,
                             content: (
-                                // UI Polish: Increased padding and gap for better readability
                                 <div className="flex flex-col gap-1.5 py-1">
-                                    {/* Breadcrumb Display */}
                                     {breadcrumbs.length > 0 && (
                                         <div className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider">
                                             {breadcrumbs.map((crumb, idx) => (
