@@ -1376,6 +1376,51 @@ EventTypes:
     activated: "Web Anahtarı etkinleştirildi"
     deactivated: "Web Anahtarı devre dışı bırakıldı"
     removed: "Web Anahtarı kaldırıldı"
+  session:
+    added: "Oturum oluşturuldu"
+    user:
+      checked: "Oturum kullanıcısı kontrol edildi"
+    password:
+      checked: "Oturum şifresi kontrol edildi"
+    intent:
+      checked: "Oturum kimlik sağlayıcı intent'i kontrol edildi"
+    webAuthN:
+      challenged: "Oturum WebAuthN sınaması oluşturuldu"
+      checked: "Oturum WebAuthN kontrol edildi"
+    totp:
+      checked: "Oturum TOTP kontrol edildi"
+    otp:
+      sms:
+        challenged: "Oturum OTP SMS sınaması oluşturuldu"
+        sent: "Oturum OTP SMS kodu gönderildi"
+        checked: "Oturum OTP SMS kontrol edildi"
+      email:
+        challenged: "Oturum OTP E-posta sınaması oluşturuldu"
+        sent: "Oturum OTP E-posta kodu gönderildi"
+        checked: "Oturum OTP E-posta kontrol edildi"
+    recoveryCode:
+      checked: "Oturum kurtarma kodu kontrol edildi"
+    token:
+      set: "Oturum token'ı ayarlandı"
+    metadata:
+      set: "Oturum metadata'sı ayarlandı"
+    lifetime:
+      set: "Oturum süresi ayarlandı"
+    terminated: "Oturum sonlandırıldı"
+  oidc_session:
+    added: "OIDC Oturumu oluşturuldu"
+    access_token:
+      added: "OIDC Oturumu Erişim Token'ı oluşturuldu"
+      revoked: "OIDC Oturumu Erişim Token'ı iptal edildi"
+    refresh_token:
+      added: "OIDC Oturumu Yenileme Token'ı oluşturuldu"
+      renewed: "OIDC Oturumu Yenileme Token'ı yenilendi"
+      revoked: "OIDC Oturumu Yenileme Token'ı iptal edildi"
+  saml_session:
+    added: "SAML Oturumu oluşturuldu"
+    saml_response:
+      added: "SAML Oturumu yanıtı oluşturuldu"
+      revoked: "SAML Oturumu yanıtı iptal edildi"
 Application:
   OIDC:
     UnsupportedVersion: "OIDC sürümünüz desteklenmiyor"

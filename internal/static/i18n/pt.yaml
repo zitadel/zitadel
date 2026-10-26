@@ -1372,6 +1372,51 @@ EventTypes:
     activated: "Chave Web ativada"
     deactivated: "Chave Web desativada"
     removed: "Chave Web removida"
+  session:
+    added: "Sessão criada"
+    user:
+      checked: "Usuário da sessão verificado"
+    password:
+      checked: "Senha da sessão verificada"
+    intent:
+      checked: "Intent do provedor de identidade da sessão verificado"
+    webAuthN:
+      challenged: "Desafio WebAuthN da sessão criado"
+      checked: "WebAuthN da sessão verificado"
+    totp:
+      checked: "TOTP da sessão verificado"
+    otp:
+      sms:
+        challenged: "Desafio OTP SMS da sessão criado"
+        sent: "Código OTP SMS da sessão enviado"
+        checked: "OTP SMS da sessão verificado"
+      email:
+        challenged: "Desafio OTP e-mail da sessão criado"
+        sent: "Código OTP e-mail da sessão enviado"
+        checked: "OTP e-mail da sessão verificado"
+    recoveryCode:
+      checked: "Código de recuperação da sessão verificado"
+    token:
+      set: "Token da sessão definido"
+    metadata:
+      set: "Metadados da sessão definidos"
+    lifetime:
+      set: "Duração da sessão definida"
+    terminated: "Sessão encerrada"
+  oidc_session:
+    added: "Sessão OIDC criada"
+    access_token:
+      added: "Token de acesso da sessão OIDC criado"
+      revoked: "Token de acesso da sessão OIDC revogado"
+    refresh_token:
+      added: "Refresh Token da sessão OIDC criado"
+      renewed: "Refresh Token da sessão OIDC renovado"
+      revoked: "Refresh Token da sessão OIDC revogado"
+  saml_session:
+    added: "Sessão SAML criada"
+    saml_response:
+      added: "Resposta SAML da sessão criada"
+      revoked: "Resposta SAML da sessão revogada"
 Application:
   OIDC:
     UnsupportedVersion: "Sua versão do OIDC não é suportada"

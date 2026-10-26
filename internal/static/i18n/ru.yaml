@@ -1362,6 +1362,51 @@ EventTypes:
     activated: "Веб-ключ активирован"
     deactivated: "Веб-ключ деактивирован"
     removed: "Веб-ключ удален"
+  session:
+    added: "Сеанс создан"
+    user:
+      checked: "Пользователь сеанса проверен"
+    password:
+      checked: "Пароль сеанса проверен"
+    intent:
+      checked: "Intent провайдера идентификации сеанса проверен"
+    webAuthN:
+      challenged: "Запрос WebAuthN сеанса создан"
+      checked: "WebAuthN сеанса проверен"
+    totp:
+      checked: "TOTP сеанса проверен"
+    otp:
+      sms:
+        challenged: "Запрос OTP SMS сеанса создан"
+        sent: "Код OTP SMS сеанса отправлен"
+        checked: "OTP SMS сеанса проверен"
+      email:
+        challenged: "Запрос OTP Email сеанса создан"
+        sent: "Код OTP Email сеанса отправлен"
+        checked: "OTP Email сеанса проверен"
+    recoveryCode:
+      checked: "Код восстановления сеанса проверен"
+    token:
+      set: "Токен сеанса установлен"
+    metadata:
+      set: "Метаданные сеанса установлены"
+    lifetime:
+      set: "Время жизни сеанса установлено"
+    terminated: "Сеанс завершён"
+  oidc_session:
+    added: "Сеанс OIDC создан"
+    access_token:
+      added: "Токен доступа сеанса OIDC создан"
+      revoked: "Токен доступа сеанса OIDC отозван"
+    refresh_token:
+      added: "Токен обновления сеанса OIDC создан"
+      renewed: "Токен обновления сеанса OIDC обновлён"
+      revoked: "Токен обновления сеанса OIDC отозван"
+  saml_session:
+    added: "Сессия SAML создана"
+    saml_response:
+      added: "Ответ SAML сессии создан"
+      revoked: "Ответ SAML сессии отозван"
 Application:
   OIDC:
     UnsupportedVersion: "Ваша версия OIDC не поддерживается"
