@@ -240,6 +240,7 @@ RegistrationUser:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: vietnami
   GenderLabel: Nem
   Female: Nő
   Male: Férfi
@@ -362,6 +363,7 @@ ExternalNotFound:
   Turkish: Türkçe
   Ukrainian: Українська
   Arabic: العربية
+  Vietnamese: vietnami
 DeviceAuth:
   Title: Eszköz engedélyezése
   UserCode:
