@@ -26,20 +26,32 @@ function escapeRegExp(string: string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function formatBreadcrumb(url: string): string[] {
+function formatBreadcrumb(url: string, searchType: 'docs' | 'api'): string[] {
     if (!url) return [];
 
     let pathname = url;
     try {
         pathname = new URL(url).pathname;
     } catch {
-        // If the URL is relative, we can still process it
+        // Fallback if the URL is already a relative path
     }
 
     const basePath = pathname.split('#')[0];
+
     const segments = basePath
         .split('/')
-        .filter(segment => segment && segment.toLowerCase() !== 'docs');
+        .filter(segment => {
+            if (!segment) return false;
+            const lower = segment.toLowerCase();
+
+            if (lower === 'docs') return false;
+
+            if (searchType === 'api' && (lower === 'reference' || lower === 'api')) {
+                return false;
+            }
+
+            return true;
+        });
 
     return segments.map(segment =>
         segment.split('-')
@@ -124,7 +136,7 @@ export default function CustomSearchDialog(props: SharedProps) {
 
                     if (!seenUrls.has(targetUrl)) {
                         seenUrls.add(targetUrl);
-                        const breadcrumbs = formatBreadcrumb(targetUrl);
+                        const breadcrumbs = formatBreadcrumb(targetUrl, searchType);
 
                         formattedResults.push({
                             id: targetUrl,
@@ -135,7 +147,7 @@ export default function CustomSearchDialog(props: SharedProps) {
                                             {breadcrumbs.map((crumb, idx) => (
                                                 <span key={idx} className="flex items-center gap-1.5">
                                                     {idx > 0 && <span className="text-muted-foreground/40">›</span>}
-                                                    <span className="truncate max-w-[120px]">{crumb}</span>
+                                                    <span>{crumb}</span>
                                                 </span>
                                             ))}
                                         </div>
