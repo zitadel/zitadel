@@ -22,6 +22,7 @@ import { NavToggleModule } from 'src/app/modules/nav-toggle/nav-toggle.module';
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { TableActionsModule } from 'src/app/modules/table-actions/table-actions.module';
+import { TableSearchModule } from 'src/app/modules/table-search/table-search.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
@@ -53,6 +54,7 @@ import { UserTableComponent } from './user-table/user-table.component';
     NavToggleModule,
     RefreshTableModule,
     TableActionsModule,
+    TableSearchModule,
     ActionKeysModule,
     MatMenuModule,
     MatSortModule,
