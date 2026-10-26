@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import frameworkDefinition from '../../../../../apps/docs/frameworks.json';
 import { MatButtonModule } from '@angular/material/button';
 import type { getFramework } from '@netlify/build-info';
-import { OIDC_CONFIGURATIONS } from 'src/app/utils/framework';
+import { FRAMEWORK_DEFINITION } from 'src/app/utils/framework';
 
 type FrameworkName = Parameters<typeof getFramework>[0];
 
@@ -29,13 +28,5 @@ export type Framework = FrameworkDefinition & {
   imports: [TranslateModule, RouterModule, MatButtonModule],
 })
 export class QuickstartComponent {
-  public frameworks: FrameworkDefinition[] = frameworkDefinition
-    .filter((f) => f.id && OIDC_CONFIGURATIONS[f.id])
-    .map((f) => {
-      return {
-        ...f,
-        imgSrcDark: `assets${f.imgSrcDark}`,
-        imgSrcLight: `assets${f.imgSrcLight ? f.imgSrcLight : f.imgSrcDark}`,
-      };
-    });
+  public frameworks: FrameworkDefinition[] = FRAMEWORK_DEFINITION;
 }
