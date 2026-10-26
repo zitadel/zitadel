@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"sync"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -275,6 +276,18 @@ func (es *Eventstore) pushTx(ctx context.Context, client new_db.QueryExecutor) (
 		return nil, nil, err
 	}
 	return tx, func(err error) error { return tx.End(ctx, err) }, nil
+}
+
+// endPushTx ends the transaction of a push using the deferrable returned by [Eventstore.pushTx].
+// recovered must be the result of recover() called by the deferred function.
+// If the push panicked, the transaction is ended with an error, so that it is rolled back instead of committed,
+// before the panic is propagated.
+func endPushTx(deferrable func(err error) error, err error, recovered any) error {
+	if recovered != nil {
+		_ = deferrable(fmt.Errorf("panic during push: %v", recovered))
+		panic(recovered)
+	}
+	return deferrable(err)
 }
 
 type EventstoreOption func(*Eventstore)

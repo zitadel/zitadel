@@ -40,7 +40,7 @@ func (es *Eventstore) writeCommands(ctx context.Context, client database.QueryEx
 	}
 	if close != nil {
 		defer func() {
-			err = close(err)
+			err = endPushTx(close, err, recover())
 		}()
 	}
 
