@@ -35,6 +35,13 @@ func Test_logMiddleware_InsertMany(t *testing.T) {
 			wantJobDetails:  2,
 			wantLogContains: []string{`"msg":"jobs inserted"`, `"count":2`, "kind1", "kind2"},
 		},
+		{
+			name: "result without job",
+			// not returned by river, covers the defensive check
+			results:         []*rivertype.JobInsertResult{{}},
+			wantJobDetails:  0,
+			wantLogContains: []string{`"msg":"jobs inserted"`, `"count":1`},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
