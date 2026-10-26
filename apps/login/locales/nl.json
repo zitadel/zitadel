@@ -255,6 +255,7 @@
       "smsDescription": "Voer jouw telefoonnummer in om een code via sms te ontvangen.",
       "emailDescription": "Voer jouw e-mailadres in om een code via e-mail te ontvangen.",
       "totpRegisterDescription": "Scan de QR-code of navigeer handmatig naar de URL.",
+      "manualSetupDescription": "Kun je de QR-code niet scannen? Voer dan deze sleutel in jouw authenticator-app in.",
       "submit": "Verder",
       "labels": {
         "code": "Code"
