@@ -13,7 +13,10 @@ import (
 	"github.com/stretchr/testify/require"
 	slogctx "github.com/veqryn/slog-context"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 	sdk_log "go.opentelemetry.io/otel/sdk/log"
+	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/sdk/trace/tracetest"
 
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -175,6 +178,33 @@ func Test_setLogger_otelExporter(t *testing.T) {
 		assert.Equal(t, want, got.attributes[key], key)
 	}
 	assert.Contains(t, got.attributes, "code.function.name")
+}
+
+func Test_setLogger_otelExporter_traceSpanID(t *testing.T) {
+	restoreGlobalLogger(t)
+
+	exporter := new(recordingExporter)
+	provider := sdk_log.NewLoggerProvider(sdk_log.WithProcessor(sdk_log.NewSimpleProcessor(exporter)))
+	setLogger(provider, LogConfig{
+		Level:  slog.LevelInfo,
+		Format: LogFormatDisabled,
+	})
+
+	spans := tracetest.NewSpanRecorder()
+	ctx, span := sdk_trace.NewTracerProvider(sdk_trace.WithSpanProcessor(spans)).Tracer("test").Start(context.Background(), "test")
+	slog.ErrorContext(ctx, "error")
+	span.End()
+
+	records := exporter.get()
+	require.Len(t, records, 2) // the first is the "structured logger configured" record
+	// the OTEL slog bridge sets the trace and span ID on the record itself
+	assert.NotContains(t, records[1].attributes, "trace_id")
+	assert.NotContains(t, records[1].attributes, "span_id")
+
+	// without standard error output, error logs do not change the span status
+	ended := spans.Ended()
+	require.Len(t, ended, 1)
+	assert.Equal(t, codes.Unset, ended[0].Status().Code)
 }
 
 // restoreGlobalLogger restores the global state changed by [setLogger] after the test.

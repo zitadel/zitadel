@@ -168,7 +168,18 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 		cfg.Mask.replacer(),
 	)
 
-	// The context attributes are added before the fanout,
+	// The OTEL slog bridge sets the trace and span ID on the record from the context,
+	// so they are only added as attributes to the standard error logs.
+	stdErrHandler = slogctx.NewHandler(
+		stdErrHandler,
+		&slogctx.HandlerOptions{
+			Prependers: []slogctx.AttrExtractor{
+				slogotel.ExtractTraceSpanID,
+			},
+		},
+	)
+
+	// The other context attributes are added before the fanout,
 	// so that both handlers receive and mask the same attributes.
 	handler := slogctx.NewHandler(
 		slogmulti.Fanout(stdErrHandler, otelHandler),
@@ -176,7 +187,6 @@ func setLogger(provider *log.LoggerProvider, cfg LogConfig) {
 			Prependers: []slogctx.AttrExtractor{
 				causeExtractor,
 				requestDetailsExtractor,
-				slogotel.ExtractTraceSpanID,
 				slogctx.ExtractPrepended,
 			},
 		},
