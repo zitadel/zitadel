@@ -4,9 +4,11 @@
   <div class="home-wrapper enlarged-container">
     <cnsl-quickstart></cnsl-quickstart>
 
-    @if (['iam.read$'] | hasRole | async) {
+    <!-- wait for the permissions, so the shortcuts (and their projects) aren't loaded for instance admins -->
+    @let isInstanceAdmin = ['iam.read$'] | hasRole | async;
+    @if (isInstanceAdmin) {
       <cnsl-onboarding />
-    } @else {
+    } @else if (isInstanceAdmin === false) {
       <cnsl-shortcuts />
     }
 

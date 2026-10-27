@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, combineLatest, map } from 'rxjs';
+import { BehaviorSubject, concat, from, of, switchMap } from 'rxjs';
 
 import { ManagementService } from './mgmt.service';
 
@@ -38,28 +38,20 @@ export class Breadcrumb {
 })
 export class BreadcrumbService {
   public readonly breadcrumbs$: BehaviorSubject<Breadcrumb[]> = new BehaviorSubject<Breadcrumb[]>([]);
-  public readonly breadcrumbsExtended$ = combineLatest([
-    this.breadcrumbs$,
-    this.mgmtService.ownedProjects,
-    this.mgmtService.grantedProjects,
-  ]).pipe(
-    map(([breadcrumbs, projects, grantedProjects]) => {
-      const newValues = breadcrumbs.map((b) => {
-        if (!b.name && b.type === BreadcrumbType.PROJECT) {
-          const project = projects.find((project) => b.param && project.id === b.param.value);
-          b.name = project?.name ?? '';
-          return b;
-        } else if (!b.name && b.type === BreadcrumbType.GRANTEDPROJECT) {
-          const grantedproject = grantedProjects.find(
-            (grantedproject) => b.param && grantedproject.projectId === b.param.value,
-          );
-          b.name = grantedproject?.projectName ?? '';
-          return b;
-        } else {
-          return b;
-        }
-      });
-      return newValues;
+  public readonly breadcrumbsExtended$ = this.breadcrumbs$.pipe(
+    switchMap((breadcrumbs) => {
+      // the names of granted projects are set by the pages, since they can't be loaded by the project id only
+      const unnamed = breadcrumbs.filter((b) => !b.name && b.type === BreadcrumbType.PROJECT && b.param);
+      if (!unnamed.length) {
+        return of(breadcrumbs);
+      }
+      // show the breadcrumbs right away and update them once the names are loaded
+      const named = Promise.all(
+        unnamed.map(async (b) => {
+          b.name = await this.projectName(b.param?.value ?? '');
+        }),
+      ).then(() => [...breadcrumbs]);
+      return concat(of(breadcrumbs), from(named));
     }),
   );
 
@@ -67,5 +59,12 @@ export class BreadcrumbService {
 
   public setBreadcrumb(breadcrumbs: Breadcrumb[]) {
     this.breadcrumbs$.next(breadcrumbs);
+  }
+
+  private projectName(projectId: string): Promise<string> {
+    return this.mgmtService
+      .getProjectByID(projectId)
+      .then((resp) => resp.project?.name ?? '')
+      .catch(() => '');
   }
 }

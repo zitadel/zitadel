@@ -12,20 +12,19 @@ import {
   verifyTOTPRegistration,
   sendEmailCode as zitadelSendEmailCode,
 } from "@/lib/zitadel";
-import crypto from "crypto";
 
 import { create } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getTranslations } from "next-intl/server";
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
-import { getOrSetFingerprintId } from "../fingerprint";
 import { checkMFAFactors } from "../mfa-helper";
 import { getServiceConfig } from "../service-url";
 import { loadMostRecentSession } from "../session";
+import { setUserVerificationCheckCookie } from "../verification-check";
 import { createSessionAndUpdateCookie } from "./cookie";
 import { getEnrollmentAuthorizationError } from "./enrollment-guard";
 import { getPublicHostWithProtocol } from "./host";
@@ -172,19 +171,9 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       params.set("requestId", command.requestId);
     }
 
-    // set hash of userId and userAgentId to prevent attacks, checks are done for users with invalid sessions and invalid userAgentId
-    const cookiesList = await cookies();
-    const userAgentId = await getOrSetFingerprintId();
-
-    const verificationCheck = crypto.createHash("sha256").update(`${user.userId}:${userAgentId}`).digest("hex");
-
-    await cookiesList.set({
-      name: "verificationCheck",
-      value: verificationCheck,
-      httpOnly: true,
-      path: "/",
-      maxAge: 300, // 5 minutes
-    });
+    // remember the successful verification for this browser (signed with a server-only secret),
+    // checks are done for users with invalid sessions and invalid userAgentId
+    await setUserVerificationCheckCookie(user.userId);
 
     return { redirect: `/authenticator/set?${params}` };
   }
