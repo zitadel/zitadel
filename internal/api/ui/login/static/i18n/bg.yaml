@@ -358,6 +358,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Външен потребител не е намерен
   Description: 'Външен потребител не е намерен. '
+  NoOptionAvailable: Не беше намерен профил, съответстващ на вашия външен потребител, и не може да бъде създаден нов профил. Моля, свържете се с вашия администратор или с поддръжката.
   LinkButtonText: Връзка
   AutoRegisterButtonText: регистрирам
   TosAndPrivacyLabel: Правила и условия
@@ -492,6 +493,7 @@ Errors:
         AlreadyReady: Многофакторният OTP (OneTimePassword) вече е настроен
         NotExisting: Многофакторният OTP (OneTimePassword) не съществува
         InvalidCode: Невалиден код
+        Reused: Този код вече е използван. Моля, изчакайте нов код
         NotReady: Многофакторният OTP (OneTimePassword) не е готов
     Locked: Потребителят е заключен
     SomethingWentWrong: Нещо се обърка

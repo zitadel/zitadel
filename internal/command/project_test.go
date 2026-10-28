@@ -6,6 +6,7 @@ import (
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -1244,6 +1245,34 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCommandSide_RemoveProjectOwnerDeleteReady(t *testing.T) {
+	r := &Commands{
+		eventstore: expectEventstore(
+			expectFilter(
+				eventFromEventPusher(
+					project.NewProjectAddedEvent(context.Background(),
+						&project.NewAggregate("project1", "org1").Aggregate,
+						"project", true, true, true,
+						domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
+				),
+			),
+			expectPush(
+				project.NewProjectRemovedByOwnerEvent(context.Background(),
+					&project.NewAggregate("project1", "org1").Aggregate,
+					"project"),
+			),
+		)(t),
+		checkPermission:  newMockPermissionCheckAllowed(),
+		ownerDeleteReady: func(context.Context) (bool, error) { return true, nil },
+	}
+	assertOwnerOnlyUniqueConstraints(t, project.NewProjectRemovedByOwnerEvent(context.Background(),
+		&project.NewAggregate("project1", "org1").Aggregate,
+		"project"), eventstore.UniqueConstraintOwnerProject, "project1")
+	got, err := r.RemoveProject(context.Background(), "project1", "org1")
+	require.NoError(t, err)
+	assertObjectDetails(t, &domain.ObjectDetails{ResourceOwner: "org1"}, got)
 }
 
 func TestCommandSide_DeleteProject(t *testing.T) {

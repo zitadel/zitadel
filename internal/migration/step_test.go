@@ -5,8 +5,37 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
+
+func TestStepStates_Reduce_failedKeepsLastRun(t *testing.T) {
+	agg := eventstore.NewAggregate(t.Context(), SystemAggregateID, SystemAggregate, "v1")
+	done := &SetupStep{
+		BaseEvent: eventstore.BaseEvent{EventType: repeatableDoneType, Agg: agg},
+		Name:      "79_backfill_unique_constraint_owners",
+		LastRun:   map[string]any{"version": "v1.0.0", "finalized": false},
+	}
+	failed := &SetupStep{
+		BaseEvent: eventstore.BaseEvent{EventType: failedType, Agg: agg},
+		Name:      "79_backfill_unique_constraint_owners",
+		LastRun:   map[string]any{"version": "v2.0.0", "finalized": true},
+	}
+
+	states := &StepStates{}
+	states.AppendEvents(done, failed)
+	require.NoError(t, states.Reduce())
+
+	step := states.byName("79_backfill_unique_constraint_owners")
+	require.NotNil(t, step)
+	assert.Equal(t, StepFailed, step.state)
+	lastRun, ok := step.LastRun.(map[string]any)
+	require.True(t, ok)
+	assert.Equal(t, "v1.0.0", lastRun["version"])
+	assert.Equal(t, false, lastRun["finalized"])
+}
 
 func TestStepStates_lastByState(t *testing.T) {
 	now := time.Now()

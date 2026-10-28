@@ -28,6 +28,7 @@ type Server struct {
 }
 
 func CreateServer(
+	systemDefaults systemdefaults.SystemDefaults,
 	command *command.Commands,
 	query *query.Queries,
 	defaultInstance command.InstanceSetup,
@@ -35,6 +36,7 @@ func CreateServer(
 	check domain.PermissionCheck,
 ) *Server {
 	return &Server{
+		systemDefaults:  systemDefaults,
 		command:         command,
 		query:           query,
 		defaultInstance: defaultInstance,

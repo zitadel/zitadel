@@ -11,10 +11,10 @@ import (
 	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
@@ -91,8 +91,11 @@ func updateJWTConfigToDomain(req *mgmt_pb.UpdateOrgIDPJWTConfigRequest) *domain.
 	}
 }
 
-func listIDPsToModel(ctx context.Context, req *mgmt_pb.ListOrgIDPsRequest) (queries *query.IDPSearchQueries, err error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func listIDPsToModel(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListOrgIDPsRequest) (queries *query.IDPSearchQueries, err error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	q, err := idpQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
@@ -154,8 +157,11 @@ func userLinksToDomain(idps []*query.IDPUserLink) []*domain.UserIDPLink {
 	return links
 }
 
-func listProvidersToQuery(ctx context.Context, req *mgmt_pb.ListProvidersRequest) (*query.IDPTemplateSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func listProvidersToQuery(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListProvidersRequest) (*query.IDPTemplateSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := providerQueriesToQuery(req.Queries)
 	if err != nil {
 		return nil, err
@@ -544,38 +550,22 @@ func signatureAlgorithmToCommand(signatureAlgorithm idp_pb.SAMLSignatureAlgorith
 
 func addZitadelProviderToCommand(req *mgmt_pb.AddZitadelProviderRequest) command.ZitadelProvider {
 	return command.ZitadelProvider{
-		Name:              req.Name,
-		Issuer:            req.Issuer,
-		ClientID:          req.ClientId,
-		ClientSecret:      req.ClientSecret,
-		Scopes:            req.Scopes,
-		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
-		InstanceRolesInfo: instanceRolesInfoToCommand(req.InstanceRolesInfo),
+		Name:         req.Name,
+		Issuer:       req.Issuer,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 
 func updateZitadelProviderToCommand(req *mgmt_pb.UpdateZitadelProviderRequest) command.ZitadelProvider {
 	return command.ZitadelProvider{
-		Name:              req.Name,
-		Issuer:            req.Issuer,
-		ClientID:          req.ClientId,
-		ClientSecret:      req.ClientSecret,
-		Scopes:            req.Scopes,
-		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
-		InstanceRolesInfo: instanceRolesInfoToCommand(req.InstanceRolesInfo),
+		Name:         req.Name,
+		Issuer:       req.Issuer,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
-}
-
-func instanceRolesInfoToCommand(reqInstanceRolesInfo []*idp_pb.InstanceRolesInfo) []idp.RolesInfo {
-	if reqInstanceRolesInfo == nil {
-		return nil
-	}
-	instanceRolesInfo := make([]idp.RolesInfo, 0, len(reqInstanceRolesInfo))
-	for _, info := range reqInstanceRolesInfo {
-		instanceRolesInfo = append(instanceRolesInfo, idp.RolesInfo{
-			OrganizationID:     info.OrganizationId,
-			OrganizationDomain: info.OrganizationDomain,
-		})
-	}
-	return instanceRolesInfo
 }

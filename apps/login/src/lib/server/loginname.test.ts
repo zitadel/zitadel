@@ -279,6 +279,70 @@ describe("sendLoginname", () => {
         });
       });
 
+      test("should pass the login name to the user's IDP as a login hint", async () => {
+        mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD],
+        });
+        mockListIDPLinks.mockResolvedValue({
+          result: [{ idpId: "idp123" }],
+        });
+        mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
+
+        await sendLoginname({
+          loginName: "user@example.com",
+        });
+
+        expect(mockStartIdentityProviderFlow).toHaveBeenCalledWith(
+          expect.objectContaining({
+            urls: expect.objectContaining({ loginHint: "user@example.com" }),
+          }),
+        );
+      });
+
+      test("should prefer the username known by the linked IDP over the login name as a login hint", async () => {
+        mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD],
+        });
+        mockListIDPLinks.mockResolvedValue({
+          result: [{ idpId: "idp123", userName: "user.name@idp.example.com" }],
+        });
+        mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
+
+        await sendLoginname({
+          loginName: "user@example.com",
+        });
+
+        expect(mockStartIdentityProviderFlow).toHaveBeenCalledWith(
+          expect.objectContaining({
+            urls: expect.objectContaining({ loginHint: "user.name@idp.example.com" }),
+          }),
+        );
+      });
+
+      test("should add the suffix back to the login hint when the user only typed the local part", async () => {
+        mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD],
+        });
+        mockListIDPLinks.mockResolvedValue({
+          result: [{ idpId: "idp123" }],
+        });
+        mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
+
+        await sendLoginname({
+          loginName: "user",
+          suffix: "example.com",
+        });
+
+        expect(mockStartIdentityProviderFlow).toHaveBeenCalledWith(
+          expect.objectContaining({
+            urls: expect.objectContaining({ loginHint: "user@example.com" }),
+          }),
+        );
+      });
+
       test("should return error when password not allowed and no IDP links available", async () => {
         mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
         mockListAuthenticationMethodTypes.mockResolvedValue({
@@ -317,6 +381,29 @@ describe("sendLoginname", () => {
           serviceConfig: { baseUrl: "https://api.example.com" },
           orgId: "org123", // User's organization from resourceOwner
         });
+      });
+
+      test("should pass the login name to the organization's single active IDP as a login hint", async () => {
+        mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD],
+        });
+        mockListIDPLinks.mockResolvedValue({ result: [] });
+        mockGetActiveIdentityProviders.mockResolvedValue({
+          identityProviders: [{ id: "org-idp-123", type: 0, options: { isAutoCreation: true } }],
+        });
+        mockIdpTypeToSlug.mockReturnValue("google");
+        mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://org-idp.example.com/auth" });
+
+        await sendLoginname({
+          loginName: "user@example.com",
+        });
+
+        expect(mockStartIdentityProviderFlow).toHaveBeenCalledWith(
+          expect.objectContaining({
+            urls: expect.objectContaining({ loginHint: "user@example.com" }),
+          }),
+        );
       });
 
       test("should redirect to passkey when user has only passkey method and it's allowed", async () => {
@@ -537,7 +624,6 @@ describe("sendLoginname", () => {
         loginName: "user@example.com",
         requestId: "req123",
         organization: "org123",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).toBeDefined();
@@ -545,6 +631,81 @@ describe("sendLoginname", () => {
       expect(result?.redirect).toContain("loginName=user%40example.com");
       expect(result?.redirect).toContain("requestId=req123");
       expect(result?.redirect).toContain("organization=org123");
+    });
+
+    test("should redirect to IDP via domain discovery for IdP-only org even when ignoreUnknownUsernames is true", async () => {
+      // Regression test: enumeration protection must not divert unknown users of
+      // an IdP-only org (allowLocalAuthentication: false) to the decoy password
+      // screen — known users of that org are auto-redirected to the IdP, so the
+      // redirect is the indistinguishable (and functional) behavior.
+      mockGetLoginSettings
+        .mockResolvedValueOnce({
+          // context (instance default) settings
+          ignoreUnknownUsernames: true,
+          allowLocalAuthentication: true,
+        })
+        .mockResolvedValueOnce({
+          // discovered org settings: IdP-only
+          allowDomainDiscovery: true,
+          allowRegister: false,
+          allowLocalAuthentication: false,
+          ignoreUnknownUsernames: true,
+        });
+
+      mockGetOrgsByDomain.mockResolvedValue({
+        result: [{ id: "discovered-org-sso", name: "Enterprise Org" }],
+      });
+
+      mockGetActiveIdentityProviders.mockResolvedValue({
+        identityProviders: [{ id: "idp-entra", type: "OIDC", options: { isCreationAllowed: true } }],
+      });
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://entra.example.com/auth" });
+
+      const result = await sendLoginname({
+        loginName: "newuser@enterprise.com",
+        requestId: "req123",
+      });
+
+      expect(result).toEqual({ redirect: "https://entra.example.com/auth" });
+
+      expect(mockGetActiveIdentityProviders).toHaveBeenCalledWith({
+        serviceConfig: { baseUrl: "https://api.example.com" },
+        orgId: "discovered-org-sso",
+      });
+    });
+
+    test("should keep decoy password screen when ignoreUnknownUsernames is true and discovered org allows local authentication", async () => {
+      // With local authentication enabled, known (password) users see the
+      // password screen, so the decoy is what keeps unknown users
+      // indistinguishable — the discovery-based IdP redirect stays gated.
+      mockGetLoginSettings
+        .mockResolvedValueOnce({
+          // context (instance default) settings
+          ignoreUnknownUsernames: true,
+          allowLocalAuthentication: true,
+        })
+        .mockResolvedValueOnce({
+          // discovered org settings: local auth enabled
+          allowDomainDiscovery: true,
+          allowRegister: false,
+          allowLocalAuthentication: true,
+          ignoreUnknownUsernames: true,
+        });
+
+      mockGetOrgsByDomain.mockResolvedValue({
+        result: [{ id: "discovered-org-local", name: "Password Org" }],
+      });
+
+      const result = await sendLoginname({
+        loginName: "newuser@company.com",
+        requestId: "req123",
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.redirect).toMatch(/^\/password\?/);
+      expect(result?.redirect).toContain("loginName=newuser%40company.com");
+      expect(result?.redirect).toContain("organization=discovered-org-local");
+      expect(mockStartIdentityProviderFlow).not.toHaveBeenCalled();
     });
 
     test("should return error when user not found and no registration allowed", async () => {
@@ -874,7 +1035,6 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user@example.com",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).not.toEqual({ error: "errors.userNotFound" });
@@ -899,7 +1059,6 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user@example.com",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).not.toEqual({ error: "errors.userNotFound" });
@@ -989,7 +1148,6 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user@example.com",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).not.toEqual({ error: "errors.moreThanOneUserFound" });
@@ -1020,7 +1178,7 @@ describe("sendLoginname", () => {
         rawMessage: "Errors.User.NotActive (SESSION-Gj4ko)",
       });
 
-      const result = await sendLoginname({ loginName: "user1", ignoreUnknownUsernames: true });
+      const result = await sendLoginname({ loginName: "user1" });
 
       expect(result).toEqual({ redirect: "/password?loginName=user1" });
       // With ignoreUnknownUsernames: true, we skip session creation, so this mock is NOT called
@@ -1046,7 +1204,7 @@ describe("sendLoginname", () => {
         authMethodTypes: [AuthenticationMethodType.PASSWORD],
       });
 
-      const result = await sendLoginname({ loginName: "user1", ignoreUnknownUsernames: true });
+      const result = await sendLoginname({ loginName: "user1" });
 
       expect(result).toEqual({ redirect: "/password?loginName=user1" });
       expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
@@ -1086,7 +1244,6 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user@example.com",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).not.toEqual({ error: "errors.localAuthenticationNotAllowed" });
@@ -1126,7 +1283,6 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user@example.com",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).not.toEqual({ error: "errors.passkeysNotAllowed" });
@@ -1239,7 +1395,6 @@ describe("sendLoginname", () => {
       // INPUT login name is just "user"
       const result = await sendLoginname({
         loginName: "user",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).toHaveProperty("redirect");
@@ -1281,7 +1436,6 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).toHaveProperty("redirect");
@@ -1323,7 +1477,6 @@ describe("sendLoginname", () => {
 
       const result = await sendLoginname({
         loginName: "user",
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).toHaveProperty("redirect");
@@ -1371,7 +1524,6 @@ describe("sendLoginname", () => {
       const result = await sendLoginname({
         loginName: "input-name",
         organization: "context-org", // Context has ignore=true
-        ignoreUnknownUsernames: true,
       });
 
       expect(result).toHaveProperty("redirect");
@@ -1419,7 +1571,6 @@ describe("sendLoginname", () => {
       const result = await sendLoginname({
         loginName: "input-name",
         organization: "context-org", // Context has ignore=false
-        ignoreUnknownUsernames: false,
       });
 
       expect(result).toHaveProperty("redirect");

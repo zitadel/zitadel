@@ -5,6 +5,7 @@ import (
 	"errors"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/shopspring/decimal"
@@ -15,7 +16,9 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-// awaitOpenTransactions ensures event ordering, so we don't events younger that open transactions
+// awaitOpenTransactions drains in-flight writers, then caps at projector TX start (now()),
+// not clock_timestamp(). A wall-clock cap at SELECT time would include rows inserted after
+// BEGIN and recreate position overtake.
 var (
 	awaitOpenTransactionsV1 = ` AND created_at <= now()`
 	awaitOpenTransactionsV2 = ` AND "position" <= EXTRACT(EPOCH FROM now())`
@@ -37,6 +40,38 @@ func NewPostgres(client *database.DB) *Postgres {
 }
 
 func (db *Postgres) Health(ctx context.Context) error { return db.Ping() }
+
+const eventColumnsSQL = `created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision, in_tx_order`
+
+// eventSortKeyColumns is the lexicographic sort key of events.
+// It defines the default ORDER BY and the tuple of the resume cursor ([eventstore.EventSortKey]),
+// both must always use the same columns in the same order.
+var eventSortKeyColumns = []string{`"position"`, "in_tx_order", "instance_id", "aggregate_type", "aggregate_id", `"sequence"`}
+
+// eventSortKeySQL is the comma separated [eventSortKeyColumns], used as tuple in the resume cursor
+// and as ORDER BY of the per event type scans.
+var eventSortKeySQL = strings.Join(eventSortKeyColumns, ", ")
+
+// orderBy builds the ORDER BY clause of the given columns, all in the same direction.
+// It is deliberately written as a column list and not as a row constructor (ORDER BY (a, b) DESC):
+// only a column list allows postgres to presort from an index (incremental sort) and stop after
+// LIMIT rows instead of sorting all matching events.
+func orderBy(desc bool, columns ...string) string {
+	direction := ""
+	if desc {
+		direction = " DESC"
+	}
+	var b strings.Builder
+	b.WriteString(" ORDER BY ")
+	for i, column := range columns {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		b.WriteString(column)
+		b.WriteString(direction)
+	}
+	return b.String()
+}
 
 // FilterToReducer finds all events matching the given search query and passes them to the reduce function.
 func (psql *Postgres) FilterToReducer(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder, reduce eventstore.Reducer) (err error) {
@@ -76,24 +111,18 @@ func (db *Postgres) Client() *database.DB {
 	return db.DB
 }
 
-func (db *Postgres) orderByEventSequence(desc, shouldOrderBySequence, useV1 bool) string {
+func (db *Postgres) orderByEventSequence(desc, shouldOrderBySequence, orderByCreationDate, useV1 bool) string {
 	if useV1 {
-		if desc {
-			return ` ORDER BY event_sequence DESC`
-		}
-		return ` ORDER BY event_sequence`
+		return orderBy(desc, "event_sequence")
 	}
 	if shouldOrderBySequence {
-		if desc {
-			return ` ORDER BY "sequence" DESC`
-		}
-		return ` ORDER BY "sequence"`
+		return orderBy(desc, `"sequence"`)
 	}
-
-	if desc {
-		return ` ORDER BY "position" DESC, in_tx_order DESC, instance_id, aggregate_type, aggregate_id`
+	if orderByCreationDate {
+		// created_at first and the sort key as tie breaker for events created in the same microsecond
+		return orderBy(desc, append([]string{"created_at"}, eventSortKeyColumns...)...)
 	}
-	return ` ORDER BY "position", in_tx_order, instance_id, aggregate_type, aggregate_id`
+	return orderBy(desc, eventSortKeyColumns...)
 }
 
 func (db *Postgres) eventQuery(useV1 bool) string {
@@ -111,19 +140,7 @@ func (db *Postgres) eventQuery(useV1 bool) string {
 			", aggregate_version" +
 			" FROM eventstore.events"
 	}
-	return "SELECT" +
-		" created_at" +
-		", event_type" +
-		`, "sequence"` +
-		`, "position"` +
-		", payload" +
-		", creator" +
-		`, "owner"` +
-		", instance_id" +
-		", aggregate_type" +
-		", aggregate_id" +
-		", revision" +
-		" FROM eventstore.events2"
+	return "SELECT " + eventColumnsSQL + " FROM eventstore.events2"
 }
 
 func (db *Postgres) maxPositionQuery(useV1 bool) string {

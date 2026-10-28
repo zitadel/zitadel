@@ -99,7 +99,7 @@ We currently allow all token types, except refresh tokens, to be used as subject
 
 The actor parameters are optional and enable impersonation and delegation. At ZITADEL we don't make any distinction between the two concepts, so we call both cases impersonation from this point.The `actor_token` and `actor_token_type` come in a pair. If the actor token is provided, the actor token type must also be specified.
 
-Currently only a valid access token or ID token are allowed as actor token. The user represented by the actor token must have the [impersonation permission](#impersonation-permissions) set, or else the request will be rejected and an error returned.
+Currently only a valid access token or ID token are allowed as actor token. The user represented by the actor token must have the [impersonation permission](#impersonation-permissions) set, or else the request will be rejected and an error returned. Note that `*_END_USER_IMPERSONATOR` roles can only impersonate users without memberships. To impersonate a user with any administrative membership, or for a machine user impersonating itself, an admin impersonator role such as `ORG_ADMIN_IMPERSONATOR` or `IAM_ADMIN_IMPERSONATOR` is required.
 
 #### Requested token type
 
@@ -113,9 +113,11 @@ Currently ZITADEL supports requesting of:
 
 #### Scope
 
-[Scope](/apis/openidoauth/scopes) is an optional parameter that allows changing the scope of the supplied token, for the requested token. Scope can be entirely different from any of the supplied tokens. It can be used to extend or decrease the scope of the new token.
+[Scope](/apis/openidoauth/scopes) is an optional parameter that allows changing the scope of the supplied token, for the requested token. Scope can be used to decrease privileges carried by the input tokens. Authorization-related reserved scopes (for example project audience or `offline_access`) must already be present on the `subject_token` and/or `actor_token`.
 
 When scope is omitted in the request, it is taken from the `subject_token`. If the `subject_token` doesn't carry any scope (some types can't), it is taken from the `actor_token`. All allowed token types for the `actor_token` typically have a scope.
+
+The reserved scope `urn:zitadel:iam:org:roles:id:{orgID}` is special: it only filters which organization IDs appear in role claims and never grants additional roles. During token exchange it is **downscope-only**. You may add it to narrow a broad token, or further reduce an existing filter, but you cannot switch to an organization that was not already allowed by the subject token. If the subject token already includes that filter and the exchange request omits it, ZITADEL inherits the filter so omitting scope cannot re-widen role claims.
 
 #### Audience
 
@@ -458,7 +460,9 @@ Next, we need to configure which users are allowed to impersonate other users. Z
 | Org Admin Impersonator | ORG_ADMIN_IMPERSONATOR    | Allow impersonation of admin and end users from the organization  |
 | Org Impersonator       | ORG_END_USER_IMPERSONATOR | Allow impersonation of end users from the organization            |
 
- In this example we will assign the `ORG_END_USER_IMPERSONATOR` role to a user:
+The `*_END_USER_IMPERSONATOR` roles only work for users who have no memberships. If the impersonated user has any administrative membership, you must use an admin impersonator role instead, such as `ORG_ADMIN_IMPERSONATOR` or `IAM_ADMIN_IMPERSONATOR`. The same applies when a machine user impersonates itself: use an admin impersonator role.
+
+In this example we will assign the `ORG_END_USER_IMPERSONATOR` role to a user:
 
 ![](../../../public/img/guides/token-exchange/org-role-end-user-impersonator.png)
 

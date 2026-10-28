@@ -47,6 +47,14 @@ var (
 		name:  projection.SecurityPolicyColumnEnableImpersonation,
 		table: securityPolicyTable,
 	}
+	SecurityPolicyColumnEnableDynamicClientRegistration = Column{
+		name:  projection.SecurityPolicyColumnEnableDynamicClientRegistration,
+		table: securityPolicyTable,
+	}
+	SecurityPolicyColumnAllowUnauthenticatedDynamicClientRegistration = Column{
+		name:  projection.SecurityPolicyColumnAllowUnauthenticatedDynamicClientRegistration,
+		table: securityPolicyTable,
+	}
 )
 
 type SecurityPolicy struct {
@@ -59,6 +67,9 @@ type SecurityPolicy struct {
 	EnableIframeEmbedding bool
 	AllowedOrigins        database.TextArray[string]
 	EnableImpersonation   bool
+
+	EnableDynamicClientRegistration               bool
+	AllowUnauthenticatedDynamicClientRegistration bool
 }
 
 func (q *Queries) SecurityPolicy(ctx context.Context) (policy *SecurityPolicy, err error) {
@@ -86,7 +97,9 @@ func prepareSecurityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*SecurityPo
 			SecurityPolicyColumnSequence.identifier(),
 			SecurityPolicyColumnEnableIframeEmbedding.identifier(),
 			SecurityPolicyColumnAllowedOrigins.identifier(),
-			SecurityPolicyColumnEnableImpersonation.identifier()).
+			SecurityPolicyColumnEnableImpersonation.identifier(),
+			SecurityPolicyColumnEnableDynamicClientRegistration.identifier(),
+			SecurityPolicyColumnAllowUnauthenticatedDynamicClientRegistration.identifier()).
 			From(securityPolicyTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*SecurityPolicy, error) {
@@ -100,6 +113,8 @@ func prepareSecurityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*SecurityPo
 				&securityPolicy.EnableIframeEmbedding,
 				&securityPolicy.AllowedOrigins,
 				&securityPolicy.EnableImpersonation,
+				&securityPolicy.EnableDynamicClientRegistration,
+				&securityPolicy.AllowUnauthenticatedDynamicClientRegistration,
 			)
 			if err != nil && !errors.Is(err, sql.ErrNoRows) { // ignore not found errors
 				return nil, zerrors.ThrowInternal(err, "QUERY-Dfrt2", "Errors.Internal")
