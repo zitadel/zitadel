@@ -6,6 +6,7 @@ import { Translated } from "@/components/translated";
 import { getServiceConfig } from "@/lib/service-url";
 import {
   getActiveIdentityProviders,
+  getAuthRequest,
   getBrandingSettings,
   getDefaultOrg,
   getLegalAndSupportSettings,
@@ -37,10 +38,23 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     }
   }
 
+  // For an OIDC auth request without an explicit organization, honor the project's
+  // private-labeling org for BRANDING ONLY; policy/IdP/discovery keep using organization.
+  let brandingOrganization;
+  if (!searchParams.organization && requestId?.startsWith("oidc_")) {
+    const { authRequest } = await getAuthRequest({
+      serviceConfig,
+      authRequestId: requestId.replace("oidc_", ""),
+    });
+    if (authRequest?.privateLabelingOrganizationId) {
+      brandingOrganization = authRequest.privateLabelingOrganizationId;
+    }
+  }
+
   const legal = await getLegalAndSupportSettings({ serviceConfig, organization });
   const passwordComplexitySettings = await getPasswordComplexitySettings({ serviceConfig, organization });
 
-  const branding = await getBrandingSettings({ serviceConfig, organization });
+  const branding = await getBrandingSettings({ serviceConfig, organization: brandingOrganization ?? organization });
 
   const loginSettings = await getLoginSettings({ serviceConfig, organization });
 

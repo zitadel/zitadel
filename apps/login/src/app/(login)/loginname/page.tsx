@@ -3,7 +3,13 @@ import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { Translated } from "@/components/translated";
 import { UsernameForm } from "@/components/username-form";
 import { getServiceConfig } from "@/lib/service-url";
-import { getActiveIdentityProviders, getBrandingSettings, getDefaultOrg, getLoginSettings } from "@/lib/zitadel";
+import {
+  getActiveIdentityProviders,
+  getAuthRequest,
+  getBrandingSettings,
+  getDefaultOrg,
+  getLoginSettings,
+} from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -32,10 +38,24 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const { serviceConfig } = getServiceConfig(_headers);
 
   let defaultOrganization;
+  let brandingOrganization;
   if (!organization) {
     const org: Organization | null = await getDefaultOrg({ serviceConfig });
     if (org) {
       defaultOrganization = org.id;
+    }
+
+    // For an OIDC auth request, honor the project's private-labeling org for BRANDING ONLY
+    // (see the AuthRequest's resolved private_labeling_organization_id). Login policy, IdP discovery,
+    // and username discovery keep using the real default organization.
+    if (requestId?.startsWith("oidc_")) {
+      const { authRequest } = await getAuthRequest({
+        serviceConfig,
+        authRequestId: requestId.replace("oidc_", ""),
+      });
+      if (authRequest?.privateLabelingOrganizationId) {
+        brandingOrganization = authRequest.privateLabelingOrganizationId;
+      }
     }
   }
 
@@ -48,7 +68,10 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     return resp.identityProviders;
   });
 
-  const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization });
+  const branding = await getBrandingSettings({
+    serviceConfig,
+    organization: organization ?? brandingOrganization ?? defaultOrganization,
+  });
 
   return (
     <DynamicTheme branding={branding}>

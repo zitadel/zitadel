@@ -88,6 +88,8 @@ func authRequestToPb(a *query.AuthRequest) *oidc_pb.AuthRequest {
 		UiLocales:    a.UiLocales,
 		LoginHint:    a.LoginHint,
 		HintUserId:   a.HintUserID,
+
+		PrivateLabelingOrganizationId: a.PrivateLabelingOrgID,
 	}
 	if a.MaxAge != nil {
 		pba.MaxAge = durationpb.New(*a.MaxAge)
