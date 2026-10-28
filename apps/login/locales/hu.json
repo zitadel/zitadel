@@ -241,6 +241,7 @@
       "emailDescription": "Add meg az e-mailben kapott kódot.",
       "noCodeReceived": "Nem kaptál kódot?",
       "resendCode": "Kód újraküldése",
+      "resendCodeIn": "Kód újraküldése ({seconds} mp)",
       "submit": "Tovább",
       "labels": {
         "code": "Kód"
@@ -265,7 +266,8 @@
     },
     "errors": {
       "couldNotRequestChallenge": "Nem sikerült OTP-kihívást kérni",
-      "couldNotVerifyCode": "Nem sikerült ellenőrizni az OTP-kódot"
+      "couldNotVerifyCode": "Nem sikerült ellenőrizni az OTP-kódot",
+      "resendCooldown": "Várj {seconds} másodpercet, mielőtt új kódot kérsz."
     }
   },
   "passkey": {

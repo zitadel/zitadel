@@ -241,6 +241,7 @@
       "emailDescription": "Entrez le code reçu par e-mail.",
       "noCodeReceived": "Vous n'avez pas reçu de code ?",
       "resendCode": "Renvoyer le code",
+      "resendCodeIn": "Renvoyer le code ({seconds}s)",
       "submit": "Continuer",
       "labels": {
         "code": "Code"
@@ -265,7 +266,8 @@
     },
     "errors": {
       "couldNotRequestChallenge": "Impossible de demander le challenge OTP",
-      "couldNotVerifyCode": "Impossible de vérifier le code OTP"
+      "couldNotVerifyCode": "Impossible de vérifier le code OTP",
+      "resendCooldown": "Veuillez patienter {seconds} secondes avant de demander un nouveau code."
     }
   },
   "passkey": {

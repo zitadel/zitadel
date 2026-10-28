@@ -241,6 +241,7 @@
       "emailDescription": "E-posta ile aldığınız kodu girin.",
       "noCodeReceived": "Kod almadınız mı?",
       "resendCode": "Kodu tekrar gönder",
+      "resendCodeIn": "Kodu tekrar gönder ({seconds} sn)",
       "submit": "Devam",
       "labels": {
         "code": "Kod"
@@ -265,7 +266,8 @@
     },
     "errors": {
       "couldNotRequestChallenge": "OTP meydan okuması istenemedi",
-      "couldNotVerifyCode": "OTP kodu doğrulanamadı"
+      "couldNotVerifyCode": "OTP kodu doğrulanamadı",
+      "resendCooldown": "Yeni bir kod istemeden önce lütfen {seconds} saniye bekleyin."
     }
   },
   "passkey": {

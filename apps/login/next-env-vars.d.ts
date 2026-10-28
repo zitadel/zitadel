@@ -94,6 +94,13 @@ declare namespace NodeJS {
     NEXT_PUBLIC_AUTO_SUBMIT_CODE?: string;
 
     /**
+     * Optional: Minimum number of seconds between two OTP SMS codes sent for the same session.
+     * Enforced by the server and shown as a countdown on the "Resend code" button, it keeps users
+     * (and scripts) from requesting codes in a loop. Defaults to 30, set to "0" to disable.
+     */
+    OTP_SMS_RESEND_COOLDOWN_SECONDS?: string;
+
+    /**
      * Optional: Enable the SWR in-memory cache for API requests globally.
      * Defaults to true. Set to "false" to disable completely.
      */

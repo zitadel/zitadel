@@ -1,7 +1,7 @@
 import { create } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
-import { assert, describe, expect, it } from "vitest";
-import { sanitizeChallenges } from "./challenges";
+import { afterEach, assert, describe, expect, it, vi } from "vitest";
+import { getOTPSMSResendCooldownSeconds, getOTPSMSRetryAfterSeconds, sanitizeChallenges } from "./challenges";
 
 describe("sanitizeChallenges", () => {
   it("returns undefined when no challenges are requested", () => {
@@ -78,5 +78,66 @@ describe("sanitizeChallenges", () => {
 
     expect(challenges.otpSms?.returnCode).toBe(true);
     expect(challenges.otpEmail?.deliveryType?.case).toBe("returnCode");
+  });
+});
+
+describe("getOTPSMSResendCooldownSeconds", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("defaults to 30 seconds", () => {
+    vi.stubEnv("OTP_SMS_RESEND_COOLDOWN_SECONDS", undefined);
+    expect(getOTPSMSResendCooldownSeconds()).toBe(30);
+  });
+
+  it("uses the configured value", () => {
+    vi.stubEnv("OTP_SMS_RESEND_COOLDOWN_SECONDS", "60");
+    expect(getOTPSMSResendCooldownSeconds()).toBe(60);
+  });
+
+  it("allows disabling the cooldown with 0", () => {
+    vi.stubEnv("OTP_SMS_RESEND_COOLDOWN_SECONDS", "0");
+    expect(getOTPSMSResendCooldownSeconds()).toBe(0);
+  });
+
+  it.each(["", "abc", "-5", "1.5"])("falls back to the default for the invalid value %j", (value) => {
+    vi.stubEnv("OTP_SMS_RESEND_COOLDOWN_SECONDS", value);
+    expect(getOTPSMSResendCooldownSeconds()).toBe(30);
+  });
+});
+
+describe("getOTPSMSRetryAfterSeconds", () => {
+  const now = 1_000_000;
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("allows sending when no SMS was sent yet", () => {
+    expect(getOTPSMSRetryAfterSeconds(undefined, now)).toBe(0);
+  });
+
+  it("allows sending when the timestamp is not a number", () => {
+    expect(getOTPSMSRetryAfterSeconds("garbage", now)).toBe(0);
+  });
+
+  it("returns the remaining seconds, rounded up, within the cooldown", () => {
+    expect(getOTPSMSRetryAfterSeconds(`${now}`, now)).toBe(30);
+    expect(getOTPSMSRetryAfterSeconds(`${now - 10_500}`, now)).toBe(20);
+    expect(getOTPSMSRetryAfterSeconds(`${now - 29_999}`, now)).toBe(1);
+  });
+
+  it("allows sending once the cooldown has passed", () => {
+    expect(getOTPSMSRetryAfterSeconds(`${now - 30_000}`, now)).toBe(0);
+  });
+
+  it("caps a timestamp in the future at the full cooldown", () => {
+    expect(getOTPSMSRetryAfterSeconds(`${now + 3_600_000}`, now)).toBe(30);
+  });
+
+  it("follows the configured cooldown", () => {
+    vi.stubEnv("OTP_SMS_RESEND_COOLDOWN_SECONDS", "0");
+    expect(getOTPSMSRetryAfterSeconds(`${now}`, now)).toBe(0);
   });
 });

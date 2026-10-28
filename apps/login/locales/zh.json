@@ -241,6 +241,7 @@
       "emailDescription": "输入通过电子邮件收到的验证码。",
       "noCodeReceived": "没有收到验证码？",
       "resendCode": "重发验证码",
+      "resendCodeIn": "重发验证码 ({seconds}秒)",
       "submit": "继续",
       "labels": {
         "code": "验证码"
@@ -265,7 +266,8 @@
     },
     "errors": {
       "couldNotRequestChallenge": "无法请求 OTP 质询",
-      "couldNotVerifyCode": "无法验证 OTP 验证码"
+      "couldNotVerifyCode": "无法验证 OTP 验证码",
+      "resendCooldown": "请等待 {seconds} 秒后再请求新的验证码。"
     }
   },
   "passkey": {
