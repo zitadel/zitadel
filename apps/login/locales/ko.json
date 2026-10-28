@@ -77,7 +77,7 @@
         "couldNotResetPassword": "비밀번호를 재설정할 수 없습니다"
       },
       "info": {
-        "passwordResetSent": "비밀번호가 재설정되었습니다. 이메일을 확인하세요"
+        "passwordResetSent": "비밀번호 재설정 메일을 보냈습니다. 이메일을 확인하세요"
       }
     },
     "set": {
@@ -152,7 +152,8 @@
       "failedPrecondition": "사전 조건이 충족되지 않았습니다",
       "sessionNotValid": "세션이 유효하지 않습니다",
       "passwordVerificationMissing": "비밀번호 확인이 누락되었습니다.",
-      "passwordVerificationTooOld": "비밀번호 확인이 너무 오래되었습니다. 비밀번호를 다시 확인하세요."
+      "passwordVerificationTooOld": "비밀번호 확인이 너무 오래되었습니다. 비밀번호를 다시 확인하세요.",
+      "passwordResetNotAllowed": "비밀번호 재설정이 허용되지 않습니다. 자세한 내용은 관리자에게 문의하세요."
     }
   },
   "idp": {
@@ -164,6 +165,7 @@
     "signInWithAzureAD": "AzureAD로 로그인",
     "signInWithGithub": "GitHub로 로그인",
     "signInWithGitlab": "GitLab으로 로그인",
+    "signInWithZitadel": "Zitadel로 로그인",
     "loginError": {
       "title": "로그인 실패",
       "description": "로그인 중 오류가 발생했습니다."
@@ -260,6 +262,10 @@
       "required": {
         "code": "필수 입력 항목입니다"
       }
+    },
+    "errors": {
+      "couldNotRequestChallenge": "OTP 챌린지를 요청할 수 없습니다",
+      "couldNotVerifyCode": "OTP 코드를 확인할 수 없습니다"
     }
   },
   "passkey": {
@@ -421,7 +427,15 @@
     "description": "인증할 방법을 선택하세요",
     "noMethodsAvailable": "사용 가능한 인증 방법이 없습니다",
     "allSetup": "이미 인증기를 설정했습니다!",
-    "linkWithIDP": "또는 ID 제공자와 연결"
+    "linkWithIDP": "또는 ID 제공자와 연결",
+    "methods": {
+      "totp": "인증 앱",
+      "u2f": "범용 2단계 인증(U2F)",
+      "otpEmail": "이메일로 코드 받기",
+      "otpSms": "SMS로 코드 받기",
+      "passkey": "패스키",
+      "password": "비밀번호"
+    }
   },
   "device": {
     "usercode": {
@@ -438,7 +452,8 @@
     "request": {
       "title": "{appName}에서 연결을 요청합니다",
       "description": "{appName}에 다음 권한이 부여됩니다:",
-      "disclaimer": "허용을 클릭하면 {appName}과 Zitadel이 각자의 서비스 약관과 개인정보 처리방침에 따라 귀하의 정보를 사용하도록 허용하게 됩니다. 이 액세스는 언제든지 철회할 수 있습니다.",
+      "disclaimer": "허용을 클릭하면 {appName} 및 Zitadel이 각자의 서비스 약관과 개인정보 처리방침에 따라 귀하의 정보를 사용하도록 허용하게 됩니다. 이 액세스는 언제든지 철회할 수 있습니다.",
+      "usercode": "기기에 표시된 코드:",
       "submit": "허용",
       "deny": "거부"
     },
@@ -453,9 +468,10 @@
     "noUserCode": "사용자 코드가 제공되지 않았습니다!",
     "noDeviceRequest": "기기 요청을 찾을 수 없습니다.",
     "unknownContext": "사용자의 컨텍스트를 가져올 수 없습니다. 먼저 사용자 이름을 입력하거나 loginName을 searchParam으로 전달하세요.",
-    "sessionExpired": "현재 세션이 만료되었습니다. 다시 로그인하세요.",
+    "sessionExpired": "세션이 만료되었거나 다시 인증해야 합니다. 다시 로그인하세요.",
     "failedLoading": "데이터를 불러오지 못했습니다. 다시 시도하세요.",
     "tryagain": "다시 시도",
-    "couldNotContinueSession": "세션을 계속할 수 없습니다 - 사용자 정보가 누락되었습니다"
+    "couldNotContinueSession": "세션을 계속할 수 없습니다 - 사용자 정보가 누락되었습니다",
+    "couldNotClearSession": "세션을 종료할 수 없습니다. 다시 시도하세요."
   }
 }
