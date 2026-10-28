@@ -68,7 +68,6 @@ export function UsernameForm({
           defaultOrganization,
           requestId,
           suffix,
-          ignoreUnknownUsernames: loginSettings?.ignoreUnknownUsernames,
         });
 
         handleServerActionResponse(res, router, setSamlData, setError);
@@ -79,7 +78,7 @@ export function UsernameForm({
         setLoading(false);
       }
     },
-    [defaultOrganization, requestId, suffix, loginSettings, router, t],
+    [defaultOrganization, requestId, suffix, router, t],
   );
 
   useEffect(() => {

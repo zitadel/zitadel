@@ -25,7 +25,7 @@ func TestCommandSide_AddOrgGenericOAuthProvider(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -216,7 +216,7 @@ func TestCommandSide_AddOrgGenericOAuthProvider(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -268,7 +268,7 @@ func TestCommandSide_AddOrgGenericOAuthProvider(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -322,7 +322,7 @@ func TestCommandSide_AddOrgGenericOAuthProvider(t *testing.T) {
 func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -604,7 +604,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -657,7 +657,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -777,7 +777,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -824,7 +824,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -876,7 +876,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -1079,7 +1079,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1129,7 +1129,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -1265,7 +1265,7 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1327,7 +1327,7 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 						),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1376,7 +1376,7 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -1489,7 +1489,7 @@ func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 						),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1548,7 +1548,7 @@ func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 						),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1595,7 +1595,7 @@ func TestCommandSide_AddOrgAzureADIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -1693,7 +1693,7 @@ func TestCommandSide_AddOrgAzureADIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1738,7 +1738,7 @@ func TestCommandSide_AddOrgAzureADIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1789,7 +1789,7 @@ func TestCommandSide_AddOrgAzureADIDP(t *testing.T) {
 func TestCommandSide_UpdateOrgAzureADIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -1967,7 +1967,7 @@ func TestCommandSide_UpdateOrgAzureADIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -2017,7 +2017,7 @@ func TestCommandSide_AddOrgGitHubIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -2093,7 +2093,7 @@ func TestCommandSide_AddOrgGitHubIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -2135,7 +2135,7 @@ func TestCommandSide_AddOrgGitHubIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -2184,7 +2184,7 @@ func TestCommandSide_AddOrgGitHubIDP(t *testing.T) {
 func TestCommandSide_UpdateOrgGitHubIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -2335,7 +2335,7 @@ func TestCommandSide_UpdateOrgGitHubIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -2383,7 +2383,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -2548,7 +2548,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -2597,7 +2597,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -2649,7 +2649,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -2899,7 +2899,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -2950,7 +2950,7 @@ func TestCommandSide_AddOrgGitLabIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -3026,7 +3026,7 @@ func TestCommandSide_AddOrgGitLabIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -3068,7 +3068,7 @@ func TestCommandSide_AddOrgGitLabIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -3116,7 +3116,7 @@ func TestCommandSide_AddOrgGitLabIDP(t *testing.T) {
 func TestCommandSide_UpdateOrgGitLabIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -3266,7 +3266,7 @@ func TestCommandSide_UpdateOrgGitLabIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -3313,7 +3313,7 @@ func TestCommandSide_AddOrgGitLabSelfHostedIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -3431,7 +3431,7 @@ func TestCommandSide_AddOrgGitLabSelfHostedIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -3476,7 +3476,7 @@ func TestCommandSide_AddOrgGitLabSelfHostedIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -3526,7 +3526,7 @@ func TestCommandSide_AddOrgGitLabSelfHostedIDP(t *testing.T) {
 func TestCommandSide_UpdateOrgGitLabSelfHostedIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -3723,7 +3723,7 @@ func TestCommandSide_UpdateOrgGitLabSelfHostedIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -3772,7 +3772,7 @@ func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -3848,7 +3848,7 @@ func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -3890,7 +3890,7 @@ func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -3938,7 +3938,7 @@ func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -4088,7 +4088,7 @@ func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -4135,7 +4135,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -4383,7 +4383,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -4455,7 +4455,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -4526,7 +4526,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -4886,7 +4886,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -4956,7 +4956,7 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -5087,7 +5087,7 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -5133,7 +5133,7 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -5178,7 +5178,7 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -5388,7 +5388,7 @@ func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -5436,7 +5436,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 	type fields struct {
 		eventstore                 func(*testing.T) *eventstore.Eventstore
 		idGenerator                id.Generator
-		secretCrypto               crypto.EncryptionAlgorithm
+		secretCrypto               crypto.AuthEncryptionAlgorithm
 		certificateAndKeyGenerator func(id string) ([]byte, []byte, error)
 	}
 	type args struct {
@@ -5539,7 +5539,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)), certificateAndKeyGenerator: func(id string) ([]byte, []byte, error) { return []byte("key"), []byte("certificate"), nil },
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)), certificateAndKeyGenerator: func(id string) ([]byte, []byte, error) { return []byte("key"), []byte("certificate"), nil },
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -5587,7 +5587,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 					),
 				),
 				idGenerator:                id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto:               crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto:               crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 				certificateAndKeyGenerator: func(id string) ([]byte, []byte, error) { return []byte("key"), []byte("certificate"), nil },
 			},
 			args: args{
@@ -5642,7 +5642,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -5846,7 +5846,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -5896,7 +5896,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 func TestCommandSide_RegenerateOrgSAMLProviderCertificate(t *testing.T) {
 	type fields struct {
 		eventstore                 func(*testing.T) *eventstore.Eventstore
-		secretCrypto               crypto.EncryptionAlgorithm
+		secretCrypto               crypto.AuthEncryptionAlgorithm
 		certificateAndKeyGenerator func(id string) ([]byte, []byte, error)
 	}
 	type args struct {
@@ -5991,7 +5991,7 @@ func TestCommandSide_RegenerateOrgSAMLProviderCertificate(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 				certificateAndKeyGenerator: func(id string) ([]byte, []byte, error) {
 					return []byte("new key"), []byte("new certificate"), nil
 				},
@@ -6031,7 +6031,7 @@ func TestCommandSide_AddOrgZitadelIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -6150,7 +6150,7 @@ func TestCommandSide_AddOrgZitadelIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -6160,66 +6160,6 @@ func TestCommandSide_AddOrgZitadelIDP(t *testing.T) {
 					Issuer:       "issuer",
 					ClientID:     "clientID",
 					ClientSecret: "clientSecret",
-				},
-			},
-			res: res{
-				id:   "id1",
-				want: &domain.ObjectDetails{ResourceOwner: "org1"},
-			},
-		},
-		{
-			name: "ok",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(),
-					expectPush(
-						org.NewZitadelIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
-							"id1",
-							"name",
-							"issuer",
-							"clientID",
-							&crypto.CryptoValue{
-								CryptoType: crypto.TypeEncryption,
-								Algorithm:  "enc",
-								KeyID:      "id",
-								Crypted:    []byte("clientSecret"),
-							},
-							nil,
-							idp.Options{},
-							[]idp.RolesInfo{
-								{
-									OrganizationID:     "org1",
-									OrganizationDomain: "example-org1.com",
-								},
-								{
-									OrganizationID:     "org2",
-									OrganizationDomain: "example-org2.com",
-								},
-							},
-						),
-					),
-				),
-				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			},
-			args: args{
-				ctx:           context.Background(),
-				resourceOwner: "org1",
-				provider: ZitadelProvider{
-					Name:         "name",
-					Issuer:       "issuer",
-					ClientID:     "clientID",
-					ClientSecret: "clientSecret",
-					InstanceRolesInfo: []idp.RolesInfo{
-						{
-							OrganizationID:     "org1",
-							OrganizationDomain: "example-org1.com",
-						},
-						{
-							OrganizationID:     "org2",
-							OrganizationDomain: "example-org2.com",
-						},
-					},
 				},
 			},
 			res: res{
@@ -6251,21 +6191,12 @@ func TestCommandSide_AddOrgZitadelIDP(t *testing.T) {
 								IsAutoCreation:    true,
 								IsAutoUpdate:      true,
 							},
-							[]idp.RolesInfo{
-								{
-									OrganizationID:     "org1",
-									OrganizationDomain: "example-org1.com",
-								},
-								{
-									OrganizationID:     "org2",
-									OrganizationDomain: "example-org2.com",
-								},
-							},
+							nil,
 						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -6282,21 +6213,39 @@ func TestCommandSide_AddOrgZitadelIDP(t *testing.T) {
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
 					},
-					InstanceRolesInfo: []idp.RolesInfo{
-						{
-							OrganizationID:     "org1",
-							OrganizationDomain: "example-org1.com",
-						},
-						{
-							OrganizationID:     "org2",
-							OrganizationDomain: "example-org2.com",
-						},
-					},
 				},
 			},
 			res: res{
 				id:   "id1",
 				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+			},
+		},
+		{
+			name: "instance roles info not allowed",
+			fields: fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: ZitadelProvider{
+					Name:         "name",
+					Issuer:       "issuer",
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+					InstanceRolesInfo: []idp.RolesInfo{
+						{
+							OrganizationID:     "org1",
+							OrganizationDomain: "example-org1.com",
+						},
+					},
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-ImOVF3", "Errors.Invalid.Argument"))
+				},
 			},
 		},
 	}
@@ -6326,7 +6275,7 @@ func TestCommands_UpdateOrgZitadelIDP(t *testing.T) {
 	pushErr := errors.New("push error")
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		id            string
@@ -6465,7 +6414,7 @@ func TestCommands_UpdateOrgZitadelIDP(t *testing.T) {
 						),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				id:            "id1",
@@ -6504,16 +6453,7 @@ func TestCommands_UpdateOrgZitadelIDP(t *testing.T) {
 								},
 								[]string{openid.ScopeOpenID, openid.ScopeEmail},
 								idp.Options{},
-								[]idp.RolesInfo{
-									{
-										OrganizationID:     "org1",
-										OrganizationDomain: "example-org1.com",
-									},
-									{
-										OrganizationID:     "org2",
-										OrganizationDomain: "example-org2.com",
-									},
-								},
+								nil,
 							),
 						),
 					),
@@ -6527,20 +6467,36 @@ func TestCommands_UpdateOrgZitadelIDP(t *testing.T) {
 					Issuer:   "issuer",
 					ClientID: "clientID",
 					Scopes:   []string{openid.ScopeOpenID, openid.ScopeEmail},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+			},
+		},
+		{
+			name: "instance roles info not allowed",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				id:            "idp-id",
+				resourceOwner: "org1",
+				provider: ZitadelProvider{
+					Name:     "name",
+					Issuer:   "issuer",
+					ClientID: "clientID",
 					InstanceRolesInfo: []idp.RolesInfo{
 						{
 							OrganizationID:     "org1",
 							OrganizationDomain: "example-org1.com",
 						},
-						{
-							OrganizationID:     "org2",
-							OrganizationDomain: "example-org2.com",
-						},
 					},
 				},
 			},
 			res: res{
-				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-ImOVF3", "Errors.Invalid.Argument"))
+				},
 			},
 		},
 		{
@@ -6562,12 +6518,7 @@ func TestCommands_UpdateOrgZitadelIDP(t *testing.T) {
 								},
 								[]string{openid.ScopeOpenID, openid.ScopeEmail},
 								idp.Options{},
-								[]idp.RolesInfo{
-									{
-										OrganizationID:     "org1",
-										OrganizationDomain: "example-org1.com",
-									},
-								},
+								nil,
 							)),
 					),
 					expectPush(
@@ -6592,23 +6543,13 @@ func TestCommands_UpdateOrgZitadelIDP(t *testing.T) {
 										IsAutoCreation:    &t,
 										IsAutoUpdate:      &t,
 									}),
-									idp.ChangeZitadelIDPInstanceRolesInfo([]idp.RolesInfo{
-										{
-											OrganizationID:     "org1",
-											OrganizationDomain: "example-org1.com",
-										},
-										{
-											OrganizationID:     "org2",
-											OrganizationDomain: "example-org2.com",
-										},
-									}),
 								},
 							)
 							return event
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				id:            "id1",
@@ -6624,16 +6565,6 @@ func TestCommands_UpdateOrgZitadelIDP(t *testing.T) {
 						IsLinkingAllowed:  true,
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
-					},
-					InstanceRolesInfo: []idp.RolesInfo{
-						{
-							OrganizationID:     "org1",
-							OrganizationDomain: "example-org1.com",
-						},
-						{
-							OrganizationID:     "org2",
-							OrganizationDomain: "example-org2.com",
-						},
 					},
 				},
 			},
@@ -6660,12 +6591,7 @@ func TestCommands_UpdateOrgZitadelIDP(t *testing.T) {
 								},
 								[]string{openid.ScopeOpenID, openid.ScopeEmail},
 								idp.Options{},
-								[]idp.RolesInfo{
-									{
-										OrganizationID:     "org1",
-										OrganizationDomain: "example-org1.com",
-									},
-								},
+								nil,
 							)),
 					),
 					expectPush(
@@ -6690,23 +6616,13 @@ func TestCommands_UpdateOrgZitadelIDP(t *testing.T) {
 										IsAutoCreation:    &t,
 										IsAutoUpdate:      &t,
 									}),
-									idp.ChangeZitadelIDPInstanceRolesInfo([]idp.RolesInfo{
-										{
-											OrganizationID:     "org1",
-											OrganizationDomain: "example-org1.com",
-										},
-										{
-											OrganizationID:     "org2",
-											OrganizationDomain: "example-org2.com",
-										},
-									}),
 								},
 							)
 							return event
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				id:            "id1",
@@ -6722,16 +6638,6 @@ func TestCommands_UpdateOrgZitadelIDP(t *testing.T) {
 						IsLinkingAllowed:  true,
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
-					},
-					InstanceRolesInfo: []idp.RolesInfo{
-						{
-							OrganizationID:     "org1",
-							OrganizationDomain: "example-org1.com",
-						},
-						{
-							OrganizationID:     "org2",
-							OrganizationDomain: "example-org2.com",
-						},
 					},
 				},
 			},
@@ -6794,7 +6700,7 @@ func TestCommands_UpdateOrgZitadelIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				id:            "id1",

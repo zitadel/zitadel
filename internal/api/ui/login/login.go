@@ -26,6 +26,7 @@ import (
 	"github.com/zitadel/zitadel/internal/form"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/static"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Login struct {
@@ -334,6 +335,31 @@ func setUserContext(ctx context.Context, userID, resourceOwner string) context.C
 		OrgID:  resourceOwner,
 	}
 	return authz.SetCtxData(ctx, data)
+}
+
+// checkMFAPromptStep ensures the auth request has legitimately reached the MFA prompt
+// (enrollment) step before any MFA registration/initialization is performed.
+// MFA enrollment promotes authReq.UserID to the request principal via setUserContext, so it
+// must only be reachable once the preceding factors have been checked. nextSteps only yields
+// an *domain.MFAPromptStep after firstFactorChecked has passed, so an unauthenticated request
+// that merely submitted a loginname (or otherwise skipped the first factor) will not carry it.
+func (l *Login) checkMFAPromptStep(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) bool {
+	if !isMFAPromptStep(authReq) {
+		l.renderError(w, r, authReq, zerrors.ThrowPreconditionFailed(nil, "LOGIN-s9GW3M", "Errors.User.NotAllowed"))
+		return false
+	}
+	return true
+}
+
+// isMFAPromptStep reports whether the auth request's current step is the MFA prompt
+// (enrollment) step. nextSteps only yields an *domain.MFAPromptStep once firstFactorChecked
+// has passed, so this is false for a request that merely submitted a loginname.
+func isMFAPromptStep(authReq *domain.AuthRequest) bool {
+	if authReq == nil || len(authReq.PossibleSteps) == 0 {
+		return false
+	}
+	_, ok := authReq.PossibleSteps[0].(*domain.MFAPromptStep)
+	return ok
 }
 
 func (l *Login) baseURL(ctx context.Context) string {

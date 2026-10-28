@@ -79,6 +79,9 @@ func (l *Login) handleRegisterSMSCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
+	if !l.checkMFAPromptStep(w, r, authReq) {
+		return
+	}
 
 	ctx := setUserContext(r.Context(), authReq.UserID, authReq.UserOrgID)
 	// save the current state

@@ -63,7 +63,8 @@ export default async function Layout(props: { children: ReactNode; params: Promi
       {...baseOptions()}
       sidebar={{
         banner: (
-          <VersionSelector />
+          // fumadocs renders the banner inside a children array, so it needs a key.
+          <VersionSelector key="version-selector" />
         ),
       }}
     >

@@ -16,6 +16,7 @@ import {
 
 import { timestampDate, timestampFromMs } from "@zitadel/client";
 import { cookies } from "next/headers";
+import { signSession, verifySession } from "./session-cookie-signature";
 
 // Mock logger - use vi.hoisted to ensure it's defined before vi.mock runs
 const mockLogger = vi.hoisted(() => ({
@@ -42,8 +43,17 @@ vi.mock("@zitadel/client", () => ({
 describe("cookies", () => {
   let mockCookies: any;
 
+  function stored(...sessions: Cookie[]) {
+    return { value: JSON.stringify(sessions.map((session) => signSession(session))) };
+  }
+
+  function writtenSessions(): Array<Cookie & { sig: string }> {
+    return JSON.parse(mockCookies.set.mock.calls[0][0].value);
+  }
+
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env.ZITADEL_SESSION_COOKIE_SECRET = "test-session-cookie-secret-at-least-32-chars";
     mockCookies = {
       get: vi.fn(),
       set: vi.fn(),
@@ -111,12 +121,10 @@ describe("cookies", () => {
 
       await addSessionToCookie({ session: mockSession });
 
-      expect(mockCookies.set).toHaveBeenCalledWith(
-        expect.objectContaining({
-          name: "sessions",
-          value: JSON.stringify([mockSession]),
-        }),
-      );
+      const sessions = writtenSessions();
+      expect(sessions).toHaveLength(1);
+      expect(sessions[0]).toMatchObject(mockSession);
+      expect(verifySession(sessions[0])).toBe(true);
     });
 
     it("should prepend new session to existing sessions", async () => {
@@ -129,18 +137,15 @@ describe("cookies", () => {
         changeTs: "1600000000000",
       };
 
-      mockCookies.get.mockReturnValue({
-        value: JSON.stringify([existingSession]),
-      });
+      mockCookies.get.mockReturnValue(stored(existingSession));
 
       await addSessionToCookie({ session: mockSession });
 
-      const expectedSessions = [mockSession, existingSession];
-      expect(mockCookies.set).toHaveBeenCalledWith(
-        expect.objectContaining({
-          value: JSON.stringify(expectedSessions),
-        }),
-      );
+      const sessions = writtenSessions();
+      expect(sessions).toHaveLength(2);
+      expect(sessions[0]).toMatchObject(mockSession);
+      expect(sessions[1]).toMatchObject(existingSession);
+      expect(sessions.every(verifySession)).toBe(true);
     });
 
     it("should update existing session with same loginName", async () => {
@@ -153,9 +158,7 @@ describe("cookies", () => {
         changeTs: "1600000000000",
       };
 
-      mockCookies.get.mockReturnValue({
-        value: JSON.stringify([existingSession]),
-      });
+      mockCookies.get.mockReturnValue(stored(existingSession));
 
       const updatedSession: Cookie = {
         ...mockSession,
@@ -174,8 +177,8 @@ describe("cookies", () => {
     });
 
     it("should handle cookie overflow by replacing oldest session", async () => {
-      // Create many sessions to exceed MAX_COOKIE_SIZE (2048)
-      const manySessions: Cookie[] = Array.from({ length: 10 }, (_, i) => ({
+      // Create many sessions to exceed MAX_COOKIE_SIZE (3500)
+      const manySessions: Cookie[] = Array.from({ length: 16 }, (_, i) => ({
         id: `session-${i}`,
         token: `token-${i}-very-long-token-to-increase-size-padding-padding-padding`,
         loginName: `user${i}@example.com`,
@@ -184,20 +187,17 @@ describe("cookies", () => {
         changeTs: `${1600000000000 + i * 1000}`,
       }));
 
-      mockCookies.get.mockReturnValue({
-        value: JSON.stringify(manySessions),
-      });
+      mockCookies.get.mockReturnValue(stored(...manySessions));
 
       await addSessionToCookie({ session: mockSession });
 
       expect(mockLogger.warn).toHaveBeenCalledWith("WARNING COOKIE OVERFLOW");
 
-      const setCall = mockCookies.set.mock.calls[0][0];
-      const sessions = JSON.parse(setCall.value);
+      const sessions = writtenSessions();
 
       // Should have new session and all but the first old session
-      expect(sessions[0]).toEqual(mockSession);
-      expect(sessions).not.toContain(manySessions[0]);
+      expect(sessions[0]).toMatchObject(mockSession);
+      expect(sessions.some((s) => s.id === manySessions[0].id)).toBe(false);
     });
 
     it("should cleanup expired sessions when cleanup is true", async () => {
@@ -220,9 +220,7 @@ describe("cookies", () => {
         changeTs: `${now}`,
       };
 
-      mockCookies.get.mockReturnValue({
-        value: JSON.stringify([expiredSession, validSession]),
-      });
+      mockCookies.get.mockReturnValue(stored(expiredSession, validSession));
 
       vi.mocked(timestampDate).mockImplementation((ts: any) => new Date(Number(ts.seconds) * 1000));
       vi.mocked(timestampFromMs).mockImplementation((ms: number) => ({ seconds: BigInt(Math.floor(ms / 1000)) }) as any);
@@ -245,6 +243,7 @@ describe("cookies", () => {
       expect(mockCookies.set).toHaveBeenCalledWith(
         expect.objectContaining({
           sameSite: "none",
+          secure: true,
         }),
       );
     });
@@ -283,7 +282,7 @@ describe("cookies", () => {
 
     it("should update existing session by id", async () => {
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([mockSession]),
+        ...stored(mockSession),
       });
 
       const updatedSession: Cookie = {
@@ -306,7 +305,7 @@ describe("cookies", () => {
 
     it("should throw error if session id not found", async () => {
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([mockSession]),
+        ...stored(mockSession),
       });
 
       await expect(
@@ -329,7 +328,7 @@ describe("cookies", () => {
       };
 
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([mockSession, expiredSession]),
+        ...stored(mockSession, expiredSession),
       });
 
       vi.mocked(timestampDate).mockImplementation((ts: any) => new Date(Number(ts.seconds) * 1000));
@@ -350,7 +349,7 @@ describe("cookies", () => {
 
     it("should respect iFrameEnabled parameter", async () => {
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([mockSession]),
+        ...stored(mockSession),
       });
 
       await updateSessionCookie({
@@ -388,7 +387,7 @@ describe("cookies", () => {
 
     it("should remove session by id", async () => {
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([session1, session2]),
+        ...stored(session1, session2),
       });
 
       await removeSessionFromCookie({ session: session1 });
@@ -402,7 +401,7 @@ describe("cookies", () => {
 
     it("should handle removing non-existent session gracefully", async () => {
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([session1]),
+        ...stored(session1),
       });
 
       const nonExistentSession: Cookie = {
@@ -431,7 +430,7 @@ describe("cookies", () => {
       };
 
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([session1, session2, expiredSession]),
+        ...stored(session1, session2, expiredSession),
       });
 
       vi.mocked(timestampDate).mockImplementation((ts: any) => new Date(Number(ts.seconds) * 1000));
@@ -448,7 +447,7 @@ describe("cookies", () => {
 
     it("should respect iFrameEnabled parameter", async () => {
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([session1, session2]),
+        ...stored(session1, session2),
       });
 
       await removeSessionFromCookie({
@@ -485,7 +484,7 @@ describe("cookies", () => {
       };
 
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([session1, session2]),
+        ...stored(session1, session2),
       });
 
       const result = await getMostRecentSessionCookie();
@@ -511,7 +510,7 @@ describe("cookies", () => {
       };
 
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([session]),
+        ...stored(session),
       });
 
       const result = await getMostRecentSessionCookie();
@@ -544,7 +543,7 @@ describe("cookies", () => {
 
     it("should find session by id", async () => {
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([session1, session2]),
+        ...stored(session1, session2),
       });
 
       const result = await getSessionCookieById({ sessionId: "session-1" });
@@ -556,7 +555,7 @@ describe("cookies", () => {
 
     it("should filter by organization when provided", async () => {
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([session1, session2]),
+        ...stored(session1, session2),
       });
 
       const result = await getSessionCookieById({
@@ -571,7 +570,7 @@ describe("cookies", () => {
 
     it("should return undefined if session not found", async () => {
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([session1]),
+        ...stored(session1),
       });
 
       await expect(getSessionCookieById({ sessionId: "non-existent" })).resolves.toBeUndefined();
@@ -579,7 +578,7 @@ describe("cookies", () => {
 
     it("should return undefined if organization doesn't match", async () => {
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([session1]),
+        ...stored(session1),
       });
 
       await expect(
@@ -620,7 +619,7 @@ describe("cookies", () => {
 
     it("should find session by loginName", async () => {
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([session1, session2]),
+        ...stored(session1, session2),
       });
 
       const result = await getSessionCookieByLoginName({
@@ -634,7 +633,7 @@ describe("cookies", () => {
 
     it("should filter by organization when provided", async () => {
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([session1, session2]),
+        ...stored(session1, session2),
       });
 
       const result = await getSessionCookieByLoginName({
@@ -649,7 +648,7 @@ describe("cookies", () => {
 
     it("should return undefined if session not found", async () => {
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([session1]),
+        ...stored(session1),
       });
 
       await expect(getSessionCookieByLoginName({ loginName: "nonexistent@example.com" })).resolves.toBeUndefined();
@@ -684,7 +683,7 @@ describe("cookies", () => {
       ];
 
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify(sessions),
+        ...stored(...sessions),
       });
 
       const result = await getAllSessionCookieIds();
@@ -714,7 +713,7 @@ describe("cookies", () => {
       ];
 
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify(sessions),
+        ...stored(...sessions),
       });
 
       vi.mocked(timestampDate).mockImplementation((ts: any) => new Date(Number(ts.seconds) * 1000));
@@ -756,7 +755,7 @@ describe("cookies", () => {
       ];
 
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify(sessions),
+        ...stored(...sessions),
       });
 
       const result = await getAllSessions();
@@ -785,7 +784,7 @@ describe("cookies", () => {
       };
 
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([validSession, expiredSession]),
+        ...stored(validSession, expiredSession),
       });
 
       vi.mocked(timestampDate).mockImplementation((ts: any) => new Date(Number(ts.seconds) * 1000));
@@ -828,7 +827,7 @@ describe("cookies", () => {
       };
 
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([session1, session2]),
+        ...stored(session1, session2),
       });
 
       const result = await getMostRecentCookieWithLoginname({
@@ -858,7 +857,7 @@ describe("cookies", () => {
       };
 
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([session1, session2]),
+        ...stored(session1, session2),
       });
 
       await expect(
@@ -890,7 +889,7 @@ describe("cookies", () => {
       };
 
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([session1, session2]),
+        ...stored(session1, session2),
       });
 
       const result = await getMostRecentCookieWithLoginname({
@@ -922,7 +921,7 @@ describe("cookies", () => {
       };
 
       mockCookies.get.mockReturnValue({
-        value: JSON.stringify([session1, session2]),
+        ...stored(session1, session2),
       });
 
       const result = await getMostRecentCookieWithLoginname({});
@@ -938,6 +937,61 @@ describe("cookies", () => {
           loginName: "user@example.com",
         }),
       ).resolves.toBeUndefined();
+    });
+  });
+
+  describe("session cookie HMAC", () => {
+    const victimSession: Cookie = {
+      id: "victim-session-id",
+      token: "victim-token",
+      loginName: "admin@example.com",
+      organization: "org-1",
+      creationTs: "1700000000000",
+      expirationTs: "1800000000000",
+      changeTs: "1700000000000",
+    };
+
+    it("ignores an unsigned guessed session id", async () => {
+      mockCookies.get.mockReturnValue({
+        value: JSON.stringify([{ ...victimSession, token: "" }]),
+      });
+
+      await expect(getSessionCookieById({ sessionId: "victim-session-id" })).resolves.toBeUndefined();
+      await expect(getAllSessionCookieIds()).resolves.toEqual([]);
+    });
+
+    it("ignores a session whose id was swapped after signing", async () => {
+      const signed = signSession({ ...victimSession, id: "attacker-session", token: "attacker-token" });
+      mockCookies.get.mockReturnValue({
+        value: JSON.stringify([{ ...signed, id: "victim-session-id", token: "" }]),
+      });
+
+      await expect(getSessionCookieById({ sessionId: "victim-session-id" })).resolves.toBeUndefined();
+    });
+
+    it("does not update a session that is only present as a forged cookie entry", async () => {
+      mockCookies.get.mockReturnValue({
+        value: JSON.stringify([{ ...victimSession, token: "" }]),
+      });
+
+      await expect(
+        updateSessionCookie({
+          id: "victim-session-id",
+          session: { ...victimSession, token: "rotated-token" },
+        }),
+      ).rejects.toThrow("updateSessionCookie<T>: session id not found");
+      expect(mockCookies.set).not.toHaveBeenCalled();
+    });
+
+    it("still writes a newly created session when no cookie exists", async () => {
+      mockCookies.get.mockReturnValue(undefined);
+
+      await addSessionToCookie({ session: victimSession });
+
+      const sessions = writtenSessions();
+      expect(sessions).toHaveLength(1);
+      expect(sessions[0]).toMatchObject(victimSession);
+      expect(verifySession(sessions[0])).toBe(true);
     });
   });
 });

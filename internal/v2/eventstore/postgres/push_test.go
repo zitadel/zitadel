@@ -75,6 +75,34 @@ func Test_uniqueConstraints(t *testing.T) {
 			assertErr: expectNoErr,
 		},
 		{
+			name: "add 1 constraint with owners",
+			args: args{
+				commands: []*command{
+					{
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("", "", ""),
+							).Aggregates()[0],
+						},
+						Command: &eventstore.Command{
+							UniqueConstraints: []*eventstore.UniqueConstraint{
+								eventstore.NewAddEventUniqueConstraint("test", "id", "error").WithOwners("org:org-1", "user:u1"),
+							},
+						},
+					},
+				},
+				expectations: []mock.Expectation{
+					mock.ExpectExec(
+						"INSERT INTO eventstore.unique_constraints (instance_id, unique_type, unique_field, owners) VALUES ($1, $2, $3, $4)",
+						mock.WithExecArgs("instance", "test", "id", []string{"org:org-1", "user:u1"}),
+						mock.WithExecRowsAffected(1),
+					),
+				},
+			},
+			assertErr: expectNoErr,
+		},
+		{
 			name: "add 1 global constraint 1 command",
 			args: args{
 				commands: []*command{
@@ -125,6 +153,40 @@ func Test_uniqueConstraints(t *testing.T) {
 					mock.ExpectExec(
 						"INSERT INTO eventstore.unique_constraints (instance_id, unique_type, unique_field) VALUES ($1, $2, $3)",
 						mock.WithExecArgs("instance", "test", "id"),
+						mock.WithExecRowsAffected(1),
+					),
+					mock.ExpectExec(
+						"INSERT INTO eventstore.unique_constraints (instance_id, unique_type, unique_field) VALUES ($1, $2, $3)",
+						mock.WithExecArgs("instance", "test", "id2"),
+						mock.WithExecRowsAffected(1),
+					),
+				},
+			},
+			assertErr: expectNoErr,
+		},
+		{
+			name: "add tagged and empty owners 1 command",
+			args: args{
+				commands: []*command{
+					{
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("", "", ""),
+							).Aggregates()[0],
+						},
+						Command: &eventstore.Command{
+							UniqueConstraints: []*eventstore.UniqueConstraint{
+								eventstore.NewAddEventUniqueConstraint("test", "id", "error").WithOwners("org:org-1"),
+								eventstore.NewAddEventUniqueConstraint("test", "id2", "error"),
+							},
+						},
+					},
+				},
+				expectations: []mock.Expectation{
+					mock.ExpectExec(
+						"INSERT INTO eventstore.unique_constraints (instance_id, unique_type, unique_field, owners) VALUES ($1, $2, $3, $4)",
+						mock.WithExecArgs("instance", "test", "id", []string{"org:org-1"}),
 						mock.WithExecRowsAffected(1),
 					),
 					mock.ExpectExec(
@@ -387,6 +449,34 @@ func Test_uniqueConstraints(t *testing.T) {
 						`DELETE FROM eventstore.unique_constraints WHERE (instance_id = $1 AND unique_type = $2 AND unique_field = ( SELECT unique_field from ( SELECT instance_id, unique_type, unique_field FROM eventstore.unique_constraints WHERE instance_id = $1 AND unique_type = $2 AND unique_field = $3 UNION ALL SELECT instance_id, unique_type, unique_field FROM eventstore.unique_constraints WHERE instance_id = $1 AND unique_type = $2 AND unique_field = LOWER($3) ) AS case_insensitive_constraints LIMIT 1) )`,
 						mock.WithExecArgs("instance", "test", "id2"),
 						mock.WithExecRowsAffected(1),
+					),
+				},
+			},
+			assertErr: expectNoErr,
+		},
+		{
+			name: "remove by owner 1 command",
+			args: args{
+				commands: []*command{
+					{
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("", "", ""),
+							).Aggregates()[0],
+						},
+						Command: &eventstore.Command{
+							UniqueConstraints: []*eventstore.UniqueConstraint{
+								eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerOrg, "org-1"),
+							},
+						},
+					},
+				},
+				expectations: []mock.Expectation{
+					mock.ExpectExec(
+						`DELETE FROM eventstore.unique_constraints WHERE instance_id = $1 AND owners @> ARRAY[$2]::text[]`,
+						mock.WithExecArgs("instance", "org:org-1"),
+						mock.WithExecRowsAffected(3),
 					),
 				},
 			},

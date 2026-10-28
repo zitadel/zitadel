@@ -108,7 +108,7 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 				}
 				codeAlg, code := cryptoValue(t, ctrl, "testcode")
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-				commands.EXPECT().InviteCodeSent(gomock.Any(), orgID, userID).Return(nil)
+				commands.EXPECT().InviteCodeSent(gomock.Any(), userID, orgID).Return(nil)
 				return fieldsWorker{
 						queries:  queries,
 						commands: commands,

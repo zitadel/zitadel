@@ -207,3 +207,85 @@ func Test_verifyEncryptedCode(t *testing.T) {
 		})
 	}
 }
+
+func TestGenerateRandomString(t *testing.T) {
+	tests := []struct {
+		name    string
+		length  uint
+		chars   []rune
+		want    string
+		wantErr bool
+	}{
+		{
+			name:    "empty chars returns error",
+			length:  5,
+			chars:   nil,
+			wantErr: true,
+		},
+		{
+			name:   "zero length returns empty string",
+			length: 0,
+			chars:  []rune{'a', 'b'},
+			want:   "",
+		},
+		{
+			name:   "single charset char is used for all positions",
+			length: 4,
+			chars:  []rune{'x'},
+			want:   "xxxx",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := GenerateRandomString(tt.length, tt.chars)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("GenerateRandomString() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if got != tt.want {
+				t.Errorf("GenerateRandomString() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGenerateRandomString_UsesOnlyProvidedChars(t *testing.T) {
+	chars := []rune("abcXYZ09")
+	got, err := GenerateRandomString(32, chars)
+	if err != nil {
+		t.Fatalf("GenerateRandomString() error = %v", err)
+	}
+	if len([]rune(got)) != 32 {
+		t.Fatalf("GenerateRandomString() length = %d, want %d", len([]rune(got)), 32)
+	}
+	allowed := make(map[rune]struct{}, len(chars))
+	for _, r := range chars {
+		allowed[r] = struct{}{}
+	}
+	for _, r := range got {
+		if _, ok := allowed[r]; !ok {
+			t.Fatalf("GenerateRandomString() produced rune %q not in charset", r)
+		}
+	}
+}
+
+func TestGenerateRandomString_EveryCharCanBeGenerated(t *testing.T) {
+	// Regression test: a previous implementation indexed the charset with
+	// modulo len(chars)-1, so the last rune (e.g. '9' in numeric codes) could
+	// never be generated. With a uniform distribution, the chance of any of
+	// the 10 runes missing in 1000 draws is below 1e-45, so this cannot flake.
+	chars := []rune("0123456789")
+	got, err := GenerateRandomString(1000, chars)
+	if err != nil {
+		t.Fatalf("GenerateRandomString() error = %v", err)
+	}
+	seen := make(map[rune]struct{}, len(chars))
+	for _, r := range got {
+		seen[r] = struct{}{}
+	}
+	for _, r := range chars {
+		if _, ok := seen[r]; !ok {
+			t.Errorf("GenerateRandomString() never produced rune %q", r)
+		}
+	}
+}

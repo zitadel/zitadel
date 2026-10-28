@@ -8,20 +8,19 @@ import {
   startIdentityProviderFlow,
   startLDAPIdentityProviderFlow,
 } from "@/lib/zitadel";
-import crypto from "crypto";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById } from "../cookies";
 import { getOrSetFingerprintId } from "../fingerprint";
+import { createIdpLinkProof } from "../idp-link-proof";
 import { getServiceConfig } from "../service-url";
 import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
 import { getPublicHost } from "./host";
 
 export type RedirectToIdpState =
-  | { error?: string | null; samlData?: { url: string; fields: Record<string, string> } }
-  | undefined;
+  { error?: string | null; samlData?: { url: string; fields: Record<string, string> } } | undefined;
 
 export async function redirectToIdp(prevState: RedirectToIdpState, formData: FormData): Promise<RedirectToIdpState> {
   const _headers = await headers();
@@ -36,6 +35,7 @@ export async function redirectToIdp(prevState: RedirectToIdpState, formData: For
   const idpId = formData.get("id") as string;
   const provider = formData.get("provider") as string;
   const postErrorRedirectUrl = formData.get("postErrorRedirectUrl") as string;
+  const loginHint = formData.get("loginHint") as string;
 
   if (sessionId) {
     try {
@@ -45,11 +45,8 @@ export async function redirectToIdp(prevState: RedirectToIdpState, formData: For
       // Get fingerprint (ensure it exists)
       const fingerprintId = await getOrSetFingerprintId();
 
-      // Create hash to verify intent upon return
-      const linkFingerprint = crypto
-        .createHash("sha256")
-        .update(sessionId + fingerprintId)
-        .digest("hex");
+      // Signed proof (server-only secret) to verify the intent upon return
+      const linkFingerprint = createIdpLinkProof(sessionId, fingerprintId);
 
       params.set("linkToSessionId", sessionId);
       params.set("linkFingerprint", linkFingerprint);
@@ -73,6 +70,7 @@ export async function redirectToIdp(prevState: RedirectToIdpState, formData: For
     idpId,
     successUrl: `/idp/${provider}/process?` + params.toString(),
     failureUrl: `/idp/${provider}/failure?` + params.toString(),
+    loginHint: loginHint || undefined,
   });
 
   if (!response) {
@@ -100,6 +98,7 @@ export type StartIDPFlowCommand = {
   idpId: string;
   successUrl: string;
   failureUrl: string;
+  loginHint?: string;
 };
 
 async function startIDPFlow(command: StartIDPFlowCommand) {
@@ -111,6 +110,7 @@ async function startIDPFlow(command: StartIDPFlowCommand) {
     urls: {
       successUrl: `${command.host.includes("localhost") ? "http://" : "https://"}${command.host}${basePath}${command.successUrl}`,
       failureUrl: `${command.host.includes("localhost") ? "http://" : "https://"}${command.host}${basePath}${command.failureUrl}`,
+      loginHint: command.loginHint,
     },
   });
 

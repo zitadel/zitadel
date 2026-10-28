@@ -18,7 +18,7 @@ import { timestampDate } from "@zitadel/client";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import * as cookiesModule from "./cookies";
-import { isSessionValid, loadMostRecentSession } from "./session";
+import { isSessionValid, loadMostRecentSession, loadSessionById } from "./session";
 import * as verifyHelperModule from "./verify-helper";
 import * as zitadelModule from "./zitadel";
 
@@ -35,6 +35,7 @@ vi.mock("./zitadel", () => ({
 
 vi.mock("./cookies", () => ({
   getMostRecentCookieWithLoginname: vi.fn(),
+  getSessionCookieById: vi.fn(),
 }));
 
 vi.mock("./verify-helper", () => ({
@@ -956,6 +957,92 @@ describe("isSessionValid", () => {
 
       expect(result).toBe(true);
     });
+
+    test("should return true when authenticated with user-verified passkey even if TOTP is configured but not verified", async () => {
+      // Regression: a user with passkey + password + TOTP got stuck in a redirect loop on
+      // /passkey — the flow never prompts for TOTP after a passkey login (checkMFAFactors
+      // escapes), but isSessionValid deemed the session invalid because the configured
+      // TOTP factor was not verified. A user-verified passkey is inherently multi-factor.
+      const verifiedTimestamp = createMockTimestamp();
+      const session = createMockSession({
+        factors: {
+          user: {
+            id: mockUserId,
+            organizationId: mockOrganizationId,
+            loginName: "test@example.com",
+            displayName: "Test User",
+            verifiedAt: verifiedTimestamp,
+          },
+          webAuthN: {
+            verifiedAt: verifiedTimestamp,
+            userVerified: true,
+          },
+          // No password factor, TOTP configured but not verified in this session
+        },
+      });
+
+      vi.mocked(zitadelModule.listAuthenticationMethodTypes).mockResolvedValue({
+        authMethodTypes: [
+          AuthenticationMethodType.PASSWORD,
+          AuthenticationMethodType.PASSKEY,
+          AuthenticationMethodType.TOTP,
+        ],
+      } as any);
+
+      vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+        forceMfa: false,
+        forceMfaLocalOnly: false,
+      } as any);
+
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(false);
+
+      const result = await isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session });
+
+      expect(result).toBe(true);
+    });
+
+    test("should return false when WebAuthn was presence-only (no userVerified) and configured TOTP is not verified", async () => {
+      // A presence-only WebAuthn assertion (U2F-style, userVerified=false) is not a passkey
+      // login and must not bypass the configured-MFA requirement.
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const verifiedTimestamp = createMockTimestamp();
+      const session = createMockSession({
+        factors: {
+          user: {
+            id: mockUserId,
+            organizationId: mockOrganizationId,
+            loginName: "test@example.com",
+            displayName: "Test User",
+            verifiedAt: verifiedTimestamp,
+          },
+          password: {
+            verifiedAt: verifiedTimestamp,
+          },
+          webAuthN: {
+            verifiedAt: verifiedTimestamp,
+            userVerified: false,
+          },
+          // TOTP configured but not verified in this session
+        },
+      });
+
+      vi.mocked(zitadelModule.listAuthenticationMethodTypes).mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.TOTP],
+      } as any);
+
+      vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+        forceMfa: true,
+        forceMfaLocalOnly: false,
+      } as any);
+
+      vi.mocked(verifyHelperModule.shouldEnforceMFA).mockReturnValue(true);
+
+      const result = await isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session });
+
+      expect(result).toBe(false);
+      expect(consoleSpy).toHaveBeenCalledWith("[Session] MFA is required but not valid");
+      consoleSpy.mockRestore();
+    });
   });
 
   describe("IDP authentication", () => {
@@ -1566,7 +1653,7 @@ describe("loadMostRecentSession", () => {
     const result = await loadMostRecentSession({ serviceConfig, sessionParams });
 
     expect(result).toBeUndefined();
-    expect(consoleSpy).toHaveBeenCalledWith("[Session] Could not load most recent session", notFound);
+    expect(consoleSpy).toHaveBeenCalledWith("[Session] Could not load session", notFound);
     consoleSpy.mockRestore();
   });
 
@@ -1593,5 +1680,30 @@ describe("loadMostRecentSession", () => {
     await expect(loadMostRecentSession({ serviceConfig, sessionParams })).rejects.toBe(unexpected);
     expect(consoleSpy).not.toHaveBeenCalled();
     consoleSpy.mockRestore();
+  });
+});
+
+describe("loadSessionById", () => {
+  const serviceConfig = { baseUrl: "https://zitadel-abc123.zitadel.cloud" };
+  const cookie = { id: "session-id", token: "session-token", loginName: "test@example.com", organization: "test-org-id" };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(cookiesModule.getSessionCookieById).mockResolvedValue(cookie as any);
+  });
+
+  test("returns undefined when getSession rejects with NotFound (stale cookie)", async () => {
+    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.mocked(zitadelModule.getSession).mockRejectedValue(new ConnectError("Session does not exist", Code.NotFound));
+
+    await expect(loadSessionById(serviceConfig, "session-id", "test-org-id")).resolves.toBeUndefined();
+    consoleSpy.mockRestore();
+  });
+
+  test("re-throws other errors", async () => {
+    const unavailable = new ConnectError("backend unavailable", Code.Unavailable);
+    vi.mocked(zitadelModule.getSession).mockRejectedValue(unavailable);
+
+    await expect(loadSessionById(serviceConfig, "session-id")).rejects.toBe(unavailable);
   });
 });

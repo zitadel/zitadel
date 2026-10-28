@@ -6,7 +6,7 @@ import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceConfig } from "@/lib/service-url";
-import { loadMostRecentSession } from "@/lib/session";
+import { hasVerifiedPrimaryFactor, loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
   getLoginSettings,
@@ -14,7 +14,6 @@ import {
   getUserByID,
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
-import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { SecondFactorType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { Metadata } from "next";
@@ -25,25 +24,6 @@ import { redirect } from "next/navigation";
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("mfa");
   return { title: t("set.title") };
-}
-
-function isSessionValidForMfaSet(session: Partial<Session>): {
-  valid: boolean;
-  verifiedAt?: Timestamp;
-} {
-  const validPassword = session?.factors?.password?.verifiedAt;
-  const validPasskey =
-    session?.factors?.webAuthN?.verifiedAt && !!session?.factors?.webAuthN?.userVerified
-      ? session?.factors?.webAuthN?.verifiedAt
-      : undefined;
-  const validIDP = session?.factors?.intent?.verifiedAt;
-
-  const stillValid = session.expirationDate ? timestampDate(session.expirationDate) > new Date() : true;
-
-  const verifiedAt = validPassword || validPasskey || validIDP;
-  const valid = !!((validPassword || validPasskey || validIDP) && stillValid);
-
-  return { valid, verifiedAt };
 }
 
 export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
@@ -111,7 +91,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     organization: sessionWithData?.factors?.user?.organizationId,
   });
 
-  const { valid } = sessionWithData ? isSessionValidForMfaSet(sessionWithData) : { valid: false };
+  const { valid } = sessionWithData ? hasVerifiedPrimaryFactor(sessionWithData) : { valid: false };
 
   if (force === "true" && valid && sessionWithData?.factors?.user?.loginName && loginSettings) {
     const emailVerified = sessionWithData.emailVerified ?? false;
