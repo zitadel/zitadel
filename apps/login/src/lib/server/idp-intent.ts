@@ -31,6 +31,7 @@ import {
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+import { unstable_rethrow } from "next/navigation";
 import { getFingerprintIdCookie } from "../fingerprint";
 import { isIdpLinkProofValid } from "../idp-link-proof";
 import { getEnrollmentAuthorizationError } from "./enrollment-guard";
@@ -442,6 +443,7 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
 
       return { error: t("errors.sessionCreationFailed") };
     } catch (error) {
+      unstable_rethrow(error);
       logger.error("Error linking IDP", { error });
       const errorMessage = error instanceof Error ? error.message : t("errors.unknownError");
       let params = buildRedirectParams({ error: errorMessage });
@@ -609,6 +611,7 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
 
         return { error: t("errors.sessionCreationFailed") };
       } catch (error) {
+        unstable_rethrow(error);
         logger.error("Error auto-linking user", { error });
         const errorMessage = error instanceof Error ? error.message : t("errors.unknownError");
         const params = buildRedirectParams({ error: errorMessage });
@@ -712,6 +715,7 @@ async function handleAutoCreation(ctx: IDPHandlerContext): Promise<IDPHandlerRes
 
       return { error: t("errors.sessionCreationFailed") };
     } catch (error: unknown) {
+      unstable_rethrow(error);
       logger.error("Error auto-creating user", { error });
       const params = buildRedirectParams();
       return { redirect: `/idp/${provider}/failure?${params}&error=user_creation_failed` };
@@ -904,6 +908,7 @@ export async function processIDPCallback({
     // Should theoretically be unreachable if handleNoUserFound covers the rest
     return { error: t("errors.unknown") };
   } catch (error: unknown) {
+    unstable_rethrow(error);
     logger.error("Error processing intent", { error });
 
     const errorParams = new URLSearchParams();

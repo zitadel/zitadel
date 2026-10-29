@@ -1,5 +1,6 @@
 "use client";
 
+import { isRedirectError } from "@/lib/client-utils";
 import { processIDPCallback } from "@/lib/server/idp-intent";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -87,6 +88,7 @@ export function IdpProcessHandler({
         setLoading(false);
       })
       .catch((err) => {
+        if (isRedirectError(err)) return;
         console.error("[IDP Process Handler] Unexpected error:", err);
         setError(err instanceof Error ? err.message : t("processing.unexpectedError"));
         setLoading(false);

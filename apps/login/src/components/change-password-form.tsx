@@ -1,7 +1,7 @@
 "use client";
 
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from "@/helpers/validators";
-import { handleServerActionResponse } from "@/lib/client-utils";
+import { handleServerActionResponse, isRedirectError } from "@/lib/client-utils";
 import { checkSessionAndSetPassword, sendPassword } from "@/lib/server/password";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -88,7 +88,8 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
       }),
       requestId,
     })
-      .catch(() => {
+      .catch((error) => {
+        if (isRedirectError(error)) return;
         setError(t("change.errors.couldNotVerifyPassword"));
         return;
       })

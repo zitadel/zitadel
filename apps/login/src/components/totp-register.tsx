@@ -1,7 +1,7 @@
 "use client";
 
 import { completeFlowOrGetUrl } from "@/lib/client";
-import { handleServerActionResponse } from "@/lib/client-utils";
+import { handleServerActionResponse, isRedirectError } from "@/lib/client-utils";
 import { verifyTOTP } from "@/lib/server/verify";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
@@ -92,6 +92,7 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
         }
       })
       .catch((e) => {
+        if (isRedirectError(e)) return;
         setError(e.message);
         return;
       })

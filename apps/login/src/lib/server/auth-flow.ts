@@ -1,5 +1,6 @@
 "use server";
 
+import { isExternalUrl, isSafeRedirectUri } from "@/lib/client-utils";
 import { getAllSessions } from "@/lib/cookies";
 import { createLogger } from "@/lib/logger";
 import { loginWithOIDCAndSession } from "@/lib/oidc";
@@ -8,6 +9,7 @@ import { getServiceConfig } from "@/lib/service-url";
 import { listSessions, ServiceConfig } from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 const logger = createLogger("auth-flow");
 
@@ -24,10 +26,27 @@ async function loadSessions({ serviceConfig, ids }: { serviceConfig: ServiceConf
 }
 
 /**
+ * Ends the server action with an HTTP redirect to an absolute callback URL.
+ * Returning the URL instead makes Next.js stream a re-render of the page after it, which Firefox aborts on navigation.
+ * URLs with a literal semicolon keep the client-side navigation, because the client cuts the redirect header at the first semicolon.
+ */
+function redirectToCallback(result: object) {
+  if (
+    "redirect" in result &&
+    typeof result.redirect === "string" &&
+    !result.redirect.includes(";") &&
+    isSafeRedirectUri(result.redirect) &&
+    isExternalUrl(result.redirect)
+  ) {
+    redirect(result.redirect);
+  }
+}
+
+/**
  * Server Action to complete authentication flow
  * Complete OIDC/SAML authentication flow with session
  * This is the shared logic for flow completion
- * Returns either an error or a redirect URL for client-side navigation
+ * Redirects to an absolute callback URL, otherwise returns an error, a relative redirect URL, or SAML POST data
  */
 export async function completeAuthFlow(
   command: AuthFlowParams,
@@ -61,6 +80,7 @@ export async function completeAuthFlow(
       return { error: "Authentication completed but navigation failed" };
     }
 
+    redirectToCallback(result);
     return result;
   } else if (requestId.startsWith("saml_")) {
     // Complete SAML flow
@@ -82,6 +102,7 @@ export async function completeAuthFlow(
       return { error: "Authentication completed but navigation failed" };
     }
 
+    redirectToCallback(result);
     return result;
   }
 

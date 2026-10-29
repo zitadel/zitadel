@@ -57,6 +57,19 @@ export function handleServerActionResponse(
 }
 
 /**
+ * Returns true for the error Next.js throws, and rejects a server action call with, to redirect.
+ */
+export function isRedirectError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "digest" in error &&
+    typeof error.digest === "string" &&
+    error.digest.startsWith("NEXT_REDIRECT;")
+  );
+}
+
+/**
  * Returns true if the URL is external (absolute URL or custom protocol).
  * Relative paths (starting with "/" but not "//") are considered internal.
  */

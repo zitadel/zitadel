@@ -1,5 +1,6 @@
 "use server";
 
+import { isRedirectError } from "@/lib/client-utils";
 import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { createLogger } from "@/lib/logger";
 import { recordAuthAttempt, recordAuthFailure, recordAuthSuccess } from "@/lib/metrics";
@@ -419,7 +420,12 @@ export async function sendPassword(
         organization: command.organization ?? session.factors?.user?.organizationId,
       },
       loginSettingsByUser?.defaultRedirectUri,
-    );
+    ).catch((error) => {
+      if (isRedirectError(error)) {
+        recordAuthSuccess("password", command.organization);
+      }
+      throw error;
+    });
   } else {
     // Regular flow (no requestId)
     logger.info("Password auth: Regular flow with loginName:", { loginName: session.factors.user.loginName });
