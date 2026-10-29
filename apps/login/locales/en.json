@@ -1,4 +1,8 @@
 {
+  "reauthenticate": {
+    "title": "Confirm your identity",
+    "description": "Sign in again to continue securely."
+  },
   "common": {
     "back": "Back",
     "title": "Login with Zitadel"
