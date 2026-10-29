@@ -2398,7 +2398,14 @@
       "SIGNATUREALGORITHM": "İmza algoritması",
       "NAMEIDFORMAT": "NameID Formatı",
       "TRANSIENTMAPPINGATTRIBUTENAME": "Özel Eşleme Özellik Adı",
-      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "`nameid-format` `transient` döndürülmesi durumunda kullanıcıyı eşlemek için alternatif özellik adı, örn. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "`nameid-format` `transient` döndürülmesi durumunda kullanıcıyı eşlemek için alternatif özellik adı, örn. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`",
+      "CERTIFICATE": "Sertifika",
+      "PRIVATEKEY": "Özel anahtar",
+      "UPLOADCERTIFICATE": "Sertifika yükle",
+      "UPLOADPRIVATEKEY": "Özel anahtar yükle",
+      "UPDATECERTIFICATE": "Sertifikayı değiştir",
+      "FILEMAXSIZEEXCEEDED": "Maksimum dosya boyutu aşıldı.",
+      "CERTIFICATE_DESC": "İsteğe bağlı olarak bir sertifika ve özel anahtarını (PEM) yükleyin, örneğin kimlik sağlayıcının gerektirdiği bir sertifika yetkilisi tarafından verilmiş. Bunlar istekleri imzalamak ve onayların şifresini çözmek için kullanılır. Sağlanmazsa, kendinden imzalı bir sertifika oluşturulur."
     },
     "TOAST": {
       "SAVED": "Başarıyla kaydedildi.",

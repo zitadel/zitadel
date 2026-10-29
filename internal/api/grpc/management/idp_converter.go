@@ -495,6 +495,8 @@ func addSAMLProviderToCommand(req *mgmt_pb.AddSAMLProviderRequest) *command.SAML
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
 		FederatedLogoutEnabled:        req.GetFederatedLogoutEnabled(),
 		IDPOptions:                    idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Certificate:                   req.GetCertificate().GetCertificate(),
+		Key:                           req.GetCertificate().GetPrivateKey(),
 	}
 }
 
@@ -515,6 +517,8 @@ func updateSAMLProviderToCommand(req *mgmt_pb.UpdateSAMLProviderRequest) *comman
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
 		FederatedLogoutEnabled:        req.GetFederatedLogoutEnabled(),
 		IDPOptions:                    idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Certificate:                   req.GetCertificate().GetCertificate(),
+		Key:                           req.GetCertificate().GetPrivateKey(),
 	}
 }
 

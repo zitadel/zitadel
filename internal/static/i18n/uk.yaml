@@ -613,6 +613,10 @@ Errors:
     KeyIDMissing: "Відсутній KeyID"
     PrivateKeyMissing: "Відсутній приватний ключ"
     InvalidPrivateKey: "Невірний формат приватного ключа"
+    SAMLCertificateMissing: "Відсутній сертифікат SAML"
+    SAMLCertificateInvalid: "Недійсний сертифікат SAML"
+    SAMLCertificateExpired: "Термін дії сертифіката SAML минув або ще не розпочався"
+    SAMLCertificateKeyMismatch: "Приватний ключ не відповідає сертифікату SAML"
 
 AggregateTypes:
   action: "Дія"

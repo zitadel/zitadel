@@ -2392,7 +2392,14 @@
       "SIGNATUREALGORITHM": "Algoritm de semnătură",
       "NAMEIDFORMAT": "Format ID nume",
       "TRANSIENTMAPPINGATTRIBUTENAME": "Nume atribut mapare personalizat",
-      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Nume alternativ de atribut pentru a mapa utilizatorul în cazul în care nameid-format returnat este tranzitoriu, de exemplu, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Nume alternativ de atribut pentru a mapa utilizatorul în cazul în care nameid-format returnat este tranzitoriu, de exemplu, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
+      "CERTIFICATE": "Certificat",
+      "PRIVATEKEY": "Cheie privată",
+      "UPLOADCERTIFICATE": "Încarcă certificatul",
+      "UPLOADPRIVATEKEY": "Încarcă cheia privată",
+      "UPDATECERTIFICATE": "Înlocuiește certificatul",
+      "FILEMAXSIZEEXCEEDED": "Dimensiunea maximă a fișierului a fost depășită.",
+      "CERTIFICATE_DESC": "Opțional, încărcați un certificat și cheia sa privată (PEM), de exemplu emis de o autoritate de certificare cerută de furnizorul de identitate. Acestea sunt folosite pentru a semna cererile și a decripta aserțiunile. Dacă nu este furnizat, se generează un certificat autosemnat."
     },
     "TOAST": {
       "SAVED": "Salvat cu succes.",

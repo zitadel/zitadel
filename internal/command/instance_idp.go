@@ -1775,6 +1775,10 @@ func (c *Commands) prepareAddInstanceSAMLProvider(a *instance.Aggregate, writeMo
 		if _, err := saml.ParseMetadata(provider.Metadata); err != nil {
 			return nil, zerrors.ThrowInvalidArgument(err, "INST-SF3rwhgh", "Errors.Project.App.SAMLMetadataFormat")
 		}
+		key, cert, err := provider.certificateAndKey()
+		if err != nil {
+			return nil, err
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -1785,9 +1789,11 @@ func (c *Commands) prepareAddInstanceSAMLProvider(a *instance.Aggregate, writeMo
 				return nil, err
 			}
 
-			key, cert, err := c.samlCertificateAndKeyGenerator(writeModel.ID)
-			if err != nil {
-				return nil, err
+			if key == nil {
+				key, cert, err = c.samlCertificateAndKeyGenerator(writeModel.ID)
+				if err != nil {
+					return nil, err
+				}
 			}
 			keyEnc, err := crypto.Encrypt(key, c.idpConfigEncryption)
 			if err != nil {
@@ -1836,6 +1842,10 @@ func (c *Commands) prepareUpdateInstanceSAMLProvider(a *instance.Aggregate, writ
 		if _, err := saml.ParseMetadata(provider.Metadata); err != nil {
 			return nil, zerrors.ThrowInvalidArgument(err, "INST-dsfj3kl2", "Errors.Project.App.SAMLMetadataFormat")
 		}
+		key, cert, err := provider.certificateAndKey()
+		if err != nil {
+			return nil, err
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
@@ -1854,8 +1864,8 @@ func (c *Commands) prepareUpdateInstanceSAMLProvider(a *instance.Aggregate, writ
 				writeModel.ID,
 				provider.Name,
 				provider.Metadata,
-				nil,
-				nil,
+				key,
+				cert,
 				c.idpConfigEncryption,
 				provider.Binding,
 				provider.WithSignedRequest,

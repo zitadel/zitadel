@@ -607,6 +607,10 @@ Errors:
     KeyIDMissing: "KeyID отсутствует"
     PrivateKeyMissing: "Закрытый ключ отсутствует"
     InvalidPrivateKey: "Неверный формат приватного ключа"
+    SAMLCertificateMissing: "Отсутствует сертификат SAML"
+    SAMLCertificateInvalid: "Недействительный сертификат SAML"
+    SAMLCertificateExpired: "Срок действия сертификата SAML истёк или ещё не начался"
+    SAMLCertificateKeyMismatch: "Приватный ключ не соответствует сертификату SAML"
 
 AggregateTypes:
   action: "Действие"

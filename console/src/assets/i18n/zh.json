@@ -2402,7 +2402,14 @@
       "SIGNEDREQUEST": "登录请求",
       "NAMEIDFORMAT": "名字 ID 格式",
       "TRANSIENTMAPPINGATTRIBUTENAME": "自定义映射属性名称",
-      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "如果返回的 `nameid-format` 是 `transient` ，则映射用户的备用属性名称，参考 `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "如果返回的 `nameid-format` 是 `transient` ，则映射用户的备用属性名称，参考 `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`",
+      "CERTIFICATE": "证书",
+      "PRIVATEKEY": "私钥",
+      "UPLOADCERTIFICATE": "上传证书",
+      "UPLOADPRIVATEKEY": "上传私钥",
+      "UPDATECERTIFICATE": "替换证书",
+      "FILEMAXSIZEEXCEEDED": "已超过最大文件大小。",
+      "CERTIFICATE_DESC": "可选择上传证书及其私钥（PEM），例如由身份提供商要求的证书颁发机构签发的证书。它们用于签名请求和解密断言。如果未提供，将生成自签名证书。"
     },
     "TOAST": {
       "SAVED": "成功保存。",

@@ -613,6 +613,10 @@ Errors:
     KeyIDMissing: "ID Kunci hilang"
     PrivateKeyMissing: "Kunci Pribadi hilang"
     InvalidPrivateKey: "Format kunci pribadi tidak valid"
+    SAMLCertificateMissing: "Sertifikat SAML tidak ada"
+    SAMLCertificateInvalid: "Sertifikat SAML tidak valid"
+    SAMLCertificateExpired: "Sertifikat SAML sudah kedaluwarsa atau belum berlaku"
+    SAMLCertificateKeyMismatch: "Kunci pribadi tidak cocok dengan sertifikat SAML"
 
 AggregateTypes:
   action: "Tindakan"
