@@ -3,7 +3,7 @@
 import { getComponentRoundness } from "@/lib/theme";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { clsx } from "clsx";
-import { ChangeEvent, DetailedHTMLProps, forwardRef, InputHTMLAttributes, ReactNode } from "react";
+import { ChangeEvent, DetailedHTMLProps, forwardRef, InputHTMLAttributes, ReactNode, useId } from "react";
 
 export type TextInputProps = DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> & {
   label: string;
@@ -40,6 +40,7 @@ function getDefaultInputRoundness(): string {
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
   (
     {
+      id,
       label,
       placeholder,
       defaultValue,
@@ -51,21 +52,30 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
       onChange,
       onBlur,
       roundness,
+      "aria-describedby": ariaDescribedBy,
+      "aria-invalid": ariaInvalid,
       ...props
     },
     ref,
   ) => {
     // Use theme-based roundness if not explicitly provided
     const actualRoundness = roundness || getDefaultInputRoundness();
+    const generatedId = useId();
+    const inputId = id || generatedId;
+    const errorId = `${generatedId}-error`;
+    const describedBy = [ariaDescribedBy, error ? errorId : undefined].filter(Boolean).join(" ") || undefined;
 
     return (
-      <label className="text-12px text-input-light-label dark:text-input-dark-label relative flex flex-col">
-        <span className={`mb-1 leading-3 ${error ? "text-warn-light-500 dark:text-warn-dark-500" : ""}`}>
+      <div className="text-12px text-input-light-label dark:text-input-dark-label relative flex flex-col">
+        <label htmlFor={inputId} className={`mb-1 leading-3 ${error ? "text-warn-light-500 dark:text-warn-dark-500" : ""}`}>
           {label} {required && "*"}
-        </span>
+        </label>
         <input
           suppressHydrationWarning
           ref={ref}
+          id={inputId}
+          aria-describedby={describedBy}
+          aria-invalid={error ? true : ariaInvalid}
           className={styles(!!error, !!disabled, actualRoundness)}
           defaultValue={defaultValue}
           required={required}
@@ -89,7 +99,11 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           </span>
         )}
 
-        <div className="leading-14.5px h-14.5px text-12px text-warn-light-500 dark:text-warn-dark-500 flex flex-row items-center">
+        <div
+          id={errorId}
+          role={error ? "alert" : undefined}
+          className="leading-14.5px h-14.5px text-12px text-warn-light-500 dark:text-warn-dark-500 flex flex-row items-center"
+        >
           <span>{error ? error : " "}</span>
         </div>
 
@@ -99,7 +113,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             <span className="ml-1">{success}</span>
           </div>
         )}
-      </label>
+      </div>
     );
   },
 );
