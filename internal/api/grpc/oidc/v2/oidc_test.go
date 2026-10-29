@@ -148,3 +148,89 @@ func Test_errorReasonToOIDC(t *testing.T) {
 		})
 	}
 }
+
+func Test_errorReasonToDomain(t *testing.T) {
+	tests := []struct {
+		reason oidc_pb.ErrorReason
+		want   domain.OIDCErrorReason
+	}{
+		{
+			reason: oidc_pb.ErrorReason_ERROR_REASON_UNSPECIFIED,
+			want:   domain.OIDCErrorReasonUnspecified,
+		},
+		{
+			reason: oidc_pb.ErrorReason_ERROR_REASON_INVALID_REQUEST,
+			want:   domain.OIDCErrorReasonInvalidRequest,
+		},
+		{
+			reason: oidc_pb.ErrorReason_ERROR_REASON_UNAUTHORIZED_CLIENT,
+			want:   domain.OIDCErrorReasonUnauthorizedClient,
+		},
+		{
+			reason: oidc_pb.ErrorReason_ERROR_REASON_ACCESS_DENIED,
+			want:   domain.OIDCErrorReasonAccessDenied,
+		},
+		{
+			reason: oidc_pb.ErrorReason_ERROR_REASON_UNSUPPORTED_RESPONSE_TYPE,
+			want:   domain.OIDCErrorReasonUnsupportedResponseType,
+		},
+		{
+			reason: oidc_pb.ErrorReason_ERROR_REASON_INVALID_SCOPE,
+			want:   domain.OIDCErrorReasonInvalidScope,
+		},
+		{
+			reason: oidc_pb.ErrorReason_ERROR_REASON_SERVER_ERROR,
+			want:   domain.OIDCErrorReasonServerError,
+		},
+		{
+			reason: oidc_pb.ErrorReason_ERROR_REASON_TEMPORARY_UNAVAILABLE,
+			want:   domain.OIDCErrorReasonTemporaryUnavailable,
+		},
+		{
+			reason: oidc_pb.ErrorReason_ERROR_REASON_INTERACTION_REQUIRED,
+			want:   domain.OIDCErrorReasonInteractionRequired,
+		},
+		{
+			reason: oidc_pb.ErrorReason_ERROR_REASON_LOGIN_REQUIRED,
+			want:   domain.OIDCErrorReasonLoginRequired,
+		},
+		{
+			reason: oidc_pb.ErrorReason_ERROR_REASON_ACCOUNT_SELECTION_REQUIRED,
+			want:   domain.OIDCErrorReasonAccountSelectionRequired,
+		},
+		{
+			reason: oidc_pb.ErrorReason_ERROR_REASON_CONSENT_REQUIRED,
+			want:   domain.OIDCErrorReasonConsentRequired,
+		},
+		{
+			reason: oidc_pb.ErrorReason_ERROR_REASON_INVALID_REQUEST_URI,
+			want:   domain.OIDCErrorReasonInvalidRequestURI,
+		},
+		{
+			reason: oidc_pb.ErrorReason_ERROR_REASON_INVALID_REQUEST_OBJECT,
+			want:   domain.OIDCErrorReasonInvalidRequestObject,
+		},
+		{
+			reason: oidc_pb.ErrorReason_ERROR_REASON_REQUEST_NOT_SUPPORTED,
+			want:   domain.OIDCErrorReasonRequestNotSupported,
+		},
+		{
+			reason: oidc_pb.ErrorReason_ERROR_REASON_REQUEST_URI_NOT_SUPPORTED,
+			want:   domain.OIDCErrorReasonRequestURINotSupported,
+		},
+		{
+			reason: oidc_pb.ErrorReason_ERROR_REASON_REGISTRATION_NOT_SUPPORTED,
+			want:   domain.OIDCErrorReasonRegistrationNotSupported,
+		},
+		{
+			reason: 99999,
+			want:   domain.OIDCErrorReasonUnspecified,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.reason.String(), func(t *testing.T) {
+			got := errorReasonToDomain(tt.reason)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}

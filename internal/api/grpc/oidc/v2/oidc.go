@@ -2,6 +2,8 @@ package oidc
 
 import (
 	"context"
+	"errors"
+	"net/url"
 
 	"connectrpc.com/connect"
 	"github.com/zitadel/logging"
@@ -144,6 +146,10 @@ func (s *Server) failAuthRequest(ctx context.Context, authRequestID string, ae *
 	authReq := &oidc.AuthRequestV2{CurrentAuthRequest: aar}
 	callback, err := oidc.CreateErrorCallbackURL(authReq, errorReasonToOIDC(ae.GetError()), ae.GetErrorDescription(), ae.GetErrorUri(), s.op.Provider())
 	if err != nil {
+		var urlErr *url.Error
+		if errors.As(err, &urlErr) {
+			return nil, zerrors.ThrowInvalidArgument(err, "OIDCv2-N83df", "Errors.AuthRequest.InvalidRedirectURI")
+		}
 		return nil, err
 	}
 	return connect.NewResponse(&oidc_pb.CreateCallbackResponse{
@@ -170,6 +176,10 @@ func (s *Server) linkSessionToAuthRequest(ctx context.Context, authRequestID str
 		callback, err = s.op.CreateTokenCallbackURL(ctx, authReq)
 	}
 	if err != nil {
+		var urlErr *url.Error
+		if errors.As(err, &urlErr) {
+			return nil, zerrors.ThrowInvalidArgument(err, "OIDCv2-N83dg", "Errors.AuthRequest.InvalidRedirectURI")
+		}
 		return nil, err
 	}
 	return connect.NewResponse(&oidc_pb.CreateCallbackResponse{

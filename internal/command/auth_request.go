@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"net/url"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -44,6 +45,9 @@ type CurrentAuthRequest struct {
 const IDPrefixV2 = "V2_"
 
 func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest) (_ *CurrentAuthRequest, err error) {
+	if _, err := url.Parse(authRequest.RedirectURI); err != nil {
+		return nil, zerrors.ThrowInvalidArgument(err, "COMMAND-3m9sf", "Errors.AuthRequest.InvalidRedirectURI")
+	}
 	authRequestID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
@@ -95,6 +99,9 @@ func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, 
 	if writeModel.AuthRequestState != domain.AuthRequestStateAdded {
 		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sx208nt", "Errors.AuthRequest.AlreadyHandled")
 	}
+	if _, err := url.Parse(writeModel.RedirectURI); err != nil {
+		return nil, nil, zerrors.ThrowInvalidArgument(err, "COMMAND-8m2sf", "Errors.AuthRequest.InvalidRedirectURI")
+	}
 	if checkLoginClient && authz.GetCtxData(ctx).UserID != writeModel.LoginClient {
 		if err := c.checkPermission(ctx, domain.PermissionSessionLink, writeModel.ResourceOwner, ""); err != nil {
 			return nil, nil, err
@@ -141,6 +148,9 @@ func (c *Commands) FailAuthRequest(ctx context.Context, id string, reason domain
 	}
 	if writeModel.AuthRequestState != domain.AuthRequestStateAdded {
 		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sx202nt", "Errors.AuthRequest.AlreadyHandled")
+	}
+	if _, err := url.Parse(writeModel.RedirectURI); err != nil {
+		return nil, nil, zerrors.ThrowInvalidArgument(err, "COMMAND-9m3sf", "Errors.AuthRequest.InvalidRedirectURI")
 	}
 	if authz.GetCtxData(ctx).UserID != writeModel.LoginClient {
 		if err := c.checkPermission(ctx, domain.PermissionSessionLink, writeModel.ResourceOwner, ""); err != nil {
