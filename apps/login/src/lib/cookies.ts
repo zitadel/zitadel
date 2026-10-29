@@ -8,10 +8,13 @@ import { parseAndVerifySessions, signSession } from "./session-cookie-signature"
 
 const logger = createLogger("cookies");
 
-// TODO: improve this to handle overflow
-// Browsers cap a single cookie at ~4096 bytes (name, value and attributes). Keep a margin for
-// the attributes and for the signature that is added to every entry when the cookie is written.
-const MAX_COOKIE_SIZE = 3500;
+const SESSIONS_COOKIE_NAME = "sessions";
+
+// Browsers cap a single cookie at ~4096 bytes and silently drop a Set-Cookie above it, which leaves
+// the previous cookie (with an outdated session token) in place. The budget applies to
+// `name=value` as it is sent, i.e. after Next.js URL-encodes the value, and keeps a margin for the
+// attributes (path, sameSite, secure, httpOnly) that some browsers count towards the limit.
+const MAX_COOKIE_SIZE = 3800;
 
 export type Cookie = {
   id: string;
@@ -26,7 +29,61 @@ export type Cookie = {
 
 type SessionCookie<T> = Cookie & T;
 
-async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[], iFrameEnabled: boolean = false) {
+function isExpired(session: Cookie, now: Date): boolean {
+  return session.expirationTs ? timestampDate(timestampFromMs(Number(session.expirationTs))) <= now : false;
+}
+
+function encodedCookieSize(value: string): number {
+  // encodeURIComponent only emits ASCII, so the string length equals the byte length
+  return `${SESSIONS_COOKIE_NAME}=${encodeURIComponent(value)}`.length;
+}
+
+/**
+ * Signs the sessions and evicts entries until the cookie fits into MAX_COOKIE_SIZE.
+ * Entries the cookie considers expired go first, then the least recently changed ones.
+ * The entry with `keepId` (the session of the current flow) is never evicted.
+ */
+function serializeWithinBudget<T>(sessions: SessionCookie<T>[], keepId?: string): string {
+  const signed = sessions.map((session) => signSession(session));
+  let kept = signed;
+  let value = JSON.stringify(kept);
+
+  if (encodedCookieSize(value) <= MAX_COOKIE_SIZE) {
+    return value;
+  }
+
+  const sizeBefore = encodedCookieSize(value);
+  const now = new Date();
+  const evictionOrder = signed
+    .filter((session) => session.id !== keepId)
+    .sort((a, b) => {
+      const expiredA = isExpired(a, now);
+      if (expiredA !== isExpired(b, now)) {
+        return expiredA ? -1 : 1;
+      }
+      return Number(a.changeTs || 0) - Number(b.changeTs || 0);
+    });
+
+  for (const evicted of evictionOrder) {
+    kept = kept.filter((session) => session !== evicted);
+    value = JSON.stringify(kept);
+    if (encodedCookieSize(value) <= MAX_COOKIE_SIZE) {
+      break;
+    }
+  }
+
+  const sizeAfter = encodedCookieSize(value);
+  const meta = { sizeBefore, sizeAfter, evicted: sessions.length - kept.length, remaining: kept.length };
+  if (sizeAfter > MAX_COOKIE_SIZE) {
+    logger.error("sessions cookie exceeds the size budget even after evicting all other entries", meta);
+  } else {
+    logger.warn("sessions cookie exceeded the size budget, evicted the oldest entries", meta);
+  }
+
+  return value;
+}
+
+async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[], iFrameEnabled: boolean = false, keepId?: string) {
   const cookiesList = await cookies();
 
   // "none" is required for iframe embedding (with secure flag)
@@ -41,8 +98,8 @@ async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[], iFrameE
   }
 
   return cookiesList.set({
-    name: "sessions",
-    value: JSON.stringify(sessions.map((session) => signSession(session))),
+    name: SESSIONS_COOKIE_NAME,
+    value: serializeWithinBudget(sessions, keepId),
     httpOnly: true,
     path: "/",
     sameSite: resolvedSameSite,
@@ -108,27 +165,16 @@ export async function addSessionToCookie<T>({
   if (index > -1) {
     currentSessions[index] = session;
   } else {
-    const temp = [...currentSessions, session];
-
-    // measure the value as it will be written (including signatures)
-    if (JSON.stringify(temp.map((s) => signSession(s))).length >= MAX_COOKIE_SIZE) {
-      logger.warn("WARNING COOKIE OVERFLOW");
-      // TODO: improve cookie handling
-      // this replaces the first session (oldest) with the new one
-      currentSessions = [session].concat(currentSessions.slice(1));
-    } else {
-      currentSessions = [session].concat(currentSessions);
-    }
+    // the size budget is enforced when the cookie is written
+    currentSessions = [session].concat(currentSessions);
   }
 
   if (cleanup) {
     const now = new Date();
-    const filteredSessions = currentSessions.filter((session) =>
-      session.expirationTs ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now : true,
-    );
-    return setSessionHttpOnlyCookie(filteredSessions, iFrameEnabled);
+    const filteredSessions = currentSessions.filter((s) => !isExpired(s, now));
+    return setSessionHttpOnlyCookie(filteredSessions, iFrameEnabled, session.id);
   } else {
-    return setSessionHttpOnlyCookie(currentSessions, iFrameEnabled);
+    return setSessionHttpOnlyCookie(currentSessions, iFrameEnabled, session.id);
   }
 }
 
@@ -154,12 +200,10 @@ export async function updateSessionCookie<T>({
     sessions[foundIndex] = session;
     if (cleanup) {
       const now = new Date();
-      const filteredSessions = sessions.filter((session) =>
-        session.expirationTs ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now : true,
-      );
-      return setSessionHttpOnlyCookie(filteredSessions, iFrameEnabled);
+      const filteredSessions = sessions.filter((s) => !isExpired(s, now));
+      return setSessionHttpOnlyCookie(filteredSessions, iFrameEnabled, session.id);
     } else {
-      return setSessionHttpOnlyCookie(sessions, iFrameEnabled);
+      return setSessionHttpOnlyCookie(sessions, iFrameEnabled, session.id);
     }
   } else {
     throw "updateSessionCookie<T>: session id not found";
@@ -183,9 +227,7 @@ export async function removeSessionFromCookie<T>({
   const reducedSessions = sessions.filter((s) => s.id !== session.id);
   if (cleanup) {
     const now = new Date();
-    const filteredSessions = reducedSessions.filter((session) =>
-      session.expirationTs ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now : true,
-    );
+    const filteredSessions = reducedSessions.filter((s) => !isExpired(s, now));
     return setSessionHttpOnlyCookie(filteredSessions, iFrameEnabled);
   } else {
     return setSessionHttpOnlyCookie(reducedSessions, iFrameEnabled);
@@ -264,9 +306,7 @@ export async function getAllSessions<T>(cleanup: boolean = false): Promise<Sessi
 
   if (cleanup) {
     const now = new Date();
-    return sessions.filter((session) =>
-      session.expirationTs ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now : true,
-    );
+    return sessions.filter((session) => !isExpired(session, now));
   }
 
   return sessions;
