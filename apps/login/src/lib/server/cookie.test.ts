@@ -1,6 +1,6 @@
 import { create } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 vi.mock("next/headers", () => ({
   headers: vi.fn(),
@@ -97,5 +97,80 @@ describe("session challenge sanitization", () => {
 
     expect(setSession).toHaveBeenCalledTimes(1);
     expectSanitized(vi.mocked(setSession).mock.calls[0][0].challenges);
+  });
+});
+
+describe("OTP SMS resend cooldown timestamp", () => {
+  const recentCookie = {
+    id: "sessionId",
+    token: "sessionToken",
+    loginName: "user@example.com",
+    creationTs: "",
+    expirationTs: "",
+    changeTs: "",
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+
+    vi.mocked(headers).mockResolvedValue({} as any);
+    vi.mocked(getServiceConfig).mockReturnValue({ serviceConfig: {} } as any);
+    vi.mocked(getSecuritySettings).mockResolvedValue({ embeddedIframe: { enabled: false } } as any);
+    vi.mocked(getSession).mockResolvedValue({
+      session: { id: "sessionId", factors: { user: { loginName: "user@example.com", organizationId: "orgId" } } },
+    } as any);
+    vi.mocked(setSession).mockResolvedValue({ sessionToken: "sessionToken", details: {} } as any);
+    vi.mocked(updateSessionCookie).mockResolvedValue(undefined as any);
+    vi.mocked(addSessionToCookie).mockResolvedValue(undefined as any);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  function writtenSessionCookie() {
+    return vi.mocked(updateSessionCookie).mock.calls[0][0].session as any;
+  }
+
+  test("setSessionAndUpdateCookie records when an OTP SMS was requested", async () => {
+    await setSessionAndUpdateCookie({
+      recentCookie,
+      challenges: create(RequestChallengesSchema, { otpSms: {} }),
+      lifetime: {} as any,
+    });
+
+    expect(writtenSessionCookie().otpSmsSentTs).toBe("1000000");
+  });
+
+  test("setSessionAndUpdateCookie keeps the timestamp on updates without an OTP SMS challenge", async () => {
+    await setSessionAndUpdateCookie({
+      recentCookie: { ...recentCookie, otpSmsSentTs: "999000" },
+      lifetime: {} as any,
+    });
+
+    expect(writtenSessionCookie().otpSmsSentTs).toBe("999000");
+  });
+
+  test("setSessionAndUpdateCookie does not add a timestamp when no OTP SMS was ever requested", async () => {
+    await setSessionAndUpdateCookie({ recentCookie, lifetime: {} as any });
+
+    expect(writtenSessionCookie()).not.toHaveProperty("otpSmsSentTs");
+  });
+
+  test("createSessionAndUpdateCookie records when an OTP SMS was requested", async () => {
+    vi.mocked(createSessionFromChecksAndChallenges).mockResolvedValue({
+      sessionId: "sessionId",
+      sessionToken: "sessionToken",
+    } as any);
+
+    await createSessionAndUpdateCookie({
+      checks: {} as any,
+      requestId: undefined,
+      challenges: create(RequestChallengesSchema, { otpSms: {} }),
+    });
+
+    expect((vi.mocked(addSessionToCookie).mock.calls[0][0].session as any).otpSmsSentTs).toBe("1000000");
   });
 });

@@ -241,6 +241,7 @@
       "emailDescription": "أدخل الرمز الذي تلقيته عبر البريد الإلكتروني.",
       "noCodeReceived": "لم تستلم رمزاً؟",
       "resendCode": "إعادة إرسال الرمز",
+      "resendCodeIn": "إعادة إرسال الرمز ({seconds} ث)",
       "submit": "متابعة",
       "labels": {
         "code": "الرمز"
@@ -265,7 +266,8 @@
     },
     "errors": {
       "couldNotRequestChallenge": "تعذر طلب تحدي OTP",
-      "couldNotVerifyCode": "تعذر التحقق من رمز OTP"
+      "couldNotVerifyCode": "تعذر التحقق من رمز OTP",
+      "resendCooldown": "يرجى الانتظار {seconds} ثانية قبل طلب رمز جديد."
     }
   },
   "passkey": {

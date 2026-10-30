@@ -25,6 +25,7 @@ export type Cookie = {
   expirationTs: string;
   changeTs: string;
   requestId?: string; // if its linked to an OIDC flow
+  otpSmsSentTs?: string; // when the last OTP SMS was requested for this session, enforces the resend cooldown
 };
 
 type SessionCookie<T> = Cookie & T;

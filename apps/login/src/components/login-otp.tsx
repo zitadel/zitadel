@@ -41,6 +41,8 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
+  // seconds until the server accepts another OTP SMS request
+  const [resendCooldown, setResendCooldown] = useState<number>(0);
 
   const router = useRouter();
 
@@ -53,10 +55,13 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
     },
   });
 
-  const updateSessionForOTPChallenge = useCallback(async (): Promise<{
-    error?: string;
-    [key: string]: any;
-  }> => {
+  const updateSessionForOTPChallenge = useCallback(async (): Promise<
+    | {
+        error?: string;
+        [key: string]: any;
+      }
+    | undefined
+  > => {
     let challenges;
 
     const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
@@ -97,12 +102,28 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
       return { error: t("errors.couldNotRequestChallenge") };
     }
 
+    if (response && "retryAfterSeconds" in response && response.retryAfterSeconds) {
+      setResendCooldown(response.retryAfterSeconds);
+      // the server refused because a code was sent moments ago (e.g. after a reload), the countdown says enough
+      if ("error" in response && response.error) {
+        return;
+      }
+    }
+
     if (response && "error" in response && response.error) {
       return { error: response.error };
     }
 
     return response;
   }, [method, host, requestId, loginName, sessionId, organization, t]);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) {
+      return;
+    }
+    const timer = setTimeout(() => setResendCooldown((seconds) => seconds - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
 
   useEffect(() => {
     if (!initialized.current && ["email", "sms"].includes(method) && !code) {
@@ -221,7 +242,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
               </span>
               <button
                 aria-label={t("verify.resendCode")}
-                disabled={loading}
+                disabled={loading || resendCooldown > 0}
                 type="button"
                 className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
                 onClick={async () => {
@@ -234,7 +255,11 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
                 }}
                 data-testid="resend-button"
               >
-                <Translated i18nKey="verify.resendCode" namespace="otp" />
+                {resendCooldown > 0 ? (
+                  <Translated i18nKey="verify.resendCodeIn" namespace="otp" data={{ seconds: resendCooldown }} />
+                ) : (
+                  <Translated i18nKey="verify.resendCode" namespace="otp" />
+                )}
               </button>
             </div>
           </Alert>

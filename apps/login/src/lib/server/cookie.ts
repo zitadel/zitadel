@@ -29,6 +29,7 @@ type CustomCookieData = {
   expirationTs: string;
   changeTs: string;
   requestId?: string; // if its linked to an OIDC flow
+  otpSmsSentTs?: string; // when the last OTP SMS was requested for this session, enforces the resend cooldown
 };
 
 const passwordAttemptsHandler = (error: ConnectError) => {
@@ -89,6 +90,10 @@ export async function createSessionAndUpdateCookie(command: {
 
         if (command.requestId) {
           sessionCookie.requestId = command.requestId;
+        }
+
+        if (command.challenges?.otpSms) {
+          sessionCookie.otpSmsSentTs = `${Date.now()}`;
         }
 
         if (response.session.factors.user.organizationId) {
@@ -253,6 +258,12 @@ export async function setSessionAndUpdateCookie(command: {
 
             if (sessionCookie.requestId) {
               newCookie.requestId = sessionCookie.requestId;
+            }
+
+            // carried over on every update, otherwise any other update of the session would reset the resend cooldown
+            const otpSmsSentTs = command.challenges?.otpSms ? `${Date.now()}` : command.recentCookie.otpSmsSentTs;
+            if (otpSmsSentTs) {
+              newCookie.otpSmsSentTs = otpSmsSentTs;
             }
 
             const securitySettings = await getSecuritySettings({ serviceConfig });

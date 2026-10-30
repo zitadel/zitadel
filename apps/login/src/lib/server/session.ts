@@ -26,6 +26,7 @@ import {
 } from "../cookies";
 import { getServiceConfig } from "../service-url";
 import { isSessionValid } from "../session";
+import { getOTPSMSResendCooldownSeconds, getOTPSMSRetryAfterSeconds } from "./challenges";
 import { getPublicHost } from "./host";
 import { sendLoginname } from "./loginname";
 
@@ -177,9 +178,9 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       user: { search: { case: "loginName", value: loginName } },
     });
 
+    // the challenges are requested by the setSession call below, requesting them here as well would send every code twice
     const result = await createSessionAndUpdateCookie({
       checks,
-      challenges,
       requestId,
     }).catch((error) => {
       if (isClassifiedError(error) && error.isUserError) {
@@ -198,6 +199,14 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       return {
         error: t("couldNotFindSession"),
       };
+    }
+  }
+
+  if (challenges?.otpSms) {
+    const retryAfterSeconds = getOTPSMSRetryAfterSeconds(recentSession.otpSmsSentTs);
+    if (retryAfterSeconds > 0) {
+      const tOtp = await getTranslations("otp");
+      return { error: tOtp("errors.resendCooldown", { seconds: retryAfterSeconds }), retryAfterSeconds };
     }
   }
 
@@ -287,6 +296,8 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
     // if that ever regresses (GHSA-3gwm-5wx8-4gm6).
     challenges: challengeResponse?.webAuthN ? { webAuthN: challengeResponse.webAuthN } : undefined,
     authMethods,
+    // lets the UI count down until the next OTP SMS may be requested
+    retryAfterSeconds: challenges?.otpSms ? getOTPSMSResendCooldownSeconds() : undefined,
   };
 }
 

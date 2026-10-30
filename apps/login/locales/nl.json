@@ -241,6 +241,7 @@
       "emailDescription": "Voer de code in die u via e-mail heeft ontvangen.",
       "noCodeReceived": "Geen code ontvangen?",
       "resendCode": "Code opnieuw versturen",
+      "resendCodeIn": "Code opnieuw versturen ({seconds}s)",
       "submit": "Verder",
       "labels": {
         "code": "Code"
@@ -265,7 +266,8 @@
     },
     "errors": {
       "couldNotRequestChallenge": "Kon OTP-uitdaging niet aanvragen",
-      "couldNotVerifyCode": "Kon OTP-code niet verifiëren"
+      "couldNotVerifyCode": "Kon OTP-code niet verifiëren",
+      "resendCooldown": "Wacht {seconds} seconden voordat je een nieuwe code aanvraagt."
     }
   },
   "passkey": {

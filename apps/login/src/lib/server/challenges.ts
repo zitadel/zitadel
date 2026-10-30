@@ -42,3 +42,38 @@ export function sanitizeChallenges(challenges?: RequestChallenges): RequestChall
 
   return sanitized;
 }
+
+const DEFAULT_OTP_SMS_RESEND_COOLDOWN_SECONDS = 30;
+
+/**
+ * Minimum number of seconds between two OTP SMS challenges on the same session.
+ *
+ * Every OTP SMS challenge makes Zitadel send a text message. Without a cooldown a user (or a script)
+ * can hit "resend" in a loop and flood the user's phone with codes.
+ *
+ * Configurable via `OTP_SMS_RESEND_COOLDOWN_SECONDS`, defaults to 30. `0` disables the cooldown;
+ * anything that is not a non-negative integer falls back to the default.
+ */
+export function getOTPSMSResendCooldownSeconds(): number {
+  const configured = process.env.OTP_SMS_RESEND_COOLDOWN_SECONDS?.trim();
+  if (!configured || !/^\d+$/.test(configured)) {
+    return DEFAULT_OTP_SMS_RESEND_COOLDOWN_SECONDS;
+  }
+  return Number(configured);
+}
+
+/**
+ * Returns how many seconds are left until another OTP SMS may be sent, or 0 if one may be sent now.
+ *
+ * @param otpSmsSentTs the `otpSmsSentTs` (ms since epoch) of the session cookie entry
+ */
+export function getOTPSMSRetryAfterSeconds(otpSmsSentTs: string | undefined, now: number = Date.now()): number {
+  const sentAt = Number(otpSmsSentTs);
+  if (!otpSmsSentTs || !Number.isFinite(sentAt)) {
+    return 0;
+  }
+
+  const remainingMs = sentAt + getOTPSMSResendCooldownSeconds() * 1000 - now;
+  // a timestamp in the future can only come from clock skew between replicas, cap it at the full cooldown
+  return Math.min(Math.max(Math.ceil(remainingMs / 1000), 0), getOTPSMSResendCooldownSeconds());
+}
