@@ -1,0 +1,1425 @@
+Errors:
+  Internal: "Nagkaroon ng internal na error"
+  NoChangesFound: "Walang pagbabago"
+  OriginNotAllowed: "Hindi pinapayagan ang \"Origin\" na ito"
+  IDMissing: "Nawawala ang ID"
+  ResourceOwnerMissing: "Nawawala ang Organisasyong may-ari ng resource"
+  RemoveFailed: "Hindi maalis"
+  PermissionDenied: "Tinanggihan ang pahintulot"
+  ProjectionName:
+    Invalid: "Hindi wasto ang pangalan ng projection"
+  Assets:
+    EmptyKey: "Walang laman ang asset key"
+    Store:
+      NotInitialized: "Hindi pa naka-initialize ang storage ng assets"
+      NotConfigured: "Hindi naka-configure ang storage ng assets"
+    Bucket:
+      Internal: "Internal na error sa paggawa ng bucket"
+      AlreadyExists: "Umiiral na ang bucket"
+      CreateFailed: "Hindi nagawa ang bucket"
+      ListFailed: "Hindi mabasa ang mga bucket"
+      RemoveFailed: "Hindi nabura ang bucket"
+      SetPublicFailed: "Hindi maitakda bilang public ang bucket"
+    Object:
+      PutFailed: "Hindi nagawa ang object"
+      GetFailed: "Hindi mabasa ang object"
+      NotFound: "Hindi nahanap ang object"
+      PresignedTokenFailed: "Hindi magawa ang signed token"
+      ListFailed: "Hindi mabasa ang listahan ng object"
+      RemoveFailed: "Hindi maalis ang object"
+  Limit:
+    ExceedsDefault: "Lumalampas ang limit sa default na limit"
+  Limits:
+    NotFound: "Hindi nahanap ang mga limit"
+    NoneSpecified: "Walang tinukoy na limit"
+    Instance:
+      Blocked: "Naka-block ang instance"
+  Restrictions:
+    NoneSpecified: "Walang tinukoy na restriksyon"
+    DefaultLanguageMustBeAllowed: "Dapat pinapayagan ang default na wika"
+  Language:
+    NotParsed: "Hindi ma-parse ang wika"
+    NotSupported: "Hindi suportado ang wika"
+    NotAllowed: "Hindi pinapayagan ang wika"
+    Undefined: "Hindi tinukoy ang wika"
+    Duplicate: "May mga duplicate sa mga wika"
+  OIDCSettings:
+    NotFound: "Hindi nahanap ang OIDC configuration"
+    AlreadyExists: "Umiiral na ang OIDC configuration"
+  SecretGenerator:
+    AlreadyExists: "Umiiral na ang secret generator"
+    TypeMissing: "Nawawala ang uri ng secret generator"
+    NotFound: "Hindi nahanap ang secret generator"
+  SMSConfig:
+    NotFound: "Hindi nahanap ang SMS configuration"
+    AlreadyActive: "Aktibo na ang SMS configuration"
+    AlreadyDeactivated: "Na-deactivate na ang SMS configuration"
+    NotExternalVerification: "Hindi sinusuportahan ng SMS configuration ang pag-verify ng code"
+  SMTP:
+    NotEmailMessage: "ang mensahe ay hindi EmailMessage"
+    RequiredAttributes: "kailangang itakda ang subject, recipients at content ngunit ang ilan o lahat sa mga ito ay walang laman"
+    CouldNotSplit: "hindi mahati ang host at port para kumonekta sa smtp"
+    CouldNotDial: "hindi makakonekta sa SMTP server, tingnan ang port, mga isyu sa firewall..."
+    CouldNotDialTLS: "hindi makakonekta sa SMTP server gamit ang TLS, tingnan ang port, mga isyu sa firewall..."
+    CouldNotCreateClient: "hindi magawa ang smtp client"
+    CouldNotStartTLS: "hindi masimulan ang tls"
+    CouldNotAuth: "hindi maidagdag ang smtp auth, tingnan kung tama ang iyong user at password; kung tama ang mga ito, maaaring nangangailangan ang iyong provider ng auth method na hindi sinusuportahan ng Zitadel"
+    CouldNotSetSender: "hindi maitakda ang sender"
+    CouldNotSetRecipient: "hindi maitakda ang recipient"
+  SMTPConfig:
+    TestPassword: "Hindi nahanap ang password para sa test"
+    NotFound: "Hindi nahanap ang SMTP configuration"
+    AlreadyExists: "Umiiral na ang SMTP configuration"
+    AlreadyDeactivated: "Na-deactivate na ang SMTP configuration"
+    SenderAdressNotCustomDomain: "Dapat naka-configure ang sender address bilang Custom Domain sa instance."
+    TestEmailNotFound: "Hindi nahanap ang email address para sa test"
+  Notification:
+    NoDomain: "Walang nahanap na Domain para sa mensahe"
+  User:
+    NotFound: "Hindi nahanap ang user"
+    AlreadyExists: "Umiiral na ang user"
+    NotFoundOnOrg: "Hindi nahanap ang user sa napiling organisasyon"
+    NotAllowedOrg: "Hindi miyembro ang user ng kinakailangang organisasyon"
+    UserIDMissing: "Nawawala ang User ID"
+    UserIDWrong: "Hindi tugma ang user ng request sa na-authenticate na user"
+    DomainPolicyNil: "Walang laman ang Policy ng Organisasyon"
+    EmailAsUsernameNotAllowed: "Hindi pinapayagan ang email bilang username"
+    Invalid: "Hindi wasto ang data ng user"
+    DomainNotAllowedAsUsername: "Naka-reserve na ang domain at hindi maaaring gamitin"
+    AlreadyInactive: "Inactive na ang user"
+    NotInactive: "Hindi inactive ang user"
+    CantDeactivateInitial: "Ang user na nasa initial na estado ay maaari lamang burahin, hindi i-deactivate"
+    ShouldBeActiveOrInitial: "Ang user ay hindi aktibo o initial"
+    AlreadyInitialised: "Naka-initialize na ang user"
+    NotInitialised: "Hindi pa naka-initialize ang user"
+    NotLocked: "Hindi naka-lock ang user"
+    NoChanges: "Walang nahanap na pagbabago"
+    InitCodeNotFound: "Hindi nahanap ang Initialization Code"
+    UsernameNotChanged: "Hindi nabago ang username"
+    InvalidURLTemplate: "Hindi wasto ang URL Template"
+    Locked: "Naka-lock ang user"
+    Profile:
+      NotFound: "Hindi nahanap ang profile"
+      NotChanged: "Hindi nabago ang profile"
+      Empty: "Walang laman ang profile"
+      FirstNameEmpty: "Walang laman ang unang pangalan sa profile"
+      LastNameEmpty: "Walang laman ang apelyido sa profile"
+      IDMissing: "Nawawala ang Profile ID"
+    Email:
+      NotFound: "Hindi nahanap ang email"
+      Invalid: "Hindi wasto ang email"
+      AlreadyVerified: "Na-verify na ang email"
+      NotChanged: "Hindi nabago ang email"
+      Empty: "Walang laman ang email"
+      IDMissing: "Nawawala ang Email ID"
+    Phone:
+      NotFound: "Hindi nahanap ang telepono"
+      Invalid: "Hindi wasto ang telepono"
+      AlreadyVerified: "Na-verify na ang telepono"
+      Empty: "Walang laman ang telepono"
+      NotChanged: "Hindi nabago ang telepono"
+      VerifyingRemovalIsNotSupported: "Hindi sinusuportahan ang pag-verify ng pag-alis ng telepono"
+    Address:
+      NotFound: "Hindi nahanap ang address"
+      NotChanged: "Hindi nabago ang address"
+    Machine:
+      Key:
+        NotFound: "Hindi nahanap ang machine key"
+        AlreadyExisting: "Umiiral na ang machine key"
+        Invalid: "Ang public key ay hindi wastong RSA public key sa PKIX format na may PEM encoding"
+      Secret:
+        NotExisting: "Hindi umiiral ang secret"
+        Invalid: "Hindi wasto ang secret"
+        CouldNotGenerate: "Hindi magawa ang secret"
+    PAT:
+      NotFound: "Hindi nahanap ang Personal Access Token"
+    Metadata:
+      Conflicting: "Hindi dapat itakda ang metadata sa parehong user at human fields"
+    NotHuman: "Dapat personal ang User"
+    NotMachine: "Dapat teknikal ang User"
+    WrongType: "Hindi pinapayagan para sa uri ng user na ito"
+    NotAllowedToLink: "Hindi pinapayagan ang user na mag-link sa external login provider"
+    Username:
+      AlreadyExists: "Nagamit na ang username"
+      Reserved: "Nagamit na ang username"
+      Empty: "Walang laman ang username"
+    Code:
+      Empty: "Walang laman ang code"
+      NotFound: "Hindi nahanap ang code"
+      Expired: "Expired na ang code"
+      GeneratorAlgNotSupported: "Hindi suportadong generator algorithm"
+      Invalid: "Hindi wasto ang code"
+    Password:
+      NotFound: "Hindi nahanap ang password"
+      Empty: "Walang laman ang password"
+      Invalid: "Hindi wasto ang password"
+      NotSet: "Hindi pa nagtakda ng password ang user"
+      NotChanged: "Hindi maaaring kapareho ng kasalukuyan mong password ang bagong password"
+      NotSupported: "Hindi suportado ang encoding ng password hash. Tingnan ang https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets"
+    PasswordComplexityPolicy:
+      NotFound: "Hindi nahanap ang password policy"
+      MinLength: "Masyadong maikli ang password"
+      MinLengthNotAllowed: "Hindi pinapayagan ang ibinigay na minimum na haba"
+      HasLower: "Dapat may maliit na titik ang password"
+      HasUpper: "Dapat may malaking titik ang password"
+      HasNumber: "Dapat may numero ang password"
+      HasSymbol: "Dapat may simbolo ang password"
+    ExternalIDP:
+      Invalid: "Hindi wasto ang External IDP"
+      IDPConfigNotExisting: "Hindi wasto ang IDP provider para sa organisasyong ito"
+      NotAllowed: "Hindi pinapayagan ang External IDP"
+      MinimumExternalIDPNeeded: "Kailangang magdagdag ng kahit isang IDP"
+      AlreadyExists: "Nagamit na ang External IDP"
+      NotFound: "Hindi nahanap ang External IDP"
+      LoginFailed: "Nabigo ang pag-log in sa External IDP"
+    MFA:
+      OTP:
+        AlreadyReady: "Naka-set up na ang Multifactor OTP (OneTimePassword)"
+        NotExisting: "Hindi umiiral ang Multifactor OTP (OneTimePassword)"
+        NotReady: "Hindi pa handa ang Multifactor OTP (OneTimePassword)"
+        InvalidCode: "Hindi wastong code"
+        Reused: "Nagamit na ang code na ito. Maghintay ng bagong code"
+      U2F:
+        NotExisting: "Hindi umiiral ang U2F"
+      Passwordless:
+        NotExisting: "Hindi umiiral ang passkey"
+      RecoveryCodes:
+        Empty: "Walang laman ang recovery code"
+        InvalidCode: "Hindi wasto ang ibinigay na recovery code"
+        MaxCountExceeded: "Nalampasan na ang maximum na bilang ng recovery codes"
+        NotReady: "Hindi pa handang gamitin ang mga recovery code"
+        ConfigInvalid: "Hindi wasto ang configuration ng recovery codes"
+    WebAuthN:
+      NotFound: "Hindi nahanap ang WebAuthN Token"
+      BeginRegisterFailed: "Nabigo ang pagsisimula ng WebAuthN registration"
+      MarshalError: "Error sa pag-marshal ng data"
+      ErrorOnParseCredential: "Error sa pag-parse ng credential data"
+      CreateCredentialFailed: "Error sa paggawa ng credentials"
+      BeginLoginFailed: "Nabigo ang pagsisimula ng WebAuthN login"
+      ValidateLoginFailed: "Error sa pag-validate ng login credentials"
+      CloneWarning: "Maaaring na-clone ang credentials"
+    RefreshToken:
+      Invalid: "Hindi wasto ang Refresh Token"
+      NotFound: "Hindi nahanap ang Refresh Token"
+  Org:
+    AlreadyExists: "Nagamit na ang pangalan o id ng Organisasyon"
+    Invalid: "Hindi wasto ang Organisasyon"
+    AlreadyDeactivated: "Na-deactivate na ang Organisasyon"
+    AlreadyActive: "Aktibo na ang Organisasyon"
+    Empty: "Walang laman ang Organisasyon"
+    NotFound: "Hindi nahanap ang Organisasyon"
+    NotActive: "Hindi aktibo ang Organisasyon"
+    NotChanged: "Hindi nabago ang Organisasyon"
+    DefaultOrgNotDeletable: "Hindi dapat burahin ang Default na Organisasyon"
+    ZitadelOrgNotDeletable: "Hindi dapat burahin ang Organisasyong may Zitadel project"
+    InvalidDomain: "Hindi wastong domain"
+    DomainMissing: "Nawawala ang domain"
+    DomainNotOnOrg: "Hindi umiiral ang domain sa organisasyon"
+    DomainNotVerified: "Hindi pa na-verify ang domain"
+    DomainAlreadyVerified: "Na-verify na ang domain"
+    DomainVerificationTypeInvalid: "Hindi wasto ang uri ng domain verification"
+    DomainVerificationMissing: "Hindi pa nasisimulan ang domain verification"
+    DomainVerificationFailed: "Nabigo ang domain verification"
+    DomainVerificationTXTNotFound: "Hindi nahanap ang _zitadel-challenge TXT record para sa iyong domain. Tiyaking naidagdag mo ito sa iyong DNS server o maghintay hanggang ma-propagate ang bagong record"
+    DomainVerificationTXTNoMatch: "Nahanap ang _zitadel-challenge TXT record para sa iyong domain ngunit hindi nito taglay ang tamang token text. Tiyaking naidagdag mo ang tamang token sa iyong DNS server o maghintay hanggang ma-propagate ang bagong record"
+    DomainVerificationHTTPNotFound: "Hindi nahanap ang file na naglalaman ng challenge sa inaasahang URL. Tiyaking na-upload mo ang file sa tamang lugar na may read permissions"
+    DomainVerificationHTTPNoMatch: "Nahanap ang file na naglalaman ng challenge sa inaasahang URL ngunit hindi nito taglay ang tamang token text. Tingnan ang nilalaman nito"
+    DomainVerificationTimeout: "Nag-timeout ang pag-query sa DNS server"
+    PrimaryDomainNotDeletable: "Hindi dapat burahin ang Domain ng Organisasyon"
+    DomainNotFound: "Hindi nahanap ang domain"
+    MemberIDMissing: "Nawawala ang Member ID"
+    MemberNotFound: "Hindi nahanap ang miyembro ng Organisasyon"
+    InvalidMember: "Hindi wasto ang miyembro ng Organisasyon"
+    UserIDMissing: "Nawawala ang User ID"
+    PolicyAlreadyExists: "Umiiral na ang policy"
+    PolicyNotExisting: "Hindi umiiral ang policy"
+    IdpInvalid: "Hindi wasto ang IDP configuration"
+    IdpNotExisting: "Hindi umiiral ang IDP configuration"
+    OIDCConfigInvalid: "Hindi wasto ang OIDC IDP configuration"
+    IdpIsNotOIDC: "Hindi oidc ang uri ng IDP configuration"
+    Domain:
+      AlreadyExists: "Umiiral na ang domain"
+      InvalidCharacter: "Mga alphanumeric na character, . at - lamang ang pinapayagan para sa domain"
+      EmptyString: "Pinalitan ng mga bakanteng espasyo ang mga hindi wastong character na hindi numeric at hindi alphabetical, at ang naging domain ay isang bakanteng string"
+    LoginPolicy:
+      NotFound: "Hindi nahanap ang Login Policy"
+      Invalid: "Hindi wasto ang Login Policy"
+      RedirectURIInvalid: "Hindi wasto ang Default Redirect URI"
+      NotExisting: "Hindi umiiral ang Login Policy"
+      AlreadyExists: "Umiiral na ang Login Policy"
+      IdpProviderAlreadyExisting: "Umiiral na ang Identity Provider"
+      IdpProviderNotExisting: "Hindi umiiral ang Identity Provider"
+      RegistrationNotAllowed: "Hindi pinapayagan ang pagrehistro"
+      UsernamePasswordNotAllowed: "Hindi pinapayagan ang pag-log in gamit ang Username / Password"
+      MFA:
+        AlreadyExists: "Umiiral na ang multifactor"
+        NotExisting: "Hindi umiiral ang multifactor"
+        Unspecified: "Hindi wasto ang multifactor"
+    MailTemplate:
+      NotFound: "Hindi nahanap ang Default Mail Template"
+      NotChanged: "Hindi nabago ang Default Mail Template"
+      AlreadyExists: "Umiiral na ang Default Mail Template"
+      Invalid: "Hindi wasto ang Default Mail Template"
+    CustomMessageText:
+      NotFound: "Hindi nahanap ang Default Message Text"
+      NotChanged: "Hindi nabago ang Default Message Text"
+      AlreadyExists: "Umiiral na ang Default Message Text"
+      Invalid: "Hindi wasto ang Default Message Text"
+    PasswordComplexityPolicy:
+      NotFound: "Hindi nahanap ang Password Complexity Policy"
+      Empty: "Walang laman ang Password Complexity Policy"
+      NotExisting: "Hindi umiiral ang Password Complexity Policy"
+      AlreadyExists: "Umiiral na ang Password Complexity Policy"
+    PasswordLockoutPolicy:
+      NotFound: "Hindi nahanap ang Password Lockout Policy"
+      Empty: "Walang laman ang Password Lockout Policy"
+      NotExisting: "Hindi umiiral ang Password Lockout Policy"
+      AlreadyExists: "Umiiral na ang Password Lockout Policy"
+    PasswordAgePolicy:
+      NotFound: "Hindi nahanap ang Password Age Policy"
+      Empty: "Walang laman ang Password Age Policy"
+      NotExisting: "Hindi umiiral ang Password Age Policy"
+      AlreadyExists: "Umiiral na ang Password Age Policy"
+    NotificationPolicy:
+      NotFound: "Hindi nahanap ang Notification Policy"
+      NotChanged: "Hindi nabago ang Notification Policy"
+      AlreadyExists: "Umiiral na ang Notification Policy"
+    LabelPolicy:
+      NotFound: "Hindi nahanap ang Private Label Policy"
+      NotChanged: "Hindi nabago ang Private Label Policy"
+    IDPConfig:
+      NotExisting: "Hindi umiiral ang Identity Provider Configuration"
+  Project:
+    ProjectIDMissing: "Nawawala ang Project Id"
+    AlreadyExists: "Umiiral na ang project sa organisasyon"
+    OrgNotExisting: "Hindi umiiral ang Organisasyon"
+    UserNotExisting: "Hindi umiiral ang user"
+    CouldNotGenerateClientSecret: "Hindi magawa ang client secret"
+    Invalid: "Hindi wasto ang project"
+    NotActive: "Hindi aktibo ang project"
+    NotInactive: "Hindi naka-deactivate ang project"
+    NotFound: "Hindi nahanap ang project"
+    UserIDMissing: "Nawawala ang User ID"
+    Member:
+      NotFound: "Hindi nahanap ang miyembro ng project"
+      Invalid: "Hindi wasto ang miyembro ng project"
+      AlreadyExists: "Umiiral na ang miyembro ng project"
+      NotExisting: "Hindi umiiral ang miyembro ng project"
+    MinimumOneRoleNeeded: "Kailangang magdagdag ng kahit isang role"
+    Role:
+      AlreadyExists: "Umiiral na ang role"
+      Invalid: "Hindi wasto ang role"
+      NotExisting: "Hindi umiiral ang role"
+    IDMissing: "Nawawala ang ID"
+    App:
+      AlreadyExists: "Umiiral na ang application"
+      NotFound: "Hindi nahanap ang application"
+      Invalid: "Hindi wasto ang application"
+      NotExisting: "Hindi umiiral ang application"
+      NotActive: "Hindi aktibo ang application"
+      NotInactive: "Hindi inactive ang application"
+      OIDCConfigInvalid: "Hindi wasto ang OIDC configuration"
+      APIConfigInvalid: "Hindi wasto ang API configuration"
+      SAMLConfigInvalid: "Hindi wasto ang SAML configuration"
+      IsNotOIDC: "Hindi OIDC ang uri ng application"
+      IsNotAPI: "Hindi API ang uri ng application"
+      IsNotSAML: "Hindi SAML ang uri ng application"
+      SAMLMetadataMissing: "Nawawala ang SAML metadata"
+      SAMLMetadataFormat: "Error sa format ng SAML Metadata"
+      SAMLEntityIDAlreadyExisting: "Umiiral na ang SAML EntityID"
+      OIDCAuthMethodNoSecret: "Hindi nangangailangan ng secret ang napiling OIDC Auth Method"
+      APIAuthMethodNoSecret: "Hindi nangangailangan ng secret ang napiling API Auth Method"
+      AuthMethodNoPrivateKeyJWT: "Hindi nangangailangan ng key ang napiling Auth Method"
+      ClientSecretInvalid: "Hindi wasto ang Client Secret"
+      Key:
+        AlreadyExisting: "Umiiral na ang application key"
+        NotFound: "Hindi nahanap ang application key"
+    RequiredFieldsMissing: "Nawawala ang ilang kinakailangang field"
+    Grant:
+      AlreadyExists: "Umiiral na ang Project Grant"
+      NotFound: "Hindi nahanap ang Project Grant"
+      Invalid: "Hindi wasto ang Project Grant"
+      NotExisting: "Hindi umiiral ang Project Grant"
+      HasNotExistingRole: "May isang role na hindi umiiral sa project"
+      NotActive: "Hindi aktibo ang Project Grant"
+      NotInactive: "Hindi inactive ang Project Grant"
+  Instance:
+    AlreadyExists: "Umiiral na ang instance"
+    NotChanged: "Hindi nabago ang instance"
+    NotFound: "Hindi nahanap ang instance. Tiyaking tama ang domain. Tingnan ang https://zitadel.com/docs/apis/introduction#domains"
+    Member:
+      RolesNotChanged: "Hindi nabago ang mga role"
+    MemberInvalid: "Hindi wasto ang miyembro"
+    MemberAlreadyExisting: "Umiiral na ang miyembro"
+    MemberNotExisting: "Hindi umiiral ang miyembro"
+    IDMissing: "Nawawala ang Id"
+    IdpInvalid: "Hindi wasto ang IDP configuration"
+    IdpNotExisting: "Hindi umiiral ang IDP configuration"
+    OIDCConfigInvalid: "Hindi wasto ang OIDC IDP configuration"
+    IdpIsNotOIDC: "Hindi oidc ang uri ng IDP configuration"
+    LoginPolicyInvalid: "Hindi wasto ang Login Policy"
+    LoginPolicyNotExisting: "Hindi umiiral ang Login Policy"
+    IdpProviderInvalid: "Hindi wasto ang Identity Provider"
+    LoginPolicy:
+      NotFound: "Hindi nahanap ang Default Login Policy"
+      NotChanged: "Hindi nabago ang Default Login Policy"
+      NotExisting: "Hindi umiiral ang Default Login Policy"
+      AlreadyExists: "Umiiral na ang Default Login Policy"
+      RedirectURIInvalid: "Hindi wasto ang Default Redirect URI"
+      MFA:
+        AlreadyExists: "Umiiral na ang multifactor"
+        NotExisting: "Hindi umiiral ang multifactor"
+        Unspecified: "Hindi wasto ang multifactor"
+      IDP:
+        AlreadyExists: "Umiiral na ang identity provider"
+        NotExisting: "Hindi umiiral ang identity provider"
+        Invalid: "Hindi wasto ang Identity Provider"
+      IDPConfig:
+        AlreadyExists: "Umiiral na ang Identity Provider Configuration"
+        NotInactive: "Hindi inactive ang Identity Provider Configuration"
+        NotActive: "Hindi aktibo ang Identity Provider Configuration"
+    LabelPolicy:
+      NotFound: "Hindi nahanap ang Default Private Label Policy"
+      NotChanged: "Hindi nabago ang Default Private Label Policy"
+    MailTemplate:
+      NotFound: "Hindi nahanap ang Default Mail Template"
+      NotChanged: "Hindi nabago ang Default Mail Template"
+      AlreadyExists: "Umiiral na ang Default Mail Template"
+      Invalid: "Hindi wasto ang Default Mail Template"
+    CustomMessageText:
+      NotFound: "Hindi nahanap ang Default Message Text"
+      NotChanged: "Hindi nabago ang Default Message Text"
+      AlreadyExists: "Umiiral na ang Default Message Text"
+      Invalid: "Hindi wasto ang Default Message Text"
+    PasswordComplexityPolicy:
+      NotFound: "Hindi nahanap ang Default Password Complexity Policy"
+      NotExisting: "Hindi umiiral ang Default Password Complexity Policy"
+      AlreadyExists: "Umiiral na ang Default Password Complexity Policy"
+      Empty: "Walang laman ang Default Password Complexity Policy"
+      NotChanged: "Hindi nabago ang Default Password Complexity Policy"
+    PasswordAgePolicy:
+      NotFound: "Hindi nahanap ang Default Password Age Policy"
+      NotExisting: "Hindi umiiral ang Default Password Age Policy"
+      AlreadyExists: "Umiiral na ang Default Password Age Policy"
+      Empty: "Walang laman ang Default Password Age Policy"
+      NotChanged: "Hindi nabago ang Default Password Age Policy"
+    PasswordLockoutPolicy:
+      NotFound: "Hindi nahanap ang Default Password Lockout Policy"
+      NotExisting: "Hindi umiiral ang Default Password Lockout Policy"
+      AlreadyExists: "Umiiral na ang Default Password Lockout Policy"
+      Empty: "Walang laman ang Default Password Lockout Policy"
+      NotChanged: "Hindi nabago ang Default Password Lockout Policy"
+    DomainPolicy:
+      NotFound: "Hindi nahanap ang Organization Domain Policy"
+      Empty: "Walang laman ang Organization Domain Policy"
+      NotExisting: "Hindi umiiral ang Organization Domain Policy"
+      AlreadyExists: "Umiiral na ang Organization Domain Policy"
+      NotChanged: "Hindi nabago ang Organization Domain Policy"
+    NotificationPolicy:
+      NotFound: "Hindi nahanap ang Default Notification Policy"
+      NotChanged: "Hindi nabago ang Default Notification Policy"
+      AlreadyExists: "Umiiral na ang Default Notification Policy"
+  Policy:
+    AlreadyExists: "Umiiral na ang policy"
+    Label:
+      Invalid:
+        PrimaryColor: "Ang primary color ay hindi wastong Hex color value"
+        BackgroundColor: "Ang background color ay hindi wastong Hex color value"
+        WarnColor: "Ang warn color ay hindi wastong Hex color value"
+        FontColor: "Ang font color ay hindi wastong Hex color value"
+        PrimaryColorDark: "Ang primary color (dark mode) ay hindi wastong Hex color value"
+        BackgroundColorDark: "Ang background color (dark mode) ay hindi wastong Hex color value"
+        WarnColorDark: "Ang warn color (dark mode) ay hindi wastong Hex color value"
+        FontColorDark: "Ang font color (dark mode) ay hindi wastong Hex color value"
+  UserGrant:
+    AlreadyExists: "Umiiral na ang user grant"
+    NotFound: "Hindi nahanap ang user grant"
+    Invalid: "Hindi wasto ang user grant"
+    NotChanged: "Hindi nabago ang user grant"
+    IDMissing: "Nawawala ang Id"
+    NoPermissionForProject: "Walang pahintulot ang user sa project na ito"
+    RoleKeyNotFound: "Hindi nahanap ang role"
+  Member:
+    AlreadyExists: "Umiiral na ang miyembro"
+  IDPConfig:
+    AlreadyExists: "Umiiral na ang IDP Configuration na may ganitong pangalan"
+    NotExisting: "Hindi umiiral ang Identity Provider Configuration"
+  Changes:
+    NotFound: "Walang nahanap na history"
+    AuditRetention: "Ang history ay nasa labas ng Audit Log Retention"
+  Token:
+    NotFound: "Hindi nahanap ang token"
+    Invalid: "Hindi wasto ang token"
+  UserSession:
+    NotFound: "Hindi nahanap ang UserSession"
+  Key:
+    NotFound: "Hindi nahanap ang key"
+    ExpireBeforeNow: "Nasa nakaraan ang petsa ng expiration"
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: "Naka-configure bilang kinakailangan ang multifactor, ngunit walang naka-configure na posibleng provider. Makipag-ugnayan sa iyong system administrator."
+  Step:
+    Started:
+      AlreadyExists: "Umiiral na ang nasimulang step"
+    Done:
+      AlreadyExists: "Umiiral na ang tapos na step"
+  CustomText:
+    AlreadyExists: "Umiiral na ang custom text"
+    Invalid: "Hindi wasto ang custom text"
+    NotFound: "Hindi nahanap ang custom text"
+  TranslationFile:
+    ReadError: "Error sa pagbasa ng translation file"
+    MergeError: "Hindi ma-merge ang translation file sa mga custom na translation"
+    NotFound: "Hindi umiiral ang translation file"
+  Metadata:
+    NotFound: "Hindi nahanap ang metadata"
+    NoData: "Walang laman ang listahan ng metadata"
+    Invalid: "Hindi wasto ang metadata"
+    KeyNotExisting: "Hindi umiiral ang isa o higit pang key"
+  Action:
+    Invalid: "Hindi wasto ang action"
+    NotFound: "Hindi nahanap ang action"
+    NotActive: "Hindi aktibo ang action"
+    NotInactive: "Hindi inactive ang action"
+    MaxAllowed: "Wala nang pinapayagang karagdagang aktibong Action"
+    NotEnabled: "Hindi naka-enable ang feature na \"Action\""
+  Flow:
+    FlowTypeMissing: "Nawawala ang FlowType"
+    Empty: "Walang laman na ang flow"
+    WrongTriggerType: "Hindi wasto ang TriggerType"
+    NoChanges: "Walang Pagbabago"
+    ActionIDsNotExist: "Hindi umiiral ang mga ActionID"
+  Query:
+    CloseRows: "Hindi matapos ang SQL Statement"
+    SQLStatement: "Hindi magawa ang SQL Statement"
+    InvalidRequest: "Hindi wasto ang request"
+    TooManyNestingLevels: "Masyadong maraming nesting level ng query (Max 20)"
+    LimitExceeded: "Nalampasan ang limit"
+  Quota:
+    AlreadyExists: "Umiiral na ang quota para sa unit na ito"
+    NotFound: "Hindi nahanap ang quota para sa unit na ito"
+    Invalid:
+      CallURL: "Hindi wasto ang quota call URL"
+      Percent: "Mas mababa sa 1 ang quota percent"
+      Unimplemented: "Hindi pa sinusuportahan ang mga quota para sa unit na ito"
+      Amount: "Mas mababa sa 1 ang halaga ng quota"
+      ResetInterval: "Mas maikli sa isang minuto ang reset interval ng quota"
+      Noop: "Walang epekto ang walang limitasyong quota na walang notification"
+    Access:
+      Exhausted: "Naubos na ang quota para sa mga authenticated na request"
+    Execution:
+      Exhausted: "Naubos na ang quota para sa execution seconds"
+  LogStore:
+    Access:
+      StorageFailed: "Nabigo ang pag-store ng access log sa database"
+      ScanFailed: "Nabigo ang pag-query ng usage para sa mga authenticated na request"
+    Execution:
+      StorageFailed: "Nabigo ang pag-store ng action execution log sa database"
+      ScanFailed: "Nabigo ang pag-query ng usage para sa action execution seconds"
+  Session:
+    IDMissing: "Nawawala ang Session ID"
+    NotFound: "Hindi nahanap ang session"
+    NotExisting: "Hindi umiiral ang session"
+    Terminated: "Natapos na ang session"
+    Expired: "Nag-expire na ang session"
+    PositiveLifetime: "Hindi dapat mas mababa sa 0 ang lifetime ng session"
+    Token:
+      Invalid: "Hindi wasto ang Session Token"
+    WebAuthN:
+      NoChallenge: "Session na walang WebAuthN challenge"
+  Intent:
+    IDPMissing: "Nawawala ang IDP ID sa request"
+    IDPInvalid: "Hindi wasto ang IDP para sa request"
+    ResponseInvalid: "Hindi wasto ang response ng IDP"
+    MissingSingleMappingAttribute: "Hindi naglalaman ang response ng IDP ng mapping attribute o mayroon itong higit sa isang value"
+    SuccessURLMissing: "Nawawala ang Success URL sa request"
+    FailureURLMissing: "Nawawala ang Failure URL sa request"
+    StateMissing: "Nawawala ang State parameter sa request"
+    NotStarted: "Hindi pa nasisimulan ang intent o natapos na ito"
+    NotSucceeded: "Hindi nagtagumpay ang intent"
+    Expired: "Nag-expire na ang intent"
+    TokenCreationFailed: "Nabigo ang paggawa ng token"
+    InvalidToken: "Hindi wasto ang Intent Token"
+    OtherUser: "Ang intent ay para sa ibang user"
+  AuthRequest:
+    AlreadyExists: "Umiiral na ang Auth Request"
+    NotExisting: "Hindi umiiral ang Auth Request"
+    WrongLoginClient: "Ang Auth Request ay ginawa ng ibang login application"
+    AlreadyHandled: "Naproseso na ang Auth Request"
+  OIDCSession:
+    RefreshTokenInvalid: "Hindi wasto ang Refresh Token"
+    Token:
+      Invalid: "Hindi wasto ang token"
+      Expired: "Expired na ang token"
+    InvalidClient: "Hindi inisyu ang token para sa application na ito"
+  SAMLRequest:
+    AlreadyExists: "Umiiral na ang SAMLRequest"
+    NotExisting: "Hindi umiiral ang SAMLRequest"
+    WrongLoginClient: "Ang SAMLRequest ay ginawa ng ibang login application"
+    AlreadyHandled: "Naproseso na ang SAMLRequest"
+  SAMLSession:
+    InvalidClient: "Hindi inisyu ang SAMLResponse para sa application na ito"
+  DeviceAuth:
+    NotFound: "Hindi umiiral ang Device Authorization Request"
+    AlreadyHandled: "Naproseso na ang Device Authorization Request"
+  Feature:
+    NotExisting: "Hindi umiiral ang feature"
+    TypeNotSupported: "Hindi suportado ang uri ng feature"
+    InvalidValue: "Hindi wastong value para sa feature na ito"
+  Target:
+    Invalid: "Hindi wasto ang target"
+    NoTimeout: "Walang timeout ang target"
+    InvalidURL: "May hindi wastong URL ang target"
+    NotFound: "Hindi nahanap ang target"
+    InvalidExpirationDate: "Dapat nasa hinaharap ang petsa ng expiration ng key"
+    PublicKeyExpired: "Expired na ang public key ng target"
+    PublicKeyActive: "Hindi maaaring burahin ang aktibong public key ng target"
+    InvalidPublicKey: "Hindi wasto ang public key. Dapat itong PEM encoded na RSA o ECDSA public key sa PKCS#8 format"
+  Execution:
+    ConditionInvalid: "Hindi wasto ang kondisyon ng execution"
+    Invalid: "Hindi wasto ang execution"
+    NotFound: "Hindi nahanap ang execution"
+    IncludeNotFound: "Hindi nahanap ang include"
+    NoTargets: "Walang tinukoy na target"
+    Failed: "Nabigo ang execution"
+    ResponseIsNotValidJSON: "Ang response ay hindi wastong JSON"
+    MissingEncryptionKey: "Walang nahanap na encryption key para sa target"
+  UserSchema:
+    NotEnabled: "Hindi naka-enable ang feature na \"User Schema\""
+    Type:
+      Missing: "Nawawala ang User Schema Type"
+      AlreadyExists: "Umiiral na ang User Schema Type"
+    Authenticator:
+      Invalid: "Hindi wastong uri ng authenticator"
+    NotActive: "Hindi aktibo ang User Schema"
+    NotInactive: "Hindi inactive ang User Schema"
+    NotExists: "Hindi umiiral ang User Schema"
+    ID:
+      Missing: "Nawawala ang User Schema ID"
+    Invalid: "Hindi wasto ang User Schema"
+    Data:
+      Invalid: "Hindi wasto ang data para sa User Schema"
+  TokenExchange:
+    Token:
+      Missing: "Nawawala ang token"
+      Invalid: "Hindi wasto ang token"
+      TypeMissing: "Nawawala ang uri ng token"
+      TypeNotAllowed: "Hindi pinapayagan ang uri ng token"
+      TypeNotSupported: "Hindi suportado ang uri ng token"
+      NotForAPI: "Hindi pinapayagan ang mga impersonated token para sa API"
+    Impersonation:
+      PolicyDisabled: "Naka-disable ang impersonation sa security policy ng instance"
+  WebKey:
+    ActiveDelete: "Hindi maaaring burahin ang aktibong web key"
+    Config: "Hindi wastong web key config"
+    Duplicate: "Hindi natatangi ang Web key ID"
+    NoActive: "Walang nahanap na aktibong web key"
+    NotFound: "Hindi nahanap ang web key"
+  IDP:
+    InvalidSearchQuery: "Hindi wastong search query"
+    ClientIDMissing: "Nawawala ang ClientID"
+    TeamIDMissing: "Nawawala ang TeamID"
+    KeyIDMissing: "Nawawala ang KeyID"
+    PrivateKeyMissing: "Nawawala ang Private Key"
+    InvalidPrivateKey: "Hindi wastong format ng Private Key"
+
+AggregateTypes:
+  action: "Action"
+  instance: "Instance"
+  key_pair: "Key Pair"
+  org: "Organisasyon"
+  project: "Project"
+  user: "User"
+  usergrant: "User grant"
+  quota: "Quota"
+  feature: "Feature"
+  target: "Target"
+  execution: "Execution"
+  user_schema: "User Schema"
+  auth_request: "Auth Request"
+  device_auth: "Device Auth"
+  idpintent: "IDP Intent"
+  limits: "Mga Limit"
+  milestone: "Milestone"
+  oidc_session: "OIDC Session"
+  restrictions: "Mga Restriksyon"
+  system: "System"
+  session: "Session"
+  web_key: "Web Key"
+  saml_request: "SAML Request"
+  saml_session: "SAML Session"
+EventTypes:
+  execution:
+    set: "Naitakda ang execution"
+    removed: "Binura ang execution"
+  target:
+    added: "Ginawa ang target"
+    changed: "Binago ang target"
+    removed: "Binura ang target"
+  user:
+    added: "Naidagdag ang user"
+    selfregistered: "Nagrehistro ang user nang mag-isa"
+    initialization:
+      code:
+        added: "Nabuo ang initialization code"
+        sent: "Naipadala ang initialization code"
+      check:
+        succeeded: "Nagtagumpay ang initialization check"
+        failed: "Nabigo ang initialization check"
+    token:
+      added: "Ginawa ang Access Token"
+      v2.added: "Ginawa ang Access Token"
+      removed: "Inalis ang Access Token"
+    impersonated: "Na-impersonate ang user"
+    username:
+      reserved: "Na-reserve ang username"
+      released: "Na-release ang username"
+      changed: "Binago ang username"
+    email:
+      reserved: "Na-reserve ang email address"
+      released: "Na-release ang email address"
+      changed: "Binago ang email address"
+      verified: "Na-verify ang email address"
+      verification:
+        failed: "Nabigo ang pag-verify ng email address"
+      code:
+        added: "Nabuo ang verification code ng email address"
+        sent: "Naipadala ang verification code ng email address"
+    machine:
+      added: "Naidagdag ang teknikal na user"
+      changed: "Binago ang teknikal na user"
+      key:
+        added: "Naidagdag ang key"
+        removed: "Inalis ang key"
+      secret:
+        set: "Naitakda ang secret"
+        updated: "Na-update ang secret hash"
+        removed: "Inalis ang secret"
+        check:
+          succeeded: "Nagtagumpay ang secret check"
+          failed: "Nabigo ang secret check"
+    human:
+      added: "Naidagdag ang tao"
+      selfregistered: "Nagrehistro ang tao nang mag-isa"
+      avatar:
+        added: "Naidagdag ang avatar"
+        removed: "Inalis ang avatar"
+      initialization:
+        code:
+          added: "Nabuo ang initialization code"
+          sent: "Naipadala ang initialization code"
+        check:
+          succeeded: "Nagtagumpay ang initialization check"
+          failed: "Nabigo ang initialization check"
+      invite:
+        code:
+          added: "Nabuo ang invitation code"
+          sent: "Naipadala ang invitation code"
+        check:
+          succeeded: "Nagtagumpay ang invitation check"
+          failed: "Nabigo ang invitation check"
+      username:
+        reserved: "Na-reserve ang username"
+        released: "Na-release ang username"
+      email:
+        changed: "Binago ang email address"
+        verified: "Na-verify ang email address"
+        verification:
+          failed: "Nabigo ang pag-verify ng email address"
+        code:
+          added: "Nabuo ang verification code ng email address"
+          sent: "Naipadala ang verification code ng email address"
+      password:
+        changed: "Binago ang password"
+        code:
+          added: "Nabuo ang password code"
+          sent: "Naipadala ang password code"
+        check:
+          succeeded: "Nagtagumpay ang password check"
+          failed: "Nabigo ang password check"
+        change:
+          sent: "Naipadala ang abiso ng pagbabago ng password"
+        hash:
+          updated: "Na-update ang password hash"
+      externallogin:
+        check:
+          succeeded: "Nagtagumpay ang external login"
+      externalidp:
+        added: "Naidagdag ang External IDP"
+        removed: "Inalis ang External IDP"
+        cascade:
+          removed: "Inalis ang External IDP (cascade)"
+        id:
+          migrated: "Na-migrate ang External UserID ng IDP"
+      phone:
+        changed: "Binago ang numero ng telepono"
+        verified: "Na-verify ang numero ng telepono"
+        verification:
+          failed: "Nabigo ang pag-verify ng numero ng telepono"
+        code:
+          added: "Nabuo ang code ng numero ng telepono"
+          sent: "Naipadala ang code ng numero ng telepono"
+        removed: "Inalis ang numero ng telepono"
+      profile:
+        changed: "Binago ang profile ng user"
+      address:
+        changed: "Binago ang address ng user"
+      mfa:
+        otp:
+          added: "Naidagdag ang Multifactor OTP"
+          verified: "Na-verify ang Multifactor OTP"
+          removed: "Inalis ang Multifactor OTP"
+          check:
+            succeeded: "Nagtagumpay ang Multifactor OTP check"
+            failed: "Nabigo ang Multifactor OTP check"
+            reused: "Muling ginamit ang Multifactor OTP code"
+          sms:
+            added: "Naidagdag ang Multifactor OTP SMS"
+            removed: "Inalis ang Multifactor OTP SMS"
+            code:
+              added: "Naidagdag ang Multifactor OTP SMS code"
+              sent: "Naipadala ang Multifactor OTP SMS code"
+            check:
+              succeeded: "Nagtagumpay ang Multifactor OTP SMS check"
+              failed: "Nabigo ang Multifactor OTP SMS check"
+          email:
+            added: "Naidagdag ang Multifactor OTP Email"
+            removed: "Inalis ang Multifactor OTP Email"
+            code:
+              added: "Naidagdag ang Multifactor OTP Email code"
+              sent: "Naipadala ang Multifactor OTP Email code"
+            check:
+              succeeded: "Nagtagumpay ang Multifactor OTP Email check"
+              failed: "Nabigo ang Multifactor OTP Email check"
+        u2f:
+          token:
+            added: "Naidagdag ang Multifactor U2F Token"
+            verified: "Na-verify ang Multifactor U2F Token"
+            removed: "Inalis ang Multifactor U2F Token"
+            begin:
+              login: "Sinimulan ang Multifactor U2F check"
+            check:
+              succeeded: "Nagtagumpay ang Multifactor U2F check"
+              failed: "Nabigo ang Multifactor U2F check"
+            signcount:
+              changed: "Binago ang checksum ng Multifactor U2F Token"
+        init:
+          skipped: "Nilaktawan ang multifactor initialization"
+      passwordless:
+        token:
+          added: "Naidagdag ang token para sa Passkey Login"
+          verified: "Na-verify ang token para sa Passkey Login"
+          removed: "Inalis ang token para sa Passkey Login"
+          begin:
+            login: "Sinimulan ang Passkey Login check"
+          check:
+            succeeded: "Nagtagumpay ang Passkey Login check"
+            failed: "Nabigo ang Passkey Login check"
+          signcount:
+            changed: "Binago ang checksum ng Passkey Login Token"
+        initialization:
+          code:
+            added: "Naidagdag ang passkey initialization code"
+            sent: "Naipadala ang passkey initialization code"
+            requested: "Hiniling ang passkey initialization code"
+            check:
+              succeeded: "Matagumpay na na-check ang passkey initialization code"
+              failed: "Nabigo ang check ng passkey initialization code"
+      signed:
+        out: "Nag-sign out ang user"
+      refresh:
+        token:
+          added: "Ginawa ang Refresh Token"
+          renewed: "Na-renew ang Refresh Token"
+          removed: "Inalis ang Refresh Token"
+    locked: "Na-lock ang user"
+    unlocked: "Na-unlock ang user"
+    deactivated: "Na-deactivate ang user"
+    reactivated: "Na-reactivate ang user"
+    removed: "Inalis ang user"
+    password:
+      changed: "Binago ang password"
+      code:
+        added: "Nabuo ang password code"
+        sent: "Naipadala ang password code"
+      check:
+        succeeded: "Nagtagumpay ang password check"
+        failed: "Nabigo ang password check"
+    phone:
+      changed: "Binago ang numero ng telepono"
+      verified: "Na-verify ang numero ng telepono"
+      verification:
+        failed: "Nabigo ang pag-verify ng numero ng telepono"
+      code:
+        added: "Nabuo ang code ng numero ng telepono"
+        sent: "Naipadala ang code ng numero ng telepono"
+    profile:
+      changed: "Binago ang profile ng user"
+    address:
+      changed: "Binago ang address ng user"
+    mfa:
+      otp:
+        added: "Naidagdag ang Multifactor OTP"
+        verified: "Na-verify ang Multifactor OTP"
+        removed: "Inalis ang Multifactor OTP"
+        check:
+          succeeded: "Nagtagumpay ang Multifactor OTP check"
+          failed: "Nabigo ang Multifactor OTP check"
+        init:
+          skipped: "Nilaktawan ang Multifactor OTP initialization"
+      init:
+        skipped: "Nilaktawan ang multifactor initialization"
+    signed:
+      out: "Nag-sign out ang user"
+    grant:
+      added: "Naidagdag ang authorization"
+      changed: "Binago ang authorization"
+      removed: "Inalis ang authorization"
+      deactivated: "Na-deactivate ang authorization"
+      reactivated: "Na-reactivate ang authorization"
+      reserved: "Na-reserve ang authorization"
+      released: "Na-release ang authorization"
+      cascade:
+        removed: "Inalis ang authorization"
+        changed: "Binago ang authorization"
+    metadata:
+      set: "Naitakda ang metadata ng user"
+      removed: "Inalis ang metadata ng user"
+      removed.all: "Inalis ang lahat ng metadata ng user"
+    domain:
+      claimed: "Na-claim ang domain"
+      claimed.sent: "Naipadala ang notification ng na-claim na domain"
+    pat:
+      added: "Naidagdag ang Personal Access Token"
+      removed: "Inalis ang Personal Access Token"
+  org:
+    added: "Naidagdag ang organisasyon"
+    changed: "Binago ang organisasyon"
+    deactivated: "Na-deactivate ang organisasyon"
+    reactivated: "Na-reactivate ang organisasyon"
+    removed: "Inalis ang organisasyon"
+    domain:
+      added: "Naidagdag ang domain"
+      verification:
+        added: "Naidagdag ang domain verification"
+        failed: "Nabigo ang domain verification"
+      verified: "Na-verify ang domain"
+      removed: "Inalis ang domain"
+      primary:
+        set: "Naitakda ang Domain ng Organisasyon"
+      reserved: "Na-reserve ang domain"
+      released: "Na-release ang domain"
+    name:
+      reserved: "Na-reserve ang pangalan ng organisasyon"
+      released: "Na-release ang pangalan ng organisasyon"
+    member:
+      added: "Naidagdag ang miyembro ng organisasyon"
+      changed: "Binago ang miyembro ng organisasyon"
+      removed: "Inalis ang miyembro ng organisasyon"
+      cascade:
+        removed: "Inalis ang miyembro ng organisasyon (cascade)"
+    iam:
+      policy:
+        added: "Naidagdag ang system policy"
+        changed: "Binago ang system policy"
+        removed: "Inalis ang system policy"
+    idp:
+      config:
+        added: "Naidagdag ang IDP configuration"
+        changed: "Binago ang IDP configuration"
+        removed: "Inalis ang IDP configuration"
+        deactivated: "Na-deactivate ang IDP configuration"
+        reactivated: "Na-reactivate ang IDP configuration"
+      oidc:
+        config:
+          added: "Naidagdag ang OIDC IDP configuration"
+          changed: "Binago ang OIDC IDP configuration"
+      saml:
+        config:
+          added: "Naidagdag ang SAML IDP configuration"
+          changed: "Binago ang SAML IDP configuration"
+      jwt:
+        config:
+          added: "Naidagdag ang JWT IDP configuration"
+          changed: "Binago ang JWT IDP configuration"
+    customtext:
+      set: "Naitakda ang custom text"
+      removed: "Inalis ang custom text"
+      template:
+        removed: "Inalis ang custom text template"
+    policy:
+      login:
+        added: "Naidagdag ang Login Policy"
+        changed: "Binago ang Login Policy"
+        removed: "Inalis ang Login Policy"
+        idpprovider:
+          added: "Naidagdag ang Identity Provider sa Login Policy"
+          removed: "Inalis ang Identity Provider sa Login Policy"
+          cascade:
+            removed: "Inalis ang Identity Provider sa Login Policy (cascade)"
+        secondfactor:
+          added: "Naidagdag ang second factor sa Login Policy"
+          removed: "Inalis ang second factor sa Login Policy"
+        multifactor:
+          added: "Naidagdag ang multi-factor sa Login Policy"
+          removed: "Inalis ang multi-factor sa Login Policy"
+      password:
+        complexity:
+          added: "Naidagdag ang password complexity policy"
+          changed: "Binago ang password complexity policy"
+          removed: "Inalis ang password complexity policy"
+        age:
+          added: "Naidagdag ang password age policy"
+          changed: "Binago ang password age policy"
+          removed: "Inalis ang password age policy"
+        lockout:
+          added: "Naidagdag ang password lockout policy"
+          changed: "Binago ang password lockout policy"
+          removed: "Inalis ang password lockout policy"
+      label:
+        added: "Naidagdag ang Label Policy"
+        changed: "Binago ang Label Policy"
+        activated: "Na-activate ang Label Policy"
+        removed: "Inalis ang Label Policy"
+        logo:
+          added: "Naidagdag ang logo sa Label Policy"
+          removed: "Inalis ang logo sa Label Policy"
+          dark:
+            added: "Naidagdag ang logo (dark mode) sa Label Policy"
+            removed: "Inalis ang logo (dark mode) sa Label Policy"
+        icon:
+          added: "Naidagdag ang icon sa Label Policy"
+          removed: "Inalis ang icon sa Label Policy"
+          dark:
+            added: "Naidagdag ang icon (dark mode) sa Label Policy"
+            removed: "Inalis ang icon (dark mode) sa Label Policy"
+        font:
+          added: "Naidagdag ang font sa Label Policy"
+          removed: "Inalis ang font sa Label Policy"
+        assets:
+          removed: "Inalis ang mga asset sa Label Policy"
+      privacy:
+        added: "Naidagdag ang privacy policy at TOS"
+        changed: "Binago ang privacy policy at TOS"
+        removed: "Inalis ang privacy policy at TOS"
+      domain:
+        added: "Naidagdag ang domain policy"
+        changed: "Binago ang domain policy"
+        removed: "Inalis ang domain policy"
+      lockout:
+        added: "Naidagdag ang lockout policy"
+        changed: "Binago ang lockout policy"
+        removed: "Inalis ang lockout policy"
+      notification:
+        added: "Naidagdag ang notification policy"
+        changed: "Binago ang notification policy"
+        removed: "Inalis ang notification policy"
+    flow:
+      trigger_actions:
+        set: "Naitakda ang action"
+        cascade:
+          removed: "Inalis ang mga action (cascade)"
+        removed: "Inalis ang mga action"
+      cleared: "Na-clear ang flow"
+    mail:
+      template:
+        added: "Naidagdag ang E-Mail template"
+        changed: "Binago ang E-Mail template"
+        removed: "Inalis ang E-Mail template"
+      text:
+        added: "Naidagdag ang E-Mail text"
+        changed: "Binago ang E-Mail text"
+        removed: "Inalis ang E-Mail text"
+    metadata:
+      removed: "Inalis ang metadata"
+      removed.all: "Inalis ang lahat ng metadata"
+      set: "Naitakda ang metadata"
+  project:
+    added: "Naidagdag ang project"
+    changed: "Binago ang project"
+    deactivated: "Na-deactivate ang project"
+    reactivated: "Na-reactivate ang project"
+    removed: "Inalis ang project"
+    member:
+      added: "Naidagdag ang miyembro ng project"
+      changed: "Binago ang miyembro ng project"
+      removed: "Inalis ang miyembro ng project"
+      cascade:
+        removed: "Inalis ang miyembro ng project (cascade)"
+    role:
+      added: "Naidagdag ang role ng project"
+      changed: "Binago ang role ng project"
+      removed: "Inalis ang role ng project"
+    grant:
+      added: "Naidagdag ang management access"
+      changed: "Binago ang management access"
+      removed: "Inalis ang management access"
+      deactivated: "Na-deactivate ang management access"
+      reactivated: "Na-reactivate ang management access"
+      cascade:
+        changed: "Binago ang management access"
+      member:
+        added: "Naidagdag ang miyembro ng management access"
+        changed: "Binago ang miyembro ng management access"
+        removed: "Inalis ang miyembro ng management access"
+        cascade:
+          removed: "Inalis ang management access (cascade)"
+    application:
+      added: "Naidagdag ang application"
+      changed: "Binago ang application"
+      removed: "Inalis ang application"
+      deactivated: "Na-deactivate ang application"
+      reactivated: "Na-reactivate ang application"
+      oidc:
+        secret:
+          check:
+            succeeded: "Nagtagumpay ang OIDC Client Secret check"
+            failed: "Nabigo ang OIDC Client Secret check"
+        key:
+          added: "Naidagdag ang OIDC Application Key"
+          removed: "Inalis ang OIDC Application Key"
+      api:
+        secret:
+          check:
+            succeeded: "Nagtagumpay ang API secret check"
+            failed: "Nabigo ang API secret check"
+        key:
+          added: "Naidagdag ang application key"
+          removed: "Inalis ang application key"
+      config:
+        saml:
+          added: "Naidagdag ang SAML Configuration"
+          changed: "Binago ang SAML Configuration"
+        oidc:
+          added: "Naidagdag ang OIDC Configuration"
+          changed: "Binago ang OIDC Configuration"
+          secret:
+            changed: "Binago ang OIDC secret"
+            updated: "Na-update ang OIDC secret hash"
+        api:
+          added: "Naidagdag ang API Configuration"
+          changed: "Binago ang API Configuration"
+          secret:
+            changed: "Binago ang API secret"
+            updated: "Na-update ang API secret hash"
+  policy:
+    password:
+      complexity:
+        added: "Naidagdag ang password complexity policy"
+        changed: "Binago ang password complexity policy"
+      age:
+        added: "Naidagdag ang password age policy"
+        changed: "Binago ang password age policy"
+      lockout:
+        added: "Naidagdag ang password lockout policy"
+        changed: "Binago ang password lockout policy"
+  iam:
+    setup:
+      started: "Sinimulan ang Zitadel setup"
+      done: "Tapos na ang Zitadel setup"
+    global:
+      org:
+        set: "Naitakda ang global org"
+    project:
+      iam:
+        set: "Naitakda ang Zitadel project"
+    member:
+      added: "Naidagdag ang Zitadel member"
+      changed: "Binago ang Zitadel member"
+      removed: "Inalis ang Zitadel member"
+      cascade:
+        removed: "Inalis ang Zitadel member (cascade)"
+    idp:
+      config:
+        added: "Naidagdag ang IDP configuration"
+        changed: "Binago ang IDP configuration"
+        removed: "Inalis ang IDP configuration"
+        deactivated: "Na-deactivate ang IDP configuration"
+        reactivated: "Na-reactivate ang IDP configuration"
+      oidc:
+        config:
+          added: "Naidagdag ang OIDC IDP configuration"
+          changed: "Binago ang OIDC IDP configuration"
+      saml:
+        config:
+          added: "Naidagdag ang SAML IDP configuration"
+          changed: "Binago ang SAML IDP configuration"
+      jwt:
+        config:
+          added: "Naidagdag ang JWT configuration sa identity provider"
+          changed: "Inalis ang JWT configuration sa identity provider"
+    customtext:
+      set: "Naitakda ang text"
+      removed: "Inalis ang text"
+    policy:
+      login:
+        added: "Naidagdag ang Default Login Policy"
+        changed: "Binago ang Default Login Policy"
+        idpprovider:
+          added: "Naidagdag ang Identity Provider sa Default Login Policy"
+          removed: "Inalis ang Identity Provider sa Default Login Policy"
+      label:
+        added: "Naidagdag ang Label Policy"
+        changed: "Binago ang Label Policy"
+        activated: "Na-activate ang Label Policy"
+        logo:
+          added: "Naidagdag ang logo sa Label Policy"
+          removed: "Inalis ang logo sa Label Policy"
+          dark:
+            added: "Naidagdag ang logo (dark mode) sa Label Policy"
+            removed: "Inalis ang logo (dark mode) sa Label Policy"
+        icon:
+          added: "Naidagdag ang icon sa Label Policy"
+          removed: "Inalis ang icon sa Label Policy"
+          dark:
+            added: "Naidagdag ang icon (dark mode) sa Label Policy"
+            removed: "Inalis ang icon (dark mode) sa Label Policy"
+        font:
+          added: "Naidagdag ang font sa Label Policy"
+          removed: "Inalis ang font sa Label Policy"
+        assets:
+          removed: "Inalis ang mga asset sa Label Policy"
+    default:
+      language:
+        set: "Naitakda ang default na wika"
+    oidc:
+      settings:
+        added: "Naidagdag ang OIDC configuration"
+        changed: "Binago ang OIDC configuration"
+        removed: "Inalis ang OIDC configuration"
+    secret:
+      generator:
+        added: "Naidagdag ang secret generator"
+        changed: "Binago ang secret generator"
+        removed: "Inalis ang secret generator"
+    smtp:
+      config:
+        added: "Naidagdag ang SMTP configuration"
+        changed: "Binago ang SMTP configuration"
+        activated: "Na-activate ang SMTP configuration"
+        deactivated: "Na-deactivate ang SMTP configuration"
+        removed: "Inalis ang SMTP configuration"
+        password:
+          changed: "Binago ang secret ng SMTP configuration"
+    sms:
+      config:
+        twilio:
+          added: "Naidagdag ang Twilio SMS provider"
+          changed: "Binago ang Twilio SMS provider"
+          token:
+            changed: "Binago ang token ng Twilio SMS provider"
+          removed: "Inalis ang Twilio SMS provider"
+          activated: "Na-activate ang Twilio SMS provider"
+          deactivated: "Na-deactivate ang Twilio SMS provider"
+  key_pair:
+    added: "Naidagdag ang key pair"
+    certificate:
+      added: "Naidagdag ang certificate"
+  action:
+    added: "Naidagdag ang action"
+    changed: "Binago ang action"
+    deactivated: "Na-deactivate ang action"
+    reactivated: "Na-reactivate ang action"
+    removed: "Inalis ang action"
+  instance:
+    added: "Naidagdag ang instance"
+    changed: "Binago ang instance"
+    customtext:
+      removed: "Inalis ang custom text"
+      set: "Naitakda ang custom text"
+      template:
+        removed: "Inalis ang template ng custom text"
+    default:
+      language:
+        set: "Naitakda ang default na wika"
+      org:
+        set: "Naitakda ang default na organisasyon"
+    domain:
+      added: "Naidagdag ang domain"
+      primary:
+        set: "Naitakda ang primary domain"
+      removed: "Inalis ang domain"
+    iam:
+      console:
+        set: "Naitakda ang Zitadel Management Console application"
+      project:
+        set: "Naitakda ang Zitadel project"
+    mail:
+      template:
+        added: "Naidagdag ang E-Mail template"
+        changed: "Binago ang E-Mail template"
+      text:
+        added: "Naidagdag ang E-Mail text"
+        changed: "Binago ang E-Mail text"
+    member:
+      added: "Naidagdag ang miyembro ng instance"
+      changed: "Binago ang miyembro ng instance"
+      removed: "Inalis ang miyembro ng instance"
+      cascade:
+        removed: "Inalis ang miyembro ng instance (cascade)"
+    notification:
+      provider:
+        debug:
+          fileadded: "Naidagdag ang file debug notification provider"
+          filechanged: "Binago ang file debug notification provider"
+          fileremoved: "Inalis ang file debug notification provider"
+          logadded: "Naidagdag ang log debug notification provider"
+          logchanged: "Binago ang log debug notification provider"
+          logremoved: "Inalis ang log debug notification provider"
+    oidc:
+      settings:
+        added: "Naidagdag ang mga OIDC setting"
+        changed: "Binago ang mga OIDC setting"
+    policy:
+      domain:
+        added: "Naidagdag ang domain policy"
+        changed: "Binago ang domain policy"
+      label:
+        activated: "Na-activate ang label policy"
+        added: "Naidagdag ang label policy"
+        assets:
+          removed: "Inalis ang asset sa label policy"
+        changed: "Binago ang label policy"
+        font:
+          added: "Naidagdag ang font sa label policy"
+          removed: "Inalis ang font sa label policy"
+        icon:
+          added: "Naidagdag ang icon sa label policy"
+          removed: "Inalis ang icon sa label policy"
+          dark:
+            added: "Naidagdag ang icon sa dark label policy"
+            removed: "Inalis ang icon sa dark label policy"
+        logo:
+          added: "Naidagdag ang logo sa label policy"
+          removed: "Inalis ang logo sa label policy"
+          dark:
+            added: "Naidagdag ang logo sa dark label policy"
+            removed: "Inalis ang logo sa dark label policy"
+      lockout:
+        added: "Naidagdag ang lockout policy"
+        changed: "Binago ang lockout policy"
+      login:
+        added: "Naidagdag ang login policy"
+        changed: "Binago ang login policy"
+        idpprovider:
+          added: "Naidagdag ang Identity Provider sa login policy"
+          cascade:
+            removed: "Inalis ang Identity Provider sa login policy (cascade)"
+          removed: "Inalis ang Identity Provider sa login policy"
+        multifactor:
+          added: "Naidagdag ang multifactor sa login policy"
+          removed: "Inalis ang multifactor sa login policy"
+        secondfactor:
+          added: "Naidagdag ang second factor sa login policy"
+          removed: "Inalis ang second factor sa login policy"
+      password:
+        age:
+          added: "Naidagdag ang password age policy"
+          changed: "Binago ang password age policy"
+        complexity:
+          added: "Naidagdag ang password complexity policy"
+          changed: "Binago ang password complexity policy"
+      privacy:
+        added: "Naidagdag ang privacy policy"
+        changed: "Binago ang privacy policy"
+      security:
+        set: "Naitakda ang security policy"
+    removed: "Inalis ang instance"
+    secret:
+      generator:
+        added: "Naidagdag ang secret generator"
+        changed: "Binago ang secret generator"
+        removed: "Inalis ang secret generator"
+    sms:
+      configtwilio:
+        activated: "Na-activate ang Twilio SMS configuration"
+        added: "Naidagdag ang Twilio SMS configuration"
+        changed: "Binago ang Twilio SMS configuration"
+        deactivated: "Na-deactivate ang Twilio SMS configuration"
+        removed: "Inalis ang Twilio SMS configuration"
+        token:
+          changed: "Binago ang token ng Twilio SMS configuration"
+    smtp:
+      config:
+        added: "Naidagdag ang SMTP configuration"
+        changed: "Binago ang SMTP configuration"
+        activated: "Na-activate ang SMTP configuration"
+        deactivated: "Na-deactivate ang SMTP configuration"
+        password:
+          changed: "Binago ang password ng SMTP configuration"
+        removed: "Inalis ang SMTP configuration"
+  user_schema:
+    created: "Ginawa ang User Schema"
+    updated: "Na-update ang User Schema"
+    deactivated: "Na-deactivate ang User Schema"
+    reactivated: "Na-reactivate ang User Schema"
+    deleted: "Binura ang User Schema"
+    user:
+      created: "Ginawa ang user"
+      updated: "Na-update ang user"
+      deleted: "Binura ang user"
+      email:
+        updated: "Binago ang email address"
+        verified: "Na-verify ang email address"
+        verification:
+          failed: "Nabigo ang pag-verify ng email address"
+        code:
+          added: "Nabuo ang verification code ng email address"
+          sent: "Naipadala ang verification code ng email address"
+      phone:
+        updated: "Binago ang numero ng telepono"
+        verified: "Na-verify ang numero ng telepono"
+        verification:
+          failed: "Nabigo ang pag-verify ng numero ng telepono"
+        code:
+          added: "Nabuo ang verification code ng numero ng telepono"
+          sent: "Naipadala ang verification code ng numero ng telepono"
+  web_key:
+    added: "Naidagdag ang Web Key"
+    activated: "Na-activate ang Web Key"
+    deactivated: "Na-deactivate ang Web Key"
+    removed: "Inalis ang Web Key"
+Application:
+  OIDC:
+    UnsupportedVersion: "Hindi suportado ang iyong bersyon ng OIDC"
+    V1:
+      NotCompliant: "Hindi compliant ang iyong configuration at naiiba ito sa OIDC 1.0 standard."
+      NoRedirectUris: "Kailangang magrehistro ng kahit isang redirect uri."
+      NotAllCombinationsAreAllowed: "Compliant ang configuration, ngunit hindi lahat ng posibleng kombinasyon ay pinapayagan."
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: "Pinapayagan lamang ng grant type na \"code\" ang mga http redirect uri para sa apptype na \"web\"."
+          CustomOnlyForNative: "Pinapayagan lamang ng grant type na \"code\" ang mga custom redirect uri para sa apptype na \"native\"  (hal. appname:// )"
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: "Hindi pinapayagan ng grant type na implicit ang mga custom redirect uri"
+          HttpNotAllowed: "Hindi pinapayagan ng grant type na implicit ang mga http redirect uri"
+          HttpLocalhostOnlyForNative: "Ang Http://localhost redirect uri ay pinapayagan lamang para sa mga native application."
+      Native:
+        AuthMethodType:
+          NotNone: "Ang mga native application ay dapat may authmethodtype na none."
+        RedirectUris:
+          MustBeHttpLocalhost: "Ang mga Redirect URI ay dapat magsimula sa sarili mong protocol, http://127.0.0.1, http://[::1] o http://localhost."
+      UserAgent:
+        AuthMethodType:
+          NotNone: "Ang user agent application ay dapat may authmethodtype na none."
+      GrantType:
+        Refresh:
+          NoAuthCode: "Ang Refresh Token ay pinapayagan lamang kasama ng Authorization Code."
+Action:
+  Flow:
+    Type:
+      Unspecified: "Hindi tinukoy"
+      ExternalAuthentication: "External na Authentication"
+      CustomiseToken: "Pagdaragdag sa Token"
+      InternalAuthentication: "Internal na Authentication"
+      CustomizeSAMLResponse: "Pagdaragdag sa SAMLResponse"
+  TriggerType:
+    Unspecified: "Hindi tinukoy"
+    PostAuthentication: "Pagkatapos ng Authentication"
+    PreCreation: "Bago ang Paggawa"
+    PostCreation: "Pagkatapos ng Paggawa"
+    PreUserinfoCreation: "Bago ang paggawa ng Userinfo"
+    PreAccessTokenCreation: "Bago ang paggawa ng access token"
+    PreSAMLResponseCreation: "Bago ang paggawa ng SAMLResponse"

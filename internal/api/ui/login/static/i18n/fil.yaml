@@ -1,0 +1,543 @@
+Login:
+  Title: Maligayang pagbabalik!
+  Description: Ilagay ang iyong mga detalye sa pag-log in.
+  TitleLinking: Mag-log in para sa pag-link ng user
+  DescriptionLinking: Ilagay ang iyong mga detalye sa pag-log in para i-link ang iyong external na user.
+  LoginNameLabel: Login Name
+  UsernamePlaceHolder: username
+  LoginnamePlaceHolder: username@domain
+  ExternalUserDescription: Mag-log in gamit ang external na user.
+  MustBeMemberOfOrg: Ang user ay dapat miyembro ng organisasyong {{.OrgName}}.
+  RegisterButtonText: Magrehistro
+  NextButtonText: Magpatuloy
+
+LDAP:
+  Title: Mag-log in
+  Description: Ilagay ang iyong mga detalye sa pag-log in.
+  LoginNameLabel: Login Name
+  PasswordLabel: Password
+  NextButtonText: Magpatuloy
+
+SelectAccount:
+  Title: Pumili ng Account
+  Description: Gamitin ang iyong account
+  TitleLinking: Pumili ng account para sa pag-link ng user
+  DescriptionLinking: Piliin ang iyong account na ili-link sa iyong external na user.
+  OtherUser: Ibang User
+  SessionState0: aktibo
+  SessionState1: Naka-log out
+  MustBeMemberOfOrg: Ang user ay dapat miyembro ng organisasyong {{.OrgName}}.
+
+Password:
+  Title: Password
+  Description: Ilagay ang iyong mga detalye sa pag-log in.
+  PasswordLabel: Password
+  MinLength: Dapat ay hindi bababa sa
+  MinLengthp2: character ang haba.
+  MaxLength: Dapat ay mas maikli sa 70 character.
+  HasUppercase: Dapat may kasamang malaking titik.
+  HasLowercase: Dapat may kasamang maliit na titik.
+  HasNumber: Dapat may kasamang numero.
+  HasSymbol: Dapat may kasamang simbolo.
+  Confirmation: Tugma ang kumpirmasyon ng password.
+  ResetLinkText: I-reset ang Password
+  BackButtonText: Bumalik
+  NextButtonText: Magpatuloy
+
+UsernameChange:
+  Title: Palitan ang Username
+  Description: Itakda ang iyong bagong username
+  UsernameLabel: Username
+  CancelButtonText: Kanselahin
+  NextButtonText: Magpatuloy
+
+UsernameChangeDone:
+  Title: Napalitan ang Username
+  Description: Matagumpay na napalitan ang iyong username.
+  NextButtonText: Magpatuloy
+
+InitPassword:
+  Title: Itakda ang Password
+  Description: Nakatanggap ka ng code na kailangan mong ilagay sa form sa ibaba para maitakda ang iyong bagong password.
+  CodeLabel: Code
+  NewPasswordLabel: Bagong Password
+  NewPasswordConfirmLabel: Kumpirmahin ang Password
+  ResendButtonText: Ipadala muli ang Code
+  NextButtonText: Magpatuloy
+
+InitPasswordDone:
+  Title: Naitakda na ang Password
+  Description: Matagumpay na naitakda ang password
+  NextButtonText: Magpatuloy
+  CancelButtonText: Kanselahin
+
+InitUser:
+  Title: I-activate ang User
+  Description: I-verify ang iyong email gamit ang code sa ibaba at itakda ang iyong password.
+  CodeLabel: Code
+  NewPasswordLabel: Bagong Password
+  NewPasswordConfirm: Kumpirmahin ang Password
+  NextButtonText: Magpatuloy
+  ResendButtonText: Ipadala muli ang Code
+
+InitUserDone:
+  Title: Na-activate na ang User
+  Description: Na-verify ang email at matagumpay na naitakda ang password
+  NextButtonText: Magpatuloy
+  CancelButtonText: Kanselahin
+
+InviteUser:
+  Title: I-activate ang User
+  Description: I-verify ang iyong email gamit ang code sa ibaba at itakda ang iyong password.
+  CodeLabel: Code
+  NewPasswordLabel: Bagong Password
+  NewPasswordConfirm: Kumpirmahin ang Password
+  NextButtonText: Magpatuloy
+  ResendButtonText: Ipadala muli ang Code
+
+InitMFAPrompt:
+  Title: Pag-set up ng 2-Factor
+  Description: Nagbibigay ang 2-factor authentication ng karagdagang seguridad para sa iyong user account. Tinitiyak nito na ikaw lang ang may access sa iyong account.
+  Provider0: Authenticator App (hal. Google/Microsoft Authenticator, Authy)
+  Provider1: Nakadepende sa device (hal. FaceID, Windows Hello, Fingerprint)
+  Provider3: OTP SMS
+  Provider4: OTP Email
+  NextButtonText: Magpatuloy
+  SkipButtonText: Laktawan
+
+InitMFAOTP:
+  Title: Pag-verify ng 2-Factor
+  Description: Gumawa ng iyong 2-factor. Mag-download ng authenticator app kung wala ka pa nito.
+  OTPDescription: I-scan ang code gamit ang iyong authenticator app (hal. Google/Microsoft Authenticator, Authy) o kopyahin ang secret at ilagay ang nabuong code sa ibaba.
+  SecretLabel: Secret
+  CodeLabel: Code
+  NextButtonText: Magpatuloy
+  CancelButtonText: Kanselahin
+
+InitMFAOTPSMS:
+  Title: Pag-verify ng 2-Factor
+  DescriptionPhone: Gumawa ng iyong 2-factor. Ilagay ang iyong numero ng telepono para i-verify ito.
+  DescriptionCode: Gumawa ng iyong 2-factor. Ilagay ang natanggap na code para i-verify ang iyong numero ng telepono.
+  CountryCodeLabel: Bansa
+  PhoneLabel: Telepono
+  CodeLabel: Code
+  EditButtonText: I-edit
+  ResendButtonText: Ipadala muli ang Code
+  NextButtonText: Magpatuloy
+
+InitMFAU2F:
+  Title: Magdagdag ng Security Key
+  Description: Ang security key ay isang paraan ng pag-verify na maaaring nakapaloob sa iyong telepono, gumagamit ng Bluetooth, o direktang isinasaksak sa USB port ng iyong computer.
+  TokenNameLabel: Pangalan ng security key / device
+  NotSupported: Hindi suportado ng iyong browser ang WebAuthN. Tiyaking updated ito o gumamit ng ibang browser (hal. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Magdagdag ng security key
+  ErrorRetry: Subukang muli, gumawa ng bagong challenge, o pumili ng ibang paraan.
+
+InitMFADone:
+  Title: Na-verify ang 2-factor
+  Description: Ayos! Matagumpay mong na-set up ang iyong 2-factor at mas naging ligtas ang iyong account. Kailangang ilagay ang factor sa bawat pag-log in.
+  NextButtonText: Magpatuloy
+  CancelButtonText: Kanselahin
+
+MFAProvider:
+  Provider0: Authenticator App (hal. Google/Microsoft Authenticator, Authy)
+  Provider1: Nakadepende sa device (hal. FaceID, Windows Hello, Fingerprint)
+  Provider3: OTP SMS
+  Provider4: OTP Email
+  ChooseOther: o pumili ng ibang opsyon
+
+VerifyMFAOTP:
+  Title: I-verify ang 2-Factor
+  Description: I-verify ang iyong second factor
+  CodeLabel: Code
+  NextButtonText: Magpatuloy
+
+VerifyOTP:
+  Title: I-verify ang 2-Factor
+  Description: I-verify ang iyong second factor
+  CodeLabel: Code
+  ResendButtonText: Ipadala muli ang Code
+  NextButtonText: Magpatuloy
+
+VerifyMFAU2F:
+  Title: Pag-verify ng 2-Factor
+  Description: I-verify ang iyong 2-Factor gamit ang nakarehistrong device (hal. FaceID, Windows Hello, Fingerprint)
+  NotSupported: Hindi suportado ng iyong browser ang WebAuthN. Tiyaking ginagamit mo ang pinakabagong bersyon o lumipat sa suportadong browser (Chrome, Safari, Firefox)
+  ErrorRetry: Subukang muli, gumawa ng bagong request, o pumili ng ibang paraan.
+  ValidateTokenButtonText: I-verify ang 2-Factor
+
+Passwordless:
+  Title: Mag-log in nang Walang Password
+  Description: Mag-log in gamit ang mga paraan ng authentication ng iyong device tulad ng FaceID, Windows Hello o Fingerprint.
+  NotSupported: Hindi suportado ng iyong browser ang WebAuthN. Tiyaking updated ito o gumamit ng ibang browser (hal. Chrome, Safari, Firefox)
+  ErrorRetry: Subukang muli, gumawa ng bagong challenge, o pumili ng ibang paraan.
+  LoginWithPwButtonText: Mag-log in gamit ang password
+  ValidateTokenButtonText: Mag-log in nang walang password
+
+PasswordlessPrompt:
+  Title: Pag-set up ng Passwordless
+  Description: Gusto mo bang i-set up ang pag-log in nang walang password? (Mga paraan ng authentication ng iyong device tulad ng FaceID, Windows Hello o Fingerprint)
+  DescriptionInit: Kailangan mong i-set up ang pag-log in nang walang password. Gamitin ang link na ibinigay sa iyo para irehistro ang iyong device.
+  PasswordlessButtonText: Gumamit ng passwordless
+  NextButtonText: Magpatuloy
+  SkipButtonText: Laktawan
+
+PasswordlessRegistration:
+  Title: Pag-set up ng Passwordless
+  Description: Idagdag ang iyong authentication sa pamamagitan ng pagbibigay ng pangalan (hal. MyMobilePhone, MacBook, atbp.) at pagkatapos ay i-click ang 'Irehistro ang passwordless' na button sa ibaba.
+  TokenNameLabel: Pangalan ng device
+  NotSupported: Hindi suportado ng iyong browser ang WebAuthN. Tiyaking updated ito o gumamit ng ibang browser (hal. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Irehistro ang passwordless
+  ErrorRetry: Subukang muli, gumawa ng bagong challenge, o pumili ng ibang paraan.
+
+PasswordlessRegistrationDone:
+  Title: Na-set up ang Passwordless
+  Description: Matagumpay na naidagdag ang device para sa passwordless.
+  DescriptionClose: Maaari mo nang isara ang window na ito.
+  NextButtonText: Magpatuloy
+  CancelButtonText: Kanselahin
+
+PasswordChange:
+  Title: Palitan ang Password
+  Description: Palitan ang iyong password. Ilagay ang iyong luma at bagong password.
+  ExpiredDescription: Nag-expire na ang iyong password at kailangan na itong palitan. Ilagay ang iyong luma at bagong password.
+  OldPasswordLabel: Lumang Password
+  NewPasswordLabel: Bagong Password
+  NewPasswordConfirmLabel: Kumpirmasyon ng password
+  CancelButtonText: Kanselahin
+  NextButtonText: Magpatuloy
+  Footer: Footer
+
+PasswordChangeDone:
+  Title: Palitan ang Password
+  Description: Matagumpay na napalitan ang iyong password.
+  NextButtonText: Magpatuloy
+
+PasswordResetDone:
+  Title: Naipadala na ang Link para I-reset ang Password
+  Description: Tingnan ang iyong email para i-reset ang iyong password.
+  NextButtonText: Magpatuloy
+
+EmailVerification:
+  Title: Pag-verify ng Email
+  Description: Nagpadala kami sa iyo ng email para i-verify ang iyong address. Pakilagay ang code sa form sa ibaba.
+  CodeLabel: Code
+  NextButtonText: Magpatuloy
+  ResendButtonText: Ipadala muli ang Code
+
+EmailVerificationDone:
+  Title: Pag-verify ng Email
+  Description: Matagumpay na na-verify ang iyong email address.
+  NextButtonText: Magpatuloy
+  CancelButtonText: Kanselahin
+  LoginButtonText: Mag-log in
+
+RegisterOption:
+  Title: Mga Opsyon sa Pagrehistro
+  Description: Piliin kung paano mo gustong magrehistro
+  RegisterUsernamePasswordButtonText: Gamit ang username at password
+  ExternalLoginDescription: o magrehistro gamit ang external na user
+  LoginButtonText: Mag-log in
+
+RegistrationUser:
+  Title: Pagrehistro
+  Description: Ilagay ang iyong user data. Gagamitin ang iyong email address bilang iyong login name.
+  DescriptionOrgRegister: Ilagay ang iyong user data.
+  EmailLabel: Email
+  UsernameLabel: Username
+  FirstnameLabel: Pangalan
+  LastnameLabel: Apelyido
+  LanguageLabel: Wika
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Filipino: Filipino
+  GenderLabel: Kasarian
+  Female: Babae
+  Male: Lalaki
+  Diverse: iba pa / X
+  PasswordLabel: Password
+  PasswordConfirmLabel: Kumpirmasyon ng password
+  TosAndPrivacyLabel: Mga tuntunin at kundisyon
+  TosConfirm: Tinatanggap ko ang
+  TosLinkText: TOS
+  PrivacyConfirm: Tinatanggap ko ang
+  PrivacyLinkText: patakaran sa privacy
+  ExternalLogin: o magrehistro gamit ang external na user
+  BackButtonText: Mag-log in
+  NextButtonText: Magpatuloy
+
+ExternalRegistrationUserOverview:
+  Title: Pagrehistro ng External na User
+  Description: Kinuha namin ang iyong mga detalye ng user mula sa napiling provider. Maaari mo na itong baguhin o kumpletuhin.
+  EmailLabel: Email
+  UsernameLabel: Username
+  FirstnameLabel: Pangalan
+  LastnameLabel: Apelyido
+  NicknameLabel: Palayaw
+  PhoneLabel: Numero ng telepono
+  LanguageLabel: Wika
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Filipino: Filipino
+  TosAndPrivacyLabel: Mga tuntunin at kundisyon
+  TosConfirm: Tinatanggap ko ang
+  TosLinkText: TOS
+  PrivacyConfirm: Tinatanggap ko ang
+  PrivacyLinkText: patakaran sa privacy
+  ExternalLogin: o magrehistro gamit ang external na user
+  BackButtonText: Bumalik
+  NextButtonText: I-save
+
+RegistrationOrg:
+  Title: Pagrehistro ng Organisasyon
+  Description: Ilagay ang pangalan ng iyong organisasyon at ang iyong user data.
+  OrgNameLabel: Pangalan ng organisasyon
+  EmailLabel: Email
+  UsernameLabel: Username
+  FirstnameLabel: Pangalan
+  LastnameLabel: Apelyido
+  PasswordLabel: Password
+  PasswordConfirmLabel: Kumpirmasyon ng password
+  TosAndPrivacyLabel: Mga tuntunin at kundisyon
+  TosConfirm: Tinatanggap ko ang
+  TosLinkText: TOS
+  PrivacyConfirm: Tinatanggap ko ang
+  PrivacyLinkText: patakaran sa privacy
+  SaveButtonText: Gumawa ng organisasyon
+
+LoginSuccess:
+  Title: Matagumpay ang Pag-log in
+  AutoRedirectDescription: Awtomatiko kang ibabalik sa iyong application. Kung hindi, i-click ang button sa ibaba. Maaari mo nang isara ang window pagkatapos.
+  RedirectedDescription: Maaari mo nang isara ang window na ito.
+  NextButtonText: Magpatuloy
+
+LogoutDone:
+  Title: Naka-log out
+  Description: Matagumpay kang naka-log out.
+  LoginButtonText: Mag-log in
+
+LinkingUserPrompt:
+  Title: May Nakitang Umiiral na User
+  Description: "Gusto mo bang i-link ang iyong umiiral na account:"
+  LinkButtonText: I-link
+  OtherButtonText: Iba pang opsyon
+
+LinkingUsersDone:
+  Title: Pag-link ng User
+  Description: Na-link na ang user.
+  CancelButtonText: Kanselahin
+  NextButtonText: Magpatuloy
+
+ExternalNotFound:
+  Title: Hindi Nahanap ang External na User
+  Description: Hindi nahanap ang external na user. Gusto mo bang i-link ang iyong user o awtomatikong magrehistro ng bago?
+  NoOptionAvailable: Walang nahanap na account na tumutugma sa iyong external na user at hindi maaaring gumawa ng bagong account. Makipag-ugnayan sa iyong administrator o support.
+  LinkButtonText: I-link
+  AutoRegisterButtonText: Magrehistro
+  TosAndPrivacyLabel: Mga tuntunin at kundisyon
+  TosConfirm: Tinatanggap ko ang
+  TosLinkText: TOS
+  PrivacyConfirm: Tinatanggap ko ang
+  PrivacyLinkText: patakaran sa privacy
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Filipino: Filipino
+DeviceAuth:
+  Title: Awtorisasyon ng Device
+  UserCode:
+    Label: User Code
+    Description: Ilagay ang user code na ipinapakita sa device.
+    ButtonNext: Magpatuloy
+  Action:
+    Description: Bigyan ng access ang device.
+    GrantDevice: bibigyan mo ng access ang device
+    AccessToScopes: sa mga sumusunod na scope
+    Button:
+      Allow: Payagan
+      Deny: Tanggihan
+  Done:
+    Description: Tapos na.
+    Approved: Inaprubahan ang awtorisasyon ng device. Maaari ka nang bumalik sa device.
+    Denied: Tinanggihan ang awtorisasyon ng device. Maaari ka nang bumalik sa device.
+
+Footer:
+  PoweredBy: Pinapagana ng
+  Tos: TOS
+  PrivacyPolicy: Patakaran sa privacy
+  Help: Tulong
+  SupportEmail: Email ng Support
+
+SignIn: Mag-log in gamit ang {{.Provider}}
+
+Errors:
+  Internal: Nagkaroon ng internal na error
+  AuthRequest:
+    NotFound: Hindi mahanap ang authrequest
+    UserAgentNotCorresponding: Hindi tumutugma ang User Agent
+    UserAgentNotFound: Hindi nahanap ang User Agent ID
+    TokenNotFound: Hindi nahanap ang token
+    RequestTypeNotSupported: Hindi suportado ang uri ng request
+    MissingParameters: Kulang ang mga kinakailangang parameter
+  User:
+    NotFound: Hindi mahanap ang user
+    AlreadyExists: Umiiral na ang user
+    Inactive: Hindi aktibo ang user
+    NotFoundOnOrg: Hindi mahanap ang user sa napiling organisasyon
+    NotAllowedOrg: Hindi miyembro ang user ng kinakailangang organisasyon
+    NotMatchingUserID: Hindi tugma ang user at ang user sa authrequest
+    UserIDMissing: Walang laman ang UserID
+    Invalid: Hindi wastong user data
+    DomainNotAllowedAsUsername: Nakareserba na ang domain at hindi maaaring gamitin
+    NotAllowedToLink: Hindi pinapayagan ang user na mag-link sa external na login provider
+    Profile:
+      NotFound: Hindi nahanap ang profile
+      NotChanged: Hindi nabago ang profile
+      Empty: Walang laman ang profile
+      FirstNameEmpty: Walang laman ang pangalan sa profile
+      LastNameEmpty: Walang laman ang apelyido sa profile
+      IDMissing: Nawawala ang Profile ID
+    Email:
+      NotFound: Hindi nahanap ang email
+      Invalid: Hindi wasto ang email
+      AlreadyVerified: Na-verify na ang email
+      NotChanged: Hindi nabago ang email
+      Empty: Walang laman ang email
+      IDMissing: Nawawala ang Email ID
+    Phone:
+      NotFound: Hindi nahanap ang telepono
+      Invalid: Hindi wasto ang telepono
+      AlreadyVerified: Na-verify na ang telepono
+      Empty: Walang laman ang telepono
+      NotChanged: Hindi nabago ang telepono
+    Address:
+      NotFound: Hindi nahanap ang address
+      NotChanged: Hindi nabago ang address
+    Username:
+      AlreadyExists: Ginagamit na ang username
+      Reserved: Ginagamit na ang username
+      Empty: Walang laman ang username
+    Password:
+      ConfirmationWrong: Mali ang kumpirmasyon ng password
+      Empty: Walang laman ang password
+      Invalid: Hindi wasto ang password
+      InvalidAndLocked: Hindi wasto ang password at naka-lock ang user, makipag-ugnayan sa iyong administrator.
+      NotChanged: Hindi maaaring kapareho ng iyong kasalukuyang password ang bagong password
+    UsernameOrPassword:
+      Invalid: Hindi wasto ang username o password
+    PasswordComplexityPolicy:
+      NotFound: Hindi nahanap ang password policy
+      MinLength: Masyadong maikli ang password
+      HasLower: Dapat may maliit na titik ang password
+      HasUpper: Dapat may malaking titik ang password
+      HasNumber: Dapat may numero ang password
+      HasSymbol: Dapat may simbolo ang password
+    Code:
+      Expired: Nag-expire na ang code
+      Invalid: Hindi wasto ang code
+      Empty: Walang laman ang code
+      CryptoCodeNil: Nil ang crypto code
+      NotFound: Hindi mahanap ang code
+      GeneratorAlgNotSupported: Hindi suportadong generator algorithm
+    EmailVerify:
+      UserIDEmpty: Walang laman ang UserID
+    ExternalData:
+      CouldNotRead: Hindi nabasa nang tama ang external na data
+    MFA:
+      NoProviders: Walang available na multifactor provider
+      OTP:
+        AlreadyReady: Naka-set up na ang multifactor OTP (OneTimePassword)
+        NotExisting: Hindi umiiral ang multifactor OTP (OneTimePassword)
+        InvalidCode: Hindi wastong code
+        Reused: Nagamit na ang code na ito. Maghintay ng bagong code
+        NotReady: Hindi pa handa ang multifactor OTP (OneTimePassword)
+    Locked: Naka-lock ang user
+    SomethingWentWrong: Nagkaroon ng problema
+    NotActive: Hindi aktibo ang user
+    ExternalIDP:
+      IDPTypeNotImplemented: Hindi pa naipapatupad ang uri ng IDP
+      NotAllowed: Hindi pinapayagan ang external na login provider
+      IDPConfigIDEmpty: Walang laman ang Identity Provider ID
+      ExternalUserIDEmpty: Walang laman ang External User ID
+      UserDisplayNameEmpty: Walang laman ang User Display Name
+      NoExternalUserData: Walang natanggap na external na user data
+      CreationNotAllowed: Hindi pinapayagan ang paggawa ng bagong user sa provider na ito
+      LinkingNotAllowed: Hindi pinapayagan ang pag-link ng user sa provider na ito
+      NoOptionAllowed: Hindi pinapayagan ang paggawa o pag-link sa provider na ito. Makipag-ugnayan sa iyong administrator.
+      LoginFailedSwitchLocal: |
+        Nabigo ang pag-log in sa external na IDP. Lilipat sa lokal na pag-log in.
+
+        Mga detalye ng error: {{.Details}}
+    GrantRequired: Hindi maaaring mag-log in. Kailangang may kahit isang grant ang user sa application. Makipag-ugnayan sa iyong administrator.
+    ProjectRequired: Hindi maaaring mag-log in. Kailangang mabigyan ng grant sa project ang organisasyon ng user. Makipag-ugnayan sa iyong administrator.
+  IdentityProvider:
+    InvalidConfig: Hindi wasto ang configuration ng Identity Provider
+  IAM:
+    LockoutPolicy:
+      NotExisting: Hindi umiiral ang Lockout Policy
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Hindi pinapayagan ang pagrehistro
+  DeviceAuth:
+    NotExisting: Hindi umiiral ang User Code
+
+optional: (opsyonal)

@@ -1,0 +1,68 @@
+InitCode:
+  Title: I-initialize ang User
+  PreHeader: I-initialize ang User
+  Subject: I-initialize ang User
+  Greeting: Kumusta {{.DisplayName}},
+  Text: Nagawa na ang user na ito. Gamitin ang username na {{.PreferredLoginName}} para mag-log in. I-click ang button sa ibaba para tapusin ang proseso ng initialization. (Code {{.Code}}) Kung hindi mo hiniling ang email na ito, huwag na itong pansinin.
+  ButtonText: Tapusin ang initialization
+PasswordReset:
+  Title: I-reset ang password
+  PreHeader: I-reset ang password
+  Subject: I-reset ang password
+  Greeting: Kumusta {{.DisplayName}},
+  Text: Nakatanggap kami ng request para i-reset ang password. Gamitin ang button sa ibaba para i-reset ang iyong password. (Code {{.Code}}) Kung hindi mo hiniling ang email na ito, huwag na itong pansinin.
+  ButtonText: I-reset ang password
+VerifyEmail:
+  Title: I-verify ang email
+  PreHeader: I-verify ang email
+  Subject: I-verify ang email
+  Greeting: Kumusta {{.DisplayName}},
+  Text: May idinagdag na bagong email. Gamitin ang button sa ibaba para i-verify ang iyong email. (Code {{.Code}}) Kung hindi ka nagdagdag ng bagong email, huwag na itong pansinin.
+  ButtonText: I-verify ang email
+VerifyPhone:
+  Title: I-verify ang telepono
+  PreHeader: I-verify ang telepono
+  Subject: I-verify ang telepono
+  Greeting: Kumusta {{.DisplayName}},
+  Text: May idinagdag na bagong numero ng telepono. Gamitin ang sumusunod na code para i-verify ito {{.Code}}
+  ButtonText: I-verify ang telepono
+VerifyEmailOTP:
+  Title: I-verify ang OTP
+  PreHeader: I-verify ang OTP
+  Subject: I-verify ang OTP
+  Greeting: Kumusta {{.DisplayName}},
+  Text: Gamitin ang OTP na {{.OTP}} para mag-authenticate sa loob ng susunod na limang minuto o i-click ang button na "Mag-authenticate".
+  ButtonText: Mag-authenticate
+VerifySMSOTP:
+  Text: >-
+    {{.OTP}} ang iyong OTP para sa {{ .Domain }}. Gamitin ito sa loob ng susunod na {{.Expiry}}.
+
+    @{{.Domain}} #{{.OTP}}
+DomainClaimed:
+  Title: Na-claim na ang domain
+  PreHeader: Palitan ang email / username
+  Subject: Na-claim na ang domain
+  Greeting: Kumusta {{.DisplayName}},
+  Text: Na-claim na ng isang organisasyon ang domain na {{.Domain}}. Ang iyong kasalukuyang user na {{.Username}} ay hindi bahagi ng organisasyong ito. Kaya kailangan mong palitan ang iyong email kapag nag-log in ka. Gumawa kami ng pansamantalang username ({{.TempUsername}}) para sa pag-log in na ito.
+  ButtonText: Mag-log in
+PasswordlessRegistration:
+  Title: Magdagdag ng Passkey Login
+  PreHeader: Magdagdag ng Passkey Login
+  Subject: Magdagdag ng Passkey Login
+  Greeting: Kumusta {{.DisplayName}},
+  Text: Nakatanggap kami ng request na magdagdag ng token para sa passkey login. Gamitin ang button sa ibaba para idagdag ang iyong token o device para sa passkey login.
+  ButtonText: Magdagdag ng Passkey Login
+PasswordChange:
+  Title: Napalitan ang password ng user
+  PreHeader: Palitan ang password
+  Subject: Napalitan ang password ng user
+  Greeting: Kumusta {{.DisplayName}},
+  Text: Napalitan ang password ng iyong user. Kung hindi ikaw ang gumawa ng pagbabagong ito, i-reset agad ang iyong password.
+  ButtonText: Mag-log in
+InviteUser:
+  Title: Imbitasyon sa {{.ApplicationName}}
+  PreHeader: Imbitasyon sa {{.ApplicationName}}
+  Subject: Imbitasyon sa {{.ApplicationName}}
+  Greeting: Kumusta {{.DisplayName}},
+  Text: Inimbitahan ang iyong user sa {{.ApplicationName}}. I-click ang button sa ibaba para tapusin ang proseso ng imbitasyon. Kung hindi mo hiniling ang email na ito, huwag na itong pansinin.
+  ButtonText: Tanggapin ang imbitasyon
