@@ -163,9 +163,24 @@ curl --request POST \
 
 ### Python Example
 
-Below is a Python function that generates the JWT assertion and performs token introspection:
+Below is a Python function that generates the JWT assertion and performs token introspection. It needs the `requests` and `pyjwt` libraries; signing with RS256 also requires `cryptography`, so install them with `pip install requests "pyjwt[crypto]"`.
 
 ```python
+import json
+import time
+
+import jwt
+import requests
+
+# Your ZITADEL issuer URL, including the scheme
+ZITADEL_ISSUER_URL = "https://your-custom-domain.zitadel.cloud"
+ZITADEL_INTROSPECTION_URL = f"{ZITADEL_ISSUER_URL}/oauth/v2/introspect"
+
+# The JSON key file downloaded for your API application
+with open("path/to/api-key.json") as key_file:
+    API_KEY_FILE = json.load(key_file)
+
+
 def introspect_token(token_string):
     # Build JWT for client assertion
     payload = {
@@ -187,7 +202,7 @@ def introspect_token(token_string):
         "client_assertion": jwt_token,
         "token": token_string
     }
-    response = requests.post(ZITADEL_INTROSPECTION_ENDPOINT, headers=req_headers, data=req_data)
+    response = requests.post(ZITADEL_INTROSPECTION_URL, headers=req_headers, data=req_data)
     response.raise_for_status()
     token_data = response.json()
     print(f"Token data from introspection: {token_data}")

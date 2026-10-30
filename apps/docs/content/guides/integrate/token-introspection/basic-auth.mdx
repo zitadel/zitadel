@@ -85,14 +85,21 @@ curl --request POST \
  --data token=VjVxyCZmRmWYqd3_F5db9Pb9mHR5fqzhn...
  ```
 
-Here's an example of how this is done in Python code:
+Here's an example of how this is done in Python code, using the `requests` library:
 
 ```python
-def introspect_token(self, token_string):
-    url = ZITADEL_INTROSPECTION_URL
-    data = {'token': token_string, 'token_type_hint': 'access_token', 'scope': 'openid'}
+import requests
+from requests.auth import HTTPBasicAuth
+
+ZITADEL_INTROSPECTION_URL = "https://your-custom-domain.zitadel.cloud/oauth/v2/introspect"
+API_CLIENT_ID = "your-api-client-id"
+API_CLIENT_SECRET = "your-api-client-secret"
+
+
+def introspect_token(token_string):
+    data = {"token": token_string, "token_type_hint": "access_token"}
     auth = HTTPBasicAuth(API_CLIENT_ID, API_CLIENT_SECRET)
-    resp = requests.post(url, data=data, auth=auth)
+    resp = requests.post(ZITADEL_INTROSPECTION_URL, data=data, auth=auth)
     resp.raise_for_status()
     return resp.json()
 ```
