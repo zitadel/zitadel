@@ -1024,9 +1024,12 @@ func (p *relationalTablesProjection) reduceLockoutPolicyAdded(event eventstore.E
 				UpdatedAt:      policyEvent.Creation,
 			},
 			LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
-				MaxPasswordAttempts: &policyEvent.MaxPasswordAttempts,
-				MaxOTPAttempts:      &policyEvent.MaxOTPAttempts,
-				ShowLockOutFailures: &policyEvent.ShowLockOutFailures,
+				MaxPasswordAttempts:      &policyEvent.MaxPasswordAttempts,
+				MaxOTPAttempts:           &policyEvent.MaxOTPAttempts,
+				ShowLockOutFailures:      &policyEvent.ShowLockOutFailures,
+				AutoUnlockAfterMin:       &policyEvent.AutoUnlockAfterMin,
+				ShowRemainingLockoutTime: &policyEvent.ShowRemainingLockoutTime,
+				ShowAbsoluteLockoutTime:  &policyEvent.ShowAbsoluteLockoutTime,
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
@@ -1061,9 +1064,12 @@ func (p *relationalTablesProjection) reduceLockoutPolicyChanged(event eventstore
 				UpdatedAt:      policyEvent.Creation,
 			},
 			LockoutSettingsAttributes: domain.LockoutSettingsAttributes{
-				MaxPasswordAttempts: policyEvent.MaxPasswordAttempts,
-				MaxOTPAttempts:      policyEvent.MaxOTPAttempts,
-				ShowLockOutFailures: policyEvent.ShowLockOutFailures,
+				MaxPasswordAttempts:      policyEvent.MaxPasswordAttempts,
+				MaxOTPAttempts:           policyEvent.MaxOTPAttempts,
+				ShowLockOutFailures:      policyEvent.ShowLockOutFailures,
+				AutoUnlockAfterMin:       policyEvent.AutoUnlockAfterMin,
+				ShowRemainingLockoutTime: policyEvent.ShowRemainingLockoutTime,
+				ShowAbsoluteLockoutTime:  policyEvent.ShowAbsoluteLockoutTime,
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)

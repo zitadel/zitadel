@@ -142,6 +142,8 @@
       "failedToAuthenticate": "Error al autenticar. Tuvo {failedAttempts} de {maxPasswordAttempts} intentos de contraseña.{lockoutMessage}",
       "failedToAuthenticateNoLimit": "Error al autenticar.",
       "accountLockedContactAdmin": " Comuníquese con su administrador para desbloquear su cuenta",
+      "accountLocked": "La cuenta está bloqueada. Duración restante del bloqueo: {remainingLockDuration} minutos",
+      "accountLockedAbsolute": "La cuenta está bloqueada. Duración del bloqueo: {lockDuration} minutos.",
       "userNotFound": "Usuario no encontrado en el sistema",
       "initialUserNotSupported": "Usuario inicial no compatible",
       "userInitialStateNotSupported": "El estado inicial del usuario no es compatible",

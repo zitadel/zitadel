@@ -142,6 +142,8 @@
       "failedToAuthenticate": "Не вдалося автентифікуватися. Ви використали {failedAttempts} з {maxPasswordAttempts} спроб введення пароля.{lockoutMessage}",
       "failedToAuthenticateNoLimit": "Не вдалося автентифікуватися.",
       "accountLockedContactAdmin": " Зверніться до адміністратора, щоб розблокувати свій обліковий запис",
+      "accountLocked": "Обліковий запис заблоковано. Час до розблокування: {remainingLockDuration} хвилин",
+      "accountLockedAbsolute": "Обліковий запис заблоковано. Тривалість блокування: {lockDuration} хвилин.",
       "userNotFound": "Користувача не знайдено в системі",
       "initialUserNotSupported": "Початковий користувач не підтримується",
       "userInitialStateNotSupported": "Початковий стан користувача не підтримується",

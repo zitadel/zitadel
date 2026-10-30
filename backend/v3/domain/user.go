@@ -109,6 +109,8 @@ type HumanPassword struct {
 	// FailedAttempts is the number of consecutive failed password attempts
 	// It is reset to 0 on successful verification
 	FailedAttempts uint8 `json:"failedAttempts,omitempty" db:"-"`
+	// LockedAt is the time when the user was locked after too many failed password checks.
+	LockedAt *time.Time `json:"lockedAt,omitzero" db:"-"`
 }
 
 type HumanEmail struct {

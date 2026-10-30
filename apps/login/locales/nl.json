@@ -142,6 +142,8 @@
       "failedToAuthenticate": "Authenticatie mislukt. U had {failedAttempts} van {maxPasswordAttempts} wachtwoordpogingen.{lockoutMessage}",
       "failedToAuthenticateNoLimit": "Authenticatie mislukt.",
       "accountLockedContactAdmin": " Neem contact op met jouw beheerder om jouw account te ontgrendelen",
+      "accountLocked": "Account is geblokkeerd. Resterende blokkeringstijd: {remainingLockDuration} minuten",
+      "accountLockedAbsolute": "Het account is vergrendeld. Vergrendelingsduur: {lockDuration} minuten.",
       "userNotFound": "Gebruiker niet in het systeem gevonden",
       "initialUserNotSupported": "Initiële gebruiker wordt niet ondersteund",
       "userInitialStateNotSupported": "Initiële gebruikersstatus wordt niet ondersteund",
