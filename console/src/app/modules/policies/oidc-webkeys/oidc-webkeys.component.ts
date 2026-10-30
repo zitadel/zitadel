@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, signal } from '@angular/core';
 import { WebKeysService } from 'src/app/services/webkeys.service';
-import { firstValueFrom, Observable, ObservedValueOf, shareReplay, Subject, switchMap } from 'rxjs';
+import { firstValueFrom, lastValueFrom, Observable, ObservedValueOf, shareReplay, Subject, switchMap } from 'rxjs';
 import { catchError, map, startWith } from 'rxjs/operators';
 import { ToastService } from 'src/app/services/toast.service';
 import { MessageInitShape } from '@bufbuild/protobuf';
@@ -129,11 +129,31 @@ export class OidcWebKeysComponent {
 
   protected async deleteWebKey(row: WebKey) {
     try {
+      if (row.state === State.INACTIVE && !(await this.openDeleteInactiveWebKeyDialog())) {
+        return;
+      }
+
       await this.webKeysService.DeleteWebKey(row.id);
       this.refresh.next(true);
     } catch (err) {
       this.toast.showError(err);
     }
+  }
+
+  private async openDeleteInactiveWebKeyDialog() {
+    const data = {
+      confirmKey: 'ACTIONS.DELETE',
+      cancelKey: 'ACTIONS.CANCEL',
+      titleKey: 'DESCRIPTIONS.SETTINGS.WEB_KEYS.PREVIOUS_TABLE.DELETE_TITLE',
+      descriptionKey: 'DESCRIPTIONS.SETTINGS.WEB_KEYS.PREVIOUS_TABLE.DELETE_DESCRIPTION',
+    } as const;
+
+    const dialogRef = this.dialog.open<WarnDialogComponent, typeof data, boolean>(WarnDialogComponent, {
+      data,
+      width: '400px',
+    });
+
+    return lastValueFrom(dialogRef.afterClosed());
   }
 
   protected async activateWebKey(nextWebKey: WebKey) {
@@ -160,17 +180,18 @@ export class OidcWebKeysComponent {
   }
 
   private openCacheWarnDialog() {
-    const dialogRef = this.dialog.open(WarnDialogComponent, {
-      data: {
-        confirmKey: 'DESCRIPTIONS.SETTINGS.WEB_KEYS.TABLE.ACTIVATE',
-        cancelKey: 'ACTIONS.CANCEL',
-        titleKey: 'Web Key is less then 5 min old',
-        descriptionKey: 'DESCRIPTIONS.SETTINGS.WEB_KEYS.TABLE.NOTE',
-      },
+    const data = {
+      confirmKey: 'DESCRIPTIONS.SETTINGS.WEB_KEYS.TABLE.ACTIVATE',
+      cancelKey: 'ACTIONS.CANCEL',
+      titleKey: 'Web Key is less then 5 min old',
+      descriptionKey: 'DESCRIPTIONS.SETTINGS.WEB_KEYS.TABLE.NOTE',
+    } as const;
+
+    const dialogRef = this.dialog.open<WarnDialogComponent, typeof data, boolean>(WarnDialogComponent, {
+      data,
       width: '400px',
     });
 
-    const obs = dialogRef.afterClosed().pipe(map(Boolean), takeUntilDestroyed(this.destroyRef));
-    return firstValueFrom(obs);
+    return lastValueFrom(dialogRef.afterClosed());
   }
 }
