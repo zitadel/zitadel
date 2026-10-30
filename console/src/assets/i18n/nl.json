@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "SMS-instellingen",
-        "DESCRIPTION": "Om alle Zitadel-functies te ontgrendelen, configureer Twilio om SMS-berichten naar je gebruikers te sturen."
+        "DESCRIPTION": "Configureer Twilio of je eigen HTTP-endpoint om sms-berichten naar je gebruikers te sturen en alle functies van Zitadel te ontgrendelen."
       },
       "IAM_EVENTS": {
         "TITLE": "Evenementen",
@@ -1603,6 +1603,25 @@
         "SETTOKEN": "Stel Token in",
         "TOKENSET": "Token succesvol ingesteld."
       }
+    },
+    "HTTPPROVIDER": {
+      "ADD_TITLE": "HTTP-provider toevoegen",
+      "EDIT_TITLE": "HTTP-provider bewerken",
+      "EMAIL_DESCRIPTION": "In plaats van SMTP stuurt Zitadel elke e-mail als ondertekend JSON-verzoek naar je endpoint. Jouw service stelt het bericht op en bezorgt het.",
+      "SMS_DESCRIPTION": "Zitadel stuurt elke sms als ondertekend JSON-verzoek naar je endpoint. Jouw service bezorgt het bericht.",
+      "ENDPOINT": "Endpoint",
+      "ENDPOINT_INVALID": "Voer een URL in die begint met http:// of https://.",
+      "DESCRIPTION": "Beschrijving",
+      "SIGNINGKEY": "Ondertekeningssleutel",
+      "SIGNINGKEY_DESCRIPTION": "Elk verzoek bevat een ZITADEL-Signature-header die is ondertekend met de sleutel van deze provider. Controleer deze in je service.",
+      "SIGNINGKEY_STORE": "Kopieer de ondertekeningssleutel en bewaar deze veilig. Je service heeft hem nodig om de ZITADEL-Signature-header te controleren.",
+      "REGENERATE_SIGNINGKEY": "Nieuwe ondertekeningssleutel genereren. De huidige sleutel werkt meteen niet meer.",
+      "ADDED": "HTTP-provider toegevoegd.",
+      "UPDATED": "HTTP-provider bijgewerkt.",
+      "REMOVED": "HTTP-provider verwijderd.",
+      "DELETE_TITLE": "HTTP-provider verwijderen",
+      "DELETE_DESCRIPTION": "Je staat op het punt een HTTP-provider te verwijderen. Bevestig door het endpoint in te voeren.",
+      "DELETE_CONFIRM": "Voer {{value}} in om deze HTTP-provider te verwijderen."
     },
     "SECRETS": {
       "TYPES": "Secret Types",
