@@ -39,15 +39,20 @@ Also, not all configuration options are available as environment variables.
 
 By default, [**metrics**](/apis/observability/metrics) are exposed at /debug/metrics in OpenTelemetry (otel) format.
 
-Also, you can enable **tracing** in the ZITADEL configuration.
+You can also enable **tracing** and control both metrics and tracing exporters through the unified [`Instrumentation`](/self-hosting/manage/instrumentation/overview) configuration section, which replaces the older `Tracing`/`Metrics` sections:
 
 ```yaml
-Tracing:
-  # Choose one in "otel", "google", "log" and "none"
-  Type: google
-  Fraction: 1
-  MetricPrefix: zitadel
+Instrumentation:
+  Trace:
+    Fraction: 1.0 # ZITADEL_INSTRUMENTATION_TRACE_FRACTION
+    Exporter:
+      Type: "google" # none|auto|stdOut|stdErr|grpc|http|google
+  Metric:
+    Exporter:
+      Type: "prometheus" # none|auto|stdOut|stdErr|grpc|http|google|prometheus
 ```
+
+See [Instrumentation](/self-hosting/manage/instrumentation/overview) for the full set of options, and how tracing/metric exporters share a common `Exporter` shape.
 
 ## Logging
 
@@ -56,17 +61,21 @@ Logs are a stream of time-ordered events collected from all running processes.
 
 [ZITADEL is configurable](#default-zitadel-logging-config) to write the following events to the standard output:
 
-- Runtime Logs: Define the log level and record format in the `Log` configuration section.
+- Runtime Logs: Define the log level and output format in the `Instrumentation.Log` configuration section. See [Instrumentation](/self-hosting/manage/instrumentation/overview#logging) for all options, and [Structured Log Fields](/self-hosting/manage/instrumentation/log-fields) for the JSON schema and real example output.
 - Access Logs: Enable logging all HTTP and gRPC responses from the ZITADEL binary by setting `LogStore.Access.Stdout.Enabled` to true.
 - Actions Execution Logs: Actions can emit custom logs at different levels. For example, a log record can be emitted each time a user is created or authenticated. If you don't want to have these logs in STDOUT, you can disable this by setting `LogStore.Execution.Stdout.Enabled` to true.
+
+<Callout>
+`LogStore` (below) is a separate feature from `Instrumentation.Log` — it controls whether ZITADEL persists/prints dedicated access and Actions execution logs, independent of the general structured application logging described in [Instrumentation](/self-hosting/manage/instrumentation/overview#logging).
+</Callout>
 
 ### Default ZITADEL Logging Config
 
 ```yaml
-Log:
-  Level: info # ZITADEL_LOG_LEVEL
-  Formatter:
-    Format: text # ZITADEL_LOG_FORMATTER_FORMAT
+Instrumentation:
+  Log:
+    Level: "INFO" # ZITADEL_INSTRUMENTATION_LOG_LEVEL
+    Format: "disabled" # disabled|text|json|gcp|gcp_error_reporting, ZITADEL_INSTRUMENTATION_LOG_STDERR
 
 LogStore:
   Access:
@@ -80,6 +89,10 @@ LogStore:
 
 ```
 
+<Callout type="warn">
+`Instrumentation.Log.Format` defaults to `disabled`, which falls back to the legacy `Log.Formatter.Format` default of `text`. To get structured JSON output (recommended for log collectors), set `Instrumentation.Log.Format: json` explicitly — see [Instrumentation](/self-hosting/manage/instrumentation/overview#logging).
+</Callout>
+
 ### Why ZITADEL does not write logs to files
 
 Log file management should not be in each business apps responsibility.
@@ -88,6 +101,10 @@ This includes tasks like rotating files, routing, collecting, archiving and clea
 For example, systemd has journald and kubernetes has fluentd and fluentbit.
 
 ## Telemetry
+
+<Callout>
+This `Telemetry` section is unrelated to the `Instrumentation` section described under [Monitoring](#monitoring) and [Logging](#logging) above — it only pushes anonymized usage-milestone data, not traces, metrics, or logs.
+</Callout>
 
 If you want to have some data about reached usage milestones pushed to external systems, enable telemetry in the ZITADEL configuration.
 
