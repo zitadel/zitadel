@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -307,30 +308,36 @@ func HumanInitialCodeAddedEventMapper(event eventstore.Event) (eventstore.Event,
 
 type HumanInitialCodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	// DeliveryInfo states the provider the email was sent through or that the delivery was suppressed.
+	senders.DeliveryInfo
 }
 
+// Payload returns nil if no delivery information is set, as the event had no payload before it was introduced.
 func (e *HumanInitialCodeSentEvent) Payload() interface{} {
-	return nil
+	if e.DeliveryInfo == (senders.DeliveryInfo{}) {
+		return nil
+	}
+	return e
 }
 
 func (e *HumanInitialCodeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func NewHumanInitialCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanInitialCodeSentEvent {
+func (e *HumanInitialCodeSentEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewHumanInitialCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate, deliveryInfo senders.DeliveryInfo) *HumanInitialCodeSentEvent {
 	return &HumanInitialCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			HumanInitialCodeSentType,
 		),
+		DeliveryInfo: deliveryInfo,
 	}
-}
-
-func HumanInitialCodeSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	return &HumanInitialCodeSentEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
 }
 
 type HumanInitializedCheckSucceededEvent struct {
@@ -444,27 +451,35 @@ func NewHumanInviteCodeAddedEvent(
 
 type HumanInviteCodeSentEvent struct {
 	*eventstore.BaseEvent `json:"-"`
+
+	// DeliveryInfo states the provider the email was sent through or that the delivery was suppressed.
+	senders.DeliveryInfo
 }
 
 func (e *HumanInviteCodeSentEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
+// Payload returns nil if no delivery information is set, as the event had no payload before it was introduced.
 func (e *HumanInviteCodeSentEvent) Payload() interface{} {
-	return nil
+	if e.DeliveryInfo == (senders.DeliveryInfo{}) {
+		return nil
+	}
+	return e
 }
 
 func (e *HumanInviteCodeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func NewHumanInviteCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanInviteCodeSentEvent {
+func NewHumanInviteCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate, deliveryInfo senders.DeliveryInfo) *HumanInviteCodeSentEvent {
 	return &HumanInviteCodeSentEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			HumanInviteCodeSentType,
 		),
+		DeliveryInfo: deliveryInfo,
 	}
 }
 

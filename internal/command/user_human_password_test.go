@@ -689,6 +689,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 									ID:             "id",
 									VerificationID: "verificationID",
 								},
+								senders.DeliveryInfo{},
 							),
 						),
 					),
@@ -1620,6 +1621,7 @@ func TestCommandSide_PasswordCodeSent(t *testing.T) {
 						user.NewHumanPasswordCodeSentEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&senders.CodeGeneratorInfo{},
+							senders.DeliveryInfo{},
 						),
 					),
 				),
@@ -1665,6 +1667,7 @@ func TestCommandSide_PasswordCodeSent(t *testing.T) {
 								ID:             "generatorID",
 								VerificationID: "verificationID",
 							},
+							senders.DeliveryInfo{},
 						),
 					),
 				),
@@ -1686,7 +1689,7 @@ func TestCommandSide_PasswordCodeSent(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			err := r.PasswordCodeSent(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.generatorInfo)
+			err := r.PasswordCodeSent(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.generatorInfo, senders.DeliveryInfo{})
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

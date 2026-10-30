@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -374,6 +375,9 @@ func HumanPasswordlessInitCodeRequestedEventMapper(event eventstore.Event) (even
 type HumanPasswordlessInitCodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
+	// DeliveryInfo states the provider the email was sent through or that the delivery was suppressed.
+	senders.DeliveryInfo
+
 	ID string `json:"id"`
 }
 
@@ -385,10 +389,15 @@ func (e *HumanPasswordlessInitCodeSentEvent) UniqueConstraints() []*eventstore.U
 	return nil
 }
 
+func (e *HumanPasswordlessInitCodeSentEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
 func NewHumanPasswordlessInitCodeSentEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id string,
+	deliveryInfo senders.DeliveryInfo,
 ) *HumanPasswordlessInitCodeSentEvent {
 	return &HumanPasswordlessInitCodeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -396,19 +405,9 @@ func NewHumanPasswordlessInitCodeSentEvent(
 			aggregate,
 			HumanPasswordlessInitCodeSentType,
 		),
-		ID: id,
+		DeliveryInfo: deliveryInfo,
+		ID:           id,
 	}
-}
-
-func HumanPasswordlessInitCodeSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	webAuthNAdded := &HumanPasswordlessInitCodeSentEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := event.Unmarshal(webAuthNAdded)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "USER-Gtg4j", "unable to unmarshal human passwordless code sent")
-	}
-	return webAuthNAdded, nil
 }
 
 type HumanPasswordlessInitCodeCheckFailedEvent struct {
