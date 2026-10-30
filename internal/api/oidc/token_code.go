@@ -19,7 +19,7 @@ func (s *Server) CodeExchange(ctx context.Context, r *op.ClientRequest[oidc.Acce
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
 		span.EndWithError(err)
-		err = oidcError(ctx, err)
+		err = oidcError(ctx, asInvalidGrant(ctx, err, "authorization code invalid, expired or already used"))
 	}()
 
 	client, ok := r.Client.(*Client)
