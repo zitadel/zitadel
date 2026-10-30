@@ -273,12 +273,22 @@ func HandleResponse(resp *http.Response) ([]byte, error) {
 			if errorBody.ForwardedStatusCode >= 400 && errorBody.ForwardedStatusCode < 500 {
 				return nil, zhttp.HTTPStatusCodeToZitadelError(nil, errorBody.ForwardedStatusCode, "EXEC-reUaUZCzCp", errorBody.ForwardedErrorMessage)
 			}
+			if errorBody.ForwardedStatusCode >= 500 && errorBody.ForwardedStatusCode < 600 {
+				return nil, zerrors.ThrowUnavailable(nil, "EXEC-Uu9aiCee4j", errorBody.ForwardedErrorMessage)
+			}
 			return nil, zerrors.ThrowPreconditionFailed(nil, "EXEC-bmhNhpcqpF", errorBody.ForwardedErrorMessage)
 		}
 		// no ErrorBody filled in response, so will be taken as successful response
 		return data, nil
 	}
 
+	// A status from 500 to 599 shows that the target itself failed. This is a
+	// condition on the server side, not a bad request from the caller. Thus the
+	// error must keep a status of 500 or above, and the caller can do the
+	// request again later.
+	if resp.StatusCode >= 500 && resp.StatusCode < 600 {
+		return nil, zerrors.ThrowUnavailable(nil, "EXEC-ohT1ieZ3ye", "Errors.Execution.Failed")
+	}
 	return nil, zerrors.ThrowPreconditionFailed(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed")
 }
 
