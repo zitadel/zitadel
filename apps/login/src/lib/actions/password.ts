@@ -2,7 +2,7 @@
 
 import { completeFlowOrGetUrl } from "@/lib/actions/flow";
 import { equalsIgnoreCase } from "@/lib/server/auth-utils";
-import { getSessionCookieById, getSessionCookieByLoginName } from "@/lib/server/cookies";
+import { getSessionCookieById, getSessionCookieByLoginName, removeSessionFromCookie } from "@/lib/server/cookies";
 import { isClassifiedError } from "@/lib/server/grpc/interceptors/error-classification";
 import { getPublicHostWithProtocol } from "@/lib/server/host";
 import { createLogger } from "@/lib/server/logger";
@@ -19,11 +19,13 @@ import {
   getLockoutSettings,
   getLoginSettings,
   getPasswordExpirySettings,
+  getSecuritySettings,
   getSession,
   getUserByID,
   listAuthenticationMethodTypes,
   passwordReset,
   searchUsers,
+  type ServiceConfig,
   setPassword,
   setUserPassword,
 } from "@/lib/server/zitadel";
@@ -36,6 +38,38 @@ import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 const logger = createLogger("password");
+
+async function failedPasswordCheckError({
+  serviceConfig,
+  orgId,
+  failedAttempts,
+  ignoreUnknownUsernames,
+  t,
+}: {
+  serviceConfig: ServiceConfig;
+  orgId?: string;
+  failedAttempts: number;
+  ignoreUnknownUsernames?: boolean;
+  t: Awaited<ReturnType<typeof getTranslations>>;
+}): Promise<{ error: string }> {
+  if (ignoreUnknownUsernames) {
+    return { error: t("errors.failedToAuthenticateNoLimit") };
+  }
+  const lockoutSettings = await getLockoutSettings({ serviceConfig, orgId });
+
+  const maxPasswordAttempts = lockoutSettings?.maxPasswordAttempts ?? BigInt(0);
+  const hasLimit = maxPasswordAttempts > BigInt(0);
+  const locked = hasLimit && failedAttempts >= maxPasswordAttempts;
+  const messageKey = hasLimit ? "errors.failedToAuthenticate" : "errors.failedToAuthenticateNoLimit";
+
+  return {
+    error: t(messageKey, {
+      failedAttempts,
+      maxPasswordAttempts: hasLimit ? String(maxPasswordAttempts) : "?",
+      lockoutMessage: locked ? t("errors.accountLockedContactAdmin") : "",
+    }),
+  };
+}
 
 type ResetPasswordCommand = {
   loginName: string;
@@ -210,10 +244,28 @@ export async function sendPassword(
         // Force fallback if settings can't be loaded
         throw new Error("Could not load login settings");
       }
-    } catch {
-      logger.warn("[Password] Could not update session");
-      // If the session was terminated or any other error occurred during update,
-      // we fall back to creating a new session.
+    } catch (error: any) {
+      // The password was checked against the existing session and was wrong.
+      // Do not fall back, as checking it again on a new session would count the failed attempt twice.
+      if (error && "failedAttempts" in error && error.failedAttempts) {
+        recordAuthFailure("password", "invalid_password", command.organization);
+        return failedPasswordCheckError({
+          serviceConfig,
+          orgId: sessionCookie.organization,
+          failedAttempts: error.failedAttempts,
+          ignoreUnknownUsernames: loginSettingsByUser?.ignoreUnknownUsernames,
+          t,
+        });
+      }
+
+      logger.warn("[Password] Could not update session, removing it from the cookie", { error });
+      // If the session was terminated, no longer exists or any other error occurred during update,
+      // we remove it from the cookie, so it is not reused, and fall back to creating a new session.
+      const securitySettings = await getSecuritySettings({ serviceConfig });
+      await removeSessionFromCookie({
+        session: sessionCookie,
+        iFrameEnabled: !!securitySettings?.embeddedIframe?.enabled,
+      });
       sessionCookie = undefined;
       session = undefined;
     }
@@ -322,23 +374,13 @@ export async function sendPassword(
       } catch (error: any) {
         if ("failedAttempts" in error && error.failedAttempts) {
           recordAuthFailure("password", "invalid_password", command.organization);
-          if (loginSettingsByContext?.ignoreUnknownUsernames) {
-            return { error: t("errors.failedToAuthenticateNoLimit") };
-          }
-          const lockoutSettings = await getLockoutSettings({ serviceConfig, orgId: command.organization });
-
-          const hasLimit =
-            lockoutSettings?.maxPasswordAttempts !== undefined && lockoutSettings?.maxPasswordAttempts > BigInt(0);
-          const locked = hasLimit && error.failedAttempts >= lockoutSettings?.maxPasswordAttempts;
-          const messageKey = hasLimit ? "errors.failedToAuthenticate" : "errors.failedToAuthenticateNoLimit";
-
-          return {
-            error: t(messageKey, {
-              failedAttempts: error.failedAttempts,
-              maxPasswordAttempts: hasLimit ? String(lockoutSettings?.maxPasswordAttempts ?? 0) : "?",
-              lockoutMessage: locked ? t("errors.accountLockedContactAdmin") : "",
-            }),
-          };
+          return failedPasswordCheckError({
+            serviceConfig,
+            orgId: command.organization,
+            failedAttempts: error.failedAttempts,
+            ignoreUnknownUsernames: loginSettingsByContext?.ignoreUnknownUsernames,
+            t,
+          });
         }
         recordAuthFailure("password", "session_creation_failed", command.organization);
         if (loginSettingsByContext?.ignoreUnknownUsernames) {
@@ -599,23 +641,13 @@ export async function checkSessionAndSetPassword({
     });
   } catch (error: any) {
     if ("failedAttempts" in error && error.failedAttempts) {
-      if (loginSettings?.ignoreUnknownUsernames) {
-        return { error: t("errors.failedToAuthenticateNoLimit") };
-      }
-      const lockoutSettings = await getLockoutSettings({ serviceConfig, orgId: sessionCookie.organization });
-
-      const hasLimit =
-        lockoutSettings?.maxPasswordAttempts !== undefined && lockoutSettings?.maxPasswordAttempts > BigInt(0);
-      const locked = hasLimit && error.failedAttempts >= lockoutSettings?.maxPasswordAttempts;
-      const messageKey = hasLimit ? "errors.failedToAuthenticate" : "errors.failedToAuthenticateNoLimit";
-
-      return {
-        error: t(messageKey, {
-          failedAttempts: error.failedAttempts,
-          maxPasswordAttempts: hasLimit ? String(lockoutSettings?.maxPasswordAttempts ?? 0) : "?",
-          lockoutMessage: locked ? t("errors.accountLockedContactAdmin") : "",
-        }),
-      };
+      return failedPasswordCheckError({
+        serviceConfig,
+        orgId: sessionCookie.organization,
+        failedAttempts: error.failedAttempts,
+        ignoreUnknownUsernames: loginSettings?.ignoreUnknownUsernames,
+        t,
+      });
     }
     if (loginSettings?.ignoreUnknownUsernames) {
       return { error: t("change.errors.couldNotVerifyPassword") };

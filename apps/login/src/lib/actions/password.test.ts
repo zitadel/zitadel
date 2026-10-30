@@ -37,6 +37,7 @@ vi.mock("@/lib/server/zitadel", () => ({
   getUserByID: vi.fn(),
   setUserPassword: vi.fn(),
   getPasswordExpirySettings: vi.fn(),
+  getSecuritySettings: vi.fn(),
   searchUsers: vi.fn(),
 }));
 
@@ -48,6 +49,7 @@ vi.mock("@/lib/server/session-cookie", () => ({
 vi.mock("@/lib/server/cookies", () => ({
   getSessionCookieById: vi.fn(),
   getSessionCookieByLoginName: vi.fn(),
+  removeSessionFromCookie: vi.fn(),
 }));
 
 vi.mock("next-intl/server", () => ({
@@ -322,14 +324,16 @@ describe("sendPassword", () => {
   let mockCreateSessionAndUpdateCookie: any;
   let mockSetSessionAndUpdateCookie: any;
   let mockGetLockoutSettings: any;
+  let mockGetSecuritySettings: any;
+  let mockRemoveSessionFromCookie: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
 
     const { headers } = await import("next/headers");
     const { getServiceConfig } = await import("@/lib/server/service-url");
-    const { getSessionCookieByLoginName } = await import("@/lib/server/cookies");
-    const { getLoginSettings, getLockoutSettings, searchUsers } = await import("@/lib/server/zitadel");
+    const { getSessionCookieByLoginName, removeSessionFromCookie } = await import("@/lib/server/cookies");
+    const { getLoginSettings, getLockoutSettings, getSecuritySettings, searchUsers } = await import("@/lib/server/zitadel");
     const { createSessionAndUpdateCookie, setSessionAndUpdateCookie } = await import("@/lib/server/session-cookie");
 
     mockHeaders = vi.mocked(headers);
@@ -342,6 +346,8 @@ describe("sendPassword", () => {
     mockCreateSessionAndUpdateCookie = vi.mocked(createSessionAndUpdateCookie);
     mockSetSessionAndUpdateCookie = vi.mocked(setSessionAndUpdateCookie);
     mockGetLockoutSettings = vi.mocked(getLockoutSettings);
+    mockGetSecuritySettings = vi.mocked(getSecuritySettings);
+    mockRemoveSessionFromCookie = vi.mocked(removeSessionFromCookie);
 
     const { completeFlowOrGetUrl } = await import("@/lib/actions/flow");
     vi.mocked(completeFlowOrGetUrl).mockResolvedValue({ redirect: "https://example.com" });
@@ -604,6 +610,59 @@ describe("sendPassword", () => {
 
     expect(mockSetSessionAndUpdateCookie).toHaveBeenCalled();
     expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
+  });
+
+  // Regression test for: https://github.com/zitadel/zitadel/issues/12615
+  // A wrong password on an existing session must not be checked a second time against a new session,
+  // as every check records a failed attempt.
+  test("should return lockout error without creating a new session when password check on existing session fails", async () => {
+    mockGetSessionCookieByLoginName.mockResolvedValue({
+      id: "session123",
+      token: "token123",
+      organization: "org123",
+    });
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: false, allowLocalAuthentication: true });
+    mockSetSessionAndUpdateCookie.mockRejectedValue({ failedAttempts: 1 });
+    mockGetLockoutSettings.mockResolvedValue({ maxPasswordAttempts: BigInt(5) });
+
+    const result = await sendPassword({
+      loginName: "user@example.com",
+      checks: { password: { password: "wrong" } } as any,
+    });
+
+    expect(result).toEqual({ error: "errors.failedToAuthenticate" });
+    expect(mockGetLockoutSettings).toHaveBeenCalledWith(expect.objectContaining({ orgId: "org123" }));
+    expect(mockSearchUsers).not.toHaveBeenCalled();
+    expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+  });
+
+  test("should remove unusable session from cookie before creating a new session", async () => {
+    const staleCookie = {
+      id: "session123",
+      token: "token123",
+      organization: "org123",
+    };
+    mockGetSessionCookieByLoginName.mockResolvedValue(staleCookie);
+    // e.g. the session no longer exists after its instance was recreated
+    mockSetSessionAndUpdateCookie.mockRejectedValue(new Error("Errors.User.UserIDMissing (COMMAND-Sfw3f)"));
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true, allowLocalAuthentication: true });
+    mockGetSecuritySettings.mockResolvedValue({ embeddedIframe: { enabled: true } });
+    mockSearchUsers.mockResolvedValue({
+      result: [{ userId: "user123", type: { case: "human", value: {} }, state: 1 }],
+    });
+    mockCreateSessionAndUpdateCookie.mockResolvedValue({
+      session: { factors: { user: { id: "user123", loginName: "user@example.com" } } },
+      sessionCookie: { id: "newSession", token: "newToken" },
+    });
+
+    const result = await sendPassword({
+      loginName: "user@example.com",
+      checks: { password: { password: "password" } } as any,
+    });
+
+    expect(mockRemoveSessionFromCookie).toHaveBeenCalledWith({ session: staleCookie, iFrameEnabled: true });
+    expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
+    expect(result).toEqual({ redirect: "https://example.com" });
   });
 });
 describe("resetPassword", () => {
