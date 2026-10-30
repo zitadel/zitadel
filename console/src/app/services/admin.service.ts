@@ -179,6 +179,8 @@ import {
   ListSecretGeneratorsResponse,
   ListSMSProvidersRequest,
   ListSMSProvidersResponse,
+  ListEmailProvidersRequest,
+  ListEmailProvidersResponse,
   ListSMTPConfigsRequest,
   ListSMTPConfigsResponse,
   ListViewsRequest,
@@ -957,6 +959,14 @@ export class AdminService {
   public listSMTPConfigs(): Promise<ListSMTPConfigsResponse.AsObject> {
     const req = new ListSMTPConfigsRequest();
     return this.grpcService.admin.listSMTPConfigs(req, null).then((resp) => resp.toObject());
+  }
+
+  public listEmailProviders(query?: ListQuery): Promise<ListEmailProvidersResponse.AsObject> {
+    const req = new ListEmailProvidersRequest();
+    if (query) {
+      req.setQuery(query);
+    }
+    return this.grpcService.admin.listEmailProviders(req, null).then((resp) => resp.toObject());
   }
 
   public addSMTPConfig(req: AddSMTPConfigRequest): Promise<AddSMTPConfigResponse.AsObject> {

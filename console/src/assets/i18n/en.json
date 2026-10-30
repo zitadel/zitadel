@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "SMS Settings",
-        "DESCRIPTION": "To unlock all Zitadel features, configure Twilio to send SMS messages to your users."
+        "DESCRIPTION": "To unlock all Zitadel features, configure Twilio or your own HTTP endpoint to send SMS messages to your users."
       },
       "IAM_EVENTS": {
         "TITLE": "Events",
@@ -1608,6 +1608,25 @@
         "SETTOKEN": "Set Token",
         "TOKENSET": "Token successfully set."
       }
+    },
+    "HTTPPROVIDER": {
+      "ADD_TITLE": "Add HTTP provider",
+      "EDIT_TITLE": "Edit HTTP provider",
+      "EMAIL_DESCRIPTION": "Instead of using SMTP, Zitadel sends each email as a signed JSON request to your endpoint. Your service renders and delivers the message.",
+      "SMS_DESCRIPTION": "Zitadel sends each SMS as a signed JSON request to your endpoint. Your service delivers the message.",
+      "ENDPOINT": "Endpoint",
+      "ENDPOINT_INVALID": "Enter an http:// or https:// URL.",
+      "DESCRIPTION": "Description",
+      "SIGNINGKEY": "Signing key",
+      "SIGNINGKEY_DESCRIPTION": "Every request carries a ZITADEL-Signature header signed with this provider's key. Verify it in your service.",
+      "SIGNINGKEY_STORE": "Copy the signing key and store it securely. Your service needs it to verify the ZITADEL-Signature header.",
+      "REGENERATE_SIGNINGKEY": "Generate a new signing key. The current key stops working immediately.",
+      "ADDED": "HTTP provider added.",
+      "UPDATED": "HTTP provider updated.",
+      "REMOVED": "HTTP provider removed.",
+      "DELETE_TITLE": "Delete HTTP provider",
+      "DELETE_DESCRIPTION": "You are about to delete an HTTP provider. Confirm by typing its endpoint.",
+      "DELETE_CONFIRM": "Type {{value}} to delete this HTTP provider."
     },
     "SECRETS": {
       "TYPES": "Secret Types",

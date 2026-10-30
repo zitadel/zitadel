@@ -9,6 +9,10 @@ import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { DialogAddSMSProviderComponent } from './dialog-add-sms-provider/dialog-add-sms-provider.component';
+import {
+  HttpProviderDialogComponent,
+  HttpProviderDialogData,
+} from '../../http-provider-dialog/http-provider-dialog.component';
 
 @Component({
   selector: 'cnsl-notification-sms-provider',
@@ -113,7 +117,31 @@ export class NotificationSMSProviderComponent implements OnInit {
     }
   }
 
-  public removeSMSProvider(id: string): void {
+  public editHttpProvider(): void {
+    const http = this.http;
+    const data: HttpProviderDialogData = {
+      type: 'sms',
+      provider: http?.http && {
+        id: http.id,
+        description: http.description,
+        endpoint: http.http.endpoint,
+        signingKey: http.http.signingKey,
+      },
+    };
+    this.dialog
+      .open<HttpProviderDialogComponent, HttpProviderDialogData, boolean>(HttpProviderDialogComponent, {
+        data,
+        width: '500px',
+      })
+      .afterClosed()
+      .subscribe((saved) => {
+        if (saved) {
+          this.fetchData();
+        }
+      });
+  }
+
+  public removeSMSProvider(id: string, removedKey: string = 'SETTING.SMS.TWILIO.REMOVED'): void {
     const dialogRef = this.dialog.open(WarnDialogComponent, {
       data: {
         confirmKey: 'ACTIONS.DELETE',
@@ -129,7 +157,7 @@ export class NotificationSMSProviderComponent implements OnInit {
         this.service
           .removeSMSProvider(id)
           .then(() => {
-            this.toast.showInfo('SETTING.SMS.TWILIO.REMOVED', true);
+            this.toast.showInfo(removedKey, true);
             this.fetchData();
           })
           .catch((error) => {
@@ -141,5 +169,9 @@ export class NotificationSMSProviderComponent implements OnInit {
 
   public get twilio(): SMSProvider.AsObject | undefined {
     return this.smsProviders.find((p) => p.twilio);
+  }
+
+  public get http(): SMSProvider.AsObject | undefined {
+    return this.smsProviders.find((p) => p.http);
   }
 }

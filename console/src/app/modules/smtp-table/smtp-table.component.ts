@@ -10,12 +10,13 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
-import { ListSMTPConfigsRequest, ListSMTPConfigsResponse } from 'src/app/proto/generated/zitadel/admin_pb';
-import { SMTPConfig, SMTPConfigState } from 'src/app/proto/generated/zitadel/settings_pb';
+import { ListEmailProvidersResponse } from 'src/app/proto/generated/zitadel/admin_pb';
+import { EmailProvider, EmailProviderState } from 'src/app/proto/generated/zitadel/settings_pb';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { SmtpTestDialogComponent } from '../smtp-test-dialog/smtp-test-dialog.component';
+import { HttpProviderDialogComponent, HttpProviderDialogData } from '../http-provider-dialog/http-provider-dialog.component';
 
 @Component({
   selector: 'cnsl-smtp-table',
@@ -25,14 +26,14 @@ import { SmtpTestDialogComponent } from '../smtp-test-dialog/smtp-test-dialog.co
 })
 export class SMTPTableComponent implements OnInit {
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
-  public dataSource: MatTableDataSource<SMTPConfig.AsObject> = new MatTableDataSource<SMTPConfig.AsObject>();
-  public selection: SelectionModel<SMTPConfig.AsObject> = new SelectionModel<SMTPConfig.AsObject>(true, []);
-  public configsResult?: ListSMTPConfigsResponse.AsObject;
+  public dataSource: MatTableDataSource<EmailProvider.AsObject> = new MatTableDataSource<EmailProvider.AsObject>();
+  public selection: SelectionModel<EmailProvider.AsObject> = new SelectionModel<EmailProvider.AsObject>(true, []);
+  public configsResult?: ListEmailProvidersResponse.AsObject;
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
-  public displayedColumns: string[] = ['activated', 'description', 'tls', 'host', 'senderAddress', 'actions'];
-  @Output() public changedSelection: EventEmitter<Array<SMTPConfig.AsObject>> = new EventEmitter();
+  public displayedColumns: string[] = ['activated', 'description', 'type', 'tls', 'host', 'senderAddress', 'actions'];
+  @Output() public changedSelection: EventEmitter<Array<EmailProvider.AsObject>> = new EventEmitter();
 
   public loginPolicy!: LoginPolicy.AsObject;
 
@@ -53,7 +54,7 @@ export class SMTPTableComponent implements OnInit {
   }
 
   public isActive(state: number) {
-    return state === SMTPConfigState.SMTP_CONFIG_ACTIVE;
+    return state === EmailProviderState.EMAIL_PROVIDER_ACTIVE;
   }
 
   public isAllSelected(): boolean {
@@ -122,25 +123,35 @@ export class SMTPTableComponent implements OnInit {
     });
   }
 
-  public deleteSMTPConfig(id: string, senderName: string): void {
+  public deleteSMTPConfig(config: EmailProvider.AsObject): void {
+    // an HTTP provider has no sender name, so its endpoint is typed to confirm instead
     const dialogRef = this.dialog.open(WarnDialogComponent, {
-      data: {
-        confirmKey: 'ACTIONS.DELETE',
-        cancelKey: 'ACTIONS.CANCEL',
-        titleKey: 'SMTP.LIST.DIALOG.DELETE_TITLE',
-        descriptionKey: 'SMTP.LIST.DIALOG.DELETE_DESCRIPTION',
-        confirmationKey: 'SMTP.LIST.DIALOG.SENDER',
-        confirmation: senderName,
-      },
+      data: config.http
+        ? {
+            confirmKey: 'ACTIONS.DELETE',
+            cancelKey: 'ACTIONS.CANCEL',
+            titleKey: 'SETTING.HTTPPROVIDER.DELETE_TITLE',
+            descriptionKey: 'SETTING.HTTPPROVIDER.DELETE_DESCRIPTION',
+            confirmationKey: 'SETTING.HTTPPROVIDER.DELETE_CONFIRM',
+            confirmation: config.http.endpoint,
+          }
+        : {
+            confirmKey: 'ACTIONS.DELETE',
+            cancelKey: 'ACTIONS.CANCEL',
+            titleKey: 'SMTP.LIST.DIALOG.DELETE_TITLE',
+            descriptionKey: 'SMTP.LIST.DIALOG.DELETE_DESCRIPTION',
+            confirmationKey: 'SMTP.LIST.DIALOG.SENDER',
+            confirmation: config.smtp?.senderName,
+          },
       width: '400px',
     });
 
     dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
         this.adminService
-          .removeSMTPConfig(id)
+          .removeSMTPConfig(config.id)
           .then(() => {
-            this.toast.showInfo('SMTP.LIST.DIALOG.DELETED', true);
+            this.toast.showInfo(config.http ? 'SETTING.HTTPPROVIDER.REMOVED' : 'SMTP.LIST.DIALOG.DELETED', true);
             this.refreshPage();
           })
           .catch((error) => {
@@ -168,13 +179,11 @@ export class SMTPTableComponent implements OnInit {
   private async getData(limit: number, offset: number): Promise<void> {
     this.loadingSubject.next(true);
 
-    const req = new ListSMTPConfigsRequest();
     const lq = new ListQuery();
     lq.setOffset(offset);
     lq.setLimit(limit);
-    req.setQuery(lq);
     this.adminService
-      .listSMTPConfigs()
+      .listEmailProviders(lq)
       .then((resp) => {
         this.configsResult = resp;
         if (resp.resultList) {
@@ -192,14 +201,32 @@ export class SMTPTableComponent implements OnInit {
     this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
   }
 
-  public routerLinkForRow(row: SMTPConfig.AsObject): any {
+  public routerLinkForRow(row: EmailProvider.AsObject): any {
     return ['/instance', 'smtpprovider', row.id];
   }
 
-  public navigateToProvider(row: SMTPConfig.AsObject) {
-    if (!row.senderAddress) {
+  public navigateToProvider(row: EmailProvider.AsObject) {
+    if (row.http) {
+      this.editHttpProvider(row.id, row.description, row.http);
+      return;
+    }
+    if (!row.smtp?.senderAddress) {
       return;
     }
     this.router.navigate(this.routerLinkForRow(row));
+  }
+
+  private editHttpProvider(id: string, description: string, http: { endpoint: string; signingKey: string }): void {
+    this.dialog
+      .open<HttpProviderDialogComponent, HttpProviderDialogData, boolean>(HttpProviderDialogComponent, {
+        data: { type: 'email', provider: { id, description, endpoint: http.endpoint, signingKey: http.signingKey } },
+        width: '500px',
+      })
+      .afterClosed()
+      .subscribe((saved) => {
+        if (saved) {
+          this.refreshPage();
+        }
+      });
   }
 }

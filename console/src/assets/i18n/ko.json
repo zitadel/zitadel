@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "SMS 설정",
-        "DESCRIPTION": "Zitadel의 모든 기능을 사용하려면 Twilio를 설정하여 사용자에게 SMS 메시지를 보내세요."
+        "DESCRIPTION": "Zitadel의 모든 기능을 사용하려면 사용자에게 SMS를 보낼 Twilio 또는 자체 HTTP 엔드포인트를 구성하세요."
       },
       "IAM_EVENTS": {
         "TITLE": "이벤트",
@@ -1602,6 +1602,25 @@
         "SETTOKEN": "토큰 설정",
         "TOKENSET": "토큰이 성공적으로 설정되었습니다."
       }
+    },
+    "HTTPPROVIDER": {
+      "ADD_TITLE": "HTTP 공급자 추가",
+      "EDIT_TITLE": "HTTP 공급자 편집",
+      "EMAIL_DESCRIPTION": "SMTP 대신 Zitadel은 각 이메일을 서명된 JSON 요청으로 엔드포인트에 보냅니다. 메시지 작성과 전송은 사용자의 서비스가 담당합니다.",
+      "SMS_DESCRIPTION": "Zitadel은 각 SMS를 서명된 JSON 요청으로 엔드포인트에 보냅니다. 메시지 전송은 사용자의 서비스가 담당합니다.",
+      "ENDPOINT": "엔드포인트",
+      "ENDPOINT_INVALID": "http:// 또는 https://로 시작하는 URL을 입력하세요.",
+      "DESCRIPTION": "설명",
+      "SIGNINGKEY": "서명 키",
+      "SIGNINGKEY_DESCRIPTION": "모든 요청에는 이 공급자의 키로 서명된 ZITADEL-Signature 헤더가 포함됩니다. 서비스에서 이를 검증하세요.",
+      "SIGNINGKEY_STORE": "서명 키를 복사해 안전하게 보관하세요. 서비스에서 ZITADEL-Signature 헤더를 검증하는 데 필요합니다.",
+      "REGENERATE_SIGNINGKEY": "새 서명 키를 생성합니다. 현재 키는 즉시 사용할 수 없게 됩니다.",
+      "ADDED": "HTTP 공급자가 추가되었습니다.",
+      "UPDATED": "HTTP 공급자가 업데이트되었습니다.",
+      "REMOVED": "HTTP 공급자가 삭제되었습니다.",
+      "DELETE_TITLE": "HTTP 공급자 삭제",
+      "DELETE_DESCRIPTION": "HTTP 공급자를 삭제하려고 합니다. 엔드포인트를 입력하여 확인하세요.",
+      "DELETE_CONFIRM": "이 HTTP 공급자를 삭제하려면 {{value}}을(를) 입력하세요."
     },
     "SECRETS": {
       "TYPES": "시크릿 유형",
