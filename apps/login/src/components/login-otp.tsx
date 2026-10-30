@@ -55,10 +55,13 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
     },
   });
 
-  const updateSessionForOTPChallenge = useCallback(async (): Promise<{
-    error?: string;
-    [key: string]: any;
-  }> => {
+  const updateSessionForOTPChallenge = useCallback(async (): Promise<
+    | {
+        error?: string;
+        [key: string]: any;
+      }
+    | undefined
+  > => {
     let challenges;
 
     const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
@@ -103,7 +106,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
       setResendCooldown(response.retryAfterSeconds);
       // the server refused because a code was sent moments ago (e.g. after a reload), the countdown says enough
       if ("error" in response && response.error) {
-        return {};
+        return;
       }
     }
 
