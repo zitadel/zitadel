@@ -393,6 +393,98 @@ describe("sendPassword", () => {
     expect(result).toEqual({ error: "errors.failedToAuthenticateNoLimit" });
   });
 
+  // Regression tests for: https://github.com/zitadel/zitadel/issues/12025
+  // User discovery is case insensitive, so the post-discovery check that verifies *which*
+  // identifier the user was found by must ignore case too. Otherwise "Jackson@Example.com"
+  // resolves the user and is then rejected as unknown.
+  test("should accept a differently cased login name when login with email and phone are disabled", async () => {
+    mockGetSessionCookieByLoginName.mockResolvedValue(null);
+    mockSearchUsers.mockResolvedValue({
+      result: [
+        {
+          userId: "user123",
+          preferredLoginName: "jackson@example.com",
+          type: { case: "human", value: {} },
+          state: 1,
+        },
+      ],
+    });
+    mockGetLoginSettings.mockResolvedValue({
+      allowLocalAuthentication: true,
+      disableLoginWithEmail: true,
+      disableLoginWithPhone: true,
+    });
+    mockCreateSessionAndUpdateCookie.mockResolvedValue({
+      session: { factors: { user: { id: "user123" } } },
+      sessionCookie: { id: "session123" },
+    });
+
+    const result = await sendPassword({
+      loginName: "Jackson@Example.com",
+      checks: { password: { password: "password" } } as any,
+    });
+
+    expect(result).toEqual({ redirect: "https://example.com" });
+    expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
+  });
+
+  test("should accept a differently cased email when login with email is disabled", async () => {
+    mockGetSessionCookieByLoginName.mockResolvedValue(null);
+    mockSearchUsers.mockResolvedValue({
+      result: [
+        {
+          userId: "user123",
+          preferredLoginName: "jackson",
+          type: { case: "human", value: { phone: { phone: "+41791234567" } } },
+          state: 1,
+        },
+      ],
+    });
+    mockGetLoginSettings.mockResolvedValue({
+      allowLocalAuthentication: true,
+      disableLoginWithPhone: true,
+    });
+    mockCreateSessionAndUpdateCookie.mockResolvedValue({
+      session: { factors: { user: { id: "user123" } } },
+      sessionCookie: { id: "session123" },
+    });
+
+    const result = await sendPassword({
+      loginName: "Jackson",
+      checks: { password: { password: "password" } } as any,
+    });
+
+    expect(result).toEqual({ redirect: "https://example.com" });
+    expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
+  });
+
+  test("should still reject a login name that does not match the discovered user", async () => {
+    mockGetSessionCookieByLoginName.mockResolvedValue(null);
+    mockSearchUsers.mockResolvedValue({
+      result: [
+        {
+          userId: "user123",
+          preferredLoginName: "jackson@example.com",
+          type: { case: "human", value: {} },
+          state: 1,
+        },
+      ],
+    });
+    mockGetLoginSettings.mockResolvedValue({
+      allowLocalAuthentication: true,
+      disableLoginWithEmail: true,
+      disableLoginWithPhone: true,
+    });
+
+    const result = await sendPassword({
+      loginName: "someone-else@example.com",
+      checks: { password: { password: "password" } } as any,
+    });
+
+    expect(result).toEqual({ error: "errors.couldNotVerifyPassword" });
+    expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+  });
+
   test("should return specific error with lockout info when password verification fails and ignoreUnknownUsernames is false", async () => {
     mockGetSessionCookieByLoginName.mockResolvedValue(null);
     mockSearchUsers.mockResolvedValue({
@@ -520,6 +612,64 @@ describe("resetPassword", () => {
 
     const result = await resetPassword({
       loginName: "unknown@example.com",
+    });
+
+    expect(result).toEqual({ error: "errors.couldNotSendResetLink" });
+    expect(mockPasswordReset).not.toHaveBeenCalled();
+  });
+
+  // Regression tests for: https://github.com/zitadel/zitadel/issues/12025
+  // See the equivalent sendPassword tests above; the same post-discovery check guards the reset link.
+  test("should send the reset link for a differently cased login name when login with email and phone are disabled", async () => {
+    mockSearchUsers.mockResolvedValue({
+      result: [{ userId: "user123", preferredLoginName: "jackson@example.com", type: { case: "human", value: {} } }],
+    });
+    mockGetLoginSettings.mockResolvedValue({
+      disableLoginWithEmail: true,
+      disableLoginWithPhone: true,
+    });
+    mockPasswordReset.mockResolvedValue({});
+
+    const result = await resetPassword({
+      loginName: "Jackson@Example.com",
+    });
+
+    expect(result).toEqual({});
+    expect(mockPasswordReset).toHaveBeenCalledWith(expect.objectContaining({ userId: "user123" }));
+  });
+
+  test("should send the reset link for a differently cased email when login with phone is disabled", async () => {
+    mockSearchUsers.mockResolvedValue({
+      result: [
+        {
+          userId: "user123",
+          preferredLoginName: "jackson",
+          type: { case: "human", value: { email: { email: "jackson@example.com" } } },
+        },
+      ],
+    });
+    mockGetLoginSettings.mockResolvedValue({ disableLoginWithPhone: true });
+    mockPasswordReset.mockResolvedValue({});
+
+    const result = await resetPassword({
+      loginName: "Jackson@Example.com",
+    });
+
+    expect(result).toEqual({});
+    expect(mockPasswordReset).toHaveBeenCalledWith(expect.objectContaining({ userId: "user123" }));
+  });
+
+  test("should still reject a login name that does not match the discovered user", async () => {
+    mockSearchUsers.mockResolvedValue({
+      result: [{ userId: "user123", preferredLoginName: "jackson@example.com", type: { case: "human", value: {} } }],
+    });
+    mockGetLoginSettings.mockResolvedValue({
+      disableLoginWithEmail: true,
+      disableLoginWithPhone: true,
+    });
+
+    const result = await resetPassword({
+      loginName: "someone-else@example.com",
     });
 
     expect(result).toEqual({ error: "errors.couldNotSendResetLink" });
