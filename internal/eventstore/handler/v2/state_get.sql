@@ -1,4 +1,4 @@
--- filter_offset stores events2.in_tx_order (reused column; not a row OFFSET).
+-- filter_offset is events2.in_tx_order when setup 77 is Done, else a row OFFSET.
 SELECT
     aggregate_id
     , aggregate_type
@@ -6,6 +6,7 @@ SELECT
     , event_date
     , "position"
     , filter_offset
+    , in_tx_order
 FROM 
     projections.current_states
 WHERE
