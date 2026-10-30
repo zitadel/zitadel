@@ -349,14 +349,15 @@ func (p *smtpConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 	if e.User != nil {
 		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigSMTPColumnUser, *e.User))
 	}
-	if e.Password != nil {
-		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, *e.Password))
-	}
-
+	// ChangeSMTPConfigSMTPPassword sets both the legacy Password field and
+	// PlainAuth.Password, so the column must be assigned once or Postgres
+	// rejects the UPDATE ("multiple assignments to same column").
 	if !e.PlainAuth.IsEmpty() {
 		smtpColumns = append(smtpColumns,
 			handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, e.PlainAuth.Password),
 		)
+	} else if e.Password != nil {
+		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, *e.Password))
 	}
 
 	if !e.XOAuth2Auth.IsEmpty() {
