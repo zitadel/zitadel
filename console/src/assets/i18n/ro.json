@@ -654,6 +654,7 @@
     "IAM_OWNER_VIEWER": "Are permisiunea de a revizui întreaga instanță, inclusiv toate organizațiile",
     "IAM_ORG_MANAGER": "Are permisiunea de a crea și gestiona organizații",
     "IAM_USER_MANAGER": "Are permisiunea de a crea și gestiona utilizatori",
+    "IAM_USER_VIEWER": "Are permisiunea de a vizualiza utilizatori",
     "IAM_ADMIN_IMPERSONATOR": "Are permisiunea de a impersona administratorul și utilizatorii finali din toate organizațiile",
     "IAM_END_USER_IMPERSONATOR": "Are permisiunea de a impersona utilizatorii finali din toate organizațiile",
     "IAM_LOGIN_CLIENT": "Are permisiunea de a gestiona aplicațiile de login",
