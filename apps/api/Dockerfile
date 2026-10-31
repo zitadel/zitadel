@@ -15,7 +15,9 @@ RUN useradd -s "" --home / zitadel && \
     chown zitadel /app/zitadel && \
     chmod +x /app/zitadel && \
     chown zitadel /app/entrypoint.sh && \
-    chmod +x /app/entrypoint.sh
+    chmod +x /app/entrypoint.sh && \
+    mkdir -p /current-dir && \
+    chown zitadel /current-dir
 
 WORKDIR /app
 ENV PATH="/app:${PATH}"
@@ -29,9 +31,11 @@ FROM scratch AS final
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/ssl/certs /etc/ssl/certs
 COPY --from=builder /app/zitadel /app/zitadel
+COPY --from=builder /current-dir /current-dir
 
 HEALTHCHECK NONE
 EXPOSE 8080
 
 USER zitadel
+VOLUME [ "/current-dir" ]
 ENTRYPOINT ["/app/zitadel"]
