@@ -23,7 +23,7 @@ end
 local usage_lifetime = getCall("HGET", object_id, "usage_lifetime")
 -- reset usage based TTL
 if not (usage_lifetime == nil) and tonumber(usage_lifetime) > 0 then
-    redis.call('EXPIRE', object_id, usage_lifetime)
+    resetTTL(object_id, tonumber(usage_lifetime))
 end
 
 return object
