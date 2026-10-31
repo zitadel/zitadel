@@ -201,8 +201,8 @@ export async function sendPassword(
         // Force fallback if settings can't be loaded
         throw new Error("Could not load login settings");
       }
-    } catch (error) {
-      logger.warn("[Password] Could not update session", { error });
+    } catch {
+      logger.warn("[Password] Could not update session");
       // If the session was terminated or any other error occurred during update,
       // we fall back to creating a new session.
       sessionCookie = undefined;
@@ -312,7 +312,6 @@ export async function sendPassword(
             }),
           };
         }
-        logger.warn("[Password] Could not create session", { error });
         recordAuthFailure("password", "session_creation_failed", command.organization);
         if (loginSettingsByContext?.ignoreUnknownUsernames) {
           return { error: t("errors.failedToAuthenticateNoLimit") };
