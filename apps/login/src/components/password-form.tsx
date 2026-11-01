@@ -115,7 +115,7 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
         <div className={`${error && "animate-shake transform-gpu"}`}>
           <TextInput
             type="password"
-            autoComplete="password"
+            autoComplete="current-password"
             autoFocus
             {...register("password", { required: t("verify.required.password") })}
             label={t("verify.labels.password")}
