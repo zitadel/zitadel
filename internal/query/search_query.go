@@ -126,11 +126,7 @@ func (q *OrQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (q *OrQuery) comp() sq.Sqlizer {
-	or := make(sq.Or, len(q.queries))
-	for i, query := range q.queries {
-		or[i] = query.comp()
-	}
-	return or
+	return combineSearchQueryComps[sq.Or](q.queries)
 }
 
 type AndQuery struct {
@@ -152,11 +148,62 @@ func (q *AndQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (q *AndQuery) comp() sq.Sqlizer {
-	and := make(sq.And, len(q.queries))
-	for i, query := range q.queries {
-		and[i] = query.comp()
+	return combineSearchQueryComps[sq.And](q.queries)
+}
+
+// combineSearchQueryComps skips nil comps from empty pattern filters.
+// Zero remaining → nil; one → that comp; else Or or And of the rest.
+func combineSearchQueryComps[T sq.And | sq.Or](queries []SearchQuery) sq.Sqlizer {
+	parts := make([]sq.Sqlizer, 0, len(queries))
+	for _, query := range queries {
+		if c := query.comp(); c != nil {
+			parts = append(parts, c)
+		}
 	}
-	return and
+	switch len(parts) {
+	case 0:
+		return nil
+	case 1:
+		return parts[0]
+	default:
+		return sq.Sqlizer(T(parts))
+	}
+}
+
+// noopSearchQuery adds no WHERE clause. Used when an empty pattern filter
+// would otherwise leave only non-selective SubSelect correlates.
+type noopSearchQuery struct{}
+
+func (noopSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query
+}
+
+func (noopSearchQuery) comp() sq.Sqlizer {
+	return nil
+}
+
+func (noopSearchQuery) Col() Column {
+	return Column{}
+}
+
+func isTextPatternComparison(comparison TextComparison) bool {
+	switch comparison {
+	case TextStartsWith,
+		TextStartsWithIgnoreCase,
+		TextEndsWith,
+		TextEndsWithIgnoreCase,
+		TextContains,
+		TextContainsIgnoreCase:
+		return true
+	case TextEquals,
+		TextEqualsIgnoreCase,
+		TextNotEquals,
+		TextNotEqualsIgnoreCase,
+		TextListContains,
+		textCompareMax:
+		return false
+	}
+	return false
 }
 
 func (q *AndQuery) Prepend(queries ...SearchQuery) {
@@ -182,12 +229,17 @@ func (q *NotQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (notQ NotQuery) ToSql() (sql string, args []interface{}, err error) {
-	querySql, queryArgs, queryErr := notQ.query.comp().ToSql()
-	// Handle the error from the query's ToSql() function.
+	inner := notQ.query.comp()
+	// Empty LIKE patterns omit the filter (no constraint) outside NOT.
+	// Inside NOT that would be wrong: keep FALSE deliberately so we still
+	// match nothing, same as the old NOT (LIKE '%') behaviour.
+	if inner == nil {
+		return "FALSE", nil, nil
+	}
+	querySql, queryArgs, queryErr := inner.ToSql()
 	if queryErr != nil {
 		return "", queryArgs, queryErr
 	}
-	// Construct the SQL statement.
 	sql = fmt.Sprintf("NOT (%s)", querySql)
 	return sql, queryArgs, nil
 }
@@ -346,16 +398,34 @@ func (q *textQuery) comp() sq.Sqlizer {
 	case TextNotEqualsIgnoreCase:
 		return sq.NotEq{"LOWER(" + q.Column.identifier() + ")": strings.ToLower(q.Text)}
 	case TextStartsWith:
+		if q.Text == "" {
+			return nil
+		}
 		return sq.Like{q.Column.identifier(): q.Text + "%"}
 	case TextStartsWithIgnoreCase:
+		if q.Text == "" {
+			return nil
+		}
 		return sq.Like{"LOWER(" + q.Column.identifier() + ")": strings.ToLower(q.Text) + "%"}
 	case TextEndsWith:
+		if q.Text == "" {
+			return nil
+		}
 		return sq.Like{q.Column.identifier(): "%" + q.Text}
 	case TextEndsWithIgnoreCase:
+		if q.Text == "" {
+			return nil
+		}
 		return sq.Like{"LOWER(" + q.Column.identifier() + ")": "%" + strings.ToLower(q.Text)}
 	case TextContains:
+		if q.Text == "" {
+			return nil
+		}
 		return sq.Like{q.Column.identifier(): "%" + q.Text + "%"}
 	case TextContainsIgnoreCase:
+		if q.Text == "" {
+			return nil
+		}
 		return sq.Like{"LOWER(" + q.Column.identifier() + ")": "%" + strings.ToLower(q.Text) + "%"}
 	case TextListContains:
 		return &listContains{col: q.Column, args: []any{q.Text}}
@@ -579,11 +649,7 @@ func (q *or) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (q *or) comp() sq.Sqlizer {
-	queries := make([]sq.Sqlizer, 0)
-	for _, query := range q.queries {
-		queries = append(queries, query.comp())
-	}
-	return sq.Or(queries)
+	return combineSearchQueryComps[sq.Or](q.queries)
 }
 
 func (q *or) Col() Column {

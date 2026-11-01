@@ -176,14 +176,13 @@ describe("cookies", () => {
       expect(sessions[0].token).toBe("token-new");
     });
 
-    it("should handle cookie overflow by replacing oldest session", async () => {
-      // Create many sessions to exceed MAX_COOKIE_SIZE (3500)
+    it("should handle cookie overflow by evicting the least recently changed sessions", async () => {
       const manySessions: Cookie[] = Array.from({ length: 16 }, (_, i) => ({
         id: `session-${i}`,
         token: `token-${i}-very-long-token-to-increase-size-padding-padding-padding`,
         loginName: `user${i}@example.com`,
         creationTs: `${1600000000000 + i * 1000}`,
-        expirationTs: `${1700000000000 + i * 1000}`,
+        expirationTs: `${1900000000000 + i * 1000}`,
         changeTs: `${1600000000000 + i * 1000}`,
       }));
 
@@ -191,13 +190,17 @@ describe("cookies", () => {
 
       await addSessionToCookie({ session: mockSession });
 
-      expect(mockLogger.warn).toHaveBeenCalledWith("WARNING COOKIE OVERFLOW");
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        "sessions cookie exceeded the size budget, evicted the oldest entries",
+        expect.objectContaining({ evicted: expect.any(Number) }),
+      );
 
       const sessions = writtenSessions();
 
-      // Should have new session and all but the first old session
       expect(sessions[0]).toMatchObject(mockSession);
       expect(sessions.some((s) => s.id === manySessions[0].id)).toBe(false);
+      // the most recently changed existing session survives
+      expect(sessions.some((s) => s.id === manySessions[15].id)).toBe(true);
     });
 
     it("should cleanup expired sessions when cleanup is true", async () => {
@@ -460,6 +463,146 @@ describe("cookies", () => {
           sameSite: "none",
         }),
       );
+    });
+  });
+
+  describe("sessions cookie size budget", () => {
+    // size of the Set-Cookie `name=value` pair as Next.js sends it (the value is URL-encoded)
+    function sentCookieSize(value: string) {
+      return `sessions=${encodeURIComponent(value)}`.length;
+    }
+
+    function writtenValues(): string[] {
+      return mockCookies.set.mock.calls.map((call: any[]) => call[0].value);
+    }
+
+    function lastWrittenSessions(): Array<Cookie & { sig: string }> {
+      const values = writtenValues();
+      return JSON.parse(values[values.length - 1]);
+    }
+
+    // shaped like the entries ZITADEL Cloud writes: numeric ids, encrypted token, email login names, OIDC request
+    function realisticSession(i: number, overrides: Partial<Cookie> = {}): Cookie {
+      return {
+        id: `34567890123456${String(i).padStart(4, "0")}`,
+        token: `${"x".repeat(100)}${i}`,
+        loginName: `qa.user${i}@example-company.ch`,
+        organization: "345678901234567890",
+        creationTs: `${1761480000000 + i * 1000}`,
+        expirationTs: `${1900000000000 + i * 1000}`,
+        changeTs: `${1761480000000 + i * 1000}`,
+        requestId: "oidc_V2_345678901234567890",
+        ...overrides,
+      };
+    }
+
+    beforeEach(() => {
+      vi.mocked(timestampDate).mockImplementation((ts: any) => new Date(Number(ts.seconds) * 1000));
+      vi.mocked(timestampFromMs).mockImplementation((ms: number) => ({ seconds: BigInt(Math.floor(ms / 1000)) }) as any);
+    });
+
+    it("should keep the URL-encoded cookie below the browser limit while many users sign in", async () => {
+      let current: { value: string } | undefined;
+      mockCookies.get.mockImplementation(() => current);
+      mockCookies.set.mockImplementation((cookie: { value: string }) => {
+        current = { value: cookie.value };
+      });
+
+      for (let i = 0; i < 30; i++) {
+        const session = realisticSession(i);
+        await addSessionToCookie({ session });
+
+        const written = lastWrittenSessions();
+        expect(written[0]).toMatchObject(session);
+        expect(sentCookieSize(current!.value)).toBeLessThanOrEqual(3800);
+      }
+
+      // the most recent users are the ones that remain
+      const ids = lastWrittenSessions().map((s) => s.id);
+      expect(ids).toContain(realisticSession(29).id);
+      expect(ids).toContain(realisticSession(28).id);
+      expect(ids).not.toContain(realisticSession(0).id);
+    });
+
+    it("should measure the URL-encoded size, not the raw JSON length", async () => {
+      // 8 entries: the raw JSON stays below 3800 bytes but the encoded cookie is above the 4096 browser limit
+      const existing = Array.from({ length: 7 }, (_, i) => realisticSession(i));
+      const rawLength = stored(...existing, realisticSession(7)).value.length;
+      expect(rawLength).toBeLessThan(3800);
+      expect(sentCookieSize(stored(...existing, realisticSession(7)).value)).toBeGreaterThan(4096);
+
+      mockCookies.get.mockReturnValue(stored(...existing));
+
+      await addSessionToCookie({ session: realisticSession(7) });
+
+      expect(sentCookieSize(writtenValues()[0])).toBeLessThanOrEqual(3800);
+    });
+
+    it("should evict by least recent changeTs, not by position in the cookie", async () => {
+      // position 0 holds the most recently changed entry
+      const existing = Array.from({ length: 8 }, (_, i) => realisticSession(i, { changeTs: `${1761480000000 - i * 1000}` }));
+      mockCookies.get.mockReturnValue(stored(...existing));
+
+      await addSessionToCookie({ session: realisticSession(99) });
+
+      const ids = lastWrittenSessions().map((s) => s.id);
+      expect(ids[0]).toBe(realisticSession(99).id);
+      expect(ids).toContain(existing[0].id);
+      expect(ids).not.toContain(existing[7].id);
+    });
+
+    it("should evict expired entries before older valid ones", async () => {
+      const now = Date.now();
+      const expired = realisticSession(1, { expirationTs: `${now - 1000}`, changeTs: `${now - 1000}` });
+      const existing = [
+        expired,
+        ...Array.from({ length: 6 }, (_, i) => realisticSession(i + 2, { changeTs: `${now - 1000000 + i}` })),
+      ];
+      mockCookies.get.mockReturnValue(stored(...existing));
+
+      await addSessionToCookie({ session: realisticSession(99, { changeTs: `${now}` }) });
+
+      const ids = lastWrittenSessions().map((s) => s.id);
+      expect(ids).not.toContain(expired.id);
+      // removing the expired entry is enough, the oldest valid one stays
+      expect(ids).toContain(existing[1].id);
+    });
+
+    it("should keep expired entries while the cookie fits", async () => {
+      const now = Date.now();
+      const expired = realisticSession(1, { expirationTs: `${now - 1000}` });
+      mockCookies.get.mockReturnValue(stored(expired));
+
+      await addSessionToCookie({ session: realisticSession(2) });
+
+      expect(lastWrittenSessions().map((s) => s.id)).toContain(expired.id);
+      expect(mockLogger.warn).not.toHaveBeenCalled();
+    });
+
+    it("should never evict the session being updated", async () => {
+      const existing = Array.from({ length: 9 }, (_, i) => realisticSession(i));
+      mockCookies.get.mockReturnValue(stored(...existing));
+
+      // the updated entry has the oldest changeTs
+      const updated = { ...existing[0], token: `${"y".repeat(100)}0` };
+      await updateSessionCookie({ id: updated.id, session: updated });
+
+      const written = lastWrittenSessions();
+      expect(written.find((s) => s.id === updated.id)).toMatchObject(updated);
+      expect(written.length).toBeLessThan(existing.length);
+      expect(sentCookieSize(writtenValues()[0])).toBeLessThanOrEqual(3800);
+    });
+
+    it("should enforce the budget when removing a session", async () => {
+      // a cookie written by an older version can already be over the budget
+      const existing = Array.from({ length: 12 }, (_, i) => realisticSession(i));
+      mockCookies.get.mockReturnValue(stored(...existing));
+
+      await removeSessionFromCookie({ session: existing[11] });
+
+      const ids = lastWrittenSessions().map((s) => s.id);
+      expect(ids).not.toContain(existing[11].id);
+      expect(sentCookieSize(writtenValues()[0])).toBeLessThanOrEqual(3800);
     });
   });
 

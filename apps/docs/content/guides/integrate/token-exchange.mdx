@@ -99,7 +99,7 @@ We currently allow all token types, except refresh tokens, to be used as subject
 
 The actor parameters are optional and enable impersonation and delegation. At ZITADEL we don't make any distinction between the two concepts, so we call both cases impersonation from this point.The `actor_token` and `actor_token_type` come in a pair. If the actor token is provided, the actor token type must also be specified.
 
-Currently only a valid access token or ID token are allowed as actor token. The user represented by the actor token must have the [impersonation permission](#impersonation-permissions) set, or else the request will be rejected and an error returned.
+Currently only a valid access token or ID token are allowed as actor token. The user represented by the actor token must have the [impersonation permission](#impersonation-permissions) set, or else the request will be rejected and an error returned. Note that `*_END_USER_IMPERSONATOR` roles can only impersonate users without memberships. To impersonate a user with any administrative membership, or for a machine user impersonating itself, an admin impersonator role such as `ORG_ADMIN_IMPERSONATOR` or `IAM_ADMIN_IMPERSONATOR` is required.
 
 #### Requested token type
 
@@ -460,7 +460,9 @@ Next, we need to configure which users are allowed to impersonate other users. Z
 | Org Admin Impersonator | ORG_ADMIN_IMPERSONATOR    | Allow impersonation of admin and end users from the organization  |
 | Org Impersonator       | ORG_END_USER_IMPERSONATOR | Allow impersonation of end users from the organization            |
 
- In this example we will assign the `ORG_END_USER_IMPERSONATOR` role to a user:
+The `*_END_USER_IMPERSONATOR` roles only work for users who have no memberships. If the impersonated user has any administrative membership, you must use an admin impersonator role instead, such as `ORG_ADMIN_IMPERSONATOR` or `IAM_ADMIN_IMPERSONATOR`. The same applies when a machine user impersonates itself: use an admin impersonator role.
+
+In this example we will assign the `ORG_END_USER_IMPERSONATOR` role to a user:
 
 ![](../../../public/img/guides/token-exchange/org-role-end-user-impersonator.png)
 

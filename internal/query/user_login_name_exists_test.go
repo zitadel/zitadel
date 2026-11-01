@@ -1,9 +1,11 @@
 package query
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -45,6 +47,40 @@ func TestNewUserLoginNameExistsQuery_ContainsFallsBackToView(t *testing.T) {
 	require.NoError(t, err)
 	assert.Contains(t, sql, "projections.login_names3")
 	assert.Contains(t, strings.ToLower(sql), "login_name")
+}
+
+func TestNewUserLoginNameExistsQuery_EmptyPatternIsNoop(t *testing.T) {
+	for _, comparison := range []TextComparison{
+		TextStartsWith,
+		TextStartsWithIgnoreCase,
+		TextEndsWith,
+		TextEndsWithIgnoreCase,
+		TextContains,
+		TextContainsIgnoreCase,
+	} {
+		t.Run(fmt.Sprintf("comparison_%d", comparison), func(t *testing.T) {
+			qry, err := NewUserLoginNameExistsQuery("", comparison)
+			require.NoError(t, err)
+			_, ok := qry.(noopSearchQuery)
+			require.True(t, ok)
+			assert.Nil(t, qry.comp())
+
+			builder := sq.Select("id").From("users")
+			sql, _, err := qry.toQuery(builder).ToSql()
+			require.NoError(t, err)
+			assert.NotContains(t, sql, "login_names3")
+			assert.NotContains(t, strings.ToLower(sql), " in (")
+		})
+	}
+}
+
+func TestNewUserLoginNameExistsQuery_EmptyEqualsStillFilters(t *testing.T) {
+	qry, err := NewUserLoginNameExistsQuery("", TextEqualsIgnoreCase)
+	require.NoError(t, err)
+	_, ok := qry.(noopSearchQuery)
+	assert.False(t, ok)
+	_, ok = qry.(*loginNameEqualsFilter)
+	assert.True(t, ok)
 }
 
 func TestExtractLoginEqualitySeeks_LoginNameAndOrg(t *testing.T) {

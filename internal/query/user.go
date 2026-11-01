@@ -838,6 +838,11 @@ var userLoginNameMatchesCaseSensitiveQuery string
 // Equals / EqualsIgnoreCase are rewritten in prepareUsersQuery into an indexed
 // ID-seek. Other comparisons use the login_names3 view.
 func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (SearchQuery, error) {
+	// Empty pattern would drop only the LIKE arm and leave correlate-only
+	// login_names3 existence checks that make COUNT(*) very expensive.
+	if value == "" && isTextPatternComparison(comparison) {
+		return noopSearchQuery{}, nil
+	}
 	if comparison == TextEquals || comparison == TextEqualsIgnoreCase {
 		return newLoginNameEqualsFilter(value, comparison == TextEqualsIgnoreCase)
 	}
