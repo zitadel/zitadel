@@ -1,0 +1,133 @@
+---
+title: Error Response Formats in ZITADEL APIs
+description: Understanding the different error response formats across ZITADEL's API endpoints
+sidebar_label: Error Responses
+---
+
+ZITADEL uses different error response formats depending on which API layer you're interacting with. Understanding these formats helps you handle errors appropriately in your applications.
+
+## gRPC-Based Resource APIs (v1/v2)
+
+When calling ZITADEL's resource APIs (User Service, Organization Service, etc.), you'll receive gRPC-formatted error responses that are mapped to HTTP status codes.[^1]
+
+### Response Format
+
+{
+  "code": 16,
+  "message": "Errors.Token.Invalid (AUTH-7fs1e)",
+  "details": [
+    {
+      "@type": "type.googleapis.com/zitadel.v1.ErrorDetail",
+      "id": "AUTH-7fs1e",
+      "message": "Errors.Token.Invalid"
+    }
+  ]
+}
+
+### Key Fields
+
+- **code**: gRPC status code (e.g., `16` = `UNAUTHENTICATED`)[^1]
+- **message**: Human-readable error message with an error ID in parentheses
+- **details**: Array containing structured error information
+  - **id**: Error identifier that maps to a specific location in the source code (useful for debugging)
+  - **message**: Machine-readable error message
+
+### Error Details and Slugs (v2 APIs)
+
+For stable v2 APIs, error responses may include `ErrorDetail.slug` for programmatic handling.[^1]
+
+{
+  "code": 6,
+  "message": "user already exists",
+  "details": [
+    {
+      "@type": "type.googleapis.com/zitadel.error.v2.ErrorDetail",
+      "slug": "user.already_exists",
+      "message": "user already exists"
+    }
+  ]
+}
+
+**Best Practices:**
+- Inspect `ErrorDetail.slug` first for programmatic error handling
+- Slugs are stable machine-readable identifiers (e.g., `user.already_exists`)
+- Use `ErrorDetail.message` for developer diagnostics, not end-user text
+- Map slugs to your own localized messages in client applications[^1]
+
+**Note:** Slug-based handling is currently relevant for backend/domain paths that run with relational-storage-backed logic. Do not assume it for `v1`, `v2beta`, or `v3alpha` APIs or when using a v2 endpoint without having the relational storage feature enabled.[^1]
+
+## OAuth/OIDC Endpoints
+
+OAuth and OIDC endpoints (such as `/oauth/v2/token`) follow the standard OAuth 2.0 error specification.[^2]
+
+### Response Format
+
+{
+  "error": "invalid_request",
+  "error_description": "Errors.User.Machine.Secret.Invalid"
+}
+
+### Key Fields
+
+- **error**: Standard OAuth 2.0 error code[^2]
+- **error_description**: Human-readable description providing additional context
+
+### Common OAuth Error Types
+
+| Error Type | Description |
+|:-----------|:------------|
+| `invalid_request` | The request is missing a required parameter, includes an unsupported parameter value, repeats a parameter, or is otherwise malformed[^2] |
+| `invalid_client` | Client authentication failed (e.g., unknown client, no client authentication included, or unsupported authentication method)[^2] |
+| `invalid_grant` | The provided authorization grant or refresh token is invalid, expired, revoked, or was issued to another client[^2] |
+| `unauthorized_client` | The authenticated client is not authorized to use this authorization grant type[^2] |
+| `unsupported_grant_type` | The authorization grant type is not supported by the authorization server[^2] |
+| `invalid_scope` | The requested scope is invalid, unknown, malformed, or exceeds the scope granted by the resource owner[^2] |
+| `server_error` | The authorization server encountered an unexpected condition that prevented it from fulfilling the request[^2] |
+
+## gRPC Status Code Mapping
+
+ZITADEL maps gRPC status codes to HTTP status codes as follows:[^1]
+
+| gRPC Code | HTTP Status | Description |
+|:----------|:------------|:------------|
+| 0 (OK) | 200 | Success |
+| 2 (UNKNOWN) | 500 | Unknown error |
+| 3 (INVALID_ARGUMENT) | 400 | Invalid argument |
+| 4 (DEADLINE_EXCEEDED) | 504 | Gateway timeout |
+| 5 (NOT_FOUND) | 404 | Entity not found |
+| 6 (ALREADY_EXISTS) | 409 | Entity already exists |
+| 7 (PERMISSION_DENIED) | 403 | Permission denied |
+| 9 (FAILED_PRECONDITION) | 400 | Failed precondition |
+| 12 (UNIMPLEMENTED) | 501 | Not implemented |
+| 13 (INTERNAL) | 500 | Internal error |
+| 14 (UNAVAILABLE) | 503 | Service unavailable |
+| 16 (UNAUTHENTICATED) | 401 | Unauthenticated |
+
+## Error Handling Best Practices
+
+1. **Identify the API Layer**: Determine whether you're calling a gRPC-based resource API or an OAuth/OIDC endpoint
+2. **Parse Accordingly**: Use the appropriate error format parser for each API type
+3. **Use Error IDs for Debugging**: The error ID (e.g., `AUTH-7fs1e`) can be searched in the ZITADEL source code for detailed debugging
+4. **Handle Slugs Programmatically**: For v2 APIs with relational storage, use `ErrorDetail.slug` for stable error handling
+5. **Localize Error Messages**: Don't display raw error messages to end users; map error codes/slugs to user-friendly, localized messages
+
+## Actions Error Forwarding
+
+When using ZITADEL Actions, you can forward specific errors from your target endpoint through ZITADEL.[^3]
+
+Return a response with status code 200 and the following JSON format:
+
+{
+  "forwardedStatusCode": 403,
+  "forwardedErrorMessage": "Call is forbidden through the IP AllowList definition"
+}
+
+**Important:**
+- Only status codes from 400 to 499 will be forwarded through ZITADEL
+- Other status codes will result in a `FAILED_PRECONDITION` error
+- To interrupt execution while forwarding the error, set `interruptOnError` to `true` for the target[^3]
+- If the target returns any status code outside the 200-299 range, the execution is considered failed and a `FAILED_PRECONDITION` error is logged[^3]
+
+[^1]: [GRPC Status Codes in ZITADEL](https://zitadel.com/docs/apis/statuscodes)
+[^2]: [OpenID Connect Endpoints in ZITADEL](https://zitadel.com/docs/apis/openidoauth/endpoints)
+[^3]: [Using Actions](https://zitadel.com/docs/guides/integrate/actions/usage)
