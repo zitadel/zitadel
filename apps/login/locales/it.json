@@ -1,7 +1,9 @@
 {
   "common": {
     "back": "Indietro",
-    "title": "Accedi con Zitadel"
+    "title": "Accedi con Zitadel",
+    "showPassword": "Mostra password",
+    "hidePassword": "Nascondi password"
   },
   "accounts": {
     "title": "Account",

@@ -1,7 +1,9 @@
 {
   "common": {
     "back": "Terug",
-    "title": "Inloggen met Zitadel"
+    "title": "Inloggen met Zitadel",
+    "showPassword": "Wachtwoord tonen",
+    "hidePassword": "Wachtwoord verbergen"
   },
   "accounts": {
     "title": "Accounts",

@@ -1,7 +1,9 @@
 {
   "common": {
     "back": "Voltar",
-    "title": "Entrar com Zitadel"
+    "title": "Entrar com Zitadel",
+    "showPassword": "Mostrar senha",
+    "hidePassword": "Ocultar senha"
   },
   "accounts": {
     "title": "Contas",
