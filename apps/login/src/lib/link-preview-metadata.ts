@@ -17,7 +17,7 @@ export function loginMetadataFromBranding(title: string, branding?: LinkPreviewB
 
   return {
     title,
-    ...(description ? { description } : {}),
+    description: description ?? null,
     openGraph: {
       title: previewTitle,
       ...(description ? { description } : {}),

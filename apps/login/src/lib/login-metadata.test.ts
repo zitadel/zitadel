@@ -34,7 +34,7 @@ describe("loginMetadataFromBranding", () => {
     });
   });
 
-  it("keeps the screen title and omits description and image when branding is empty", () => {
+  it("keeps the screen title and clears description and image when branding is empty", () => {
     const metadata = loginMetadataFromBranding("Welcome back!", {
       linkPreviewTitle: "",
       linkPreviewDescription: "",
@@ -42,7 +42,7 @@ describe("loginMetadataFromBranding", () => {
     });
 
     expect(metadata.title).toBe("Welcome back!");
-    expect(metadata.description).toBeUndefined();
+    expect(metadata.description).toBeNull();
     expect(metadata.openGraph).toEqual({ title: "Welcome back!" });
     expect(metadata.twitter).toEqual({ card: "summary", title: "Welcome back!" });
   });
