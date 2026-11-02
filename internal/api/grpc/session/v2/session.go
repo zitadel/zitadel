@@ -274,5 +274,5 @@ type userSearchByLoginName struct {
 }
 
 func (u userSearchByLoginName) search(ctx context.Context, q *query.Queries) (*query.User, error) {
-	return q.GetUserByLoginName(ctx, true, u.loginName)
+	return q.GetUserByLoginName(ctx, false, u.loginName)
 }
