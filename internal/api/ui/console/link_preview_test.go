@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 	"testing/fstest"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -167,6 +168,7 @@ func Test_linkPreviewHandler(t *testing.T) {
 		"assets/a.js": {Data: []byte("a")},
 	}
 	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("static"))
 	})
 	passthrough := func(h http.Handler) http.Handler { return h }
@@ -184,30 +186,37 @@ func Test_linkPreviewHandler(t *testing.T) {
 	empty := func(context.Context, string) (*LinkPreview, error) { return &LinkPreview{}, nil }
 	failing := func(context.Context, string) (*LinkPreview, error) { return nil, errors.New("db down") }
 
+	const (
+		shortCache = "public, max-age=0, s-maxage=300"
+		longCache  = "public, max-age=43200, s-maxage=604800"
+	)
 	tests := []struct {
-		name            string
-		instanceHandler func(http.Handler) http.Handler
-		linkPreview     LinkPreviewFunc
-		path            string
-		wantStatus      int
-		wantContains    string
+		name             string
+		instanceHandler  func(http.Handler) http.Handler
+		linkPreview      LinkPreviewFunc
+		path             string
+		wantStatus       int
+		wantContains     string
+		wantCacheControl string
 	}{
-		{name: "instance branding on root", instanceHandler: passthrough, linkPreview: acme, path: "/", wantStatus: http.StatusOK, wantContains: `content="Acme"`},
-		{name: "instance branding on spa route", instanceHandler: passthrough, linkPreview: acme, path: "/users", wantStatus: http.StatusOK, wantContains: `content="Acme"`},
-		{name: "organization branding", instanceHandler: passthrough, linkPreview: acme, path: "/?org=org1", wantStatus: http.StatusOK, wantContains: `content="Org One"`},
-		{name: "static file untouched", instanceHandler: passthrough, linkPreview: acme, path: "/main.js", wantStatus: http.StatusOK, wantContains: "static"},
-		{name: "no custom values", instanceHandler: passthrough, linkPreview: empty, path: "/", wantStatus: http.StatusOK, wantContains: "static"},
-		{name: "query error falls back", instanceHandler: passthrough, linkPreview: failing, path: "/", wantStatus: http.StatusOK, wantContains: "static"},
-		{name: "unknown instance falls back", instanceHandler: rejecting, linkPreview: acme, path: "/", wantStatus: http.StatusOK, wantContains: "static"},
-		{name: "no link preview func", instanceHandler: passthrough, linkPreview: nil, path: "/", wantStatus: http.StatusOK, wantContains: "static"},
+		{name: "instance branding on root", instanceHandler: passthrough, linkPreview: acme, path: "/", wantStatus: http.StatusOK, wantContains: `content="Acme"`, wantCacheControl: indexCacheControl},
+		{name: "instance branding on spa route", instanceHandler: passthrough, linkPreview: acme, path: "/users", wantStatus: http.StatusOK, wantContains: `content="Acme"`, wantCacheControl: indexCacheControl},
+		{name: "organization branding", instanceHandler: passthrough, linkPreview: acme, path: "/?org=org1", wantStatus: http.StatusOK, wantContains: `content="Org One"`, wantCacheControl: indexCacheControl},
+		{name: "static file untouched", instanceHandler: passthrough, linkPreview: acme, path: "/main.js", wantStatus: http.StatusOK, wantContains: "static", wantCacheControl: longCache},
+		{name: "no custom values", instanceHandler: passthrough, linkPreview: empty, path: "/", wantStatus: http.StatusOK, wantContains: "static", wantCacheControl: indexCacheControl},
+		{name: "query error falls back", instanceHandler: passthrough, linkPreview: failing, path: "/", wantStatus: http.StatusOK, wantContains: "static", wantCacheControl: indexCacheControl},
+		{name: "unknown instance falls back", instanceHandler: rejecting, linkPreview: acme, path: "/", wantStatus: http.StatusOK, wantContains: "static", wantCacheControl: indexCacheControl},
+		{name: "no link preview func", instanceHandler: passthrough, linkPreview: nil, path: "/", wantStatus: http.StatusOK, wantContains: "static", wantCacheControl: shortCache},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handler := linkPreviewHandler(fSys, tt.instanceHandler, tt.linkPreview, next)
+			cache := assetsCacheInterceptorIgnoreManifest(0, 5*time.Minute, 12*time.Hour, 168*time.Hour)
+			handler := cache(linkPreviewHandler(fSys, tt.instanceHandler, tt.linkPreview, next))
 			rec := httptest.NewRecorder()
 			handler.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, tt.path, nil))
 			assert.Equal(t, tt.wantStatus, rec.Code)
 			assert.Contains(t, rec.Body.String(), tt.wantContains)
+			assert.Equal(t, tt.wantCacheControl, rec.Header().Get("Cache-Control"))
 		})
 	}
 }

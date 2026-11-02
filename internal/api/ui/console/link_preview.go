@@ -11,6 +11,8 @@ import (
 	"strings"
 
 	"github.com/zitadel/logging"
+
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
 // LinkPreview holds the branding values used for the Open Graph and Twitter tags of the console page.
@@ -30,7 +32,10 @@ func (p *LinkPreview) isEmpty() bool {
 // or of the organization if orgID is set and the organization has a custom branding.
 type LinkPreviewFunc func(ctx context.Context, orgID string) (*LinkPreview, error)
 
-const consoleOrgQueryParam = "org"
+const (
+	consoleOrgQueryParam = "org"
+	indexCacheControl    = "private, max-age=0"
+)
 
 var (
 	titleMetaKeys       = []string{"og:title", "twitter:title"}
@@ -67,6 +72,7 @@ func linkPreviewHandler(fSys fs.FS, instanceHandler func(http.Handler) http.Hand
 			next.ServeHTTP(w, r)
 			return
 		}
+		w.Header().Set(http_util.CacheControl, indexCacheControl)
 		instanceRequest := requestWithInstance(instanceHandler, r)
 		if instanceRequest == nil {
 			next.ServeHTTP(w, r)
