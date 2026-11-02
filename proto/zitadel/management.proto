@@ -6073,7 +6073,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Branding";
             summary: "Remove Link Preview Image";
-            description: "Removes the link preview image from the configured label policy/branding of the organization. It will only be shown on the preview. Make sure to activate your changes afterward."
+            description: "Removes the link preview image from the configured label policy/branding of the organization. The stored image is deleted immediately, so the active branding loses its image even before you activate your changes. To replace the image, upload a new one instead."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
