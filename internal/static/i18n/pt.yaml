@@ -427,6 +427,8 @@ Errors:
         BackgroundColorDark: "A cor de fundo (modo escuro) não é um valor hexadecimal válido"
         WarnColorDark: "A cor de aviso (modo escuro) não é um valor hexadecimal válido"
         FontColorDark: "A cor da fonte (modo escuro) não é um valor hexadecimal válido"
+        LinkPreviewTitle: "O título da pré-visualização do link não pode ter mais de 120 caracteres"
+        LinkPreviewDescription: "A descrição da pré-visualização do link não pode ter mais de 300 caracteres"
   UserGrant:
     AlreadyExists: "A concessão de usuário já existe"
     NotFound: "A concessão de usuário não foi encontrada"

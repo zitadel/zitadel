@@ -429,6 +429,8 @@ Errors:
         BackgroundColorDark: "배경 색상(다크 모드)이 유효한 16진수 색상 값이 아닙니다"
         WarnColorDark: "경고 색상(다크 모드)이 유효한 16진수 색상 값이 아닙니다"
         FontColorDark: "글꼴 색상(다크 모드)이 유효한 16진수 색상 값이 아닙니다"
+        LinkPreviewTitle: "링크 미리보기 제목은 120자를 초과할 수 없습니다"
+        LinkPreviewDescription: "링크 미리보기 설명은 300자를 초과할 수 없습니다"
   UserGrant:
     AlreadyExists: "사용자 권한이 이미 존재합니다"
     NotFound: "사용자 권한을 찾을 수 없습니다"

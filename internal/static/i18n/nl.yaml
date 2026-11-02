@@ -428,6 +428,8 @@ Errors:
         BackgroundColorDark: "Achtergrondkleur (donkere modus) is geen geldige Hex kleur waarde"
         WarnColorDark: "Waarschuwingskleur (donkere modus) is geen geldige Hex kleur waarde"
         FontColorDark: "Tekstkleur (donkere modus) is geen geldige Hex kleur waarde"
+        LinkPreviewTitle: "De titel van de linkvoorvertoning mag maximaal 120 tekens lang zijn"
+        LinkPreviewDescription: "De beschrijving van de linkvoorvertoning mag maximaal 300 tekens lang zijn"
   UserGrant:
     AlreadyExists: "Gebruikerstoekenning bestaat al"
     NotFound: "Gebruikerstoekenning niet gevonden"

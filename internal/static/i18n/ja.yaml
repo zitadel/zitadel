@@ -429,6 +429,8 @@ Errors:
         BackgroundColorDark: "背景色（ダークモード）は有効なHexカラー値ではありません"
         WarnColorDark: "ワーンカラー（ダークモード）は有効なHexカラー値ではありません"
         FontColorDark: "フォントカラー（ダークモード）は有効なHexカラー値ではありません"
+        LinkPreviewTitle: "リンクプレビューのタイトルは120文字以内にしてください"
+        LinkPreviewDescription: "リンクプレビューの説明は300文字以内にしてください"
   UserGrant:
     AlreadyExists: "ユーザーグラントはすでに存在しています"
     NotFound: "ユーザーグラントが見つかりません"

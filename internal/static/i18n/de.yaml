@@ -428,6 +428,8 @@ Errors:
         BackgroundColorDark: "Hintergrund Farbe (dunkler Modus) ist kein gültiger Hex Farbwert"
         WarnColorDark: "Warn Farbe (dunkler Modus) ist kein gültiger Hex Farbwert"
         FontColorDark: "Schrift Farbe (dunkler Modus) ist kein gültiger Hex Farbwert"
+        LinkPreviewTitle: "Der Titel der Linkvorschau darf höchstens 120 Zeichen lang sein"
+        LinkPreviewDescription: "Die Beschreibung der Linkvorschau darf höchstens 300 Zeichen lang sein"
   UserGrant:
     AlreadyExists: "Benutzer Berechtigung existiert bereits"
     NotFound: "Benutzer Berechtigung konnte nicht gefunden werden"

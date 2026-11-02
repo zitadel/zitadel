@@ -428,6 +428,8 @@ Errors:
         BackgroundColorDark: "Barva pozadí (tmavý režim) nemá platnou hodnotu Hex barvy"
         WarnColorDark: "Upozornění barva (tmavý režim) nemá platnou hodnotu Hex barvy"
         FontColorDark: "Barva písma (tmavý režim) nemá platnou hodnotu Hex barvy"
+        LinkPreviewTitle: "Název náhledu odkazu nesmí být delší než 120 znaků"
+        LinkPreviewDescription: "Popis náhledu odkazu nesmí být delší než 300 znaků"
   UserGrant:
     AlreadyExists: "Uživatelský grant již existuje"
     NotFound: "Uživatelský grant nenalezen"

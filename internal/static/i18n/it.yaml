@@ -428,6 +428,8 @@ Errors:
         BackgroundColorDark: "Il colore di sfondo (modo scuro) non è un valore di colore HEX valido"
         WarnColorDark: "Warn color (dark mode) non è un valore di colore HEX valido"
         FontColorDark: "Il colore del carattere (modalità scura) non è un valore di colore HEX valido"
+        LinkPreviewTitle: "Il titolo dell'anteprima del link non può superare i 120 caratteri"
+        LinkPreviewDescription: "La descrizione dell'anteprima del link non può superare i 300 caratteri"
   UserGrant:
     AlreadyExists: "User Grant già esistente"
     NotFound: "User Grant non trovato"

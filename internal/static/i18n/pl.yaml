@@ -428,6 +428,8 @@ Errors:
         BackgroundColorDark: "Kolor tła (tryb ciemny) nie jest prawidłową wartością Hex koloru"
         WarnColorDark: "Kolor ostrzegawczy (tryb ciemny) nie jest prawidłową wartością Hex koloru"
         FontColorDark: "Kolor czcionki (tryb ciemny) nie jest prawidłową wartością Hex koloru"
+        LinkPreviewTitle: "Tytuł podglądu linku nie może przekraczać 120 znaków"
+        LinkPreviewDescription: "Opis podglądu linku nie może przekraczać 300 znaków"
   UserGrant:
     AlreadyExists: "Uprawnienie użytkownika już istnieje"
     NotFound: "Uprawnienie użytkownika nie znalezione"

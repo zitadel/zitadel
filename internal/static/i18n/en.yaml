@@ -431,6 +431,8 @@ Errors:
         BackgroundColorDark: "Background color (dark mode) is no valid Hex color value"
         WarnColorDark: "Warn color (dark mode) is no valid Hex color value"
         FontColorDark: "Font color (dark mode) is no valid Hex color value"
+        LinkPreviewTitle: "Link preview title must not be longer than 120 characters"
+        LinkPreviewDescription: "Link preview description must not be longer than 300 characters"
   UserGrant:
     AlreadyExists: "User grant already exists"
     NotFound: "User grant not found"

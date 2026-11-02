@@ -429,6 +429,8 @@ Errors:
             BackgroundColorDark: "Culoarea de fundal (modul întunecat) nu este o valoare de culoare Hex validă"
             WarnColorDark: "Culoarea de avertizare (modul întunecat) nu este o valoare de culoare Hex validă"
             FontColorDark: "Culoarea fontului (modul întunecat) nu este o valoare de culoare Hex validă"
+            LinkPreviewTitle: "Titlul previzualizării linkului nu poate depăși 120 de caractere"
+            LinkPreviewDescription: "Descrierea previzualizării linkului nu poate depăși 300 de caractere"
       UserGrant:
         AlreadyExists: "Acordarea utilizatorului există deja"
         NotFound: "Acordarea utilizatorului nu a fost găsită"
