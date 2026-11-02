@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "Paramètres SMS",
-        "DESCRIPTION": "Pour débloquer toutes les fonctionnalités de Zitadel, configurez Twilio pour envoyer des messages SMS à vos utilisateurs."
+        "DESCRIPTION": "Pour débloquer toutes les fonctionnalités de Zitadel, configurez Twilio ou votre propre endpoint HTTP pour envoyer des SMS à vos utilisateurs."
       },
       "IAM_EVENTS": {
         "TITLE": "Événements",
@@ -1603,6 +1603,25 @@
         "SETTOKEN": "Définir le jeton",
         "TOKENSET": "Le jeton a été défini avec succès."
       }
+    },
+    "HTTPPROVIDER": {
+      "ADD_TITLE": "Ajouter un fournisseur HTTP",
+      "EDIT_TITLE": "Modifier le fournisseur HTTP",
+      "EMAIL_DESCRIPTION": "Au lieu d'utiliser SMTP, Zitadel envoie chaque e-mail sous forme de requête JSON signée à votre endpoint. Votre service compose et distribue le message.",
+      "SMS_DESCRIPTION": "Zitadel envoie chaque SMS sous forme de requête JSON signée à votre endpoint. Votre service distribue le message.",
+      "ENDPOINT": "Endpoint",
+      "ENDPOINT_INVALID": "Saisissez une URL commençant par http:// ou https://.",
+      "DESCRIPTION": "Description",
+      "SIGNINGKEY": "Clé de signature",
+      "SIGNINGKEY_DESCRIPTION": "Chaque requête contient un en-tête ZITADEL-Signature signé avec la clé de ce fournisseur. Vérifiez-le dans votre service.",
+      "SIGNINGKEY_STORE": "Copiez la clé de signature et conservez-la en lieu sûr. Votre service en a besoin pour vérifier l'en-tête ZITADEL-Signature.",
+      "REGENERATE_SIGNINGKEY": "Générer une nouvelle clé de signature. La clé actuelle cesse immédiatement de fonctionner.",
+      "ADDED": "Fournisseur HTTP ajouté.",
+      "UPDATED": "Fournisseur HTTP mis à jour.",
+      "REMOVED": "Fournisseur HTTP supprimé.",
+      "DELETE_TITLE": "Supprimer le fournisseur HTTP",
+      "DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer un fournisseur HTTP. Confirmez en saisissant son endpoint.",
+      "DELETE_CONFIRM": "Saisissez {{value}} pour supprimer ce fournisseur HTTP."
     },
     "SECRETS": {
       "TYPES": "Types de secret",

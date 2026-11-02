@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "إعدادات الرسائل القصيرة (SMS)",
-        "DESCRIPTION": "لفتح جميع ميزات ZITADEL، قم بتكوين Twilio لإرسال رسائل SMS للمستخدمين."
+        "DESCRIPTION": "لتفعيل جميع ميزات Zitadel، قم بتهيئة Twilio أو نقطة نهاية HTTP خاصة بك لإرسال رسائل SMS إلى المستخدمين."
       },
       "IAM_EVENTS": {
         "TITLE": "الأحداث",
@@ -1597,6 +1597,25 @@
         "SETTOKEN": "تعيين الرمز",
         "TOKENSET": "تم تعيين الرمز بنجاح."
       }
+    },
+    "HTTPPROVIDER": {
+      "ADD_TITLE": "إضافة مزوّد HTTP",
+      "EDIT_TITLE": "تعديل مزوّد HTTP",
+      "EMAIL_DESCRIPTION": "بدلاً من استخدام SMTP، يرسل Zitadel كل بريد إلكتروني كطلب JSON موقّع إلى نقطة النهاية الخاصة بك. تتولى خدمتك إنشاء الرسالة وتسليمها.",
+      "SMS_DESCRIPTION": "يرسل Zitadel كل رسالة SMS كطلب JSON موقّع إلى نقطة النهاية الخاصة بك. تتولى خدمتك تسليم الرسالة.",
+      "ENDPOINT": "نقطة النهاية",
+      "ENDPOINT_INVALID": "أدخل عنوان URL يبدأ بـ http:// أو https://.",
+      "DESCRIPTION": "الوصف",
+      "SIGNINGKEY": "مفتاح التوقيع",
+      "SIGNINGKEY_DESCRIPTION": "يحمل كل طلب ترويسة ZITADEL-Signature موقّعة بمفتاح هذا المزوّد. تحقّق منها في خدمتك.",
+      "SIGNINGKEY_STORE": "انسخ مفتاح التوقيع واحفظه بأمان. تحتاجه خدمتك للتحقق من ترويسة ZITADEL-Signature.",
+      "REGENERATE_SIGNINGKEY": "إنشاء مفتاح توقيع جديد. يتوقف المفتاح الحالي عن العمل فوراً.",
+      "ADDED": "تمت إضافة مزوّد HTTP.",
+      "UPDATED": "تم تحديث مزوّد HTTP.",
+      "REMOVED": "تمت إزالة مزوّد HTTP.",
+      "DELETE_TITLE": "حذف مزوّد HTTP",
+      "DELETE_DESCRIPTION": "أنت على وشك حذف مزوّد HTTP. أكّد ذلك بكتابة نقطة النهاية الخاصة به.",
+      "DELETE_CONFIRM": "اكتب {{value}} لحذف مزوّد HTTP هذا."
     },
     "SECRETS": {
       "TYPES": "أنواع الأسرار",

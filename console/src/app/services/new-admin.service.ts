@@ -2,12 +2,16 @@ import { Injectable } from '@angular/core';
 import { GrpcService } from './grpc.service';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import {
+  AddEmailProviderHTTPRequestSchema,
   AddEmailProviderSMTPRequestSchema,
+  AddSMSProviderHTTPRequestSchema,
   GetDefaultOrgResponse,
   GetMyInstanceResponse,
   SetUpOrgRequestSchema,
   TestEmailProviderSMTPRequestSchema,
+  UpdateEmailProviderHTTPRequestSchema,
   UpdateEmailProviderSMTPRequestSchema,
+  UpdateSMSProviderHTTPRequestSchema,
 } from '@zitadel/proto/zitadel/admin_pb';
 import { injectQuery, queryOptions, skipToken } from '@tanstack/angular-query-experimental';
 import { NewAuthService } from './new-auth.service';
@@ -65,6 +69,22 @@ export class NewAdminService {
 
   public updateEmailProviderSMTP(req: MessageInitShape<typeof UpdateEmailProviderSMTPRequestSchema>) {
     return this.grpcService.adminNew.updateEmailProviderSMTP(req);
+  }
+
+  public addEmailProviderHTTP(req: MessageInitShape<typeof AddEmailProviderHTTPRequestSchema>) {
+    return this.grpcService.adminNew.addEmailProviderHTTP(req);
+  }
+
+  public updateEmailProviderHTTP(req: MessageInitShape<typeof UpdateEmailProviderHTTPRequestSchema>) {
+    return this.grpcService.adminNew.updateEmailProviderHTTP(req);
+  }
+
+  public addSMSProviderHTTP(req: MessageInitShape<typeof AddSMSProviderHTTPRequestSchema>) {
+    return this.grpcService.adminNew.addSMSProviderHTTP(req);
+  }
+
+  public updateSMSProviderHTTP(req: MessageInitShape<typeof UpdateSMSProviderHTTPRequestSchema>) {
+    return this.grpcService.adminNew.updateSMSProviderHTTP(req);
   }
 
   public activateSMTPConfig(id: string) {

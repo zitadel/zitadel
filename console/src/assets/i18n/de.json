@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "SMS-Einstellungen",
-        "DESCRIPTION": "Um alle Zitadel-Funktionen zu nutzen, konfiguriere Twilio, um SMS-Nachrichten an deine Benutzer zu senden."
+        "DESCRIPTION": "Um alle Zitadel-Funktionen zu nutzen, konfiguriere Twilio oder deinen eigenen HTTP-Endpunkt, um SMS-Nachrichten an deine Benutzer zu senden."
       },
       "IAM_EVENTS": {
         "TITLE": "Ereignisse",
@@ -1603,6 +1603,25 @@
         "SETTOKEN": "Token setzen",
         "TOKENSET": "Token erfolgreich gesetzt."
       }
+    },
+    "HTTPPROVIDER": {
+      "ADD_TITLE": "HTTP-Anbieter hinzufügen",
+      "EDIT_TITLE": "HTTP-Anbieter bearbeiten",
+      "EMAIL_DESCRIPTION": "Statt SMTP zu verwenden, sendet Zitadel jede E-Mail als signierte JSON-Anfrage an deinen Endpunkt. Dein Dienst erstellt und versendet die Nachricht.",
+      "SMS_DESCRIPTION": "Zitadel sendet jede SMS als signierte JSON-Anfrage an deinen Endpunkt. Dein Dienst versendet die Nachricht.",
+      "ENDPOINT": "Endpunkt",
+      "ENDPOINT_INVALID": "Gib eine http://- oder https://-URL ein.",
+      "DESCRIPTION": "Beschreibung",
+      "SIGNINGKEY": "Signaturschlüssel",
+      "SIGNINGKEY_DESCRIPTION": "Jede Anfrage enthält einen ZITADEL-Signature-Header, der mit dem Schlüssel dieses Anbieters signiert ist. Prüfe ihn in deinem Dienst.",
+      "SIGNINGKEY_STORE": "Kopiere den Signaturschlüssel und bewahre ihn sicher auf. Dein Dienst braucht ihn, um den ZITADEL-Signature-Header zu prüfen.",
+      "REGENERATE_SIGNINGKEY": "Neuen Signaturschlüssel erzeugen. Der aktuelle Schlüssel ist sofort ungültig.",
+      "ADDED": "HTTP-Anbieter hinzugefügt.",
+      "UPDATED": "HTTP-Anbieter aktualisiert.",
+      "REMOVED": "HTTP-Anbieter entfernt.",
+      "DELETE_TITLE": "HTTP-Anbieter löschen",
+      "DELETE_DESCRIPTION": "Du bist dabei, einen HTTP-Anbieter zu löschen. Bestätige, indem du seinen Endpunkt eingibst.",
+      "DELETE_CONFIRM": "Gib {{value}} ein, um diesen HTTP-Anbieter zu löschen."
     },
     "SECRETS": {
       "TYPES": "Schlüsseltypen",

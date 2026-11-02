@@ -4,7 +4,9 @@
 
 .sms-providers {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem 0;
+  align-items: flex-start;
 
   .sms-card {
     margin-right: 1rem;
@@ -30,6 +32,13 @@
       .fill-space {
         flex: 1;
       }
+    }
+
+    .sms-endpoint {
+      max-width: 350px;
+      margin: 0.5rem 0 0;
+      font-size: 13px;
+      overflow-wrap: anywhere;
     }
   }
 }

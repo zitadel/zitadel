@@ -59,5 +59,57 @@
         </button>
       </div>
     </cnsl-card>
+
+    <cnsl-card class="sms-card" [nomargin]="true">
+      <div class="sms-provider">
+        <h4 class="title">HTTP</h4>
+        @if (http) {
+          <span
+            class="state"
+            [ngClass]="{
+              active: http.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_ACTIVE,
+              inactive: http.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_INACTIVE,
+            }"
+            >{{ 'SETTING.SMS.SMSPROVIDERSTATE.' + http.state | translate }}</span
+          >
+        }
+        <span class="fill-space"></span>
+        @if (http && http.id) {
+          <button
+            [disabled]="(['iam.write'] | hasRole | async) === false"
+            mat-stroked-button
+            data-e2e="activate-http-sms-provider-button"
+            (click)="toggleSMSProviderState(http.id)"
+          >
+            @if (http.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_ACTIVE) {
+              <span>{{ 'ACTIONS.DEACTIVATE' | translate }}</span>
+            }
+            @if (http.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_INACTIVE) {
+              <span>{{ 'ACTIONS.ACTIVATE' | translate }}</span>
+            }
+          </button>
+          <button
+            color="warn"
+            [disabled]="(['iam.write'] | hasRole | async) === false"
+            mat-icon-button
+            (click)="removeSMSProvider(http.id, 'SETTING.HTTPPROVIDER.REMOVED')"
+            data-e2e="remove-http-sms-provider-button"
+          >
+            <i class="las la-trash"></i>
+          </button>
+        }
+        <button
+          [disabled]="(['iam.write'] | hasRole | async) === false"
+          mat-icon-button
+          (click)="editHttpProvider()"
+          data-e2e="new-http-sms-provider-button"
+        >
+          <i class="las la-pen"></i>
+        </button>
+      </div>
+      @if (http?.http?.endpoint) {
+        <p class="cnsl-secondary-text sms-endpoint">{{ http?.http?.endpoint }}</p>
+      }
+    </cnsl-card>
   </div>
 }

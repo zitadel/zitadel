@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "Configuración de SMS",
-        "DESCRIPTION": "Para desbloquear todas las características de Zitadel, configura Twilio para enviar mensajes SMS a tus usuarios."
+        "DESCRIPTION": "Para desbloquear todas las funciones de Zitadel, configura Twilio o tu propio endpoint HTTP para enviar mensajes SMS a tus usuarios."
       },
       "IAM_EVENTS": {
         "TITLE": "Eventos",
@@ -1604,6 +1604,25 @@
         "SETTOKEN": "Establecer token",
         "TOKENSET": "Token establecido con éxito."
       }
+    },
+    "HTTPPROVIDER": {
+      "ADD_TITLE": "Añadir proveedor HTTP",
+      "EDIT_TITLE": "Editar proveedor HTTP",
+      "EMAIL_DESCRIPTION": "En lugar de usar SMTP, Zitadel envía cada correo como una solicitud JSON firmada a tu endpoint. Tu servicio genera y entrega el mensaje.",
+      "SMS_DESCRIPTION": "Zitadel envía cada SMS como una solicitud JSON firmada a tu endpoint. Tu servicio entrega el mensaje.",
+      "ENDPOINT": "Endpoint",
+      "ENDPOINT_INVALID": "Introduce una URL que empiece por http:// o https://.",
+      "DESCRIPTION": "Descripción",
+      "SIGNINGKEY": "Clave de firma",
+      "SIGNINGKEY_DESCRIPTION": "Cada solicitud incluye una cabecera ZITADEL-Signature firmada con la clave de este proveedor. Verifícala en tu servicio.",
+      "SIGNINGKEY_STORE": "Copia la clave de firma y guárdala de forma segura. Tu servicio la necesita para verificar la cabecera ZITADEL-Signature.",
+      "REGENERATE_SIGNINGKEY": "Generar una nueva clave de firma. La clave actual deja de funcionar de inmediato.",
+      "ADDED": "Proveedor HTTP añadido.",
+      "UPDATED": "Proveedor HTTP actualizado.",
+      "REMOVED": "Proveedor HTTP eliminado.",
+      "DELETE_TITLE": "Eliminar proveedor HTTP",
+      "DELETE_DESCRIPTION": "Vas a eliminar un proveedor HTTP. Confírmalo escribiendo su endpoint.",
+      "DELETE_CONFIRM": "Escribe {{value}} para eliminar este proveedor HTTP."
     },
     "SECRETS": {
       "TYPES": "Tipos de secreto",

@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "Nastavení SMS",
-        "DESCRIPTION": "Pro odemčení všech funkcí Zitadel nakonfigurujte Twilio pro odesílání SMS zpráv vašim uživatelům."
+        "DESCRIPTION": "Chcete-li odemknout všechny funkce Zitadel, nakonfigurujte Twilio nebo vlastní HTTP endpoint pro odesílání SMS zpráv vašim uživatelům."
       },
       "IAM_EVENTS": {
         "TITLE": "Události",
@@ -1603,6 +1603,25 @@
         "SETTOKEN": "Nastavit token",
         "TOKENSET": "Token byl úspěšně nastaven."
       }
+    },
+    "HTTPPROVIDER": {
+      "ADD_TITLE": "Přidat poskytovatele HTTP",
+      "EDIT_TITLE": "Upravit poskytovatele HTTP",
+      "EMAIL_DESCRIPTION": "Místo SMTP posílá Zitadel každý e-mail jako podepsaný JSON požadavek na váš endpoint. Vaše služba zprávu sestaví a doručí.",
+      "SMS_DESCRIPTION": "Zitadel posílá každou SMS jako podepsaný JSON požadavek na váš endpoint. Vaše služba zprávu doručí.",
+      "ENDPOINT": "Endpoint",
+      "ENDPOINT_INVALID": "Zadejte URL začínající http:// nebo https://.",
+      "DESCRIPTION": "Popis",
+      "SIGNINGKEY": "Podpisový klíč",
+      "SIGNINGKEY_DESCRIPTION": "Každý požadavek obsahuje hlavičku ZITADEL-Signature podepsanou klíčem tohoto poskytovatele. Ověřte ji ve své službě.",
+      "SIGNINGKEY_STORE": "Zkopírujte podpisový klíč a bezpečně jej uložte. Vaše služba jej potřebuje k ověření hlavičky ZITADEL-Signature.",
+      "REGENERATE_SIGNINGKEY": "Vygenerovat nový podpisový klíč. Současný klíč okamžitě přestane platit.",
+      "ADDED": "Poskytovatel HTTP byl přidán.",
+      "UPDATED": "Poskytovatel HTTP byl aktualizován.",
+      "REMOVED": "Poskytovatel HTTP byl odebrán.",
+      "DELETE_TITLE": "Smazat poskytovatele HTTP",
+      "DELETE_DESCRIPTION": "Chystáte se smazat poskytovatele HTTP. Potvrďte zadáním jeho endpointu.",
+      "DELETE_CONFIRM": "Zadejte {{value}} pro smazání tohoto poskytovatele HTTP."
     },
     "SECRETS": {
       "TYPES": "Typy tajemství",
