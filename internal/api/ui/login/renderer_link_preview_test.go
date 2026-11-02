@@ -98,6 +98,32 @@ func TestLogin_applyLinkPreview(t *testing.T) {
 	}
 }
 
+func TestLogin_applyLinkPreview_afterPageTextChange(t *testing.T) {
+	l := &Login{renderer: &Renderer{pathPrefix: HandlerPrefix}}
+	r := httptest.NewRequest(http.MethodGet, "/ui/login/mfa/verify", nil)
+
+	t.Run("defaults follow the final page text", func(t *testing.T) {
+		data := l.applyLinkPreview(r, baseData{})
+		data.Title = "Verify TOTP"
+		data.Description = "Enter the code"
+		data = l.applyLinkPreview(r, data)
+		assert.Equal(t, "Verify TOTP", data.OpenGraphTitle)
+		assert.Equal(t, "Enter the code", data.OpenGraphDescription)
+	})
+
+	t.Run("custom values win over the final page text", func(t *testing.T) {
+		policy := &domain.LabelPolicy{LinkPreviewTitle: "Acme", LinkPreviewDescription: "Sign in to Acme"}
+		data := l.applyLinkPreview(r, baseData{LabelPolicy: policy})
+		data.Title = "Verify TOTP"
+		data.Description = "Enter the code"
+		data = l.applyLinkPreview(r, data)
+		assert.Equal(t, "Verify TOTP", data.Title)
+		assert.Equal(t, "Sign in to Acme", data.Description)
+		assert.Equal(t, "Acme", data.OpenGraphTitle)
+		assert.Equal(t, "Sign in to Acme", data.OpenGraphDescription)
+	})
+}
+
 func TestMainTemplate_linkPreviewTags(t *testing.T) {
 	stub := func(...any) string { return "" }
 	tmpl := template.Must(template.New("").Funcs(template.FuncMap{
