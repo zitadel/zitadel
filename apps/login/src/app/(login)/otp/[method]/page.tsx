@@ -4,6 +4,7 @@ import { LoginOTP } from "@/components/login-otp";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
+import { getLoginPageMetadata, type LoginPageMetadataProps } from "@/lib/login-metadata";
 import { getPublicHost } from "@/lib/server/host";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
@@ -12,9 +13,9 @@ import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata(props: LoginPageMetadataProps): Promise<Metadata> {
   const t = await getTranslations("otp");
-  return { title: t("verify.title") };
+  return getLoginPageMetadata(props, t("verify.title"));
 }
 
 export default async function Page(props: {

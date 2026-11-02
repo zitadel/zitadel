@@ -5,6 +5,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
+import { getLoginPageMetadata, type LoginPageMetadataProps } from "@/lib/login-metadata";
 import { getServiceConfig } from "@/lib/service-url";
 import { hasVerifiedPrimaryFactor, loadMostRecentSession } from "@/lib/session";
 import {
@@ -21,9 +22,9 @@ import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata(props: LoginPageMetadataProps): Promise<Metadata> {
   const t = await getTranslations("mfa");
-  return { title: t("set.title") };
+  return getLoginPageMetadata(props, t("set.title"));
 }
 
 export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {

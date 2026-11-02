@@ -3,12 +3,20 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { checkDeviceCodeCheckCookie } from "@/lib/device-code-check";
+import { getLoginPageMetadata, type LoginPageMetadataProps } from "@/lib/login-metadata";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession, loadSessionById } from "@/lib/session";
 import { getBrandingSettings, getDefaultOrg, getDeviceAuthorizationRequest } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+
+export async function generateMetadata(props: LoginPageMetadataProps): Promise<Metadata> {
+  const t = await getTranslations("common");
+  return getLoginPageMetadata(props, t("title"), { fallbackToDefaultOrganization: true });
+}
 
 export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;

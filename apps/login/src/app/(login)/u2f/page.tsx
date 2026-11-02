@@ -4,6 +4,7 @@ import { LoginPasskey } from "@/components/login-passkey";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
+import { getLoginPageMetadata, type LoginPageMetadataProps } from "@/lib/login-metadata";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getSession } from "@/lib/zitadel";
@@ -11,9 +12,9 @@ import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata(props: LoginPageMetadataProps): Promise<Metadata> {
   const t = await getTranslations("u2f");
-  return { title: t("verify.title") };
+  return getLoginPageMetadata(props, t("verify.title"));
 }
 
 export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {

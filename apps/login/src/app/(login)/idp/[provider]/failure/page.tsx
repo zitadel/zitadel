@@ -3,11 +3,19 @@ import { ChooseAuthenticatorToLogin } from "@/components/choose-authenticator-to
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
+import { getLoginPageMetadata, type LoginPageMetadataProps } from "@/lib/login-metadata";
 import { getServiceConfig } from "@/lib/service-url";
 import { getBrandingSettings, getLoginSettings, getUserByID, listAuthenticationMethodTypes } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+
+export async function generateMetadata(props: LoginPageMetadataProps): Promise<Metadata> {
+  const t = await getTranslations("common");
+  return getLoginPageMetadata(props, t("title"));
+}
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;

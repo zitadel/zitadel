@@ -1,13 +1,21 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterFormIDPIncomplete } from "@/components/register-form-idp-incomplete";
 import { Translated } from "@/components/translated";
+import { getLoginPageMetadata, type LoginPageMetadataProps } from "@/lib/login-metadata";
 import { getServiceConfig } from "@/lib/service-url";
 import { getBrandingSettings } from "@/lib/zitadel";
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 /**
  * Complete registration page - shown when manual user registration is required
  */
+export async function generateMetadata(props: LoginPageMetadataProps): Promise<Metadata> {
+  const t = await getTranslations("common");
+  return getLoginPageMetadata(props, t("title"));
+}
+
 export default async function CompleteRegistrationPage(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
   params: Promise<{ provider: string }>;

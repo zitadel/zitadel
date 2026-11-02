@@ -4,6 +4,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { resolveRedirectUri } from "@/lib/client";
+import { getLoginPageMetadata, type LoginPageMetadataProps } from "@/lib/login-metadata";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession, loadSessionById } from "@/lib/session";
 import { getBrandingSettings, getLoginSettings } from "@/lib/zitadel";
@@ -12,9 +13,9 @@ import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import Link from "next/link";
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata(props: LoginPageMetadataProps): Promise<Metadata> {
   const t = await getTranslations("signedin");
-  return { title: t("title", { user: "" }) };
+  return getLoginPageMetadata(props, t("title", { user: "" }));
 }
 
 export default async function Page(props: { searchParams: Promise<any> }) {
