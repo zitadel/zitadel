@@ -1,8 +1,8 @@
 import { LANGS, LANGUAGE_COOKIE_NAME, LANGUAGE_HEADER_NAME } from "@/lib/i18n";
+import { mergeMessages } from "@/lib/merge-messages";
 import { getServiceConfig } from "@/lib/service-url";
 import { getAllowedLanguages, getHostedLoginTranslation } from "@/lib/zitadel";
 import { JsonObject } from "@zitadel/client";
-import deepmerge from "deepmerge";
 import { getRequestConfig } from "next-intl/server";
 import { cookies, headers } from "next/headers";
 
@@ -85,6 +85,6 @@ export default getRequestConfig(async () => {
 
   return {
     locale,
-    messages: deepmerge.all([fallbackMessages, localeMessages, customMessages]) as Record<string, string>,
+    messages: mergeMessages(fallbackMessages, localeMessages, customMessages) as Record<string, string>,
   };
 });
