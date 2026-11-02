@@ -16,6 +16,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/i18n"
@@ -411,7 +412,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, transl
 		baseData.LabelPolicy = authReq.LabelPolicy
 		baseData.IDPProviders = authReq.AllowedExternalIDPs
 		if authReq.PrivacyPolicy == nil {
-			return baseData
+			return l.applyLinkPreview(r, baseData)
 		}
 		privacyPolicy = authReq.PrivacyPolicy
 	} else {
@@ -421,7 +422,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, transl
 		}
 		policy, err := l.query.DefaultPrivacyPolicy(r.Context(), false)
 		if err != nil {
-			return baseData
+			return l.applyLinkPreview(r, baseData)
 		}
 		privacyPolicy = policy.ToDomain()
 	}
@@ -429,7 +430,43 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, transl
 	baseData.ThemeClass = l.getThemeClass(r, baseData.LabelPolicy)
 	baseData.DarkMode = l.isDarkMode(r, baseData.LabelPolicy)
 	baseData = l.setLinksOnBaseData(baseData, privacyPolicy)
-	return baseData
+	return l.applyLinkPreview(r, baseData)
+}
+
+func (l *Login) applyLinkPreview(r *http.Request, data baseData) baseData {
+	data.OpenGraphTitle = data.Title
+	data.OpenGraphDescription = data.Description
+	data.TwitterCard = "summary"
+	if data.LabelPolicy == nil {
+		return data
+	}
+	if data.LabelPolicy.LinkPreviewTitle != "" {
+		data.OpenGraphTitle = data.LabelPolicy.LinkPreviewTitle
+	}
+	if data.LabelPolicy.LinkPreviewDescription != "" {
+		data.OpenGraphDescription = data.LabelPolicy.LinkPreviewDescription
+		data.Description = data.LabelPolicy.LinkPreviewDescription
+	}
+	if data.LabelPolicy.LinkPreviewImageURL == "" {
+		return data
+	}
+	data.OpenGraphImage = l.linkPreviewImageURL(r, data.LabelPolicy, data.PrivateLabelingOrgID)
+	if data.OpenGraphImage != "" {
+		data.TwitterCard = "summary_large_image"
+	}
+	return data
+}
+
+func (l *Login) linkPreviewImageURL(r *http.Request, policy *domain.LabelPolicy, orgID string) string {
+	rel := path.Join(l.renderer.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default, "filename", policy.LinkPreviewImageURL))
+	if !strings.HasPrefix(rel, "/") {
+		rel = "/" + rel
+	}
+	domainCtx := http_util.DomainContext(r.Context())
+	if domainCtx.Protocol == "" || domainCtx.RequestedHost() == "" {
+		return ""
+	}
+	return domainCtx.Origin() + rel
 }
 
 func (l *Login) getTranslator(ctx context.Context, authReq *domain.AuthRequest) *i18n.Translator {
@@ -639,6 +676,10 @@ type baseData struct {
 	Lang                   string
 	Title                  string
 	Description            string
+	OpenGraphTitle         string
+	OpenGraphDescription   string
+	OpenGraphImage         string
+	TwitterCard            string
 	Theme                  string
 	ThemeMode              domain.LabelPolicyThemeMode
 	ThemeClass             string
