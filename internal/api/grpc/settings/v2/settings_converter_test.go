@@ -288,12 +288,15 @@ func Test_brandingSettingsToPb(t *testing.T) {
 			LogoURL:         "dark-logo",
 			IconURL:         "dark-icon",
 		},
-		ResourceOwner:       "me",
-		FontURL:             "fonts",
-		WatermarkDisabled:   true,
-		HideLoginNameSuffix: true,
-		ThemeMode:           domain.LabelPolicyThemeDark,
-		IsDefault:           true,
+		ResourceOwner:          "me",
+		FontURL:                "fonts",
+		WatermarkDisabled:      true,
+		HideLoginNameSuffix:    true,
+		ThemeMode:              domain.LabelPolicyThemeDark,
+		IsDefault:              true,
+		LinkPreviewTitle:       "Acme",
+		LinkPreviewDescription: "Sign in to Acme",
+		LinkPreviewImageURL:    "preview.png",
 	}
 	want := &settings.BrandingSettings{
 		LightTheme: &settings.Theme{
@@ -312,11 +315,14 @@ func Test_brandingSettingsToPb(t *testing.T) {
 			LogoUrl:         "http://example.com/me/dark-logo",
 			IconUrl:         "http://example.com/me/dark-icon",
 		},
-		FontUrl:             "http://example.com/me/fonts",
-		DisableWatermark:    true,
-		HideLoginNameSuffix: true,
-		ResourceOwnerType:   settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE,
-		ThemeMode:           settings.ThemeMode_THEME_MODE_DARK,
+		FontUrl:                "http://example.com/me/fonts",
+		DisableWatermark:       true,
+		HideLoginNameSuffix:    true,
+		ResourceOwnerType:      settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE,
+		ThemeMode:              settings.ThemeMode_THEME_MODE_DARK,
+		LinkPreviewTitle:       "Acme",
+		LinkPreviewDescription: "Sign in to Acme",
+		LinkPreviewImageUrl:    "http://example.com/me/preview.png",
 	}
 
 	got := brandingSettingsToPb(arg, "http://example.com")

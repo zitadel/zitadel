@@ -34,6 +34,21 @@ Services:
             Comment:
             Type: preview
             Permission: iam.policy.read
+      DefaultLabelPolicyLinkPreviewImage:
+        Path: "/policy/label/link_preview_image"
+        Handlers:
+          - Name: Upload
+            Comment:
+            Type: upload
+            Permission: iam.policy.write
+          - Name: Get
+            Comment:
+            Type: download
+            Permission: iam.policy.read
+          - Name: GetPreview
+            Comment:
+            Type: preview
+            Permission: iam.policy.read
       DefaultLabelPolicyFont:
         Path: "/policy/label/font"
         Handlers:
@@ -71,6 +86,21 @@ Services:
       OrgLabelPolicyIcon:
         Path: "/policy/label/icon"
         HasDarkMode: true
+        Handlers:
+          - Name: Upload
+            Comment:
+            Type: upload
+            Permission: policy.write
+          - Name: Get
+            Comment:
+            Type: download
+            Permission: policy.read
+          - Name: GetPreview
+            Comment:
+            Type: preview
+            Permission: policy.read
+      OrgLabelPolicyLinkPreviewImage:
+        Path: "/policy/label/link_preview_image"
         Handlers:
           - Name: Upload
             Comment:

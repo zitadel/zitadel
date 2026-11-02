@@ -13,6 +13,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
@@ -367,17 +368,19 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 	t.Run("test policy label change", func(t *testing.T) {
 		before := time.Now()
 		_, err := newInstance.Client.Admin.UpdateLabelPolicy(IAMCTX, &admin.UpdateLabelPolicyRequest{
-			PrimaryColor:        "#055000",
-			HideLoginNameSuffix: true,
-			WarnColor:           "#055000",
-			BackgroundColor:     "#055000",
-			FontColor:           "#055000",
-			PrimaryColorDark:    "#055000",
-			BackgroundColorDark: "#055000",
-			WarnColorDark:       "#055000",
-			FontColorDark:       "#055000",
-			DisableWatermark:    true,
-			ThemeMode:           policy.ThemeMode_THEME_MODE_LIGHT,
+			PrimaryColor:           "#055000",
+			HideLoginNameSuffix:    true,
+			WarnColor:              "#055000",
+			BackgroundColor:        "#055000",
+			FontColor:              "#055000",
+			PrimaryColorDark:       "#055000",
+			BackgroundColorDark:    "#055000",
+			WarnColorDark:          "#055000",
+			FontColorDark:          "#055000",
+			DisableWatermark:       true,
+			ThemeMode:              policy.ThemeMode_THEME_MODE_LIGHT,
+			LinkPreviewTitle:       gu.Ptr("Acme"),
+			LinkPreviewDescription: gu.Ptr("Sign in to Acme"),
 		})
 		require.NoError(t, err)
 		after := time.Now()
@@ -407,6 +410,8 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			assert.Equal(collect, false, *setting.ErrorMsgPopup)
 			assert.Equal(collect, true, *setting.DisableWatermark)
 			assert.Equal(collect, domain.BrandingPolicyThemeLight, *setting.ThemeMode)
+			assert.Equal(collect, "Acme", *setting.LinkPreviewTitle)
+			assert.Equal(collect, "Sign in to Acme", *setting.LinkPreviewDescription)
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -663,6 +668,51 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 
 			// event instance.policy.label.font.removed
 			assert.Equal(collect, url.URL{}, *setting.FontURL)
+			assert.Equal(collect, domain.SettingStatePreview, setting.State)
+			assert.WithinRange(collect, setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test policy link preview image added", func(t *testing.T) {
+		before := time.Now()
+		uploadInstanceAsset(IAMCTX, t, newInstance, "/instance/policy/label/link_preview_image", bytes.NewReader(picture))
+		after := time.Now()
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStatePreview),
+				),
+			)
+			require.NoError(collect, err)
+
+			// event instance.policy.label.linkpreviewimage.added
+			assert.NotNil(collect, setting.LinkPreviewImageURL)
+			assert.Equal(collect, domain.SettingStatePreview, setting.State)
+			assert.WithinRange(collect, setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test policy link preview image removed", func(t *testing.T) {
+		before := time.Now()
+		_, err := newInstance.Client.Admin.RemoveLabelPolicyLinkPreviewImage(IAMCTX, &admin.RemoveLabelPolicyLinkPreviewImageRequest{})
+		require.NoError(t, err)
+		after := time.Now()
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), nil, domain.SettingTypeBranding, domain.SettingStatePreview),
+				),
+			)
+			require.NoError(collect, err)
+
+			// event instance.policy.label.linkpreviewimage.removed
+			assert.Equal(collect, url.URL{}, *setting.LinkPreviewImageURL)
 			assert.Equal(collect, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(collect, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)

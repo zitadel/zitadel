@@ -24,9 +24,12 @@ func ModelLabelPolicyToPb(policy *query.LabelPolicy, assetPrefix string) *policy
 		IconUrl:             domain.AssetURL(assetPrefix, policy.ResourceOwner, policy.Light.IconURL),
 		IconUrlDark:         domain.AssetURL(assetPrefix, policy.ResourceOwner, policy.Dark.IconURL),
 
-		DisableWatermark:    policy.WatermarkDisabled,
-		HideLoginNameSuffix: policy.HideLoginNameSuffix,
-		ThemeMode:           themeModeToPb(policy.ThemeMode),
+		DisableWatermark:       policy.WatermarkDisabled,
+		HideLoginNameSuffix:    policy.HideLoginNameSuffix,
+		ThemeMode:              themeModeToPb(policy.ThemeMode),
+		LinkPreviewTitle:       policy.LinkPreviewTitle,
+		LinkPreviewDescription: policy.LinkPreviewDescription,
+		LinkPreviewImageUrl:    domain.AssetURL(assetPrefix, policy.ResourceOwner, policy.LinkPreviewImageURL),
 		Details: object.ToViewDetailsPb(
 			policy.Sequence,
 			policy.CreationDate,

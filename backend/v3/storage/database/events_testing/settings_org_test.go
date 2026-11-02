@@ -428,17 +428,19 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 	t.Run("test policy label change", func(t *testing.T) {
 		before := time.Now()
 		_, err := newInstance.Client.Mgmt.UpdateCustomLabelPolicy(IAMCTX, &management.UpdateCustomLabelPolicyRequest{
-			PrimaryColor:        "#055000",
-			HideLoginNameSuffix: true,
-			WarnColor:           "#055000",
-			BackgroundColor:     "#055000",
-			FontColor:           "#055000",
-			PrimaryColorDark:    "#055000",
-			BackgroundColorDark: "#055000",
-			WarnColorDark:       "#055000",
-			FontColorDark:       "#055000",
-			DisableWatermark:    true,
-			ThemeMode:           policy.ThemeMode_THEME_MODE_LIGHT,
+			PrimaryColor:           "#055000",
+			HideLoginNameSuffix:    true,
+			WarnColor:              "#055000",
+			BackgroundColor:        "#055000",
+			FontColor:              "#055000",
+			PrimaryColorDark:       "#055000",
+			BackgroundColorDark:    "#055000",
+			WarnColorDark:          "#055000",
+			FontColorDark:          "#055000",
+			DisableWatermark:       true,
+			ThemeMode:              policy.ThemeMode_THEME_MODE_LIGHT,
+			LinkPreviewTitle:       gu.Ptr("Acme"),
+			LinkPreviewDescription: gu.Ptr("Sign in to Acme"),
 		})
 		require.NoError(t, err)
 		after := time.Now()
@@ -454,6 +456,8 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event org.policy.label.change
+			assert.Equal(t, "Acme", *setting.LinkPreviewTitle)
+			assert.Equal(t, "Sign in to Acme", *setting.LinkPreviewDescription)
 			assert.Equal(t, "#055000", *setting.PrimaryColorLight)
 			assert.Equal(t, "#055000", *setting.BackgroundColorLight)
 			assert.Equal(t, "#055000", *setting.WarnColorLight)
@@ -730,6 +734,51 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 
 			// event org.policy.label.font.removed
 			assert.Equal(t, url.URL{}, *setting.FontURL)
+			assert.Equal(t, domain.SettingStatePreview, setting.State)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test policy link preview image added", func(t *testing.T) {
+		before := time.Now()
+		uploadOrganizationAsset(IAMCTX, t, newInstance, "/org/policy/label/link_preview_image", bytes.NewReader(picture))
+		after := time.Now()
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
+				),
+			)
+			require.NoError(t, err)
+
+			// event org.policy.label.linkpreviewimage.added
+			assert.NotNil(t, setting.LinkPreviewImageURL)
+			assert.Equal(t, domain.SettingStatePreview, setting.State)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test policy link preview image removed", func(t *testing.T) {
+		before := time.Now()
+		_, err := newInstance.Client.Mgmt.RemoveCustomLabelPolicyLinkPreviewImage(IAMCTX, &management.RemoveCustomLabelPolicyLinkPreviewImageRequest{})
+		require.NoError(t, err)
+		after := time.Now()
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeBranding, domain.SettingStatePreview),
+				),
+			)
+			require.NoError(t, err)
+
+			// event org.policy.label.linkpreviewimage.removed
+			assert.Equal(t, url.URL{}, *setting.LinkPreviewImageURL)
 			assert.Equal(t, domain.SettingStatePreview, setting.State)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
