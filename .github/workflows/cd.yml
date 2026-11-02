@@ -1,0 +1,129 @@
+name: Deploy to test on main merge
+
+on:
+  pull_request:
+    branches: [main]
+    types:
+      - closed
+
+concurrency:
+  group: deploy-test
+  cancel-in-progress: false
+
+env:
+  ENVIRONMENT: test
+  # Service folder in the gitops repo: configs/backend/vars/<env>.json.
+  SERVICE_NAME: backend
+  # Deploy the exact image CI built on this PR. ci.yml tags by the PR head SHA,
+  # so reuse that tag rather than the merge commit (which has no image).
+  IMAGE_TAG: ${{ github.event.pull_request.head.sha }}
+  ECR_REPOSITORY_NAME: legacy-collect-backend
+  ECS_GITOPS_PATH: ecs-gitops
+  # Gitops repo in this org (owner = github.repository_owner).
+  ECS_GITOPS_REPO_NAME: legacy-collect-ecs-gitops
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  DEPLOY:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-24.04
+    environment: test
+    steps:
+      - name: In progress message
+        uses: actions/github-script@v8
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: Number(process.env.PR_NUMBER),
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `<b>TEST</b><br>Deployment started ...`,
+            });
+
+      - name: Initialize repository
+        uses: actions/checkout@v5
+
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # A merge can land without CI having pushed this image (admin bypass, a
+      # failed BUILD, a branch-protection gap). Fail before writing the gitops
+      # pointer rather than pointing test at an image that is not in ECR.
+      - name: Verify image exists in ECR
+        run: |
+          aws ecr describe-images \
+            --repository-name "$ECR_REPOSITORY_NAME" \
+            --image-ids imageTag="$IMAGE_TAG" \
+            > /dev/null
+          echo "Image $ECR_REPOSITORY_NAME:$IMAGE_TAG found, deploying to $ENVIRONMENT."
+
+      - name: Create gitops app token
+        uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ secrets.CI_BOT_APP_ID }}
+          private-key: ${{ secrets.CI_BOT_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ env.ECS_GITOPS_REPO_NAME }}
+
+      - name: Checkout gitops repo
+        uses: actions/checkout@v5
+        with:
+          repository: ${{ github.repository_owner }}/${{ env.ECS_GITOPS_REPO_NAME }}
+          token: ${{ steps.app-token.outputs.token }}
+          path: ecs-gitops
+          ref: test
+
+      - name: Configure Git
+        working-directory: ecs-gitops
+        run: |
+          git config --local user.email "automation@most.dev"
+          git config --local user.name "Legacy Collect Deployment Automation"
+
+      - name: Write image tag and push
+        run: task gitops:deploy
+
+      - name: Message success
+        if: ${{ success() }}
+        uses: actions/github-script@v8
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: Number(process.env.PR_NUMBER),
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `<b>TEST</b> Deployment succeeded ✅<br>ECS rolls out the new image shortly.<br>${process.env.RUN_URL}`,
+            });
+
+      - name: Message failure
+        if: ${{ failure() }}
+        uses: actions/github-script@v8
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: Number(process.env.PR_NUMBER),
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `<b>TEST</b> Deployment failed ❌<br>${process.env.RUN_URL}`,
+            });

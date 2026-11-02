@@ -1,0 +1,68 @@
+version: "3"
+
+vars:
+  REVIEW_OUTPUT_FILE: kiro-review.md
+  IMAGE_TAG: '{{.IMAGE_TAG | default "latest"}}'
+  ECS_GITOPS_PATH: '{{.ECS_GITOPS_PATH | default "ecs-gitops"}}'
+  SERVICE_NAME: '{{.SERVICE_NAME}}'
+  ECR_REGISTRY: '{{.ECR_REGISTRY}}'
+  ENVIRONMENT: '{{.ENVIRONMENT | default "test"}}'
+  GITOPS_BRANCH: '{{.GITOPS_BRANCH | default .ENVIRONMENT}}'
+  ECR_REPOSITORY_NAME: '{{.ECR_REPOSITORY_NAME}}'
+  FULL_IMAGE: "{{.ECR_REGISTRY}}/{{.ECR_REPOSITORY_NAME}}:{{.IMAGE_TAG}}"
+
+tasks:
+  default:
+    desc: List available tasks
+    cmds:
+      - task --list
+
+  build:
+    desc: Build the Docker image
+    vars:
+      DOCKER_PLATFORM: '{{.DOCKER_PLATFORM | default "linux/amd64"}}'
+    cmds:
+      - docker build --platform={{.DOCKER_PLATFORM}} --no-cache -t {{.FULL_IMAGE}} .
+
+  push:
+    desc: Push the image to ECR
+    cmds:
+      - cmd: echo "Pushing {{.FULL_IMAGE}}"
+        silent: true
+      - docker push {{.FULL_IMAGE}}
+
+  pull:
+    desc: Pull the image from ECR
+    cmds:
+      - cmd: echo "Pulling {{.FULL_IMAGE}}"
+        silent: true
+      - docker pull {{.FULL_IMAGE}}
+
+  ecs:tag-update:
+    desc: Update version tag in environment JSON
+    vars:
+      FILE: '{{.ECS_GITOPS_PATH}}/configs/{{.SERVICE_NAME}}/vars/{{.ENVIRONMENT}}.json'
+    preconditions:
+      - sh: command -v jq
+        msg: "jq is not installed."
+    cmds:
+      - jq --arg tag "{{.IMAGE_TAG}}" '.tag = $tag' {{.FILE}} > temp.json && mv temp.json {{.FILE}}
+      - cmd: echo "Updated {{.FILE}} with tag {{.IMAGE_TAG}}"
+        silent: true
+
+  ecs:commit:
+    desc: Commit ECS gitops changes
+    dir: '{{.ECS_GITOPS_PATH}}'
+    preconditions:
+      - sh: command -v git
+        msg: "git is not installed."
+    cmds:
+      - git add .
+      - git diff --cached --quiet && echo "No changes to commit" || git commit -m "Deployment({{.ENVIRONMENT}})/({{.SERVICE_NAME}})/({{.IMAGE_TAG}})"
+      - git push origin {{.GITOPS_BRANCH}}
+
+  gitops:deploy:
+    desc: Deploy tag to Ecspresso manifests
+    cmds:
+      - task: ecs:tag-update
+      - task: ecs:commit

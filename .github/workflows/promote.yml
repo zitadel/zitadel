@@ -1,0 +1,106 @@
+name: Promote image to prod
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        options: [prod]
+      image_tag:
+        description: "Image tag to promote (the full 40-char commit SHA CI built)"
+        required: true
+        type: string
+
+concurrency:
+  group: promote-${{ inputs.environment }}
+  cancel-in-progress: false
+
+env:
+  # Service folder in the gitops repo: configs/backend/vars/<env>.json.
+  SERVICE_NAME: backend
+  IMAGE_TAG: ${{ inputs.image_tag }}
+  ENVIRONMENT: ${{ inputs.environment }}
+  ECR_REPOSITORY_NAME: legacy-collect-backend
+  ECS_GITOPS_PATH: ecs-gitops
+  # Gitops repo in this org (owner = github.repository_owner).
+  ECS_GITOPS_REPO_NAME: legacy-collect-ecs-gitops
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  PROMOTE:
+    runs-on: ubuntu-24.04
+    # Binds the run to the GitHub Environment, which enforces its required-reviewer
+    # approval before any step runs.
+    environment: ${{ inputs.environment }}
+    steps:
+      # image_tag is free-text input flowing into a privileged job (AWS OIDC +
+      # gitops App token). Reject anything that is not a full commit SHA before it
+      # is used anywhere. It is read from env, never inlined into the script.
+      - name: Validate image tag
+        run: |
+          if ! printf '%s' "$IMAGE_TAG" | grep -Eq '^[0-9a-f]{40}$'; then
+            echo "image_tag must be a full 40-char lowercase hex commit SHA" >&2
+            exit 1
+          fi
+          echo "image_tag validated."
+
+      - name: Initialize repository
+        uses: actions/checkout@v5
+
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # Only an image CI actually built and pushed can be promoted. This is what
+      # makes "promote, don't rebuild" safe: a missing tag fails here.
+      - name: Verify image exists in ECR
+        run: |
+          aws ecr describe-images \
+            --repository-name "$ECR_REPOSITORY_NAME" \
+            --image-ids imageTag="$IMAGE_TAG" \
+            > /dev/null
+          echo "Image $ECR_REPOSITORY_NAME:$IMAGE_TAG found, promoting to $ENVIRONMENT."
+
+      - name: Create gitops app token
+        uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ secrets.CI_BOT_APP_ID }}
+          private-key: ${{ secrets.CI_BOT_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ env.ECS_GITOPS_REPO_NAME }}
+
+      - name: Checkout gitops repo
+        uses: actions/checkout@v5
+        with:
+          repository: ${{ github.repository_owner }}/${{ env.ECS_GITOPS_REPO_NAME }}
+          token: ${{ steps.app-token.outputs.token }}
+          path: ecs-gitops
+          ref: ${{ inputs.environment }}
+
+      - name: Configure Git
+        working-directory: ecs-gitops
+        run: |
+          git config --local user.email "automation@most.dev"
+          git config --local user.name "Legacy Collect Deployment Automation"
+
+      - name: Write image tag and push
+        run: task gitops:deploy
+
+      - name: Summary
+        run: |
+          echo "### Promoted \`$IMAGE_TAG\` to \`$ENVIRONMENT\` ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "The gitops \`$ENVIRONMENT\` branch now points at this image; ECS rolls it out." >> "$GITHUB_STEP_SUMMARY"

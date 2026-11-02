@@ -1,70 +1,110 @@
-name: CI 
+name: CI Build on Pull Request
 
 on:
-  push:
-    tags-ignore:
-      - "*"
-    branches:
-      - "main"
   pull_request:
-  workflow_dispatch:
+    branches: [main]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ci-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
+env:
+  # The image is tagged by the PR head commit SHA so the exact bytes tested here
+  # can be deployed to test on merge (cd.yml) and promoted to prod by tag
+  # (promote.yml) without a rebuild.
+  IMAGE_TAG: ${{ github.event.pull_request.head.sha }}
+  ECR_REPOSITORY_NAME: legacy-collect-backend
+
 permissions:
-  contents: write
-  packages: write
-  issues: write
+  id-token: write
+  contents: read
   pull-requests: write
 
 jobs:
-  lint_test_build:
-    uses: ./.github/workflows/lint_test_build.yml
-    if: ${{ github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
-    permissions:
-      contents: read
-    with:
-      node_version: "22"
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      NX_CLOUD_ACCESS_TOKEN_READONLY: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+  # Tests run on the runner, not inside the image build, so a Testcontainers
+  # suite has the Docker daemon it needs. BUILD depends on this job.
+  TEST:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Initialize repository
+        uses: actions/checkout@v5
 
-  pack:
-    uses: ./.github/workflows/pack.yml
-    permissions:
-      contents: write
-      packages: write
-    secrets:
-      GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
-    if: ${{ github.event_name == 'workflow_dispatch' }}
-    with:
-      node_version: "22"
-      semantic_version: "23.0.7"
-      image_name_github_api: "ghcr.io/zitadel/zitadel"
-      image_name_google_api: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
-      image_name_github_login: "ghcr.io/zitadel/zitadel-login"
-      image_name_google_login: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login"
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
 
-  release:
-    uses: ./.github/workflows/release.yml
-    permissions:
-      packages: write
-      contents: write
-      issues: write
-      pull-requests: write
-    needs:
-      - lint_test_build
-      - pack
-    if: ${{ github.event_name == 'workflow_dispatch' }}
-    secrets:
-      GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
-      APP_ID: ${{ secrets.APP_ID }}
-      APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
-    with:
-      semantic_version: "23.0.7"
-      image_name_github_api: "ghcr.io/zitadel/zitadel"
-      image_name_google_api: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
-      image_name_github_login: "ghcr.io/zitadel/zitadel-login"
-      image_name_google_login: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login"
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run build and tests
+        run: task test
+
+  # Multi-stage Dockerfile compiles the jar and ships a thin JRE image. The
+  # official action wires the GitHub Actions layer cache (type=gha), which a
+  # plain `docker buildx` run step cannot reach without the runtime token.
+  BUILD:
+    needs: [TEST]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Initialize repository
+        uses: actions/checkout@v5
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build & push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NAME }}:${{ env.IMAGE_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Message success
+        if: ${{ success() }}
+        uses: actions/github-script@v8
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: Number(process.env.PR_NUMBER),
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `Docker image is ready 💿 (\`${process.env.IMAGE_TAG}\`)<br>It is deployed to \`test\` when this PR is merged. Promote to prod via the Promote workflow.`,
+            });
+
+      - name: Message failure
+        if: ${{ failure() }}
+        uses: actions/github-script@v8
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: Number(process.env.PR_NUMBER),
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `Build failed ❌<br>${process.env.RUN_URL}`,
+            });
