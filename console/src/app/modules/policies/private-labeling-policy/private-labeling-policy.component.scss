@@ -337,3 +337,10 @@
   display: block;
   margin: 50px 0;
 }
+
+.link-preview-description {
+  min-height: 80px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.4;
+}

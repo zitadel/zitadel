@@ -193,6 +193,8 @@ import {
   RemoveIDPFromLoginPolicyResponse,
   RemoveLabelPolicyFontRequest,
   RemoveLabelPolicyFontResponse,
+  RemoveLabelPolicyLinkPreviewImageRequest,
+  RemoveLabelPolicyLinkPreviewImageResponse,
   RemoveLabelPolicyIconDarkRequest,
   RemoveLabelPolicyIconDarkResponse,
   RemoveLabelPolicyIconRequest,
@@ -1083,6 +1085,11 @@ export class AdminService {
   public removeLabelPolicyFont(): Promise<RemoveLabelPolicyFontResponse.AsObject> {
     const req = new RemoveLabelPolicyFontRequest();
     return this.grpcService.admin.removeLabelPolicyFont(req, null).then((resp) => resp.toObject());
+  }
+
+  public removeLabelPolicyLinkPreviewImage(): Promise<RemoveLabelPolicyLinkPreviewImageResponse.AsObject> {
+    const req = new RemoveLabelPolicyLinkPreviewImageRequest();
+    return this.grpcService.admin.removeLabelPolicyLinkPreviewImage(req, null).then((resp) => resp.toObject());
   }
 
   public removeLabelPolicyIcon(): Promise<RemoveLabelPolicyIconResponse.AsObject> {

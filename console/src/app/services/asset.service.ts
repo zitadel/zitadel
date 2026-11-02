@@ -21,6 +21,8 @@ export enum AssetType {
 export enum AssetEndpoint {
   IAMFONT = 'instance/policy/label/font',
   MGMTFONT = 'org/policy/label/font',
+  IAMLINKPREVIEW = 'instance/policy/label/link_preview_image',
+  MGMTLINKPREVIEW = 'org/policy/label/link_preview_image',
 
   IAMDARKLOGO = 'instance/policy/label/logo/dark',
   IAMLOGO = 'instance/policy/label/logo',

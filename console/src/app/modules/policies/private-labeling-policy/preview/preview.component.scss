@@ -31,6 +31,15 @@
       top: 0;
     }
 
+    .link-preview-thumb {
+      display: block;
+      width: 96px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 0.25rem;
+      margin: 0 0 0.75rem 0;
+    }
+
     .dashed {
       padding: 100px 20px;
 
