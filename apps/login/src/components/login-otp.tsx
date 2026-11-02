@@ -55,13 +55,8 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
     },
   });
 
-  const updateSessionForOTPChallenge = useCallback(async (): Promise<
-    | {
-        error?: string;
-        [key: string]: any;
-      }
-    | undefined
-  > => {
+  // resolves to the error to show to the user, if any
+  const updateSessionForOTPChallenge = useCallback(async (): Promise<string | undefined> => {
     let challenges;
 
     const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
@@ -99,22 +94,18 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
         requestId,
       });
     } catch {
-      return { error: t("errors.couldNotRequestChallenge") };
+      return t("errors.couldNotRequestChallenge");
     }
 
     if (response && "retryAfterSeconds" in response && response.retryAfterSeconds) {
+      // the code was either just sent or, if the server refused, sent moments ago (e.g. before a reload): the countdown covers both
       setResendCooldown(response.retryAfterSeconds);
-      // the server refused because a code was sent moments ago (e.g. after a reload), the countdown says enough
-      if ("error" in response && response.error) {
-        return;
-      }
+      return;
     }
 
-    if (response && "error" in response && response.error) {
-      return { error: response.error };
+    if (response && "error" in response) {
+      return response.error;
     }
-
-    return response;
   }, [method, host, requestId, loginName, sessionId, organization, t]);
 
   useEffect(() => {
@@ -130,9 +121,9 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
       initialized.current = true;
       setLoading(true);
       updateSessionForOTPChallenge()
-        .then((response) => {
-          if (response?.error) {
-            setError(response.error);
+        .then((challengeError) => {
+          if (challengeError) {
+            setError(challengeError);
           }
         })
         .finally(() => {
@@ -247,9 +238,9 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
                 className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
                 onClick={async () => {
                   setLoading(true);
-                  const response = await updateSessionForOTPChallenge();
-                  if (response?.error) {
-                    setError(response.error);
+                  const challengeError = await updateSessionForOTPChallenge();
+                  if (challengeError) {
+                    setError(challengeError);
                   }
                   setLoading(false);
                 }}

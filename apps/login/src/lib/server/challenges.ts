@@ -73,7 +73,8 @@ export function getOTPSMSRetryAfterSeconds(otpSmsSentTs: string | undefined, now
     return 0;
   }
 
-  const remainingMs = sentAt + getOTPSMSResendCooldownSeconds() * 1000 - now;
+  const cooldownSeconds = getOTPSMSResendCooldownSeconds();
+  const remainingSeconds = Math.ceil((sentAt + cooldownSeconds * 1000 - now) / 1000);
   // a timestamp in the future can only come from clock skew between replicas, cap it at the full cooldown
-  return Math.min(Math.max(Math.ceil(remainingMs / 1000), 0), getOTPSMSResendCooldownSeconds());
+  return Math.min(Math.max(remainingSeconds, 0), cooldownSeconds);
 }
