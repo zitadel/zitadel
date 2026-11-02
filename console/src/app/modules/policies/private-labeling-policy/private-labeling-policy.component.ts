@@ -258,7 +258,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
 
   public onDropLinkPreviewImage(filelist: FileList | null): Promise<any> | void {
     const file = filelist?.item(0);
-    if (!file) {
+    if (!file || this.view === View.CURRENT) {
       return;
     }
     const allowed = ['image/png', 'image/jpeg', 'image/webp'];
