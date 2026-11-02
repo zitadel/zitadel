@@ -710,7 +710,7 @@
           </cnsl-form-field>
           <cnsl-label>{{ 'POLICY.PRIVATELABELING.LINKPREVIEW_IMAGE' | translate }}</cnsl-label>
           <div class="fonts">
-            @if (view === View.CURRENT ? data.linkPreviewImageUrl : previewData.linkPreviewImageUrl) {
+            @if (view === View.CURRENT ? data.linkPreviewImageUrl : previewData.linkPreviewImageUrl && !isDefault) {
               <div class="font-preview">
                 <img
                   [src]="view === View.CURRENT ? data.linkPreviewImageUrl : previewData.linkPreviewImageUrl"
