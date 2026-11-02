@@ -146,6 +146,27 @@ message LabelPolicy {
     ];
     string font_url = 18;
     ThemeMode theme_mode = 19;
+    // Title used for link previews of the hosted login and the management console. Empty keeps the default ZITADEL title.
+    string link_preview_title = 20 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "title used for Open Graph link previews of the hosted login and the management console";
+            max_length: 120;
+        }
+    ];
+    // Description used for link previews of the hosted login and the management console. Empty keeps the default description.
+    string link_preview_description = 21 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "description used for Open Graph link previews of the hosted login and the management console";
+            max_length: 300;
+        }
+    ];
+    // Absolute URL of the raster image used for link previews.
+    string link_preview_image_url = 22 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "absolute URL of the link preview image";
+            example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/link_preview_image-180950416321494657\"";
+        }
+    ];
 }
 
 enum ThemeMode {

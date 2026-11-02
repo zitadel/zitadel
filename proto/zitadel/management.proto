@@ -6060,6 +6060,31 @@ service ManagementService {
         };
     }
 
+    rpc RemoveCustomLabelPolicyLinkPreviewImage(RemoveCustomLabelPolicyLinkPreviewImageRequest) returns (RemoveCustomLabelPolicyLinkPreviewImageResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/link_preview_image"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Remove Link Preview Image";
+            description: "Removes the link preview image from the configured label policy/branding of the organization. It will only be shown on the preview. Make sure to activate your changes afterward."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
     rpc RemoveCustomLabelPolicyFont(RemoveCustomLabelPolicyFontRequest) returns (RemoveCustomLabelPolicyFontResponse) {
         option (google.api.http) = {
             delete: "/policies/label/font"
@@ -11752,6 +11777,20 @@ message AddCustomLabelPolicyRequest {
             description: "setting if there should be a restriction on which themes are available";
         }
     ];
+    optional string link_preview_title = 13 [
+        (validate.rules).string.max_len = 120,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "title used for Open Graph link previews of the hosted login and the management console";
+            max_length: 120;
+        }
+    ];
+    optional string link_preview_description = 14 [
+        (validate.rules).string.max_len = 300,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "description used for Open Graph link previews of the hosted login and the management console";
+            max_length: 300;
+        }
+    ];
 }
 
 message AddCustomLabelPolicyResponse {
@@ -11827,6 +11866,20 @@ message UpdateCustomLabelPolicyRequest {
             description: "setting if there should be a restriction on which themes are available";
         }
     ];
+    optional string link_preview_title = 13 [
+        (validate.rules).string.max_len = 120,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "title used for Open Graph link previews of the hosted login and the management console";
+            max_length: 120;
+        }
+    ];
+    optional string link_preview_description = 14 [
+        (validate.rules).string.max_len = 300,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "description used for Open Graph link previews of the hosted login and the management console";
+            max_length: 300;
+        }
+    ];
 }
 
 message UpdateCustomLabelPolicyResponse {
@@ -11872,6 +11925,13 @@ message RemoveCustomLabelPolicyIconDarkResponse {
 message RemoveCustomLabelPolicyFontRequest {}
 
 message RemoveCustomLabelPolicyFontResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveCustomLabelPolicyLinkPreviewImageRequest {}
+
+message RemoveCustomLabelPolicyLinkPreviewImageResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
