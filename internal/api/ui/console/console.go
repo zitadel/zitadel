@@ -97,7 +97,7 @@ func (f *file) Stat() (_ fs.FileInfo, err error) {
 	return f, nil
 }
 
-func Start(config Config, issuer op.IssuerFromRequest, callDurationInterceptor, instanceHandler func(http.Handler) http.Handler, limitingAccessInterceptor *middleware.AccessInterceptor, customerPortal string) (http.Handler, error) {
+func Start(config Config, issuer op.IssuerFromRequest, callDurationInterceptor, instanceHandler func(http.Handler) http.Handler, limitingAccessInterceptor *middleware.AccessInterceptor, customerPortal string, linkPreview LinkPreviewFunc) (http.Handler, error) {
 	fSys, err := fs.Sub(static, "static")
 	if err != nil {
 		return nil, err
@@ -139,7 +139,8 @@ func Start(config Config, issuer op.IssuerFromRequest, callDurationInterceptor, 
 		_, err = w.Write(environmentJSON)
 		logging.OnError(err).Error("error serving environment.json")
 	})
-	handler.SkipClean(true).PathPrefix("").Handler(cache(http.FileServer(&spaHandler{http.FS(fSys)})))
+	fileServer := http.FileServer(&spaHandler{http.FS(fSys)})
+	handler.SkipClean(true).PathPrefix("").Handler(cache(linkPreviewHandler(fSys, instanceHandler, linkPreview, fileServer)))
 	return handler, nil
 }
 

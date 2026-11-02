@@ -727,7 +727,18 @@ func startAPIs(
 			instanceInterceptor.HandlerFuncWithError,
 			middleware.AuthorizationInterceptor(verifier, config.SystemAuthZ, config.InternalAuthZ).HandlerFuncWithError(schemas.HandlerPrefix)))
 
-	c, err := console.Start(config.Console, oidcServer.IssuerFromRequest, middleware.CallDurationHandler, instanceInterceptor.Handler, limitingAccessInterceptor, config.CustomerPortal)
+	consoleLinkPreview := func(ctx context.Context, orgID string) (*console.LinkPreview, error) {
+		policy, err := queries.ActiveLabelPolicyByOrg(ctx, orgID, false)
+		if err != nil {
+			return nil, err
+		}
+		return &console.LinkPreview{
+			Title:       policy.LinkPreviewTitle,
+			Description: policy.LinkPreviewDescription,
+			ImageURL:    domain.AssetURL(assets.AssetAPI()(ctx), policy.ResourceOwner, policy.LinkPreviewImageURL),
+		}, nil
+	}
+	c, err := console.Start(config.Console, oidcServer.IssuerFromRequest, middleware.CallDurationHandler, instanceInterceptor.Handler, limitingAccessInterceptor, config.CustomerPortal, consoleLinkPreview)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start management console: %w", err)
 	}
