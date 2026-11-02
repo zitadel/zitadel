@@ -292,6 +292,9 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   }
 
   public deleteLinkPreviewImage(): Promise<any> | void {
+    if (this.isDefault) {
+      return;
+    }
     const handler = (prom: Promise<any>) =>
       prom
         .then(() => {
