@@ -274,10 +274,21 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
     formData.append('file', file);
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
-        return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTLINKPREVIEW, formData, this.org));
+        return this.ensureCustomOrgPolicy().then((created) =>
+          created
+            ? this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTLINKPREVIEW, formData, this.org))
+            : undefined,
+        );
       case PolicyComponentServiceType.ADMIN:
         return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMLINKPREVIEW, formData));
     }
+  }
+
+  private ensureCustomOrgPolicy(): Promise<boolean> {
+    if (!(this.previewData as LabelPolicy.AsObject).isDefault) {
+      return Promise.resolve(true);
+    }
+    return this.savePolicy().then(() => !(this.previewData as LabelPolicy.AsObject).isDefault);
   }
 
   public deleteLinkPreviewImage(): Promise<any> | void {
