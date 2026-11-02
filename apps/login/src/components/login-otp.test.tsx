@@ -94,6 +94,33 @@ describe("LoginOTP", () => {
       expect(resendButton).not.toBeDisabled();
     });
 
+    test("catches up with the time that passed while the timer was suspended", async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      mockUpdateOrCreateSession.mockResolvedValue({ sessionId: "session-1", retryAfterSeconds: 30 });
+
+      render(<LoginOTP host={null} method="sms" />);
+
+      const resendButton = screen.getByTestId("resend-button");
+      await waitFor(() => expect(resendButton).toHaveTextContent('verify.resendCodeIn {"seconds":30}'));
+
+      // the clock moves on while no timer fires, like in a suspended tab
+      vi.setSystemTime(Date.now() + 60_000);
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1000);
+      });
+
+      expect(resendButton).toHaveTextContent(/^verify\.resendCode$/);
+      expect(resendButton).not.toBeDisabled();
+    });
+
+    test("exposes the countdown in the button's accessible name", async () => {
+      mockUpdateOrCreateSession.mockResolvedValue({ sessionId: "session-1", retryAfterSeconds: 25 });
+
+      render(<LoginOTP host={null} method="sms" />);
+
+      expect(await screen.findByRole("button", { name: 'verify.resendCodeIn {"seconds":25}' })).toBeDisabled();
+    });
+
     test("shows the countdown instead of an error when the server refuses within the cooldown", async () => {
       mockUpdateOrCreateSession.mockResolvedValue({ error: "errors.resendCooldown", retryAfterSeconds: 25 });
 

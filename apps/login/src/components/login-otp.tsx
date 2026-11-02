@@ -43,6 +43,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
   // seconds until the server accepts another OTP SMS request
   const [resendCooldown, setResendCooldown] = useState<number>(0);
+  const resendAvailableAt = useRef<number>(0);
 
   const router = useRouter();
 
@@ -99,6 +100,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
 
     if (response && "retryAfterSeconds" in response && response.retryAfterSeconds) {
       // the code was either just sent or, if the server refused, sent moments ago (e.g. before a reload): the countdown covers both
+      resendAvailableAt.current = Date.now() + response.retryAfterSeconds * 1000;
       setResendCooldown(response.retryAfterSeconds);
       return;
     }
@@ -112,7 +114,11 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
     if (resendCooldown <= 0) {
       return;
     }
-    const timer = setTimeout(() => setResendCooldown((seconds) => seconds - 1), 1000);
+    const timer = setTimeout(() => {
+      // timers are throttled or suspended in background tabs, so catch up with the time that actually passed
+      const remainingSeconds = Math.ceil((resendAvailableAt.current - Date.now()) / 1000);
+      setResendCooldown(Math.max(Math.min(resendCooldown - 1, remainingSeconds), 0));
+    }, 1000);
     return () => clearTimeout(timer);
   }, [resendCooldown]);
 
@@ -232,7 +238,6 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
                 <Translated i18nKey="verify.noCodeReceived" namespace="otp" />
               </span>
               <button
-                aria-label={t("verify.resendCode")}
                 disabled={loading || resendCooldown > 0}
                 type="button"
                 className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
