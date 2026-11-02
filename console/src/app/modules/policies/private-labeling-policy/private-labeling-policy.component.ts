@@ -73,6 +73,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   public isHoveringOverLinkPreview: boolean = false;
   private linkPreviewTitleOnFocus: string = '';
   private linkPreviewDescriptionOnFocus: string = '';
+  private pendingLinkPreviewSave?: Promise<boolean | undefined>;
 
   private sub: Subscription = new Subscription();
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
@@ -253,7 +254,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
     ) {
       return;
     }
-    this.savePolicy();
+    this.pendingLinkPreviewSave = this.savePolicy();
   }
 
   public onDropLinkPreviewImage(filelist: FileList | null): Promise<any> | void {
@@ -623,9 +624,11 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
               this.toast.showInfo('POLICY.TOAST.SET', true);
 
               reloadPolicy();
+              return true;
             })
             .catch((error: HttpErrorResponse) => {
               this.toast.showError(error);
+              return false;
             });
         } else {
           const req1 = new UpdateCustomLabelPolicyRequest();
@@ -637,9 +640,11 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
               this.toast.showInfo('POLICY.TOAST.SET', true);
 
               reloadPolicy();
+              return true;
             })
             .catch((error) => {
               this.toast.showError(error);
+              return false;
             });
         }
       case PolicyComponentServiceType.ADMIN:
@@ -650,9 +655,11 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
           .then(() => {
             reloadPolicy();
             this.toast.showInfo('POLICY.TOAST.SET', true);
+            return true;
           })
           .catch((error) => {
             this.toast.showError(error);
+            return false;
           });
     }
   }
@@ -747,6 +754,13 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   }
 
   public activatePolicy(): Promise<any> {
+    // a link preview text change saves on blur, which runs at the same time as the Apply click
+    const pendingSave = this.pendingLinkPreviewSave ?? Promise.resolve(true);
+    this.pendingLinkPreviewSave = undefined;
+    return pendingSave.then((saved) => (saved === false ? undefined : this.activate()));
+  }
+
+  private activate(): Promise<any> {
     // dialog warning
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
