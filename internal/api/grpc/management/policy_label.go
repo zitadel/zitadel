@@ -48,7 +48,8 @@ func (s *Server) AddCustomLabelPolicy(ctx context.Context, req *mgmt_pb.AddCusto
 }
 
 func (s *Server) UpdateCustomLabelPolicy(ctx context.Context, req *mgmt_pb.UpdateCustomLabelPolicyRequest) (*mgmt_pb.UpdateCustomLabelPolicyResponse, error) {
-	policy, err := s.command.ChangeLabelPolicy(ctx, authz.GetCtxData(ctx).OrgID, updateLabelPolicyToDomain(req))
+	labelPolicy, linkPreview := updateLabelPolicyToDomain(req)
+	policy, err := s.command.ChangeLabelPolicy(ctx, authz.GetCtxData(ctx).OrgID, labelPolicy, linkPreview)
 	if err != nil {
 		return nil, err
 	}
@@ -133,6 +134,20 @@ func (s *Server) RemoveCustomLabelPolicyIconDark(ctx context.Context, req *mgmt_
 		return nil, err
 	}
 	return &mgmt_pb.RemoveCustomLabelPolicyIconDarkResponse{
+		Details: object.ChangeToDetailsPb(
+			policy.Sequence,
+			policy.EventDate,
+			policy.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) RemoveCustomLabelPolicyLinkPreviewImage(ctx context.Context, req *mgmt_pb.RemoveCustomLabelPolicyLinkPreviewImageRequest) (*mgmt_pb.RemoveCustomLabelPolicyLinkPreviewImageResponse, error) {
+	policy, err := s.command.RemoveLinkPreviewImageLabelPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveCustomLabelPolicyLinkPreviewImageResponse{
 		Details: object.ChangeToDetailsPb(
 			policy.Sequence,
 			policy.EventDate,

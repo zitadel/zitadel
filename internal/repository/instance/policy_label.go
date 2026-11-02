@@ -24,6 +24,9 @@ var (
 
 	LabelPolicyFontAddedEventType   = instanceEventTypePrefix + policy.LabelPolicyFontAddedEventType
 	LabelPolicyFontRemovedEventType = instanceEventTypePrefix + policy.LabelPolicyFontRemovedEventType
+
+	LabelPolicyLinkPreviewImageAddedEventType   = instanceEventTypePrefix + policy.LabelPolicyLinkPreviewImageAddedEventType
+	LabelPolicyLinkPreviewImageRemovedEventType = instanceEventTypePrefix + policy.LabelPolicyLinkPreviewImageRemovedEventType
 )
 
 type LabelPolicyAddedEvent struct {
@@ -45,6 +48,8 @@ func NewLabelPolicyAddedEvent(
 	errorMsgPopup,
 	disableWatermark bool,
 	themeMode domain.LabelPolicyThemeMode,
+	linkPreviewTitle,
+	linkPreviewDescription string,
 ) *LabelPolicyAddedEvent {
 	return &LabelPolicyAddedEvent{
 		LabelPolicyAddedEvent: *policy.NewLabelPolicyAddedEvent(
@@ -63,7 +68,10 @@ func NewLabelPolicyAddedEvent(
 			hideLoginNameSuffix,
 			errorMsgPopup,
 			disableWatermark,
-			themeMode),
+			themeMode,
+			linkPreviewTitle,
+			linkPreviewDescription,
+		),
 	}
 }
 
@@ -422,6 +430,64 @@ func LabelPolicyFontRemovedEventMapper(event eventstore.Event) (eventstore.Event
 	}
 
 	return &LabelPolicyFontRemovedEvent{LabelPolicyFontRemovedEvent: *e.(*policy.LabelPolicyFontRemovedEvent)}, nil
+}
+
+type LabelPolicyLinkPreviewImageAddedEvent struct {
+	policy.LabelPolicyLinkPreviewImageAddedEvent
+}
+
+func NewLabelPolicyLinkPreviewImageAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	storageKey string,
+) *LabelPolicyLinkPreviewImageAddedEvent {
+	return &LabelPolicyLinkPreviewImageAddedEvent{
+		LabelPolicyLinkPreviewImageAddedEvent: *policy.NewLabelPolicyLinkPreviewImageAddedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				LabelPolicyLinkPreviewImageAddedEventType),
+			storageKey,
+		),
+	}
+}
+
+func LabelPolicyLinkPreviewImageAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	e, err := policy.LabelPolicyLinkPreviewImageAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LabelPolicyLinkPreviewImageAddedEvent{LabelPolicyLinkPreviewImageAddedEvent: *e.(*policy.LabelPolicyLinkPreviewImageAddedEvent)}, nil
+}
+
+type LabelPolicyLinkPreviewImageRemovedEvent struct {
+	policy.LabelPolicyLinkPreviewImageRemovedEvent
+}
+
+func NewLabelPolicyLinkPreviewImageRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	storageKey string,
+) *LabelPolicyLinkPreviewImageRemovedEvent {
+	return &LabelPolicyLinkPreviewImageRemovedEvent{
+		LabelPolicyLinkPreviewImageRemovedEvent: *policy.NewLabelPolicyLinkPreviewImageRemovedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				LabelPolicyLinkPreviewImageRemovedEventType),
+			storageKey,
+		),
+	}
+}
+
+func LabelPolicyLinkPreviewImageRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	e, err := policy.LabelPolicyLinkPreviewImageRemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LabelPolicyLinkPreviewImageRemovedEvent{LabelPolicyLinkPreviewImageRemovedEvent: *e.(*policy.LabelPolicyLinkPreviewImageRemovedEvent)}, nil
 }
 
 type LabelPolicyAssetsRemovedEvent struct {

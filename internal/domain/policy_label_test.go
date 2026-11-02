@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -498,6 +499,59 @@ func TestLabelPolicyFontColorDarkValid(t *testing.T) {
 				assert.NoError(t, err)
 			}
 			if tt.err != nil && !tt.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestLabelPolicyLinkPreviewValid(t *testing.T) {
+	tests := []struct {
+		name   string
+		policy *LabelPolicy
+		err    func(error) bool
+	}{
+		{
+			name:   "empty values",
+			policy: &LabelPolicy{},
+		},
+		{
+			name: "within limits",
+			policy: &LabelPolicy{
+				LinkPreviewTitle:       "Acme",
+				LinkPreviewDescription: "Sign in to Acme",
+			},
+		},
+		{
+			name: "multi-byte characters within limits",
+			policy: &LabelPolicy{
+				LinkPreviewTitle:       strings.Repeat("ログ", 60),
+				LinkPreviewDescription: strings.Repeat("تسجيل", 60),
+			},
+		},
+		{
+			name: "title too long",
+			policy: &LabelPolicy{
+				LinkPreviewTitle: string(make([]byte, 121)),
+			},
+			err: zerrors.IsErrorInvalidArgument,
+		},
+		{
+			name: "description too long",
+			policy: &LabelPolicy{
+				LinkPreviewDescription: string(make([]byte, 301)),
+			},
+			err: zerrors.IsErrorInvalidArgument,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.policy.IsValid()
+			if tt.err == nil {
+				assert.NoError(t, err)
+				return
+			}
+			if !tt.err(err) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 		})

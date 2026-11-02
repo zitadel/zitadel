@@ -25,6 +25,10 @@ type LabelPolicyWriteModel struct {
 
 	FontKey string
 
+	LinkPreviewTitle       string
+	LinkPreviewDescription string
+	LinkPreviewImageKey    string
+
 	HideLoginNameSuffix bool
 	ErrorMsgPopup       bool
 	DisableWatermark    bool
@@ -49,6 +53,8 @@ func (wm *LabelPolicyWriteModel) Reduce() error {
 			wm.ErrorMsgPopup = e.ErrorMsgPopup
 			wm.DisableWatermark = e.DisableWatermark
 			wm.ThemeMode = e.ThemeMode
+			wm.LinkPreviewTitle = e.LinkPreviewTitle
+			wm.LinkPreviewDescription = e.LinkPreviewDescription
 			wm.State = domain.PolicyStateActive
 		case *policy.LabelPolicyChangedEvent:
 			if e.PrimaryColor != nil {
@@ -87,6 +93,12 @@ func (wm *LabelPolicyWriteModel) Reduce() error {
 			if e.ThemeMode != nil {
 				wm.ThemeMode = *e.ThemeMode
 			}
+			if e.LinkPreviewTitle != nil {
+				wm.LinkPreviewTitle = *e.LinkPreviewTitle
+			}
+			if e.LinkPreviewDescription != nil {
+				wm.LinkPreviewDescription = *e.LinkPreviewDescription
+			}
 		case *policy.LabelPolicyLogoAddedEvent:
 			wm.LogoKey = e.StoreKey
 		case *policy.LabelPolicyLogoRemovedEvent:
@@ -107,6 +119,10 @@ func (wm *LabelPolicyWriteModel) Reduce() error {
 			wm.FontKey = e.StoreKey
 		case *policy.LabelPolicyFontRemovedEvent:
 			wm.FontKey = ""
+		case *policy.LabelPolicyLinkPreviewImageAddedEvent:
+			wm.LinkPreviewImageKey = e.StoreKey
+		case *policy.LabelPolicyLinkPreviewImageRemovedEvent:
+			wm.LinkPreviewImageKey = ""
 		case *policy.LabelPolicyRemovedEvent:
 			wm.State = domain.PolicyStateRemoved
 		}

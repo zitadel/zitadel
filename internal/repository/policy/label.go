@@ -25,6 +25,9 @@ const (
 	LabelPolicyFontAddedEventType   = "policy.label.font.added"
 	LabelPolicyFontRemovedEventType = "policy.label.font.removed"
 
+	LabelPolicyLinkPreviewImageAddedEventType   = "policy.label.linkpreviewimage.added"
+	LabelPolicyLinkPreviewImageRemovedEventType = "policy.label.linkpreviewimage.removed"
+
 	LabelPolicyRemovedEventType = "policy.label.removed"
 )
 
@@ -43,6 +46,9 @@ type LabelPolicyAddedEvent struct {
 	ErrorMsgPopup       bool                        `json:"errorMsgPopup,omitempty"`
 	DisableWatermark    bool                        `json:"disableMsgPopup,omitempty"`
 	ThemeMode           domain.LabelPolicyThemeMode `json:"themeMode,omitempty"`
+
+	LinkPreviewTitle       string `json:"linkPreviewTitle,omitempty"`
+	LinkPreviewDescription string `json:"linkPreviewDescription,omitempty"`
 }
 
 func (e *LabelPolicyAddedEvent) Payload() interface{} {
@@ -67,21 +73,25 @@ func NewLabelPolicyAddedEvent(
 	errorMsgPopup,
 	disableWatermark bool,
 	themeMode domain.LabelPolicyThemeMode,
+	linkPreviewTitle,
+	linkPreviewDescription string,
 ) *LabelPolicyAddedEvent {
 	return &LabelPolicyAddedEvent{
-		BaseEvent:           *base,
-		PrimaryColor:        primaryColor,
-		BackgroundColor:     backgroundColor,
-		WarnColor:           warnColor,
-		FontColor:           fontColor,
-		PrimaryColorDark:    primaryColorDark,
-		BackgroundColorDark: backgroundColorDark,
-		WarnColorDark:       warnColorDark,
-		FontColorDark:       fontColorDark,
-		HideLoginNameSuffix: hideLoginNameSuffix,
-		ErrorMsgPopup:       errorMsgPopup,
-		DisableWatermark:    disableWatermark,
-		ThemeMode:           themeMode,
+		BaseEvent:              *base,
+		PrimaryColor:           primaryColor,
+		BackgroundColor:        backgroundColor,
+		WarnColor:              warnColor,
+		FontColor:              fontColor,
+		PrimaryColorDark:       primaryColorDark,
+		BackgroundColorDark:    backgroundColorDark,
+		WarnColorDark:          warnColorDark,
+		FontColorDark:          fontColorDark,
+		HideLoginNameSuffix:    hideLoginNameSuffix,
+		ErrorMsgPopup:          errorMsgPopup,
+		DisableWatermark:       disableWatermark,
+		ThemeMode:              themeMode,
+		LinkPreviewTitle:       linkPreviewTitle,
+		LinkPreviewDescription: linkPreviewDescription,
 	}
 }
 
@@ -113,6 +123,9 @@ type LabelPolicyChangedEvent struct {
 	ErrorMsgPopup       *bool                        `json:"errorMsgPopup,omitempty"`
 	DisableWatermark    *bool                        `json:"disableWatermark,omitempty"`
 	ThemeMode           *domain.LabelPolicyThemeMode `json:"themeMode,omitempty"`
+
+	LinkPreviewTitle       *string `json:"linkPreviewTitle,omitempty"`
+	LinkPreviewDescription *string `json:"linkPreviewDescription,omitempty"`
 }
 
 func (e *LabelPolicyChangedEvent) Payload() interface{} {
@@ -210,6 +223,18 @@ func ChangeDisableWatermark(disableWatermark bool) func(*LabelPolicyChangedEvent
 func ChangeThemeMode(themeMode domain.LabelPolicyThemeMode) func(*LabelPolicyChangedEvent) {
 	return func(e *LabelPolicyChangedEvent) {
 		e.ThemeMode = &themeMode
+	}
+}
+
+func ChangeLinkPreviewTitle(title string) func(*LabelPolicyChangedEvent) {
+	return func(e *LabelPolicyChangedEvent) {
+		e.LinkPreviewTitle = &title
+	}
+}
+
+func ChangeLinkPreviewDescription(description string) func(*LabelPolicyChangedEvent) {
+	return func(e *LabelPolicyChangedEvent) {
+		e.LinkPreviewDescription = &description
 	}
 }
 
@@ -542,6 +567,60 @@ func LabelPolicyFontRemovedEventMapper(event eventstore.Event) (eventstore.Event
 	}
 
 	return &LabelPolicyFontRemovedEvent{*e.(*asset.RemovedEvent)}, nil
+}
+
+type LabelPolicyLinkPreviewImageAddedEvent struct {
+	asset.AddedEvent
+}
+
+func (e *LabelPolicyLinkPreviewImageAddedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *LabelPolicyLinkPreviewImageAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewLabelPolicyLinkPreviewImageAddedEvent(base *eventstore.BaseEvent, storageKey string) *LabelPolicyLinkPreviewImageAddedEvent {
+	return &LabelPolicyLinkPreviewImageAddedEvent{
+		*asset.NewAddedEvent(base, storageKey),
+	}
+}
+
+func LabelPolicyLinkPreviewImageAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	e, err := asset.AddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LabelPolicyLinkPreviewImageAddedEvent{*e.(*asset.AddedEvent)}, nil
+}
+
+type LabelPolicyLinkPreviewImageRemovedEvent struct {
+	asset.RemovedEvent
+}
+
+func (e *LabelPolicyLinkPreviewImageRemovedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *LabelPolicyLinkPreviewImageRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewLabelPolicyLinkPreviewImageRemovedEvent(base *eventstore.BaseEvent, storageKey string) *LabelPolicyLinkPreviewImageRemovedEvent {
+	return &LabelPolicyLinkPreviewImageRemovedEvent{
+		*asset.NewRemovedEvent(base, storageKey),
+	}
+}
+
+func LabelPolicyLinkPreviewImageRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	e, err := asset.RemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LabelPolicyLinkPreviewImageRemovedEvent{*e.(*asset.RemovedEvent)}, nil
 }
 
 type LabelPolicyAssetsRemovedEvent struct {

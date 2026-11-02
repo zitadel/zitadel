@@ -47,19 +47,22 @@ func writeModelToLoginPolicy(wm *LoginPolicyWriteModel) *domain.LoginPolicy {
 
 func writeModelToLabelPolicy(wm *LabelPolicyWriteModel) *domain.LabelPolicy {
 	return &domain.LabelPolicy{
-		ObjectRoot:          writeModelToObjectRoot(wm.WriteModel),
-		PrimaryColor:        wm.PrimaryColor,
-		BackgroundColor:     wm.BackgroundColor,
-		WarnColor:           wm.WarnColor,
-		FontColor:           wm.FontColor,
-		PrimaryColorDark:    wm.PrimaryColorDark,
-		BackgroundColorDark: wm.BackgroundColorDark,
-		WarnColorDark:       wm.WarnColorDark,
-		FontColorDark:       wm.FontColorDark,
-		HideLoginNameSuffix: wm.HideLoginNameSuffix,
-		ErrorMsgPopup:       wm.ErrorMsgPopup,
-		DisableWatermark:    wm.DisableWatermark,
-		ThemeMode:           wm.ThemeMode,
+		ObjectRoot:             writeModelToObjectRoot(wm.WriteModel),
+		PrimaryColor:           wm.PrimaryColor,
+		BackgroundColor:        wm.BackgroundColor,
+		WarnColor:              wm.WarnColor,
+		FontColor:              wm.FontColor,
+		PrimaryColorDark:       wm.PrimaryColorDark,
+		BackgroundColorDark:    wm.BackgroundColorDark,
+		WarnColorDark:          wm.WarnColorDark,
+		FontColorDark:          wm.FontColorDark,
+		HideLoginNameSuffix:    wm.HideLoginNameSuffix,
+		ErrorMsgPopup:          wm.ErrorMsgPopup,
+		DisableWatermark:       wm.DisableWatermark,
+		ThemeMode:              wm.ThemeMode,
+		LinkPreviewTitle:       wm.LinkPreviewTitle,
+		LinkPreviewDescription: wm.LinkPreviewDescription,
+		LinkPreviewImageURL:    wm.LinkPreviewImageKey,
 	}
 }
 

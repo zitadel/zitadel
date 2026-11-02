@@ -12,8 +12,11 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) ChangeDefaultLabelPolicy(ctx context.Context, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
+func (c *Commands) ChangeDefaultLabelPolicy(ctx context.Context, policy *domain.LabelPolicy, linkPreview LabelPolicyLinkPreviewUpdate) (*domain.LabelPolicy, error) {
 	if err := policy.IsValid(); err != nil {
+		return nil, err
+	}
+	if err := linkPreview.validate(); err != nil {
 		return nil, err
 	}
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
@@ -39,7 +42,9 @@ func (c *Commands) ChangeDefaultLabelPolicy(ctx context.Context, policy *domain.
 		policy.HideLoginNameSuffix,
 		policy.ErrorMsgPopup,
 		policy.DisableWatermark,
-		policy.ThemeMode)
+		policy.ThemeMode,
+		linkPreview.Title,
+		linkPreview.Description)
 	if !hasChanged {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-28fHe", "Errors.Instance.LabelPolicy.NotChanged")
 	}
@@ -319,6 +324,56 @@ func (c *Commands) RemoveFontDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
+func (c *Commands) AddLinkPreviewImageDefaultLabelPolicy(ctx context.Context, upload *AssetUpload) (*domain.ObjectDetails, error) {
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-LP8fE", "Errors.Instance.LabelPolicy.NotFound")
+	}
+	asset, err := c.uploadAsset(ctx, upload)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "INSTANCE-LP8fs", "Errors.Assets.Object.PutFailed")
+	}
+	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.WriteModel)
+	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyLinkPreviewImageAddedEvent(ctx, instanceAgg, asset.Name))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.WriteModel), nil
+}
+
+func (c *Commands) RemoveLinkPreviewImageDefaultLabelPolicy(ctx context.Context) (*domain.ObjectDetails, error) {
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-LP0gw", "Errors.Instance.LabelPolicy.NotFound")
+	}
+	err = c.removeAsset(ctx, authz.GetInstance(ctx).InstanceID(), existingPolicy.LinkPreviewImageKey)
+	if err != nil {
+		return nil, err
+	}
+	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.WriteModel)
+	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyLinkPreviewImageRemovedEvent(ctx, instanceAgg, existingPolicy.LinkPreviewImageKey))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.WriteModel), nil
+}
+
 func (c *Commands) defaultLabelPolicyWriteModelByID(ctx context.Context) (policy *InstanceLabelPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -357,8 +412,13 @@ func prepareAddDefaultLabelPolicy(
 	errorMsgPopup,
 	disableWatermark bool,
 	themeMode domain.LabelPolicyThemeMode,
+	linkPreviewTitle,
+	linkPreviewDescription string,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if err := domain.ValidateLinkPreviewText(linkPreviewTitle, linkPreviewDescription); err != nil {
+			return nil, err
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewInstanceLabelPolicyWriteModel(ctx)
 			events, err := filter(ctx, writeModel.Query())
@@ -386,6 +446,8 @@ func prepareAddDefaultLabelPolicy(
 					errorMsgPopup,
 					disableWatermark,
 					themeMode,
+					linkPreviewTitle,
+					linkPreviewDescription,
 				),
 				instance.NewLabelPolicyActivatedEvent(ctx, &a.Aggregate),
 			}, nil

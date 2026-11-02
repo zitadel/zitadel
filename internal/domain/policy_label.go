@@ -2,6 +2,7 @@ package domain
 
 import (
 	"regexp"
+	"unicode/utf8"
 
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -35,6 +36,10 @@ type LabelPolicy struct {
 	ErrorMsgPopup       bool
 	DisableWatermark    bool
 	ThemeMode           LabelPolicyThemeMode
+
+	LinkPreviewTitle       string
+	LinkPreviewDescription string
+	LinkPreviewImageURL    string
 }
 
 type LabelPolicyState int32
@@ -80,6 +85,17 @@ func (f LabelPolicy) IsValid() error {
 	}
 	if !colorRegex.MatchString(f.FontColorDark) {
 		return zerrors.ThrowInvalidArgument(nil, "POLICY-3M0fs", "Errors.Policy.Label.Invalid.FontColorDark")
+	}
+	return ValidateLinkPreviewText(f.LinkPreviewTitle, f.LinkPreviewDescription)
+}
+
+// ValidateLinkPreviewText checks the length of the link preview title and description in characters.
+func ValidateLinkPreviewText(title, description string) error {
+	if utf8.RuneCountInString(title) > 120 {
+		return zerrors.ThrowInvalidArgument(nil, "POLICY-ogT1l", "Errors.Policy.Label.Invalid.LinkPreviewTitle")
+	}
+	if utf8.RuneCountInString(description) > 300 {
+		return zerrors.ThrowInvalidArgument(nil, "POLICY-ogD3s", "Errors.Policy.Label.Invalid.LinkPreviewDescription")
 	}
 	return nil
 }
