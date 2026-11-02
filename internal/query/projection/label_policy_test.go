@@ -38,7 +38,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.label_policies3 (creation_date, change_date, sequence, id, state, is_default, resource_owner, instance_id, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled, theme_mode) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)",
+							expectedStmt: "INSERT INTO projections.label_policies3 (creation_date, change_date, sequence, id, state, is_default, resource_owner, instance_id, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled, theme_mode, link_preview_title, link_preview_description) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -60,6 +60,8 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 								false,
 								false,
 								domain.LabelPolicyThemeLight,
+								"",
+								"",
 							},
 						},
 					},
@@ -171,7 +173,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.label_policies3 (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url, theme_mode) SELECT $1, $2, $3, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url, theme_mode FROM projections.label_policies3 AS copy_table WHERE (copy_table.id = $4) AND (copy_table.state = $5) AND (copy_table.instance_id = $6) ON CONFLICT (instance_id, id, state) DO UPDATE SET (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url, theme_mode) = ($1, $2, $3, EXCLUDED.creation_date, EXCLUDED.resource_owner, EXCLUDED.instance_id, EXCLUDED.id, EXCLUDED.is_default, EXCLUDED.hide_login_name_suffix, EXCLUDED.font_url, EXCLUDED.watermark_disabled, EXCLUDED.should_error_popup, EXCLUDED.light_primary_color, EXCLUDED.light_warn_color, EXCLUDED.light_background_color, EXCLUDED.light_font_color, EXCLUDED.light_logo_url, EXCLUDED.light_icon_url, EXCLUDED.dark_primary_color, EXCLUDED.dark_warn_color, EXCLUDED.dark_background_color, EXCLUDED.dark_font_color, EXCLUDED.dark_logo_url, EXCLUDED.dark_icon_url, EXCLUDED.theme_mode)",
+							expectedStmt: "INSERT INTO projections.label_policies3 (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url, theme_mode, link_preview_title, link_preview_description, link_preview_image_url) SELECT $1, $2, $3, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url, theme_mode, link_preview_title, link_preview_description, link_preview_image_url FROM projections.label_policies3 AS copy_table WHERE (copy_table.id = $4) AND (copy_table.state = $5) AND (copy_table.instance_id = $6) ON CONFLICT (instance_id, id, state) DO UPDATE SET (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url, theme_mode, link_preview_title, link_preview_description, link_preview_image_url) = ($1, $2, $3, EXCLUDED.creation_date, EXCLUDED.resource_owner, EXCLUDED.instance_id, EXCLUDED.id, EXCLUDED.is_default, EXCLUDED.hide_login_name_suffix, EXCLUDED.font_url, EXCLUDED.watermark_disabled, EXCLUDED.should_error_popup, EXCLUDED.light_primary_color, EXCLUDED.light_warn_color, EXCLUDED.light_background_color, EXCLUDED.light_font_color, EXCLUDED.light_logo_url, EXCLUDED.light_icon_url, EXCLUDED.dark_primary_color, EXCLUDED.dark_warn_color, EXCLUDED.dark_background_color, EXCLUDED.dark_font_color, EXCLUDED.dark_logo_url, EXCLUDED.dark_icon_url, EXCLUDED.theme_mode, EXCLUDED.link_preview_title, EXCLUDED.link_preview_description, EXCLUDED.link_preview_image_url)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -465,6 +467,100 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name: "org reduceLinkPreviewImageAdded",
+			args: args{
+				event: getEvent(
+					testEvent(
+						org.LabelPolicyLinkPreviewImageAddedEventType,
+						org.AggregateType,
+						[]byte(`{"storeKey": "/path/to/preview.png"}`),
+					), org.LabelPolicyLinkPreviewImageAddedEventMapper),
+			},
+			reduce: (&labelPolicyProjection{}).reduceLinkPreviewImageAdded,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, link_preview_image_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"/path/to/preview.png",
+								"agg-id",
+								domain.LabelPolicyStatePreview,
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceLinkPreviewImageRemoved",
+			args: args{
+				event: getEvent(
+					testEvent(
+						org.LabelPolicyLinkPreviewImageRemovedEventType,
+						org.AggregateType,
+						[]byte(`{"storeKey": "/path/to/preview.png"}`),
+					), org.LabelPolicyLinkPreviewImageRemovedEventMapper),
+			},
+			reduce: (&labelPolicyProjection{}).reduceLinkPreviewImageRemoved,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, link_preview_image_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								nil,
+								"agg-id",
+								domain.LabelPolicyStatePreview,
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceChanged link preview",
+			args: args{
+				event: getEvent(
+					testEvent(
+						org.LabelPolicyChangedEventType,
+						org.AggregateType,
+						[]byte(`{"linkPreviewTitle": "Acme", "linkPreviewDescription": "Sign in to Acme"}`),
+					), org.LabelPolicyChangedEventMapper),
+			},
+			reduce: (&labelPolicyProjection{}).reduceChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, link_preview_title, link_preview_description) = ($1, $2, $3, $4) WHERE (id = $5) AND (state = $6) AND (instance_id = $7)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"Acme",
+								"Sign in to Acme",
+								"agg-id",
+								domain.LabelPolicyStatePreview,
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "org reduceFontRemoved",
 			args: args{
 				event: getEvent(
@@ -512,7 +608,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.label_policies3 (creation_date, change_date, sequence, id, state, is_default, resource_owner, instance_id, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled, theme_mode) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)",
+							expectedStmt: "INSERT INTO projections.label_policies3 (creation_date, change_date, sequence, id, state, is_default, resource_owner, instance_id, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled, theme_mode, link_preview_title, link_preview_description) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -534,6 +630,8 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 								false,
 								false,
 								domain.LabelPolicyThemeLight,
+								"",
+								"",
 							},
 						},
 					},
@@ -599,7 +697,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.label_policies3 (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url, theme_mode) SELECT $1, $2, $3, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url, theme_mode FROM projections.label_policies3 AS copy_table WHERE (copy_table.id = $4) AND (copy_table.state = $5) AND (copy_table.instance_id = $6) ON CONFLICT (instance_id, id, state) DO UPDATE SET (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url, theme_mode) = ($1, $2, $3, EXCLUDED.creation_date, EXCLUDED.resource_owner, EXCLUDED.instance_id, EXCLUDED.id, EXCLUDED.is_default, EXCLUDED.hide_login_name_suffix, EXCLUDED.font_url, EXCLUDED.watermark_disabled, EXCLUDED.should_error_popup, EXCLUDED.light_primary_color, EXCLUDED.light_warn_color, EXCLUDED.light_background_color, EXCLUDED.light_font_color, EXCLUDED.light_logo_url, EXCLUDED.light_icon_url, EXCLUDED.dark_primary_color, EXCLUDED.dark_warn_color, EXCLUDED.dark_background_color, EXCLUDED.dark_font_color, EXCLUDED.dark_logo_url, EXCLUDED.dark_icon_url, EXCLUDED.theme_mode)",
+							expectedStmt: "INSERT INTO projections.label_policies3 (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url, theme_mode, link_preview_title, link_preview_description, link_preview_image_url) SELECT $1, $2, $3, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url, theme_mode, link_preview_title, link_preview_description, link_preview_image_url FROM projections.label_policies3 AS copy_table WHERE (copy_table.id = $4) AND (copy_table.state = $5) AND (copy_table.instance_id = $6) ON CONFLICT (instance_id, id, state) DO UPDATE SET (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url, theme_mode, link_preview_title, link_preview_description, link_preview_image_url) = ($1, $2, $3, EXCLUDED.creation_date, EXCLUDED.resource_owner, EXCLUDED.instance_id, EXCLUDED.id, EXCLUDED.is_default, EXCLUDED.hide_login_name_suffix, EXCLUDED.font_url, EXCLUDED.watermark_disabled, EXCLUDED.should_error_popup, EXCLUDED.light_primary_color, EXCLUDED.light_warn_color, EXCLUDED.light_background_color, EXCLUDED.light_font_color, EXCLUDED.light_logo_url, EXCLUDED.light_icon_url, EXCLUDED.dark_primary_color, EXCLUDED.dark_warn_color, EXCLUDED.dark_background_color, EXCLUDED.dark_font_color, EXCLUDED.dark_logo_url, EXCLUDED.dark_icon_url, EXCLUDED.theme_mode, EXCLUDED.link_preview_title, EXCLUDED.link_preview_description, EXCLUDED.link_preview_image_url)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -883,6 +981,68 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 								anyArg{},
 								uint64(15),
 								"/path/to/font.ttf",
+								"agg-id",
+								domain.LabelPolicyStatePreview,
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceLinkPreviewImageAdded",
+			args: args{
+				event: getEvent(
+					testEvent(
+						instance.LabelPolicyLinkPreviewImageAddedEventType,
+						instance.AggregateType,
+						[]byte(`{"storeKey": "/path/to/preview.png"}`),
+					), instance.LabelPolicyLinkPreviewImageAddedEventMapper),
+			},
+			reduce: (&labelPolicyProjection{}).reduceLinkPreviewImageAdded,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, link_preview_image_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"/path/to/preview.png",
+								"agg-id",
+								domain.LabelPolicyStatePreview,
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceLinkPreviewImageRemoved",
+			args: args{
+				event: getEvent(
+					testEvent(
+						instance.LabelPolicyLinkPreviewImageRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{"storeKey": "/path/to/preview.png"}`),
+					), instance.LabelPolicyLinkPreviewImageRemovedEventMapper),
+			},
+			reduce: (&labelPolicyProjection{}).reduceLinkPreviewImageRemoved,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, link_preview_image_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								nil,
 								"agg-id",
 								domain.LabelPolicyStatePreview,
 								"instance-id",

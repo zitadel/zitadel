@@ -305,23 +305,25 @@ func (p *relationalTablesProjection) reduceLabelPolicyAdded(event eventstore.Eve
 				UpdatedAt:      policyEvent.Creation,
 			},
 			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-				PrimaryColorLight:    &policyEvent.PrimaryColor,
-				BackgroundColorLight: &policyEvent.BackgroundColor,
-				WarnColorLight:       &policyEvent.WarnColor,
-				FontColorLight:       &policyEvent.FontColor,
-				PrimaryColorDark:     &policyEvent.PrimaryColorDark,
-				BackgroundColorDark:  &policyEvent.BackgroundColorDark,
-				WarnColorDark:        &policyEvent.WarnColorDark,
-				FontColorDark:        &policyEvent.FontColorDark,
-				HideLoginNameSuffix:  &policyEvent.HideLoginNameSuffix,
-				ErrorMsgPopup:        &policyEvent.ErrorMsgPopup,
-				DisableWatermark:     &policyEvent.DisableWatermark,
-				ThemeMode:            &themeMode,
-				LogoURLLight:         nil,
-				IconURLLight:         nil,
-				LogoURLDark:          nil,
-				IconURLDark:          nil,
-				FontURL:              nil,
+				PrimaryColorLight:      &policyEvent.PrimaryColor,
+				BackgroundColorLight:   &policyEvent.BackgroundColor,
+				WarnColorLight:         &policyEvent.WarnColor,
+				FontColorLight:         &policyEvent.FontColor,
+				PrimaryColorDark:       &policyEvent.PrimaryColorDark,
+				BackgroundColorDark:    &policyEvent.BackgroundColorDark,
+				WarnColorDark:          &policyEvent.WarnColorDark,
+				FontColorDark:          &policyEvent.FontColorDark,
+				HideLoginNameSuffix:    &policyEvent.HideLoginNameSuffix,
+				ErrorMsgPopup:          &policyEvent.ErrorMsgPopup,
+				DisableWatermark:       &policyEvent.DisableWatermark,
+				ThemeMode:              &themeMode,
+				LogoURLLight:           nil,
+				IconURLLight:           nil,
+				LogoURLDark:            nil,
+				IconURLDark:            nil,
+				FontURL:                nil,
+				LinkPreviewTitle:       &policyEvent.LinkPreviewTitle,
+				LinkPreviewDescription: &policyEvent.LinkPreviewDescription,
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
@@ -358,23 +360,25 @@ func (p *relationalTablesProjection) reduceLabelPolicyChanged(event eventstore.E
 				UpdatedAt:      policyEvent.Creation,
 			},
 			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
-				PrimaryColorLight:    policyEvent.PrimaryColor,
-				BackgroundColorLight: policyEvent.BackgroundColor,
-				WarnColorLight:       policyEvent.WarnColor,
-				FontColorLight:       policyEvent.FontColor,
-				PrimaryColorDark:     policyEvent.PrimaryColorDark,
-				BackgroundColorDark:  policyEvent.BackgroundColorDark,
-				WarnColorDark:        policyEvent.WarnColorDark,
-				FontColorDark:        policyEvent.FontColorDark,
-				HideLoginNameSuffix:  policyEvent.HideLoginNameSuffix,
-				ErrorMsgPopup:        policyEvent.ErrorMsgPopup,
-				DisableWatermark:     policyEvent.DisableWatermark,
-				ThemeMode:            themeMode,
-				LogoURLLight:         nil,
-				IconURLLight:         nil,
-				LogoURLDark:          nil,
-				IconURLDark:          nil,
-				FontURL:              nil,
+				PrimaryColorLight:      policyEvent.PrimaryColor,
+				BackgroundColorLight:   policyEvent.BackgroundColor,
+				WarnColorLight:         policyEvent.WarnColor,
+				FontColorLight:         policyEvent.FontColor,
+				PrimaryColorDark:       policyEvent.PrimaryColorDark,
+				BackgroundColorDark:    policyEvent.BackgroundColorDark,
+				WarnColorDark:          policyEvent.WarnColorDark,
+				FontColorDark:          policyEvent.FontColorDark,
+				HideLoginNameSuffix:    policyEvent.HideLoginNameSuffix,
+				ErrorMsgPopup:          policyEvent.ErrorMsgPopup,
+				DisableWatermark:       policyEvent.DisableWatermark,
+				ThemeMode:              themeMode,
+				LogoURLLight:           nil,
+				IconURLLight:           nil,
+				LogoURLDark:            nil,
+				IconURLDark:            nil,
+				FontURL:                nil,
+				LinkPreviewTitle:       policyEvent.LinkPreviewTitle,
+				LinkPreviewDescription: policyEvent.LinkPreviewDescription,
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
@@ -786,6 +790,79 @@ func (p *relationalTablesProjection) reduceLabelPolicyFontRemoved(event eventsto
 			},
 			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
 				FontURL: &url.URL{},
+			},
+		}
+		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
+	}), nil
+}
+
+func (p *relationalTablesProjection) reduceLabelPolicyLinkPreviewImageAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
+	var policyEvent policy.LabelPolicyLinkPreviewImageAddedEvent
+	switch e := event.(type) {
+	case *org.LabelPolicyLinkPreviewImageAddedEvent:
+		orgId = &event.Aggregate().ID
+		policyEvent = e.LabelPolicyLinkPreviewImageAddedEvent
+	case *instance.LabelPolicyLinkPreviewImageAddedEvent:
+		policyEvent = e.LabelPolicyLinkPreviewImageAddedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-lp7aR", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyLinkPreviewImageAddedEventType, instance.LabelPolicyLinkPreviewImageAddedEventType})
+	}
+
+	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, _ string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-lp7aT", "reduce.wrong.db.pool %T", ex)
+		}
+
+		url, err := url.Parse(policyEvent.StoreKey)
+		if err != nil {
+			return err
+		}
+
+		settingsRepo := repository.BrandingSettingsRepository()
+		settings := domain.BrandingSettings{
+			Settings: domain.Settings{
+				InstanceID:     event.Aggregate().InstanceID,
+				OrganizationID: orgId,
+				UpdatedAt:      policyEvent.Creation,
+			},
+			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+				LinkPreviewImageURL: url,
+			},
+		}
+		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
+	}), nil
+}
+
+func (p *relationalTablesProjection) reduceLabelPolicyLinkPreviewImageRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
+	var policyEvent policy.LabelPolicyLinkPreviewImageRemovedEvent
+	switch e := event.(type) {
+	case *org.LabelPolicyLinkPreviewImageRemovedEvent:
+		orgId = &event.Aggregate().ID
+		policyEvent = e.LabelPolicyLinkPreviewImageRemovedEvent
+	case *instance.LabelPolicyLinkPreviewImageRemovedEvent:
+		policyEvent = e.LabelPolicyLinkPreviewImageRemovedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-lp7rM", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyLinkPreviewImageRemovedEventType, instance.LabelPolicyLinkPreviewImageRemovedEventType})
+	}
+
+	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, _ string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-lp7rN", "reduce.wrong.db.pool %T", ex)
+		}
+
+		settingsRepo := repository.BrandingSettingsRepository()
+		settings := domain.BrandingSettings{
+			Settings: domain.Settings{
+				InstanceID:     event.Aggregate().InstanceID,
+				OrganizationID: orgId,
+				UpdatedAt:      policyEvent.Creation,
+			},
+			BrandingSettingsAttributes: domain.BrandingSettingsAttributes{
+				LinkPreviewImageURL: &url.URL{},
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)

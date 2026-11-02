@@ -151,6 +151,14 @@ func (p *relationalTablesProjection) Reducers() []handler.AggregateReducer {
 					Event:  instance.LabelPolicyFontRemovedEventType,
 					Reduce: p.reduceLabelPolicyFontRemoved,
 				},
+				{
+					Event:  instance.LabelPolicyLinkPreviewImageAddedEventType,
+					Reduce: p.reduceLabelPolicyLinkPreviewImageAdded,
+				},
+				{
+					Event:  instance.LabelPolicyLinkPreviewImageRemovedEventType,
+					Reduce: p.reduceLabelPolicyLinkPreviewImageRemoved,
+				},
 				// Password Complexity
 				{
 					Event:  instance.PasswordComplexityPolicyAddedEventType,
@@ -557,6 +565,14 @@ func (p *relationalTablesProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  org.LabelPolicyFontRemovedEventType,
 					Reduce: p.reduceLabelPolicyFontRemoved,
+				},
+				{
+					Event:  org.LabelPolicyLinkPreviewImageAddedEventType,
+					Reduce: p.reduceLabelPolicyLinkPreviewImageAdded,
+				},
+				{
+					Event:  org.LabelPolicyLinkPreviewImageRemovedEventType,
+					Reduce: p.reduceLabelPolicyLinkPreviewImageRemoved,
 				},
 				// Password Complexity
 				{
