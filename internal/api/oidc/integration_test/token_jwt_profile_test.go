@@ -20,6 +20,10 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 )
 
+// defaultIDTokenLifetime mirrors OIDC.DefaultIdTokenLifetime from cmd/defaults.yaml,
+// which the integration configuration does not override.
+const defaultIDTokenLifetime = 12 * time.Hour
+
 func TestServer_JWTProfile(t *testing.T) {
 	user, name, keyData, err := Instance.CreateOIDCJWTProfileClient(CTX, time.Hour)
 	require.NoError(t, err)
@@ -174,4 +178,37 @@ func TestServer_JWTProfile(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestServer_JWTProfile_IDTokenLifetime checks that the ID token returned by the JWT profile
+// grant expires after the configured lifetime. It used to be issued with exp == iat, which
+// made it expired on arrival.
+func TestServer_JWTProfile_IDTokenLifetime(t *testing.T) {
+	_, _, keyData, err := Instance.CreateOIDCJWTProfileClient(CTX, time.Hour)
+	require.NoError(t, err)
+
+	tokenSource, err := profile.NewJWTProfileTokenSourceFromKeyFileData(CTX, Instance.OIDCIssuer(), keyData, []string{oidc.ScopeOpenID})
+	require.NoError(t, err)
+
+	var tokens *oauth2.Token
+	require.EventuallyWithT(
+		t, func(collect *assert.CollectT) {
+			tokens, err = tokenSource.TokenCtx(CTX)
+			assert.NoError(collect, err)
+			assert.NotNil(collect, tokens)
+		},
+		time.Minute, time.Second,
+	)
+
+	idToken, ok := tokens.Extra("id_token").(string)
+	require.True(t, ok, "openid scope must return an id_token")
+
+	claims := new(oidc.IDTokenClaims)
+	_, err = oidc.ParseToken(idToken, claims)
+	require.NoError(t, err)
+
+	lifetime := claims.GetExpiration().Sub(claims.GetIssuedAt())
+	assert.Positive(t, lifetime, "ID token must not expire at the moment it is issued")
+	// The integration config does not override OIDC.DefaultIdTokenLifetime, so the default applies.
+	assert.InDelta(t, defaultIDTokenLifetime.Seconds(), lifetime.Seconds(), 5)
 }
