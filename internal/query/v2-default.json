@@ -255,6 +255,7 @@
         "smsDescription": "Geben Sie Ihre Telefonnummer ein, um einen Code per SMS zu erhalten.",
         "emailDescription": "Geben Sie Ihre E-Mail-Adresse ein, um einen Code per E-Mail zu erhalten.",
         "totpRegisterDescription": "Scannen Sie den QR-Code oder navigieren Sie manuell zur URL.",
+        "manualSetupDescription": "Sie können den QR-Code nicht scannen? Geben Sie stattdessen diesen Schlüssel in Ihrer Authentifizierungs-App ein.",
         "submit": "Weiter",
         "labels": {
           "code": "Code"
@@ -729,6 +730,7 @@
         "smsDescription": "Enter your phone number to receive a code via SMS.",
         "emailDescription": "Enter your email address to receive a code via email.",
         "totpRegisterDescription": "Scan the QR Code or navigate to the URL manually.",
+        "manualSetupDescription": "Can't scan the QR code? Enter this key in your authenticator app instead.",
         "submit": "Continue",
         "labels": {
           "code": "Code"
@@ -1203,6 +1205,7 @@
         "smsDescription": "Introduce tu número de teléfono para recibir un código por SMS.",
         "emailDescription": "Introduce tu dirección de correo electrónico para recibir un código por correo electrónico.",
         "totpRegisterDescription": "Escanea el código QR o navega manualmente a la URL.",
+        "manualSetupDescription": "¿No puedes escanear el código QR? Introduce esta clave en tu aplicación de autenticación.",
         "submit": "Continuar",
         "labels": {
           "code": "Código"
@@ -1677,6 +1680,7 @@
         "smsDescription": "Inserisci il tuo numero di telefono per ricevere un codice via SMS.",
         "emailDescription": "Inserisci il tuo indirizzo email per ricevere un codice via email.",
         "totpRegisterDescription": "Scansiona il codice QR o naviga manualmente all'URL.",
+        "manualSetupDescription": "Non riesci a scansionare il codice QR? Inserisci invece questa chiave nella tua app di autenticazione.",
         "submit": "Continua",
         "labels": {
           "code": "Codice"
@@ -2151,6 +2155,7 @@
         "smsDescription": "Voer jouw telefoonnummer in om een code via sms te ontvangen.",
         "emailDescription": "Voer jouw e-mailadres in om een code via e-mail te ontvangen.",
         "totpRegisterDescription": "Scan de QR-code of navigeer handmatig naar de URL.",
+        "manualSetupDescription": "Kun je de QR-code niet scannen? Voer dan deze sleutel in jouw authenticator-app in.",
         "submit": "Verder",
         "labels": {
           "code": "Code"
@@ -2625,6 +2630,7 @@
         "smsDescription": "Wprowadź swój numer telefonu, aby otrzymać kod SMS-em.",
         "emailDescription": "Wprowadź swój adres e-mail, aby otrzymać kod e-mailem.",
         "totpRegisterDescription": "Zeskanuj kod QR lub otwórz adres URL ręcznie.",
+        "manualSetupDescription": "Nie możesz zeskanować kodu QR? Wprowadź ten klucz w aplikacji uwierzytelniającej.",
         "submit": "Kontynuuj",
         "labels": {
           "code": "Kod"
@@ -3099,6 +3105,7 @@
         "smsDescription": "Введите номер телефона для получения кода по SMS.",
         "emailDescription": "Введите email для получения кода.",
         "totpRegisterDescription": "Отсканируйте QR-код или перейдите по ссылке вручную.",
+        "manualSetupDescription": "Не удаётся отсканировать QR-код? Введите этот ключ в приложении-аутентификаторе.",
         "submit": "Продолжить",
         "labels": {
           "code": "Код"
@@ -3573,6 +3580,7 @@
         "smsDescription": "输入您的电话号码以接收短信验证码。",
         "emailDescription": "输入您的电子邮箱地址以接收电子邮件验证码。",
         "totpRegisterDescription": "扫描二维码或手动导航到URL。",
+        "manualSetupDescription": "无法扫描二维码？请在认证应用程序中输入此密钥。",
         "submit": "继续",
         "labels": {
           "code": "验证码"
@@ -4047,6 +4055,7 @@
         "smsDescription": "SMS ile kod almak için telefon numaranızı girin.",
         "emailDescription": "E-posta ile kod almak için e-posta adresinizi girin.",
         "totpRegisterDescription": "QR Kodunu tarayın veya URL'ye manuel olarak gidin.",
+        "manualSetupDescription": "QR kodunu tarayamıyor musunuz? Bunun yerine bu anahtarı kimlik doğrulama uygulamanıza girin.",
         "submit": "Devam",
         "labels": {
           "code": "Kod"
@@ -4521,6 +4530,7 @@
         "smsDescription": "Введіть номер телефону для отримання коду через SMS.",
         "emailDescription": "Введіть електронну адресу для отримання коду на пошту.",
         "totpRegisterDescription": "Відскануйте QR-код або перейдіть за URL вручну.",
+        "manualSetupDescription": "Не вдається відсканувати QR-код? Введіть цей ключ у вашому додатку автентифікації.",
         "submit": "Продовжити",
         "labels": {
           "code": "Код"
@@ -4995,6 +5005,7 @@
         "smsDescription": "أدخل رقم هاتفك لتلقي رمز عبر الرسائل القصيرة.",
         "emailDescription": "أدخل عنوان بريدك الإلكتروني لتلقي رمز عبر البريد الإلكتروني.",
         "totpRegisterDescription": "امسح رمز الاستجابة السريعة أو انتقل إلى عنوان URL يدوياً.",
+        "manualSetupDescription": "لا يمكنك مسح رمز الاستجابة السريعة؟ أدخل هذا المفتاح في تطبيق المصادقة الخاص بك بدلاً من ذلك.",
         "submit": "متابعة",
         "labels": {
           "code": "الرمز"
@@ -5469,6 +5480,7 @@
         "smsDescription": "Add meg a telefonszámodat, hogy SMS-ben elküldhessük az ellenőrző kódot.",
         "emailDescription": "Add meg az e-mail címedet, hogy e-mailben elküldhessük az ellenőrző kódot.",
         "totpRegisterDescription": "Olvasd be a QR-kódot, vagy navigálj az URL-re manuálisan.",
+        "manualSetupDescription": "Nem tudod beolvasni a QR-kódot? Add meg helyette ezt a kulcsot a hitelesítő alkalmazásodban.",
         "submit": "Tovább",
         "labels": {
           "code": "Kód"
@@ -5943,6 +5955,7 @@
         "smsDescription": "Entrez votre numéro de téléphone pour recevoir un code par SMS.",
         "emailDescription": "Entrez votre adresse e-mail pour recevoir un code par e-mail.",
         "totpRegisterDescription": "Scannez le QR code ou saisissez l'URL manuellement.",
+        "manualSetupDescription": "Vous ne pouvez pas scanner le QR code ? Saisissez plutôt cette clé dans votre application d'authentification.",
         "submit": "Continuer",
         "labels": {
           "code": "Code"
@@ -6417,6 +6430,7 @@
         "smsDescription": "SMSでコードを受信する電話番号を入力してください。",
         "emailDescription": "メールでコードを受信するメールアドレスを入力してください。",
         "totpRegisterDescription": "QRコードをスキャンするか、URLに手動でアクセスしてください。",
+        "manualSetupDescription": "QRコードをスキャンできない場合は、認証アプリにこのキーを入力してください。",
         "submit": "続行",
         "labels": {
           "code": "コード"
@@ -6891,6 +6905,7 @@
         "smsDescription": "Insira seu número de telefone para receber um código via SMS.",
         "emailDescription": "Insira seu endereço de e-mail para receber um código por e-mail.",
         "totpRegisterDescription": "Escaneie o QR Code ou acesse a URL manualmente.",
+        "manualSetupDescription": "Não consegue escanear o QR Code? Insira esta chave no seu aplicativo autenticador.",
         "submit": "Continuar",
         "labels": {
           "code": "Código"

@@ -255,6 +255,7 @@
       "smsDescription": "输入您的电话号码以接收短信验证码。",
       "emailDescription": "输入您的电子邮箱地址以接收电子邮件验证码。",
       "totpRegisterDescription": "扫描二维码或手动导航到URL。",
+      "manualSetupDescription": "无法扫描二维码？请在认证应用程序中输入此密钥。",
       "submit": "继续",
       "labels": {
         "code": "验证码"
