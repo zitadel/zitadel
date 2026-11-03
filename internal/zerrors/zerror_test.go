@@ -2,6 +2,7 @@ package zerrors
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -59,6 +60,43 @@ func TestZitadelError_Is(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := errors.Is(tt.err, target)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestZitadelError_Is_WrappedTarget(t *testing.T) {
+	parent := errors.New("parent error")
+	err := CreateZitadelError(KindAborted, parent, "id", "message", 0)
+	tests := []struct {
+		name   string // description of this test case
+		target error
+		want   bool
+	}{
+		{
+			name:   "unwrapped target",
+			target: CreateZitadelError(KindAborted, parent, "id", "message", 0),
+			want:   true,
+		},
+		{
+			name:   "wrapped target",
+			target: fmt.Errorf("wrapped: %w", CreateZitadelError(KindAborted, parent, "id", "message", 0)),
+			want:   true,
+		},
+		{
+			name:   "wrapped target of different kind",
+			target: fmt.Errorf("wrapped: %w", CreateZitadelError(KindNotFound, parent, "id", "message", 0)),
+			want:   false,
+		},
+		{
+			name:   "wrapped target without zitadel error",
+			target: fmt.Errorf("wrapped: %w", errors.New("some other error")),
+			want:   false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := errors.Is(err, tt.target)
 			assert.Equal(t, tt.want, got)
 		})
 	}
