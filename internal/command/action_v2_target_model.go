@@ -44,6 +44,7 @@ func (wm *TargetWriteModel) Reduce() error {
 			wm.TargetType = e.TargetType
 			wm.Endpoint = e.Endpoint
 			wm.Timeout = e.Timeout
+			wm.InterruptOnError = e.InterruptOnError
 			wm.State = domain.TargetActive
 			wm.SigningKey = e.SigningKey
 			wm.PayloadType = e.PayloadType
