@@ -5,6 +5,9 @@ import { baseOptions } from '@/lib/layout.shared';
 import { buildCustomTree } from '@/lib/custom-tree';
 import rawVersions from '@/content/versions.json';
 import { VersionSelector } from '@/components/version-selector';
+import { LATEST_VERSION, resolveVersion, VERSION_PREFERENCE_COOKIE } from '@/lib/version-preference.mjs';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 type DocVersion = { param: string };
 type PageTree = typeof source.pageTree;
@@ -54,8 +57,19 @@ export default async function Layout(props: { children: ReactNode; params: Promi
   const params = await props.params;
   const slug = params.slug || [];
 
-  const currentVersion = slug[0] && versionParams.has(slug[0]) ? slug[0] : 'latest';
-  const tree = currentVersion === 'latest' ? latestTree : getVersionTree(currentVersion);
+  const requestedVersion = slug[0] && versionParams.has(slug[0]) ? slug[0] : undefined;
+  const cookieStore = await cookies();
+  const currentVersion = resolveVersion({
+    requestedVersion,
+    storedVersion: cookieStore.get(VERSION_PREFERENCE_COOKIE)?.value,
+    versions,
+  });
+
+  if (!requestedVersion && currentVersion !== LATEST_VERSION) {
+    redirect(`/${[currentVersion, ...slug].join('/')}`);
+  }
+
+  const tree = currentVersion === LATEST_VERSION ? latestTree : getVersionTree(currentVersion);
 
   return (
     <DocsLayout

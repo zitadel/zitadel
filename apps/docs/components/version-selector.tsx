@@ -12,6 +12,7 @@ interface DocVersion {
 }
 
 import rawVersions from '../content/versions.json';
+import { getVersionPreferenceCookie } from '../lib/version-preference.mjs';
 const versions = rawVersions as DocVersion[];
 
 export function VersionSelector() {
@@ -46,6 +47,8 @@ export function VersionSelector() {
         if (!version) return;
 
         if (!version.param) return;
+
+        document.cookie = getVersionPreferenceCookie(version.param);
 
         // Calculate the 'tail' of the path (content path)
         let tail = normalizedPath;
