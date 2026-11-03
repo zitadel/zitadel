@@ -19,9 +19,26 @@ elseif max_age > 0 then
     redis.call("EXPIRE", object_id, max_age)
 end
 
+-- Index keys and the key set need a TTL as well. Otherwise they are never removed when the object
+-- isn't requested again by that key, for example after a version upgrade,
+-- and can't be evicted under a volatile-* maxmemory-policy.
+-- The object is never returned after max_age, so the keys can simply expire then.
+-- Without max_age they share the usage based TTL of the object, which Get resets.
+local keys_ttl = max_age
+if keys_ttl <= 0 then
+    keys_ttl = usage_lifetime
+end
+
 local n = #KEYS
 local setKey = keySetKey(object_id)
 for i = 2, n do -- offset to the second element to skip object_id
     redis.call("SADD", setKey, KEYS[i]) -- set of all keys used for housekeeping
-    redis.call("SET", KEYS[i], object_id) -- key to object_id mapping
+    if keys_ttl > 0 then
+        redis.call("SET", KEYS[i], object_id, "EX", keys_ttl) -- key to object_id mapping
+    else
+        redis.call("SET", KEYS[i], object_id) -- key to object_id mapping
+    end
+end
+if keys_ttl > 0 then
+    redis.call("EXPIRE", setKey, keys_ttl)
 end
