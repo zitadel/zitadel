@@ -1350,6 +1350,51 @@ EventTypes:
     activated: "Kunci Web diaktifkan"
     deactivated: "Kunci Web dinonaktifkan"
     removed: "Kunci Web dihapus"
+  session:
+    added: "Sesi dibuat"
+    user:
+      checked: "Pengguna sesi diperiksa"
+    password:
+      checked: "Kata sandi sesi diperiksa"
+    intent:
+      checked: "Intent penyedia identitas sesi diperiksa"
+    webAuthN:
+      challenged: "Tantangan WebAuthN sesi dibuat"
+      checked: "WebAuthN sesi diperiksa"
+    totp:
+      checked: "TOTP sesi diperiksa"
+    otp:
+      sms:
+        challenged: "Tantangan OTP SMS sesi dibuat"
+        sent: "Kode OTP SMS sesi terkirim"
+        checked: "OTP SMS sesi diperiksa"
+      email:
+        challenged: "Tantangan OTP Email sesi dibuat"
+        sent: "Kode OTP Email sesi terkirim"
+        checked: "OTP Email sesi diperiksa"
+    recoveryCode:
+      checked: "Kode pemulihan sesi diperiksa"
+    token:
+      set: "Token sesi ditetapkan"
+    metadata:
+      set: "Metadata sesi ditetapkan"
+    lifetime:
+      set: "Masa berlaku sesi ditetapkan"
+    terminated: "Sesi diakhiri"
+  oidc_session:
+    added: "Sesi OIDC dibuat"
+    access_token:
+      added: "Token Akses sesi OIDC dibuat"
+      revoked: "Token Akses sesi OIDC dicabut"
+    refresh_token:
+      added: "Token Penyegaran sesi OIDC dibuat"
+      renewed: "Token Penyegaran sesi OIDC diperbarui"
+      revoked: "Token Penyegaran sesi OIDC dicabut"
+  saml_session:
+    added: "Sesi SAML dibuat"
+    saml_response:
+      added: "Respons SAML sesi dibuat"
+      revoked: "Respons SAML sesi dicabut"
 Application:
   OIDC:
     UnsupportedVersion: "Versi OIDC Anda tidak didukung"

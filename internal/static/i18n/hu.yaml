@@ -1375,6 +1375,51 @@ EventTypes:
     activated: "Web Key aktiválva"
     deactivated: "Web Key deaktiválva"
     removed: "Web Key eltávolítva"
+  session:
+    added: "Munkamenet létrehozva"
+    user:
+      checked: "Munkamenet felhasználója ellenőrizve"
+    password:
+      checked: "Munkamenet jelszava ellenőrizve"
+    intent:
+      checked: "Munkamenet identitásszolgáltatói intentje ellenőrizve"
+    webAuthN:
+      challenged: "Munkamenet WebAuthN kihívása létrehozva"
+      checked: "Munkamenet WebAuthN ellenőrizve"
+    totp:
+      checked: "Munkamenet TOTP ellenőrizve"
+    otp:
+      sms:
+        challenged: "Munkamenet OTP SMS kihívása létrehozva"
+        sent: "Munkamenet OTP SMS kódja elküldve"
+        checked: "Munkamenet OTP SMS ellenőrizve"
+      email:
+        challenged: "Munkamenet OTP Email kihívása létrehozva"
+        sent: "Munkamenet OTP Email kódja elküldve"
+        checked: "Munkamenet OTP Email ellenőrizve"
+    recoveryCode:
+      checked: "Munkamenet helyreállítási kódja ellenőrizve"
+    token:
+      set: "Munkamenet tokenje beállítva"
+    metadata:
+      set: "Munkamenet metaadatai beállítva"
+    lifetime:
+      set: "Munkamenet élettartama beállítva"
+    terminated: "Munkamenet befejezve"
+  oidc_session:
+    added: "OIDC munkamenet létrehozva"
+    access_token:
+      added: "OIDC munkamenet hozzáférési tokenje létrehozva"
+      revoked: "OIDC munkamenet hozzáférési tokenje visszavonva"
+    refresh_token:
+      added: "OIDC munkamenet Refresh Tokenje létrehozva"
+      renewed: "OIDC munkamenet Refresh Tokenje megújítva"
+      revoked: "OIDC munkamenet Refresh Tokenje visszavonva"
+  saml_session:
+    added: "SAML munkamenet létrehozva"
+    saml_response:
+      added: "SAML munkamenet válasza létrehozva"
+      revoked: "SAML munkamenet válasza visszavonva"
 Application:
   OIDC:
     UnsupportedVersion: "Az OIDC verziód nem támogatott"

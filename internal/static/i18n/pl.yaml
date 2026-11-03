@@ -1376,6 +1376,51 @@ EventTypes:
     activated: "Klucz internetowy aktywowano"
     deactivated: "Klucz internetowy dezaktywowano"
     removed: "Klucz internetowy usunięto"
+  session:
+    added: "Utworzono sesję"
+    user:
+      checked: "Sprawdzono użytkownika sesji"
+    password:
+      checked: "Sprawdzono hasło sesji"
+    intent:
+      checked: "Sprawdzono intencję dostawcy tożsamości sesji"
+    webAuthN:
+      challenged: "Utworzono wyzwanie WebAuthN sesji"
+      checked: "Sprawdzono WebAuthN sesji"
+    totp:
+      checked: "Sprawdzono TOTP sesji"
+    otp:
+      sms:
+        challenged: "Utworzono wyzwanie OTP SMS sesji"
+        sent: "Wysłano kod OTP SMS sesji"
+        checked: "Sprawdzono OTP SMS sesji"
+      email:
+        challenged: "Utworzono wyzwanie OTP e-mail sesji"
+        sent: "Wysłano kod OTP e-mail sesji"
+        checked: "Sprawdzono OTP e-mail sesji"
+    recoveryCode:
+      checked: "Sprawdzono kod odzyskiwania sesji"
+    token:
+      set: "Ustawiono token sesji"
+    metadata:
+      set: "Ustawiono metadane sesji"
+    lifetime:
+      set: "Ustawiono czas życia sesji"
+    terminated: "Zakończono sesję"
+  oidc_session:
+    added: "Utworzono sesję OIDC"
+    access_token:
+      added: "Utworzono token dostępu sesji OIDC"
+      revoked: "Unieważniono token dostępu sesji OIDC"
+    refresh_token:
+      added: "Utworzono token odświeżania sesji OIDC"
+      renewed: "Odnowiono token odświeżania sesji OIDC"
+      revoked: "Unieważniono token odświeżania sesji OIDC"
+  saml_session:
+    added: "Utworzono sesję SAML"
+    saml_response:
+      added: "Utworzono odpowiedź SAML sesji"
+      revoked: "Unieważniono odpowiedź SAML sesji"
 Application:
   OIDC:
     UnsupportedVersion: "Twoja wersja OIDC nie jest obsługiwana"
