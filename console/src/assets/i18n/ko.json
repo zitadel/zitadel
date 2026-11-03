@@ -2376,7 +2376,8 @@
       "HEADERNAME": "헤더 이름",
       "JWTENDPOINT": "JWT 엔드포인트",
       "JWTKEYSENDPOINT": "JWT 키 엔드포인트",
-      "AUDIENCE": "청중"
+      "AUDIENCE": "청중",
+      "AUDIENCE_EMPTY_WARNING": "청중을 설정하지 않으면 ZITADEL은 이 발급자가 발급한 유효한 토큰을 어떤 애플리케이션용으로 발급되었는지와 관계없이 모두 수락합니다. 청중 설정을 강력히 권장합니다."
     },
     "APPLE": {
       "TEAMID": "팀 ID",
