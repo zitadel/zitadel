@@ -76,6 +76,34 @@ func TestEmailValid(t *testing.T) {
 			result: true,
 		},
 		{
+			name: "email without dot in domain, invalid", // https://github.com/zitadel/zitadel/issues/3919
+			args: args{
+				email: &Email{EmailAddress: "test@test"},
+			},
+			result: false,
+		},
+		{
+			name: "email without dot in domain, invalid", // https://github.com/zitadel/zitadel/issues/3919
+			args: args{
+				email: &Email{EmailAddress: "est@test"},
+			},
+			result: false,
+		},
+		{
+			name: "email with country TLD, valid", // https://github.com/zitadel/zitadel/issues/3919
+			args: args{
+				email: &Email{EmailAddress: "test@test.ch"},
+			},
+			result: true,
+		},
+		{
+			name: "email with subdomain, valid",
+			args: args{
+				email: &Email{EmailAddress: "test@mail.test.ch"},
+			},
+			result: true,
+		},
+		{
 			name: "email with name, invalid",
 			args: args{
 				email: &Email{EmailAddress: "John Doe <john.doe@example.com>"},
