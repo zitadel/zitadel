@@ -259,9 +259,10 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s74Apps7OIDCConfigsAddRegistrationToken = &Apps7OIDCConfigsAddRegistrationToken{dbClient: dbClient}
 	steps.s75Apps7OIDCConfigsAddAppLinkConfig = &Apps7OIDCConfigsAddAppLinkConfig{dbClient: dbClient}
 	steps.s76Users14LoginEqualityIndexes = &Users14LoginEqualityIndexes{dbClient: dbClient}
-	steps.s77StampEventPositionAtInsert = &StampEventPositionAtInsert{dbClient: dbClient}
 	steps.s78UniqueConstraintOwners = &UniqueConstraintOwners{dbClient: dbClient}
 	steps.s80Users14InstanceResourceOwnerIndex = &Users14InstanceResourceOwnerIndex{dbClient: dbClient}
+	steps.s81CommandsToEventsClockTimestamp = &CommandsToEventsClockTimestamp{dbClient: dbClient}
+	steps.s82CurrentStatesInTxOrder = &CurrentStatesInTxOrder{dbClient: dbClient}
 	if steps.BackfillUniqueConstraintOwners == nil {
 		steps.BackfillUniqueConstraintOwners = &BackfillUniqueConstraintOwners{}
 	}
@@ -297,6 +298,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s23CorrectGlobalUniqueConstraints,
 		steps.s24AddActorToAuthTokens,
 		steps.s26AuthUsers3,
+		steps.s82CurrentStatesInTxOrder,
 		steps.s29FillFieldsForProjectGrant,
 		steps.s30FillFieldsForOrgDomainVerified,
 		steps.s34AddCacheSchema,
@@ -326,9 +328,9 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s69CacheTablesLogged,
 		steps.s70AddEventStoreCommandEnforceOwner,
 		steps.s76Users14LoginEqualityIndexes,
-		steps.s77StampEventPositionAtInsert,
 		steps.s78UniqueConstraintOwners,
 		steps.s80Users14InstanceResourceOwnerIndex,
+		steps.s81CommandsToEventsClockTimestamp,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
