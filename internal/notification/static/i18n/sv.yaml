@@ -34,6 +34,10 @@ VerifyEmailOTP:
   Text: "Använd OTP {{.OTP}} för att autentisera inom de närmaste fem minuterna eller klicka på \"Autentisera\"-knappen."
   ButtonText: "Autentisera"
 VerifySMSOTP:
+  Title: "Verifiera OTP"
+  PreHeader: "Verifiera OTP"
+  Subject: "Verifiera OTP"
+  Greeting: "Hej {{.DisplayName}},"
   Text: |-
     {{.OTP}} är ditt OTP för {{ .Domain }}. Använd det inom {{.Expiry}}.
     @{{.Domain}} #{{.OTP}}
