@@ -619,6 +619,10 @@ Errors:
     KeyIDMissing: "KeyID eksik"
     PrivateKeyMissing: "Özel Anahtar eksik"
     InvalidPrivateKey: "Geçersiz özel anahtar biçimi"
+    SAMLCertificateMissing: "SAML sertifikası eksik"
+    SAMLCertificateInvalid: "Geçersiz SAML sertifikası"
+    SAMLCertificateExpired: "SAML sertifikasının süresi dolmuş veya henüz geçerli değil"
+    SAMLCertificateKeyMismatch: "Özel anahtar SAML sertifikasıyla eşleşmiyor"
 
 AggregateTypes:
   action: "Eylem"

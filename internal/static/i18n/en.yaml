@@ -623,6 +623,10 @@ Errors:
     KeyIDMissing: "KeyID missing"
     PrivateKeyMissing: "Private Key missing"
     InvalidPrivateKey: "Invalid Private Key format"
+    SAMLCertificateMissing: "SAML certificate missing"
+    SAMLCertificateInvalid: "Invalid SAML certificate"
+    SAMLCertificateExpired: "SAML certificate is expired or not yet valid"
+    SAMLCertificateKeyMismatch: "Private key does not match the SAML certificate"
 
 AggregateTypes:
   action: "Action"

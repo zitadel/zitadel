@@ -2398,7 +2398,14 @@
       "SIGNATUREALGORITHM": "Aláírási algoritmus",
       "NAMEIDFORMAT": "NameID formátum",
       "TRANSIENTMAPPINGATTRIBUTENAME": "Egyéni leképezési attribútumnév",
-      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternatív attribútumnév a felhasználó leképezéséhez, ha a visszakapott `nameid-format` `transient`, pl. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternatív attribútumnév a felhasználó leképezéséhez, ha a visszakapott `nameid-format` `transient`, pl. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`",
+      "CERTIFICATE": "Tanúsítvány",
+      "PRIVATEKEY": "Titkos kulcs",
+      "UPLOADCERTIFICATE": "Tanúsítvány feltöltése",
+      "UPLOADPRIVATEKEY": "Titkos kulcs feltöltése",
+      "UPDATECERTIFICATE": "Tanúsítvány cseréje",
+      "FILEMAXSIZEEXCEEDED": "A fájl mérete meghaladja a maximumot.",
+      "CERTIFICATE_DESC": "Opcionálisan feltölthet egy tanúsítványt és a hozzá tartozó titkos kulcsot (PEM), például az identitásszolgáltató által megkövetelt hitelesítésszolgáltatótól. Ezekkel írja alá a kéréseket és fejti vissza az assertionöket. Ha nincs megadva, önaláírt tanúsítvány jön létre."
     },
     "TOAST": {
       "SAVED": "Sikeresen mentve.",

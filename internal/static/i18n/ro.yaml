@@ -614,6 +614,10 @@ Errors:
     KeyIDMissing: "KeyID lipsă"
     PrivateKeyMissing: "Cheie Privată lipsă"
     InvalidPrivateKey: "Format de cheie privată nevalid"
+    SAMLCertificateMissing: "Certificatul SAML lipsește"
+    SAMLCertificateInvalid: "Certificat SAML nevalid"
+    SAMLCertificateExpired: "Certificatul SAML a expirat sau nu este încă valid"
+    SAMLCertificateKeyMismatch: "Cheia privată nu corespunde certificatului SAML"
 
     AggregateTypes:
       action: "Acțiune"

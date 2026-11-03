@@ -619,6 +619,10 @@ Errors:
     KeyIDMissing: "KeyID가 누락되었습니다"
     PrivateKeyMissing: "개인 키가 누락되었습니다"
     InvalidPrivateKey: "유효하지 않은 개인 키 형식"
+    SAMLCertificateMissing: "SAML 인증서가 없습니다"
+    SAMLCertificateInvalid: "유효하지 않은 SAML 인증서"
+    SAMLCertificateExpired: "SAML 인증서가 만료되었거나 아직 유효하지 않습니다"
+    SAMLCertificateKeyMismatch: "개인 키가 SAML 인증서와 일치하지 않습니다"
 
 AggregateTypes:
   action: "작업"

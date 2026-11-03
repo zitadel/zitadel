@@ -614,6 +614,10 @@ Errors:
     KeyIDMissing: "معرف المفتاح مفقود"
     PrivateKeyMissing: "المفتاح الخاص مفقود"
     InvalidPrivateKey: "تنسيق مفتاح خاص غير صالح"
+    SAMLCertificateMissing: "شهادة SAML مفقودة"
+    SAMLCertificateInvalid: "شهادة SAML غير صالحة"
+    SAMLCertificateExpired: "شهادة SAML منتهية الصلاحية أو غير صالحة بعد"
+    SAMLCertificateKeyMismatch: "المفتاح الخاص لا يتطابق مع شهادة SAML"
 
 AggregateTypes:
   action: "إجراء"

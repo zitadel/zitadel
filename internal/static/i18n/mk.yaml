@@ -617,6 +617,10 @@ Errors:
     KeyIDMissing: "Недостасува ID на клуч"
     PrivateKeyMissing: "Недостасува приватен клуч"
     InvalidPrivateKey: "Невалиден формат на приватен клуч"
+    SAMLCertificateMissing: "Недостасува SAML сертификат"
+    SAMLCertificateInvalid: "Невалиден SAML сертификат"
+    SAMLCertificateExpired: "SAML сертификатот е истечен или сè уште не е валиден"
+    SAMLCertificateKeyMismatch: "Приватниот клуч не се совпаѓа со SAML сертификатот"
 
 AggregateTypes:
   action: "Акција"

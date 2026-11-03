@@ -618,6 +618,10 @@ Errors:
     KeyIDMissing: "KeyID ontbreekt"
     PrivateKeyMissing: "Privésleutel ontbreekt"
     InvalidPrivateKey: "Ongeldig formaat van privésleutel"
+    SAMLCertificateMissing: "SAML-certificaat ontbreekt"
+    SAMLCertificateInvalid: "Ongeldig SAML-certificaat"
+    SAMLCertificateExpired: "SAML-certificaat is verlopen of nog niet geldig"
+    SAMLCertificateKeyMismatch: "Privésleutel komt niet overeen met het SAML-certificaat"
 
 AggregateTypes:
   action: "Actie"

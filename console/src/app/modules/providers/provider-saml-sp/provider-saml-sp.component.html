@@ -114,6 +114,93 @@
                 }}</mat-checkbox>
               </div>
             </cnsl-info-section>
+            <cnsl-info-section>
+              <div>
+                <p class="option-desc">{{ 'IDP.SAML.CERTIFICATE_DESC' | translate }}</p>
+                @if (provider) {
+                  <mat-checkbox
+                    class="update-secret-checkbox"
+                    [(ngModel)]="updateCertificate"
+                    [ngModelOptions]="{ standalone: true }"
+                    >{{ 'IDP.SAML.UPDATECERTIFICATE' | translate }}</mat-checkbox
+                  >
+                }
+                @if (!provider || updateCertificate) {
+                  <div class="certificate-upload">
+                    <div>
+                      <span class="pk-label cnsl-secondary-text">{{ 'IDP.SAML.CERTIFICATE' | translate }}</span>
+                      <div class="private-key-wrapper">
+                        @if (certificate.value) {
+                          <i class="las la-file"></i>
+                          <button
+                            class="dl-btn"
+                            mat-icon-button
+                            color="warn"
+                            type="button"
+                            (click)="certificate.setValue('')"
+                            matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+                          >
+                            <i class="las la-trash"></i>
+                          </button>
+                        } @else {
+                          <input
+                            #certificateFileInput
+                            style="display: none"
+                            type="file"
+                            accept=".pem,.crt,.cer"
+                            (change)="onDropCertificate($any($event.target).files)"
+                          />
+                          <button
+                            class="asset-add-btn"
+                            mat-icon-button
+                            type="button"
+                            matTooltip="{{ 'IDP.SAML.UPLOADCERTIFICATE' | translate }}"
+                            (click)="certificateFileInput.click()"
+                          >
+                            <mat-icon>add</mat-icon>
+                          </button>
+                        }
+                      </div>
+                    </div>
+                    <div>
+                      <span class="pk-label cnsl-secondary-text">{{ 'IDP.SAML.PRIVATEKEY' | translate }}</span>
+                      <div class="private-key-wrapper">
+                        @if (privateKey.value) {
+                          <i class="las la-file"></i>
+                          <button
+                            class="dl-btn"
+                            mat-icon-button
+                            color="warn"
+                            type="button"
+                            (click)="privateKey.setValue('')"
+                            matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+                          >
+                            <i class="las la-trash"></i>
+                          </button>
+                        } @else {
+                          <input
+                            #keyFileInput
+                            style="display: none"
+                            type="file"
+                            accept=".pem,.key"
+                            (change)="onDropPrivateKey($any($event.target).files)"
+                          />
+                          <button
+                            class="asset-add-btn"
+                            mat-icon-button
+                            type="button"
+                            matTooltip="{{ 'IDP.SAML.UPLOADPRIVATEKEY' | translate }}"
+                            (click)="keyFileInput.click()"
+                          >
+                            <mat-icon>add</mat-icon>
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </cnsl-info-section>
           </div>
           <cnsl-provider-options
             [initialOptions]="provider?.config?.options"

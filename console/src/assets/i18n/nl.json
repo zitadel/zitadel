@@ -2392,7 +2392,14 @@
       "METADATAURL": "Metadata URL",
       "BINDING": "Binding",
       "SIGNEDREQUEST": "Ondertekend Verzoek",
-      "SIGNATUREALGORITHM": "Handtekeningalgoritme"
+      "SIGNATUREALGORITHM": "Handtekeningalgoritme",
+      "CERTIFICATE": "Certificaat",
+      "PRIVATEKEY": "Privésleutel",
+      "UPLOADCERTIFICATE": "Certificaat uploaden",
+      "UPLOADPRIVATEKEY": "Privésleutel uploaden",
+      "UPDATECERTIFICATE": "Certificaat vervangen",
+      "FILEMAXSIZEEXCEEDED": "Maximale bestandsgrootte overschreden.",
+      "CERTIFICATE_DESC": "Upload optioneel een certificaat met de bijbehorende privésleutel (PEM), bijvoorbeeld uitgegeven door een certificaatautoriteit die de identity provider vereist. Deze worden gebruikt om verzoeken te ondertekenen en assertions te ontsleutelen. Zonder certificaat wordt een zelfondertekend certificaat gegenereerd."
     },
     "TOAST": {
       "SAVED": "Succesvol opgeslagen.",

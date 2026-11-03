@@ -619,6 +619,10 @@ Errors:
     KeyIDMissing: "キーIDがありません"
     PrivateKeyMissing: "秘密キーがありません"
     InvalidPrivateKey: "無効な秘密鍵形式"
+    SAMLCertificateMissing: "SAML証明書がありません"
+    SAMLCertificateInvalid: "無効なSAML証明書"
+    SAMLCertificateExpired: "SAML証明書の有効期限が切れているか、まだ有効ではありません"
+    SAMLCertificateKeyMismatch: "秘密鍵がSAML証明書と一致しません"
 
 AggregateTypes:
   action: "アクション"

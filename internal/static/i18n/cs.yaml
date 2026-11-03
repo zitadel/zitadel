@@ -616,6 +616,10 @@ Errors:
     KeyIDMissing: "Chybí KeyID"
     PrivateKeyMissing: "Chybí privátní klíč"
     InvalidPrivateKey: "Neplatný formát privátního klíče"
+    SAMLCertificateMissing: "Chybí certifikát SAML"
+    SAMLCertificateInvalid: "Neplatný certifikát SAML"
+    SAMLCertificateExpired: "Platnost certifikátu SAML vypršela nebo ještě nezačala"
+    SAMLCertificateKeyMismatch: "Privátní klíč neodpovídá certifikátu SAML"
 
 AggregateTypes:
   action: "Akce"

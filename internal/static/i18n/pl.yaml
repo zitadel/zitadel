@@ -618,6 +618,10 @@ Errors:
     KeyIDMissing: "Brak KeyID"
     PrivateKeyMissing: "Brak klucza prywatnego"
     InvalidPrivateKey: "Nieprawidłowy format klucza prywatnego"
+    SAMLCertificateMissing: "Brak certyfikatu SAML"
+    SAMLCertificateInvalid: "Nieprawidłowy certyfikat SAML"
+    SAMLCertificateExpired: "Certyfikat SAML wygasł lub nie jest jeszcze ważny"
+    SAMLCertificateKeyMismatch: "Klucz prywatny nie pasuje do certyfikatu SAML"
 
 AggregateTypes:
   action: "Działanie"
