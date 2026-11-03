@@ -1092,3 +1092,136 @@ describe("handleOIDCFlowInitiation — idp scope (urn:zitadel:iam:org:idp:id)", 
     );
   });
 });
+
+describe("handleOIDCFlowInitiation account selection", () => {
+  const firstSession = {
+    id: "first-session",
+    factors: { user: { id: "first-user", organizationId: "111111", loginName: "first@example.com" } },
+  };
+  const secondSession = {
+    id: "second-session",
+    factors: { user: { id: "second-user", organizationId: "111111", loginName: "second@example.com" } },
+  };
+  const callbackUrl = "https://example.com/callback";
+
+  beforeEach(async () => {
+    vi.resetAllMocks();
+    vi.stubEnv("NEXT_PUBLIC_BASE_PATH", "/ui/v2/login");
+    const zitadel = await import("@/lib/zitadel");
+    const serviceUrl = await import("@/lib/service-url");
+    const session = await import("@/lib/session");
+    const client = await import("@zitadel/client");
+
+    vi.mocked(zitadel.getAuthRequest).mockResolvedValue({
+      authRequest: { id: "abc123", uiLocales: [], scope: [], prompt: [] },
+    } as any);
+    const actualServiceUrl = await vi.importActual<typeof import("@/lib/service-url")>("@/lib/service-url");
+    vi.mocked(serviceUrl.constructUrl).mockImplementation(actualServiceUrl.constructUrl);
+    vi.mocked(session.findValidSession).mockImplementation(async ({ sessions, authRequest, organization }) => {
+      return sessions.find(
+        (candidate) =>
+          (!organization || candidate.factors?.user?.organizationId === organization) &&
+          (!authRequest?.loginHint || candidate.factors?.user?.loginName === authRequest.loginHint) &&
+          (!authRequest?.hintUserId || candidate.factors?.user?.id === authRequest.hintUserId),
+      );
+    });
+    vi.mocked(client.create).mockImplementation((_schema, value) => value as any);
+    vi.mocked(zitadel.createCallback).mockResolvedValue({ callbackUrl } as any);
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  async function initiate(sessions = [firstSession, secondSession]): Promise<Response> {
+    return handleOIDCFlowInitiation(
+      makeBaseParams({
+        request: new NextRequest("https://example.com/ui/v2/login?requestId=oidc_abc123", {
+          headers: { host: "example.com" },
+        }),
+        sessions: sessions as any,
+        sessionCookies: sessions.map(({ id }) => ({ id, token: "test-session-token" })),
+      }),
+    );
+  }
+
+  test("asks which user to use when two users have valid sessions", async () => {
+    const zitadel = await import("@/lib/zitadel");
+    const response = await initiate();
+    const location = new URL(response.headers.get("location")!);
+    expect(location.pathname).toBe("/ui/v2/login/accounts");
+    expect(location.searchParams.get("requestId")).toBe("oidc_abc123");
+    expect(zitadel.createCallback).not.toHaveBeenCalled();
+  });
+
+  test("keeps automatic sign-in with one user", async () => {
+    const response = await initiate([firstSession]);
+    expect(response.headers.get("location")).toBe(callbackUrl);
+  });
+
+  test("keeps automatic sign-in with multiple sessions for the same user", async () => {
+    const response = await initiate([firstSession, { ...firstSession, id: "another-session" }]);
+    expect(response.headers.get("location")).toBe(callbackUrl);
+  });
+
+  test("does not offer an expired second session", async () => {
+    const session = await import("@/lib/session");
+    vi.mocked(session.findValidSession)
+      .mockResolvedValueOnce(firstSession as any)
+      .mockResolvedValueOnce(undefined);
+    const response = await initiate();
+    expect(response.headers.get("location")).toBe(callbackUrl);
+  });
+
+  test("does not count users outside the requested organization", async () => {
+    const zitadel = await import("@/lib/zitadel");
+    vi.mocked(zitadel.getAuthRequest).mockResolvedValue({
+      authRequest: { id: "abc123", uiLocales: [], scope: ["urn:zitadel:iam:org:id:111111"], prompt: [] },
+    } as any);
+    const response = await initiate([
+      firstSession,
+      { ...secondSession, factors: { user: { ...secondSession.factors.user, organizationId: "999999" } } },
+    ]);
+    expect(response.headers.get("location")).toBe(callbackUrl);
+  });
+
+  test.each([{ loginHint: "second@example.com" }, { hintUserId: "second-user" }])(
+    "honors an explicit user hint: %j",
+    async (hint) => {
+      const zitadel = await import("@/lib/zitadel");
+      vi.mocked(zitadel.getAuthRequest).mockResolvedValue({
+        authRequest: { id: "abc123", uiLocales: [], scope: [], prompt: [], ...hint },
+      } as any);
+      const response = await initiate();
+      expect(response.headers.get("location")).toBe(callbackUrl);
+      expect(zitadel.createCallback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          req: expect.objectContaining({
+            callbackKind: { case: "session", value: { sessionId: "second-session", sessionToken: "test-session-token" } },
+          }),
+        }),
+      );
+    },
+  );
+
+  test("keeps prompt=none non-interactive with multiple users", async () => {
+    const zitadel = await import("@/lib/zitadel");
+    const { Prompt } = await import("@zitadel/proto/zitadel/oidc/v2/authorization_pb");
+    vi.mocked(zitadel.getAuthRequest).mockResolvedValue({
+      authRequest: { id: "abc123", uiLocales: [], scope: [], prompt: [Prompt.NONE] },
+    } as any);
+    const response = await initiate();
+    expect(response.headers.get("location")).toBe(callbackUrl);
+  });
+
+  test("retains the requested organization on the account picker", async () => {
+    const zitadel = await import("@/lib/zitadel");
+    vi.mocked(zitadel.getAuthRequest).mockResolvedValue({
+      authRequest: { id: "abc123", uiLocales: [], scope: ["urn:zitadel:iam:org:id:111111"], prompt: [] },
+    } as any);
+    const response = await initiate();
+    const location = new URL(response.headers.get("location")!);
+    expect(location.pathname).toBe("/ui/v2/login/accounts");
+    expect(location.searchParams.get("organization")).toBe("111111");
+  });
+});

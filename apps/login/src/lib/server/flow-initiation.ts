@@ -467,6 +467,18 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
     } else {
       let selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
 
+      if (selectedSession?.id && !authRequest.loginHint && !authRequest.hintUserId) {
+        const otherUserSessions = eligibleSessions.filter(
+          (session) => session.factors?.user?.id !== selectedSession.factors?.user?.id,
+        );
+        if (
+          otherUserSessions.length > 0 &&
+          (await findValidSession({ serviceConfig, sessions: otherUserSessions, authRequest, organization }))
+        ) {
+          return gotoAccounts({ request, requestId, organization, orgDomain });
+        }
+      }
+
       if (!selectedSession || !selectedSession.id) {
         // login_hint matches no session: resolve it straight to the next step.
         const hintResponse = await resolveLoginHint({
