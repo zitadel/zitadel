@@ -1148,7 +1148,7 @@ EventTypes:
       jwt:
         config:
           added: "Naidagdag ang JWT configuration sa identity provider"
-          changed: "Inalis ang JWT configuration sa identity provider"
+          changed: "Binago ang JWT configuration sa identity provider"
     customtext:
       set: "Naitakda ang text"
       removed: "Inalis ang text"
