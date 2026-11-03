@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -363,6 +364,14 @@ func Test_setInstance_errorCodes(t *testing.T) {
 			if got := status.Code(err); got != tc.wantCode {
 				t.Errorf("got code %v, want %v", got, tc.wantCode)
 			}
+			message := status.Convert(err).Message()
+			if !strings.Contains(message, tc.err.(*zerrors.ZitadelError).GetID()) ||
+				!strings.Contains(message, tc.err.(*zerrors.ZitadelError).GetMessage()) {
+				t.Errorf("response message does not preserve the stable error fields: %q", message)
+			}
+			if strings.Contains(message, "Parent=(") || strings.Contains(message, "SQLSTATE") {
+				t.Errorf("response message leaks the parent error: %q", message)
+			}
 		})
 
 		t.Run("byID/"+tc.name, func(t *testing.T) {
@@ -378,6 +387,14 @@ func Test_setInstance_errorCodes(t *testing.T) {
 			if got := status.Code(err); got != tc.wantCode {
 				t.Errorf("got code %v, want %v", got, tc.wantCode)
 			}
+			message := status.Convert(err).Message()
+			if !strings.Contains(message, tc.err.(*zerrors.ZitadelError).GetID()) ||
+				!strings.Contains(message, tc.err.(*zerrors.ZitadelError).GetMessage()) {
+				t.Errorf("response message does not preserve the stable error fields: %q", message)
+			}
+			if strings.Contains(message, "Parent=(") || strings.Contains(message, "SQLSTATE") {
+				t.Errorf("response message leaks the parent error: %q", message)
+			}
 		})
 
 		t.Run("byDomain/"+tc.name, func(t *testing.T) {
@@ -392,6 +409,14 @@ func Test_setInstance_errorCodes(t *testing.T) {
 			}
 			if got := status.Code(err); got != tc.wantCode {
 				t.Errorf("got code %v, want %v", got, tc.wantCode)
+			}
+			message := status.Convert(err).Message()
+			if !strings.Contains(message, tc.err.(*zerrors.ZitadelError).GetID()) ||
+				!strings.Contains(message, tc.err.(*zerrors.ZitadelError).GetMessage()) {
+				t.Errorf("response message does not preserve the stable error fields: %q", message)
+			}
+			if strings.Contains(message, "Parent=(") || strings.Contains(message, "SQLSTATE") {
+				t.Errorf("response message leaks the parent error: %q", message)
 			}
 		})
 	}
