@@ -62,6 +62,7 @@ type DefaultPaths struct {
 	BasePath          *url.URL
 	PasswordSetPath   *url.URL
 	EmailCodePath     *url.URL
+	InviteCodePath    *url.URL
 	OTPEmailPath      *url.URL
 	PasskeySetPath    *url.URL
 	DomainClaimedPath *url.URL
@@ -147,6 +148,14 @@ func (c *DefaultPaths) DefaultEmailCodeURLTemplate(ctx context.Context) string {
 		return ""
 	}
 	return mergeURLs(basePath, c.EmailCodePath)
+}
+
+func (c *DefaultPaths) DefaultInviteCodeURLTemplate(ctx context.Context) string {
+	basePath := c.defaultBaseURL(ctx)
+	if basePath == nil {
+		return ""
+	}
+	return mergeURLs(basePath, c.InviteCodePath)
 }
 
 func (c *DefaultPaths) DefaultPasswordSetURLTemplate(ctx context.Context) string {
