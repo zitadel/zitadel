@@ -1,4 +1,5 @@
 import { Alert } from "@/components/alert";
+import { AuthenticationHeading } from "@/components/authentication-heading";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { PasswordForm } from "@/components/password-form";
 import { Translated } from "@/components/translated";
@@ -53,12 +54,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col space-y-4">
-        <h1>
-          <Translated i18nKey="verify.title" namespace="password" />
-        </h1>
-        <p className="ztdl-p">
-          <Translated i18nKey="verify.description" namespace="password" />
-        </p>
+        <AuthenticationHeading requestId={requestId} serviceConfig={serviceConfig} namespace="password" />
 
         {sessionFactors ? (
           <UserAvatar

@@ -1,6 +1,6 @@
+import { AuthenticationHeading } from "@/components/authentication-heading";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
-import { Translated } from "@/components/translated";
 import { UsernameForm } from "@/components/username-form";
 import { getServiceConfig } from "@/lib/service-url";
 import { getActiveIdentityProviders, getBrandingSettings, getDefaultOrg, getLoginSettings } from "@/lib/zitadel";
@@ -53,12 +53,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col space-y-4">
-        <h1>
-          <Translated i18nKey="title" namespace="loginname" />
-        </h1>
-        <p className="ztdl-p">
-          <Translated i18nKey="description" namespace="loginname" />
-        </p>
+        <AuthenticationHeading requestId={requestId} serviceConfig={serviceConfig} namespace="loginname" />
       </div>
 
       <div className="w-full">
