@@ -30,7 +30,7 @@ func (c *Commands) AddLabelPolicy(ctx context.Context, resourceOwner string, pol
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, org.NewLabelPolicyAddedEvent(
+	addedEvent := org.NewLabelPolicyAddedEvent(
 		ctx,
 		orgAgg,
 		policy.PrimaryColor,
@@ -44,7 +44,11 @@ func (c *Commands) AddLabelPolicy(ctx context.Context, resourceOwner string, pol
 		policy.HideLoginNameSuffix,
 		policy.ErrorMsgPopup,
 		policy.DisableWatermark,
-		policy.ThemeMode))
+		policy.ThemeMode,
+		policy.LinkPreviewTitle,
+		policy.LinkPreviewDescription,
+	)
+	pushedEvents, err := c.eventstore.Push(ctx, addedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -55,11 +59,14 @@ func (c *Commands) AddLabelPolicy(ctx context.Context, resourceOwner string, pol
 	return writeModelToLabelPolicy(&addedPolicy.LabelPolicyWriteModel), nil
 }
 
-func (c *Commands) ChangeLabelPolicy(ctx context.Context, resourceOwner string, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
+func (c *Commands) ChangeLabelPolicy(ctx context.Context, resourceOwner string, policy *domain.LabelPolicy, linkPreview LabelPolicyLinkPreviewUpdate) (*domain.LabelPolicy, error) {
 	if resourceOwner == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "Org-3N9fs", "Errors.ResourceOwnerMissing")
 	}
 	if err := policy.IsValid(); err != nil {
+		return nil, err
+	}
+	if err := linkPreview.validate(); err != nil {
 		return nil, err
 	}
 	existingPolicy := NewOrgLabelPolicyWriteModel(resourceOwner)
@@ -86,7 +93,9 @@ func (c *Commands) ChangeLabelPolicy(ctx context.Context, resourceOwner string, 
 		policy.HideLoginNameSuffix,
 		policy.ErrorMsgPopup,
 		policy.DisableWatermark,
-		policy.ThemeMode)
+		policy.ThemeMode,
+		linkPreview.Title,
+		linkPreview.Description)
 	if !hasChanged {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "Org-8nfSr", "Errors.Org.LabelPolicy.NotChanged")
 	}
@@ -400,6 +409,62 @@ func (c *Commands) RemoveFontLabelPolicy(ctx context.Context, orgID string) (*do
 		return nil, err
 	}
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
+}
+
+func (c *Commands) AddLinkPreviewImageLabelPolicy(ctx context.Context, orgID string, upload *AssetUpload) (*domain.ObjectDetails, error) {
+	if orgID == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-LP9s", "Errors.ResourceOwnerMissing")
+	}
+	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, zerrors.ThrowNotFound(nil, "ORG-LP9fw", "Errors.Org.LabelPolicy.NotFound")
+	}
+	asset, err := c.uploadAsset(ctx, upload)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "ORG-LP9sd", "Errors.Assets.Object.PutFailed")
+	}
+	orgAgg := OrgAggregateFromWriteModelWithCTX(ctx, &existingPolicy.WriteModel)
+	pushedEvents, err := c.eventstore.Push(ctx, org.NewLabelPolicyLinkPreviewImageAddedEvent(ctx, orgAgg, asset.Name))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.WriteModel), nil
+}
+
+func (c *Commands) RemoveLinkPreviewImageLabelPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
+	if orgID == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-LP0w", "Errors.ResourceOwnerMissing")
+	}
+	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, zerrors.ThrowNotFound(nil, "ORG-LP9SD", "Errors.Org.LabelPolicy.NotFound")
+	}
+	err = c.removeAsset(ctx, orgID, existingPolicy.LinkPreviewImageKey)
+	if err != nil {
+		return nil, err
+	}
+	orgAgg := OrgAggregateFromWriteModelWithCTX(ctx, &existingPolicy.WriteModel)
+	pushedEvents, err := c.eventstore.Push(ctx, org.NewLabelPolicyLinkPreviewImageRemovedEvent(ctx, orgAgg, existingPolicy.LinkPreviewImageKey))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.WriteModel), nil
 }
 
 func (c *Commands) RemoveLabelPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {

@@ -80,6 +80,7 @@ func (l *Login) renderMFAVerifySelected(w http.ResponseWriter, r *http.Request, 
 		data.SelectedMFAProvider = domain.MFATypeTOTP
 		data.Title = translator.LocalizeWithoutArgs("VerifyMFAOTP.Title")
 		data.Description = translator.LocalizeWithoutArgs("VerifyMFAOTP.Description")
+		data.baseData = l.applyLinkPreview(r, data.baseData)
 	case domain.MFATypeOTPSMS:
 		l.handleOTPVerification(w, r, authReq, verificationStep.MFAProviders, domain.MFATypeOTPSMS, nil)
 		return

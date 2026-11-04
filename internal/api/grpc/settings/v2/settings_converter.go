@@ -117,13 +117,16 @@ func passwordExpirySettingsToPb(current *query.PasswordAgePolicy) *settings.Pass
 
 func brandingSettingsToPb(current *query.LabelPolicy, assetPrefix string) *settings.BrandingSettings {
 	return &settings.BrandingSettings{
-		LightTheme:          themeToPb(current.Light, assetPrefix, current.ResourceOwner),
-		DarkTheme:           themeToPb(current.Dark, assetPrefix, current.ResourceOwner),
-		FontUrl:             domain.AssetURL(assetPrefix, current.ResourceOwner, current.FontURL),
-		DisableWatermark:    current.WatermarkDisabled,
-		HideLoginNameSuffix: current.HideLoginNameSuffix,
-		ResourceOwnerType:   isDefaultToResourceOwnerTypePb(current.IsDefault),
-		ThemeMode:           themeModeToPb(current.ThemeMode),
+		LightTheme:             themeToPb(current.Light, assetPrefix, current.ResourceOwner),
+		DarkTheme:              themeToPb(current.Dark, assetPrefix, current.ResourceOwner),
+		FontUrl:                domain.AssetURL(assetPrefix, current.ResourceOwner, current.FontURL),
+		DisableWatermark:       current.WatermarkDisabled,
+		HideLoginNameSuffix:    current.HideLoginNameSuffix,
+		ResourceOwnerType:      isDefaultToResourceOwnerTypePb(current.IsDefault),
+		ThemeMode:              themeModeToPb(current.ThemeMode),
+		LinkPreviewTitle:       current.LinkPreviewTitle,
+		LinkPreviewDescription: current.LinkPreviewDescription,
+		LinkPreviewImageUrl:    domain.AssetURL(assetPrefix, current.ResourceOwner, current.LinkPreviewImageURL),
 	}
 }
 

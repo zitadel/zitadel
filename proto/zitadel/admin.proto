@@ -2736,6 +2736,23 @@ service AdminService {
         };
     }
 
+    rpc RemoveLabelPolicyLinkPreviewImage(RemoveLabelPolicyLinkPreviewImageRequest) returns (RemoveLabelPolicyLinkPreviewImageResponse) {
+        option (google.api.http) = {
+            delete: "/policies/label/link_preview_image"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Remove Link Preview Image";
+            description: "Removes the link preview image from the configured label policy/branding of the instance. The stored image is deleted immediately, so the active branding loses its image even before you activate your changes. To replace the image, upload a new one instead."
+        };
+    }
+
     rpc GetLoginPolicy(GetLoginPolicyRequest) returns (GetLoginPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/login";
@@ -7771,6 +7788,20 @@ message UpdateLabelPolicyRequest {
             description: "setting if there should be a restriction on which themes are available";
         }
     ];
+    optional string link_preview_title = 13 [
+        (validate.rules).string.max_len = 120,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "title used for Open Graph link previews of the hosted login and the management console";
+            max_length: 120;
+        }
+    ];
+    optional string link_preview_description = 14 [
+        (validate.rules).string.max_len = 300,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "description used for Open Graph link previews of the hosted login and the management console";
+            max_length: 300;
+        }
+    ];
 }
 
 message UpdateLabelPolicyResponse {
@@ -7816,6 +7847,13 @@ message RemoveLabelPolicyIconDarkResponse {
 message RemoveLabelPolicyFontRequest {}
 
 message RemoveLabelPolicyFontResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveLabelPolicyLinkPreviewImageRequest {}
+
+message RemoveLabelPolicyLinkPreviewImageResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

@@ -429,6 +429,8 @@ Errors:
         BackgroundColorDark: "背景颜色 (深色模式) 不是有效的十六进制颜色值"
         WarnColorDark: "警告颜色 (深色模式) 不是有效的十六进制颜色值"
         FontColorDark: "字体颜色 (深色模式) 不是有效的十六进制颜色值"
+        LinkPreviewTitle: "链接预览标题不能超过 120 个字符"
+        LinkPreviewDescription: "链接预览描述不能超过 300 个字符"
   UserGrant:
     AlreadyExists: "用户授权已存在"
     NotFound: "用户授权不存在"

@@ -34,6 +34,25 @@ The warn color is used for all the error messages and warnings and the font colo
 Last step to apply to your branding is the font upload.
 The best way is to upload a ttf file after a successful upload you will see it in the font part, but not in the preview.
 
+### Link preview
+
+Set the title, description, and image used when a hosted login or Management Console URL is shared in chat or social apps.
+These values are sent as Open Graph and Twitter card tags from Login V2, Login V1, and the Management Console.
+
+Leave a field empty to keep the default ZITADEL text. The title can have up to 120 characters and the description up to 300.
+The image must be a PNG, JPEG, or WebP file of at most 512 KiB (524 kB), the same limit as logos. A 1200×630 pixel image works well for most chat and social apps.
+Organization values override the instance values, the same way colors and logos do.
+When an organization starts its own branding, the Management Console copies the instance title and description, but not the image. Upload an image for the organization if its previews should show one.
+Removing the image takes effect right away, also on the live login and Management Console, even before you apply the settings.
+To replace the image through the API, upload the new image and apply the settings without removing the old one first. The live preview keeps the old image until you apply.
+In the Management Console, delete the image, upload the new one, and apply the settings. Until you apply, the live preview points to the deleted image, so it shows no image.
+Chat apps cache previews, so a changed preview can take a while to show up.
+The Management Console uses the organization values when the shared URL contains the `org` query parameter. Link preview values are public, like the rest of the branding shown on the login page.
+Save the preview, then apply the settings so the tags are used on the live login and Management Console.
+
+When you update the branding through the API, requests that leave out `link_preview_title` or `link_preview_description` keep the current values. Send an empty string to clear a value.
+To preset the title and description for new instances, set `DefaultInstance.LabelPolicy.LinkPreviewTitle` and `DefaultInstance.LabelPolicy.LinkPreviewDescription` in the runtime configuration.
+
 ### Advanced Settings
 
 In the advanced behavior you can choose if the loginname suffix (domain e.g. road.runner@acme.caos.ch) should be shown in the loginname screen or not and if the “ZITADEL watermark” should be hidden.

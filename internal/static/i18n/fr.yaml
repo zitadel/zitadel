@@ -428,6 +428,8 @@ Errors:
         BackgroundColorDark: "La couleur d'arrière-plan (mode foncé) n'a pas de valeur de couleur Hex valide."
         WarnColorDark: "La couleur d'avertissement (mode sombre) n'a pas de valeur de couleur hexadécimale valide."
         FontColorDark: "La couleur de la police (mode foncé) n'a pas de valeur de couleur hexadécimale valide."
+        LinkPreviewTitle: "Le titre de l'aperçu du lien ne doit pas dépasser 120 caractères"
+        LinkPreviewDescription: "La description de l'aperçu du lien ne doit pas dépasser 300 caractères"
   UserGrant:
     AlreadyExists: "L'autorisation de l'utilisateur existe déjà"
     NotFound: "Subvention d'utilisateur non trouvée"

@@ -1,8 +1,11 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { IdpProcessHandler } from "@/components/idp-process-handler";
+import { getLoginPageMetadata, type LoginPageMetadataProps } from "@/lib/login-metadata";
 import { getServiceConfig } from "@/lib/service-url";
 import { getBrandingSettings, getDefaultOrg } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 /**
@@ -10,6 +13,11 @@ import { headers } from "next/headers";
  * It delegates to a client component which calls the server action.
  * The client component is needed so that cookies can be set properly.
  */
+export async function generateMetadata(props: LoginPageMetadataProps): Promise<Metadata> {
+  const t = await getTranslations("common");
+  return getLoginPageMetadata(props, t("title"), { fallbackToDefaultOrganization: true });
+}
+
 export default async function ProcessPage(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
   params: Promise<{ provider: string }>;

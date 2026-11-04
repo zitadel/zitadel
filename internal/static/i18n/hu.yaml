@@ -428,6 +428,8 @@ Errors:
         BackgroundColorDark: "A háttérszín (sötét mód) nem érvényes Hex színérték"
         WarnColorDark: "A figyelmeztető szín (sötét mód) nem érvényes Hex színérték"
         FontColorDark: "A betűszín (sötét mód) nem érvényes Hex színérték"
+        LinkPreviewTitle: "A linkelőnézet címe legfeljebb 120 karakter lehet"
+        LinkPreviewDescription: "A linkelőnézet leírása legfeljebb 300 karakter lehet"
   UserGrant:
     AlreadyExists: "A felhasználói jogosultság már létezik"
     NotFound: "A felhasználói jogosultság nem található"

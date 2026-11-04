@@ -1,5 +1,8 @@
 @if (policy) {
   <div class="preview">
+    @if (policy.linkPreviewImageUrl) {
+      <img class="link-preview-thumb" [src]="policy.linkPreviewImageUrl" alt="" />
+    }
     <div
       class="dashed"
       [ngClass]="{ dark: theme === Theme.DARK, light: theme === Theme.LIGHT }"

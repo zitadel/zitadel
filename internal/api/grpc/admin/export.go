@@ -373,16 +373,18 @@ func (s *Server) getLabelPolicy(ctx context.Context, orgID string) (_ *managemen
 	}
 	if !queriedLabel.IsDefault {
 		return &management_pb.AddCustomLabelPolicyRequest{
-			PrimaryColor:        queriedLabel.Light.PrimaryColor,
-			HideLoginNameSuffix: queriedLabel.HideLoginNameSuffix,
-			WarnColor:           queriedLabel.Light.WarnColor,
-			BackgroundColor:     queriedLabel.Light.BackgroundColor,
-			FontColor:           queriedLabel.Light.FontColor,
-			PrimaryColorDark:    queriedLabel.Dark.PrimaryColor,
-			BackgroundColorDark: queriedLabel.Dark.BackgroundColor,
-			WarnColorDark:       queriedLabel.Dark.WarnColor,
-			FontColorDark:       queriedLabel.Dark.FontColor,
-			DisableWatermark:    queriedLabel.WatermarkDisabled,
+			PrimaryColor:           queriedLabel.Light.PrimaryColor,
+			HideLoginNameSuffix:    queriedLabel.HideLoginNameSuffix,
+			WarnColor:              queriedLabel.Light.WarnColor,
+			BackgroundColor:        queriedLabel.Light.BackgroundColor,
+			FontColor:              queriedLabel.Light.FontColor,
+			PrimaryColorDark:       queriedLabel.Dark.PrimaryColor,
+			BackgroundColorDark:    queriedLabel.Dark.BackgroundColor,
+			WarnColorDark:          queriedLabel.Dark.WarnColor,
+			FontColorDark:          queriedLabel.Dark.FontColor,
+			DisableWatermark:       queriedLabel.WatermarkDisabled,
+			LinkPreviewTitle:       &queriedLabel.LinkPreviewTitle,
+			LinkPreviewDescription: &queriedLabel.LinkPreviewDescription,
 		}, nil
 	}
 	return nil, nil

@@ -70,6 +70,10 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   public isHoveringOverLightLogo: boolean = false;
   public isHoveringOverLightIcon: boolean = false;
   public isHoveringOverFont: boolean = false;
+  public isHoveringOverLinkPreview: boolean = false;
+  private linkPreviewTitleOnFocus: string = '';
+  private linkPreviewDescriptionOnFocus: string = '';
+  private pendingLinkPreviewSave?: Promise<boolean | undefined>;
 
   private sub: Subscription = new Subscription();
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
@@ -214,6 +218,103 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
             return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.IAMFONT, formData));
         }
       }
+    }
+  }
+
+  public toggleHoverLinkPreview(isHovering: boolean): void {
+    this.isHoveringOverLinkPreview = isHovering;
+  }
+
+  public rememberLinkPreview(): void {
+    this.linkPreviewTitleOnFocus = this.previewData?.linkPreviewTitle ?? '';
+    this.linkPreviewDescriptionOnFocus = this.previewData?.linkPreviewDescription ?? '';
+  }
+
+  public setLinkPreviewTitle(value: string): void {
+    if (this.view === View.CURRENT || !this.previewData) {
+      return;
+    }
+    this.previewData.linkPreviewTitle = value;
+  }
+
+  public setLinkPreviewDescription(value: string): void {
+    if (this.view === View.CURRENT || !this.previewData) {
+      return;
+    }
+    this.previewData.linkPreviewDescription = value;
+  }
+
+  public saveLinkPreviewText(): void {
+    if (this.view !== View.PREVIEW || !this.previewData) {
+      return;
+    }
+    if (
+      (this.previewData.linkPreviewTitle ?? '') === this.linkPreviewTitleOnFocus &&
+      (this.previewData.linkPreviewDescription ?? '') === this.linkPreviewDescriptionOnFocus
+    ) {
+      return;
+    }
+    this.pendingLinkPreviewSave = this.savePolicy();
+  }
+
+  public onDropLinkPreviewImage(filelist: FileList | null): Promise<any> | void {
+    const file = filelist?.item(0);
+    if (!file || this.view === View.CURRENT) {
+      return;
+    }
+    const allowed = ['image/png', 'image/jpeg', 'image/webp'];
+    if (file.size > MAX_ALLOWED_SIZE) {
+      this.toast.showError('POLICY.PRIVATELABELING.MAXSIZEEXCEEDED', false, true);
+      return;
+    }
+    if (!allowed.includes(file.type)) {
+      this.toast.showError('POLICY.PRIVATELABELING.LINKPREVIEW_UNSUPPORTED', false, true);
+      return;
+    }
+    const formData = new FormData();
+    formData.append('file', file);
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.MGMT:
+        return this.ensureCustomOrgPolicy().then((created) =>
+          created
+            ? this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTLINKPREVIEW, formData, this.org))
+            : undefined,
+        );
+      case PolicyComponentServiceType.ADMIN:
+        return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMLINKPREVIEW, formData));
+    }
+  }
+
+  private ensureCustomOrgPolicy(): Promise<boolean> {
+    if (!(this.previewData as LabelPolicy.AsObject).isDefault) {
+      return Promise.resolve(true);
+    }
+    return this.savePolicy().then(() => !(this.previewData as LabelPolicy.AsObject).isDefault);
+  }
+
+  public deleteLinkPreviewImage(): Promise<any> | void {
+    if (this.isDefault) {
+      return;
+    }
+    const handler = (prom: Promise<any>) =>
+      prom
+        .then(() => {
+          this.toast.showInfo('POLICY.TOAST.DELETESUCCESS', true);
+          setTimeout(() => {
+            this.getPreviewData().then((data) => {
+              if (data.policy) {
+                this.previewData = data.policy;
+              }
+            });
+          }, 1000);
+        })
+        .catch((error) => this.toast.showError(error));
+
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.MGMT:
+        return handler((this.service as ManagementService).removeLabelPolicyLinkPreviewImage());
+      case PolicyComponentServiceType.ADMIN:
+        return handler((this.service as AdminService).removeLabelPolicyLinkPreviewImage());
     }
   }
 
@@ -523,9 +624,11 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
               this.toast.showInfo('POLICY.TOAST.SET', true);
 
               reloadPolicy();
+              return true;
             })
             .catch((error: HttpErrorResponse) => {
               this.toast.showError(error);
+              return false;
             });
         } else {
           const req1 = new UpdateCustomLabelPolicyRequest();
@@ -537,9 +640,11 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
               this.toast.showInfo('POLICY.TOAST.SET', true);
 
               reloadPolicy();
+              return true;
             })
             .catch((error) => {
               this.toast.showError(error);
+              return false;
             });
         }
       case PolicyComponentServiceType.ADMIN:
@@ -550,9 +655,11 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
           .then(() => {
             reloadPolicy();
             this.toast.showInfo('POLICY.TOAST.SET', true);
+            return true;
           })
           .catch((error) => {
             this.toast.showError(error);
+            return false;
           });
     }
   }
@@ -621,7 +728,9 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
     }
   }
 
-  public overwriteValues(req: AddCustomLabelPolicyRequest | UpdateCustomLabelPolicyRequest): void {
+  public overwriteValues(
+    req: AddCustomLabelPolicyRequest | UpdateCustomLabelPolicyRequest | UpdateLabelPolicyRequest,
+  ): void {
     if (this.previewData) {
       req.setBackgroundColorDark(this.previewData.backgroundColorDark);
       req.setBackgroundColor(this.previewData.backgroundColor);
@@ -639,10 +748,19 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
       req.setHideLoginNameSuffix(this.previewData.hideLoginNameSuffix);
 
       req.setThemeMode(this.previewData.themeMode);
+      req.setLinkPreviewTitle(this.previewData.linkPreviewTitle ?? '');
+      req.setLinkPreviewDescription(this.previewData.linkPreviewDescription ?? '');
     }
   }
 
   public activatePolicy(): Promise<any> {
+    // a link preview text change saves on blur, which runs at the same time as the Apply click
+    const pendingSave = this.pendingLinkPreviewSave ?? Promise.resolve(true);
+    this.pendingLinkPreviewSave = undefined;
+    return pendingSave.then((saved) => (saved === false ? undefined : this.activate()));
+  }
+
+  private activate(): Promise<any> {
     // dialog warning
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:

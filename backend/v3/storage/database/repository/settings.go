@@ -500,6 +500,15 @@ func (b brandingSettings) SetSettingFields(value domain.BrandingSettingsAttribut
 	if value.FontURL != nil {
 		changes = append(changes, b.SetFontURL(*value.FontURL))
 	}
+	if value.LinkPreviewTitle != nil {
+		changes = append(changes, b.SetLinkPreviewTitle(*value.LinkPreviewTitle))
+	}
+	if value.LinkPreviewDescription != nil {
+		changes = append(changes, b.SetLinkPreviewDescription(*value.LinkPreviewDescription))
+	}
+	if value.LinkPreviewImageURL != nil {
+		changes = append(changes, b.SetLinkPreviewImageURL(*value.LinkPreviewImageURL))
+	}
 	return db_json.NewJsonChanges(b.SettingsColumn(), changes...)
 }
 
@@ -569,6 +578,18 @@ func (brandingSettings) SetIconURLDark(value url.URL) db_json.JsonUpdate {
 
 func (brandingSettings) SetFontURL(value url.URL) db_json.JsonUpdate {
 	return db_json.NewFieldChange([]string{"fontUrl"}, value)
+}
+
+func (brandingSettings) SetLinkPreviewTitle(value string) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"linkPreviewTitle"}, value)
+}
+
+func (brandingSettings) SetLinkPreviewDescription(value string) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"linkPreviewDescription"}, value)
+}
+
+func (brandingSettings) SetLinkPreviewImageURL(value url.URL) db_json.JsonUpdate {
+	return db_json.NewFieldChange([]string{"linkPreviewImageUrl"}, value)
 }
 
 func BrandingSettingsRepository() domain.BrandingSettingsRepository {

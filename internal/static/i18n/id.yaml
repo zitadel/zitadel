@@ -428,6 +428,8 @@ Errors:
         BackgroundColorDark: "Warna latar belakang (mode gelap) bukanlah nilai warna Hex yang valid"
         WarnColorDark: "Warna peringatan (mode gelap) bukanlah nilai warna Hex yang valid"
         FontColorDark: "Warna font (mode gelap) bukanlah nilai warna Hex yang valid"
+        LinkPreviewTitle: "Judul pratinjau tautan tidak boleh lebih dari 120 karakter"
+        LinkPreviewDescription: "Deskripsi pratinjau tautan tidak boleh lebih dari 300 karakter"
   UserGrant:
     AlreadyExists: "Hibah pengguna sudah ada"
     NotFound: "Hibah pengguna tidak ditemukan"

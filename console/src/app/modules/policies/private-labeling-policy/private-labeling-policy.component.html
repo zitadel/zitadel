@@ -651,6 +651,127 @@
           </div>
         </mat-expansion-panel>
         <mat-expansion-panel class="expansion">
+          <mat-expansion-panel-header class="header" data-e2e="policy-category">
+            <mat-panel-title>
+              <div class="panel-title">
+                <i class="icon las la-share-alt"></i>
+                {{ 'POLICY.PRIVATELABELING.LINKPREVIEW' | translate }}
+              </div>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <cnsl-info-section class="info-section">{{
+            'POLICY.PRIVATELABELING.LINKPREVIEW_DESC' | translate
+          }}</cnsl-info-section>
+          <cnsl-form-field>
+            <cnsl-label>{{ 'POLICY.PRIVATELABELING.LINKPREVIEW_TITLE' | translate }}</cnsl-label>
+            <input
+              cnslInput
+              [disabled]="
+                view === View.CURRENT ||
+                ([
+                  serviceType === PolicyComponentServiceType.ADMIN
+                    ? 'iam.policy.write'
+                    : serviceType === PolicyComponentServiceType.MGMT
+                      ? 'policy.write'
+                      : '',
+                ]
+                  | hasRole
+                  | async) === false
+              "
+              [ngModel]="view === View.CURRENT ? data.linkPreviewTitle : previewData.linkPreviewTitle"
+              (ngModelChange)="setLinkPreviewTitle($event)"
+              (focus)="rememberLinkPreview()"
+              (blur)="saveLinkPreviewText()"
+            />
+          </cnsl-form-field>
+          <cnsl-form-field>
+            <cnsl-label>{{ 'POLICY.PRIVATELABELING.LINKPREVIEW_DESCRIPTION' | translate }}</cnsl-label>
+            <textarea
+              cnslInput
+              class="link-preview-description"
+              rows="3"
+              [disabled]="
+                view === View.CURRENT ||
+                ([
+                  serviceType === PolicyComponentServiceType.ADMIN
+                    ? 'iam.policy.write'
+                    : serviceType === PolicyComponentServiceType.MGMT
+                      ? 'policy.write'
+                      : '',
+                ]
+                  | hasRole
+                  | async) === false
+              "
+              [ngModel]="view === View.CURRENT ? data.linkPreviewDescription : previewData.linkPreviewDescription"
+              (ngModelChange)="setLinkPreviewDescription($event)"
+              (focus)="rememberLinkPreview()"
+              (blur)="saveLinkPreviewText()"
+            ></textarea>
+          </cnsl-form-field>
+          <cnsl-label>{{ 'POLICY.PRIVATELABELING.LINKPREVIEW_IMAGE' | translate }}</cnsl-label>
+          <div class="fonts">
+            @if (view === View.CURRENT ? data.linkPreviewImageUrl : previewData.linkPreviewImageUrl && !isDefault) {
+              <div class="font-preview">
+                <img
+                  [src]="view === View.CURRENT ? data.linkPreviewImageUrl : previewData.linkPreviewImageUrl"
+                  alt=""
+                  style="max-width: 96px; max-height: 50px; object-fit: cover"
+                />
+                <span class="fill-space"></span>
+                <button
+                  class="dl-btn"
+                  [disabled]="
+                    view === View.CURRENT ||
+                    isDefault ||
+                    ([
+                      serviceType === PolicyComponentServiceType.ADMIN
+                        ? 'iam.policy.write'
+                        : serviceType === PolicyComponentServiceType.MGMT
+                          ? 'policy.write'
+                          : '',
+                    ]
+                      | hasRole
+                      | async) === false
+                  "
+                  mat-icon-button
+                  color="warn"
+                  (click)="deleteLinkPreviewImage()"
+                  matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+                >
+                  <i class="las la-trash"></i>
+                </button>
+              </div>
+            } @else {
+              <div
+                class="font-add"
+                cnslDropzone
+                (hovered)="toggleHoverLinkPreview($event)"
+                (dropped)="onDropLinkPreviewImage($event)"
+                [class.hovering]="isHoveringOverLinkPreview"
+              >
+                <input
+                  #selectedLinkPreviewFile
+                  style="display: none"
+                  class="file-input"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  (change)="onDropLinkPreviewImage($any($event.target).files)"
+                />
+                @if (view !== View.CURRENT) {
+                  <a
+                    class="asset-add-btn"
+                    mat-icon-button
+                    (click)="selectedLinkPreviewFile.click()"
+                    matTooltip="{{ 'POLICY.PRIVATELABELING.BTN' | translate }}"
+                  >
+                    <mat-icon>add</mat-icon>
+                  </a>
+                }
+              </div>
+            }
+          </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel class="expansion">
           <mat-expansion-panel-header>
             <mat-panel-title>
               <div class="panel-title">

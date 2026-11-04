@@ -429,6 +429,8 @@ Errors:
         BackgroundColorDark: "Arka plan rengi (karanlık mod) geçerli bir Hex renk değeri değil"
         WarnColorDark: "Uyarı rengi (karanlık mod) geçerli bir Hex renk değeri değil"
         FontColorDark: "Yazı tipi rengi (karanlık mod) geçerli bir Hex renk değeri değil"
+        LinkPreviewTitle: "Bağlantı önizleme başlığı en fazla 120 karakter olabilir"
+        LinkPreviewDescription: "Bağlantı önizleme açıklaması en fazla 300 karakter olabilir"
   UserGrant:
     AlreadyExists: "Kullanıcı yetkisi zaten mevcut"
     NotFound: "Kullanıcı yetkisi bulunamadı"

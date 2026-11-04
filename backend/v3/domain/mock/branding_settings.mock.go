@@ -1053,6 +1053,120 @@ func (c *MockBrandingSettingsRepositorySetIconURLLightCall) DoAndReturn(f func(u
 	return c
 }
 
+// SetLinkPreviewDescription mocks base method.
+func (m *MockBrandingSettingsRepository) SetLinkPreviewDescription(value string) json.JsonUpdate {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetLinkPreviewDescription", value)
+	ret0, _ := ret[0].(json.JsonUpdate)
+	return ret0
+}
+
+// SetLinkPreviewDescription indicates an expected call of SetLinkPreviewDescription.
+func (mr *MockBrandingSettingsRepositoryMockRecorder) SetLinkPreviewDescription(value any) *MockBrandingSettingsRepositorySetLinkPreviewDescriptionCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetLinkPreviewDescription", reflect.TypeOf((*MockBrandingSettingsRepository)(nil).SetLinkPreviewDescription), value)
+	return &MockBrandingSettingsRepositorySetLinkPreviewDescriptionCall{Call: call}
+}
+
+// MockBrandingSettingsRepositorySetLinkPreviewDescriptionCall wrap *gomock.Call
+type MockBrandingSettingsRepositorySetLinkPreviewDescriptionCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockBrandingSettingsRepositorySetLinkPreviewDescriptionCall) Return(arg0 json.JsonUpdate) *MockBrandingSettingsRepositorySetLinkPreviewDescriptionCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockBrandingSettingsRepositorySetLinkPreviewDescriptionCall) Do(f func(string) json.JsonUpdate) *MockBrandingSettingsRepositorySetLinkPreviewDescriptionCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockBrandingSettingsRepositorySetLinkPreviewDescriptionCall) DoAndReturn(f func(string) json.JsonUpdate) *MockBrandingSettingsRepositorySetLinkPreviewDescriptionCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SetLinkPreviewImageURL mocks base method.
+func (m *MockBrandingSettingsRepository) SetLinkPreviewImageURL(value url.URL) json.JsonUpdate {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetLinkPreviewImageURL", value)
+	ret0, _ := ret[0].(json.JsonUpdate)
+	return ret0
+}
+
+// SetLinkPreviewImageURL indicates an expected call of SetLinkPreviewImageURL.
+func (mr *MockBrandingSettingsRepositoryMockRecorder) SetLinkPreviewImageURL(value any) *MockBrandingSettingsRepositorySetLinkPreviewImageURLCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetLinkPreviewImageURL", reflect.TypeOf((*MockBrandingSettingsRepository)(nil).SetLinkPreviewImageURL), value)
+	return &MockBrandingSettingsRepositorySetLinkPreviewImageURLCall{Call: call}
+}
+
+// MockBrandingSettingsRepositorySetLinkPreviewImageURLCall wrap *gomock.Call
+type MockBrandingSettingsRepositorySetLinkPreviewImageURLCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockBrandingSettingsRepositorySetLinkPreviewImageURLCall) Return(arg0 json.JsonUpdate) *MockBrandingSettingsRepositorySetLinkPreviewImageURLCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockBrandingSettingsRepositorySetLinkPreviewImageURLCall) Do(f func(url.URL) json.JsonUpdate) *MockBrandingSettingsRepositorySetLinkPreviewImageURLCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockBrandingSettingsRepositorySetLinkPreviewImageURLCall) DoAndReturn(f func(url.URL) json.JsonUpdate) *MockBrandingSettingsRepositorySetLinkPreviewImageURLCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// SetLinkPreviewTitle mocks base method.
+func (m *MockBrandingSettingsRepository) SetLinkPreviewTitle(value string) json.JsonUpdate {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetLinkPreviewTitle", value)
+	ret0, _ := ret[0].(json.JsonUpdate)
+	return ret0
+}
+
+// SetLinkPreviewTitle indicates an expected call of SetLinkPreviewTitle.
+func (mr *MockBrandingSettingsRepositoryMockRecorder) SetLinkPreviewTitle(value any) *MockBrandingSettingsRepositorySetLinkPreviewTitleCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetLinkPreviewTitle", reflect.TypeOf((*MockBrandingSettingsRepository)(nil).SetLinkPreviewTitle), value)
+	return &MockBrandingSettingsRepositorySetLinkPreviewTitleCall{Call: call}
+}
+
+// MockBrandingSettingsRepositorySetLinkPreviewTitleCall wrap *gomock.Call
+type MockBrandingSettingsRepositorySetLinkPreviewTitleCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockBrandingSettingsRepositorySetLinkPreviewTitleCall) Return(arg0 json.JsonUpdate) *MockBrandingSettingsRepositorySetLinkPreviewTitleCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockBrandingSettingsRepositorySetLinkPreviewTitleCall) Do(f func(string) json.JsonUpdate) *MockBrandingSettingsRepositorySetLinkPreviewTitleCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockBrandingSettingsRepositorySetLinkPreviewTitleCall) DoAndReturn(f func(string) json.JsonUpdate) *MockBrandingSettingsRepositorySetLinkPreviewTitleCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // SetLogoURLDark mocks base method.
 func (m *MockBrandingSettingsRepository) SetLogoURLDark(value url.URL) json.JsonUpdate {
 	m.ctrl.T.Helper()

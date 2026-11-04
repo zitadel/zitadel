@@ -23,6 +23,21 @@
 
     <title>{{ .Title }}</title>
     <meta name="description" content="{{ .Description }}"/>
+    <meta property="og:title" content="{{ .OpenGraphTitle }}"/>
+    {{ if .OpenGraphDescription }}
+    <meta property="og:description" content="{{ .OpenGraphDescription }}"/>
+    {{ end }}
+    {{ if .OpenGraphImage }}
+    <meta property="og:image" content="{{ .OpenGraphImage }}"/>
+    {{ end }}
+    <meta name="twitter:card" content="{{ .TwitterCard }}"/>
+    <meta name="twitter:title" content="{{ .OpenGraphTitle }}"/>
+    {{ if .OpenGraphDescription }}
+    <meta name="twitter:description" content="{{ .OpenGraphDescription }}"/>
+    {{ end }}
+    {{ if .OpenGraphImage }}
+    <meta name="twitter:image" content="{{ .OpenGraphImage }}"/>
+    {{ end }}
     <meta name="robots" content="none" />
 
     <script src="{{ resourceUrl "scripts/theme.js" }}"></script>

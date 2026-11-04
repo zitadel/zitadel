@@ -201,6 +201,10 @@ type brandingSettingsJSONChanges interface {
 	SetDisableWatermark(value bool) db_json.JsonUpdate
 	SetThemeMode(value BrandingPolicyThemeMode) db_json.JsonUpdate
 	SetFontURL(value url.URL) db_json.JsonUpdate
+
+	SetLinkPreviewTitle(value string) db_json.JsonUpdate
+	SetLinkPreviewDescription(value string) db_json.JsonUpdate
+	SetLinkPreviewImageURL(value url.URL) db_json.JsonUpdate
 }
 
 type BrandingSettings struct {
@@ -228,6 +232,10 @@ type BrandingSettingsAttributes struct {
 	DisableWatermark    *bool                    `json:"disableMsgPopup,omitempty"`
 	ThemeMode           *BrandingPolicyThemeMode `json:"themeMode,omitempty"`
 	FontURL             *url.URL                 `json:"fontUrl,omitempty"`
+
+	LinkPreviewTitle       *string  `json:"linkPreviewTitle,omitempty"`
+	LinkPreviewDescription *string  `json:"linkPreviewDescription,omitempty"`
+	LinkPreviewImageURL    *url.URL `json:"linkPreviewImageUrl,omitempty"`
 }
 
 //go:generate mockgen -typed -package domainmock -destination ./mock/branding_settings.mock.go . BrandingSettingsRepository

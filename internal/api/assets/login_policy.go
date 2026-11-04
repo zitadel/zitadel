@@ -366,6 +366,98 @@ func (l *labelPolicyFontDownloader) ResourceOwner(ctx context.Context, _ string)
 	return getLabelPolicyResourceOwner(ctx, l.defaultPolicy, l.preview, l.query)
 }
 
+var linkPreviewImageContentTypes = []string{"image/png", "image/jpeg", "image/webp"}
+
+func (h *Handler) UploadDefaultLabelPolicyLinkPreviewImage() Uploader {
+	return &labelPolicyLinkPreviewImageUploader{h.idGenerator, true, linkPreviewImageContentTypes, 1 << 19}
+}
+
+func (h *Handler) UploadOrgLabelPolicyLinkPreviewImage() Uploader {
+	return &labelPolicyLinkPreviewImageUploader{h.idGenerator, false, linkPreviewImageContentTypes, 1 << 19}
+}
+
+type labelPolicyLinkPreviewImageUploader struct {
+	idGenerator   id.Generator
+	defaultPolicy bool
+	contentTypes  []string
+	maxSize       int64
+}
+
+func (l *labelPolicyLinkPreviewImageUploader) ContentTypeAllowed(contentType string) bool {
+	for _, ct := range l.contentTypes {
+		if contentType == ct {
+			return true
+		}
+	}
+	return false
+}
+
+func (l *labelPolicyLinkPreviewImageUploader) ObjectType() static.ObjectType {
+	return static.ObjectTypeStyling
+}
+
+func (l *labelPolicyLinkPreviewImageUploader) MaxFileSize() int64 {
+	return l.maxSize
+}
+
+func (l *labelPolicyLinkPreviewImageUploader) ObjectName(_ authz.CtxData) (string, error) {
+	suffixID, err := l.idGenerator.Next()
+	if err != nil {
+		return "", err
+	}
+	return domain.LabelPolicyLinkPreviewImagePath + "-" + suffixID, nil
+}
+
+func (l *labelPolicyLinkPreviewImageUploader) ResourceOwner(instance authz.Instance, ctxData authz.CtxData) string {
+	if l.defaultPolicy {
+		return instance.InstanceID()
+	}
+	return ctxData.OrgID
+}
+
+func (l *labelPolicyLinkPreviewImageUploader) UploadAsset(ctx context.Context, orgID string, upload *command.AssetUpload, commands *command.Commands) error {
+	if l.defaultPolicy {
+		_, err := commands.AddLinkPreviewImageDefaultLabelPolicy(ctx, upload)
+		return err
+	}
+	_, err := commands.AddLinkPreviewImageLabelPolicy(ctx, orgID, upload)
+	return err
+}
+
+func (h *Handler) GetDefaultLabelPolicyLinkPreviewImage() Downloader {
+	return &labelPolicyLinkPreviewImageDownloader{query: h.query, defaultPolicy: true, preview: false}
+}
+
+func (h *Handler) GetPreviewDefaultLabelPolicyLinkPreviewImage() Downloader {
+	return &labelPolicyLinkPreviewImageDownloader{query: h.query, defaultPolicy: true, preview: true}
+}
+
+func (h *Handler) GetOrgLabelPolicyLinkPreviewImage() Downloader {
+	return &labelPolicyLinkPreviewImageDownloader{query: h.query, defaultPolicy: false, preview: false}
+}
+
+func (h *Handler) GetPreviewOrgLabelPolicyLinkPreviewImage() Downloader {
+	return &labelPolicyLinkPreviewImageDownloader{query: h.query, defaultPolicy: false, preview: true}
+}
+
+type labelPolicyLinkPreviewImageDownloader struct {
+	query         *query.Queries
+	defaultPolicy bool
+	preview       bool
+}
+
+func (l *labelPolicyLinkPreviewImageDownloader) ObjectName(ctx context.Context, path string) (string, error) {
+	policy, err := getLabelPolicy(ctx, l.defaultPolicy, l.preview, l.query)
+	if err != nil {
+		return "", nil
+	}
+	return policy.LinkPreviewImageURL, nil
+}
+
+func (l *labelPolicyLinkPreviewImageDownloader) ResourceOwner(ctx context.Context, _ string) string {
+	return getLabelPolicyResourceOwner(ctx, l.defaultPolicy, l.preview, l.query)
+}
+
 func getLabelPolicy(ctx context.Context, defaultPolicy, preview bool, queries *query.Queries) (*query.LabelPolicy, error) {
 	if defaultPolicy {
 		if preview {

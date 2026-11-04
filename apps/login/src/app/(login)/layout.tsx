@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/skeleton";
 import { ThemeProvider } from "@/components/theme-provider";
 import ThemeSwitch from "@/components/theme-switch";
 import { LANGS, getLanguage } from "@/lib/i18n";
+import { getLoginMetadata } from "@/lib/login-metadata";
 import { getServiceConfig } from "@/lib/service-url";
 import { getAllowedLanguages } from "@/lib/zitadel";
 import * as Tooltip from "@radix-ui/react-tooltip";
@@ -23,7 +24,7 @@ const lato = Lato({
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("common");
-  return { title: t("title") };
+  return getLoginMetadata(t("title"));
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

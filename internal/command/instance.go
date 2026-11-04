@@ -100,18 +100,20 @@ type InstanceSetup struct {
 		CustomLinkText string
 	}
 	LabelPolicy struct {
-		PrimaryColor        string
-		BackgroundColor     string
-		WarnColor           string
-		FontColor           string
-		PrimaryColorDark    string
-		BackgroundColorDark string
-		WarnColorDark       string
-		FontColorDark       string
-		HideLoginNameSuffix bool
-		ErrorMsgPopup       bool
-		DisableWatermark    bool
-		ThemeMode           domain.LabelPolicyThemeMode
+		PrimaryColor           string
+		BackgroundColor        string
+		WarnColor              string
+		FontColor              string
+		PrimaryColorDark       string
+		BackgroundColorDark    string
+		WarnColorDark          string
+		FontColorDark          string
+		HideLoginNameSuffix    bool
+		ErrorMsgPopup          bool
+		DisableWatermark       bool
+		ThemeMode              domain.LabelPolicyThemeMode
+		LinkPreviewTitle       string
+		LinkPreviewDescription string
 	}
 	LockoutPolicy struct {
 		MaxPasswordAttempts      uint64
@@ -409,6 +411,8 @@ func setupInstanceElements(instanceAgg *instance.Aggregate, setup *InstanceSetup
 			setup.LabelPolicy.ErrorMsgPopup,
 			setup.LabelPolicy.DisableWatermark,
 			setup.LabelPolicy.ThemeMode,
+			setup.LabelPolicy.LinkPreviewTitle,
+			setup.LabelPolicy.LinkPreviewDescription,
 		),
 		prepareAddDefaultEmailTemplate(instanceAgg, setup.EmailTemplate),
 	}

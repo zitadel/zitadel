@@ -6,19 +6,21 @@ const (
 	UsersAssetPath  = "users"
 	AvatarAssetPath = "/avatar"
 
-	policyPrefix          = "policy"
-	LabelPolicyPrefix     = policyPrefix + "/label"
-	labelPolicyLogoPrefix = LabelPolicyPrefix + "/logo"
-	labelPolicyIconPrefix = LabelPolicyPrefix + "/icon"
-	labelPolicyFontPrefix = LabelPolicyPrefix + "/font"
-	Dark                  = "dark"
+	policyPrefix                      = "policy"
+	LabelPolicyPrefix                 = policyPrefix + "/label"
+	labelPolicyLogoPrefix             = LabelPolicyPrefix + "/logo"
+	labelPolicyIconPrefix             = LabelPolicyPrefix + "/icon"
+	labelPolicyFontPrefix             = LabelPolicyPrefix + "/font"
+	labelPolicyLinkPreviewImagePrefix = LabelPolicyPrefix + "/link_preview_image"
+	Dark                              = "dark"
 
 	CssPath              = LabelPolicyPrefix + "/css"
 	CssVariablesFileName = "variables.css"
 
-	LabelPolicyLogoPath = labelPolicyLogoPrefix
-	LabelPolicyIconPath = labelPolicyIconPrefix
-	LabelPolicyFontPath = labelPolicyFontPrefix
+	LabelPolicyLogoPath             = labelPolicyLogoPrefix
+	LabelPolicyIconPath             = labelPolicyIconPrefix
+	LabelPolicyFontPath             = labelPolicyFontPrefix
+	LabelPolicyLinkPreviewImagePath = labelPolicyLinkPreviewImagePrefix
 )
 
 type AssetInfo struct {

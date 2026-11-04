@@ -31,6 +31,10 @@ const (
 	LabelPolicyOwnerRemovedCol        = "owner_removed"
 	LabelPolicyThemeModeCol           = "theme_mode"
 
+	LabelPolicyLinkPreviewTitleCol       = "link_preview_title"
+	LabelPolicyLinkPreviewDescriptionCol = "link_preview_description"
+	LabelPolicyLinkPreviewImageURLCol    = "link_preview_image_url"
+
 	LabelPolicyLightPrimaryColorCol    = "light_primary_color"
 	LabelPolicyLightWarnColorCol       = "light_warn_color"
 	LabelPolicyLightBackgroundColorCol = "light_background_color"
@@ -85,6 +89,9 @@ func (*labelPolicyProjection) Init() *old_handler.Check {
 			handler.NewColumn(LabelPolicyDarkIconURLCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(LabelPolicyOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(LabelPolicyThemeModeCol, handler.ColumnTypeEnum, handler.Default(0)),
+			handler.NewColumn(LabelPolicyLinkPreviewTitleCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(LabelPolicyLinkPreviewDescriptionCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(LabelPolicyLinkPreviewImageURLCol, handler.ColumnTypeText, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(LabelPolicyInstanceIDCol, LabelPolicyIDCol, LabelPolicyStateCol),
 			handler.WithIndex(handler.NewIndex("owner_removed", []string{LabelPolicyOwnerRemovedCol})),
@@ -154,6 +161,14 @@ func (p *labelPolicyProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceFontRemoved,
 				},
 				{
+					Event:  org.LabelPolicyLinkPreviewImageAddedEventType,
+					Reduce: p.reduceLinkPreviewImageAdded,
+				},
+				{
+					Event:  org.LabelPolicyLinkPreviewImageRemovedEventType,
+					Reduce: p.reduceLinkPreviewImageRemoved,
+				},
+				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: p.reduceOwnerRemoved,
 				},
@@ -215,6 +230,14 @@ func (p *labelPolicyProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceFontRemoved,
 				},
 				{
+					Event:  instance.LabelPolicyLinkPreviewImageAddedEventType,
+					Reduce: p.reduceLinkPreviewImageAdded,
+				},
+				{
+					Event:  instance.LabelPolicyLinkPreviewImageRemovedEventType,
+					Reduce: p.reduceLinkPreviewImageRemoved,
+				},
+				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: reduceInstanceRemovedHelper(LabelPolicyInstanceIDCol),
 				},
@@ -259,6 +282,8 @@ func (p *labelPolicyProjection) reduceAdded(event eventstore.Event) (*handler.St
 			handler.NewCol(LabelPolicyShouldErrorPopupCol, policyEvent.ErrorMsgPopup),
 			handler.NewCol(LabelPolicyWatermarkDisabledCol, policyEvent.DisableWatermark),
 			handler.NewCol(LabelPolicyThemeModeCol, policyEvent.ThemeMode),
+			handler.NewCol(LabelPolicyLinkPreviewTitleCol, policyEvent.LinkPreviewTitle),
+			handler.NewCol(LabelPolicyLinkPreviewDescriptionCol, policyEvent.LinkPreviewDescription),
 		}), nil
 }
 
@@ -311,6 +336,12 @@ func (p *labelPolicyProjection) reduceChanged(event eventstore.Event) (*handler.
 	}
 	if policyEvent.ThemeMode != nil {
 		cols = append(cols, handler.NewCol(LabelPolicyThemeModeCol, *policyEvent.ThemeMode))
+	}
+	if policyEvent.LinkPreviewTitle != nil {
+		cols = append(cols, handler.NewCol(LabelPolicyLinkPreviewTitleCol, *policyEvent.LinkPreviewTitle))
+	}
+	if policyEvent.LinkPreviewDescription != nil {
+		cols = append(cols, handler.NewCol(LabelPolicyLinkPreviewDescriptionCol, *policyEvent.LinkPreviewDescription))
 	}
 	return handler.NewUpdateStatement(
 		&policyEvent,
@@ -375,6 +406,9 @@ func (p *labelPolicyProjection) reduceActivated(event eventstore.Event) (*handle
 			handler.NewCol(LabelPolicyDarkLogoURLCol, nil),
 			handler.NewCol(LabelPolicyDarkIconURLCol, nil),
 			handler.NewCol(LabelPolicyThemeModeCol, nil),
+			handler.NewCol(LabelPolicyLinkPreviewTitleCol, nil),
+			handler.NewCol(LabelPolicyLinkPreviewDescriptionCol, nil),
+			handler.NewCol(LabelPolicyLinkPreviewImageURLCol, nil),
 		},
 		[]handler.Column{
 			handler.NewCol(LabelPolicyChangeDateCol, nil),
@@ -402,6 +436,9 @@ func (p *labelPolicyProjection) reduceActivated(event eventstore.Event) (*handle
 			handler.NewCol(LabelPolicyDarkLogoURLCol, nil),
 			handler.NewCol(LabelPolicyDarkIconURLCol, nil),
 			handler.NewCol(LabelPolicyThemeModeCol, nil),
+			handler.NewCol(LabelPolicyLinkPreviewTitleCol, nil),
+			handler.NewCol(LabelPolicyLinkPreviewDescriptionCol, nil),
+			handler.NewCol(LabelPolicyLinkPreviewImageURLCol, nil),
 		},
 		[]handler.NamespacedCondition{
 			handler.NewNamespacedCondition(LabelPolicyIDCol, event.Aggregate().ID),
@@ -568,6 +605,52 @@ func (p *labelPolicyProjection) reduceFontRemoved(event eventstore.Event) (*hand
 			handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
 			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
 			handler.NewCol(col, nil),
+		},
+		[]handler.Condition{
+			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
+			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
+		}), nil
+}
+
+func (p *labelPolicyProjection) reduceLinkPreviewImageAdded(event eventstore.Event) (*handler.Statement, error) {
+	var storeKey string
+	switch e := event.(type) {
+	case *org.LabelPolicyLinkPreviewImageAddedEvent:
+		storeKey = e.StoreKey
+	case *instance.LabelPolicyLinkPreviewImageAddedEvent:
+		storeKey = e.StoreKey
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-lp8aW", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyLinkPreviewImageAddedEventType, instance.LabelPolicyLinkPreviewImageAddedEventType})
+	}
+
+	return handler.NewUpdateStatement(
+		event,
+		[]handler.Column{
+			handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
+			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
+			handler.NewCol(LabelPolicyLinkPreviewImageURLCol, storeKey),
+		},
+		[]handler.Condition{
+			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
+			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
+		}), nil
+}
+
+func (p *labelPolicyProjection) reduceLinkPreviewImageRemoved(event eventstore.Event) (*handler.Statement, error) {
+	switch event.(type) {
+	case *org.LabelPolicyLinkPreviewImageRemovedEvent, *instance.LabelPolicyLinkPreviewImageRemovedEvent:
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-lp8rJ", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyLinkPreviewImageRemovedEventType, instance.LabelPolicyLinkPreviewImageRemovedEventType})
+	}
+
+	return handler.NewUpdateStatement(
+		event,
+		[]handler.Column{
+			handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
+			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
+			handler.NewCol(LabelPolicyLinkPreviewImageURLCol, nil),
 		},
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),

@@ -428,6 +428,8 @@ Errors:
         BackgroundColorDark: "El color de fondo (modo oscuro) no es un valor de código hex válido"
         WarnColorDark: "El color de advertencia (modo oscuro) no es un valor de código hex válido"
         FontColorDark: "El color de fuente (modo oscuro) no es un valor de código hex válido"
+        LinkPreviewTitle: "El título de la vista previa del enlace no puede superar los 120 caracteres"
+        LinkPreviewDescription: "La descripción de la vista previa del enlace no puede superar los 300 caracteres"
   UserGrant:
     AlreadyExists: "La concesión de usuario ya existe"
     NotFound: "Concesión de usuario no encontrada"

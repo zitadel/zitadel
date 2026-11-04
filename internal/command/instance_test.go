@@ -219,7 +219,7 @@ func instancePoliciesEvents(ctx context.Context, instanceID string) []eventstore
 		instance.NewPrivacyPolicyAddedEvent(ctx, &instanceAgg.Aggregate, "", "", "", "", "", "", ""),
 		instance.NewNotificationPolicyAddedEvent(ctx, &instanceAgg.Aggregate, true),
 		instance.NewLockoutPolicyAddedEvent(ctx, &instanceAgg.Aggregate, 0, 0, true),
-		instance.NewLabelPolicyAddedEvent(ctx, &instanceAgg.Aggregate, "#5469d4", "#fafafa", "#cd3d56", "#000000", "#2073c4", "#111827", "#ff3b5b", "#ffffff", false, false, false, domain.LabelPolicyThemeAuto),
+		instance.NewLabelPolicyAddedEvent(ctx, &instanceAgg.Aggregate, "#5469d4", "#fafafa", "#cd3d56", "#000000", "#2073c4", "#111827", "#ff3b5b", "#ffffff", false, false, false, domain.LabelPolicyThemeAuto, "", ""),
 		instance.NewLabelPolicyActivatedEvent(ctx, &instanceAgg.Aggregate),
 	}
 }
@@ -274,19 +274,21 @@ func instanceSetupPoliciesConfig() *InstanceSetup {
 			CustomLinkText string
 		}{"", "", "", "", "", "", ""},
 		LabelPolicy: struct {
-			PrimaryColor        string
-			BackgroundColor     string
-			WarnColor           string
-			FontColor           string
-			PrimaryColorDark    string
-			BackgroundColorDark string
-			WarnColorDark       string
-			FontColorDark       string
-			HideLoginNameSuffix bool
-			ErrorMsgPopup       bool
-			DisableWatermark    bool
-			ThemeMode           domain.LabelPolicyThemeMode
-		}{"#5469d4", "#fafafa", "#cd3d56", "#000000", "#2073c4", "#111827", "#ff3b5b", "#ffffff", false, false, false, domain.LabelPolicyThemeAuto},
+			PrimaryColor           string
+			BackgroundColor        string
+			WarnColor              string
+			FontColor              string
+			PrimaryColorDark       string
+			BackgroundColorDark    string
+			WarnColorDark          string
+			FontColorDark          string
+			HideLoginNameSuffix    bool
+			ErrorMsgPopup          bool
+			DisableWatermark       bool
+			ThemeMode              domain.LabelPolicyThemeMode
+			LinkPreviewTitle       string
+			LinkPreviewDescription string
+		}{"#5469d4", "#fafafa", "#cd3d56", "#000000", "#2073c4", "#111827", "#ff3b5b", "#ffffff", false, false, false, domain.LabelPolicyThemeAuto, "", ""},
 		LockoutPolicy: struct {
 			MaxPasswordAttempts      uint64
 			MaxOTPAttempts           uint64

@@ -428,6 +428,8 @@ Errors:
         BackgroundColorDark: "Bakgrundsfärgen (mörkt läge) är inte ett giltigt Hex-färgvärde"
         WarnColorDark: "Varningsfärgen (mörkt läge) är inte ett giltigt Hex-färgvärde"
         FontColorDark: "Teckensnittsfärgen (mörkt läge) är inte ett giltigt Hex-färgvärde"
+        LinkPreviewTitle: "Länkförhandsvisningens titel får vara högst 120 tecken"
+        LinkPreviewDescription: "Länkförhandsvisningens beskrivning får vara högst 300 tecken"
   UserGrant:
     AlreadyExists: "Användarbeviljandet finns redan"
     NotFound: "Användarbeviljandet hittades inte"

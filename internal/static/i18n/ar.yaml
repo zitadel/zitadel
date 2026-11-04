@@ -429,6 +429,8 @@ Errors:
         BackgroundColorDark: "لون الخلفية (الوضع الداكن) ليس قيمة لون Hex صالحة"
         WarnColorDark: "لون التحذير (الوضع الداكن) ليس قيمة لون Hex صالحة"
         FontColorDark: "لون الخط (الوضع الداكن) ليس قيمة لون Hex صالحة"
+        LinkPreviewTitle: "يجب ألا يتجاوز عنوان معاينة الرابط 120 حرفًا"
+        LinkPreviewDescription: "يجب ألا يتجاوز وصف معاينة الرابط 300 حرف"
   UserGrant:
     AlreadyExists: "منح المستخدم موجود بالفعل"
     NotFound: "منح المستخدم غير موجود"

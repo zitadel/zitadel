@@ -53,6 +53,10 @@ func (wm *OrgLabelPolicyWriteModel) AppendEvents(events ...eventstore.Event) {
 			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyFontAddedEvent)
 		case *org.LabelPolicyFontRemovedEvent:
 			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyFontRemovedEvent)
+		case *org.LabelPolicyLinkPreviewImageAddedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyLinkPreviewImageAddedEvent)
+		case *org.LabelPolicyLinkPreviewImageRemovedEvent:
+			wm.LabelPolicyWriteModel.AppendEvents(&e.LabelPolicyLinkPreviewImageRemovedEvent)
 		}
 	}
 }
@@ -80,7 +84,9 @@ func (wm *OrgLabelPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.LabelPolicyIconDarkAddedEventType,
 			org.LabelPolicyIconDarkRemovedEventType,
 			org.LabelPolicyFontAddedEventType,
-			org.LabelPolicyFontRemovedEventType).
+			org.LabelPolicyFontRemovedEventType,
+			org.LabelPolicyLinkPreviewImageAddedEventType,
+			org.LabelPolicyLinkPreviewImageRemovedEventType).
 		Builder()
 }
 
@@ -99,6 +105,8 @@ func (wm *OrgLabelPolicyWriteModel) NewChangedEvent(
 	errorMsgPopup,
 	disableWatermark bool,
 	themeMode domain.LabelPolicyThemeMode,
+	linkPreviewTitle,
+	linkPreviewDescription *string,
 ) (*org.LabelPolicyChangedEvent, bool) {
 	changes := make([]policy.LabelPolicyChanges, 0)
 	if wm.PrimaryColor != primaryColor {
@@ -136,6 +144,12 @@ func (wm *OrgLabelPolicyWriteModel) NewChangedEvent(
 	}
 	if wm.ThemeMode != themeMode {
 		changes = append(changes, policy.ChangeThemeMode(themeMode))
+	}
+	if linkPreviewTitle != nil && wm.LinkPreviewTitle != *linkPreviewTitle {
+		changes = append(changes, policy.ChangeLinkPreviewTitle(*linkPreviewTitle))
+	}
+	if linkPreviewDescription != nil && wm.LinkPreviewDescription != *linkPreviewDescription {
+		changes = append(changes, policy.ChangeLinkPreviewDescription(*linkPreviewDescription))
 	}
 	if len(changes) == 0 {
 		return nil, false

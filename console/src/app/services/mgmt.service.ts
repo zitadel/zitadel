@@ -320,6 +320,8 @@ import {
   RemoveAppResponse,
   RemoveCustomLabelPolicyFontRequest,
   RemoveCustomLabelPolicyFontResponse,
+  RemoveCustomLabelPolicyLinkPreviewImageRequest,
+  RemoveCustomLabelPolicyLinkPreviewImageResponse,
   RemoveCustomLabelPolicyIconDarkRequest,
   RemoveCustomLabelPolicyIconDarkResponse,
   RemoveCustomLabelPolicyIconRequest,
@@ -1525,6 +1527,11 @@ export class ManagementService {
   public removeLabelPolicyFont(): Promise<RemoveCustomLabelPolicyFontResponse.AsObject> {
     const req = new RemoveCustomLabelPolicyFontRequest();
     return this.grpcService.mgmt.removeCustomLabelPolicyFont(req, null).then((resp) => resp.toObject());
+  }
+
+  public removeLabelPolicyLinkPreviewImage(): Promise<RemoveCustomLabelPolicyLinkPreviewImageResponse.AsObject> {
+    const req = new RemoveCustomLabelPolicyLinkPreviewImageRequest();
+    return this.grpcService.mgmt.removeCustomLabelPolicyLinkPreviewImage(req, null).then((resp) => resp.toObject());
   }
 
   public removeLabelPolicyIcon(): Promise<RemoveCustomLabelPolicyIconResponse.AsObject> {

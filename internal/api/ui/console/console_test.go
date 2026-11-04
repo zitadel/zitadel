@@ -60,7 +60,7 @@ func TestStart_environmentJSON(t *testing.T) {
 			passthrough := func(next http.Handler) http.Handler { return next }
 			issuer := func(r *http.Request) string { return "" }
 			accessInterceptor := middleware.NewAccessInterceptor(&logstore.Service[*record.AccessLog]{}, nil, &middleware.AccessConfig{})
-			handler, err := Start(Config{}, issuer, passthrough, passthrough, accessInterceptor, "")
+			handler, err := Start(Config{}, issuer, passthrough, passthrough, accessInterceptor, "", nil)
 			require.NoError(t, err)
 			handler = middleware.WithOrigin(tt.externalSecure, "host", ":authority", []string{"x-zitadel-instance-host"}, []string{"x-zitadel-public-host"})(handler)
 

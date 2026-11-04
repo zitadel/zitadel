@@ -31,6 +31,10 @@ type LabelPolicy struct {
 
 	Dark  Theme
 	Light Theme
+
+	LinkPreviewTitle       string
+	LinkPreviewDescription string
+	LinkPreviewImageURL    string
 }
 
 type Theme struct {
@@ -237,6 +241,15 @@ var (
 	LabelPolicyThemeMode = Column{
 		name: projection.LabelPolicyThemeModeCol,
 	}
+	LabelPolicyLinkPreviewTitle = Column{
+		name: projection.LabelPolicyLinkPreviewTitleCol,
+	}
+	LabelPolicyLinkPreviewDescription = Column{
+		name: projection.LabelPolicyLinkPreviewDescriptionCol,
+	}
+	LabelPolicyLinkPreviewImageURL = Column{
+		name: projection.LabelPolicyLinkPreviewImageURLCol,
+	}
 )
 
 func prepareLabelPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LabelPolicy, error)) {
@@ -268,6 +281,9 @@ func prepareLabelPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LabelPolicy, 
 			LabelPolicyColDarkFontColor.identifier(),
 			LabelPolicyColDarkLogoURL.identifier(),
 			LabelPolicyColDarkIconURL.identifier(),
+			LabelPolicyLinkPreviewTitle.identifier(),
+			LabelPolicyLinkPreviewDescription.identifier(),
+			LabelPolicyLinkPreviewImageURL.identifier(),
 		).
 			From(labelPolicyTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
@@ -288,6 +304,9 @@ func prepareLabelPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LabelPolicy, 
 				darkFontColor        = sql.NullString{}
 				darkLogoURL          = sql.NullString{}
 				darkIconURL          = sql.NullString{}
+				linkPreviewTitle     = sql.NullString{}
+				linkPreviewDesc      = sql.NullString{}
+				linkPreviewImageURL  = sql.NullString{}
 			)
 
 			err := row.Scan(
@@ -318,6 +337,9 @@ func prepareLabelPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LabelPolicy, 
 				&darkFontColor,
 				&darkLogoURL,
 				&darkIconURL,
+				&linkPreviewTitle,
+				&linkPreviewDesc,
+				&linkPreviewImageURL,
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
@@ -339,6 +361,9 @@ func prepareLabelPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LabelPolicy, 
 			policy.Dark.FontColor = darkFontColor.String
 			policy.Dark.LogoURL = darkLogoURL.String
 			policy.Dark.IconURL = darkIconURL.String
+			policy.LinkPreviewTitle = linkPreviewTitle.String
+			policy.LinkPreviewDescription = linkPreviewDesc.String
+			policy.LinkPreviewImageURL = linkPreviewImageURL.String
 
 			return policy, nil
 		}
@@ -346,23 +371,26 @@ func prepareLabelPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LabelPolicy, 
 
 func (p *LabelPolicy) ToDomain() *domain.LabelPolicy {
 	return &domain.LabelPolicy{
-		Default:             p.IsDefault,
-		PrimaryColor:        p.Light.PrimaryColor,
-		BackgroundColor:     p.Light.BackgroundColor,
-		WarnColor:           p.Light.WarnColor,
-		FontColor:           p.Light.FontColor,
-		LogoURL:             p.Light.LogoURL,
-		IconURL:             p.Light.IconURL,
-		PrimaryColorDark:    p.Dark.PrimaryColor,
-		BackgroundColorDark: p.Dark.BackgroundColor,
-		WarnColorDark:       p.Dark.WarnColor,
-		FontColorDark:       p.Dark.FontColor,
-		LogoDarkURL:         p.Dark.LogoURL,
-		IconDarkURL:         p.Dark.IconURL,
-		Font:                p.FontURL,
-		HideLoginNameSuffix: p.HideLoginNameSuffix,
-		ErrorMsgPopup:       p.ShouldErrorPopup,
-		DisableWatermark:    p.WatermarkDisabled,
-		ThemeMode:           p.ThemeMode,
+		Default:                p.IsDefault,
+		PrimaryColor:           p.Light.PrimaryColor,
+		BackgroundColor:        p.Light.BackgroundColor,
+		WarnColor:              p.Light.WarnColor,
+		FontColor:              p.Light.FontColor,
+		LogoURL:                p.Light.LogoURL,
+		IconURL:                p.Light.IconURL,
+		PrimaryColorDark:       p.Dark.PrimaryColor,
+		BackgroundColorDark:    p.Dark.BackgroundColor,
+		WarnColorDark:          p.Dark.WarnColor,
+		FontColorDark:          p.Dark.FontColor,
+		LogoDarkURL:            p.Dark.LogoURL,
+		IconDarkURL:            p.Dark.IconURL,
+		Font:                   p.FontURL,
+		HideLoginNameSuffix:    p.HideLoginNameSuffix,
+		ErrorMsgPopup:          p.ShouldErrorPopup,
+		DisableWatermark:       p.WatermarkDisabled,
+		ThemeMode:              p.ThemeMode,
+		LinkPreviewTitle:       p.LinkPreviewTitle,
+		LinkPreviewDescription: p.LinkPreviewDescription,
+		LinkPreviewImageURL:    p.LinkPreviewImageURL,
 	}
 }

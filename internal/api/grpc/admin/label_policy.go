@@ -25,7 +25,8 @@ func (s *Server) GetPreviewLabelPolicy(ctx context.Context, req *admin_pb.GetPre
 }
 
 func (s *Server) UpdateLabelPolicy(ctx context.Context, req *admin_pb.UpdateLabelPolicyRequest) (*admin_pb.UpdateLabelPolicyResponse, error) {
-	policy, err := s.command.ChangeDefaultLabelPolicy(ctx, updateLabelPolicyToDomain(req))
+	labelPolicy, linkPreview := updateLabelPolicyToDomain(req)
+	policy, err := s.command.ChangeDefaultLabelPolicy(ctx, labelPolicy, linkPreview)
 	if err != nil {
 		return nil, err
 	}
@@ -100,6 +101,20 @@ func (s *Server) RemoveLabelPolicyIconDark(ctx context.Context, req *admin_pb.Re
 		return nil, err
 	}
 	return &admin_pb.RemoveLabelPolicyIconDarkResponse{
+		Details: object.ChangeToDetailsPb(
+			policy.Sequence,
+			policy.EventDate,
+			policy.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) RemoveLabelPolicyLinkPreviewImage(ctx context.Context, req *admin_pb.RemoveLabelPolicyLinkPreviewImageRequest) (*admin_pb.RemoveLabelPolicyLinkPreviewImageResponse, error) {
+	policy, err := s.command.RemoveLinkPreviewImageDefaultLabelPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.RemoveLabelPolicyLinkPreviewImageResponse{
 		Details: object.ChangeToDetailsPb(
 			policy.Sequence,
 			policy.EventDate,
