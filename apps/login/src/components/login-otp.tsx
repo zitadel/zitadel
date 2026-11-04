@@ -41,6 +41,9 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
+  // seconds until the server accepts another OTP SMS request
+  const [resendCooldown, setResendCooldown] = useState<number>(0);
+  const resendAvailableAt = useRef<number>(0);
 
   const router = useRouter();
 
@@ -53,10 +56,8 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
     },
   });
 
-  const updateSessionForOTPChallenge = useCallback(async (): Promise<{
-    error?: string;
-    [key: string]: any;
-  }> => {
+  // resolves to the error to show to the user, if any
+  const updateSessionForOTPChallenge = useCallback(async (): Promise<string | undefined> => {
     let challenges;
 
     const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
@@ -94,24 +95,41 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
         requestId,
       });
     } catch {
-      return { error: t("errors.couldNotRequestChallenge") };
+      return t("errors.couldNotRequestChallenge");
     }
 
-    if (response && "error" in response && response.error) {
-      return { error: response.error };
+    if (response && "retryAfterSeconds" in response && response.retryAfterSeconds) {
+      // the code was either just sent or, if the server refused, sent moments ago (e.g. before a reload): the countdown covers both
+      resendAvailableAt.current = Date.now() + response.retryAfterSeconds * 1000;
+      setResendCooldown(response.retryAfterSeconds);
+      return;
     }
 
-    return response;
+    if (response && "error" in response) {
+      return response.error;
+    }
   }, [method, host, requestId, loginName, sessionId, organization, t]);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) {
+      return;
+    }
+    const timer = setTimeout(() => {
+      // timers are throttled or suspended in background tabs, so catch up with the time that actually passed
+      const remainingSeconds = Math.ceil((resendAvailableAt.current - Date.now()) / 1000);
+      setResendCooldown(Math.max(Math.min(resendCooldown - 1, remainingSeconds), 0));
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
 
   useEffect(() => {
     if (!initialized.current && ["email", "sms"].includes(method) && !code) {
       initialized.current = true;
       setLoading(true);
       updateSessionForOTPChallenge()
-        .then((response) => {
-          if (response?.error) {
-            setError(response.error);
+        .then((challengeError) => {
+          if (challengeError) {
+            setError(challengeError);
           }
         })
         .finally(() => {
@@ -220,21 +238,24 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
                 <Translated i18nKey="verify.noCodeReceived" namespace="otp" />
               </span>
               <button
-                aria-label={t("verify.resendCode")}
-                disabled={loading}
+                disabled={loading || resendCooldown > 0}
                 type="button"
                 className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
                 onClick={async () => {
                   setLoading(true);
-                  const response = await updateSessionForOTPChallenge();
-                  if (response?.error) {
-                    setError(response.error);
+                  const challengeError = await updateSessionForOTPChallenge();
+                  if (challengeError) {
+                    setError(challengeError);
                   }
                   setLoading(false);
                 }}
                 data-testid="resend-button"
               >
-                <Translated i18nKey="verify.resendCode" namespace="otp" />
+                {resendCooldown > 0 ? (
+                  <Translated i18nKey="verify.resendCodeIn" namespace="otp" data={{ seconds: resendCooldown }} />
+                ) : (
+                  <Translated i18nKey="verify.resendCode" namespace="otp" />
+                )}
               </button>
             </div>
           </Alert>

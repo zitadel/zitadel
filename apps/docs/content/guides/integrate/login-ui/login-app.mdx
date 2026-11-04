@@ -148,4 +148,7 @@ If you want to enforce users to have their email verified, you can set the optio
 By default, verification codes are not automatically submitted on page load. This protects against enterprise email link scanners that pre-fetch URLs and could inadvertently consume one-time codes before users click them.
 If you want to enable automatic code submission (e.g. for a smoother UX when link scanners are not a concern), set `NEXT_PUBLIC_AUTO_SUBMIT_CODE` to `true`.
 
+A new OTP SMS code can only be requested 30 seconds after the previous one for the same session; the "Resend code" button shows a countdown until then.
+Set `OTP_SMS_RESEND_COOLDOWN_SECONDS` to change the cooldown, or to `0` to disable it.
+
 ![](../../../../public/img/deploy-to-vercel.png)

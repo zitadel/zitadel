@@ -241,6 +241,7 @@
       "emailDescription": "Enter the code you received via email.",
       "noCodeReceived": "Didn't receive a code?",
       "resendCode": "Resend code",
+      "resendCodeIn": "Resend code ({seconds}s)",
       "submit": "Continue",
       "labels": {
         "code": "Code"
@@ -265,7 +266,8 @@
     },
     "errors": {
       "couldNotRequestChallenge": "Could not request OTP challenge",
-      "couldNotVerifyCode": "Could not verify OTP code"
+      "couldNotVerifyCode": "Could not verify OTP code",
+      "resendCooldown": "Please wait {seconds} seconds before requesting a new code."
     }
   },
   "passkey": {

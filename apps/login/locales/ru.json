@@ -241,6 +241,7 @@
       "emailDescription": "Введите код, полученный по email.",
       "noCodeReceived": "Не получили код?",
       "resendCode": "Отправить код повторно",
+      "resendCodeIn": "Отправить код повторно ({seconds} с)",
       "submit": "Продолжить",
       "labels": {
         "code": "Код"
@@ -265,7 +266,8 @@
     },
     "errors": {
       "couldNotRequestChallenge": "Не удалось запросить OTP-челлендж",
-      "couldNotVerifyCode": "Не удалось проверить OTP-код"
+      "couldNotVerifyCode": "Не удалось проверить OTP-код",
+      "resendCooldown": "Подождите {seconds} с, прежде чем запрашивать новый код."
     }
   },
   "passkey": {
