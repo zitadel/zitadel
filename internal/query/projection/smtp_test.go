@@ -132,6 +132,61 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name: "reduceSMTPConfigChanged, password in both the legacy field and plainAuth",
+			args: args{
+				event: getEvent(
+					testEvent(
+						instance.SMTPConfigChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
+						"instance_id": "instance-id",
+						"resource_owner": "ro-id",
+						"aggregate_id": "agg-id",
+						"id": "config-id",
+						"password": {
+							"cryptoType": 0,
+							"algorithm": "RSA-265",
+							"keyId": "key-id"
+						},
+						"plainAuth": {
+							"password": {
+								"cryptoType": 0,
+								"algorithm": "RSA-265",
+								"keyId": "key-id"
+							}
+						}
+					}`,
+						),
+					), eventstore.GenericEventMapper[instance.SMTPConfigChangedEvent]),
+			},
+			reduce: (&smtpConfigProjection{}).reduceSMTPConfigChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.smtp_configs6 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"config-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.smtp_configs6_smtp SET password = $1 WHERE (id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								"config-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "reduceSMTPConfigChanged, description",
 			args: args{
 				event: getEvent(
