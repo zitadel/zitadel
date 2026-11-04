@@ -437,7 +437,7 @@ func newNotificationWorker(t *testing.T, ctrl *gomock.Controller, queries *mock.
 		),
 		channels: &notificationChannels{
 			Chain: *senders.ChainChannels(channel),
-			EmailConfig: &email.Config{
+			emailConfig: &email.Config{
 				ProviderConfig: &email.Provider{
 					ID:          "emailProviderID",
 					Description: "description",
