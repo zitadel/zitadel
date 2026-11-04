@@ -148,7 +148,7 @@ const (
 )
 
 func (a *OIDCApp) IsValid() bool {
-	if (a.ClockSkew != nil && (*a.ClockSkew > time.Second*5 || *a.ClockSkew < time.Second*0)) || !a.OriginsValid() || !a.AppLinkConfigValid() {
+	if (a.ClockSkew != nil && (*a.ClockSkew > time.Second*5 || *a.ClockSkew < time.Second*0)) || !a.OriginsValid() || !a.AppLinkConfigValid() || !a.RedirectUrisValid() || !a.PostLogoutRedirectUrisValid() {
 		return false
 	}
 	grantTypes := a.getRequiredGrantTypes()
@@ -158,6 +158,24 @@ func (a *OIDCApp) IsValid() bool {
 	for _, grantType := range grantTypes {
 		ok := containsOIDCGrantType(a.GrantTypes, grantType)
 		if !ok {
+			return false
+		}
+	}
+	return true
+}
+
+func (a *OIDCApp) RedirectUrisValid() bool {
+	for _, uri := range a.RedirectUris {
+		if _, err := url.Parse(strings.TrimSpace(uri)); err != nil {
+			return false
+		}
+	}
+	return true
+}
+
+func (a *OIDCApp) PostLogoutRedirectUrisValid() bool {
+	for _, uri := range a.PostLogoutRedirectUris {
+		if _, err := url.Parse(strings.TrimSpace(uri)); err != nil {
 			return false
 		}
 	}

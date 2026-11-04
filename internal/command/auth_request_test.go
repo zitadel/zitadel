@@ -78,6 +78,20 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 			zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sf3gt", "Errors.AuthRequest.AlreadyExisting"),
 		},
 		{
+			"invalid_redirect_uri",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: mockCtx,
+				request: &AuthRequest{
+					RedirectURI: "http://localhost:5173.evil.example.com/callback",
+				},
+			},
+			nil,
+			zerrors.ThrowInvalidArgument(nil, "COMMAND-3m9sf", "Errors.AuthRequest.InvalidRedirectURI"),
+		},
+		{
 			"added",
 			fields{
 				eventstore: expectEventstore(
@@ -170,7 +184,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 				idGenerator: tt.fields.idGenerator,
 			}
 			got, err := c.AddAuthRequest(tt.args.ctx, tt.args.request)
-			require.ErrorIs(t, tt.wantErr, err)
+			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
 		})
 	}
@@ -261,6 +275,46 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 			},
 			res{
 				wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sx208nt", "Errors.AuthRequest.AlreadyHandled"),
+			},
+		},
+		{
+			"invalid redirect URI",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("id", "instanceID").Aggregate,
+								"loginClient",
+								"clientID",
+								"http://localhost:5173.evil.example.com/callback",
+								"state",
+								"nonce",
+								[]string{"openid"},
+								[]string{"audience"},
+								domain.OIDCResponseTypeCode,
+								domain.OIDCResponseModeQuery,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+								false,
+								"issuer",
+								"",
+							),
+						),
+					),
+				),
+				tokenVerifier: newMockTokenVerifierValid(),
+			},
+			args{
+				ctx:       mockCtx,
+				id:        "id",
+				sessionID: "sessionID",
+			},
+			res{
+				wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-8m2sf", "Errors.AuthRequest.InvalidRedirectURI"),
 			},
 		},
 		{
@@ -1214,6 +1268,46 @@ func TestCommands_FailAuthRequest(t *testing.T) {
 						Issuer:       "issuer",
 					},
 				},
+			},
+		},
+		{
+			"invalid redirect URI",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+								"loginClient",
+								"clientID",
+								"http://localhost:5173.evil.example.com/callback",
+								"state",
+								"nonce",
+								[]string{"openid"},
+								[]string{"audience"},
+								domain.OIDCResponseTypeCode,
+								domain.OIDCResponseModeQuery,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+								true,
+								"issuer",
+								"",
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args{
+				ctx:    mockCtx,
+				id:     "V2_id",
+				reason: domain.OIDCErrorReasonLoginRequired,
+			},
+			res{
+				wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-9m3sf", "Errors.AuthRequest.InvalidRedirectURI"),
 			},
 		},
 	}
