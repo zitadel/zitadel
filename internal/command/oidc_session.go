@@ -274,6 +274,12 @@ func (c *Commands) RevokeOIDCSessionToken(ctx context.Context, token, clientID s
 	if err != nil {
 		return zerrors.ThrowInternal(err, "OIDCS-NB3t2", "Errors.Internal")
 	}
+	if writeModel.State == domain.OIDCSessionStateUnspecified {
+		// Revocation must stay a no-op for dead tokens even after cleanup has removed
+		// the backing oidc_session aggregate from events2.
+		logging.WithFields("oidcSessionID", oidcSessionID).Info("token revocation for unknown oidc session")
+		return nil
+	}
 	if err = writeModel.CheckClient(clientID); err != nil {
 		return err
 	}
