@@ -359,7 +359,8 @@
       "couldNotCreateSession": "Nem sikerült létrehozni a munkamenetet",
       "userNotFound": "A felhasználó nem található a rendszerben",
       "couldNotLinkIDP": "Nem sikerült összekapcsolni az azonosítószolgáltatót a felhasználóval",
-      "couldNotRegisterUser": "Nem sikerült regisztrálni a felhasználót"
+      "couldNotRegisterUser": "Nem sikerült regisztrálni a felhasználót",
+      "registerNotAllowed": "A regisztráció nem engedélyezett"
     }
   },
   "invite": {

@@ -359,7 +359,8 @@
       "couldNotCreateSession": "Nie udało się utworzyć sesji",
       "userNotFound": "Nie znaleziono użytkownika w systemie",
       "couldNotLinkIDP": "Nie udało się powiązać IDP z użytkownikiem",
-      "couldNotRegisterUser": "Nie udało się zarejestrować użytkownika"
+      "couldNotRegisterUser": "Nie udało się zarejestrować użytkownika",
+      "registerNotAllowed": "Rejestracja nie jest dozwolona"
     }
   },
   "invite": {

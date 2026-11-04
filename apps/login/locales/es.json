@@ -359,7 +359,8 @@
       "couldNotCreateSession": "No se pudo crear la sesión",
       "userNotFound": "Usuario no encontrado en el sistema",
       "couldNotLinkIDP": "No se pudo vincular el IdP al usuario",
-      "couldNotRegisterUser": "No se pudo registrar el usuario"
+      "couldNotRegisterUser": "No se pudo registrar el usuario",
+      "registerNotAllowed": "El registro no está permitido"
     }
   },
   "invite": {
