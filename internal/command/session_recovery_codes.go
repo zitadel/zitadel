@@ -9,6 +9,11 @@ import (
 
 func CheckRecoveryCode(code string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) ([]eventstore.Command, error) {
+		// unlocks the user if the lock duration has been exceeded,
+		// a user, who is still locked, is rejected by checkRecoveryCode
+		if _, err := cmd.getHumanWriteModelWithAutoUnlock(ctx); err != nil {
+			return nil, err
+		}
 		commands, err := checkRecoveryCode(ctx, cmd.sessionWriteModel.UserID, code, cmd.sessionWriteModel.UserResourceOwner, nil, cmd.eventstore.FilterToQueryReducer, cmd.hasher)
 		if err != nil {
 			return commands, err

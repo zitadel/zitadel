@@ -14,9 +14,12 @@ const (
 type LockoutPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	MaxPasswordAttempts uint64 `json:"maxPasswordAttempts,omitempty"`
-	MaxOTPAttempts      uint64 `json:"maxOTPAttempts,omitempty"`
-	ShowLockOutFailures bool   `json:"showLockOutFailures,omitempty"`
+	MaxPasswordAttempts      uint64 `json:"maxPasswordAttempts,omitempty"`
+	MaxOTPAttempts           uint64 `json:"maxOTPAttempts,omitempty"`
+	ShowLockOutFailures      bool   `json:"showLockOutFailures,omitempty"`
+	AutoUnlockAfterMin       uint64 `json:"autoUnlockAfterMin,omitempty"`
+	ShowRemainingLockoutTime bool   `json:"showRemainingLockoutTime,omitempty"`
+	ShowAbsoluteLockoutTime  bool   `json:"showAbsoluteLockoutTime,omitempty"`
 }
 
 func (e *LockoutPolicyAddedEvent) Payload() interface{} {
@@ -32,13 +35,19 @@ func NewLockoutPolicyAddedEvent(
 	maxPasswordAttempts,
 	maxOTPAttempts uint64,
 	showLockOutFailures bool,
+	autoUnlockAfterMin uint64,
+	showRemainingLockoutTime bool,
+	showAbsoluteLockoutTime bool,
 ) *LockoutPolicyAddedEvent {
 
 	return &LockoutPolicyAddedEvent{
-		BaseEvent:           *base,
-		MaxPasswordAttempts: maxPasswordAttempts,
-		MaxOTPAttempts:      maxOTPAttempts,
-		ShowLockOutFailures: showLockOutFailures,
+		BaseEvent:                *base,
+		MaxPasswordAttempts:      maxPasswordAttempts,
+		MaxOTPAttempts:           maxOTPAttempts,
+		ShowLockOutFailures:      showLockOutFailures,
+		AutoUnlockAfterMin:       autoUnlockAfterMin,
+		ShowRemainingLockoutTime: showRemainingLockoutTime,
+		ShowAbsoluteLockoutTime:  showAbsoluteLockoutTime,
 	}
 }
 
@@ -58,9 +67,12 @@ func LockoutPolicyAddedEventMapper(event eventstore.Event) (eventstore.Event, er
 type LockoutPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	MaxPasswordAttempts *uint64 `json:"maxPasswordAttempts,omitempty"`
-	MaxOTPAttempts      *uint64 `json:"maxOTPAttempts,omitempty"`
-	ShowLockOutFailures *bool   `json:"showLockOutFailures,omitempty"`
+	MaxPasswordAttempts      *uint64 `json:"maxPasswordAttempts,omitempty"`
+	MaxOTPAttempts           *uint64 `json:"maxOTPAttempts,omitempty"`
+	ShowLockOutFailures      *bool   `json:"showLockOutFailures,omitempty"`
+	AutoUnlockAfterMin       *uint64 `json:"autoUnlockAfterMin,omitempty"`
+	ShowRemainingLockoutTime *bool   `json:"showRemainingLockoutTime,omitempty"`
+	ShowAbsoluteLockoutTime  *bool   `json:"showAbsoluteLockoutTime,omitempty"`
 }
 
 func (e *LockoutPolicyChangedEvent) Payload() interface{} {
@@ -104,6 +116,24 @@ func ChangeMaxOTPAttempts(maxAttempts uint64) func(*LockoutPolicyChangedEvent) {
 func ChangeShowLockOutFailures(showLockOutFailures bool) func(*LockoutPolicyChangedEvent) {
 	return func(e *LockoutPolicyChangedEvent) {
 		e.ShowLockOutFailures = &showLockOutFailures
+	}
+}
+
+func ChangeAutoUnlockAfterMin(autoUnlockAfterMin uint64) func(*LockoutPolicyChangedEvent) {
+	return func(e *LockoutPolicyChangedEvent) {
+		e.AutoUnlockAfterMin = &autoUnlockAfterMin
+	}
+}
+
+func ChangeShowRemainingLockoutTime(showRemainingLockoutTime bool) func(*LockoutPolicyChangedEvent) {
+	return func(e *LockoutPolicyChangedEvent) {
+		e.ShowRemainingLockoutTime = &showRemainingLockoutTime
+	}
+}
+
+func ChangeShowAbsoluteLockoutTime(showAbsoluteLockoutTime bool) func(*LockoutPolicyChangedEvent) {
+	return func(e *LockoutPolicyChangedEvent) {
+		e.ShowAbsoluteLockoutTime = &showAbsoluteLockoutTime
 	}
 }
 

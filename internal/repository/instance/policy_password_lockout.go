@@ -22,6 +22,9 @@ func NewLockoutPolicyAddedEvent(
 	maxPasswordAttempts,
 	maxOTPAttempts uint64,
 	showLockoutFailure bool,
+	autoUnlockAfterMin uint64,
+	showRemainingLockoutTime bool,
+	showAbsoluteLockoutTime bool,
 ) *LockoutPolicyAddedEvent {
 	return &LockoutPolicyAddedEvent{
 		LockoutPolicyAddedEvent: *policy.NewLockoutPolicyAddedEvent(
@@ -31,7 +34,11 @@ func NewLockoutPolicyAddedEvent(
 				LockoutPolicyAddedEventType),
 			maxPasswordAttempts,
 			maxOTPAttempts,
-			showLockoutFailure),
+			showLockoutFailure,
+			autoUnlockAfterMin,
+			showRemainingLockoutTime,
+			showAbsoluteLockoutTime,
+		),
 	}
 }
 

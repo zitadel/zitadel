@@ -262,6 +262,9 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s77StampEventPositionAtInsert = &StampEventPositionAtInsert{dbClient: dbClient}
 	steps.s78UniqueConstraintOwners = &UniqueConstraintOwners{dbClient: dbClient}
 	steps.s80Users14InstanceResourceOwnerIndex = &Users14InstanceResourceOwnerIndex{dbClient: dbClient}
+	steps.s81LockoutPolicyAutoUnlockColumn = &LockoutPolicyAutoUnlockColumn{dbClient: dbClient}
+	steps.s82LockoutPolicyShowRemainingLockoutTimeColumn = &LockoutPolicyShowRemainingLockoutTimeColumn{dbClient: dbClient}
+	steps.s83LockoutPolicyShowAbsoluteLockoutTimeColumn = &LockoutPolicyShowAbsoluteLockoutTimeColumn{dbClient: dbClient}
 	if steps.BackfillUniqueConstraintOwners == nil {
 		steps.BackfillUniqueConstraintOwners = &BackfillUniqueConstraintOwners{}
 	}
@@ -405,6 +408,9 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s73FixUserGrantRoles,
 		steps.s74Apps7OIDCConfigsAddRegistrationToken,
 		steps.s75Apps7OIDCConfigsAddAppLinkConfig,
+		steps.s81LockoutPolicyAutoUnlockColumn,
+		steps.s82LockoutPolicyShowRemainingLockoutTimeColumn,
+		steps.s83LockoutPolicyShowAbsoluteLockoutTimeColumn,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {

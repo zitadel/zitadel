@@ -13,6 +13,7 @@ message CredentialsCheckError {
   string id = 1;
   string message = 2;
   int32 failed_attempts = 3;
+  int32 remaining_lock_duration = 4;
 }
 
 message LocalizedMessage {

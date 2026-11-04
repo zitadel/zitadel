@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddDefaultLockoutPolicy(ctx context.Context, maxPasswordAttempts, maxOTPAttempts uint64, showLockoutFailure bool) (*domain.ObjectDetails, error) {
+func (c *Commands) AddDefaultLockoutPolicy(ctx context.Context, maxPasswordAttempts, maxOTPAttempts uint64, showLockoutFailure bool, autoUnlockAfterMin uint64, showRemainingLockoutTime bool, showAbsoluteLockoutTime bool) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	//nolint:staticcheck
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultLockoutPolicy(
@@ -20,6 +20,9 @@ func (c *Commands) AddDefaultLockoutPolicy(ctx context.Context, maxPasswordAttem
 		maxPasswordAttempts,
 		maxOTPAttempts,
 		showLockoutFailure,
+		autoUnlockAfterMin,
+		showRemainingLockoutTime,
+		showAbsoluteLockoutTime,
 	))
 	if err != nil {
 		return nil, err
@@ -47,6 +50,9 @@ func (c *Commands) ChangeDefaultLockoutPolicy(ctx context.Context, policy *domai
 		policy.MaxPasswordAttempts,
 		policy.MaxOTPAttempts,
 		policy.ShowLockOutFailures,
+		policy.AutoUnlockAfterMin,
+		policy.ShowRemainingLockoutTime,
+		policy.ShowAbsoluteLockoutTime,
 	)
 	if !hasChanged {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-0psjF", "Errors.Instance.LockoutPolicy.NotChanged")
@@ -80,6 +86,9 @@ func prepareAddDefaultLockoutPolicy(
 	maxPasswordAttempts,
 	maxOTPAttempts uint64,
 	showLockoutFailure bool,
+	autoUnlockAfterMin uint64,
+	showRemainingLockoutTime bool,
+	showAbsoluteLockoutTime bool,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -96,7 +105,7 @@ func prepareAddDefaultLockoutPolicy(
 				return nil, zerrors.ThrowAlreadyExists(nil, "INSTANCE-0olDf", "Errors.Instance.LockoutPolicy.AlreadyExists")
 			}
 			return []eventstore.Command{
-				instance.NewLockoutPolicyAddedEvent(ctx, &a.Aggregate, maxPasswordAttempts, maxOTPAttempts, showLockoutFailure),
+				instance.NewLockoutPolicyAddedEvent(ctx, &a.Aggregate, maxPasswordAttempts, maxOTPAttempts, showLockoutFailure, autoUnlockAfterMin, showRemainingLockoutTime, showAbsoluteLockoutTime),
 			}, nil
 		}, nil
 	}
