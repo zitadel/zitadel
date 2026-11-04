@@ -31,12 +31,17 @@ html {
   background-color: var(--theme-dark-primary-500);
 }
 
+// The check mark is inlined rather than referenced from public/. A hand authored
+// url("/checkbox.svg") is not rewritten by Next, so it resolves at the origin root
+// instead of below NEXT_PUBLIC_BASE_PATH and the tick never loads.
+$checkbox-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z' /%3E%3C/svg%3E");
+
 .form-checkbox:checked::after {
   content: "";
   position: absolute;
   inset: 0;
-  -webkit-mask-image: url("/checkbox.svg");
-  mask-image: url("/checkbox.svg");
+  -webkit-mask-image: $checkbox-mark;
+  mask-image: $checkbox-mark;
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
   -webkit-mask-repeat: no-repeat;
