@@ -61,3 +61,48 @@ func Test_oidcError(t *testing.T) {
 		})
 	}
 }
+
+func Test_asInvalidGrant(t *testing.T) {
+	tests := []struct {
+		name    string
+		err     error
+		wantErr error
+	}{
+		{
+			name:    "nil",
+			err:     nil,
+			wantErr: nil,
+		},
+		{
+			name:    "unrelated error is passed as-is",
+			err:     zerrors.ThrowInternal(io.ErrClosedPipe, "TEST-123", "oopsie"),
+			wantErr: zerrors.ThrowInternal(io.ErrClosedPipe, "TEST-123", "oopsie"),
+		},
+		{
+			name:    "refresh token invalid",
+			err:     zerrors.ThrowPreconditionFailed(nil, "OIDCS-JOI23", "Errors.OIDCSession.RefreshTokenInvalid"),
+			wantErr: oidc.ErrInvalidGrant().WithDescription("test"),
+		},
+		{
+			name:    "v1 refresh token not found",
+			err:     zerrors.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.User.RefreshToken.Invalid"),
+			wantErr: oidc.ErrInvalidGrant().WithDescription("test"),
+		},
+		{
+			name:    "op invalid refresh token",
+			err:     op.ErrInvalidRefreshToken,
+			wantErr: oidc.ErrInvalidGrant().WithDescription("test"),
+		},
+		{
+			name:    "authorization code invalid",
+			err:     zerrors.ThrowInvalidArgument(nil, "OIDC-ahLi2", "Errors.User.Code.Invalid"),
+			wantErr: oidc.ErrInvalidGrant().WithDescription("test"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := asInvalidGrant(t.Context(), tt.err, "test")
+			require.ErrorIs(t, err, tt.wantErr)
+		})
+	}
+}
