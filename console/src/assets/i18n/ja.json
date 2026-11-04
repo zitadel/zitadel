@@ -209,7 +209,9 @@
         "PREVIOUS_TABLE": {
           "TITLE": "以前のWebキー",
           "DESCRIPTION": "これらは、すでに無効になった以前のWebキーです。",
-          "DEACTIVATED_ON": "無効化日"
+          "DEACTIVATED_ON": "無効化日",
+          "DELETE_TITLE": "以前のWebキーを削除",
+          "DELETE_DESCRIPTION": "この以前のWebキーを削除すると、そのキーで署名されたすべてのトークンが無効になります。この操作は元に戻せません。"
         }
       },
       "MESSAGE_TEXTS": {
