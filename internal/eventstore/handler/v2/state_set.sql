@@ -1,3 +1,6 @@
+-- Listing in_tx_order in SET trips projections.current_states_keep_in_tx_order_opt_in
+-- (BEFORE UPDATE OF in_tx_order). Omitting it (old binaries) leaves the GUC unset so
+-- current_states_keep_in_tx_order nulls the column. Do not drop in_tx_order from SET.
 INSERT INTO projections.current_states (
     projection_name
     , instance_id
@@ -8,6 +11,7 @@ INSERT INTO projections.current_states (
     , "position"
     , last_updated
     , filter_offset
+    , in_tx_order
 ) VALUES (
     $1
     , $2
@@ -18,7 +22,9 @@ INSERT INTO projections.current_states (
     , $7
     , now()
     , $8
-) ON CONFLICT (
+    , $9
+)
+ON CONFLICT (
     projection_name
     , instance_id
 ) DO UPDATE SET
@@ -29,4 +35,5 @@ INSERT INTO projections.current_states (
     , "position" = $7
     , last_updated = statement_timestamp()
     , filter_offset = $8
+    , in_tx_order = $9
 ;
