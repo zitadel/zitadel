@@ -654,6 +654,7 @@
     "IAM_OWNER_VIEWER": "Tiene permiso para revisar toda la instancia, incluyendo todas las organizaciones",
     "IAM_ORG_MANAGER": "Tiene permiso para crear y gestionar organizaciones",
     "IAM_USER_MANAGER": "Tiene permiso para crear y gestionar usuarios",
+    "IAM_USER_VIEWER": "Tiene permiso para ver usuarios",
     "IAM_ADMIN_IMPERSONATOR": "Tiene permiso para hacerse pasar por administradores y usuarios finales de todas las organizaciones",
     "IAM_END_USER_IMPERSONATOR": "Tiene permiso para hacerse pasar por usuarios finales de todas las organizaciones",
     "IAM_LOGIN_CLIENT": "Tiene permiso para gestionar las aplicaciones de inicio de sesión",
