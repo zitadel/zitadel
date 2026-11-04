@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -468,19 +469,31 @@ func DomainClaimedEventMapper(event eventstore.Event) (eventstore.Event, error) 
 
 type DomainClaimedSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	// DeliveryInfo states the provider the email was sent through or that the delivery was suppressed.
+	senders.DeliveryInfo
 }
 
+// Payload returns nil if no delivery information is set, as the event had no payload before it was introduced.
 func (e *DomainClaimedSentEvent) Payload() interface{} {
-	return nil
+	if e.DeliveryInfo == (senders.DeliveryInfo{}) {
+		return nil
+	}
+	return e
 }
 
 func (e *DomainClaimedSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
+func (e *DomainClaimedSentEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
 func NewDomainClaimedSentEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	deliveryInfo senders.DeliveryInfo,
 ) *DomainClaimedSentEvent {
 	return &DomainClaimedSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -488,13 +501,8 @@ func NewDomainClaimedSentEvent(
 			aggregate,
 			UserDomainClaimedSentType,
 		),
+		DeliveryInfo: deliveryInfo,
 	}
-}
-
-func DomainClaimedSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	return &DomainClaimedSentEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
 }
 
 type UsernameChangedEvent struct {

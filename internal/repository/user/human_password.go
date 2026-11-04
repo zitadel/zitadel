@@ -170,6 +170,9 @@ func HumanPasswordCodeAddedEventMapper(event eventstore.Event) (eventstore.Event
 type HumanPasswordCodeSentEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
+	// DeliveryInfo states the provider the email was sent through or that the delivery was suppressed.
+	senders.DeliveryInfo
+
 	GeneratorInfo *senders.CodeGeneratorInfo `json:"generatorInfo,omitempty"`
 }
 
@@ -185,43 +188,50 @@ func (e *HumanPasswordCodeSentEvent) UniqueConstraints() []*eventstore.UniqueCon
 	return nil
 }
 
-func NewHumanPasswordCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate, generatorInfo *senders.CodeGeneratorInfo) *HumanPasswordCodeSentEvent {
+func NewHumanPasswordCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate, generatorInfo *senders.CodeGeneratorInfo, deliveryInfo senders.DeliveryInfo) *HumanPasswordCodeSentEvent {
 	return &HumanPasswordCodeSentEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			HumanPasswordCodeSentType,
 		),
+		DeliveryInfo:  deliveryInfo,
 		GeneratorInfo: generatorInfo,
 	}
 }
 
 type HumanPasswordChangeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	// DeliveryInfo states the provider the email was sent through or that the delivery was suppressed.
+	senders.DeliveryInfo
 }
 
+// Payload returns nil if no delivery information is set, as the event had no payload before it was introduced.
 func (e *HumanPasswordChangeSentEvent) Payload() interface{} {
-	return nil
+	if e.DeliveryInfo == (senders.DeliveryInfo{}) {
+		return nil
+	}
+	return e
 }
 
 func (e *HumanPasswordChangeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func NewHumanPasswordChangeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPasswordChangeSentEvent {
+func (e *HumanPasswordChangeSentEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewHumanPasswordChangeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate, deliveryInfo senders.DeliveryInfo) *HumanPasswordChangeSentEvent {
 	return &HumanPasswordChangeSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			HumanPasswordChangeSentType,
 		),
+		DeliveryInfo: deliveryInfo,
 	}
-}
-
-func HumanPasswordChangeSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	return &HumanPasswordChangeSentEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
 }
 
 type HumanPasswordCheckSucceededEvent struct {

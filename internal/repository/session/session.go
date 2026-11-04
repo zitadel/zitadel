@@ -483,6 +483,9 @@ func NewOTPEmailChallengedEvent(
 
 type OTPEmailSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	// DeliveryInfo states the provider the email was sent through or that the delivery was suppressed.
+	senders.DeliveryInfo
 }
 
 func (e *OTPEmailSentEvent) Payload() interface{} {
@@ -500,6 +503,7 @@ func (e *OTPEmailSentEvent) SetBaseEvent(base *eventstore.BaseEvent) {
 func NewOTPEmailSentEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	deliveryInfo senders.DeliveryInfo,
 ) *OTPEmailSentEvent {
 	return &OTPEmailSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -507,6 +511,7 @@ func NewOTPEmailSentEvent(
 			aggregate,
 			OTPEmailSentType,
 		),
+		DeliveryInfo: deliveryInfo,
 	}
 }
 

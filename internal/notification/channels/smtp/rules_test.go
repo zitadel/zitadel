@@ -369,7 +369,8 @@ func TestRules_Match(t *testing.T) {
 					Users:         []string{"token"},
 					SenderDomains: []string{"example.com"},
 				},
-				RestrictCustomHTML: true,
+				RestrictCustomHTML:               true,
+				SuppressReservedRecipientDomains: true,
 				Headers: map[string]string{
 					"X-Instance-ID": "{{.InstanceID}}",
 					"X-Org-ID":      "{{.OrgID}}",
@@ -379,7 +380,8 @@ func TestRules_Match(t *testing.T) {
 			}},
 			config: defaultProvider,
 			want: Rule{
-				RestrictCustomHTML: true,
+				RestrictCustomHTML:               true,
+				SuppressReservedRecipientDomains: true,
 				Headers: map[string]string{
 					"X-Instance-Id": "instance1",
 					"X-Org-Id":      "org1",
