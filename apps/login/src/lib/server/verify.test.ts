@@ -249,7 +249,7 @@ describe("trySendVerification", () => {
 
   afterEach(() => {
     if (originalBasePath === undefined) {
-      delete process.env.NEXT_PUBLIC_BASE_PATH;
+      Reflect.deleteProperty(process.env, "NEXT_PUBLIC_BASE_PATH");
     } else {
       process.env.NEXT_PUBLIC_BASE_PATH = originalBasePath;
     }

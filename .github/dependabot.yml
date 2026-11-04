@@ -23,7 +23,7 @@ updates:
     prefix: chore
     include: scope
 - package-ecosystem: npm
-  directory: '/login'
+  directory: '/apps/login'
   open-pull-requests-limit: 3
   schedule:
     interval: daily
