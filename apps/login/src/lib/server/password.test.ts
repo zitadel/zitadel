@@ -11,7 +11,7 @@ vi.mock("next/headers", () => ({
 
 vi.mock("@zitadel/client", () => ({
   create: vi.fn(),
-  Code: { FailedPrecondition: 9 },
+  Code: { InvalidArgument: 3, FailedPrecondition: 9 },
   ConnectError: class extends Error {
     code: number;
     constructor(msg: string, code: number) {
@@ -289,6 +289,35 @@ describe("checkSessionAndSetPassword", () => {
     });
 
     expect(result).toEqual({ error: "errors.failedPrecondition" });
+  });
+
+  test("should return the server message when setPassword fails with invalid argument", async () => {
+    // e.g. an Actions v2 request execution rejecting the password with forwardedStatusCode 400
+    const classifiedError = new ClassifiedConnectError(
+      new ConnectError("This password was already used, choose one you have not used before", Code.InvalidArgument),
+    );
+    mockSetPassword.mockRejectedValue(classifiedError);
+
+    const result = await checkSessionAndSetPassword({
+      sessionId: "session123",
+      currentPassword: "oldpassword",
+      password: "newpassword",
+    });
+
+    expect(result).toEqual({ error: "This password was already used, choose one you have not used before" });
+  });
+
+  test("should return translated fallback when setPassword fails with another error", async () => {
+    const classifiedError = new ClassifiedConnectError(new ConnectError("internal failure", Code.Internal));
+    mockSetPassword.mockRejectedValue(classifiedError);
+
+    const result = await checkSessionAndSetPassword({
+      sessionId: "session123",
+      currentPassword: "oldpassword",
+      password: "newpassword",
+    });
+
+    expect(result).toEqual({ error: "set.errors.couldNotSetPassword" });
   });
 });
 
