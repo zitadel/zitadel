@@ -58,6 +58,9 @@ Before you run the tests you need an initialized user. The tests don't implement
 - `make oidc_session`  
   setup: creates a service account to create the auth request and session.  
   test: creates an auth request, a session and links the session to the auth request. Implementation of [this flow](https://zitadel.com/docs/guides/integrate/login-ui/oidc-standard).
+- `make oidc_password_session`  
+  setup: creates a login-client service account and 1 human user per VU  
+  test: creates an auth request, a session with login name, checks the password, finalizes the auth request and exchanges the code at the OIDC token endpoint. Implementation of the [username/password](https://zitadel.com/docs/guides/integrate/login-ui/username-password) + [OIDC](https://zitadel.com/docs/guides/integrate/login-ui/oidc-standard) login UI flows.
 - `make otp_session`  
   setup: creates 1 human user for each VU and adds OTP Email to it  
   test: creates a session based on the login name of the user, sets the OTP Email challenge to the session and afterwards checks the OTP code
