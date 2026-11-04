@@ -64,7 +64,25 @@ export const LANGS: Lang[] = [
     name: "العربية",
     code: "ar",
   },
+  {
+    name: "Filipino",
+    code: "fil",
+  },
 ];
+
+// Language codes that share a translation with another supported language.
+// Filipino is the standardized form of Tagalog, so "tl" uses the "fil" translation.
+const LANGUAGE_ALIASES: Record<string, string> = {
+  tl: "fil",
+};
+
+/**
+ * Maps a language code to the code of the translation that serves it, e.g. "tl" -> "fil".
+ * Codes without an alias are returned unchanged.
+ */
+export function resolveLanguageAlias(code: string): string {
+  return LANGUAGE_ALIASES[code] ?? code;
+}
 
 export const LANGUAGE_COOKIE_NAME = "NEXT_LOCALE";
 export const LANGUAGE_HEADER_NAME = "accept-language";
@@ -74,7 +92,7 @@ export function shouldUILocalesOverrideCookie(): boolean {
 }
 
 export function getLanguage(code: string): Lang {
-  const lang = LANGS.find((l) => l.code === code);
+  const lang = LANGS.find((l) => l.code === resolveLanguageAlias(code));
   if (lang) {
     return lang;
   }

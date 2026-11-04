@@ -1,4 +1,4 @@
-import { LANGS } from "@/lib/i18n";
+import { LANGS, resolveLanguageAlias } from "@/lib/i18n";
 
 /**
  * Authentication utility functions that don't require server actions
@@ -23,7 +23,7 @@ export function equalsIgnoreCase(a: string | undefined, b: string | undefined): 
  * Check if a language code is valid (supported by the login UI)
  */
 export function isValidLanguage(code: string): boolean {
-  const normalized = code.trim().toLowerCase();
+  const normalized = resolveLanguageAlias(code.trim().toLowerCase());
   return LANGS.some((lang) => lang.code === normalized);
 }
 
@@ -41,7 +41,7 @@ export function getValidLocaleFromUILocales(uiLocales: string[] | undefined): st
 
     // Check if the full locale is a valid language code (e.g., "de", "EN")
     if (isValidLanguage(normalized)) {
-      return normalized;
+      return resolveLanguageAlias(normalized);
     }
 
     // uiLocales may contain language tags like "en-US" or "de-CH"
@@ -52,7 +52,7 @@ export function getValidLocaleFromUILocales(uiLocales: string[] | undefined): st
     // As of time of writing, this is expected behaviour, since there is only one translation for all languages
     const languageCode = normalized.split("-")[0];
     if (isValidLanguage(languageCode)) {
-      return languageCode;
+      return resolveLanguageAlias(languageCode);
     }
   }
 

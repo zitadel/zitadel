@@ -45,6 +45,11 @@ describe("auth-utils", () => {
       expect(isValidLanguage("EN")).toBe(true);
       expect(isValidLanguage("De")).toBe(true);
     });
+
+    it("should accept Tagalog as an alias of Filipino", () => {
+      expect(isValidLanguage("fil")).toBe(true);
+      expect(isValidLanguage("tl")).toBe(true);
+    });
   });
 
   describe("getValidLocaleFromUILocales", () => {
@@ -75,6 +80,12 @@ describe("auth-utils", () => {
     it("should handle case-insensitive matching", () => {
       expect(getValidLocaleFromUILocales(["DE"])).toBe("de");
       expect(getValidLocaleFromUILocales(["En-US"])).toBe("en");
+    });
+
+    it("should resolve Tagalog to Filipino", () => {
+      expect(getValidLocaleFromUILocales(["fil-PH"])).toBe("fil");
+      expect(getValidLocaleFromUILocales(["tl"])).toBe("fil");
+      expect(getValidLocaleFromUILocales(["tl-PH"])).toBe("fil");
     });
   });
 
