@@ -56,7 +56,11 @@ export async function completeAuthFlow(
     });
 
     // Safety net - ensure we always return a valid object
-    if (!result || typeof result !== "object" || (!("redirect" in result) && !("error" in result))) {
+    if (
+      !result ||
+      typeof result !== "object" ||
+      (!("redirect" in result) && !("error" in result) && !("samlData" in result))
+    ) {
       logger.error("Auth flow: Invalid result from loginWithOIDCAndSession:", { result });
       return { error: "Authentication completed but navigation failed" };
     }

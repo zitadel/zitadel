@@ -1,4 +1,4 @@
-import { Timestamp, timestampDate } from "@zitadel/client";
+import { Timestamp, timestampDate, timestampMs } from "@zitadel/client";
 import { AuthRequest } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import { SAMLRequest } from "@zitadel/proto/zitadel/saml/v2/authorization_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
@@ -112,13 +112,35 @@ export function hasVerifiedPrimaryFactor(session: Partial<Session>): {
 export async function isSessionValid({
   serviceConfig,
   session,
+  authRequest,
 }: {
   serviceConfig: ServiceConfig;
   session: Session;
+  authRequest?: AuthRequest;
 }): Promise<boolean> {
   // session can't be checked without user
   if (!session.factors?.user) {
     return false;
+  }
+
+  if (authRequest?.maxAge) {
+    if (!authRequest.creationDate) {
+      return false;
+    }
+    const authTimes = [
+      session.factors.password?.verifiedAt,
+      session.factors.webAuthN?.verifiedAt,
+      session.factors.totp?.verifiedAt,
+      session.factors.intent?.verifiedAt,
+      session.factors.otpSms?.verifiedAt,
+      session.factors.otpEmail?.verifiedAt,
+    ]
+      .filter((time): time is Timestamp => !!time)
+      .map(timestampMs);
+    const maxAgeMs = Number(authRequest.maxAge.seconds) * 1000 + authRequest.maxAge.nanos / 1_000_000;
+    if (authTimes.length === 0 || Math.max(...authTimes) < timestampMs(authRequest.creationDate) - maxAgeMs) {
+      return false;
+    }
   }
 
   let mfaValid = true;
@@ -256,7 +278,7 @@ export async function findValidSession({
 
   // return the first valid session according to settings
   for (const session of sessionsWithHint) {
-    if (await isSessionValid({ serviceConfig, session })) {
+    if (await isSessionValid({ serviceConfig, session, authRequest })) {
       return session;
     }
   }

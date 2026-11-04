@@ -2,7 +2,7 @@ import { isSafeRedirectUri } from "@/lib/client-utils";
 import { Cookie } from "@/lib/cookies";
 import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
-import { createCallback, getLoginSettings, ServiceConfig } from "@/lib/zitadel";
+import { createCallback, getAuthRequest, getLoginSettings, ServiceConfig } from "@/lib/zitadel";
 import { Code, create } from "@zitadel/client";
 import { CreateCallbackRequestSchema, SessionSchema } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
@@ -21,11 +21,17 @@ export async function loginWithOIDCAndSession({
   sessionId,
   sessions,
   sessionCookies,
-}: LoginWithOIDCAndSession): Promise<{ error: string } | { redirect: string }> {
+}: LoginWithOIDCAndSession): Promise<
+  { error: string } | { redirect: string } | { samlData: { url: string; fields: Record<string, string> } }
+> {
   const selectedSession = sessions.find((s) => s.id === sessionId);
 
   if (selectedSession && selectedSession.id) {
-    const isValid = await isSessionValid({ serviceConfig, session: selectedSession });
+    const { authRequest: request } = await getAuthRequest({ serviceConfig, authRequestId: authRequest });
+    if (!request) {
+      return { error: "Authorization request not found" };
+    }
+    const isValid = await isSessionValid({ serviceConfig, session: selectedSession, authRequest: request });
 
     console.log("Session is valid:", isValid);
 
@@ -43,6 +49,10 @@ export async function loginWithOIDCAndSession({
       if (res && "redirect" in res && res?.redirect) {
         return { redirect: res.redirect };
       }
+      if (res && "samlData" in res && res.samlData) {
+        return { samlData: res.samlData };
+      }
+      return { error: res && "error" in res && res.error ? res.error : "Could not reauthenticate session" };
     }
 
     const cookie = sessionCookies.find((cookie) => cookie.id === selectedSession?.id);
