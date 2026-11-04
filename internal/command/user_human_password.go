@@ -392,7 +392,14 @@ func checkPassword(ctx context.Context, userID, password string, es *eventstore.
 	if userID == "" {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sfw3f", "Errors.User.UserIDMissing")
 	}
+	// Only load the password checks since the last reset of the failed count,
+	// so the cost of a check doesn't grow with every login of the user.
+	resetWM := newPasswordCheckResetWriteModel(userID)
+	if err := es.FilterToQueryReducer(ctx, resetWM); err != nil {
+		return nil, err
+	}
 	wm := NewHumanPasswordWriteModel(userID, "")
+	wm.checksAfter = resetWM.position
 	err := es.FilterToQueryReducer(ctx, wm)
 	if err != nil {
 		return nil, err

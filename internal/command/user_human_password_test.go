@@ -1837,6 +1837,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // password check reset position
 					expectFilter(),
 				),
 				userPasswordHasher: mockPasswordHasher("x"),
@@ -1880,6 +1881,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // password check reset position
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1943,6 +1945,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // password check reset position
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -2001,6 +2004,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // password check reset position
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -2091,6 +2095,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // password check reset position
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -2181,6 +2186,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // password check reset position
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -2275,6 +2281,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // password check reset position
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -2356,6 +2363,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // password check reset position
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -2522,6 +2530,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // password check reset position
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
