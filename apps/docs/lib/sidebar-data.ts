@@ -1044,6 +1044,23 @@ export const apisSidebar: readonly SidebarItem[] = [
           "apis/benchmarks/v4.17.1/user_info",
         ],
       },
+      {
+        type: "category",
+        label: "v4.19.2",
+        items: [
+          "apis/benchmarks/v4.19.2/add_session",
+          "apis/benchmarks/v4.19.2/human_password_login",
+          "apis/benchmarks/v4.19.2/introspect",
+          "apis/benchmarks/v4.19.2/machine_client_credentials_login",
+          "apis/benchmarks/v4.19.2/machine_jwt_profile_grant",
+          "apis/benchmarks/v4.19.2/machine_pat_login",
+          "apis/benchmarks/v4.19.2/manipulate_user",
+          "apis/benchmarks/v4.19.2/oidc_session",
+          "apis/benchmarks/v4.19.2/otp_session",
+          "apis/benchmarks/v4.19.2/password_session",
+          "apis/benchmarks/v4.19.2/user_info",
+        ],
+      },
     ],
   },
 ] as const;
