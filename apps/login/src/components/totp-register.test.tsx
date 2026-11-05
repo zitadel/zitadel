@@ -30,4 +30,10 @@ describe("TotpRegister", () => {
     const { getByTestId } = render(<TotpRegister uri="otpauth://totp/test" secret="SECRET" />);
     expect(getByTestId("code-text-input")).toHaveFocus();
   });
+
+  test("should show the secret on its own for manual entry", () => {
+    const { getByTestId, getAllByRole } = render(<TotpRegister uri="otpauth://totp/test?secret=SECRET" secret="SECRET" />);
+    expect(getByTestId("totp-secret")).toHaveTextContent("SECRET");
+    expect(getAllByRole("button", { name: "" }).length).toBeGreaterThanOrEqual(2);
+  });
 });

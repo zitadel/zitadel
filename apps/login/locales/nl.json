@@ -257,7 +257,8 @@
       "totpRegisterDescription": "Scan de QR-code of navigeer handmatig naar de URL.",
       "submit": "Verder",
       "labels": {
-        "code": "Code"
+        "code": "Code",
+        "secret": "Geheime sleutel"
       },
       "required": {
         "code": "Dit veld is verplicht"

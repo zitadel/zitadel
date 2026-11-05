@@ -257,7 +257,8 @@
       "totpRegisterDescription": "Olvasd be a QR-kódot, vagy navigálj az URL-re manuálisan.",
       "submit": "Tovább",
       "labels": {
-        "code": "Kód"
+        "code": "Kód",
+        "secret": "Titkos kulcs"
       },
       "required": {
         "code": "Ez a mező kötelező"

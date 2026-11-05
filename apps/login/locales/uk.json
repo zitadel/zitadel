@@ -257,7 +257,8 @@
       "totpRegisterDescription": "Відскануйте QR-код або перейдіть за URL вручну.",
       "submit": "Продовжити",
       "labels": {
-        "code": "Код"
+        "code": "Код",
+        "secret": "Секретний ключ"
       },
       "required": {
         "code": "Це поле обов'язкове"

@@ -250,7 +250,8 @@
       "totpRegisterDescription": "QRコードをスキャンするか、URLに手動でアクセスしてください。",
       "submit": "続行",
       "labels": {
-        "code": "コード"
+        "code": "コード",
+        "secret": "シークレットキー"
       },
       "required": {
         "code": "必須項目です"
