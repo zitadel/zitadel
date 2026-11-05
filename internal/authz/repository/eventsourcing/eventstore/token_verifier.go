@@ -163,17 +163,17 @@ func (repo *TokenVerifierRepo) verifySessionToken(ctx context.Context, sessionID
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	session, err := repo.Query.SessionByID(ctx, true, sessionID, token, nil)
+	session, err := repo.Query.ActiveSessionByToken(ctx, sessionID, token)
 	if err != nil {
 		return "", "", "", err
 	}
 	if !session.Expiration.IsZero() && session.Expiration.Before(time.Now()) {
 		return "", "", "", zerrors.ThrowPermissionDenied(nil, "AUTHZ-EGDo3", "session expired")
 	}
-	if err = repo.checkAuthentication(ctx, authMethodsFromSession(session), session.UserFactor.UserID); err != nil {
+	if err = repo.checkAuthentication(ctx, session.AuthMethodTypes(), session.UserID); err != nil {
 		return "", "", "", err
 	}
-	return session.UserFactor.UserID, "", session.UserFactor.ResourceOwner, nil
+	return session.UserID, "", session.UserResourceOwner, nil
 }
 
 // checkAuthentication ensures the session or token was authenticated (at least a single [domain.UserAuthMethodType]).
@@ -229,36 +229,6 @@ func hasIDPAuthentication(authMethods []domain.UserAuthMethodType) bool {
 		}
 	}
 	return false
-}
-
-func authMethodsFromSession(session *query.Session) []domain.UserAuthMethodType {
-	types := make([]domain.UserAuthMethodType, 0, domain.UserAuthMethodTypeIDP)
-	if !session.PasswordFactor.PasswordCheckedAt.IsZero() {
-		types = append(types, domain.UserAuthMethodTypePassword)
-	}
-	if !session.WebAuthNFactor.WebAuthNCheckedAt.IsZero() {
-		if session.WebAuthNFactor.UserVerified {
-			types = append(types, domain.UserAuthMethodTypePasswordless)
-		} else {
-			types = append(types, domain.UserAuthMethodTypeU2F)
-		}
-	}
-	if !session.IntentFactor.IntentCheckedAt.IsZero() {
-		types = append(types, domain.UserAuthMethodTypeIDP)
-	}
-	if !session.TOTPFactor.TOTPCheckedAt.IsZero() {
-		types = append(types, domain.UserAuthMethodTypeTOTP)
-	}
-	if !session.OTPSMSFactor.OTPCheckedAt.IsZero() {
-		types = append(types, domain.UserAuthMethodTypeOTPSMS)
-	}
-	if !session.OTPEmailFactor.OTPCheckedAt.IsZero() {
-		types = append(types, domain.UserAuthMethodTypeOTPEmail)
-	}
-	if !session.RecoveryCodeFactor.RecoveryCodeCheckedAt.IsZero() {
-		types = append(types, domain.UserAuthMethodTypeRecoveryCode)
-	}
-	return types
 }
 
 func setCallerCtx(ctx context.Context, userID string) context.Context {
