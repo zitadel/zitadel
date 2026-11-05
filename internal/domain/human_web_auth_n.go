@@ -53,6 +53,13 @@ const (
 	AuthenticatorAttachmentCrossPlattform
 )
 
+type ResidentKeyRequirement int32
+
+const (
+	ResidentKeyRequirementUnspecified ResidentKeyRequirement = iota
+	ResidentKeyRequirementRequired
+)
+
 func GetTokenToVerify(tokens []*WebAuthNToken) (int, *WebAuthNToken) {
 	for i, u2f := range tokens {
 		if u2f.State == MFAStateNotReady {

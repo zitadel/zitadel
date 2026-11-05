@@ -52,7 +52,7 @@ func (u *webUser) WebAuthnCredentials() []webauthn.Credential {
 	return u.credentials
 }
 
-func (w *Config) BeginRegistration(ctx context.Context, user *domain.Human, accountName string, authType domain.AuthenticatorAttachment, userVerification domain.UserVerificationRequirement, rpID string, webAuthNs ...*domain.WebAuthNToken) (*domain.WebAuthNToken, error) {
+func (w *Config) BeginRegistration(ctx context.Context, user *domain.Human, accountName string, authType domain.AuthenticatorAttachment, userVerification domain.UserVerificationRequirement, residentKey domain.ResidentKeyRequirement, rpID string, webAuthNs ...*domain.WebAuthNToken) (*domain.WebAuthNToken, error) {
 	webAuthNServer, err := w.serverFromContext(ctx, rpID, "")
 	if err != nil {
 		return nil, err
@@ -65,18 +65,29 @@ func (w *Config) BeginRegistration(ctx context.Context, user *domain.Human, acco
 			CredentialID: cred.ID,
 		}
 	}
-	credentialOptions, sessionData, err := webAuthNServer.BeginRegistration(
-		&webUser{
-			Human:       user,
-			accountName: accountName,
-			credentials: creds,
-		},
+	registrationOptions := []webauthn.RegistrationOption{
 		webauthn.WithAuthenticatorSelection(protocol.AuthenticatorSelection{
 			UserVerification:        UserVerificationFromDomain(userVerification),
 			AuthenticatorAttachment: AuthenticatorAttachmentFromDomain(authType),
 		}),
 		webauthn.WithConveyancePreference(protocol.PreferNoAttestation),
 		webauthn.WithExclusions(existing),
+	}
+	if residentKey == domain.ResidentKeyRequirementRequired {
+		// A passkey is a discoverable credential by definition. Without a
+		// residentKey requirement, WebAuthn defaults to "discouraged" and the
+		// credential is created as a non-discoverable one, so client platforms
+		// do not necessarily offer it through the passkey providers
+		// (WebAuthn Level 3, section 5.4.4).
+		registrationOptions = append(registrationOptions, webauthn.WithResidentKeyRequirement(protocol.ResidentKeyRequirementRequired))
+	}
+	credentialOptions, sessionData, err := webAuthNServer.BeginRegistration(
+		&webUser{
+			Human:       user,
+			accountName: accountName,
+			credentials: creds,
+		},
+		registrationOptions...,
 	)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "WEBAU-bM8sd", "Errors.User.WebAuthN.BeginRegisterFailed")
