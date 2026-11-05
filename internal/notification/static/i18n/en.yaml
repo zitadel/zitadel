@@ -59,6 +59,20 @@ PasswordChange:
   Greeting: Hello {{.DisplayName}},
   Text: The password of your user has changed. If this change was not done by you, please be advised to immediately reset your password.
   ButtonText: Login
+EmailChange:
+  Title: Email of user has changed
+  PreHeader: Change email
+  Subject: Email of user has changed
+  Greeting: Hello {{.DisplayName}},
+  Text: The email address of your user has changed. If this change was not done by you, please be advised to immediately secure your account.
+  ButtonText: Login
+PhoneChange:
+  Title: Phone number of user has changed
+  PreHeader: Change phone number
+  Subject: Phone number of user has changed
+  Greeting: Hello {{.DisplayName}},
+  Text: The phone number of your user has changed. If this change was not done by you, please be advised to immediately secure your account.
+  ButtonText: Login
 InviteUser:
   Title: Invitation to {{.ApplicationName}}
   PreHeader: Invitation to {{.ApplicationName}}

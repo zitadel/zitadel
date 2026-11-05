@@ -161,6 +161,23 @@ func (c *Commands) HumanEmailVerificationCodeSent(ctx context.Context, orgID, us
 	return err
 }
 
+// EmailChangeSent notification sent that user changed email
+func (c *Commands) EmailChangeSent(ctx context.Context, orgID, userID string) (err error) {
+	if userID == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-eu8Ar", "Errors.User.UserIDMissing")
+	}
+	existingEmail, err := c.emailWriteModel(ctx, userID, orgID)
+	if err != nil {
+		return err
+	}
+	if existingEmail.UserState == domain.UserStateUnspecified || existingEmail.UserState == domain.UserStateDeleted {
+		return zerrors.ThrowNotFound(nil, "COMMAND-Vo1ph", "Errors.User.Email.NotFound")
+	}
+	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
+	_, err = c.eventstore.Push(ctx, user.NewHumanEmailChangeSentEvent(ctx, userAgg))
+	return err
+}
+
 func (c *Commands) emailWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *HumanEmailWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

@@ -14,6 +14,7 @@ import (
 const (
 	emailEventPrefix                 = humanEventPrefix + "email."
 	HumanEmailChangedType            = emailEventPrefix + "changed"
+	HumanEmailChangeSentType         = emailEventPrefix + "change.sent"
 	HumanEmailVerifiedType           = emailEventPrefix + "verified"
 	HumanEmailVerificationFailedType = emailEventPrefix + "verification.failed"
 	HumanEmailCodeAddedType          = emailEventPrefix + "code.added"
@@ -23,7 +24,8 @@ const (
 type HumanEmailChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	EmailAddress domain.EmailAddress `json:"email,omitempty"`
+	EmailAddress      domain.EmailAddress `json:"email,omitempty"`
+	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
 func (e *HumanEmailChangedEvent) Payload() interface{} {
@@ -34,6 +36,10 @@ func (e *HumanEmailChangedEvent) UniqueConstraints() []*eventstore.UniqueConstra
 	return nil
 }
 
+func (e *HumanEmailChangedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
+}
+
 func NewHumanEmailChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, emailAddress domain.EmailAddress) *HumanEmailChangedEvent {
 	return &HumanEmailChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -41,7 +47,8 @@ func NewHumanEmailChangedEvent(ctx context.Context, aggregate *eventstore.Aggreg
 			aggregate,
 			HumanEmailChangedType,
 		),
-		EmailAddress: emailAddress,
+		EmailAddress:      emailAddress,
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
 }
 
@@ -55,6 +62,34 @@ func HumanEmailChangedEventMapper(event eventstore.Event) (eventstore.Event, err
 	}
 
 	return emailChangedEvent, nil
+}
+
+type HumanEmailChangeSentEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *HumanEmailChangeSentEvent) Payload() interface{} {
+	return nil
+}
+
+func (e *HumanEmailChangeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewHumanEmailChangeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanEmailChangeSentEvent {
+	return &HumanEmailChangeSentEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanEmailChangeSentType,
+		),
+	}
+}
+
+func HumanEmailChangeSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	return &HumanEmailChangeSentEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
 }
 
 type HumanEmailVerifiedEvent struct {
