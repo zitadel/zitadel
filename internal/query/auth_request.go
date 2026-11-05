@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -30,6 +31,10 @@ type AuthRequest struct {
 	LoginHint    *string
 	MaxAge       *time.Duration
 	HintUserID   *string
+	// PrivateLabelingOrgID is the organization whose branding should be shown for this
+	// request, resolved from the org scope, the requested project's private labeling
+	// setting, or the instance default organization.
+	PrivateLabelingOrgID string
 }
 
 func (a *AuthRequest) checkLoginClient(ctx context.Context, permissionCheck domain.PermissionCheck) error {
@@ -81,6 +86,7 @@ func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 	dst.Scope = scope
 	dst.Prompt = prompt
 	dst.UiLocales = locales
+	dst.PrivateLabelingOrgID = q.resolvePrivateLabelingOrgID(ctx, dst.ClientID, dst.Scope)
 
 	if checkLoginClient {
 		if err = dst.checkLoginClient(ctx, q.checkPermission); err != nil {
@@ -89,4 +95,27 @@ func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 	}
 
 	return dst, nil
+}
+
+// resolvePrivateLabelingOrgID determines which organization's branding (private labeling)
+// should be shown for an auth request, reusing the same rule as the legacy login
+// (domain.AuthRequest.PrivateLabelingOrgID): an explicit organization scope wins, otherwise
+// the requested project's private labeling setting decides, otherwise the instance default
+// organization. The user is not known at this point, so the user-org branch never applies here.
+// Branding must never fail the request, so any lookup error falls back to the default org.
+func (q *Queries) resolvePrivateLabelingOrgID(ctx context.Context, clientID string, scopes []string) string {
+	ar := new(domain.AuthRequest)
+	for _, scope := range scopes {
+		if orgID, ok := strings.CutPrefix(scope, domain.OrgIDScope); ok {
+			ar.RequestedOrgID = orgID
+			break
+		}
+	}
+	if ar.RequestedOrgID == "" && clientID != "" {
+		if project, err := q.ProjectByClientID(ctx, clientID); err == nil && project != nil {
+			ar.PrivateLabelingSetting = project.PrivateLabelingSetting
+			ar.ApplicationResourceOwner = project.ResourceOwner
+		}
+	}
+	return ar.PrivateLabelingOrgID(authz.GetInstance(ctx).DefaultOrganisationID())
 }
