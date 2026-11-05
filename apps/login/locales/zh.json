@@ -1,6 +1,7 @@
 {
   "common": {
     "back": "返回",
+    "copy": "复制",
     "title": "使用 Zitadel 登录"
   },
   "accounts": {
