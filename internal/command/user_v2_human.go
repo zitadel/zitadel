@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"strings"
 
 	"golang.org/x/text/language"
 
@@ -58,6 +59,10 @@ type Password struct {
 }
 
 func (h *ChangeHuman) Validate(hasher *crypto.Hasher) (err error) {
+	if h.Profile != nil && h.Profile.DisplayName != nil && strings.TrimSpace(*h.Profile.DisplayName) == "" {
+		return zerrors.ThrowInvalidArgument(nil, "USER-4n8fs", "Errors.User.UserDisplayNameEmpty")
+	}
+
 	if h.Email != nil && h.Email.Address != "" {
 		if err := h.Email.Validate(); err != nil {
 			return err
