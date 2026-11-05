@@ -1,7 +1,7 @@
 "use client";
 
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { EMAIL, SMS, TOTP, U2F } from "./auth-methods";
+import { EMAIL, RECOVERY_CODE, SMS, TOTP, U2F } from "./auth-methods";
 
 type Props = {
   loginName?: string;
@@ -36,6 +36,7 @@ export function ChooseSecondFactor({ loginName, sessionId, requestId, organizati
             {method === AuthenticationMethodType.U2F && U2F(false, "/u2f?" + params)}
             {method === AuthenticationMethodType.OTP_EMAIL && EMAIL(false, "/otp/email?" + params)}
             {method === AuthenticationMethodType.OTP_SMS && SMS(false, "/otp/sms?" + params)}
+            {method === AuthenticationMethodType.RECOVERY_CODE && RECOVERY_CODE(false, "/recovery-code?" + params)}
           </div>
         );
       })}

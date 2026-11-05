@@ -34,6 +34,7 @@ export default async function Page(props: {
     sessionId,
     organization,
     code,
+    altRecoveryCode,
   } = searchParams;
 
   const { method } = params;
@@ -119,6 +120,7 @@ export default async function Page(props: {
             loginSettings={loginSettings}
             host={host}
             code={code}
+            altRecoveryCode={altRecoveryCode === "true"}
           ></LoginOTP>
         )}
       </div>

@@ -310,6 +310,28 @@
       "submit": "Weiter"
     }
   },
+  "recoveryCode": {
+    "verify": {
+      "title": "2-Faktor bestätigen",
+      "description": "Geben Sie einen Ihrer Wiederherstellungscodes ein. Jeder Code kann nur einmal verwendet werden.",
+      "useRecoveryCode": "Wiederherstellungscode verwenden",
+      "submit": "Weiter",
+      "labels": {
+        "code": "Wiederherstellungscode"
+      },
+      "required": {
+        "code": "Dieses Feld ist erforderlich"
+      },
+      "errors": {
+        "invalidCode": "Der Wiederherstellungscode ist ungültig oder wurde bereits verwendet.",
+        "userLocked": "Ihr Konto wurde gesperrt. Bitte wenden Sie sich an Ihren Administrator.",
+        "notReady": "Für dieses Konto sind keine Wiederherstellungscodes eingerichtet.",
+        "couldNotFindSession": "Sitzung konnte nicht gefunden werden",
+        "couldNotVerifyCode": "Wiederherstellungscode konnte nicht überprüft werden",
+        "couldNotDetermineRedirect": "Weiterleitungs-URL nach der Überprüfung konnte nicht ermittelt werden"
+      }
+    }
+  },
   "register": {
     "methods": {
       "passkey": "Passkey",
@@ -434,7 +456,8 @@
       "otpEmail": "Code per E-Mail",
       "otpSms": "Code per SMS",
       "passkey": "Passkeys",
-      "password": "Passwort"
+      "password": "Passwort",
+      "recoveryCode": "Wiederherstellungscode"
     }
   },
   "device": {

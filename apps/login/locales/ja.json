@@ -303,6 +303,28 @@
       "submit": "続行"
     }
   },
+  "recoveryCode": {
+    "verify": {
+      "title": "二要素認証",
+      "description": "リカバリーコードのいずれかを入力してください。各コードは一度しか使用できません。",
+      "useRecoveryCode": "リカバリーコードを使用",
+      "submit": "続行",
+      "labels": {
+        "code": "リカバリーコード"
+      },
+      "required": {
+        "code": "必須項目です"
+      },
+      "errors": {
+        "invalidCode": "リカバリーコードが無効か、すでに使用されています。",
+        "userLocked": "アカウントがロックされています。管理者にお問い合わせください。",
+        "notReady": "このアカウントにはリカバリーコードが設定されていません。",
+        "couldNotFindSession": "セッションが見つかりませんでした",
+        "couldNotVerifyCode": "リカバリーコードを確認できませんでした",
+        "couldNotDetermineRedirect": "確認後のリダイレクト先URLを特定できませんでした"
+      }
+    }
+  },
   "register": {
     "methods": {
       "passkey": "パスキー",
@@ -427,7 +449,8 @@
       "otpEmail": "メールでコードを受け取る",
       "otpSms": "SMSでコードを受け取る",
       "passkey": "パスキー",
-      "password": "パスワード"
+      "password": "パスワード",
+      "recoveryCode": "リカバリーコード"
     }
   },
   "device": {

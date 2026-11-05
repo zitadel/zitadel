@@ -2,8 +2,12 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { LoginOTP } from "./login-otp";
 
+const mockPush = vi.fn();
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({
+    push: mockPush,
+    back: vi.fn(),
+  }),
 }));
 
 vi.mock("next-intl", () => ({
@@ -65,5 +69,43 @@ describe("LoginOTP", () => {
     await waitFor(() => {
       expect(screen.getByText("errors.couldNotRequestChallenge")).toBeInTheDocument();
     });
+  });
+
+  test("should render the back button when no recovery code alternative is offered", () => {
+    const { queryByTestId } = render(<LoginOTP host={null} method="time-based" loginName="test@example.com" />);
+    expect(queryByTestId("recovery-code-button")).not.toBeInTheDocument();
+  });
+
+  test("should render the recovery code button when altRecoveryCode is set", () => {
+    const { getByTestId } = render(
+      <LoginOTP host={null} method="time-based" loginName="test@example.com" altRecoveryCode />,
+    );
+    expect(getByTestId("recovery-code-button")).toBeInTheDocument();
+  });
+
+  test("should navigate to the recovery code page with the session params", () => {
+    const { getByTestId } = render(
+      <LoginOTP
+        host={null}
+        method="time-based"
+        loginName="test@example.com"
+        sessionId="session-123"
+        requestId="oidc_123"
+        organization="org-123"
+        altRecoveryCode
+      />,
+    );
+
+    fireEvent.click(getByTestId("recovery-code-button"));
+
+    expect(mockPush).toHaveBeenCalledTimes(1);
+    const target = mockPush.mock.calls[0][0] as string;
+    expect(target.startsWith("/recovery-code?")).toBe(true);
+
+    const params = new URLSearchParams(target.split("?")[1]);
+    expect(params.get("loginName")).toBe("test@example.com");
+    expect(params.get("sessionId")).toBe("session-123");
+    expect(params.get("requestId")).toBe("oidc_123");
+    expect(params.get("organization")).toBe("org-123");
   });
 });
