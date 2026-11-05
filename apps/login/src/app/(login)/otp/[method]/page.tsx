@@ -1,6 +1,6 @@
-import { Alert } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { LoginOTP } from "@/components/login-otp";
+import { SessionExpiredAlert } from "@/components/session-expired-alert";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
@@ -90,12 +90,12 @@ export default async function Page(props: {
         )}
 
         {!session && (
-          <div className="py-4">
-            <Alert>
-              {/* context was provided but the session could not be resolved (cookie missing, invalid or expired) */}
-              <Translated i18nKey={loginName || sessionId ? "sessionExpired" : "unknownContext"} namespace="error" />
-            </Alert>
-          </div>
+          <SessionExpiredAlert
+            hasContext={!!(loginName || sessionId)}
+            loginName={loginName}
+            requestId={requestId}
+            organization={organization}
+          />
         )}
 
         {session && (

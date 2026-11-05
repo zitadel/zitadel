@@ -471,6 +471,7 @@
     "failedLoading": "Nie udało się załadować danych. Spróbuj ponownie.",
     "tryagain": "Spróbuj ponownie",
     "couldNotContinueSession": "Nie udało się kontynuować sesji - brak informacji o użytkowniku",
-    "couldNotClearSession": "Nie udało się zakończyć sesji. Spróbuj ponownie."
+    "couldNotClearSession": "Nie udało się zakończyć sesji. Spróbuj ponownie.",
+    "signInAgain": "Zaloguj się ponownie"
   }
 }

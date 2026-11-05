@@ -471,6 +471,7 @@
     "failedLoading": "Veri yüklenemedi. Lütfen tekrar deneyin.",
     "tryagain": "Tekrar Dene",
     "couldNotContinueSession": "Oturuma devam edilemedi - kullanıcı bilgileri eksik",
-    "couldNotClearSession": "Oturum sonlandırılamadı. Lütfen tekrar deneyin."
+    "couldNotClearSession": "Oturum sonlandırılamadı. Lütfen tekrar deneyin.",
+    "signInAgain": "Tekrar giriş yap"
   }
 }

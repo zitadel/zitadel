@@ -471,6 +471,7 @@
     "failedLoading": "No se pudieron cargar los datos. Por favor, inténtalo de nuevo.",
     "tryagain": "Intentar de nuevo",
     "couldNotContinueSession": "No se pudo continuar con la sesión - falta información del usuario",
-    "couldNotClearSession": "No se pudo cerrar la sesión. Inténtelo de nuevo."
+    "couldNotClearSession": "No se pudo cerrar la sesión. Inténtelo de nuevo.",
+    "signInAgain": "Iniciar sesión de nuevo"
   }
 }
