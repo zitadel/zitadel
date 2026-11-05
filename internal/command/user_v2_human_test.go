@@ -3469,6 +3469,30 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 		},
 		{
+			name: "profile change, empty display name, invalid argument error",
+			fields: fields{
+				eventstore:         expectEventstore(),
+				checkPermission:    newMockPermissionCheckAllowed(),
+				userPasswordHasher: mockPasswordHasher("x"),
+				tarpit:             expectTarpit(0),
+				loginPaths:         expectLoginPathsNoCall,
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Profile: &Profile{
+						DisplayName: gu.Ptr(""),
+					},
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "USER-4n8fs", "Errors.User.UserDisplayNameEmpty"))
+				},
+			},
+		},
+		{
 			name: "password change, no password, invalid argument error",
 			fields: fields{
 				eventstore:         expectEventstore(),

@@ -74,7 +74,7 @@
       </div>
     </div>
     <div class="btn-container">
-      <button [disabled]="disabled$ | async" class="submit-button" type="submit" color="primary" mat-raised-button>
+      <button [disabled]="(disabled$ | async) || profileForm.invalid" class="submit-button" type="submit" color="primary" mat-raised-button>
         {{ 'ACTIONS.SAVE' | translate }}
       </button>
     </div>
