@@ -7,11 +7,14 @@ import {
   deleteSession,
   getLoginSettings,
   getSecuritySettings,
+  getSession,
   humanMFAInitSkipped,
   listAuthenticationMethodTypes,
   listUsers,
+  searchUsers,
+  ServiceConfig,
 } from "@/lib/zitadel";
-import { Code, create, Duration } from "@zitadel/client";
+import { Code, create, Duration, timestampMs } from "@zitadel/client";
 import { Challenges, RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -143,6 +146,131 @@ export type UpdateSessionCommand = {
   lifetime?: Duration;
 };
 
+async function updateOrCreatePasskeySession(options: UpdateSessionCommand, serviceConfig: ServiceConfig) {
+  const t = await getTranslations("verify.errors");
+  const failure = {
+    error: t("couldNotFindSession"),
+    sessionId: undefined,
+    factors: undefined,
+    challenges: undefined,
+    authMethods: undefined,
+  };
+  const { loginName, sessionId, checks, challenges, requestId } = options;
+
+  try {
+    let recentSession = sessionId ? await getSessionCookieById({ sessionId }) : undefined;
+    if ((sessionId && !recentSession) || (checks?.webAuthN && !sessionId)) {
+      return failure;
+    }
+
+    const organization = options.organization || recentSession?.organization;
+    const searchValue = loginName || recentSession?.loginName;
+    if (!searchValue || (recentSession && options.organization && recentSession.organization !== options.organization)) {
+      return failure;
+    }
+
+    const loginSettings = await getLoginSettings({ serviceConfig, organization });
+    if (!loginSettings) {
+      return failure;
+    }
+
+    const users = organization
+      ? await searchUsers({ serviceConfig, searchValue, organizationId: organization, loginSettings })
+      : await listUsers({ serviceConfig, loginName: searchValue });
+    if ("error" in users || users.result.length !== 1) {
+      return failure;
+    }
+    const user = users.result[0];
+    if (!user.userId || !user.preferredLoginName || (organization && user.details?.resourceOwner !== organization)) {
+      return failure;
+    }
+
+    if (user.preferredLoginName.toLowerCase() !== searchValue.toLowerCase()) {
+      const human = user.type.case === "human" ? user.type.value : undefined;
+      const emailAllowed =
+        !loginSettings.disableLoginWithEmail && human?.email?.email.toLowerCase() === searchValue.toLowerCase();
+      const phoneAllowed = !loginSettings.disableLoginWithPhone && human?.phone?.phone === searchValue;
+      if (!emailAllowed && !phoneAllowed) {
+        return failure;
+      }
+    }
+
+    if (!sessionId) {
+      recentSession = await getSessionCookieByLoginName({
+        loginName: user.preferredLoginName,
+        organization: user.details?.resourceOwner,
+      });
+    }
+
+    let expired = false;
+    if (recentSession) {
+      if (
+        recentSession.loginName !== user.preferredLoginName ||
+        recentSession.organization !== user.details?.resourceOwner
+      ) {
+        return failure;
+      }
+      const response = await getSession({ serviceConfig, sessionId: recentSession.id, sessionToken: recentSession.token });
+      const session = response.session;
+      if (
+        !session ||
+        session.id !== recentSession.id ||
+        session.factors?.user?.id !== user.userId ||
+        session.factors.user.organizationId !== user.details?.resourceOwner
+      ) {
+        return failure;
+      }
+      expired = !!session.expirationDate && timestampMs(session.expirationDate) <= Date.now();
+    }
+
+    if (checks?.webAuthN && (!recentSession || expired)) {
+      return failure;
+    }
+
+    const lifetime = options.lifetime?.seconds
+      ? options.lifetime
+      : checks?.webAuthN && loginSettings.multiFactorCheckLifetime?.seconds
+        ? loginSettings.multiFactorCheckLifetime
+        : ({ seconds: BigInt(60 * 60 * 24), nanos: 0 } as Duration);
+
+    let session;
+    let expectedSessionId;
+    if (recentSession && !expired) {
+      expectedSessionId = recentSession.id;
+      session = await setSessionAndUpdateCookie({ recentCookie: recentSession, checks, challenges, requestId, lifetime });
+    } else {
+      const result = await createSessionAndUpdateCookie({
+        checks: create(ChecksSchema, { user: { search: { case: "userId", value: user.userId } } }),
+        challenges,
+        requestId,
+        lifetime,
+      });
+      expectedSessionId = result.sessionCookie.id;
+      session = { ...result.session, challenges: result.challenges };
+    }
+
+    if (
+      !session.id ||
+      session.id !== expectedSessionId ||
+      session.factors?.user?.id !== user.userId ||
+      session.factors.user.organizationId !== user.details?.resourceOwner
+    ) {
+      return failure;
+    }
+
+    return {
+      error: undefined,
+      sessionId: session.id,
+      factors: session.factors,
+      challenges: session.challenges?.webAuthN ? { webAuthN: session.challenges.webAuthN } : undefined,
+      authMethods: undefined,
+    };
+  } catch (error) {
+    logger.warn("Could not authenticate passkey session", { error });
+    return failure;
+  }
+}
+
 export async function updateOrCreateSession(options: UpdateSessionCommand) {
   let { loginName, sessionId, organization, checks, requestId, challenges, lifetime } = options;
 
@@ -160,6 +288,10 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
     const [hostname] = host.split(":");
 
     challenges.webAuthN.domain = hostname;
+  }
+
+  if (challenges?.webAuthN || checks?.webAuthN) {
+    return updateOrCreatePasskeySession(options, serviceConfig);
   }
 
   let recentSession = sessionId
