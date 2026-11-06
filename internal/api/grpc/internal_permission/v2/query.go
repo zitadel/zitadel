@@ -116,11 +116,11 @@ func userResourceOwnerFilterToQuery(q *filter_pb.IDFilter) (query.SearchQuery, e
 }
 
 func userLoginNameFilterToQuery(q *internal_permission.UserPreferredLoginNameFilter) (query.SearchQuery, error) {
-	return query.NewAdministratorUserLoginNameSearchQuery(q.GetPreferredLoginName())
+	return query.NewAdministratorUserLoginNameSearchQuery(q.GetPreferredLoginName(), filter.TextMethodPbToQuery(q.GetMethod()))
 }
 
 func userDisplayNameFilterToQuery(q *internal_permission.UserDisplayNameFilter) (query.SearchQuery, error) {
-	return query.NewAdministratorUserDisplayNameSearchQuery(q.GetDisplayName())
+	return query.NewAdministratorUserDisplayNameSearchQuery(q.GetDisplayName(), filter.TextMethodPbToQuery(q.GetMethod()))
 }
 
 func creationDateFilterToQuery(q *filter_pb.TimestampFilter) (query.SearchQuery, error) {

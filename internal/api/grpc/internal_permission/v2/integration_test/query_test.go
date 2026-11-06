@@ -4,6 +4,7 @@ package project_test
 
 import (
 	"context"
+	"strings"
 	"testing"
 	"time"
 
@@ -693,6 +694,64 @@ func TestServer_ListAdministrators(t *testing.T) {
 					AppliedLimit: 2,
 				},
 				Administrators: []*internal_permission.Administrator{projectAdministrator1, projectAdministrator2},
+			},
+		},
+		{
+			name: "list, user preferred login name filter, contains",
+			args: args{
+				ctx: iamOwnerCtx,
+				req: &internal_permission.ListAdministratorsRequest{
+					Filters: []*internal_permission.AdministratorSearchFilter{
+						{
+							Filter: &internal_permission.AdministratorSearchFilter_UserPreferredLoginName{
+								UserPreferredLoginName: &internal_permission.UserPreferredLoginNameFilter{
+									PreferredLoginName: strings.Split(organizationAdmin1.GetUser().GetPreferredLoginName(), "@")[0],
+									Method:             filter.TextFilterMethod_TEXT_FILTER_METHOD_CONTAINS,
+								},
+							},
+						},
+					},
+				},
+			},
+			want: &internal_permission.ListAdministratorsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  1,
+					AppliedLimit: 100,
+				},
+				Administrators: []*internal_permission.Administrator{organizationAdmin1},
+			},
+		},
+		{
+			name: "list, user display name filter, contains ignore case",
+			args: args{
+				ctx: iamOwnerCtx,
+				req: &internal_permission.ListAdministratorsRequest{
+					Filters: []*internal_permission.AdministratorSearchFilter{
+						{
+							Filter: &internal_permission.AdministratorSearchFilter_InUserIdsFilter{
+								InUserIdsFilter: &filter.InIDsFilter{
+									Ids: []string{organizationAdmin1.GetUser().GetId(), organizationAdmin2.GetUser().GetId()},
+								},
+							},
+						},
+						{
+							Filter: &internal_permission.AdministratorSearchFilter_UserDisplayName{
+								UserDisplayName: &internal_permission.UserDisplayNameFilter{
+									DisplayName: "mickey",
+									Method:      filter.TextFilterMethod_TEXT_FILTER_METHOD_CONTAINS_IGNORE_CASE,
+								},
+							},
+						},
+					},
+					Pagination: &filter.PaginationRequest{Asc: true},
+				},
+			},
+			want: &internal_permission.ListAdministratorsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  2,
+					AppliedLimit: 100,
+				},
+				Administrators: []*internal_permission.Administrator{organizationAdmin1, organizationAdmin2},
 			},
 		},
 	}
