@@ -537,5 +537,6 @@ Errors:
       RegistrationNotAllowed: Rejestracja nie jest dozwolona
   DeviceAuth:
     NotExisting: Kod użytkownika nie istnieje
+    NotFound: Żądanie autoryzacji urządzenia nie istnieje
 
 optional: (opcjonalny)

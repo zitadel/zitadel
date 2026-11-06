@@ -532,5 +532,6 @@ Errors:
       RegistrationNotAllowed: التسجيل غير مسموح به
   DeviceAuth:
     NotExisting: رمز المستخدم غير موجود
+    NotFound: طلب تفويض الجهاز غير موجود
 
 optional: (اختياري)

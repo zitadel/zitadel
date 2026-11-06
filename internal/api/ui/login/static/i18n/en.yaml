@@ -536,5 +536,6 @@ Errors:
       RegistrationNotAllowed: Registration is not allowed
   DeviceAuth:
     NotExisting: User Code doesn't exist
+    NotFound: Device Authorization Request does not exist
 
 optional: (optional)

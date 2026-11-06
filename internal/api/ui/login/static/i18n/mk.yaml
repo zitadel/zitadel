@@ -537,5 +537,6 @@ Errors:
       RegistrationNotAllowed: Не е дозволена регистрација
   DeviceAuth:
     NotExisting: Кодот на корисникот не постои
+    NotFound: Барањето за авторизација на уредот не постои
 
 optional: (опционално)
