@@ -2,7 +2,7 @@
 
 <h1>{{.Title}}</h1>
 <p>
-    {{.Username}}, {{t "DeviceAuth.Action.GrantDevice"}} {{.ClientID}} {{t "DeviceAuth.Action.AccessToScopes"}}: {{.Scopes}}.
+    {{.Username}}, {{t "DeviceAuth.Action.GrantDevice"}} {{.AppName}} {{t "DeviceAuth.Action.AccessToScopes"}}: {{.Scopes}}.
 </p>
 <form method="POST">
     {{ .CSRF }}
