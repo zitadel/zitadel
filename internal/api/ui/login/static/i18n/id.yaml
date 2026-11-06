@@ -496,4 +496,5 @@ Errors:
       RegistrationNotAllowed: Pendaftaran tidak diperbolehkan
   DeviceAuth:
     NotExisting: Kode Pengguna tidak ada
+    NotFound: Permintaan Otorisasi Perangkat tidak ada
 optional: (opsional)

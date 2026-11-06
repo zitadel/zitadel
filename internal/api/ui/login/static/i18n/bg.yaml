@@ -524,4 +524,5 @@ Errors:
       RegistrationNotAllowed: Регистрацията не е разрешена
   DeviceAuth:
     NotExisting: Потребителският код не съществува
+    NotFound: Заявката за авторизация на устройство не съществува
 optional: (по избор)

@@ -537,5 +537,6 @@ Errors:
       RegistrationNotAllowed: Регистрация запрещена
   DeviceAuth:
     NotExisting: Код пользователя не существует
+    NotFound: Запрос авторизации устройства не существует
 
 optional: (optional)

@@ -496,4 +496,5 @@ Errors:
       RegistrationNotAllowed: A regisztráció nem engedélyezett
   DeviceAuth:
     NotExisting: A felhasználói kód nem létezik
+    NotFound: Az eszközengedélyezési kérelem nem létezik
 optional: (opcionális)

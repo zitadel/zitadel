@@ -536,5 +536,6 @@ Errors:
       RegistrationNotAllowed: Kayıt olmasına izin verilmiyor
   DeviceAuth:
     NotExisting: Kullanıcı Kodu mevcut değil
+    NotFound: Cihaz Yetkilendirme İsteği mevcut değil
 
 optional: (isteğe bağlı)
