@@ -2,8 +2,9 @@ package oidc
 
 import (
 	"context"
+	"crypto/rand"
+	"crypto/rsa"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"testing"
 	"time"
@@ -38,6 +39,7 @@ func TestSession_FetchUser(t *testing.T) {
 	}
 	type want struct {
 		err               error
+		errContains       string
 		id                string
 		firstName         string
 		lastName          string
@@ -265,7 +267,7 @@ func TestSession_FetchUser(t *testing.T) {
 			},
 		},
 		{
-			name: "successful fetch with token exchange",
+			name: "successful fetch with token exchange and unsupported key in JWKS",
 			fields: fields{
 				name:         "oidc",
 				issuer:       "https://issuer.com",
@@ -274,34 +276,10 @@ func TestSession_FetchUser(t *testing.T) {
 				redirectURI:  "redirectURI",
 				scopes:       []string{"openid"},
 				userMapper:   DefaultMapper,
-				httpMock: func(issuer string) {
-					gock.New(issuer).
-						Get(oidc.DiscoveryEndpoint).
-						Reply(200).
-						JSON(&oidc.DiscoveryConfiguration{
-							Issuer:                issuer,
-							AuthorizationEndpoint: issuer + "/authorize",
-							TokenEndpoint:         issuer + "/token",
-							JwksURI:               issuer + "/keys",
-							UserinfoEndpoint:      issuer + "/userinfo",
-						})
-					gock.New(issuer).
-						Post("/token").
-						BodyString("client_id=clientID&client_secret=clientSecret&code=code&grant_type=authorization_code&redirect_uri=redirectURI").
-						Reply(200).
-						JSON(tokenResponse(t, issuer))
-					gock.New(issuer).
-						Get("/keys").
-						Reply(200).
-						JSON(keys(t))
-					gock.New(issuer).
-						Get("/userinfo").
-						Reply(200).
-						JSON(userinfo())
-				},
-				authURL: "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
-				tokens:  nil,
-				code:    "code",
+				httpMock:     tokenExchangeMock(t, signedTokenResponse(t, testSigningKey(t)), mixedKeys(t)),
+				authURL:      "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
+				tokens:       nil,
+				code:         "code",
 			},
 			want: want{
 				id:                "sub",
@@ -317,6 +295,63 @@ func TestSession_FetchUser(t *testing.T) {
 				preferredLanguage: language.English,
 				avatarURL:         "picture",
 				profile:           "profile",
+			},
+		},
+		{
+			name: "token exchange with invalid signature and unsupported key in JWKS, error",
+			fields: fields{
+				name:         "oidc",
+				issuer:       "https://issuer.com",
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
+				userMapper:   DefaultMapper,
+				// signed by a key outside the JWKS, but claiming the kid of the published RSA key
+				httpMock: tokenExchangeMock(t, signedTokenResponse(t, generateRSAKey(t)), mixedKeys(t)),
+				authURL:  "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
+				code:     "code",
+			},
+			want: want{
+				err: jose.ErrCryptoFailure,
+			},
+		},
+		{
+			name: "token exchange with malformed supported key in JWKS, error",
+			fields: fields{
+				name:         "oidc",
+				issuer:       "https://issuer.com",
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
+				userMapper:   DefaultMapper,
+				// only unsupported key types are skipped; a broken RSA key still fails the whole set
+				httpMock: tokenExchangeMock(t, signedTokenResponse(t, testSigningKey(t)), jwks(testSigningJWK(t), secp256k1Key, malformedRSAKey)),
+				authURL:  "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
+				code:     "code",
+			},
+			want: want{
+				err:         oidc.ErrSignatureInvalid,
+				errContains: "invalid RSA key",
+			},
+		},
+		{
+			name: "token exchange with only unsupported keys in JWKS, error",
+			fields: fields{
+				name:         "oidc",
+				issuer:       "https://issuer.com",
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
+				userMapper:   DefaultMapper,
+				httpMock:     tokenExchangeMock(t, signedTokenResponse(t, testSigningKey(t)), jwks(secp256k1Key)),
+				authURL:      "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
+				code:         "code",
+			},
+			want: want{
+				err: oidc.ErrKeyNone,
 			},
 		},
 	}
@@ -337,8 +372,12 @@ func TestSession_FetchUser(t *testing.T) {
 			}
 
 			user, err := session.FetchUser(context.Background())
-			if tt.want.err != nil && !errors.Is(err, tt.want.err) {
-				a.Fail("invalid error", "expected %v, got %v", tt.want.err, err)
+			if tt.want.err != nil {
+				require.ErrorIs(t, err, tt.want.err)
+				a.Nil(user)
+				if tt.want.errContains != "" {
+					a.ErrorContains(err, tt.want.errContains)
+				}
 			}
 			if tt.want.err == nil {
 				require.NoError(t, err)
@@ -384,19 +423,76 @@ func userinfo() *oidc.UserInfo {
 	}
 }
 
-func tokenResponse(t *testing.T, issuer string) *oidc.AccessTokenResponse {
-	claims := oidc.NewIDTokenClaims(
-		issuer,
-		"sub",
-		[]string{"clientID"},
-		time.Now().Add(1*time.Hour),
-		time.Now().Add(-1*time.Minute),
-		"",
-		"",
-		nil,
-		"clientID",
-		0,
-	)
+// tokenExchangeMock mocks discovery, the token endpoint returning tokens and the jwks_uri
+// returning keySet, so the ID token is verified through the provider's remote key set.
+func tokenExchangeMock(t *testing.T, tokens func(issuer string) *oidc.AccessTokenResponse, keySet testJSONWebKeySet) func(issuer string) {
+	return func(issuer string) {
+		gock.New(issuer).
+			Get(oidc.DiscoveryEndpoint).
+			Reply(200).
+			JSON(&oidc.DiscoveryConfiguration{
+				Issuer:                issuer,
+				AuthorizationEndpoint: issuer + "/authorize",
+				TokenEndpoint:         issuer + "/token",
+				JwksURI:               issuer + "/keys",
+				UserinfoEndpoint:      issuer + "/userinfo",
+			})
+		gock.New(issuer).
+			Post("/token").
+			BodyString("client_id=clientID&client_secret=clientSecret&code=code&grant_type=authorization_code&redirect_uri=redirectURI").
+			Reply(200).
+			JSON(tokens(issuer))
+		gock.New(issuer).
+			Get("/keys").
+			Reply(200).
+			JSON(keySet)
+		gock.New(issuer).
+			Get("/userinfo").
+			Reply(200).
+			JSON(userinfo())
+	}
+}
+
+// signedTokenResponse returns a token response with an RS256 ID token signed by signingKey
+// and carrying the kid of the RSA key published in [testSigningJWK].
+func signedTokenResponse(t *testing.T, signingKey *rsa.PrivateKey) func(issuer string) *oidc.AccessTokenResponse {
+	return func(issuer string) *oidc.AccessTokenResponse {
+		claims := oidc.NewIDTokenClaims(
+			issuer,
+			"sub",
+			[]string{"clientID"},
+			time.Now().Add(1*time.Hour),
+			time.Now().Add(-1*time.Minute),
+			"",
+			"",
+			nil,
+			"clientID",
+			0,
+		)
+		signerOptions := (&jose.SignerOptions{}).WithHeader(jose.HeaderKey("kid"), testSigningKeyID)
+		signer, err := jose.NewSigner(jose.SigningKey{Key: signingKey, Algorithm: jose.RS256}, signerOptions)
+		require.NoError(t, err)
+		data, err := json.Marshal(claims)
+		require.NoError(t, err)
+		jws, err := signer.Sign(data)
+		require.NoError(t, err)
+		idToken, err := jws.CompactSerialize()
+		require.NoError(t, err)
+		return &oidc.AccessTokenResponse{
+			AccessToken:  "accessToken",
+			TokenType:    oidc.BearerToken,
+			RefreshToken: "",
+			ExpiresIn:    3600,
+			IDToken:      idToken,
+			State:        "testState",
+		}
+	}
+}
+
+const testSigningKeyID = "oidc-1"
+
+// testSigningKey is the private key of the RSA key published in [testSigningJWK].
+func testSigningKey(t *testing.T) *rsa.PrivateKey {
 	privateKey, err := crypto.BytesToPrivateKey([]byte(`-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEAs38btwb3c7r0tMaQpGvBmY+mPwMU/LpfuPoC0k2t4RsKp0fv
 40SMl50CRrHgk395wch8PMPYbl3+8TtYAJuyrFALIj3Ff1UcKIk0hOH5DDsfh7/q
@@ -425,37 +521,19 @@ HfIQgWUAW9dsjVVOXMP1jhq8U9hmH/PFWA11V/iCdk1NTxZEw87VAOeWuajpdDHG
 +iex349j8h2BcQ4Zd0FWu07gGFnS/yuDJPn6jBhRusdieEcxLRjTKg==
 -----END RSA PRIVATE KEY-----
 `))
-	if err != nil {
-		t.Fatal(err)
-	}
-	signer, err := jose.NewSigner(jose.SigningKey{Key: privateKey, Algorithm: "RS256"}, &jose.SignerOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	data, err := json.Marshal(claims)
-	if err != nil {
-		t.Fatal(err)
-	}
-	jws, err := signer.Sign(data)
-	if err != nil {
-		t.Fatal(err)
-	}
-	idToken, err := jws.CompactSerialize()
-	if err != nil {
-		t.Fatal(err)
-	}
-	return &oidc.AccessTokenResponse{
-		AccessToken:  "accessToken",
-		TokenType:    oidc.BearerToken,
-		RefreshToken: "",
-		ExpiresIn:    3600,
-		IDToken:      idToken,
-		State:        "testState",
-	}
+	require.NoError(t, err)
+	return privateKey
 }
 
-func keys(t *testing.T) *jose.JSONWebKeySet {
-	privateKey, err := crypto.BytesToPublicKey([]byte(`-----BEGIN PUBLIC KEY-----
+func generateRSAKey(t *testing.T) *rsa.PrivateKey {
+	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	require.NoError(t, err)
+	return privateKey
+}
+
+// testSigningJWK is the public JWK of [testSigningKey].
+func testSigningJWK(t *testing.T) string {
+	publicKey, err := crypto.BytesToPublicKey([]byte(`-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAs38btwb3c7r0tMaQpGvB
 mY+mPwMU/LpfuPoC0k2t4RsKp0fv40SMl50CRrHgk395wch8PMPYbl3+8TtYAJuy
 rFALIj3Ff1UcKIk0hOH5DDsfh7/q2wFuncTmS6bifYo8CfSq2vDGnM7nZnEvxY/M
@@ -465,8 +543,38 @@ MZbmlCoBru+rC8ITlTX/0V1ZcsSbL8tYWhthyu9x6yjo1bH85wiVI4gs0MhU8f2a
 6QIDAQAB
 -----END PUBLIC KEY-----
 `))
-	if err != nil {
-		t.Fatal(err)
+	require.NoError(t, err)
+	key, err := json.Marshal(jose.JSONWebKey{Key: publicKey, KeyID: testSigningKeyID, Algorithm: string(jose.RS256), Use: oidc.KeyUseSignature})
+	require.NoError(t, err)
+	return string(key)
+}
+
+// Additional public keys for a JWKS mixing key types. go-jose supports the P-256 and
+// Ed25519 keys, but not the secp256k1 curve of the ES256K key.
+const (
+	es256Key     = `{"alg":"ES256","kty":"EC","x":"ahVYrohhX6YA7w0P2gUNSwMFbaabCgBZFkeq9bWdmwU","y":"Ea8nKJ34VQMA7zv8aYDfzcBhXEjnWQ9C06jVke_eUV0","crv":"P-256","kid":"oidc-es256-1","use":"sig"}`
+	eddsaKey     = `{"alg":"EdDSA","crv":"Ed25519","x":"i6BEafXMEe4osXgUTffpKAm6Cn6F2bhqPZoclunTAV4","kty":"OKP","kid":"oidc-eddsa-1","use":"sig"}`
+	secp256k1Key = `{"alg":"ES256K","kty":"EC","x":"vsk5i5YJu8H_VPL7DWTgVGXBPrqgkyNmYvfgOrVut38","y":"Mrg56tBhVeorHPXK1LbTX2jP7rEqOHIatM96HFzVMIU","crv":"secp256k1","kid":"oidc-es256k-1","use":"sig"}`
+)
+
+// malformedRSAKey is a supported key type missing its required n and e parameters.
+const malformedRSAKey = `{"alg":"RS256","kty":"RSA","kid":"oidc-malformed","use":"sig"}`
+
+type testJSONWebKeySet struct {
+	Keys []json.RawMessage `json:"keys"`
+}
+
+func jwks(keys ...string) testJSONWebKeySet {
+	keySet := testJSONWebKeySet{Keys: make([]json.RawMessage, len(keys))}
+	for i, key := range keys {
+		keySet.Keys[i] = json.RawMessage(key)
 	}
-	return &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{{Key: privateKey, Algorithm: "RS256", Use: oidc.KeyUseSignature}}}
+	return keySet
+}
+
+// mixedKeys returns a JWKS with RSA ([testSigningJWK]), P-256, Ed25519 and secp256k1 keys.
+// go-jose reports the secp256k1 key as [jose.ErrUnsupportedKeyType], which the OIDC library's
+// key set decoder skips, so the remaining keys stay usable without filtering the response.
+func mixedKeys(t *testing.T) testJSONWebKeySet {
+	return jwks(testSigningJWK(t), es256Key, eddsaKey, secp256k1Key)
 }
