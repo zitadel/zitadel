@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { cookies } from "next/headers";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getFingerprintIdCookie } from "./fingerprint";
+import { createVerificationCheck } from "./verification-check";
 
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import {
@@ -349,19 +350,11 @@ vi.mock("next/headers", () => ({
 
 vi.mock("./fingerprint", () => ({
   getFingerprintIdCookie: vi.fn(),
+  getOrSetFingerprintId: vi.fn(),
 }));
 
 vi.mock("./zitadel", () => ({
   getUserByID: vi.fn(),
-}));
-
-vi.mock("crypto", () => ({
-  default: {
-    createHash: vi.fn(() => ({
-      update: vi.fn().mockReturnThis(),
-      digest: vi.fn(() => "mockedhash123"),
-    })),
-  },
 }));
 
 describe("checkPasswordChangeRequired", () => {
@@ -640,23 +633,30 @@ describe("checkEmailVerification", () => {
 
 describe("checkUserVerification", () => {
   let mockCookies: any;
+  const originalToken = process.env.ZITADEL_SERVICE_USER_TOKEN;
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    process.env.ZITADEL_SERVICE_USER_TOKEN = "server-only-test-secret";
     mockCookies = {
       get: vi.fn(),
     };
     vi.mocked(cookies).mockResolvedValue(mockCookies);
   });
 
-  it("should return true if verification hash matches", async () => {
+  afterEach(() => {
+    process.env.ZITADEL_SERVICE_USER_TOKEN = originalToken;
+  });
+
+  it("should return true for a server issued verification check", async () => {
     vi.mocked(getFingerprintIdCookie).mockResolvedValue({
       name: "fingerprintId",
       value: "fingerprint-123",
     } as any);
 
     mockCookies.get.mockReturnValue({
-      value: "mockedhash123",
+      value: createVerificationCheck("user-123", "fingerprint-123"),
     });
 
     const result = await checkUserVerification("user-123");
@@ -664,8 +664,42 @@ describe("checkUserVerification", () => {
     expect(result).toBe(true);
   });
 
+  it("should return false for a verification check issued for another user", async () => {
+    vi.mocked(getFingerprintIdCookie).mockResolvedValue({
+      name: "fingerprintId",
+      value: "fingerprint-123",
+    } as any);
+
+    mockCookies.get.mockReturnValue({
+      value: createVerificationCheck("attacker-user", "fingerprint-123"),
+    });
+
+    const result = await checkUserVerification("user-123");
+
+    expect(result).toBe(false);
+  });
+
+  it("should return false for a client computed sha256(userId:fingerprintId) hash", async () => {
+    vi.mocked(getFingerprintIdCookie).mockResolvedValue({
+      name: "fingerprintId",
+      value: "attacker-chosen",
+    } as any);
+
+    mockCookies.get.mockReturnValue({
+      value: crypto.createHash("sha256").update("user-123:attacker-chosen").digest("hex"),
+    });
+
+    const result = await checkUserVerification("user-123");
+
+    expect(result).toBe(false);
+  });
+
   it("should return false if fingerprint cookie not found", async () => {
     vi.mocked(getFingerprintIdCookie).mockResolvedValue(undefined);
+
+    mockCookies.get.mockReturnValue({
+      value: createVerificationCheck("user-123", "fingerprint-123"),
+    });
 
     const result = await checkUserVerification("user-123");
 
@@ -696,34 +730,19 @@ describe("checkUserVerification", () => {
     expect(result).toBe(false);
   });
 
-  it("should return false if verification hash does not match", async () => {
+  it("should not log the expected value on mismatch", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     vi.mocked(getFingerprintIdCookie).mockResolvedValue({
       name: "fingerprintId",
       value: "fingerprint-123",
     } as any);
 
-    mockCookies.get.mockReturnValue({
-      value: "wronghash",
-    });
+    mockCookies.get.mockReturnValue({ value: "wronghash" });
 
-    const result = await checkUserVerification("user-123");
+    expect(await checkUserVerification("user-123")).toBe(false);
 
-    expect(result).toBe(false);
-  });
-
-  it("should create hash from userId and fingerprint", async () => {
-    vi.mocked(getFingerprintIdCookie).mockResolvedValue({
-      name: "fingerprintId",
-      value: "fingerprint-456",
-    } as any);
-
-    mockCookies.get.mockReturnValue({
-      value: "mockedhash123",
-    });
-
-    await checkUserVerification("user-456");
-
-    expect(crypto.createHash).toHaveBeenCalledWith("sha256");
+    const expected = createVerificationCheck("user-123", "fingerprint-123").split(".")[2];
+    expect(JSON.stringify(warn.mock.calls)).not.toContain(expected);
   });
 });
 

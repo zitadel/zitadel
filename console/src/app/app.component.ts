@@ -7,8 +7,8 @@ import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
-import { Observable, of } from 'rxjs';
-import { filter, map, startWith, switchMap } from 'rxjs/operators';
+import { combineLatest, EMPTY, from, Observable, of } from 'rxjs';
+import { distinctUntilChanged, filter, map, startWith, switchMap, tap } from 'rxjs/operators';
 
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
@@ -200,13 +200,25 @@ export class AppComponent {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/arrow-decision-outline.svg'),
     );
 
-    this.getProjectCount();
-
-    this.authService.activeOrgChanged.pipe(takeUntilDestroyed()).subscribe((org) => {
-      if (org?.id) {
-        this.getProjectCount();
-      }
-    });
+    // the active org is (re)set by many components, so only (re)load the project counts if it actually changed.
+    // The permissions need to be subscribed right away, since they're only loaded on a change of the active org.
+    combineLatest([
+      this.authService.activeOrgChanged.pipe(
+        map((org) => org?.id),
+        filter(Boolean),
+        distinctUntilChanged(),
+        // don't show the counts of the previous org
+        tap(() => this.mgmtService.setProjectCounts(0, 0)),
+      ),
+      this.authService.isAllowed(['project.read']),
+    ])
+      .pipe(
+        distinctUntilChanged(([orgA, allowedA], [orgB, allowedB]) => orgA === orgB && allowedA === allowedB),
+        // switching the org (or losing the permission) drops the pending counts of the previous org
+        switchMap(([, allowed]) => (allowed ? from(this.mgmtService.getProjectCounts()) : EMPTY)),
+        takeUntilDestroyed(),
+      )
+      .subscribe(({ owned, granted }) => this.mgmtService.setProjectCounts(owned, granted));
 
     this.activatedRoute.queryParamMap
       .pipe(
@@ -292,15 +304,6 @@ export class AppComponent {
         : fallbackLang;
       this.translate.use(lang);
       this.document.documentElement.lang = lang;
-    });
-  }
-
-  private getProjectCount(): void {
-    this.authService.isAllowed(['project.read']).subscribe((allowed) => {
-      if (allowed) {
-        this.mgmtService.listProjects(0, 0).then();
-        this.mgmtService.listGrantedProjects(0, 0).then();
-      }
     });
   }
 

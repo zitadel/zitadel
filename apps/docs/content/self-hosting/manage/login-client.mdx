@@ -42,6 +42,8 @@ The Login UI logs a warning at startup while it uses this fallback.
 
 The fallback has one consequence to be aware of: **rotating the value of that credential (for example creating a new PAT) invalidates all existing session cookies**, and users have to sign in to the Login UI again.
 Their application sessions and tokens are not affected.
+The same secret also signs the short-lived (5 minutes) proof that a user just verified their email or invite code, so a user who is in the middle of that step during the rotation has to request a new code.
+Likewise, it signs the short-lived (15 minutes) proof that ties linking an identity provider to the signed-in session, so a user linking an identity provider during the rotation has to start the linking again.
 Switching from one credential type to another (for example from a PAT to a login client key) does not invalidate cookies as long as both credentials are configured during the migration.
 
 Set a dedicated secret with `ZITADEL_SESSION_COOKIE_SECRET` (at least 32 characters, for example `openssl rand -base64 32`). This is the recommended configuration and will become required in a future major release: it decouples the cookie lifetime from credential rotation.

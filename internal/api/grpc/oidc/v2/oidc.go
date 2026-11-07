@@ -41,7 +41,7 @@ func (s *Server) CreateCallback(ctx context.Context, req *connect.Request[oidc_p
 }
 
 func (s *Server) GetDeviceAuthorizationRequest(ctx context.Context, req *connect.Request[oidc_pb.GetDeviceAuthorizationRequestRequest]) (*connect.Response[oidc_pb.GetDeviceAuthorizationRequestResponse], error) {
-	deviceRequest, err := s.query.DeviceAuthRequestByUserCode(ctx, req.Msg.GetUserCode())
+	deviceRequest, err := s.query.DeviceAuthRequestByUserCode(ctx, req.Msg.GetUserCode(), true)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (s *Server) AuthorizeOrDenyDeviceAuthorization(ctx context.Context, req *co
 	}
 	switch req.Msg.GetDecision().(type) {
 	case *oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session:
-		_, err = s.command.ApproveDeviceAuthWithSession(ctx, deviceCode, req.Msg.GetSession().GetSessionId(), req.Msg.GetSession().GetSessionToken())
+		_, err = s.command.ApproveDeviceAuthWithSession(ctx, deviceCode, req.Msg.GetSession().GetSessionId(), req.Msg.GetSession().GetSessionToken(), s.checkPermission)
 	case *oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Deny:
 		_, err = s.command.CancelDeviceAuth(ctx, deviceCode, domain.DeviceAuthCanceledDenied)
 	}

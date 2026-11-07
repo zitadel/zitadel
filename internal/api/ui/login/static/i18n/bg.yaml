@@ -358,6 +358,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Външен потребител не е намерен
   Description: 'Външен потребител не е намерен. '
+  NoOptionAvailable: Не беше намерен профил, съответстващ на вашия външен потребител, и не може да бъде създаден нов профил. Моля, свържете се с вашия администратор или с поддръжката.
   LinkButtonText: Връзка
   AutoRegisterButtonText: регистрирам
   TosAndPrivacyLabel: Правила и условия

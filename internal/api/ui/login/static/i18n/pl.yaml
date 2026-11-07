@@ -369,6 +369,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Nie znaleziono zewnętrznego użytkownika
   Description: Nie znaleziono zewnętrznego użytkownika. Czy chcesz połączyć swojego użytkownika lub automatycznie zarejestrować nowego.
+  NoOptionAvailable: Nie znaleziono konta odpowiadającego Twojemu użytkownikowi zewnętrznemu i nie można utworzyć nowego konta. Skontaktuj się z administratorem lub z pomocą techniczną.
   LinkButtonText: Połącz
   AutoRegisterButtonText: Zarejestruj
   TosAndPrivacyLabel: Warunki i zasady

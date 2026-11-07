@@ -709,11 +709,12 @@ func TestServer_GetDeviceAuthorizationRequest(t *testing.T) {
 	require.NoError(t, err)
 
 	tests := []struct {
-		name    string
-		dep     func() (*oidc.DeviceAuthorizationResponse, error)
-		ctx     context.Context
-		want    *oidc.DeviceAuthorizationResponse
-		wantErr bool
+		name       string
+		dep        func() (*oidc.DeviceAuthorizationResponse, error)
+		ctx        context.Context
+		want       *oidc.DeviceAuthorizationResponse
+		wantErr    bool
+		wantErrMsg string
 	}{
 		{
 			name: "Not found",
@@ -724,6 +725,15 @@ func TestServer_GetDeviceAuthorizationRequest(t *testing.T) {
 			},
 			ctx:     CTXLoginClient,
 			wantErr: true,
+		},
+		{
+			name: "no permission",
+			dep: func() (*oidc.DeviceAuthorizationResponse, error) {
+				return Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), "openid")
+			},
+			ctx:        CTX,
+			wantErr:    true,
+			wantErrMsg: "membership not found (AUTHZ-cdgFk)",
 		},
 		{
 			name: "success",
@@ -745,6 +755,9 @@ func TestServer_GetDeviceAuthorizationRequest(t *testing.T) {
 				})
 				if tt.wantErr {
 					assert.Error(ttt, err)
+					if tt.wantErrMsg != "" {
+						assert.ErrorContains(ttt, err, tt.wantErrMsg)
+					}
 					return
 				}
 				assert.NoError(ttt, err)
@@ -1008,6 +1021,141 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 			}
 			require.NoError(t, err)
 		})
+	}
+}
+
+func TestServer_AuthorizeOrDenyDeviceAuthorization_Permission(t *testing.T) {
+	tests := []struct {
+		name    string
+		ctx     context.Context
+		dep     func(ctx context.Context, t *testing.T) *oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest
+		wantErr bool
+	}{
+		{
+			name: "projectRoleCheck, usergrant and same resourceowner",
+			ctx:  CTXLoginClient,
+			dep: func(ctx context.Context, t *testing.T) *oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest {
+				projectID, clientID := createDeviceAuthorizationApplication(ctx, t, true, false)
+				user := Instance.CreateHumanUser(ctx)
+				createProjectUserGrant(ctx, t, Instance.DefaultOrg.GetId(), projectID, user.GetUserId())
+
+				return createSessionAndDeviceAuthorizationRequest(ctx, t, clientID, user.GetUserId())
+			},
+		},
+		{
+			name: "projectRoleCheck, no usergrant and same resourceowner",
+			ctx:  CTXLoginClient,
+			dep: func(ctx context.Context, t *testing.T) *oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest {
+				_, clientID := createDeviceAuthorizationApplication(ctx, t, true, false)
+				user := Instance.CreateHumanUser(ctx)
+
+				return createSessionAndDeviceAuthorizationRequest(ctx, t, clientID, user.GetUserId())
+			},
+			wantErr: true,
+		},
+		{
+			name: "projectRoleCheck, usergrant and different resourceowner",
+			ctx:  CTXLoginClient,
+			dep: func(ctx context.Context, t *testing.T) *oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest {
+				projectID, clientID := createDeviceAuthorizationApplication(ctx, t, true, false)
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
+				createProjectUserGrant(ctx, t, Instance.DefaultOrg.GetId(), projectID, user.GetUserId())
+
+				return createSessionAndDeviceAuthorizationRequest(ctx, t, clientID, user.GetUserId())
+			},
+		},
+		{
+			name: "projectRoleCheck, no usergrant and different resourceowner",
+			ctx:  CTXLoginClient,
+			dep: func(ctx context.Context, t *testing.T) *oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest {
+				_, clientID := createDeviceAuthorizationApplication(ctx, t, true, false)
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
+
+				return createSessionAndDeviceAuthorizationRequest(ctx, t, clientID, user.GetUserId())
+			},
+			wantErr: true,
+		},
+		{
+			name: "hasProjectCheck, same resourceowner",
+			ctx:  CTXLoginClient,
+			dep: func(ctx context.Context, t *testing.T) *oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest {
+				_, clientID := createDeviceAuthorizationApplication(ctx, t, false, true)
+				user := Instance.CreateHumanUser(ctx)
+
+				return createSessionAndDeviceAuthorizationRequest(ctx, t, clientID, user.GetUserId())
+			},
+		},
+		{
+			name: "hasProjectCheck, different resourceowner",
+			ctx:  CTXLoginClient,
+			dep: func(ctx context.Context, t *testing.T) *oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest {
+				_, clientID := createDeviceAuthorizationApplication(ctx, t, false, true)
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
+
+				return createSessionAndDeviceAuthorizationRequest(ctx, t, clientID, user.GetUserId())
+			},
+			wantErr: true,
+		},
+		{
+			name: "hasProjectCheck, different resourceowner with project grant",
+			ctx:  CTXLoginClient,
+			dep: func(ctx context.Context, t *testing.T) *oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest {
+				projectID, clientID := createDeviceAuthorizationApplication(ctx, t, false, true)
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
+				createProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
+
+				return createSessionAndDeviceAuthorizationRequest(ctx, t, clientID, user.GetUserId())
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := tt.dep(IAMCTX, t)
+
+			_, err := Client.AuthorizeOrDenyDeviceAuthorization(tt.ctx, req)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+		})
+	}
+}
+
+func createDeviceAuthorizationApplication(ctx context.Context, t *testing.T, projectRoleCheck, hasProjectCheck bool) (string, string) {
+	project := Instance.CreateProject(ctx, t, "", integration.ProjectName(), projectRoleCheck, hasProjectCheck)
+	clientV2, err := Instance.CreateOIDCClientLoginVersion(ctx, redirectURI, logoutRedirectURI, project.GetId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, false, loginV2, app.OIDCGrantType_OIDC_GRANT_TYPE_DEVICE_CODE)
+	require.NoError(t, err)
+	return project.GetId(), clientV2.GetClientId()
+}
+
+func createSessionAndDeviceAuthorizationRequest(ctx context.Context, t *testing.T, clientID, userID string) *oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest {
+	deviceAuth, err := Instance.CreateDeviceAuthorizationRequest(ctx, clientID, oidc.ScopeOpenID)
+	require.NoError(t, err)
+
+	var id string
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(collect *assert.CollectT) {
+		resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTXLoginClient, &oidc_pb.GetDeviceAuthorizationRequestRequest{
+			UserCode: deviceAuth.UserCode,
+		})
+		assert.NoError(collect, err)
+		id = resp.GetDeviceAuthorizationRequest().GetId()
+	}, retryDuration, tick)
+
+	sessionResp := createSession(t, ctx, userID)
+	return &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
+		DeviceAuthorizationId: id,
+		Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session{
+			Session: &oidc_pb.Session{
+				SessionId:    sessionResp.GetSessionId(),
+				SessionToken: sessionResp.GetSessionToken(),
+			},
+		},
 	}
 }
 

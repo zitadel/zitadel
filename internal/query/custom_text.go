@@ -1124,6 +1124,9 @@ func externalUserNotFoundKeyToDomain(text *CustomText, result *domain.CustomLogi
 	if text.Key == domain.LoginKeyExternalNotFoundDescription {
 		result.ExternalNotFound.Description = text.Text
 	}
+	if text.Key == domain.LoginKeyExternalNotFoundNoOptionAvailable {
+		result.ExternalNotFound.NoOptionAvailable = text.Text
+	}
 	if text.Key == domain.LoginKeyExternalNotFoundLinkButtonText {
 		result.ExternalNotFound.LinkButtonText = text.Text
 	}

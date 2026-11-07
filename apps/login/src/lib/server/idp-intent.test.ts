@@ -2,6 +2,7 @@ import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import crypto from "crypto";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { createIdpLinkProof } from "../idp-link-proof";
 import { processIDPCallback } from "./idp-intent";
 
 // Mock all the dependencies
@@ -523,18 +524,16 @@ describe("processIDPCallback", () => {
   describe("CASE 2: Link IDP to existing user", () => {
     const sessionId = "session123";
     const fingerprintValue = "fp123";
-    const linkFingerprint = crypto
-      .createHash("sha256")
-      .update(sessionId + fingerprintValue)
-      .digest("hex");
-
-    const linkParams = {
-      ...defaultParams,
-      sessionId,
-      linkFingerprint,
-    };
+    let linkParams: typeof defaultParams & { sessionId: string; linkFingerprint: string };
 
     beforeEach(() => {
+      vi.stubEnv("ZITADEL_SESSION_COOKIE_SECRET", "test-session-cookie-secret-at-least-32-chars");
+      linkParams = {
+        ...defaultParams,
+        sessionId,
+        linkFingerprint: createIdpLinkProof(sessionId, fingerprintValue),
+      };
+
       mockGetFingerprintIdCookie.mockResolvedValue({ name: "fingerprintId", value: fingerprintValue });
       mockRetrieveIDPIntent.mockResolvedValue({
         ...defaultIntent,
@@ -550,6 +549,31 @@ describe("processIDPCallback", () => {
           },
         },
       });
+    });
+
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    test.each([
+      [
+        "the legacy, client computable sha256(sessionId + fingerprint)",
+        () =>
+          crypto
+            .createHash("sha256")
+            .update(sessionId + fingerprintValue)
+            .digest("hex"),
+      ],
+      ["a proof for another session", () => createIdpLinkProof("other-session", fingerprintValue)],
+      ["a proof for another browser", () => createIdpLinkProof(sessionId, "other-fp")],
+    ])("should reject %s as linkFingerprint", async (_name, makeLinkFingerprint) => {
+      mockGetIDPByID.mockResolvedValue(defaultIdp);
+
+      const result = await processIDPCallback({ ...linkParams, linkFingerprint: makeLinkFingerprint() });
+
+      expect(result.redirect).toContain("/idp/google/linking-failed");
+      expect(result.redirect).toContain("error=session_mismatch");
+      expect(mockAddIDPLink).not.toHaveBeenCalled();
     });
 
     test("should link IDP and create session when linking is allowed", async () => {

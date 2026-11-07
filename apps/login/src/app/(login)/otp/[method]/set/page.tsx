@@ -99,6 +99,10 @@ export default async function Page(props: {
     if (method && ["email", "sms"].includes(method)) {
       return redirect(urlToContinue);
     }
+  } else if (requestId?.startsWith("device_")) {
+    // device flows are completed on the consent screen, never by navigating to /signedin
+    paramsToContinue.append("requestId", requestId);
+    urlToContinue = `/device/consent?` + paramsToContinue;
   } else if (requestId && sessionId) {
     if (requestId) {
       paramsToContinue.append("authRequest", requestId);

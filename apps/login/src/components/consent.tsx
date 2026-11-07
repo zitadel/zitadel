@@ -1,8 +1,7 @@
 "use client";
 
-import { completeDeviceAuthorization } from "@/lib/server/device";
+import { approveDeviceAuthorization, denyDeviceAuthorization } from "@/lib/server/device";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Alert } from "./alert";
@@ -12,13 +11,15 @@ import { Translated } from "./translated";
 
 export function ConsentScreen({
   scope,
-  nextUrl,
-  deviceAuthorizationRequestId,
+  userCode,
+  sessionId,
+  organization,
   appName,
 }: {
   scope?: string[];
-  nextUrl: string;
-  deviceAuthorizationRequestId: string;
+  userCode: string;
+  sessionId: string;
+  organization?: string;
   appName?: string;
 }) {
   const t = useTranslations();
@@ -26,20 +27,20 @@ export function ConsentScreen({
   const [error, setError] = useState<string>("");
   const router = useRouter();
 
-  async function denyDeviceAuth() {
+  async function run(action: () => Promise<unknown>, onSuccess: (response: { redirect?: string }) => void) {
     setLoading(true);
-    const response = await completeDeviceAuthorization(deviceAuthorizationRequestId)
-      .catch(() => {
-        setError("Could not register user");
-        return;
-      })
+    const response = (await action()
+      .catch(() => ({ error: "Could not complete the request" }))
       .finally(() => {
         setLoading(false);
-      });
+      })) as { error?: string; redirect?: string };
 
-    if (response) {
-      return router.push("/device");
+    if (response?.error) {
+      setError(response.error);
+      return;
     }
+
+    onSuccess(response);
   }
 
   const scopes = scope?.filter((s) => !!s);
@@ -49,7 +50,7 @@ export function ConsentScreen({
       <ul className="w-full list-disc space-y-2">
         {scopes?.length === 0 && (
           <span className="border-divider-light bg-background-light-400 dark:bg-background-dark-400 flex w-full flex-row items-center rounded-md border px-4 py-2 text-sm transition-all">
-            <Translated i18nKey="device.scope.openid" namespace="device" />
+            <Translated i18nKey="scope.openid" namespace="device" />
           </span>
         )}
         {scopes?.map((s) => {
@@ -70,6 +71,14 @@ export function ConsentScreen({
         })}
       </ul>
 
+      {/* RFC 8628 5.4: show the user code so the user can compare it with the one on the device */}
+      <p className="ztdl-p w-full text-left text-sm">
+        <Translated i18nKey="request.usercode" namespace="device" />{" "}
+        <span className="font-mono font-bold" data-testid="user-code">
+          {userCode}
+        </span>
+      </p>
+
       <p className="ztdl-p text-left text-xs">
         <Translated i18nKey="request.disclaimer" namespace="device" data={{ appName: appName }} />
       </p>
@@ -82,22 +91,35 @@ export function ConsentScreen({
 
       <div className="mt-4 flex w-full flex-row items-center">
         <Button
-          onClick={() => {
-            denyDeviceAuth();
-          }}
+          onClick={() =>
+            run(
+              () => denyDeviceAuthorization({ userCode, sessionId, organization }),
+              (response) => router.push(response.redirect ?? "/device"),
+            )
+          }
           variant={ButtonVariants.Secondary}
           data-testid="deny-button"
         >
           {loading && <Spinner className="mr-2 h-5 w-5" />}
-          <Translated i18nKey="device.request.deny" namespace="device" />
+          <Translated i18nKey="request.deny" namespace="device" />
         </Button>
         <span className="flex-grow"></span>
 
-        <Link href={nextUrl}>
-          <Button data-testid="submit-button" type="submit" className="self-end" variant={ButtonVariants.Primary}>
-            <Translated i18nKey="device.request.submit" namespace="device" />
-          </Button>
-        </Link>
+        <Button
+          onClick={() =>
+            run(
+              () => approveDeviceAuthorization({ userCode, sessionId, organization }),
+              (response) => response.redirect && router.push(response.redirect),
+            )
+          }
+          disabled={loading}
+          data-testid="submit-button"
+          className="self-end"
+          variant={ButtonVariants.Primary}
+        >
+          {loading && <Spinner className="mr-2 h-5 w-5" />}
+          <Translated i18nKey="request.submit" namespace="device" />
+        </Button>
       </div>
     </div>
   );

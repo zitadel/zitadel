@@ -28,11 +28,17 @@ function readSecretFile(path: string): string | undefined {
   return fileCache.get(path);
 }
 
-function deriveKey(secret: string): Buffer {
-  let key = derivedKeyCache.get(secret);
+/**
+ * Derives a purpose-bound signing key from a secret returned by `getSessionCookieSecrets`.
+ * `info` provides the domain separation, so keys for different purposes (session cookie entries,
+ * user verification check, ...) are independent even though they share the same secret.
+ */
+export function deriveSigningKey(secret: string, info: string): Buffer {
+  const cacheKey = JSON.stringify([info, secret]);
+  let key = derivedKeyCache.get(cacheKey);
   if (!key) {
-    key = Buffer.from(hkdfSync("sha256", secret, "", HKDF_INFO, DERIVED_KEY_LENGTH));
-    derivedKeyCache.set(secret, key);
+    key = Buffer.from(hkdfSync("sha256", secret, "", info, DERIVED_KEY_LENGTH));
+    derivedKeyCache.set(cacheKey, key);
   }
   return key;
 }
@@ -154,10 +160,25 @@ function canonicalPayload(session: SignableSession): string {
 }
 
 function computeSignature(session: SignableSession, secret: string): string {
-  return createHmac("sha256", deriveKey(secret)).update(canonicalPayload(session)).digest("base64url");
+  return createHmac("sha256", deriveSigningKey(secret, HKDF_INFO)).update(canonicalPayload(session)).digest("base64url");
 }
 
-function signaturesEqual(left: string, right: string): boolean {
+/**
+ * Returns the secret new signatures are created with (the first of `getSessionCookieSecrets`).
+ * Throws if no usable secret is configured.
+ */
+export function getPrimarySigningSecret(): string {
+  const [secret] = getSessionCookieSecrets();
+  if (!secret) {
+    throw new Error(
+      getSessionCookieSecretConfigError() ??
+        `Session cookie signing secret is not configured. Set ZITADEL_SESSION_COOKIE_SECRET (at least ${MIN_SESSION_COOKIE_SECRET_LENGTH} characters, e.g. \`openssl rand -base64 32\`).`,
+    );
+  }
+  return secret;
+}
+
+export function signaturesEqual(left: string, right: string): boolean {
   const leftBytes = Buffer.from(left);
   const rightBytes = Buffer.from(right);
   if (leftBytes.length !== rightBytes.length) {
@@ -171,13 +192,7 @@ export function signSession<T extends SignableSession>(session: T): T & { sig: s
     throw new Error("Session cookie entries require a non-empty id and token to be signed.");
   }
 
-  const [secret] = getSessionCookieSecrets();
-  if (!secret) {
-    throw new Error(
-      getSessionCookieSecretConfigError() ??
-        "Session cookie signing secret is not configured. Set ZITADEL_SESSION_COOKIE_SECRET (at least 32 characters, e.g. `openssl rand -base64 32`).",
-    );
-  }
+  const secret = getPrimarySigningSecret();
 
   const { sig: _ignored, ...unsigned } = session;
   return {

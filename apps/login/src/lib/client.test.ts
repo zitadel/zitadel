@@ -51,4 +51,23 @@ describe("getNextUrl", () => {
     const result = await getNextUrl(command);
     expect(result).toBe("/signedin?loginName=test-user");
   });
+
+  test("should send device flows to the consent page instead of completing them", async () => {
+    const result = await getNextUrl({
+      sessionId: "session-1",
+      requestId: "device_ABCD-1234",
+      organization: "org-1",
+    });
+
+    expect(result).toBe("/device/consent?sessionId=session-1&organization=org-1&requestId=device_ABCD-1234");
+  });
+
+  test("should send device flows with a login name to the consent page", async () => {
+    const result = await getNextUrl({
+      loginName: "test-user",
+      requestId: "device_ABCD-1234",
+    } as any);
+
+    expect(result).toBe("/device/consent?loginName=test-user&requestId=device_ABCD-1234");
+  });
 });

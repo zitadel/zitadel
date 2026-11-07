@@ -16,6 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -64,22 +65,66 @@ var (
 )
 
 func TestQueries_DeviceAuthRequestByUserCode(t *testing.T) {
-	client, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
-	if err != nil {
-		t.Fatalf("failed to build mock client: %v", err)
-	}
-	defer client.Close()
+	permissionDenied := zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied")
 
-	mock.ExpectQuery(expectedDeviceAuthWhereUserCodeQuery).WillReturnRows(
-		mock.NewRows(deviceAuthSelectColumns).AddRow(expectedDeviceAuthValues...),
-	)
-	q := Queries{
-		client: &database.DB{DB: client},
+	tests := []struct {
+		name            string
+		checkPermission bool
+		permissionErr   error
+		wantQuery       bool
+		wantErr         error
+	}{
+		{
+			name:      "without permission check",
+			wantQuery: true,
+		},
+		{
+			name:            "permission check passes",
+			checkPermission: true,
+			wantQuery:       true,
+		},
+		{
+			name:            "permission denied, no query",
+			checkPermission: true,
+			permissionErr:   permissionDenied,
+			wantErr:         permissionDenied,
+		},
 	}
-	got, err := q.DeviceAuthRequestByUserCode(context.TODO(), "789")
-	require.NoError(t, err)
-	assert.Equal(t, expectedDeviceAuth, got)
-	require.NoError(t, mock.ExpectationsWereMet())
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
+			if err != nil {
+				t.Fatalf("failed to build mock client: %v", err)
+			}
+			defer client.Close()
+
+			if tt.wantQuery {
+				mock.ExpectQuery(expectedDeviceAuthWhereUserCodeQuery).WillReturnRows(
+					mock.NewRows(deviceAuthSelectColumns).AddRow(expectedDeviceAuthValues...),
+				)
+			}
+			var permissionChecked bool
+			q := Queries{
+				client: &database.DB{DB: client},
+				checkPermission: func(_ context.Context, permission, orgID, resourceID string) error {
+					permissionChecked = true
+					assert.Equal(t, domain.PermissionSessionRead, permission)
+					assert.Empty(t, resourceID)
+					return tt.permissionErr
+				},
+			}
+			got, err := q.DeviceAuthRequestByUserCode(context.TODO(), "789", tt.checkPermission)
+			assert.Equal(t, tt.checkPermission, permissionChecked)
+			require.NoError(t, mock.ExpectationsWereMet())
+			if tt.wantErr != nil {
+				require.ErrorIs(t, err, tt.wantErr)
+				assert.Nil(t, got)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, expectedDeviceAuth, got)
+		})
+	}
 }
 
 func Test_prepareDeviceAuthQuery(t *testing.T) {

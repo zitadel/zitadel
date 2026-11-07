@@ -86,6 +86,7 @@ export class ProjectMembersComponent {
               }),
               new Breadcrumb({
                 type: BreadcrumbType.PROJECT,
+                name: this.projectName,
                 param: { key: 'projectid', value: (this.project as Project.AsObject).id },
                 routerLink: ['/projects', (this.project as Project.AsObject).id],
                 isZitadel: isZitadel,
@@ -120,6 +121,7 @@ export class ProjectMembersComponent {
             }),
             new Breadcrumb({
               type: BreadcrumbType.GRANTEDPROJECT,
+              name: this.projectName,
               param: { key: 'projectid', value: (this.project as GrantedProject.AsObject).projectId },
               routerLink: ['/projects', (this.project as GrantedProject.AsObject).projectId],
             }),

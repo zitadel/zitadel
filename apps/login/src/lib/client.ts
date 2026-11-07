@@ -12,7 +12,8 @@ type FinishFlowCommand =
     }
   | { loginName: string };
 
-function goToSignedInPage(
+function goToPage(
+  path: string,
   props:
     | { sessionId: string; organization?: string; requestId?: string }
     | { organization?: string; loginName: string; requestId?: string },
@@ -36,7 +37,11 @@ function goToSignedInPage(
     params.append("requestId", props.requestId);
   }
 
-  return `/signedin?` + params;
+  return `${path}?` + params;
+}
+
+function goToSignedInPage(props: Parameters<typeof goToPage>[1]) {
+  return goToPage("/signedin", props);
 }
 
 /**
@@ -88,13 +93,13 @@ export async function getNextUrl(
 ): Promise<string> {
   console.log("getNextUrl called with:", command, "defaultRedirectUri:", defaultRedirectUri);
 
-  // finish Device Authorization Flow
+  // ask for consent before the Device Authorization Flow is completed
   if (
     "requestId" in command &&
     command.requestId.startsWith("device_") &&
     ("loginName" in command || "sessionId" in command)
   ) {
-    const result = goToSignedInPage({
+    const result = goToPage("/device/consent", {
       ...command,
       organization: command.organization,
     });
