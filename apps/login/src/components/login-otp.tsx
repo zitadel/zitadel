@@ -42,6 +42,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const resendCooldown = useResendCooldown();
+  const { start: startResendCooldown } = resendCooldown;
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const router = useRouter();
@@ -115,15 +116,14 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
           if (response?.error) {
             setError(response.error);
           } else {
-            resendCooldown.start();
+            startResendCooldown();
           }
         })
         .finally(() => {
           setLoading(false);
         });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [updateSessionForOTPChallenge, method, code]);
+  }, [updateSessionForOTPChallenge, method, code, startResendCooldown]);
 
   async function submitCode(values: Inputs, organization?: string) {
     setLoading(true);
@@ -242,7 +242,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
                 data-testid="resend-button"
               >
                 <Translated i18nKey="verify.resendCode" namespace="otp" />
-                {resendCooldown.isCoolingDown && <> ({resendCooldown.remaining}s)</>}
+                {resendCooldown.suffix}
               </button>
             </div>
           </Alert>

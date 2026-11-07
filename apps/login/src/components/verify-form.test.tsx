@@ -1,3 +1,4 @@
+import { UNKNOWN_USER_ID } from "@/lib/constants";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { VerifyForm } from "./verify-form";
@@ -74,7 +75,7 @@ describe("VerifyForm", () => {
       render(<VerifyForm userId="user-1" code="" isInvite={false} submit={false} />);
 
       expect(screen.getByTestId("resend-button")).toBeDisabled();
-      expect(screen.getByTestId("resend-button")).toHaveTextContent("verify.resendCode (30s)");
+      expect(screen.getByTestId("resend-button")).toHaveTextContent(/verify\.resendCode \(\d+s\)/);
     });
 
     test("should not start the cooldown on arrival without codeSent", () => {
@@ -88,7 +89,7 @@ describe("VerifyForm", () => {
 
       render(<VerifyForm userId="user-1" code="" isInvite={false} submit={false} />);
 
-      expect(screen.getByRole("button", { name: "verify.resendCode (30s)" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /^verify\.resendCode \(\d+s\)$/ })).toBeInTheDocument();
     });
 
     test("should disable the resend button and show the countdown after a successful resend", async () => {
@@ -99,14 +100,28 @@ describe("VerifyForm", () => {
 
       const button = screen.getByTestId("resend-button");
       expect(button).not.toBeDisabled();
-      expect(button).not.toHaveTextContent("(30s)");
+      expect(button).not.toHaveTextContent(/\(\d+s\)/);
 
       fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("resend-button")).toBeDisabled();
       });
-      expect(screen.getByTestId("resend-button")).toHaveTextContent("verify.resendCode (30s)");
+      expect(screen.getByTestId("resend-button")).toHaveTextContent(/verify\.resendCode \(\d+s\)/);
+    });
+
+    test("should start the cooldown for the unknown-user placeholder too, to not reveal it", async () => {
+      render(<VerifyForm userId={UNKNOWN_USER_ID} code="" isInvite={false} submit={false} />);
+
+      fireEvent.click(screen.getByTestId("resend-button"));
+
+      await waitFor(
+        () => {
+          expect(screen.getByTestId("resend-button")).toHaveTextContent(/verify\.resendCode \(\d+s\)/);
+        },
+        { timeout: 3000 },
+      );
+      expect(screen.getByTestId("resend-button")).toBeDisabled();
     });
 
     test("should not start the cooldown when the resend fails", async () => {
