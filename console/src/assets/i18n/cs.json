@@ -1557,7 +1557,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "lt": "Lietuvių"
       }
     },
     "SMTP": {
@@ -1806,7 +1807,8 @@
         "ro": "Română",
         "tr": "Türkçe",
         "uk": "Українська",
-        "ar": "العربية"
+        "ar": "العربية",
+        "lt": "Lietuvių"
       },
       "KEYS": {
         "emailVerificationDoneText": "Ověření e-mailu dokončeno",
@@ -2805,7 +2807,8 @@
     "ro": "Română",
     "tr": "Türkçe",
     "uk": "Українська",
-    "ar": "العربية"
+    "ar": "العربية",
+    "lt": "Lietuvių"
   },
   "MEMBER": {
     "ADD": "Přidat správce",
