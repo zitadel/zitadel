@@ -11,6 +11,99 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+// TestIDPUserLinkProjection_IDPRemoved ensures that removing an org or instance
+// identity provider deletes the linked user IDP links, as the legacy
+// IDPConfigRemoved events do (https://github.com/zitadel/zitadel/issues/12980).
+// The reducer is looked up through Reducers like handler.NewHandler does, so a
+// missing registration fails the test.
+func TestIDPUserLinkProjection_IDPRemoved(t *testing.T) {
+	tests := []struct {
+		name          string
+		aggregateType eventstore.AggregateType
+		eventType     eventstore.EventType
+		event         func(t *testing.T) eventstore.Event
+		want          wantReduce
+	}{
+		{
+			name:          "org IDPRemovedEvent",
+			aggregateType: org.AggregateType,
+			eventType:     org.IDPRemovedEventType,
+			event: getEvent(
+				testEvent(
+					org.IDPRemovedEventType,
+					org.AggregateType,
+					[]byte(`{
+						"id": "idp-id"
+					}`),
+				), org.IDPRemovedEventMapper),
+			want: wantReduce{
+				aggregateType: org.AggregateType,
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.idp_user_links3 WHERE (idp_id = $1) AND (resource_owner = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"ro-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:          "instance IDPRemovedEvent",
+			aggregateType: instance.AggregateType,
+			eventType:     instance.IDPRemovedEventType,
+			event: getEvent(
+				testEvent(
+					instance.IDPRemovedEventType,
+					instance.AggregateType,
+					[]byte(`{
+						"id": "idp-id"
+					}`),
+				), instance.IDPRemovedEventMapper),
+			want: wantReduce{
+				aggregateType: instance.AggregateType,
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.idp_user_links3 WHERE (idp_id = $1) AND (instance_id = $2)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var reduce func(event eventstore.Event) (*handler.Statement, error)
+			for _, aggregateReducer := range (&idpUserLinkProjection{}).Reducers() {
+				if aggregateReducer.Aggregate != tt.aggregateType {
+					continue
+				}
+				for _, eventReducer := range aggregateReducer.EventReducers {
+					if eventReducer.Event == tt.eventType {
+						reduce = eventReducer.Reduce
+					}
+				}
+			}
+			if reduce == nil {
+				t.Fatalf("no reducer registered for %s on %s aggregate", tt.eventType, tt.aggregateType)
+			}
+			got, err := reduce(tt.event(t))
+			assertReduce(t, got, err, IDPUserLinkTable, tt.want)
+		})
+	}
+}
+
 func TestIDPUserLinkProjection_reduces(t *testing.T) {
 	type args struct {
 		event func(t *testing.T) eventstore.Event
