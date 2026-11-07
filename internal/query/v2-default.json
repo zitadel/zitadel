@@ -470,7 +470,8 @@
       "sessionExpired": "Ihre aktuelle Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
       "failedLoading": "Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
       "tryagain": "Erneut versuchen",
-      "couldNotContinueSession": "Sitzung konnte nicht fortgesetzt werden - fehlende Benutzerinformationen"
+      "couldNotContinueSession": "Sitzung konnte nicht fortgesetzt werden - fehlende Benutzerinformationen",
+      "internalError": "Ein interner Fehler ist aufgetreten"
     }
   },
   "en": {
@@ -944,7 +945,8 @@
       "sessionExpired": "Your current session has expired. Please login again.",
       "failedLoading": "Failed to load data. Please try again.",
       "tryagain": "Try Again",
-      "couldNotContinueSession": "Could not continue with session - missing user information"
+      "couldNotContinueSession": "Could not continue with session - missing user information",
+      "internalError": "An internal error occurred"
     }
   },
   "es": {
@@ -1418,7 +1420,8 @@
       "sessionExpired": "Tu sesión actual ha expirado. Por favor, inicia sesión de nuevo.",
       "failedLoading": "No se pudieron cargar los datos. Por favor, inténtalo de nuevo.",
       "tryagain": "Intentar de nuevo",
-      "couldNotContinueSession": "No se pudo continuar con la sesión - falta información del usuario"
+      "couldNotContinueSession": "No se pudo continuar con la sesión - falta información del usuario",
+      "internalError": "Se produjo un error interno"
     }
   },
   "it": {
@@ -1892,7 +1895,8 @@
       "sessionExpired": "La tua sessione attuale è scaduta. Effettua nuovamente l'accesso.",
       "failedLoading": "Impossibile caricare i dati. Riprova.",
       "tryagain": "Riprova",
-      "couldNotContinueSession": "Impossibile continuare con la sessione - informazioni utente mancanti"
+      "couldNotContinueSession": "Impossibile continuare con la sessione - informazioni utente mancanti",
+      "internalError": "Si è verificato un errore interno"
     }
   },
   "nl": {
@@ -2366,7 +2370,8 @@
       "sessionExpired": "Uw huidige sessie is verlopen. Log opnieuw in.",
       "failedLoading": "Gegevens laden mislukt. Probeer het opnieuw.",
       "tryagain": "Opnieuw proberen",
-      "couldNotContinueSession": "Kon de sessie niet voortzetten - ontbrekende gebruikersinformatie"
+      "couldNotContinueSession": "Kon de sessie niet voortzetten - ontbrekende gebruikersinformatie",
+      "internalError": "Er is een interne fout opgetreden"
     }
   },
   "pl": {
@@ -2840,7 +2845,8 @@
       "sessionExpired": "Twoja sesja wygasła. Zaloguj się ponownie.",
       "failedLoading": "Nie udało się załadować danych. Spróbuj ponownie.",
       "tryagain": "Spróbuj ponownie",
-      "couldNotContinueSession": "Nie udało się kontynuować sesji - brak informacji o użytkowniku"
+      "couldNotContinueSession": "Nie udało się kontynuować sesji - brak informacji o użytkowniku",
+      "internalError": "Wystąpił błąd wewnętrzny"
     }
   },
   "ru": {
@@ -3314,7 +3320,8 @@
       "sessionExpired": "Ваша сессия истекла. Войдите снова.",
       "failedLoading": "Ошибка загрузки данных. Попробуйте ещё раз.",
       "tryagain": "Попробовать снова",
-      "couldNotContinueSession": "Не удалось продолжить сеанс - отсутствует информация о пользователе"
+      "couldNotContinueSession": "Не удалось продолжить сеанс - отсутствует информация о пользователе",
+      "internalError": "Произошла внутренняя ошибка"
     }
   },
   "zh": {
@@ -3788,7 +3795,8 @@
       "sessionExpired": "当前会话已过期，请重新登录。",
       "failedLoading": "加载数据失败，请再试一次。",
       "tryagain": "重试",
-      "couldNotContinueSession": "无法继续会话 - 缺少用户信息"
+      "couldNotContinueSession": "无法继续会话 - 缺少用户信息",
+      "internalError": "发生内部错误"
     }
   },
   "tr": {
@@ -4262,7 +4270,8 @@
       "sessionExpired": "Mevcut oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.",
       "failedLoading": "Veri yüklenemedi. Lütfen tekrar deneyin.",
       "tryagain": "Tekrar Dene",
-      "couldNotContinueSession": "Oturuma devam edilemedi - kullanıcı bilgileri eksik"
+      "couldNotContinueSession": "Oturuma devam edilemedi - kullanıcı bilgileri eksik",
+      "internalError": "Bir iç hata oluştu"
     }
   },
   "uk": {
@@ -4736,7 +4745,8 @@
       "sessionExpired": "Ваш поточний сеанс закінчився. Будь ласка, увійдіть знову.",
       "failedLoading": "Не вдалося завантажити дані. Будь ласка, спробуйте ще раз.",
       "tryagain": "Спробувати ще раз",
-      "couldNotContinueSession": "Не вдалося продовжити сеанс - відсутня інформація про користувача"
+      "couldNotContinueSession": "Не вдалося продовжити сеанс - відсутня інформація про користувача",
+      "internalError": "Сталася внутрішня помилка"
     }
   },
   "ar": {
@@ -5210,7 +5220,8 @@
       "sessionExpired": "انتهت صلاحية جلستك الحالية. يرجى تسجيل الدخول مرة أخرى.",
       "failedLoading": "فشل تحميل البيانات. يرجى المحاولة مرة أخرى.",
       "tryagain": "حاول مرة أخرى",
-      "couldNotContinueSession": "تعذر المتابعة مع الجلسة - معلومات المستخدم مفقودة"
+      "couldNotContinueSession": "تعذر المتابعة مع الجلسة - معلومات المستخدم مفقودة",
+      "internalError": "حدث خطأ داخلي"
     }
   },
   "hu": {
@@ -5684,7 +5695,8 @@
       "sessionExpired": "A munkameneted lejárt. Kérjük, jelentkezz be újra.",
       "failedLoading": "Nem sikerült betölteni az adatokat. Kérjük, próbáld újra.",
       "tryagain": "Próbáld újra",
-      "couldNotContinueSession": "Nem sikerült folytatni a munkamenetet - hiányzó felhasználói információk"
+      "couldNotContinueSession": "Nem sikerült folytatni a munkamenetet - hiányzó felhasználói információk",
+      "internalError": "Belső hiba történt"
     }
   },
   "fr": {
@@ -6158,7 +6170,8 @@
       "sessionExpired": "Votre session actuelle a expiré. Veuillez vous reconnecter.",
       "failedLoading": "Échec du chargement des données. Veuillez réessayer.",
       "tryagain": "Réessayer",
-      "couldNotContinueSession": "Impossible de continuer la session - informations utilisateur manquantes"
+      "couldNotContinueSession": "Impossible de continuer la session - informations utilisateur manquantes",
+      "internalError": "Une erreur interne s'est produite"
     }
   },
   "ja": {
@@ -6632,7 +6645,8 @@
       "sessionExpired": "現在のセッションが期限切れです。再度ログインしてください。",
       "failedLoading": "データの読み込みに失敗しました。再試行してください。",
       "tryagain": "再試行",
-      "couldNotContinueSession": "セッションを継続できませんでした - ユーザー情報が不足しています"
+      "couldNotContinueSession": "セッションを継続できませんでした - ユーザー情報が不足しています",
+      "internalError": "内部エラーが発生しました"
     }
   },
   "pt": {
@@ -7106,7 +7120,8 @@
       "sessionExpired": "Sua sessão atual expirou. Por favor, faça login novamente.",
       "failedLoading": "Falha ao carregar dados. Por favor, tente novamente.",
       "tryagain": "Tentar Novamente",
-      "couldNotContinueSession": "Não foi possível continuar a sessão — informações do usuário ausentes"
+      "couldNotContinueSession": "Não foi possível continuar a sessão — informações do usuário ausentes",
+      "internalError": "Ocorreu um erro interno"
     }
   }
 }
