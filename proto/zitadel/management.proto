@@ -8615,7 +8615,7 @@ service ManagementService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.write"
+            permission: "org.smtp.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -8639,7 +8639,7 @@ service ManagementService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.write"
+            permission: "org.smtp.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -8663,7 +8663,7 @@ service ManagementService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.write"
+            permission: "org.smtp.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -8687,7 +8687,7 @@ service ManagementService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.write"
+            permission: "org.smtp.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -8711,7 +8711,7 @@ service ManagementService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.write"
+            permission: "org.smtp.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -8735,7 +8735,7 @@ service ManagementService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.write"
+            permission: "org.smtp.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -8759,7 +8759,7 @@ service ManagementService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.write"
+            permission: "org.smtp.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -8782,7 +8782,7 @@ service ManagementService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.write"
+            permission: "org.smtp.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -8806,7 +8806,7 @@ service ManagementService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.write"
+            permission: "org.smtp.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -8830,7 +8830,7 @@ service ManagementService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.write"
+            permission: "org.smtp.write"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
