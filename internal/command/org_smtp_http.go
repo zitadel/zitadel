@@ -27,6 +27,9 @@ func (c *Commands) AddOrgSMTPConfigHTTP(ctx context.Context, config *AddOrgSMTPC
 	if config.ResourceOwner == "" {
 		return zerrors.ThrowInvalidArgument(nil, "ORG-FTNDXc1", "Errors.ResourceOwnerMissing")
 	}
+	if err := c.validateNotificationWebhookEndpoint(config.Endpoint, true); err != nil {
+		return err
+	}
 	if config.ID == "" {
 		config.ID, err = c.idGenerator.Next()
 		if err != nil {
@@ -80,6 +83,9 @@ func (c *Commands) ChangeOrgSMTPConfigHTTP(ctx context.Context, config *ChangeOr
 	}
 	if config.ID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "ORG-2MHkV1", "Errors.IDMissing")
+	}
+	if err := c.validateNotificationWebhookEndpoint(config.Endpoint, true); err != nil {
+		return err
 	}
 
 	smtpConfigWriteModel, err := c.getOrgSMTPConfig(ctx, config.ResourceOwner, config.ID)
@@ -184,6 +190,7 @@ func (c *Commands) TestOrgSMTPConfig(
 		}
 	}
 
+	config.SMTP.Restrictions = c.orgSMTPRestrictions()
 	return smtp.TestConfiguration(config, email)
 }
 
@@ -254,5 +261,6 @@ func (c *Commands) TestOrgSMTPConfigById(ctx context.Context, orgID, id, email s
 		},
 	}
 
+	smtpConfig.SMTP.Restrictions = c.orgSMTPRestrictions()
 	return smtp.TestConfiguration(smtpConfig, email)
 }

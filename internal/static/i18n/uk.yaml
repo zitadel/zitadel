@@ -71,8 +71,12 @@ Errors:
     AlreadyExists: "Конфігурація SMTP вже існує"
     AlreadyDeactivated: "Конфігурація SMTP вже деактивована"
     OrgProvidersDisabled: "Поштові провайдери організацій вимкнено в цьому екземплярі"
+    OrgHTTPSRequired: "Постачальники електронної пошти організацій повинні використовувати https"
     SenderAdressNotCustomDomain: "Адреса відправника повинна бути налаштована як власний домен в інстансі."
     TestEmailNotFound: "Адреса електронної пошти для тесту не знайдена"
+  NotificationProvider:
+    Blocked:
+      Endpoint: "Адреса цього постачальника сповіщень заборонена"
   Notification:
     NoDomain: "Не знайдено домен для повідомлення"
   User:

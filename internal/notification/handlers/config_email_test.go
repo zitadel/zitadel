@@ -345,7 +345,7 @@ func TestNotificationQueries_GetActiveEmailConfig(t *testing.T) {
 			queryMock := mock.NewMockQueries(ctrl)
 			queryMock.EXPECT().SMTPConfigActive(gomock.Any(), instId).Return(tc.smtpConfig, tc.smtpConfigErr)
 
-			notificationQueries := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext domain", uint16(1234), false, "filepath", nil, cryptAlgMock, nil, nil, true)
+			notificationQueries := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext domain", uint16(1234), false, "filepath", nil, cryptAlgMock, nil, nil, nil, true)
 			cfg, err := notificationQueries.GetActiveEmailConfig(ctx, "")
 
 			assert.ErrorIs(t, err, tc.expectedErr)
@@ -391,7 +391,7 @@ func TestNotificationQueries_GetActiveEmailConfig_OrgFallback(t *testing.T) {
 		queryMock.EXPECT().OrgSMTPConfigActive(gomock.Any(), orgId).Return(nil, zerrors.ThrowNotFound(nil, "QUERY-test", "not found"))
 		queryMock.EXPECT().SMTPConfigActive(gomock.Any(), instId).Return(instanceSMTPConfig, nil)
 
-		nq := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext", uint16(443), true, "", nil, nil, nil, nil, true)
+		nq := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext", uint16(443), true, "", nil, nil, nil, nil, nil, true)
 		cfg, err := nq.GetActiveEmailConfig(ctx, orgId)
 		require.NoError(t, err)
 		assert.Equal(t, "instance-smtp", cfg.ProviderConfig.ID)
@@ -406,7 +406,7 @@ func TestNotificationQueries_GetActiveEmailConfig_OrgFallback(t *testing.T) {
 		queryMock.EXPECT().InstanceByID(gomock.Any(), instId).Return(authz.GetInstance(ctx), nil)
 		queryMock.EXPECT().OrgSMTPConfigActive(gomock.Any(), orgId).Return(nil, zerrors.ThrowNotFound(nil, "QUERY-test", "not found"))
 
-		nq := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext", uint16(443), true, "", nil, nil, nil, nil, false)
+		nq := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext", uint16(443), true, "", nil, nil, nil, nil, nil, false)
 		_, err := nq.GetActiveEmailConfig(ctx, orgId)
 		require.Error(t, err)
 		assert.True(t, zerrors.IsNotFound(err))
@@ -421,7 +421,7 @@ func TestNotificationQueries_GetActiveEmailConfig_OrgFallback(t *testing.T) {
 		queryMock.EXPECT().InstanceByID(gomock.Any(), instId).Return(authz.GetInstance(ctx), nil)
 		queryMock.EXPECT().OrgSMTPConfigActive(gomock.Any(), orgId).Return(orgSMTPConfig, nil)
 
-		nq := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext", uint16(443), true, "", nil, nil, nil, nil, true)
+		nq := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext", uint16(443), true, "", nil, nil, nil, nil, nil, true)
 		cfg, err := nq.GetActiveEmailConfig(ctx, orgId)
 		require.NoError(t, err)
 		assert.Equal(t, "org-smtp", cfg.ProviderConfig.ID)
@@ -436,7 +436,7 @@ func TestNotificationQueries_GetActiveEmailConfig_OrgFallback(t *testing.T) {
 		queryMock.EXPECT().InstanceByID(gomock.Any(), instId).Return(authz.GetInstance(ctx), nil)
 		queryMock.EXPECT().OrgSMTPConfigActive(gomock.Any(), orgId).Return(nil, zerrors.ThrowInternal(nil, "QUERY-test", "db failure"))
 
-		nq := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext", uint16(443), true, "", nil, nil, nil, nil, true)
+		nq := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext", uint16(443), true, "", nil, nil, nil, nil, nil, true)
 		_, err := nq.GetActiveEmailConfig(ctx, orgId)
 		require.Error(t, err)
 		assert.False(t, zerrors.IsNotFound(err))

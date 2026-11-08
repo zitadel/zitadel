@@ -28,7 +28,7 @@ func (n *NotificationQueries) GetActiveEmailConfig(ctx context.Context, orgID st
 	if orgProviders {
 		config, err := n.OrgSMTPConfigActive(ctx, orgID)
 		if err == nil {
-			return n.smtpConfigToEmailConfig(config)
+			return n.orgEmailConfig(config)
 		}
 		// Only fall back on "not found" — propagate real errors (DB failures, etc.)
 		if !zerrors.IsNotFound(err) {
@@ -44,6 +44,23 @@ func (n *NotificationQueries) GetActiveEmailConfig(ctx context.Context, orgID st
 		return nil, err
 	}
 	return n.smtpConfigToEmailConfig(config)
+}
+
+// orgEmailConfig converts the config of an organization.
+// Unlike the instance level config, the SMTP host and the XOAuth2 token endpoint of an organization
+// must not reach hosts on the deny list. HTTP providers use the shared client, which enforces the deny list.
+func (n *NotificationQueries) orgEmailConfig(config *query.SMTPConfig) (*email.Config, error) {
+	emailConfig, err := n.smtpConfigToEmailConfig(config)
+	if err != nil {
+		return nil, err
+	}
+	if emailConfig.SMTPConfig != nil {
+		emailConfig.SMTPConfig.SMTP.Restrictions = &smtp.Restrictions{
+			DenyList:   n.denyList,
+			HTTPClient: n.httpClient,
+		}
+	}
+	return emailConfig, nil
 }
 
 // orgEmailProvidersEnabled returns true if the org email providers must be considered for the given org.

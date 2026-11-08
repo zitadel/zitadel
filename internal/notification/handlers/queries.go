@@ -9,6 +9,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
@@ -47,6 +48,7 @@ type NotificationQueries struct {
 	SMTPPasswordCrypto        crypto.EncryptionAlgorithm
 	SMSTokenCrypto            crypto.EncryptionAlgorithm
 	httpClient                *http.Client
+	denyList                  []denylist.AddressChecker
 	OrgSMTPFallbackToInstance bool
 }
 
@@ -61,6 +63,7 @@ func NewNotificationQueries(
 	smtpPasswordCrypto crypto.EncryptionAlgorithm,
 	smsTokenCrypto crypto.EncryptionAlgorithm,
 	httpClient *http.Client,
+	denyList []denylist.AddressChecker,
 	orgSMTPFallbackToInstance bool,
 ) *NotificationQueries {
 	return &NotificationQueries{
@@ -74,6 +77,7 @@ func NewNotificationQueries(
 		SMTPPasswordCrypto:        smtpPasswordCrypto,
 		SMSTokenCrypto:            smsTokenCrypto,
 		httpClient:                httpClient,
+		denyList:                  denyList,
 		OrgSMTPFallbackToInstance: orgSMTPFallbackToInstance,
 	}
 }

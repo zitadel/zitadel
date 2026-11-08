@@ -254,7 +254,7 @@ func TestCommandSide_AddOrgSMTPConfig(t *testing.T) {
 							"user",
 							nil,
 							&instance.XOAuth2Auth{
-								TokenEndpoint: "auth.example.com/token",
+								TokenEndpoint: "https://192.0.2.1/token",
 								Scopes:        []string{"scope"},
 								ClientCredentials: &instance.XOAuth2ClientCredentials{
 									ClientId: "client-id",
@@ -282,7 +282,7 @@ func TestCommandSide_AddOrgSMTPConfig(t *testing.T) {
 					Host:          "host:587",
 					User:          "user",
 					XOAuth2Auth: &XOAuth2Auth{
-						TokenEndpoint: "auth.example.com/token",
+						TokenEndpoint: "https://192.0.2.1/token",
 						Scopes:        []string{"scope"},
 						ClientCredentialsAuth: &OAuth2ClientCredentials{
 							ClientId:     "client-id",
@@ -365,7 +365,7 @@ func TestCommandSide_AddOrgSMTPConfigHTTP(t *testing.T) {
 							&org.NewAggregate("ORG1").Aggregate,
 							"configid",
 							"test",
-							"endpoint",
+							"https://192.0.2.1/hook",
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
@@ -383,7 +383,7 @@ func TestCommandSide_AddOrgSMTPConfigHTTP(t *testing.T) {
 				http: &AddOrgSMTPConfigHTTP{
 					ResourceOwner: "ORG1",
 					Description:   "test",
-					Endpoint:      "endpoint",
+					Endpoint:      "https://192.0.2.1/hook",
 				},
 			},
 			res: res{

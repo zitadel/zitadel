@@ -71,8 +71,12 @@ Errors:
     AlreadyExists: "SMTP yapılandırması zaten mevcut"
     AlreadyDeactivated: "SMTP yapılandırması zaten devre dışı"
     OrgProvidersDisabled: "Kuruluş e-posta sağlayıcıları bu örnekte devre dışı bırakılmıştır"
+    OrgHTTPSRequired: "Kuruluşların e-posta sağlayıcıları https kullanmalıdır"
     SenderAdressNotCustomDomain: "Gönderen adresi instance üzerinde özel domain olarak yapılandırılmalı."
     TestEmailNotFound: "Test için e-posta adresi bulunamadı"
+  NotificationProvider:
+    Blocked:
+      Endpoint: "Bu bildirim sağlayıcısının adresine izin verilmiyor"
   Notification:
     NoDomain: "Mesaj için Domain bulunamadı"
   User:

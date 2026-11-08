@@ -70,8 +70,12 @@ Errors:
     AlreadyExists: "La configurazione SMTP esiste già"
     AlreadyDeactivated: "Configurazione SMTP già disattivata"
     OrgProvidersDisabled: "I provider e-mail delle organizzazioni sono disattivati su questa istanza"
+    OrgHTTPSRequired: "I provider di e-mail delle organizzazioni devono usare https"
     SenderAdressNotCustomDomain: "L'indirizzo del mittente deve essere configurato come dominio personalizzato sull'istanza."
     TestEmailNotFound: "Indirizzo email per il test non trovato"
+  NotificationProvider:
+    Blocked:
+      Endpoint: "L'indirizzo di questo provider di notifiche non è consentito"
   Notification:
     NoDomain: "Nessun dominio trovato per il messaggio"
   User:

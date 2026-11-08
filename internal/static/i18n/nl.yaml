@@ -70,8 +70,12 @@ Errors:
     AlreadyExists: "SMTP-configuratie bestaat al"
     AlreadyDeactivated: "SMTP-configuratie al gedeactiveerd"
     OrgProvidersDisabled: "E-mailproviders van organisaties zijn uitgeschakeld op deze instantie"
+    OrgHTTPSRequired: "E-mailproviders van organisaties moeten https gebruiken"
     SenderAdressNotCustomDomain: "Het afzenderadres moet worden geconfigureerd als aangepaste domein op de instantie."
     TestEmailNotFound: "E-mailadres voor test niet gevonden"
+  NotificationProvider:
+    Blocked:
+      Endpoint: "Het adres van deze meldingsprovider is niet toegestaan"
   Notification:
     NoDomain: "Geen domein gevonden voor bericht"
   User:

@@ -70,8 +70,12 @@ Errors:
     AlreadyExists: "SMTP конфигурация вече съществува"
     AlreadyDeactivated: "SMTP конфигурацията вече е деактивирана"
     OrgProvidersDisabled: "Доставчиците на имейл на организациите са изключени в тази инстанция"
+    OrgHTTPSRequired: "Доставчиците на имейл на организациите трябва да използват https"
     SenderAdressNotCustomDomain: "Адресът на изпращача трябва да бъде конфигуриран като персонализиран домейн в екземпляра."
     TestEmailNotFound: "Имейл адресът за теста не е намерен"
+  NotificationProvider:
+    Blocked:
+      Endpoint: "Адресът на този доставчик на известия не е разрешен"
   Notification:
     NoDomain: "Няма намерен домейн за съобщение"
   User:

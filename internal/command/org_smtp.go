@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -38,6 +39,15 @@ type AddOrgSMTPConfig struct {
 	XOAuth2Auth    *XOAuth2Auth
 }
 
+// orgSMTPRestrictions returns the restrictions for SMTP connections of org owned configs.
+// They use the same deny list and HTTP client as the other server side requests.
+func (c *Commands) orgSMTPRestrictions() *smtp.Restrictions {
+	return &smtp.Restrictions{
+		DenyList:   c.denyList,
+		HTTPClient: c.httpClient,
+	}
+}
+
 func (c *Commands) AddOrgSMTPConfig(ctx context.Context, config *AddOrgSMTPConfig) (err error) {
 	if err := checkOrgEmailProvidersEnabled(ctx); err != nil {
 		return err
@@ -62,6 +72,12 @@ func (c *Commands) AddOrgSMTPConfig(ctx context.Context, config *AddOrgSMTPConfi
 
 	if _, _, err := net.SplitHostPort(hostAndPort); err != nil {
 		return zerrors.ThrowInvalidArgument(nil, "ORG-gK9RE2", "Errors.Invalid.Argument")
+	}
+
+	if config.XOAuth2Auth != nil {
+		if err := c.validateNotificationWebhookEndpoint(config.XOAuth2Auth.TokenEndpoint, true); err != nil {
+			return err
+		}
 	}
 
 	smtpConfigWriteModel, err := c.getOrgSMTPConfig(ctx, config.ResourceOwner, config.ID)
@@ -161,6 +177,12 @@ func (c *Commands) ChangeOrgSMTPConfig(ctx context.Context, config *ChangeOrgSMT
 	hostAndPort := strings.TrimSpace(config.Host)
 	if _, _, err := net.SplitHostPort(hostAndPort); err != nil {
 		return zerrors.ThrowInvalidArgument(nil, "ORG-kZ3Vk2", "Errors.Invalid.Argument")
+	}
+
+	if config.XOAuth2Auth != nil {
+		if err := c.validateNotificationWebhookEndpoint(config.XOAuth2Auth.TokenEndpoint, true); err != nil {
+			return err
+		}
 	}
 
 	smtpConfigWriteModel, err := c.getOrgSMTPConfig(ctx, config.ResourceOwner, config.ID)

@@ -76,7 +76,7 @@ func TestCommandSide_ChangeOrgSMTPConfigHTTP(t *testing.T) {
 					ResourceOwner: "ORG1",
 					ID:            "ID",
 					Description:   "test",
-					Endpoint:      "endpoint",
+					Endpoint:      "https://192.0.2.1/hook",
 				},
 			},
 			res: res{
@@ -96,7 +96,7 @@ func TestCommandSide_ChangeOrgSMTPConfigHTTP(t *testing.T) {
 								&org.NewAggregate("ORG1").Aggregate,
 								"ID",
 								"test",
-								"endpoint",
+								"https://192.0.2.1/hook",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -113,7 +113,7 @@ func TestCommandSide_ChangeOrgSMTPConfigHTTP(t *testing.T) {
 					ResourceOwner: "ORG1",
 					ID:            "ID",
 					Description:   "test",
-					Endpoint:      "endpoint",
+					Endpoint:      "https://192.0.2.1/hook",
 				},
 			},
 			res: res{
@@ -133,7 +133,7 @@ func TestCommandSide_ChangeOrgSMTPConfigHTTP(t *testing.T) {
 								&org.NewAggregate("ORG1").Aggregate,
 								"ID",
 								"",
-								"endpoint",
+								"https://192.0.2.1/hook",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -149,7 +149,7 @@ func TestCommandSide_ChangeOrgSMTPConfigHTTP(t *testing.T) {
 							"ORG1",
 							"ID",
 							"test",
-							"endpoint2",
+							"https://192.0.2.1/hook2",
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
@@ -167,7 +167,7 @@ func TestCommandSide_ChangeOrgSMTPConfigHTTP(t *testing.T) {
 					ResourceOwner:        "ORG1",
 					ID:                   "ID",
 					Description:          "test",
-					Endpoint:             "endpoint2",
+					Endpoint:             "https://192.0.2.1/hook2",
 					ExpirationSigningKey: true,
 				},
 			},
