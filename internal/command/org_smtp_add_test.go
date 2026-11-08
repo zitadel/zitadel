@@ -305,7 +305,7 @@ func TestCommandSide_AddOrgSMTPConfig(t *testing.T) {
 				idGenerator:    tt.fields.idGenerator,
 				smtpEncryption: tt.fields.alg,
 			}
-			err := r.AddOrgSMTPConfig(context.Background(), tt.args.smtp)
+			err := r.AddOrgSMTPConfig(orgEmailProvidersEnabledCtx(), tt.args.smtp)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -401,7 +401,7 @@ func TestCommandSide_AddOrgSMTPConfigHTTP(t *testing.T) {
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
 			}
-			err := r.AddOrgSMTPConfigHTTP(context.Background(), tt.args.http)
+			err := r.AddOrgSMTPConfigHTTP(orgEmailProvidersEnabledCtx(), tt.args.http)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

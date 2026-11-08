@@ -30,6 +30,7 @@ var (
 	InstancePermissionCheckV2                       = setEventTypeFromFeature(feature.LevelInstance, feature.KeyPermissionCheckV2)
 	InstanceManagementConsoleUseV2UserApi           = setEventTypeFromFeature(feature.LevelInstance, feature.KeyConsoleUseV2UserApi)
 	InstanceEnableRelationalTables                  = setEventTypeFromFeature(feature.LevelInstance, feature.KeyEnableRelationalTables)
+	InstanceOrgEmailProviders                       = setEventTypeFromFeature(feature.LevelInstance, feature.KeyOrgEmailProviders)
 )
 
 const (

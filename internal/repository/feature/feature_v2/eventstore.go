@@ -25,4 +25,5 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, InstancePermissionCheckV2, eventstore.GenericEventMapper[SetEvent[bool]])
 	eventstore.RegisterFilterEventMapper(AggregateType, InstanceManagementConsoleUseV2UserApi, eventstore.GenericEventMapper[SetEvent[bool]])
 	eventstore.RegisterFilterEventMapper(AggregateType, InstanceEnableRelationalTables, eventstore.GenericEventMapper[SetEvent[bool]])
+	eventstore.RegisterFilterEventMapper(AggregateType, InstanceOrgEmailProviders, eventstore.GenericEventMapper[SetEvent[bool]])
 }

@@ -70,6 +70,7 @@ Errors:
     NotFound: "SMTP 구성을 찾을 수 없습니다"
     AlreadyExists: "SMTP 구성이 이미 존재합니다"
     AlreadyDeactivated: "SMTP 구성이 이미 비활성화되었습니다"
+    OrgProvidersDisabled: "조직 이메일 제공자는 이 인스턴스에서 비활성화되어 있습니다"
     SenderAdressNotCustomDomain: "발신자 주소는 인스턴스에서 사용자 정의 도메인으로 구성되어야 합니다"
     TestEmailNotFound: "테스트할 이메일 주소가 없습니다"
   Notification:

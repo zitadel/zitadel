@@ -1664,7 +1664,9 @@
       "LOGINV2_DESCRIPTION": "これを有効にすると、セキュリティ、パフォーマンス、およびカスタマイズ性が向上した、TypeScript ベースの新しいログイン UI が有効になります。",
       "LOGINV2_BASEURI": "ベースURI",
       "ENABLERELATIONALTABLES": "リレーショナルテーブル",
-      "ENABLERELATIONALTABLES_DESCRIPTION": "データを保存するためにプロジェクションの代わりにリレーショナルテーブルを使用するには、これを有効にします。現在、このトグルは何もしません。"
+      "ENABLERELATIONALTABLES_DESCRIPTION": "データを保存するためにプロジェクションの代わりにリレーショナルテーブルを使用するには、これを有効にします。現在、このトグルは何もしません。",
+      "ORGEMAILPROVIDERS": "組織のメールプロバイダー",
+      "ORGEMAILPROVIDERS_DESCRIPTION": "有効にすると、組織が独自のメールプロバイダーを設定できます。無効の場合、すべてのメールはインスタンスのメールプロバイダー経由で送信されます。"
     },
     "DIALOG": {
       "RESET": {

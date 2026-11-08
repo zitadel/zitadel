@@ -64,6 +64,7 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) (*com
 		PermissionCheckV2:              req.PermissionCheckV2,
 		ManagementConsoleUseV2UserApi:  req.ConsoleUseV2UserApi,
 		EnableRelationalTables:         req.EnableRelationalTables,
+		OrgEmailProviders:              req.OrgEmailProviders,
 	}, nil
 }
 
@@ -87,6 +88,7 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		PermissionCheckV2:      featureSourceToFlagPb(&f.PermissionCheckV2),
 		ConsoleUseV2UserApi:    featureSourceToFlagPb(&f.ManagementConsoleUseV2UserApi),
 		EnableRelationalTables: featureSourceToFlagPb(&f.EnableRelationalTables),
+		OrgEmailProviders:      featureSourceToFlagPb(&f.OrgEmailProviders),
 	}
 }
 

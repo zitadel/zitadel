@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/notification/channels/email"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
@@ -384,8 +385,9 @@ func TestNotificationQueries_GetActiveEmailConfig_OrgFallback(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		ctx := authz.NewMockContext(instId, orgId, "user-1")
+		ctx := authz.NewMockContext(instId, orgId, "user-1", authz.WithMockFeatures(feature.Features{OrgEmailProviders: true}))
 		queryMock := mock.NewMockQueries(ctrl)
+		queryMock.EXPECT().InstanceByID(gomock.Any(), instId).Return(authz.GetInstance(ctx), nil)
 		queryMock.EXPECT().OrgSMTPConfigActive(gomock.Any(), orgId).Return(nil, zerrors.ThrowNotFound(nil, "QUERY-test", "not found"))
 		queryMock.EXPECT().SMTPConfigActive(gomock.Any(), instId).Return(instanceSMTPConfig, nil)
 
@@ -399,8 +401,9 @@ func TestNotificationQueries_GetActiveEmailConfig_OrgFallback(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		ctx := authz.NewMockContext(instId, orgId, "user-1")
+		ctx := authz.NewMockContext(instId, orgId, "user-1", authz.WithMockFeatures(feature.Features{OrgEmailProviders: true}))
 		queryMock := mock.NewMockQueries(ctrl)
+		queryMock.EXPECT().InstanceByID(gomock.Any(), instId).Return(authz.GetInstance(ctx), nil)
 		queryMock.EXPECT().OrgSMTPConfigActive(gomock.Any(), orgId).Return(nil, zerrors.ThrowNotFound(nil, "QUERY-test", "not found"))
 
 		nq := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext", uint16(443), true, "", nil, nil, nil, nil, false)
@@ -413,8 +416,9 @@ func TestNotificationQueries_GetActiveEmailConfig_OrgFallback(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		ctx := authz.NewMockContext(instId, orgId, "user-1")
+		ctx := authz.NewMockContext(instId, orgId, "user-1", authz.WithMockFeatures(feature.Features{OrgEmailProviders: true}))
 		queryMock := mock.NewMockQueries(ctrl)
+		queryMock.EXPECT().InstanceByID(gomock.Any(), instId).Return(authz.GetInstance(ctx), nil)
 		queryMock.EXPECT().OrgSMTPConfigActive(gomock.Any(), orgId).Return(orgSMTPConfig, nil)
 
 		nq := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext", uint16(443), true, "", nil, nil, nil, nil, true)
@@ -427,8 +431,9 @@ func TestNotificationQueries_GetActiveEmailConfig_OrgFallback(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		ctx := authz.NewMockContext(instId, orgId, "user-1")
+		ctx := authz.NewMockContext(instId, orgId, "user-1", authz.WithMockFeatures(feature.Features{OrgEmailProviders: true}))
 		queryMock := mock.NewMockQueries(ctrl)
+		queryMock.EXPECT().InstanceByID(gomock.Any(), instId).Return(authz.GetInstance(ctx), nil)
 		queryMock.EXPECT().OrgSMTPConfigActive(gomock.Any(), orgId).Return(nil, zerrors.ThrowInternal(nil, "QUERY-test", "db failure"))
 
 		nq := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext", uint16(443), true, "", nil, nil, nil, nil, true)

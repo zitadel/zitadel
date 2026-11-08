@@ -185,7 +185,7 @@ func TestCommandSide_ChangeOrgSMTPConfigHTTP(t *testing.T) {
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
 			}
-			err := r.ChangeOrgSMTPConfigHTTP(context.Background(), tt.args.http)
+			err := r.ChangeOrgSMTPConfigHTTP(orgEmailProvidersEnabledCtx(), tt.args.http)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

@@ -69,6 +69,7 @@ Errors:
     NotFound: "Konfigurasi SMTP tidak ditemukan"
     AlreadyExists: "Konfigurasi SMTP sudah ada"
     AlreadyDeactivated: "Konfigurasi SMTP sudah dinonaktifkan"
+    OrgProvidersDisabled: "Penyedia email organisasi dinonaktifkan pada instans ini"
     SenderAdressNotCustomDomain: "Alamat pengirim harus dikonfigurasi sebagai domain kustom pada instance."
     TestEmailNotFound: "Alamat email untuk tes tidak ditemukan"
   Notification:

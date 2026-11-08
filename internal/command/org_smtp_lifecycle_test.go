@@ -127,7 +127,7 @@ func TestCommandSide_RemoveOrgSMTPConfig(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.RemoveOrgSMTPConfig(context.Background(), tt.args.orgID, tt.args.id)
+			got, err := r.RemoveOrgSMTPConfig(orgEmailProvidersEnabledCtx(), tt.args.orgID, tt.args.id)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -296,7 +296,7 @@ func TestCommandSide_ActivateOrgSMTPConfig(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.ActivateOrgSMTPConfig(context.Background(), tt.args.orgID, tt.args.id)
+			got, err := r.ActivateOrgSMTPConfig(orgEmailProvidersEnabledCtx(), tt.args.orgID, tt.args.id)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -477,7 +477,7 @@ func TestCommandSide_DeactivateOrgSMTPConfig(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.DeactivateOrgSMTPConfig(context.Background(), tt.args.orgID, tt.args.id)
+			got, err := r.DeactivateOrgSMTPConfig(orgEmailProvidersEnabledCtx(), tt.args.orgID, tt.args.id)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

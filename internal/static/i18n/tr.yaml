@@ -70,6 +70,7 @@ Errors:
     NotFound: "SMTP yapılandırması bulunamadı"
     AlreadyExists: "SMTP yapılandırması zaten mevcut"
     AlreadyDeactivated: "SMTP yapılandırması zaten devre dışı"
+    OrgProvidersDisabled: "Kuruluş e-posta sağlayıcıları bu örnekte devre dışı bırakılmıştır"
     SenderAdressNotCustomDomain: "Gönderen adresi instance üzerinde özel domain olarak yapılandırılmalı."
     TestEmailNotFound: "Test için e-posta adresi bulunamadı"
   Notification:

@@ -70,6 +70,7 @@ Errors:
     NotFound: "Configurația SMTP nu a fost găsită"
     AlreadyExists: "Configurația SMTP există deja"
     AlreadyDeactivated: "Configurația SMTP este deja dezactivată"
+    OrgProvidersDisabled: "Furnizorii de e-mail ai organizațiilor sunt dezactivați pe această instanță"
     SenderAdressNotCustomDomain: "Adresa expeditorului trebuie configurată ca domeniu personalizat pe instanță."
     TestEmailNotFound: "Adresa de e-mail pentru test nu a fost găsită"
   Notification:

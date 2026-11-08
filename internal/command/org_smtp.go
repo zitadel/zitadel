@@ -5,12 +5,22 @@ import (
 	"net"
 	"strings"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
+
+// checkOrgEmailProvidersEnabled refuses the org email provider commands
+// unless the instance feature org_email_providers is enabled.
+func checkOrgEmailProvidersEnabled(ctx context.Context) error {
+	if !authz.GetFeatures(ctx).OrgEmailProviders {
+		return zerrors.ThrowPreconditionFailed(nil, "ORG-Nq7Ew2", "Errors.SMTPConfig.OrgProvidersDisabled")
+	}
+	return nil
+}
 
 type AddOrgSMTPConfig struct {
 	Details       *domain.ObjectDetails
@@ -29,6 +39,9 @@ type AddOrgSMTPConfig struct {
 }
 
 func (c *Commands) AddOrgSMTPConfig(ctx context.Context, config *AddOrgSMTPConfig) (err error) {
+	if err := checkOrgEmailProvidersEnabled(ctx); err != nil {
+		return err
+	}
 	if config.ResourceOwner == "" {
 		return zerrors.ThrowInvalidArgument(nil, "ORG-sn93Ss", "Errors.ResourceOwnerMissing")
 	}
@@ -129,6 +142,9 @@ type ChangeOrgSMTPConfig struct {
 }
 
 func (c *Commands) ChangeOrgSMTPConfig(ctx context.Context, config *ChangeOrgSMTPConfig) error {
+	if err := checkOrgEmailProvidersEnabled(ctx); err != nil {
+		return err
+	}
 	if config.ResourceOwner == "" {
 		return zerrors.ThrowInvalidArgument(nil, "ORG-wJk3s0", "Errors.ResourceOwnerMissing")
 	}
@@ -219,6 +235,9 @@ func (c *Commands) ChangeOrgSMTPConfig(ctx context.Context, config *ChangeOrgSMT
 }
 
 func (c *Commands) RemoveOrgSMTPConfig(ctx context.Context, orgID, id string) (*domain.ObjectDetails, error) {
+	if err := checkOrgEmailProvidersEnabled(ctx); err != nil {
+		return nil, err
+	}
 	if orgID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-t2WsP1", "Errors.ResourceOwnerMissing")
 	}
@@ -251,6 +270,9 @@ func (c *Commands) RemoveOrgSMTPConfig(ctx context.Context, orgID, id string) (*
 func (c *Commands) ChangeOrgSMTPConfigPassword(
 	ctx context.Context, orgID, id string, password string,
 ) (*domain.ObjectDetails, error) {
+	if err := checkOrgEmailProvidersEnabled(ctx); err != nil {
+		return nil, err
+	}
 	if orgID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-gHAyv1", "Errors.ResourceOwnerMissing")
 	}
@@ -292,6 +314,9 @@ func (c *Commands) ChangeOrgSMTPConfigPassword(
 func (c *Commands) ActivateOrgSMTPConfig(
 	ctx context.Context, orgID, id string,
 ) (*domain.ObjectDetails, error) {
+	if err := checkOrgEmailProvidersEnabled(ctx); err != nil {
+		return nil, err
+	}
 	if orgID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-h5htM1", "Errors.ResourceOwnerMissing")
 	}
@@ -327,6 +352,9 @@ func (c *Commands) ActivateOrgSMTPConfig(
 func (c *Commands) DeactivateOrgSMTPConfig(
 	ctx context.Context, orgID, id string,
 ) (*domain.ObjectDetails, error) {
+	if err := checkOrgEmailProvidersEnabled(ctx); err != nil {
+		return nil, err
+	}
 	if orgID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-pvNHo1", "Errors.ResourceOwnerMissing")
 	}

@@ -69,6 +69,7 @@ Errors:
     NotFound: "SMTP Konfiguration nicht gefunden"
     AlreadyExists: "SMTP Konfiguration existiert bereits"
     AlreadyDeactivated: "SMTP-Konfiguration bereits deaktiviert"
+    OrgProvidersDisabled: "E-Mail-Provider von Organisationen sind auf dieser Instanz deaktiviert"
     SenderAdressNotCustomDomain: "Die Sender Adresse muss als Custom Domain auf der Instanz registriert sein."
     TestEmailNotFound: "E-Mail-Adresse für den Test nicht gefunden"
   Notification:

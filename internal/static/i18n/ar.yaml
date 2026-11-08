@@ -70,6 +70,7 @@ Errors:
     NotFound: "تكوين SMTP غير موجود"
     AlreadyExists: "تكوين SMTP موجود بالفعل"
     AlreadyDeactivated: "تكوين SMTP معطل بالفعل"
+    OrgProvidersDisabled: "مزودو البريد الإلكتروني للمؤسسات معطلون في هذا المثيل"
     SenderAdressNotCustomDomain: "عنوان المرسل يجب تكوينه كنطاق مخصص على المثيل."
     TestEmailNotFound: "عنوان البريد الإلكتروني للاختبار غير موجود"
   Notification:

@@ -69,6 +69,7 @@ Errors:
     NotFound: "SMTP конфигурацията не е намерена"
     AlreadyExists: "SMTP конфигурация вече съществува"
     AlreadyDeactivated: "SMTP конфигурацията вече е деактивирана"
+    OrgProvidersDisabled: "Доставчиците на имейл на организациите са изключени в тази инстанция"
     SenderAdressNotCustomDomain: "Адресът на изпращача трябва да бъде конфигуриран като персонализиран домейн в екземпляра."
     TestEmailNotFound: "Имейл адресът за теста не е намерен"
   Notification:

@@ -21,6 +21,9 @@ type AddOrgSMTPConfigHTTP struct {
 }
 
 func (c *Commands) AddOrgSMTPConfigHTTP(ctx context.Context, config *AddOrgSMTPConfigHTTP) (err error) {
+	if err := checkOrgEmailProvidersEnabled(ctx); err != nil {
+		return err
+	}
 	if config.ResourceOwner == "" {
 		return zerrors.ThrowInvalidArgument(nil, "ORG-FTNDXc1", "Errors.ResourceOwnerMissing")
 	}
@@ -69,6 +72,9 @@ type ChangeOrgSMTPConfigHTTP struct {
 }
 
 func (c *Commands) ChangeOrgSMTPConfigHTTP(ctx context.Context, config *ChangeOrgSMTPConfigHTTP) (err error) {
+	if err := checkOrgEmailProvidersEnabled(ctx); err != nil {
+		return err
+	}
 	if config.ResourceOwner == "" {
 		return zerrors.ThrowInvalidArgument(nil, "ORG-k7QCG1", "Errors.ResourceOwnerMissing")
 	}
@@ -122,6 +128,9 @@ func (c *Commands) ChangeOrgSMTPConfigHTTP(ctx context.Context, config *ChangeOr
 func (c *Commands) TestOrgSMTPConfig(
 	ctx context.Context, orgID, id, email string, config *smtp.Config,
 ) error {
+	if err := checkOrgEmailProvidersEnabled(ctx); err != nil {
+		return err
+	}
 	if email == "" {
 		return zerrors.ThrowInvalidArgument(nil, "ORG-p9uy1", "Errors.SMTPConfig.TestEmailNotFound")
 	}
@@ -179,6 +188,9 @@ func (c *Commands) TestOrgSMTPConfig(
 }
 
 func (c *Commands) TestOrgSMTPConfigById(ctx context.Context, orgID, id, email string) error {
+	if err := checkOrgEmailProvidersEnabled(ctx); err != nil {
+		return err
+	}
 	if id == "" {
 		return zerrors.ThrowInvalidArgument(nil, "ORG-99oki1", "Errors.IDMissing")
 	}

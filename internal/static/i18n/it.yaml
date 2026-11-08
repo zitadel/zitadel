@@ -69,6 +69,7 @@ Errors:
     NotFound: "Configurazione SMTP non trovata"
     AlreadyExists: "La configurazione SMTP esiste già"
     AlreadyDeactivated: "Configurazione SMTP già disattivata"
+    OrgProvidersDisabled: "I provider e-mail delle organizzazioni sono disattivati su questa istanza"
     SenderAdressNotCustomDomain: "L'indirizzo del mittente deve essere configurato come dominio personalizzato sull'istanza."
     TestEmailNotFound: "Indirizzo email per il test non trovato"
   Notification:

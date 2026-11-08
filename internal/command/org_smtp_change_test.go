@@ -235,7 +235,7 @@ func TestCommandSide_ChangeOrgSMTPConfig(t *testing.T) {
 				eventstore:     tt.fields.eventstore(t),
 				smtpEncryption: tt.fields.alg,
 			}
-			err := r.ChangeOrgSMTPConfig(context.Background(), tt.args.smtp)
+			err := r.ChangeOrgSMTPConfig(orgEmailProvidersEnabledCtx(), tt.args.smtp)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -377,7 +377,7 @@ func TestCommandSide_ChangeOrgSMTPConfigPassword(t *testing.T) {
 				eventstore:     tt.fields.eventstore(t),
 				smtpEncryption: tt.fields.alg,
 			}
-			got, err := r.ChangeOrgSMTPConfigPassword(context.Background(), tt.args.orgID, tt.args.id, tt.args.password)
+			got, err := r.ChangeOrgSMTPConfigPassword(orgEmailProvidersEnabledCtx(), tt.args.orgID, tt.args.id, tt.args.password)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

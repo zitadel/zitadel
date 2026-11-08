@@ -70,6 +70,7 @@ Errors:
     NotFound: "Конфігурація SMTP не знайдена"
     AlreadyExists: "Конфігурація SMTP вже існує"
     AlreadyDeactivated: "Конфігурація SMTP вже деактивована"
+    OrgProvidersDisabled: "Поштові провайдери організацій вимкнено в цьому екземплярі"
     SenderAdressNotCustomDomain: "Адреса відправника повинна бути налаштована як власний домен в інстансі."
     TestEmailNotFound: "Адреса електронної пошти для тесту не знайдена"
   Notification:

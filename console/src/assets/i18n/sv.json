@@ -1667,7 +1667,9 @@
       "LOGINV2_DESCRIPTION": "Att aktivera detta startar det nya inloggningsgränssnittet baserat på TypeScript med förbättrad säkerhet, prestanda och anpassning.",
       "LOGINV2_BASEURI": "Bas-URI",
       "ENABLERELATIONALTABLES": "Relationella tabeller",
-      "ENABLERELATIONALTABLES_DESCRIPTION": "Aktivera detta för att använda relationella tabeller istället för projektioner för att lagra data. För närvarande gör denna växel ingenting."
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Aktivera detta för att använda relationella tabeller istället för projektioner för att lagra data. För närvarande gör denna växel ingenting.",
+      "ORGEMAILPROVIDERS": "E-postleverantörer för organisationer",
+      "ORGEMAILPROVIDERS_DESCRIPTION": "Aktivera detta för att låta organisationer konfigurera egna e-postleverantörer. Om det är inaktiverat skickas all e-post via instansens e-postleverantör."
     },
     "DIALOG": {
       "RESET": {

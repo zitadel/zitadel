@@ -69,6 +69,7 @@ Errors:
     NotFound: "SMTP-configuratie niet gevonden"
     AlreadyExists: "SMTP-configuratie bestaat al"
     AlreadyDeactivated: "SMTP-configuratie al gedeactiveerd"
+    OrgProvidersDisabled: "E-mailproviders van organisaties zijn uitgeschakeld op deze instantie"
     SenderAdressNotCustomDomain: "Het afzenderadres moet worden geconfigureerd als aangepaste domein op de instantie."
     TestEmailNotFound: "E-mailadres voor test niet gevonden"
   Notification:

@@ -7,8 +7,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -88,7 +90,7 @@ func TestCommandSide_TestOrgSMTPConfigById(t *testing.T) {
 				eventstore:     tt.fields.eventstore(t),
 				smtpEncryption: tt.fields.alg,
 			}
-			err := r.TestOrgSMTPConfigById(context.Background(), tt.args.orgID, tt.args.id, tt.args.email)
+			err := r.TestOrgSMTPConfigById(orgEmailProvidersEnabledCtx(), tt.args.orgID, tt.args.id, tt.args.email)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -157,4 +159,9 @@ func newOrgSMTPConfigHTTPChangedEvent(
 		changes,
 	)
 	return event
+}
+
+// orgEmailProvidersEnabledCtx returns a context of an instance with the org_email_providers feature enabled.
+func orgEmailProvidersEnabledCtx() context.Context {
+	return authz.NewMockContext("", "", "", authz.WithMockFeatures(feature.Features{OrgEmailProviders: true}))
 }

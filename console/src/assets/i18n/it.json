@@ -1664,7 +1664,9 @@
       "LOGINV2_DESCRIPTION": "Abilitando questa opzione si attiva la nuova interfaccia di login basata su TypeScript con sicurezza, prestazioni e personalizzazione migliorate.",
       "LOGINV2_BASEURI": "URI di base",
       "ENABLERELATIONALTABLES": "Tabelle relazionali",
-      "ENABLERELATIONALTABLES_DESCRIPTION": "Abilita questo toggle per utilizzare le tabelle relazionali invece di proiezioni per memorizzare i dati. Attualmente questo toggle non fa nulla."
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Abilita questo toggle per utilizzare le tabelle relazionali invece di proiezioni per memorizzare i dati. Attualmente questo toggle non fa nulla.",
+      "ORGEMAILPROVIDERS": "Provider e-mail dell'organizzazione",
+      "ORGEMAILPROVIDERS_DESCRIPTION": "Attiva questa opzione per consentire alle organizzazioni di configurare i propri provider e-mail. Se disattivata, tutte le e-mail vengono inviate tramite il provider e-mail dell'istanza."
     },
     "DIALOG": {
       "RESET": {
