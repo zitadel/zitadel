@@ -17,6 +17,7 @@ import (
 )
 
 func TestServer_ActivateOrgEmailProvider(t *testing.T) {
+	ensureOrgEmailProviders(t)
 	addResp, err := Client.AddOrgEmailProviderSMTP(OrgCTX, &mgmt_pb.AddOrgEmailProviderSMTPRequest{
 		SenderAddress: "activate-test@example.com",
 		SenderName:    "Activate Test",
@@ -87,6 +88,7 @@ func TestServer_ActivateOrgEmailProvider(t *testing.T) {
 }
 
 func TestServer_DeactivateOrgEmailProvider(t *testing.T) {
+	ensureOrgEmailProviders(t)
 	addResp, err := Client.AddOrgEmailProviderSMTP(OrgCTX, &mgmt_pb.AddOrgEmailProviderSMTPRequest{
 		SenderAddress: "deactivate-test@example.com",
 		SenderName:    "Deactivate Test",
@@ -162,6 +164,7 @@ func TestServer_DeactivateOrgEmailProvider(t *testing.T) {
 }
 
 func TestServer_RemoveOrgEmailProvider(t *testing.T) {
+	ensureOrgEmailProviders(t)
 	addResp, err := Client.AddOrgEmailProviderSMTP(OrgCTX, &mgmt_pb.AddOrgEmailProviderSMTPRequest{
 		SenderAddress: "remove-test@example.com",
 		SenderName:    "Remove Test",
@@ -238,6 +241,7 @@ func TestServer_RemoveOrgEmailProvider(t *testing.T) {
 }
 
 func TestServer_OrgEmailProviderSMTP_FullLifecycle(t *testing.T) {
+	ensureOrgEmailProviders(t)
 	// 1. Add SMTP provider
 	addResp, err := Client.AddOrgEmailProviderSMTP(OrgCTX, &mgmt_pb.AddOrgEmailProviderSMTPRequest{
 		SenderAddress: "lifecycle@example.com",
@@ -366,6 +370,7 @@ func TestServer_OrgEmailProviderSMTP_FullLifecycle(t *testing.T) {
 }
 
 func TestServer_OrgEmailProvider_PermissionDenied(t *testing.T) {
+	ensureOrgEmailProviders(t)
 	_, err := Client.AddOrgEmailProviderSMTP(CTX, &mgmt_pb.AddOrgEmailProviderSMTPRequest{
 		SenderAddress: "perm-test@example.com",
 		SenderName:    "Perm Test",
@@ -380,7 +385,7 @@ func TestServer_OrgEmailProvider_PermissionDenied(t *testing.T) {
 	require.Error(t, err)
 
 	_, err = Client.AddOrgEmailProviderHTTP(CTX, &mgmt_pb.AddOrgEmailProviderHTTPRequest{
-		Endpoint: "http://relay.example.com/email",
+		Endpoint: "https://relay.example.com/email",
 	})
 	require.Error(t, err)
 

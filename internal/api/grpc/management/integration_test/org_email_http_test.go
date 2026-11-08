@@ -15,6 +15,7 @@ import (
 )
 
 func TestServer_AddOrgEmailProviderHTTP(t *testing.T) {
+	ensureOrgEmailProviders(t)
 	tests := []struct {
 		name    string
 		req     *mgmt_pb.AddOrgEmailProviderHTTPRequest
@@ -23,7 +24,7 @@ func TestServer_AddOrgEmailProviderHTTP(t *testing.T) {
 		{
 			name: "success",
 			req: &mgmt_pb.AddOrgEmailProviderHTTPRequest{
-				Endpoint:    "http://relay.example.com/email",
+				Endpoint:    "https://relay.example.com/email",
 				Description: "test http provider",
 			},
 		},
@@ -55,8 +56,9 @@ func TestServer_AddOrgEmailProviderHTTP(t *testing.T) {
 }
 
 func TestServer_UpdateOrgEmailProviderHTTP(t *testing.T) {
+	ensureOrgEmailProviders(t)
 	addResp, err := Client.AddOrgEmailProviderHTTP(OrgCTX, &mgmt_pb.AddOrgEmailProviderHTTPRequest{
-		Endpoint:    "http://relay.example.com/email",
+		Endpoint:    "https://relay.example.com/email",
 		Description: "http update test",
 	})
 	require.NoError(t, err)
@@ -71,7 +73,7 @@ func TestServer_UpdateOrgEmailProviderHTTP(t *testing.T) {
 			name: "success",
 			req: &mgmt_pb.UpdateOrgEmailProviderHTTPRequest{
 				Id:          providerID,
-				Endpoint:    "http://relay2.example.com/email",
+				Endpoint:    "https://relay2.example.com/email",
 				Description: "updated http provider",
 			},
 		},
@@ -79,7 +81,7 @@ func TestServer_UpdateOrgEmailProviderHTTP(t *testing.T) {
 			name: "nonexistent id",
 			req: &mgmt_pb.UpdateOrgEmailProviderHTTPRequest{
 				Id:       "nonexistent-id",
-				Endpoint: "http://relay.example.com/email",
+				Endpoint: "https://relay.example.com/email",
 			},
 			wantErr: true,
 		},

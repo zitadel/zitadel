@@ -14854,7 +14854,7 @@ message OrgSMTPXOAuth2Auth {
         (validate.rules).string = {min_len: 0, max_len: 200},
         (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"http://auth.example.com/token\"";
+            example: "\"https://auth.example.com/token\"";
             min_length: 0;
             max_length: 200;
         }
@@ -14989,7 +14989,7 @@ message AddOrgEmailProviderHTTPRequest {
         (validate.rules).string = {min_len: 1, max_len: 2048},
         (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"http://relay.example.com/provider\"";
+            example: "\"https://relay.example.com/provider\"";
             min_length: 1;
             max_length: 2048;
         }
@@ -15021,7 +15021,7 @@ message UpdateOrgEmailProviderHTTPRequest {
         (validate.rules).string = {min_len: 1, max_len: 2048},
         (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"http://relay.example.com/provider\"";
+            example: "\"https://relay.example.com/provider\"";
             min_length: 1;
             max_length: 2048;
         }

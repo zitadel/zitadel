@@ -250,7 +250,7 @@ func (wm *OrgSMTPConfigWriteModel) reduceSMTPConfigHTTPAddedEvent(e *org.OrgSMTP
 	wm.ID = e.ID
 	wm.Description = e.Description
 	wm.HTTPConfig = &HTTPConfig{
-		Endpoint:  e.Endpoint,
+		Endpoint:   e.Endpoint,
 		SigningKey: e.SigningKey,
 	}
 	wm.State = domain.SMTPConfigStateInactive

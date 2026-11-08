@@ -16,6 +16,7 @@ import (
 )
 
 func TestServer_AddOrgEmailProviderSMTP(t *testing.T) {
+	ensureOrgEmailProviders(t)
 	tests := []struct {
 		name    string
 		req     *mgmt_pb.AddOrgEmailProviderSMTPRequest
@@ -97,6 +98,7 @@ func TestServer_AddOrgEmailProviderSMTP(t *testing.T) {
 }
 
 func TestServer_GetOrgEmailProviderById(t *testing.T) {
+	ensureOrgEmailProviders(t)
 	addResp, err := Client.AddOrgEmailProviderSMTP(OrgCTX, &mgmt_pb.AddOrgEmailProviderSMTPRequest{
 		SenderAddress: "get-by-id@example.com",
 		SenderName:    "Get By ID",
@@ -166,6 +168,7 @@ func TestServer_GetOrgEmailProviderById(t *testing.T) {
 }
 
 func TestServer_ListOrgEmailProviders(t *testing.T) {
+	ensureOrgEmailProviders(t)
 	addResp, err := Client.AddOrgEmailProviderSMTP(OrgCTX, &mgmt_pb.AddOrgEmailProviderSMTPRequest{
 		SenderAddress: "list-test@example.com",
 		SenderName:    "List Test",
@@ -203,6 +206,7 @@ func TestServer_ListOrgEmailProviders(t *testing.T) {
 }
 
 func TestServer_UpdateOrgEmailProviderSMTP(t *testing.T) {
+	ensureOrgEmailProviders(t)
 	addResp, err := Client.AddOrgEmailProviderSMTP(OrgCTX, &mgmt_pb.AddOrgEmailProviderSMTPRequest{
 		SenderAddress: "update-test@example.com",
 		SenderName:    "Update Test",
@@ -298,6 +302,7 @@ func TestServer_UpdateOrgEmailProviderSMTP(t *testing.T) {
 }
 
 func TestServer_UpdateOrgEmailProviderSMTPPassword(t *testing.T) {
+	ensureOrgEmailProviders(t)
 	addResp, err := Client.AddOrgEmailProviderSMTP(OrgCTX, &mgmt_pb.AddOrgEmailProviderSMTPRequest{
 		SenderAddress: "password-test@example.com",
 		SenderName:    "Password Test",
