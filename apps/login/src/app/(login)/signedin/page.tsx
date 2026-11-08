@@ -55,7 +55,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
         <UserAvatar
           loginName={loginName ?? sessionFactors?.factors?.user?.loginName}
-          userId={sessionFactors?.factors?.user?.id}
+          organizationId={sessionFactors?.factors?.user?.organizationId}
           hideLoginNameSuffix={branding?.hideLoginNameSuffix}
           displayName={sessionFactors?.factors?.user?.displayName ?? loginName}
           showDropdown={!(requestId && requestId.startsWith("device_"))}

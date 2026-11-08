@@ -116,7 +116,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         {sessionFactors ? (
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-            userId={sessionFactors.factors?.user?.id}
+            organizationId={sessionFactors.factors?.user?.organizationId}
             hideLoginNameSuffix={branding?.hideLoginNameSuffix}
             displayName={sessionFactors.factors?.user?.displayName}
             showDropdown
@@ -126,7 +126,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           (user || loginName) && (
             <UserAvatar
               loginName={loginName ?? user?.preferredLoginName}
-              userId={user?.userId}
+              organizationId={user?.details?.resourceOwner}
               hideLoginNameSuffix={branding?.hideLoginNameSuffix}
               displayName={
                 !loginSettings?.ignoreUnknownUsernames

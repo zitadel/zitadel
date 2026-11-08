@@ -1,7 +1,7 @@
 import { Avatar } from "@/components/avatar";
+import { getShownLoginName } from "@/lib/login-name";
 import { getServiceConfig } from "@/lib/service-url";
 import { getComponentRoundness } from "@/lib/theme";
-import { getUserByID } from "@/lib/zitadel";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -16,37 +16,28 @@ type Props = {
   displayName?: string;
   showDropdown: boolean;
   searchParams?: Record<string | number | symbol, string | undefined>;
-  // The user's id, needed to show the username when the login name suffix is hidden.
-  userId?: string;
-  // The branding setting "hide login name suffix" of the user's organization.
+  // The organization the login name belongs to; its primary domain is the login name suffix.
+  organizationId?: string;
+  // The branding setting "hide login name suffix" of that organization.
   hideLoginNameSuffix?: boolean;
 };
-
-// With "user login must be domain" the login name is `<username>@<org domain>`. When the
-// branding hides that suffix, show the bare username instead, as the username form does.
-// Falls back to the login name when the user cannot be read.
-async function getShownLoginName(loginName?: string, userId?: string, hideLoginNameSuffix?: boolean) {
-  if (!hideLoginNameSuffix || !userId) {
-    return loginName;
-  }
-
-  const { serviceConfig } = getServiceConfig(await headers());
-  const username = await getUserByID({ serviceConfig, userId })
-    .then((response) => response.user?.username)
-    .catch(() => undefined);
-
-  return username || loginName;
-}
 
 export async function UserAvatar({
   loginName,
   displayName,
   showDropdown,
   searchParams,
-  userId,
+  organizationId,
   hideLoginNameSuffix,
 }: Props) {
-  const shownLoginName = await getShownLoginName(loginName, userId, hideLoginNameSuffix);
+  const shownLoginName = hideLoginNameSuffix
+    ? await getShownLoginName({
+        serviceConfig: getServiceConfig(await headers()).serviceConfig,
+        loginName,
+        organizationId,
+        hideLoginNameSuffix,
+      })
+    : loginName;
   const params = new URLSearchParams({});
   const userAvatarRoundness = getUserAvatarRoundness();
 
