@@ -88,6 +88,8 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
         <UserAvatar
           loginName={sessionFactors.factors?.user?.loginName}
+          userId={sessionFactors.factors?.user?.id}
+          hideLoginNameSuffix={branding?.hideLoginNameSuffix}
           displayName={sessionFactors.factors?.user?.displayName}
           showDropdown={false}
         />
