@@ -33,6 +33,7 @@ import { Metadata } from '@zitadel/proto/zitadel/metadata_pb';
 import { UserService } from 'src/app/services/user.service';
 import { LoginPolicy } from '@zitadel/proto/zitadel/policy_pb';
 import { QueryClient } from '@tanstack/angular-query-experimental';
+import { supportedLanguages } from 'src/app/utils/language';
 
 type MetadataQuery =
   { state: 'success'; value: Metadata[] } | { state: 'loading'; value: Metadata[] } | { state: 'error'; error: any };
@@ -267,7 +268,11 @@ export class AuthUserDetailComponent implements OnInit {
   }
 
   public changedLanguage(language: string): void {
-    this.translate.use(language);
+    // The preferred language may be one without a Console translation (e.g. "fil"),
+    // so only switch the Console display language when a catalog exists for it.
+    if (supportedLanguages.includes(language)) {
+      this.translate.use(language);
+    }
   }
 
   public async resendEmailVerification(user: User) {

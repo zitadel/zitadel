@@ -7108,5 +7108,482 @@
       "tryagain": "Tentar Novamente",
       "couldNotContinueSession": "Não foi possível continuar a sessão — informações do usuário ausentes"
     }
+  },
+  "fil": {
+    "common": {
+      "back": "Bumalik",
+      "title": "Mag-log in gamit ang Zitadel"
+    },
+    "accounts": {
+      "title": "Mga account",
+      "description": "Piliin ang account na gusto mong gamitin.",
+      "addAnother": "Magdagdag ng isa pang account",
+      "noResults": "Walang nahanap na account",
+      "verified": "na-verify",
+      "expired": "expired na"
+    },
+    "logout": {
+      "title": "Mag-log out",
+      "description": "Mag-click ng account para tapusin ang session",
+      "noResults": "Walang nahanap na account",
+      "clear": "Tapusin ang session",
+      "verifiedAt": "Huling aktibo: {time}",
+      "success": {
+        "title": "Matagumpay na naka-log out",
+        "description": "Matagumpay kang naka-log out."
+      }
+    },
+    "loginname": {
+      "title": "Maligayang pagbabalik!",
+      "description": "Ilagay ang iyong mga detalye sa pag-log in.",
+      "register": "Magrehistro ng bagong user",
+      "submit": "Magpatuloy",
+      "labels": {
+        "loginname": "Login name",
+        "username": "Username",
+        "usernameOrPhoneNumber": "Username o numero ng telepono",
+        "usernameOrEmail": "Username o email"
+      },
+      "required": {
+        "loginName": "Kinakailangan ang field na ito"
+      },
+      "errors": {
+        "internalError": "Nagkaroon ng internal error",
+        "couldNotGetLoginSettings": "Hindi makuha ang mga setting sa pag-log in",
+        "couldNotSearchUsers": "Hindi makapaghanap ng mga user",
+        "couldNotGetDomain": "Hindi makuha ang domain",
+        "couldNotGetHost": "Hindi makuha ang host",
+        "couldNotStartIDPFlow": "Hindi masimulan ang IDP flow",
+        "moreThanOneUserFound": "Higit sa isang user ang nahanap. Magbigay ng natatanging identifier.",
+        "userNotFound": "Hindi nahanap ang user sa system",
+        "couldNotCreateSession": "Hindi makagawa ng session para sa user",
+        "initialUserNotSupported": "Hindi suportado ang Initial User",
+        "localAuthenticationNotAllowed": "Hindi pinapayagan ang local authentication! Makipag-ugnayan sa iyong administrator para sa karagdagang impormasyon.",
+        "passkeysNotAllowed": "Hindi pinapayagan ang mga passkey! Makipag-ugnayan sa iyong administrator para sa karagdagang impormasyon.",
+        "couldNotFindIdentityProvider": "Hindi mahanap ang identity provider.",
+        "userNotActive": "Hindi aktibo ang user. Makipag-ugnayan sa iyong administrator para sa karagdagang impormasyon."
+      }
+    },
+    "zitadel": {
+      "errors": {
+        "errorOccured": "Nagkaroon ng error",
+        "multipleUsersFound": "Maraming user ang nahanap",
+        "userNotFound": "Hindi nahanap ang user sa system"
+      }
+    },
+    "password": {
+      "verify": {
+        "title": "Password",
+        "description": "Ilagay ang iyong password.",
+        "resetPassword": "I-reset ang password",
+        "submit": "Magpatuloy",
+        "labels": {
+          "password": "Password"
+        },
+        "required": {
+          "password": "Kinakailangan ang field na ito"
+        },
+        "errors": {
+          "couldNotVerifyPassword": "Hindi ma-verify ang password",
+          "couldNotResetPassword": "Hindi ma-reset ang password"
+        },
+        "info": {
+          "passwordResetSent": "Na-reset ang password. Pakitingnan ang iyong email"
+        }
+      },
+      "set": {
+        "title": "Magtakda ng password",
+        "description": "Itakda ang password para sa iyong account",
+        "codeSent": "Isang bagong code ang naipadala sa iyong email address.",
+        "noCodeReceived": "Hindi nakatanggap ng code?",
+        "resend": "Ipadala muli ang code",
+        "submit": "Magpatuloy",
+        "labels": {
+          "code": "Code",
+          "newPassword": "Bagong password",
+          "confirmPassword": "Kumpirmahin ang password"
+        },
+        "required": {
+          "code": "Kinakailangan ang field na ito",
+          "newPassword": "Kailangan mong maglagay ng password!",
+          "confirmPassword": "Kinakailangan ang field na ito"
+        },
+        "errors": {
+          "couldNotSetPassword": "Hindi maitakda ang password",
+          "couldNotResetPassword": "Hindi ma-reset ang password",
+          "couldNotVerifyPassword": "Hindi ma-verify ang password"
+        }
+      },
+      "change": {
+        "title": "Palitan ang password",
+        "description": "Itakda ang password para sa iyong account",
+        "submit": "Magpatuloy",
+        "labels": {
+          "currentPassword": "Kasalukuyang password",
+          "newPassword": "Bagong password",
+          "confirmPassword": "Kumpirmahin ang password"
+        },
+        "required": {
+          "currentPassword": "Kailangan mong ilagay ang iyong kasalukuyang password!",
+          "newPassword": "Kailangan mong maglagay ng bagong password!",
+          "confirmPassword": "Kinakailangan ang field na ito"
+        },
+        "errors": {
+          "currentPasswordInvalid": "Mali ang kasalukuyang password.",
+          "couldNotChangePassword": "Hindi mapalitan ang password",
+          "couldNotVerifyPassword": "Hindi ma-verify ang password",
+          "unknownError": "Hindi kilalang error"
+        }
+      },
+      "complexity": {
+        "length": "Dapat ay hindi bababa sa {minLength} character ang haba.",
+        "hasSymbol": "Dapat may kasamang simbolo.",
+        "hasNumber": "Dapat may kasamang numero.",
+        "hasUppercase": "Dapat may kasamang malaking titik.",
+        "hasLowercase": "Dapat may kasamang maliit na titik.",
+        "equals": "Tugma ang kumpirmasyon ng password.",
+        "matches": "Tugma",
+        "doesNotMatch": "Hindi tugma"
+      },
+      "errors": {
+        "noHostFound": "Walang nahanap na host",
+        "couldNotSendResetLink": "Hindi maipadala ang link para sa pag-reset ng password",
+        "couldNotCreateSessionForUser": "Hindi makagawa ng session para sa user",
+        "couldNotVerifyPassword": "Hindi ma-verify ang password",
+        "failedToAuthenticate": "Nabigo ang authentication. Nakagamit ka ng {failedAttempts} sa {maxPasswordAttempts} na pagsubok sa password.{lockoutMessage}",
+        "failedToAuthenticateNoLimit": "Nabigo ang authentication.",
+        "accountLockedContactAdmin": " Makipag-ugnayan sa iyong administrator para ma-unlock ang iyong account",
+        "userNotFound": "Hindi nahanap ang user sa system",
+        "initialUserNotSupported": "Hindi suportado ang Initial User",
+        "userInitialStateNotSupported": "Hindi suportado ang Initial State ng user",
+        "codeOrVerificationRequired": "Kailangan mong magbigay ng code o magkaroon ng valid na User Verification Check",
+        "verificationRequired": "Kailangang gawin ang User Verification Check",
+        "couldNotLoadSession": "Hindi ma-load ang session",
+        "couldNotLoadAuthMethods": "Hindi ma-load ang mga paraan ng authentication",
+        "failedPrecondition": "Nabigo ang precondition",
+        "sessionNotValid": "Hindi valid ang session",
+        "passwordVerificationMissing": "Kulang ang pag-verify ng password.",
+        "passwordVerificationTooOld": "Masyadong luma na ang pag-verify ng password. Paki-verify muli ang iyong password.",
+        "passwordResetNotAllowed": "Hindi pinapayagan ang pag-reset ng password. Makipag-ugnayan sa iyong administrator para sa karagdagang impormasyon."
+      }
+    },
+    "idp": {
+      "title": "Mag-log in gamit ang SSO",
+      "description": "Pumili ng isa sa mga sumusunod na provider para mag-log in",
+      "orSignInWith": "o mag-log in gamit ang",
+      "signInWithApple": "Mag-log in gamit ang Apple",
+      "signInWithGoogle": "Mag-log in gamit ang Google",
+      "signInWithAzureAD": "Mag-log in gamit ang AzureAD",
+      "signInWithGithub": "Mag-log in gamit ang GitHub",
+      "signInWithGitlab": "Mag-log in gamit ang GitLab",
+      "signInWithZitadel": "Mag-log in gamit ang Zitadel",
+      "loginError": {
+        "title": "Nabigo ang pag-log in",
+        "description": "Nagkaroon ng error habang sinusubukang mag-log in."
+      },
+      "linkingError": {
+        "title": "Nabigo ang pag-link ng account",
+        "description": "Nagkaroon ng error habang sinusubukang i-link ang iyong account."
+      },
+      "completeRegister": {
+        "title": "Kumpletuhin ang iyong datos",
+        "description": "Kailangan mong kumpletuhin ang iyong pagrehistro sa pamamagitan ng paglalagay ng iyong email address at pangalan."
+      },
+      "accountNotFound": {
+        "title": "Hindi nahanap ang account",
+        "description": "Hindi namin mahanap ang account na nauugnay sa mga credential ng iyong identity provider.",
+        "info": "Walang nahanap na umiiral na account. Mag-log in gamit ang umiiral na account o makipag-ugnayan sa iyong administrator para sa tulong.",
+        "backToLogin": "Bumalik sa pag-log in"
+      },
+      "registrationFailed": {
+        "title": "Hindi available ang pagrehistro",
+        "description": "Hindi namin makumpleto ang proseso ng pagrehistro.",
+        "info": "Hindi matukoy ang organisasyon para sa pagrehistro. Makipag-ugnayan sa iyong administrator para sa tulong.",
+        "backToLogin": "Bumalik sa pag-log in"
+      },
+      "processing": {
+        "message": "Pinoproseso ang authentication...",
+        "noRedirect": "Walang redirect o error na ibinalik mula sa server",
+        "unexpectedError": "Nagkaroon ng hindi inaasahang error"
+      },
+      "errors": {
+        "missingParameters": "Kulang ang mga kinakailangang parameter",
+        "missingIdpInfo": "Kulang ang impormasyon ng IDP",
+        "idpNotFound": "Hindi nahanap ang identity provider",
+        "linkingNotAllowed": "Hindi pinapayagan ang pag-link para sa identity provider na ito",
+        "linkingFailed": "Nabigong i-link ang identity provider sa account",
+        "autoLinkingFailed": "Nabigong awtomatikong i-link ang account",
+        "userCreationFailed": "Nabigong gumawa ng user account",
+        "orgResolutionFailed": "Hindi matukoy ang organisasyon para sa pagrehistro",
+        "sessionCreationFailed": "Hindi makagawa ng session o matukoy ang redirect",
+        "unknownError": "Nagkaroon ng hindi kilalang error"
+      }
+    },
+    "ldap": {
+      "title": "LDAP Login",
+      "description": "Ilagay ang iyong mga LDAP credential.",
+      "submit": "Magpatuloy",
+      "labels": {
+        "username": "Username",
+        "password": "Password"
+      },
+      "required": {
+        "username": "Kinakailangan ang field na ito",
+        "password": "Kinakailangan ang field na ito"
+      }
+    },
+    "mfa": {
+      "verify": {
+        "title": "I-verify ang iyong pagkakakilanlan",
+        "description": "Pumili ng isa sa mga sumusunod na factor.",
+        "noResults": "Walang available na second factor na mase-set up."
+      },
+      "set": {
+        "title": "I-set up ang 2-Factor",
+        "description": "Pumili ng isa sa mga sumusunod na second factor.",
+        "skip": "Laktawan"
+      }
+    },
+    "otp": {
+      "verify": {
+        "title": "I-verify ang 2-Factor",
+        "totpDescription": "Ilagay ang code mula sa iyong authenticator app.",
+        "smsDescription": "Ilagay ang code na natanggap mo sa SMS.",
+        "emailDescription": "Ilagay ang code na natanggap mo sa email.",
+        "noCodeReceived": "Hindi nakatanggap ng code?",
+        "resendCode": "Ipadala muli ang code",
+        "submit": "Magpatuloy",
+        "labels": {
+          "code": "Code"
+        },
+        "required": {
+          "code": "Kinakailangan ang field na ito"
+        }
+      },
+      "set": {
+        "title": "I-set up ang 2-Factor",
+        "totpDescription": "I-scan ang QR code gamit ang iyong authenticator app.",
+        "smsDescription": "Ilagay ang iyong numero ng telepono para makatanggap ng code sa SMS.",
+        "emailDescription": "Ilagay ang iyong email address para makatanggap ng code sa email.",
+        "totpRegisterDescription": "I-scan ang QR Code o manu-manong pumunta sa URL.",
+        "submit": "Magpatuloy",
+        "labels": {
+          "code": "Code"
+        },
+        "required": {
+          "code": "Kinakailangan ang field na ito"
+        }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "Hindi makahiling ng OTP challenge",
+        "couldNotVerifyCode": "Hindi ma-verify ang OTP code"
+      }
+    },
+    "passkey": {
+      "verify": {
+        "title": "Mag-authenticate gamit ang passkey",
+        "description": "Hihingin ng iyong device ang iyong fingerprint, mukha, o screen lock",
+        "usePassword": "Gumamit ng password",
+        "submit": "Magpatuloy",
+        "errors": {
+          "couldNotRequestChallenge": "Hindi makahiling ng passkey challenge",
+          "couldNotVerifyPasskey": "Hindi ma-verify ang passkey",
+          "noResponseReceived": "Nabigo ang pag-verify ng passkey - walang natanggap na tugon",
+          "noRedirectProvided": "Nakumpleto ang pag-verify ng passkey pero walang ibinigay na redirect",
+          "couldNotRetrievePasskey": "Nagkaroon ng error habang kinukuha ang passkey",
+          "verificationCancelled": "Kinansela ang pag-verify ng passkey",
+          "verificationFailed": "Nagkaroon ng error habang vine-verify ang passkey",
+          "couldNotFindSession": "Hindi mahanap ang session",
+          "couldNotUpdateSession": "Hindi ma-update ang session",
+          "userNotFound": "Hindi nahanap ang user sa system",
+          "couldNotDetermineRedirect": "Hindi matukoy ang redirect URL pagkatapos ng pag-verify ng passkey"
+        }
+      },
+      "set": {
+        "title": "Mag-set up ng passkey",
+        "description": "Hihingin ng iyong device ang iyong fingerprint, mukha, o screen lock",
+        "info": {
+          "description": "Ang passkey ay isang paraan ng authentication sa isang device tulad ng iyong fingerprint, Apple FaceID o katulad nito. ",
+          "link": "Passkey Authentication"
+        },
+        "skip": "Laktawan",
+        "submit": "Magpatuloy"
+      }
+    },
+    "u2f": {
+      "verify": {
+        "title": "I-verify ang 2-Factor",
+        "description": "I-verify ang iyong account gamit ang iyong device."
+      },
+      "set": {
+        "title": "I-set up ang 2-Factor",
+        "description": "Mag-set up ng device bilang second factor.",
+        "submit": "Magpatuloy"
+      }
+    },
+    "register": {
+      "methods": {
+        "passkey": "Passkey",
+        "password": "Password"
+      },
+      "disabled": {
+        "title": "Naka-disable ang pagrehistro",
+        "description": "Naka-disable ang pagrehistro. Makipag-ugnayan sa iyong administrator."
+      },
+      "missingdata": {
+        "title": "Kulang na datos",
+        "description": "Ilagay ang email, pangalan at apelyido para magrehistro."
+      },
+      "title": "Magrehistro",
+      "description": "Gumawa ng iyong Zitadel account.",
+      "noMethodAvailableWarning": "Walang available na paraan ng authentication. Makipag-ugnayan sa iyong administrator.",
+      "selectMethod": "Piliin ang paraan na gusto mong gamitin para mag-authenticate",
+      "agreeTo": "Para makapagrehistro, kailangan mong sumang-ayon sa mga tuntunin at kundisyon",
+      "termsOfService": "Mga Tuntunin ng Serbisyo",
+      "privacyPolicy": "Patakaran sa Privacy",
+      "submit": "Magpatuloy",
+      "password": {
+        "title": "Magtakda ng password",
+        "description": "Itakda ang password para sa iyong account",
+        "submit": "Magpatuloy",
+        "labels": {
+          "password": "Password",
+          "confirmPassword": "Kumpirmahin ang password"
+        },
+        "required": {
+          "password": "Kailangan mong maglagay ng password!",
+          "confirmPassword": "Kinakailangan ang field na ito"
+        }
+      },
+      "labels": {
+        "firstname": "Pangalan",
+        "lastname": "Apelyido",
+        "email": "E-mail"
+      },
+      "required": {
+        "firstname": "Kinakailangan ang field na ito",
+        "lastname": "Kinakailangan ang field na ito",
+        "email": "Kinakailangan ang field na ito"
+      },
+      "errors": {
+        "couldNotCreateUser": "Hindi makagawa ng user",
+        "couldNotCreateSession": "Hindi makagawa ng session",
+        "userNotFound": "Hindi nahanap ang user sa system",
+        "couldNotLinkIDP": "Hindi ma-link ang IDP sa user",
+        "couldNotRegisterUser": "Hindi mairehistro ang user"
+      }
+    },
+    "invite": {
+      "title": "Mag-imbita ng user",
+      "description": "Ilagay ang email address at pangalan ng user na gusto mong imbitahin.",
+      "info": "Makakatanggap ang user ng email na may karagdagang mga tagubilin.",
+      "notAllowed": "Hindi ka pinapayagan ng iyong mga setting na mag-imbita ng mga user.",
+      "submit": "Magpatuloy",
+      "success": {
+        "title": "Naimbitahan ang user",
+        "description": "Matagumpay na naipadala ang email.",
+        "verified": "Naimbitahan na ang user at na-verify na niya ang kanyang email.",
+        "notVerifiedYet": "Naimbitahan na ang user. Makakatanggap siya ng email na may karagdagang mga tagubilin.",
+        "submit": "Mag-imbita ng isa pang user"
+      }
+    },
+    "signedin": {
+      "title": "Maligayang pagdating, {user}!",
+      "description": "Naka-log in ka na.",
+      "continue": "Magpatuloy",
+      "error": {
+        "title": "Error",
+        "description": "Nagkaroon ng error habang sinusubukang mag-log in."
+      }
+    },
+    "verify": {
+      "userIdMissing": "Walang ibinigay na userId!",
+      "successTitle": "Na-verify ang user",
+      "successDescription": "Matagumpay na na-verify ang user.",
+      "successContinue": "Magpatuloy",
+      "setupAuthenticator": "Mag-set up ng authenticator",
+      "verify": {
+        "title": "I-verify ang user",
+        "description": "Ilagay ang code na ibinigay sa verification email.",
+        "noCodeReceived": "Hindi nakatanggap ng code?",
+        "resendCode": "Ipadala muli ang code",
+        "codeSent": "Isang bagong code ang kapapadala lang sa iyong email address.",
+        "submit": "Magpatuloy",
+        "labels": {
+          "code": "Code"
+        },
+        "required": {
+          "code": "Kinakailangan ang field na ito"
+        }
+      },
+      "errors": {
+        "couldNotResendEmail": "Hindi maipadala muli ang email",
+        "couldNotVerifyUser": "Hindi ma-verify ang user",
+        "couldNotVerifyInvite": "Hindi ma-verify ang imbitasyon",
+        "couldNotVerifyEmail": "Hindi ma-verify ang email",
+        "couldNotVerify": "Hindi ma-verify",
+        "couldNotLoadUser": "Hindi ma-load ang user",
+        "couldNotLoadAuthenticators": "Hindi ma-load ang mga posibleng authenticator",
+        "couldNotCreateSession": "Hindi makagawa ng session",
+        "noHostFound": "Walang nahanap na host",
+        "userAlreadyVerified": "Na-verify na ang user!",
+        "couldNotResendInvite": "Hindi maipadala muli ang imbitasyon",
+        "inviteSendFailed": "Nabigong ipadala ang email ng imbitasyon",
+        "emailSendFailed": "Nabigong ipadala ang verification email",
+        "contextMissing": "Nagkaroon ng error. Pakisubukan muli."
+      }
+    },
+    "authenticator": {
+      "title": "Pumili ng paraan ng authentication",
+      "description": "Piliin ang paraan na gusto mong gamitin para mag-authenticate",
+      "noMethodsAvailable": "Walang available na paraan ng authentication",
+      "allSetup": "Nakapag-set up ka na ng authenticator!",
+      "linkWithIDP": "o mag-link gamit ang Identity Provider",
+      "methods": {
+        "totp": "Authenticator App",
+        "u2f": "Universal Second Factor",
+        "otpEmail": "Code sa Email",
+        "otpSms": "Code sa SMS",
+        "passkey": "Mga passkey",
+        "password": "Password"
+      }
+    },
+    "device": {
+      "usercode": {
+        "title": "Device code",
+        "description": "Ilagay ang code na ipinapakita sa iyong app o device.",
+        "submit": "Magpatuloy",
+        "labels": {
+          "code": "Code"
+        },
+        "required": {
+          "code": "Kinakailangan ang field na ito"
+        }
+      },
+      "request": {
+        "title": "Gustong kumonekta ng {appName}",
+        "description": "Magkakaroon ng access ang {appName} sa:",
+        "disclaimer": "Sa pag-click sa Payagan, pinapayagan mo ang {appName} at Zitadel na gamitin ang iyong impormasyon alinsunod sa kani-kanilang mga tuntunin ng serbisyo at patakaran sa privacy. Maaari mong bawiin ang access na ito anumang oras.",
+        "usercode": "Code na ipinapakita sa iyong device:",
+        "submit": "Payagan",
+        "deny": "Tanggihan"
+      },
+      "scope": {
+        "openid": "I-verify ang iyong pagkakakilanlan.",
+        "email": "Tingnan ang iyong email address.",
+        "profile": "Tingnan ang buong impormasyon ng iyong profile.",
+        "offline_access": "Payagan ang offline access sa iyong account."
+      }
+    },
+    "error": {
+      "noUserCode": "Walang ibinigay na user code!",
+      "noDeviceRequest": "Walang nahanap na device request.",
+      "unknownContext": "Hindi makuha ang context ng user. Siguraduhing ilagay muna ang username o magbigay ng loginName bilang searchParam.",
+      "sessionExpired": "Nag-expire na ang iyong session o kailangan nitong mag-authenticate muli. Mag-log in muli.",
+      "failedLoading": "Nabigong i-load ang datos. Pakisubukan muli.",
+      "tryagain": "Subukan muli",
+      "couldNotContinueSession": "Hindi maipagpatuloy ang session - kulang ang impormasyon ng user",
+      "couldNotClearSession": "Hindi matapos ang session. Pakisubukan muli."
+    }
   }
 }
