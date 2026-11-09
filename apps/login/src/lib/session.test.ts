@@ -1642,22 +1642,29 @@ describe("loadMostRecentSession", () => {
     });
   });
 
-  test("returns undefined instead of throwing when getSession rejects with NotFound (stale cookie)", async () => {
-    // The `sessions` cookie can outlive the server-side session, so getSession may reject with
-    // a NotFound ConnectError. loadMostRecentSession must treat that the same as no session.
-    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const notFound = new ConnectError("Session does not exist (QUERY-SFeaa)", Code.NotFound);
-    vi.mocked(cookiesModule.getMostRecentCookieWithLoginname).mockResolvedValue(cookie as any);
-    vi.mocked(zitadelModule.getSession).mockRejectedValue(notFound);
+  test.each([
+    ["NotFound", Code.NotFound, "Session does not exist (QUERY-SFeaa)"],
+    ["PermissionDenied", Code.PermissionDenied, "Permission denied (QUERY-dsfr3)"],
+  ])(
+    "returns undefined instead of throwing when getSession rejects with %s (stale cookie)",
+    async (_name, code, message) => {
+      // The `sessions` cookie can outlive the server-side session (NotFound), or hold a token that
+      // no longer matches a session that still exists (PermissionDenied). loadMostRecentSession
+      // must treat both the same as no session.
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const error = new ConnectError(message, code);
+      vi.mocked(cookiesModule.getMostRecentCookieWithLoginname).mockResolvedValue(cookie as any);
+      vi.mocked(zitadelModule.getSession).mockRejectedValue(error);
 
-    const result = await loadMostRecentSession({ serviceConfig, sessionParams });
+      const result = await loadMostRecentSession({ serviceConfig, sessionParams });
 
-    expect(result).toBeUndefined();
-    expect(consoleSpy).toHaveBeenCalledWith("[Session] Could not load session", notFound);
-    consoleSpy.mockRestore();
-  });
+      expect(result).toBeUndefined();
+      expect(consoleSpy).toHaveBeenCalledWith("[Session] Could not load session", error);
+      consoleSpy.mockRestore();
+    },
+  );
 
-  test("re-throws non-NotFound ConnectErrors (real failures must propagate)", async () => {
+  test("re-throws other ConnectErrors (real failures must propagate)", async () => {
     const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
     const unavailable = new ConnectError("backend unavailable", Code.Unavailable);
     vi.mocked(cookiesModule.getMostRecentCookieWithLoginname).mockResolvedValue(cookie as any);
@@ -1668,8 +1675,8 @@ describe("loadMostRecentSession", () => {
     consoleSpy.mockRestore();
   });
 
-  test("re-throws non-ConnectError rejections (only coded NotFound is treated as no session)", async () => {
-    // The guard is `instanceof ConnectError && code === NotFound`; anything that is not a
+  test("re-throws non-ConnectError rejections (only coded NotFound or PermissionDenied is treated as no session)", async () => {
+    // The guard is `instanceof ConnectError && (code === NotFound || code === PermissionDenied)`; anything that is not a
     // ConnectError (e.g. an unexpected runtime error) must not be mistaken for a stale
     // cookie and must propagate.
     const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
@@ -1692,18 +1699,26 @@ describe("loadSessionById", () => {
     vi.mocked(cookiesModule.getSessionCookieById).mockResolvedValue(cookie as any);
   });
 
-  test("returns undefined when getSession rejects with NotFound (stale cookie)", async () => {
+  test.each([
+    ["NotFound", Code.NotFound, "Session does not exist"],
+    ["PermissionDenied", Code.PermissionDenied, "Permission denied (QUERY-dsfr3)"],
+  ])("returns undefined when getSession rejects with %s (stale cookie)", async (_name, code, message) => {
     const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-    vi.mocked(zitadelModule.getSession).mockRejectedValue(new ConnectError("Session does not exist", Code.NotFound));
+    const error = new ConnectError(message, code);
+    vi.mocked(zitadelModule.getSession).mockRejectedValue(error);
 
     await expect(loadSessionById(serviceConfig, "session-id", "test-org-id")).resolves.toBeUndefined();
+    expect(consoleSpy).toHaveBeenCalledWith("[Session] Could not load session", error);
     consoleSpy.mockRestore();
   });
 
   test("re-throws other errors", async () => {
+    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
     const unavailable = new ConnectError("backend unavailable", Code.Unavailable);
     vi.mocked(zitadelModule.getSession).mockRejectedValue(unavailable);
 
     await expect(loadSessionById(serviceConfig, "session-id")).rejects.toBe(unavailable);
+    expect(consoleSpy).not.toHaveBeenCalled();
+    consoleSpy.mockRestore();
   });
 });
