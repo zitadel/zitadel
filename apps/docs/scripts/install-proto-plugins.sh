@@ -75,7 +75,7 @@ esac
 sha256_var="CONNECT_OPENAPI_SHA256_${GOOS}_${GOARCH}"
 echo "Downloading protoc-gen-connect-openapi v${CONNECT_OPENAPI_VERSION} (${GOOS}/${OAI_ARCH})..."
 curl -fsSL \
-  "https://github.com/sudorandom/protoc-gen-connect-openapi/releases/download/v${CONNECT_OPENAPI_VERSION}/protoc-gen-connect-openapi_${CONNECT_OPENAPI_VERSION}_${GOOS}_${OAI_ARCH}.tar.gz" \
+  "https://github.com/connectrpc/protoc-gen-connect-openapi/releases/download/v${CONNECT_OPENAPI_VERSION}/protoc-gen-connect-openapi_${CONNECT_OPENAPI_VERSION}_${GOOS}_${OAI_ARCH}.tar.gz" \
   -o "${TMP}/oai.tar.gz"
 verify_sha256 "${TMP}/oai.tar.gz" "${!sha256_var}"
 tar -xzf "${TMP}/oai.tar.gz" -C "${TMP}" protoc-gen-connect-openapi
