@@ -128,7 +128,7 @@ export class PasswordComponent implements OnInit {
           return this.fb.group({
             currentPassword: ['', requiredValidator],
             newPassword: ['', validators],
-            confirmPassword: ['', [requiredValidator, passwordConfirmValidator()]],
+            confirmPassword: ['', [requiredValidator, passwordConfirmValidator('newPassword')]],
           });
         }
       }),
