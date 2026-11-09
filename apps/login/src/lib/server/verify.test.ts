@@ -47,6 +47,14 @@ vi.mock("./cookie", () => ({
   createSessionAndUpdateCookie: vi.fn(),
 }));
 
+vi.mock("../mfa-helper", () => ({
+  checkMFAFactors: vi.fn(),
+}));
+
+vi.mock("../client", () => ({
+  completeFlowOrGetUrl: vi.fn(),
+}));
+
 vi.mock("../service-url", () => ({
   getServiceConfig: vi.fn(() => ({ serviceConfig: {} })),
 }));
@@ -227,6 +235,90 @@ describe("sendVerification", () => {
     expect(mockGetSessionCookieByLoginName).toHaveBeenCalledWith({
       loginName: "test@example.com",
       organization: undefined,
+    });
+  });
+
+  describe("when the code was already used", () => {
+    const verifiedUser = {
+      user: {
+        userId: "user-1",
+        preferredLoginName: "test@example.com",
+        type: { case: "human", value: { email: { email: "test@example.com", isVerified: true } } },
+      },
+    };
+    const userSession = {
+      id: "session-1",
+      factors: { user: { id: "user-1", loginName: "test@example.com", organizationId: "org-1" } },
+    };
+
+    beforeEach(() => {
+      vi.clearAllMocks();
+      mockVerifyEmail.mockRejectedValue(new Error("code is invalid"));
+      mockGetUserByID.mockResolvedValue(verifiedUser);
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [1], // AuthenticationMethodType.PASSWORD
+      });
+    });
+
+    test("should return the error if the email is still unverified", async () => {
+      mockGetUserByID.mockResolvedValue({
+        user: { ...verifiedUser.user, type: { case: "human", value: { email: { isVerified: false } } } },
+      });
+
+      const result = await sendVerification({ userId: "user-1", code: "123456", isInvite: false });
+
+      expect(result).toEqual({ error: "errors.couldNotVerifyEmail" });
+    });
+
+    test("should continue the flow if the email is verified and the browser holds a session of the user", async () => {
+      mockGetSessionCookieByLoginName.mockResolvedValue({ id: "session-1", token: "token-1" });
+      mockGetSession.mockResolvedValue({ session: userSession });
+      const { checkMFAFactors } = await import("../mfa-helper");
+      vi.mocked(checkMFAFactors).mockResolvedValue(undefined);
+      const { completeFlowOrGetUrl } = await import("../client");
+      vi.mocked(completeFlowOrGetUrl).mockResolvedValue({ redirect: "https://app.example.com/callback" });
+
+      const result = await sendVerification({
+        userId: "user-1",
+        code: "123456",
+        isInvite: false,
+        requestId: "oidc_auth-req-123",
+      });
+
+      expect(result).toEqual({ redirect: "https://app.example.com/callback" });
+      expect(completeFlowOrGetUrl).toHaveBeenCalledWith(
+        expect.objectContaining({ sessionId: "session-1", requestId: "oidc_auth-req-123" }),
+        undefined,
+      );
+    });
+
+    test("should return the error if the browser holds no session of the user", async () => {
+      mockGetSessionCookieByLoginName.mockResolvedValue(undefined);
+
+      const result = await sendVerification({ userId: "user-1", code: "123456", isInvite: false });
+
+      expect(result).toEqual({ error: "errors.couldNotVerifyEmail" });
+    });
+
+    test("should return the error if the session belongs to another user", async () => {
+      mockGetSessionCookieByLoginName.mockResolvedValue({ id: "session-2", token: "token-2" });
+      mockGetSession.mockResolvedValue({
+        session: { id: "session-2", factors: { user: { id: "user-2", loginName: "other@example.com" } } },
+      });
+
+      const result = await sendVerification({ userId: "user-1", code: "123456", isInvite: false });
+
+      expect(result).toEqual({ error: "errors.couldNotVerifyEmail" });
+    });
+
+    test("should not offer to set up an authenticator without a valid code", async () => {
+      mockGetSessionCookieByLoginName.mockResolvedValue(undefined);
+      mockListAuthenticationMethodTypes.mockResolvedValue({ authMethodTypes: [] });
+
+      const result = await sendVerification({ userId: "user-1", code: "123456", isInvite: false });
+
+      expect(result).toEqual({ error: "errors.couldNotVerifyEmail" });
+      expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
     });
   });
 });

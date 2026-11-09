@@ -85,8 +85,16 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
         return { error: t("errors.couldNotVerifyEmail") };
       });
 
+  // The code may already have been used, e.g. through the button in the email opened in another browser,
+  // or by submitting the form a second time. If the email is verified by now, a browser that already holds
+  // a session of this user can continue the flow. In every other case the error is returned.
+  let codeAlreadyUsedError: { error: string } | undefined;
+
   if ("error" in verifyResponse) {
-    return verifyResponse;
+    if (command.isInvite) {
+      return verifyResponse;
+    }
+    codeAlreadyUsedError = verifyResponse;
   }
 
   if (!verifyResponse) {
@@ -97,10 +105,17 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   const userResponse = await getUserByID({ serviceConfig, userId: command.userId });
 
   if (!userResponse || !userResponse.user) {
-    return { error: t("errors.couldNotLoadUser") };
+    return codeAlreadyUsedError ?? { error: t("errors.couldNotLoadUser") };
   }
 
   const user = userResponse.user;
+
+  if (codeAlreadyUsedError) {
+    const humanUser = user.type.case === "human" ? user.type.value : undefined;
+    if (!humanUser?.email?.isVerified) {
+      return codeAlreadyUsedError;
+    }
+  }
 
   const sessionCookie = await getSessionCookieByLoginName({
     loginName: command.loginName ?? user.preferredLoginName,
@@ -138,6 +153,11 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
   // if no primary auth methods are found on the user, redirect to set one up
   if (!hasPrimaryMethod) {
+    // setting up an authenticator requires a valid code
+    if (codeAlreadyUsedError) {
+      return codeAlreadyUsedError;
+    }
+
     if (!session) {
       const checks = create(ChecksSchema, {
         user: {
@@ -181,6 +201,10 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   // if no session found only show success page,
   // if user is invited, recreate invite flow to not depend on session
   if (!session?.factors?.user?.id) {
+    if (codeAlreadyUsedError) {
+      return codeAlreadyUsedError;
+    }
+
     const verifySuccessParams = new URLSearchParams({});
 
     if (command.userId) {
@@ -201,6 +225,10 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     }
 
     return { redirect: `/verify/success?${verifySuccessParams}` };
+  }
+
+  if (codeAlreadyUsedError && session.factors.user.id !== user.userId) {
+    return codeAlreadyUsedError;
   }
 
   const loginSettings = await getLoginSettings({ serviceConfig, organization: user.details?.resourceOwner });
