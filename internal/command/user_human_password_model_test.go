@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
@@ -17,7 +16,7 @@ import (
 )
 
 func TestHumanPasswordWriteModel_Query(t *testing.T) {
-	t.Run("without reset position, all password checks", func(t *testing.T) {
+	t.Run("without reset sequence, all password checks", func(t *testing.T) {
 		wm := NewHumanPasswordWriteModel("user1", "org1")
 		query := wm.Query()
 
@@ -26,12 +25,12 @@ func TestHumanPasswordWriteModel_Query(t *testing.T) {
 		assert.Equal(t, []string{"user1"}, sub.GetAggregateIDs())
 		assert.Subset(t, sub.GetEventTypes(), humanPasswordStateEventTypes)
 		assert.Subset(t, sub.GetEventTypes(), humanPasswordCheckEventTypes)
-		assert.True(t, sub.GetPositionAfter().IsZero())
+		assert.Zero(t, sub.GetSequenceGreater())
 		assert.Equal(t, "org1", query.GetResourceOwner())
 	})
-	t.Run("with reset position, only password checks after it", func(t *testing.T) {
+	t.Run("with reset sequence, only password checks after it", func(t *testing.T) {
 		wm := NewHumanPasswordWriteModel("user1", "org1")
-		wm.checksAfter = decimal.NewFromInt(42)
+		wm.checksAfterSequence = 42
 		query := wm.Query()
 
 		require.Len(t, query.GetQueries(), 2)
@@ -39,11 +38,12 @@ func TestHumanPasswordWriteModel_Query(t *testing.T) {
 
 		assert.Equal(t, []string{"user1"}, state.GetAggregateIDs())
 		assert.ElementsMatch(t, humanPasswordStateEventTypes, state.GetEventTypes())
-		assert.True(t, state.GetPositionAfter().IsZero())
+		assert.Zero(t, state.GetSequenceGreater())
 
 		assert.Equal(t, []string{"user1"}, checks.GetAggregateIDs())
 		assert.ElementsMatch(t, humanPasswordCheckEventTypes, checks.GetEventTypes())
-		assert.True(t, checks.GetPositionAfter().Equal(decimal.NewFromInt(42)))
+		assert.Equal(t, uint64(42), checks.GetSequenceGreater())
+		assert.True(t, checks.GetPositionAfter().IsZero(), "positions can disagree with the sequence order of historical events")
 
 		assert.Equal(t, "org1", query.GetResourceOwner())
 	})
@@ -60,10 +60,10 @@ func TestPasswordCheckResetWriteModel(t *testing.T) {
 	assert.ElementsMatch(t, humanPasswordCheckResetEventTypes, query.GetQueries()[0].GetEventTypes())
 
 	event := eventFromEventPusher(user.NewHumanPasswordCheckSucceededEvent(context.Background(), &user.NewAggregate("user1", "org1").Aggregate, nil))
-	event.Pos = decimal.NewFromInt(42)
+	event.Seq = 42
 	wm.AppendEvents(event)
 	require.NoError(t, wm.Reduce())
-	assert.True(t, wm.position.Equal(decimal.NewFromInt(42)))
+	assert.Equal(t, uint64(42), wm.sequence)
 }
 
 // expectFilterQuery expects a filter call, lets assertQuery check the query and returns the events.
@@ -88,10 +88,10 @@ func Test_checkPassword_onlyLoadsChecksSinceLastReset(t *testing.T) {
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 
 	resetEvent := eventFromEventPusher(user.NewHumanPasswordCheckSucceededEvent(ctx, userAgg, nil))
-	resetEvent.Pos = decimal.NewFromInt(42)
+	resetEvent.Seq = 42
 
 	failedEvent := eventFromEventPusher(user.NewHumanPasswordCheckFailedEvent(ctx, userAgg, nil))
-	failedEvent.Pos = decimal.NewFromInt(43)
+	failedEvent.Seq = 43
 
 	es := expectEventstore(
 		// last reset of the failed password check count
@@ -106,7 +106,7 @@ func Test_checkPassword_onlyLoadsChecksSinceLastReset(t *testing.T) {
 		expectFilterQuery(
 			func(query *eventstore.SearchQueryBuilder) {
 				require.Len(t, query.GetQueries(), 2)
-				assert.True(t, query.GetQueries()[1].GetPositionAfter().Equal(decimal.NewFromInt(42)))
+				assert.Equal(t, uint64(42), query.GetQueries()[1].GetSequenceGreater())
 			},
 			eventFromEventPusher(user.NewHumanAddedEvent(ctx, userAgg,
 				"username", "firstname", "lastname", "nickname", "displayname",

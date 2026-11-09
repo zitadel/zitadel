@@ -399,7 +399,7 @@ func checkPassword(ctx context.Context, userID, password string, es *eventstore.
 		return nil, err
 	}
 	wm := NewHumanPasswordWriteModel(userID, "")
-	wm.checksAfter = resetWM.position
+	wm.checksAfterSequence = resetWM.sequence
 	err := es.FilterToQueryReducer(ctx, wm)
 	if err != nil {
 		return nil, err

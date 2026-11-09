@@ -4,8 +4,6 @@ import (
 	"slices"
 	"time"
 
-	"github.com/shopspring/decimal"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -27,18 +25,19 @@ type HumanPasswordWriteModel struct {
 
 	UserState domain.UserState
 
-	// checksAfter limits the password check events to the ones after this position.
-	// It must be the position of the last event resetting the PasswordCheckFailedCount,
+	// checksAfterSequence limits the password check events to the ones after this (aggregate) sequence.
+	// It must be the sequence of the last event resetting the PasswordCheckFailedCount,
 	// see [passwordCheckResetWriteModel].
-	checksAfter decimal.Decimal
+	// The sequence is used instead of the position, as historical positions can disagree with the sequence order.
+	checksAfterSequence uint64
 }
 
-// passwordCheckResetWriteModel returns the position of the last event of a user,
+// passwordCheckResetWriteModel returns the sequence of the last event of a user,
 // which resets the [HumanPasswordWriteModel.PasswordCheckFailedCount].
 type passwordCheckResetWriteModel struct {
 	eventstore.WriteModel
 
-	position decimal.Decimal
+	sequence uint64
 }
 
 func newPasswordCheckResetWriteModel(userID string) *passwordCheckResetWriteModel {
@@ -51,8 +50,8 @@ func newPasswordCheckResetWriteModel(userID string) *passwordCheckResetWriteMode
 
 func (wm *passwordCheckResetWriteModel) Reduce() error {
 	for _, event := range wm.Events {
-		if event.Position().GreaterThan(wm.position) {
-			wm.position = event.Position()
+		if event.Sequence() > wm.sequence {
+			wm.sequence = event.Sequence()
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -233,7 +232,7 @@ var humanPasswordCheckResetEventTypes = []eventstore.EventType{
 
 func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
 	var query *eventstore.SearchQueryBuilder
-	if wm.checksAfter.IsZero() {
+	if wm.checksAfterSequence == 0 {
 		query = eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 			AddQuery().
 			AggregateTypes(user.AggregateType).
@@ -253,7 +252,7 @@ func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
 			AggregateTypes(user.AggregateType).
 			AggregateIDs(wm.AggregateID).
 			EventTypes(humanPasswordCheckEventTypes...).
-			PositionAfter(wm.checksAfter).
+			SequenceGreater(wm.checksAfterSequence).
 			Builder()
 	}
 
