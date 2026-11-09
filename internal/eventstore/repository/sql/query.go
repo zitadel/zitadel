@@ -443,10 +443,10 @@ func subQueriesOfSingleAggregate(subQueries [][]*repository.Filter) bool {
 			if filter.Operation != repository.OperationEquals {
 				continue
 			}
-			switch filter.Field {
-			case repository.FieldAggregateType:
+			if filter.Field == repository.FieldAggregateType {
 				typ = filter.Value
-			case repository.FieldAggregateID:
+			}
+			if filter.Field == repository.FieldAggregateID {
 				id = filter.Value
 			}
 		}
