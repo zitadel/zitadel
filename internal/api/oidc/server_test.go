@@ -5,12 +5,84 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
+	opmock "github.com/zitadel/oidc/v3/pkg/op/mock"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 )
+
+func TestServer_VerifyAuthRequestPKCE(t *testing.T) {
+	tests := []struct {
+		name                string
+		clientID            string
+		codeChallenge       string
+		codeChallengeMethod oidc.CodeChallengeMethod
+		wantErr             bool
+	}{
+		{
+			name:     "public client without code challenge",
+			clientID: "native_client",
+			wantErr:  true,
+		},
+		{
+			name:                "public client with plain code challenge",
+			clientID:            "native_client",
+			codeChallenge:       "challenge",
+			codeChallengeMethod: oidc.CodeChallengeMethodPlain,
+			wantErr:             true,
+		},
+		{
+			name:                "public client with S256 code challenge",
+			clientID:            "native_client",
+			codeChallenge:       "challenge",
+			codeChallengeMethod: oidc.CodeChallengeMethodS256,
+		},
+		{
+			name:     "confidential client without code challenge",
+			clientID: "web_client",
+		},
+		{
+			name:                "confidential client with plain code challenge",
+			clientID:            "web_client",
+			codeChallenge:       "challenge",
+			codeChallengeMethod: oidc.CodeChallengeMethodPlain,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			storage := opmock.NewMockStorageExpectValidClientID(t)
+			//nolint:staticcheck
+			provider, err := op.NewForwardedOpenIDProvider("path", &op.Config{CodeMethodS256: true}, storage)
+			require.NoError(t, err)
+			server := &Server{
+				LegacyServer: op.NewLegacyServer(provider, op.Endpoints{}),
+			}
+			request := &op.Request[oidc.AuthRequest]{
+				Data: &oidc.AuthRequest{
+					ClientID:            tt.clientID,
+					ResponseType:        oidc.ResponseTypeCode,
+					CodeChallenge:       tt.codeChallenge,
+					CodeChallengeMethod: tt.codeChallengeMethod,
+				},
+			}
+
+			clientRequest, err := server.VerifyAuthRequest(context.Background(), request)
+			if tt.wantErr {
+				require.Nil(t, clientRequest)
+				var oidcErr *oidc.Error
+				require.ErrorAs(t, err, &oidcErr)
+				assert.Equal(t, oidc.InvalidRequest, oidcErr.ErrorType)
+				return
+			}
+			require.NoError(t, err)
+			require.NotNil(t, clientRequest)
+		})
+	}
+}
 
 func TestServer_createDiscoveryConfig(t *testing.T) {
 	type fields struct {
