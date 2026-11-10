@@ -38,7 +38,7 @@ export class ToastService {
 
   public showError = (error: any | string, isGrpc: boolean = true, i18nKey: boolean = false) => {
     if (isGrpc) {
-      const { message, code, metadata } = error;
+      const { message, code } = error;
       if (code !== 16) {
         this.translate
           .get('ACTIONS.CLOSE')

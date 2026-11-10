@@ -84,7 +84,25 @@ func (wm *HumanRefreshTokenWriteModel) Reduce() error {
 			*user.UserLockedEvent,
 			*user.UserDeactivatedEvent,
 			*user.UserRemovedEvent:
+
+			wm.TokenID = ""
+			wm.RefreshToken = ""
+			wm.AuthTime = time.Time{}
+			wm.IdleExpiration = time.Time{}
+			wm.Expiration = time.Time{}
+			wm.UserAgentID = ""
+			wm.AuthMethodsReferences = nil
+			wm.Actor = nil
 			wm.UserState = domain.UserStateDeleted
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent:
+			wm.TokenID = ""
+			wm.RefreshToken = ""
+			wm.AuthTime = time.Time{}
+			wm.IdleExpiration = time.Time{}
+			wm.Expiration = time.Time{}
+			wm.UserAgentID = ""
+			wm.AuthMethodsReferences = nil
+			wm.Actor = nil
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -96,6 +114,9 @@ func (wm *HumanRefreshTokenWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
 			user.HumanRefreshTokenAddedType,
 			user.HumanRefreshTokenRenewedType,
 			user.HumanRefreshTokenRemovedType,

@@ -10,6 +10,8 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -19,16 +21,16 @@ import (
 )
 
 func TestServer_RegisterPasskey(t *testing.T) {
-	userID := Instance.CreateHumanUser(CTX).GetUserId()
-	reg, err := Client.CreatePasskeyRegistrationLink(CTX, &user.CreatePasskeyRegistrationLinkRequest{
+	userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
+	reg, err := Client.CreatePasskeyRegistrationLink(OrgCTX, &user.CreatePasskeyRegistrationLinkRequest{
 		UserId: userID,
 		Medium: &user.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
 	})
 	require.NoError(t, err)
 
 	// We also need a user session
-	Instance.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	Instance.RegisterUserPasskey(OrgCTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, userID)
 
 	type args struct {
 		ctx context.Context
@@ -43,7 +45,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 		{
 			name: "missing user id",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.RegisterPasskeyRequest{},
 			},
 			wantErr: true,
@@ -51,7 +53,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 		{
 			name: "register code",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.RegisterPasskeyRequest{
 					UserId:        userID,
 					Code:          reg.GetCode(),
@@ -68,7 +70,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 		{
 			name: "reuse code (not allowed)",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.RegisterPasskeyRequest{
 					UserId:        userID,
 					Code:          reg.GetCode(),
@@ -80,7 +82,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 		{
 			name: "wrong code",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.RegisterPasskeyRequest{
 					UserId: userID,
 					Code: &user.PasskeyRegistrationCode{
@@ -120,7 +122,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 		{
 			name: "user setting its own passkey",
 			args: args{
-				ctx: integration.WithAuthorizationToken(CTX, sessionToken),
+				ctx: integration.WithAuthorizationToken(OrgCTX, sessionToken),
 				req: &user.RegisterPasskeyRequest{
 					UserId: userID,
 				},
@@ -172,7 +174,7 @@ func TestServer_VerifyPasskeyRegistration(t *testing.T) {
 		{
 			name: "missing user id",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.VerifyPasskeyRegistrationRequest{
 					PasskeyId:           pkr.GetPasskeyId(),
 					PublicKeyCredential: attestationResponse,
@@ -184,7 +186,7 @@ func TestServer_VerifyPasskeyRegistration(t *testing.T) {
 		{
 			name: "success",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.VerifyPasskeyRegistrationRequest{
 					UserId:              userID,
 					PasskeyId:           pkr.GetPasskeyId(),
@@ -202,7 +204,7 @@ func TestServer_VerifyPasskeyRegistration(t *testing.T) {
 		{
 			name: "wrong credential",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.VerifyPasskeyRegistrationRequest{
 					UserId:    userID,
 					PasskeyId: pkr.GetPasskeyId(),
@@ -230,7 +232,7 @@ func TestServer_VerifyPasskeyRegistration(t *testing.T) {
 }
 
 func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
-	userID := Instance.CreateHumanUser(CTX).GetUserId()
+	userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
 
 	type args struct {
 		ctx context.Context
@@ -246,7 +248,7 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 		{
 			name: "missing user id",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.CreatePasskeyRegistrationLinkRequest{},
 			},
 			wantErr: true,
@@ -254,7 +256,7 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 		{
 			name: "send default mail",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.CreatePasskeyRegistrationLinkRequest{
 					UserId: userID,
 				},
@@ -269,7 +271,7 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 		{
 			name: "send custom url",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.CreatePasskeyRegistrationLinkRequest{
 					UserId: userID,
 					Medium: &user.CreatePasskeyRegistrationLinkRequest_SendLink{
@@ -289,7 +291,7 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 		{
 			name: "return code",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.CreatePasskeyRegistrationLinkRequest{
 					UserId: userID,
 					Medium: &user.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
@@ -322,8 +324,53 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 	}
 }
 
+// TestServer_CreatePasskeyRegistrationLink_CrossOrg simulates the cross-organization passkey
+// enrollment code issuance: the RPC's auth annotation carries user.passkey.write with no
+// org_field, so the interceptor only checks the caller's permission in the request-header org.
+// An org owner of one organization must not be able to mint an enrollment code - and with it a
+// takeover of the account - for a user in another organization.
+func TestServer_CreatePasskeyRegistrationLink_CrossOrg(t *testing.T) {
+	// The victim lives in another organization than the caller.
+	orgB := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
+	victimID := Instance.CreateHumanUserVerified(
+		IamCTX, orgB.GetOrganizationId(), integration.Email(), integration.Phone(),
+	).GetUserId()
+
+	t.Run("org owner of another org is denied", func(t *testing.T) {
+		// The attacker is ORG_OWNER of the default org only, and pins the request-header org
+		// to it - exactly the scope the interceptor verifies.
+		attackerCTX := integration.SetOrgID(OrgCTX, Instance.DefaultOrg.GetId())
+
+		got, err := Client.CreatePasskeyRegistrationLink(attackerCTX, &user.CreatePasskeyRegistrationLinkRequest{
+			UserId: victimID,
+			Medium: &user.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
+		})
+		require.Error(t, err)
+		// The default permission path reports "membership not found" (NotFound) because the
+		// caller has no membership in the victim's org at all; the v2 permission check reports
+		// PermissionDenied. Either is a correct denial.
+		assert.Contains(t, []codes.Code{codes.NotFound, codes.PermissionDenied}, status.Code(err))
+		assert.Empty(t, got.GetCode().GetCode())
+	})
+
+	t.Run("instance wide user manager is allowed", func(t *testing.T) {
+		// IAM_USER_MANAGER holds user.passkey.write instance wide, so it must keep working
+		// across organizations - the check narrows the org, it must not narrow the role set.
+		_, pat, err := Instance.CreateMachineUserPATWithMembership(IamCTX, "IAM_USER_MANAGER")
+		require.NoError(t, err)
+		managerCTX := integration.WithAuthorizationToken(CTX, pat)
+
+		got, err := Client.CreatePasskeyRegistrationLink(managerCTX, &user.CreatePasskeyRegistrationLinkRequest{
+			UserId: victimID,
+			Medium: &user.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
+		})
+		require.NoError(t, err)
+		assert.NotEmpty(t, got.GetCode().GetId())
+	})
+}
+
 func userWithPasskeyRegistered(t *testing.T) (string, *user.RegisterPasskeyResponse) {
-	userID := Instance.CreateHumanUser(CTX).GetUserId()
+	userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
 	return userID, passkeyRegister(t, userID)
 }
 
@@ -333,12 +380,12 @@ func userWithPasskeyVerified(t *testing.T) (string, string) {
 }
 
 func passkeyRegister(t *testing.T, userID string) *user.RegisterPasskeyResponse {
-	reg, err := Client.CreatePasskeyRegistrationLink(CTX, &user.CreatePasskeyRegistrationLinkRequest{
+	reg, err := Client.CreatePasskeyRegistrationLink(OrgCTX, &user.CreatePasskeyRegistrationLinkRequest{
 		UserId: userID,
 		Medium: &user.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
 	})
 	require.NoError(t, err)
-	pkr, err := Client.RegisterPasskey(CTX, &user.RegisterPasskeyRequest{
+	pkr, err := Client.RegisterPasskey(OrgCTX, &user.RegisterPasskeyRequest{
 		UserId: userID,
 		Code:   reg.GetCode(),
 	})
@@ -352,7 +399,7 @@ func passkeyVerify(t *testing.T, userID string, pkr *user.RegisterPasskeyRespons
 	attestationResponse, err := Instance.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
 	require.NoError(t, err)
 
-	_, err = Client.VerifyPasskeyRegistration(CTX, &user.VerifyPasskeyRegistrationRequest{
+	_, err = Client.VerifyPasskeyRegistration(OrgCTX, &user.VerifyPasskeyRegistrationRequest{
 		UserId:              userID,
 		PasskeyId:           pkr.GetPasskeyId(),
 		PublicKeyCredential: attestationResponse,
@@ -363,7 +410,7 @@ func passkeyVerify(t *testing.T, userID string, pkr *user.RegisterPasskeyRespons
 }
 
 func TestServer_RemovePasskey(t *testing.T) {
-	userIDWithout := Instance.CreateHumanUser(CTX).GetUserId()
+	userIDWithout := Instance.CreateHumanUser(OrgCTX).GetUserId()
 	userIDRegistered, pkrRegistered := userWithPasskeyRegistered(t)
 	userIDVerified, passkeyIDVerified := userWithPasskeyVerified(t)
 	userIDVerifiedPermission, passkeyIDVerifiedPermission := userWithPasskeyVerified(t)
@@ -468,7 +515,7 @@ func TestServer_RemovePasskey(t *testing.T) {
 }
 
 func TestServer_ListPasskeys(t *testing.T) {
-	userIDWithout := Instance.CreateHumanUser(CTX).GetUserId()
+	userIDWithout := Instance.CreateHumanUser(OrgCTX).GetUserId()
 	userIDRegistered, _ := userWithPasskeyRegistered(t)
 	userIDVerified, passkeyIDVerified := userWithPasskeyVerified(t)
 

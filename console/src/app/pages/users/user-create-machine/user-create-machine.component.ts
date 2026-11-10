@@ -14,6 +14,7 @@ import { ToastService } from 'src/app/services/toast.service';
   selector: 'cnsl-user-create-machine',
   templateUrl: './user-create-machine.component.html',
   styleUrls: ['./user-create-machine.component.scss'],
+  standalone: false,
 })
 export class UserCreateMachineComponent implements OnDestroy {
   public user: AddMachineUserRequest.AsObject = new AddMachineUserRequest().toObject();

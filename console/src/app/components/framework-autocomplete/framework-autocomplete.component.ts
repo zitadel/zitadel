@@ -8,11 +8,10 @@ import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/ma
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Observable, map, of, startWith, switchMap, tap } from 'rxjs';
+import { Observable, map, of, startWith } from 'rxjs';
 import { Framework } from '../quickstart/quickstart.component';
 
 @Component({
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'cnsl-framework-autocomplete',
   templateUrl: './framework-autocomplete.component.html',

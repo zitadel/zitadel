@@ -6,6 +6,7 @@ import { getMembershipColor } from 'src/app/utils/color';
   selector: 'cnsl-add-member-roles-dialog',
   templateUrl: './add-member-roles-dialog.component.html',
   styleUrls: ['./add-member-roles-dialog.component.scss'],
+  standalone: false,
 })
 export class AddMemberRolesDialogComponent {
   public allRoles: string[] = [];

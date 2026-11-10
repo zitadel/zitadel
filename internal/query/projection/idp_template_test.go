@@ -192,6 +192,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
  	"userEndpoint": "user",
 	"scopes": ["profile"],
 	"idAttribute": "id-attribute",
+	"usePKCE": false,
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
@@ -227,7 +228,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_oauth2 (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes, id_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_oauth2 (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes, id_attribute, use_pkce) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -238,6 +239,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 								"user",
 								database.TextArray[string]{"profile"},
 								"id-attribute",
+								false,
 							},
 						},
 					},
@@ -265,6 +267,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
  	"userEndpoint": "user",
 	"scopes": ["profile"],
 	"idAttribute": "id-attribute",
+	"usePKCE": true,
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
@@ -300,7 +303,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_oauth2 (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes, id_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_oauth2 (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes, id_attribute, use_pkce) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -311,6 +314,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 								"user",
 								database.TextArray[string]{"profile"},
 								"id-attribute",
+								true,
 							},
 						},
 					},
@@ -380,6 +384,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
  	"userEndpoint": "user",
 	"scopes": ["profile"],
 	"idAttribute": "id-attribute",
+	"usePKCE": true,
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
@@ -410,7 +415,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates6_oauth2 SET (client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes, id_attribute) = ($1, $2, $3, $4, $5, $6, $7) WHERE (idp_id = $8) AND (instance_id = $9)",
+							expectedStmt: "UPDATE projections.idp_templates6_oauth2 SET (client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes, id_attribute, use_pkce) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (idp_id = $9) AND (instance_id = $10)",
 							expectedArgs: []interface{}{
 								"client_id",
 								anyArg{},
@@ -419,6 +424,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 								"user",
 								database.TextArray[string]{"profile"},
 								"id-attribute",
+								true,
 								"idp-id",
 								"instance-id",
 							},
@@ -2117,7 +2123,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 	"userObjectClasses": ["object"],
 	"userFilters": ["filter"],
 	"timeout": 30000000000,
-	"rootcA": `+stringToJSONByte("certificate")+`,
+	"rootCA": `+stringToJSONByte("certificate")+`,
 	"idAttribute": "id",
 	"firstNameAttribute": "first",
 	"lastNameAttribute": "last",
@@ -2166,7 +2172,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_ldap3 (idp_id, instance_id, servers, start_tls, base_dn, bind_dn, bind_password, user_base, user_object_classes, user_filters, timeout, rootCA, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_ldap2 (idp_id, instance_id, servers, start_tls, base_dn, bind_dn, bind_password, user_base, user_object_classes, user_filters, timeout, root_ca, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -2222,7 +2228,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 	"userObjectClasses": ["object"],
 	"userFilters": ["filter"],
 	"timeout": 30000000000,
-	"rootcA": `+stringToJSONByte("certificate")+`,
+	"rootCA": `+stringToJSONByte("certificate")+`,
 	"idAttribute": "id",
 	"firstNameAttribute": "first",
 	"lastNameAttribute": "last",
@@ -2271,7 +2277,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_ldap3 (idp_id, instance_id, servers, start_tls, base_dn, bind_dn, bind_password, user_base, user_object_classes, user_filters, timeout, rootCA, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_ldap2 (idp_id, instance_id, servers, start_tls, base_dn, bind_dn, bind_password, user_base, user_object_classes, user_filters, timeout, root_ca, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -2335,7 +2341,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates6_ldap3 SET base_dn = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.idp_templates6_ldap2 SET base_dn = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"basedn",
 								"idp-id",
@@ -2369,7 +2375,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 	"userObjectClasses": ["object"],
 	"userFilters": ["filter"],
 	"timeout": 30000000000,
-	"rootcA": `+stringToJSONByte("certificate")+`,
+	"rootCA": `+stringToJSONByte("certificate")+`,
 	"idAttribute": "id",
 	"firstNameAttribute": "first",
 	"lastNameAttribute": "last",
@@ -2413,7 +2419,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates6_ldap3 SET (servers, start_tls, base_dn, bind_dn, bind_password, user_base, user_object_classes, user_filters, timeout, rootCA, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23) WHERE (idp_id = $24) AND (instance_id = $25)",
+							expectedStmt: "UPDATE projections.idp_templates6_ldap2 SET (servers, start_tls, base_dn, bind_dn, bind_password, user_base, user_object_classes, user_filters, timeout, root_ca, id_attribute, first_name_attribute, last_name_attribute, display_name_attribute, nick_name_attribute, preferred_username_attribute, email_attribute, email_verified, phone_attribute, phone_verified_attribute, preferred_language_attribute, avatar_url_attribute, profile_attribute) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23) WHERE (idp_id = $24) AND (instance_id = $25)",
 							expectedArgs: []interface{}{
 								database.TextArray[string]{"server"},
 								false,
@@ -2783,11 +2789,13 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 	"nameIDFormat": 3,
 	"transientMappingAttributeName": "customAttribute",
 	"withSignedRequest": true,
+	"signatureAlgorithm": "",
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
 	"isAutoUpdate": true,
-	"autoLinkingOption": 1
+	"autoLinkingOption": 1,
+	"federatedLogoutEnabled": true
 }`),
 				), instance.SAMLIDPAddedEventMapper),
 			},
@@ -2818,7 +2826,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_saml (idp_id, instance_id, metadata, key, certificate, binding, with_signed_request, transient_mapping_attribute_name, name_id_format) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_saml (idp_id, instance_id, metadata, key, certificate, binding, with_signed_request, signature_algorithm, transient_mapping_attribute_name, federated_logout_enabled, name_id_format) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -2827,7 +2835,9 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 								anyArg{},
 								"binding",
 								true,
+								"",
 								"customAttribute",
+								true,
 								domain.SAMLNameIDFormatTransient,
 							},
 						},
@@ -2855,11 +2865,13 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 	"nameIDFormat": 3,
 	"transientMappingAttributeName": "customAttribute",
 	"withSignedRequest": true,
+	"signatureAlgorithm": "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512",
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
 	"isAutoUpdate": true,
-	"autoLinkingOption": 1
+	"autoLinkingOption": 1,
+	"federatedLogoutEnabled": true
 }`),
 				), org.SAMLIDPAddedEventMapper),
 			},
@@ -2890,7 +2902,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_saml (idp_id, instance_id, metadata, key, certificate, binding, with_signed_request, transient_mapping_attribute_name, name_id_format) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_saml (idp_id, instance_id, metadata, key, certificate, binding, with_signed_request, signature_algorithm, transient_mapping_attribute_name, federated_logout_enabled, name_id_format) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -2899,7 +2911,9 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 								anyArg{},
 								"binding",
 								true,
+								"http://www.w3.org/2001/04/xmldsig-more#rsa-sha512",
 								"customAttribute",
+								true,
 								domain.SAMLNameIDFormatTransient,
 							},
 						},
@@ -2949,6 +2963,47 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 			},
 		},
 		{
+			name: "instance reduceSAMLIDPChanged - signature algorithm",
+			args: args{
+				event: getEvent(testEvent(
+					instance.SAMLIDPChangedEventType,
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"name": "custom-zitadel-instance",
+	"signatureAlgorithm": "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
+}`),
+				), instance.SAMLIDPChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceSAMLIDPChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates6 SET (name, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								"custom-zitadel-instance",
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates6_saml SET signature_algorithm = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "instance reduceSAMLIDPChanged",
 			args: args{
 				event: getEvent(testEvent(
@@ -2966,11 +3021,13 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 	"certificate": `+stringToJSONByte("certificate")+`,
 	"binding": "binding",
 	"withSignedRequest": true,
+	"signatureAlgorithm": "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512",
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
 	"isAutoUpdate": true,
-	"autoLinkingOption": 1
+	"autoLinkingOption": 1,
+	"federatedLogoutEnabled": true
 }`),
 				), instance.SAMLIDPChangedEventMapper),
 			},
@@ -2996,12 +3053,14 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates6_saml SET (metadata, key, certificate, binding, with_signed_request) = ($1, $2, $3, $4, $5) WHERE (idp_id = $6) AND (instance_id = $7)",
+							expectedStmt: "UPDATE projections.idp_templates6_saml SET (metadata, key, certificate, binding, with_signed_request, signature_algorithm, federated_logout_enabled) = ($1, $2, $3, $4, $5, $6, $7) WHERE (idp_id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								[]byte("metadata"),
 								anyArg{},
 								anyArg{},
 								"binding",
+								true,
+								"http://www.w3.org/2001/04/xmldsig-more#rsa-sha512",
 								true,
 								"idp-id",
 								"instance-id",
@@ -3081,6 +3140,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
     },
 	"scopes": ["profile"],
 	"idTokenMapping": true,
+	"usePKCE": true,
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
@@ -3116,7 +3176,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping, use_pkce) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -3124,6 +3184,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								"client_id",
 								anyArg{},
 								database.TextArray[string]{"profile"},
+								true,
 								true,
 							},
 						},
@@ -3149,6 +3210,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
     },
 	"scopes": ["profile"],
 	"idTokenMapping": true,
+	"usePKCE": true,
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
@@ -3184,7 +3246,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping, use_pkce) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -3192,6 +3254,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								"client_id",
 								anyArg{},
 								database.TextArray[string]{"profile"},
+								true,
 								true,
 							},
 						},
@@ -3260,6 +3323,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
     },
 	"scopes": ["profile"],
 	"idTokenMapping": true,
+	"usePKCE": true,
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
@@ -3290,12 +3354,13 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates6_oidc SET (client_id, client_secret, issuer, scopes, id_token_mapping) = ($1, $2, $3, $4, $5) WHERE (idp_id = $6) AND (instance_id = $7)",
+							expectedStmt: "UPDATE projections.idp_templates6_oidc SET (client_id, client_secret, issuer, scopes, id_token_mapping, use_pkce) = ($1, $2, $3, $4, $5, $6) WHERE (idp_id = $7) AND (instance_id = $8)",
 							expectedArgs: []interface{}{
 								"client_id",
 								anyArg{},
 								"issuer",
 								database.TextArray[string]{"profile"},
+								true,
 								true,
 								"idp-id",
 								"instance-id",
@@ -3810,7 +3875,7 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping, use_pkce) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"instance-id",
@@ -3819,6 +3884,7 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 								anyArg{},
 								database.TextArray[string]{"profile"},
 								true,
+								false,
 							},
 						},
 					},
@@ -3864,7 +3930,7 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping, use_pkce) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"instance-id",
@@ -3873,6 +3939,7 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 								anyArg{},
 								database.TextArray[string]{"profile"},
 								true,
+								false,
 							},
 						},
 					},
@@ -4213,7 +4280,8 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
 	"isAutoUpdate": true,
-	"autoLinkingOption": 1
+	"autoLinkingOption": 1,
+	"audience": "audience"
 }`),
 					), instance.JWTIDPAddedEventMapper),
 			},
@@ -4244,7 +4312,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_jwt (idp_id, instance_id, issuer, jwt_endpoint, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_jwt (idp_id, instance_id, issuer, jwt_endpoint, keys_endpoint, header_name, audience) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -4252,6 +4320,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 								"jwt",
 								"keys",
 								"header",
+								"audience",
 							},
 						},
 					},
@@ -4275,7 +4344,8 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
 	"isAutoUpdate": true,
-	"autoLinkingOption": 1
+	"autoLinkingOption": 1,
+	"audience": "audience"
 }`),
 					), org.JWTIDPAddedEventMapper),
 			},
@@ -4306,7 +4376,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_jwt (idp_id, instance_id, issuer, jwt_endpoint, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_jwt (idp_id, instance_id, issuer, jwt_endpoint, keys_endpoint, header_name, audience) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -4314,6 +4384,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 								"jwt",
 								"keys",
 								"header",
+								"audience",
 							},
 						},
 					},
@@ -4375,6 +4446,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 	"jwtEndpoint": "jwt",
 	"keysEndpoint": "keys",
 	"headerName": "header",
+	"audience": "audience",
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
@@ -4404,12 +4476,13 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates6_jwt SET (jwt_endpoint, keys_endpoint, header_name, issuer) = ($1, $2, $3, $4) WHERE (idp_id = $5) AND (instance_id = $6)",
+							expectedStmt: "UPDATE projections.idp_templates6_jwt SET (jwt_endpoint, keys_endpoint, header_name, issuer, audience) = ($1, $2, $3, $4, $5) WHERE (idp_id = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								"jwt",
 								"keys",
 								"header",
 								"issuer",
+								"audience",
 								"idp-id",
 								"instance-id",
 							},
@@ -4437,4 +4510,662 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 func stringToJSONByte(data string) string {
 	jsondata, _ := json.Marshal([]byte(data))
 	return string(jsondata)
+}
+
+func TestIDPTemplateProjection_reducesZitadel(t *testing.T) {
+	type args struct {
+		event func(t *testing.T) eventstore.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		reduce func(event eventstore.Event) (*handler.Statement, error)
+		want   wantReduce
+	}{
+		{
+			name: "instance reduceZitadelIDPAdded without instance roles info",
+			args: args{
+				event: getEvent(
+					testEvent(
+						instance.ZitadelIDPAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
+	"id": "idp-id",
+	"name": "idp-name",
+	"issuer": "issuer",
+	"clientId": "client_id",
+	"clientSecret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
+}`),
+					), eventstore.GenericEventMapper[instance.ZitadelIDPAddedEvent]),
+			},
+			reduce: (&idpTemplateProjection{}).reduceZitadelIDPAdded,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateInsertStmt,
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								"idp-name",
+								domain.IdentityProviderTypeSystem,
+								domain.IDPTypeZitadel,
+								true,
+								true,
+								true,
+								true,
+								domain.AutoLinkingOptionUsername,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates6_zitadel (idp_id, instance_id, issuer, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"issuer",
+								"client_id",
+								anyArg{},
+								database.TextArray[string]{"profile"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceZitadelIDPAdded with instance roles info",
+			args: args{
+				event: getEvent(
+					testEvent(
+						instance.ZitadelIDPAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
+	"id": "idp-id",
+	"name": "idp-name",
+	"issuer": "issuer",
+	"clientId": "client_id",
+	"clientSecret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1,
+    "instanceRolesInfo": [{
+        "organizationId": "org1",
+        "organizationDomain": "org1.com"
+    },
+	{
+        "organizationId": "org2",
+        "organizationDomain": "org2.com"
+    }]
+}`),
+					), eventstore.GenericEventMapper[instance.ZitadelIDPAddedEvent]),
+			},
+			reduce: (&idpTemplateProjection{}).reduceZitadelIDPAdded,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateInsertStmt,
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								"idp-name",
+								domain.IdentityProviderTypeSystem,
+								domain.IDPTypeZitadel,
+								true,
+								true,
+								true,
+								true,
+								domain.AutoLinkingOptionUsername,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates6_zitadel (idp_id, instance_id, issuer, client_id, client_secret, scopes, instance_roles_info) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"issuer",
+								"client_id",
+								anyArg{},
+								database.TextArray[string]{"profile"},
+								[]byte(`[{"organizationId":"org1","organizationDomain":"org1.com"},{"organizationId":"org2","organizationDomain":"org2.com"}]`),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceZitadelIDPAdded without instance roles info",
+			args: args{
+				event: getEvent(
+					testEvent(
+						org.ZitadelIDPAddedEventType,
+						org.AggregateType,
+						[]byte(`{
+	"id": "idp-id",
+	"name": "idp-name",
+	"issuer": "issuer",
+	"clientId": "client_id",
+	"clientSecret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
+}`),
+					), eventstore.GenericEventMapper[org.ZitadelIDPAddedEvent]),
+			},
+			reduce: (&idpTemplateProjection{}).reduceZitadelIDPAdded,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateInsertStmt,
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								"idp-name",
+								domain.IdentityProviderTypeOrg,
+								domain.IDPTypeZitadel,
+								true,
+								true,
+								true,
+								true,
+								domain.AutoLinkingOptionUsername,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates6_zitadel (idp_id, instance_id, issuer, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"issuer",
+								"client_id",
+								anyArg{},
+								database.TextArray[string]{"profile"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceZitadelIDPAdded with instance roles info",
+			args: args{
+				event: getEvent(
+					testEvent(
+						org.ZitadelIDPAddedEventType,
+						org.AggregateType,
+						[]byte(`{
+	"id": "idp-id",
+	"name": "idp-name",
+	"issuer": "issuer",
+	"clientId": "client_id",
+	"clientSecret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1,
+    "instanceRolesInfo": [{
+        "organizationId": "org1",
+        "organizationDomain": "org1.com"
+    },
+	{
+        "organizationId": "org2",
+        "organizationDomain": "org2.com"
+    }]
+}`),
+					), eventstore.GenericEventMapper[org.ZitadelIDPAddedEvent]),
+			},
+			reduce: (&idpTemplateProjection{}).reduceZitadelIDPAdded,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateInsertStmt,
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								"idp-name",
+								domain.IdentityProviderTypeOrg,
+								domain.IDPTypeZitadel,
+								true,
+								true,
+								true,
+								true,
+								domain.AutoLinkingOptionUsername,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates6_zitadel (idp_id, instance_id, issuer, client_id, client_secret, scopes, instance_roles_info) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"issuer",
+								"client_id",
+								anyArg{},
+								database.TextArray[string]{"profile"},
+								[]byte(`[{"organizationId":"org1","organizationDomain":"org1.com"},{"organizationId":"org2","organizationDomain":"org2.com"}]`),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceZitadelIDPChanged minimal",
+			args: args{
+				event: getEvent(
+					testEvent(
+						instance.ZitadelIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
+	"id": "idp-id",
+	"isCreationAllowed": true,
+	"clientId": "id"
+}`),
+					), eventstore.GenericEventMapper[instance.ZitadelIDPChangedEvent]),
+			},
+			reduce: (&idpTemplateProjection{}).reduceZitadelIDPChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateMinimalStmt,
+							expectedArgs: []interface{}{
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates6_zitadel SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"id",
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceZitadelIDPChanged",
+			args: args{
+				event: getEvent(
+					testEvent(
+						instance.ZitadelIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
+	"id": "idp-id",
+	"name": "name",
+	"issuer": "issuer",
+	"clientId": "client_id",
+	"clientSecret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"instanceRolesInfo": [{
+        "organizationId": "org3",
+        "organizationDomain": "org3.com"
+    }],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
+}`),
+					), eventstore.GenericEventMapper[instance.ZitadelIDPChangedEvent]),
+			},
+			reduce: (&idpTemplateProjection{}).reduceZitadelIDPChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateStmt,
+							expectedArgs: []interface{}{
+								"name",
+								true,
+								true,
+								true,
+								true,
+								domain.AutoLinkingOptionUsername,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates6_zitadel SET (client_id, client_secret, issuer, scopes, instance_roles_info) = ($1, $2, $3, $4, $5) WHERE (idp_id = $6) AND (instance_id = $7)",
+							expectedArgs: []interface{}{
+								"client_id",
+								anyArg{},
+								"issuer",
+								database.TextArray[string]{"profile"},
+								[]byte(`[{"organizationId":"org3","organizationDomain":"org3.com"}]`),
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceZitadelIDPChanged - unset scopes and instance roles info",
+			args: args{
+				event: getEvent(
+					testEvent(
+						instance.ZitadelIDPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
+	"id": "idp-id",
+	"name": "name",
+	"issuer": "issuer",
+	"clientId": "client_id",
+	"clientSecret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": [],
+	"instanceRolesInfo": [],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
+}`),
+					), eventstore.GenericEventMapper[instance.ZitadelIDPChangedEvent]),
+			},
+			reduce: (&idpTemplateProjection{}).reduceZitadelIDPChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateStmt,
+							expectedArgs: []interface{}{
+								"name",
+								true,
+								true,
+								true,
+								true,
+								domain.AutoLinkingOptionUsername,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates6_zitadel SET (client_id, client_secret, issuer, scopes, instance_roles_info) = ($1, $2, $3, $4, $5) WHERE (idp_id = $6) AND (instance_id = $7)",
+							expectedArgs: []interface{}{
+								"client_id",
+								anyArg{},
+								"issuer",
+								database.TextArray[string]{},
+								[]byte(`[]`),
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceZitadelIDPChanged minimal",
+			args: args{
+				event: getEvent(
+					testEvent(
+						org.ZitadelIDPChangedEventType,
+						org.AggregateType,
+						[]byte(`{
+	"id": "idp-id",
+	"isCreationAllowed": true,
+	"clientId": "id"
+}`),
+					), eventstore.GenericEventMapper[org.ZitadelIDPChangedEvent]),
+			},
+			reduce: (&idpTemplateProjection{}).reduceZitadelIDPChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateMinimalStmt,
+							expectedArgs: []interface{}{
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates6_zitadel SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"id",
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceZitadelIDPChanged",
+			args: args{
+				event: getEvent(
+					testEvent(
+						org.ZitadelIDPChangedEventType,
+						org.AggregateType,
+						[]byte(`{
+	"id": "idp-id",
+	"name": "name",
+	"issuer": "issuer",
+	"clientId": "client_id",
+	"clientSecret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"instanceRolesInfo": [{
+        "organizationId": "org3",
+        "organizationDomain": "org3.com"
+    }],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
+}`),
+					), eventstore.GenericEventMapper[org.ZitadelIDPChangedEvent]),
+			},
+			reduce: (&idpTemplateProjection{}).reduceZitadelIDPChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateStmt,
+							expectedArgs: []interface{}{
+								"name",
+								true,
+								true,
+								true,
+								true,
+								domain.AutoLinkingOptionUsername,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates6_zitadel SET (client_id, client_secret, issuer, scopes, instance_roles_info) = ($1, $2, $3, $4, $5) WHERE (idp_id = $6) AND (instance_id = $7)",
+							expectedArgs: []interface{}{
+								"client_id",
+								anyArg{},
+								"issuer",
+								database.TextArray[string]{"profile"},
+								[]byte(`[{"organizationId":"org3","organizationDomain":"org3.com"}]`),
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceZitadelIDPChanged - unset scopes and instance roles info",
+			args: args{
+				event: getEvent(
+					testEvent(
+						org.ZitadelIDPChangedEventType,
+						org.AggregateType,
+						[]byte(`{
+	"id": "idp-id",
+	"name": "name",
+	"issuer": "issuer",
+	"clientId": "client_id",
+	"clientSecret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": [],
+	"instanceRolesInfo": [],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
+}`),
+					), eventstore.GenericEventMapper[org.ZitadelIDPChangedEvent]),
+			},
+			reduce: (&idpTemplateProjection{}).reduceZitadelIDPChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: idpTemplateUpdateStmt,
+							expectedArgs: []interface{}{
+								"name",
+								true,
+								true,
+								true,
+								true,
+								domain.AutoLinkingOptionUsername,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates6_zitadel SET (client_id, client_secret, issuer, scopes, instance_roles_info) = ($1, $2, $3, $4, $5) WHERE (idp_id = $6) AND (instance_id = $7)",
+							expectedArgs: []interface{}{
+								"client_id",
+								anyArg{},
+								"issuer",
+								database.TextArray[string]{},
+								[]byte(`[]`),
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			event := baseEvent(t)
+			got, err := tt.reduce(event)
+			if !zerrors.IsErrorInvalidArgument(err) {
+				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
+			}
+
+			event = tt.args.event(t)
+			got, err = tt.reduce(event)
+			assertReduce(t, got, err, IDPTemplateTable, tt.want)
+		})
+	}
 }

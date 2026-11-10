@@ -19,15 +19,15 @@ var (
 var _ channels.Message = (*Email)(nil)
 
 type Email struct {
-	Recipients      []string
-	BCC             []string
-	CC              []string
-	SenderEmail     string
-	SenderName      string
-	ReplyToAddress  string
-	Subject         string
-	Content         string
-	TriggeringEvent eventstore.Event
+	Recipients          []string
+	BCC                 []string
+	CC                  []string
+	SenderEmail         string
+	SenderName          string
+	ReplyToAddress      string
+	Subject             string
+	Content             string
+	TriggeringEventType eventstore.EventType
 }
 
 func (msg *Email) GetContent() (string, error) {
@@ -61,8 +61,8 @@ func (msg *Email) GetContent() (string, error) {
 	return message, nil
 }
 
-func (msg *Email) GetTriggeringEvent() eventstore.Event {
-	return msg.TriggeringEvent
+func (msg *Email) GetTriggeringEventType() eventstore.EventType {
+	return msg.TriggeringEventType
 }
 
 func isHTML(input string) bool {

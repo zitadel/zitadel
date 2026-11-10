@@ -148,7 +148,7 @@ func (wm *DomainPolicyUsernamesWriteModel) Query() *eventstore.SearchQueryBuilde
 		Builder()
 }
 
-func (wm *DomainPolicyUsernamesWriteModel) NewUsernameChangedEvents(ctx context.Context, userLoginMustBeDomain bool) []eventstore.Command {
+func (wm *DomainPolicyUsernamesWriteModel) NewUsernameChangedEvents(ctx context.Context, userLoginMustBeDomain, organizationScopedUsernames, oldUserLoginMustBeDomain bool) []eventstore.Command {
 	events := make([]eventstore.Command, 0, len(wm.Users))
 	for _, changeUser := range wm.Users {
 		events = append(events, user.NewUsernameChangedEvent(ctx,
@@ -156,10 +156,19 @@ func (wm *DomainPolicyUsernamesWriteModel) NewUsernameChangedEvents(ctx context.
 			changeUser.username,
 			wm.newUsername(changeUser.username, userLoginMustBeDomain),
 			userLoginMustBeDomain,
-			user.UsernameChangedEventWithPolicyChange()),
-		)
+			organizationScopedUsernames,
+			user.UsernameChangedEventWithPolicyChange(oldUserLoginMustBeDomain),
+		))
 	}
 	return events
+}
+
+func (wm *DomainPolicyUsernamesWriteModel) Usernames() []string {
+	usernames := make([]string, 0, len(wm.Users))
+	for i, user := range wm.Users {
+		usernames[i] = user.username
+	}
+	return usernames
 }
 
 func (wm *DomainPolicyUsernamesWriteModel) newUsername(username string, userLoginMustBeDomain bool) string {

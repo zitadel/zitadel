@@ -3,6 +3,7 @@ package jwt
 import (
 	"context"
 	"errors"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,9 +21,11 @@ func TestProvider_BeginAuth(t *testing.T) {
 		jwtEndpoint   string
 		keysEndpoint  string
 		headerName    string
+		audience      string
 		encryptionAlg func(t *testing.T) crypto.EncryptionAlgorithm
 	}
 	type args struct {
+		state  string
 		params []idp.Parameter
 	}
 	type want struct {
@@ -36,23 +39,45 @@ func TestProvider_BeginAuth(t *testing.T) {
 		want   want
 	}{
 		{
-			name: "missing userAgentID error",
+			name: "missing state, error",
 			fields: fields{
 				issuer:       "https://jwt.com",
 				jwtEndpoint:  "https://auth.com/jwt",
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
+				audience:     "audience",
 				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
 					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 				},
 			},
 			args: args{
+				state:  "",
 				params: nil,
 			},
 			want: want{
 				err: func(err error) bool {
-					return errors.Is(err, ErrMissingUserAgentID)
+					return errors.Is(err, ErrMissingState)
 				},
+			},
+		},
+		{
+			name: "missing userAgentID, fallback to state",
+			fields: fields{
+				issuer:       "https://jwt.com",
+				jwtEndpoint:  "https://auth.com/jwt",
+				keysEndpoint: "https://jwt.com/keys",
+				headerName:   "jwt-header",
+				audience:     "audience",
+				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
+					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
+				},
+			},
+			args: args{
+				state:  "testState",
+				params: nil,
+			},
+			want: want{
+				session: &Session{AuthURL: "https://auth.com/jwt?authRequestID=testState&userAgentID=dGVzdFN0YXRl"},
 			},
 		},
 		{
@@ -62,11 +87,13 @@ func TestProvider_BeginAuth(t *testing.T) {
 				jwtEndpoint:  "https://auth.com/jwt",
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
+				audience:     "audience",
 				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
 					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 				},
 			},
 			args: args{
+				state: "testState",
 				params: []idp.Parameter{
 					idp.UserAgentID("agent"),
 				},
@@ -86,21 +113,23 @@ func TestProvider_BeginAuth(t *testing.T) {
 				tt.fields.jwtEndpoint,
 				tt.fields.keysEndpoint,
 				tt.fields.headerName,
+				tt.fields.audience,
 				tt.fields.encryptionAlg(t),
+				http.DefaultClient,
 			)
 			require.NoError(t, err)
 
 			ctx := context.Background()
-			session, err := provider.BeginAuth(ctx, "testState", tt.args.params...)
+			session, err := provider.BeginAuth(ctx, tt.args.state, tt.args.params...)
 			if tt.want.err != nil && !tt.want.err(err) {
 				a.Fail("invalid error", err)
 			}
 			if tt.want.err == nil {
 				a.NoError(err)
-				wantHeaders, wantContent := tt.want.session.GetAuth(ctx)
-				gotHeaders, gotContent := session.GetAuth(ctx)
-				a.Equal(wantHeaders, gotHeaders)
-				a.Equal(wantContent, gotContent)
+				wantAuth, wantErr := tt.want.session.GetAuth(ctx)
+				gotAuth, gotErr := session.GetAuth(ctx)
+				a.Equal(wantAuth, gotAuth)
+				a.ErrorIs(gotErr, wantErr)
 			}
 		})
 	}
@@ -113,6 +142,7 @@ func TestProvider_Options(t *testing.T) {
 		jwtEndpoint   string
 		keysEndpoint  string
 		headerName    string
+		audience      string
 		encryptionAlg func(t *testing.T) crypto.EncryptionAlgorithm
 		opts          []ProviderOpts
 	}
@@ -137,6 +167,7 @@ func TestProvider_Options(t *testing.T) {
 				jwtEndpoint:  "https://auth.com/jwt",
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
+				audience:     "audience",
 				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
 					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 				},
@@ -159,6 +190,7 @@ func TestProvider_Options(t *testing.T) {
 				jwtEndpoint:  "https://auth.com/jwt",
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
+				audience:     "audience",
 				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
 					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 				},
@@ -189,7 +221,9 @@ func TestProvider_Options(t *testing.T) {
 				tt.fields.jwtEndpoint,
 				tt.fields.keysEndpoint,
 				tt.fields.headerName,
+				tt.fields.audience,
 				tt.fields.encryptionAlg(t),
+				http.DefaultClient,
 				tt.fields.opts...,
 			)
 			require.NoError(t, err)

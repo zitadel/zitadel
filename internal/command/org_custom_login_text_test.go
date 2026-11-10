@@ -1119,6 +1119,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundNoOptionAvailable, "NoOptionAvailable", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundLinkButtonText, "LinkButtonText", language.English,
 							),
 						),
@@ -1478,6 +1483,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 					ExternalNotFound: domain.ExternalUserNotFoundScreenText{
 						Title:                  "Title",
 						Description:            "Description",
+						NoOptionAvailable:      "NoOptionAvailable",
 						LinkButtonText:         "LinkButtonText",
 						AutoRegisterButtonText: "AutoRegisterButtonText",
 						TOSAndPrivacyLabel:     "TOSAndPrivacyLabel",
@@ -2529,6 +2535,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundNoOptionAvailable, "NoOptionAvailable", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundLinkButtonText, "LinkButtonText", language.English,
 							),
 						),
@@ -3224,6 +3235,9 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						org.NewCustomTextRemovedEvent(context.Background(),
 							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundDescription, language.English,
+						),
+						org.NewCustomTextRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundNoOptionAvailable, language.English,
 						),
 						org.NewCustomTextRemovedEvent(context.Background(),
 							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundLinkButtonText, language.English,
@@ -4347,6 +4361,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundNoOptionAvailable, "NoOptionAvailable", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundLinkButtonText, "LinkButtonText", language.English,
 							),
 						),
@@ -5447,6 +5466,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextRemovedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundNoOptionAvailable, language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextRemovedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundLinkButtonText, language.English,
 							),
 						),
@@ -6144,6 +6168,9 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundDescription, "Description", language.English,
 						),
 						org.NewCustomTextSetEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundNoOptionAvailable, "NoOptionAvailable", language.English,
+						),
+						org.NewCustomTextSetEvent(context.Background(),
 							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundLinkButtonText, "LinkButtonText", language.English,
 						),
 						org.NewCustomTextSetEvent(context.Background(),
@@ -6468,6 +6495,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 					ExternalNotFound: domain.ExternalUserNotFoundScreenText{
 						Title:                  "Title",
 						Description:            "Description",
+						NoOptionAvailable:      "NoOptionAvailable",
 						LinkButtonText:         "LinkButtonText",
 						AutoRegisterButtonText: "AutoRegisterButtonText",
 						TOSAndPrivacyLabel:     "TOSAndPrivacyLabel",

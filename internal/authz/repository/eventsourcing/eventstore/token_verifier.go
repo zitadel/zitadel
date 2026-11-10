@@ -2,7 +2,6 @@ package eventstore
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"slices"
 	"strings"
@@ -30,11 +29,11 @@ import (
 )
 
 type TokenVerifierRepo struct {
-	TokenVerificationKey crypto.EncryptionAlgorithm
-	Eventstore           *eventstore.Eventstore
-	View                 *view.View
-	Query                *query.Queries
-	ExternalSecure       bool
+	AuthAlgorithm  crypto.AuthAlgorithm
+	Eventstore     *eventstore.Eventstore
+	View           *view.View
+	Query          *query.Queries
+	ExternalSecure bool
 }
 
 func (repo *TokenVerifierRepo) Health() error {
@@ -98,7 +97,7 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 		return "", "", "", "", "", zerrors.ThrowUnauthenticated(nil, "APP-Reb32", "invalid token")
 	}
 	if strings.HasPrefix(tokenID, command.IDPrefixV2) {
-		return repo.verifyAccessTokenV2(ctx, tokenID, verifierClientID, projectID)
+		return repo.verifyAccessTokenV2(ctx, tokenID, subject, verifierClientID, projectID)
 	}
 	if sessionID, ok := strings.CutPrefix(tokenID, authz.SessionTokenPrefix); ok {
 		userID, clientID, resourceOwner, err = repo.verifySessionToken(ctx, sessionID, tokenString)
@@ -132,7 +131,7 @@ func (repo *TokenVerifierRepo) verifyAccessTokenV1(ctx context.Context, tokenID,
 	return token.UserID, token.UserAgentID, token.ApplicationID, token.PreferredLanguage, token.ResourceOwner, nil
 }
 
-func (repo *TokenVerifierRepo) verifyAccessTokenV2(ctx context.Context, token, verifierClientID, projectID string) (userID, agentID, clientID, prefLang, resourceOwner string, err error) {
+func (repo *TokenVerifierRepo) verifyAccessTokenV2(ctx context.Context, token, subject, verifierClientID, projectID string) (userID, agentID, clientID, prefLang, resourceOwner string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -145,6 +144,11 @@ func (repo *TokenVerifierRepo) verifyAccessTokenV2(ctx context.Context, token, v
 	}
 	if err = verifyAudience(activeToken.Audience, verifierClientID, projectID); err != nil {
 		return "", "", "", "", "", err
+	}
+	// If the subject doesn't match the userID from the database, the token probably got tampered with or truncated.
+	// See https://github.com/zitadel/zitadel/security/advisories/GHSA-6mq3-xmgp-pjm5
+	if activeToken.UserID != subject {
+		return "", "", "", "", "", zerrors.ThrowUnauthenticated(nil, "APP-3f4fs", "invalid token")
 	}
 	if err = repo.checkAuthentication(ctx, activeToken.AuthMethods, activeToken.UserID); err != nil {
 		return "", "", "", "", "", err
@@ -178,6 +182,7 @@ func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMeth
 	if len(authMethods) == 0 {
 		return zerrors.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "authentication required")
 	}
+	// if the user has MFA, we don't need to check any mfa requirements
 	if domain.HasMFA(authMethods) {
 		return nil
 	}
@@ -185,17 +190,36 @@ func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMeth
 	if err != nil {
 		return err
 	}
+	// service accounts do not have interactive logins, so we don't check for MFA requirements
 	if requirements.UserType == domain.UserTypeMachine {
 		return nil
 	}
-	if domain.RequiresMFA(
-		requirements.ForceMFA,
-		requirements.ForceMFALocalOnly,
-		!hasIDPAuthentication(authMethods),
-	) {
+	// we'll only require 2FA factors, that are allowed by the policy
+	allowedFactors := allowed2FAFactors(requirements.AllowedSecondFactors, requirements.SetUpFactors)
+	// if either the user has set up a factor that is allowed by the policy
+	// or the policy requires MFA, we'll require it and can directly return the error
+	// since the token/session was not authenticated with MFA
+	if domain.Has2FA(allowedFactors) ||
+		domain.RequiresMFA(
+			requirements.ForceMFA,
+			requirements.ForceMFALocalOnly,
+			!hasIDPAuthentication(authMethods),
+		) {
 		return zerrors.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "mfa required")
 	}
 	return nil
+}
+
+func allowed2FAFactors(factors []domain.SecondFactorType, authMethods []domain.UserAuthMethodType) []domain.UserAuthMethodType {
+	allowedFactors := make([]domain.UserAuthMethodType, 0, len(factors))
+	for _, method := range authMethods {
+		factorType := domain.AuthMethodToSecondFactor(method)
+		if factorType != domain.SecondFactorTypeUnspecified &&
+			slices.Contains(factors, factorType) {
+			allowedFactors = append(allowedFactors, method)
+		}
+	}
+	return allowedFactors
 }
 
 func hasIDPAuthentication(authMethods []domain.UserAuthMethodType) bool {
@@ -230,6 +254,9 @@ func authMethodsFromSession(session *query.Session) []domain.UserAuthMethodType 
 	}
 	if !session.OTPEmailFactor.OTPCheckedAt.IsZero() {
 		types = append(types, domain.UserAuthMethodTypeOTPEmail)
+	}
+	if !session.RecoveryCodeFactor.RecoveryCodeCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypeRecoveryCode)
 	}
 	return types
 }
@@ -278,7 +305,7 @@ func (repo *TokenVerifierRepo) getUserEvents(ctx context.Context, userID, instan
 func (repo *TokenVerifierRepo) getTokenIDAndSubject(ctx context.Context, accessToken string) (tokenID string, subject string, valid bool) {
 	// accessToken can be either opaque or JWT
 	// let's try opaque first:
-	tokenIDSubject, err := repo.decryptAccessToken(accessToken)
+	tokenIDSubject, err := repo.AuthAlgorithm.DecryptToken(accessToken)
 	if err != nil {
 		logging.WithError(err).Warn("token verifier repo: decrypt access token")
 		// if decryption did not work, it might be a JWT
@@ -301,18 +328,6 @@ func (repo *TokenVerifierRepo) jwtTokenVerifier(ctx context.Context) *op.AccessT
 	return op.NewAccessTokenVerifier(http_util.DomainContext(ctx).Origin(), keySet)
 }
 
-func (repo *TokenVerifierRepo) decryptAccessToken(token string) (string, error) {
-	tokenData, err := base64.RawURLEncoding.DecodeString(token)
-	if err != nil {
-		return "", zerrors.ThrowUnauthenticated(nil, "APP-ASdgg", "invalid token")
-	}
-	tokenIDSubject, err := repo.TokenVerificationKey.DecryptString(tokenData, repo.TokenVerificationKey.EncryptionKeyID())
-	if err != nil {
-		return "", zerrors.ThrowUnauthenticated(nil, "APP-8EF0zZ", "invalid token")
-	}
-	return tokenIDSubject, nil
-}
-
 func verifyAudience(audience []string, verifierClientID, projectID string) error {
 	for _, aud := range audience {
 		if verifierClientID == aud || projectID == aud {
@@ -329,38 +344,14 @@ type openIDKeySet struct {
 // VerifySignature implements the oidc.KeySet interface
 // providing an implementation for the keys retrieved directly from Queries
 func (o *openIDKeySet) VerifySignature(ctx context.Context, jws *jose.JSONWebSignature) (payload []byte, err error) {
-	keySet := new(jose.JSONWebKeySet)
-	if authz.GetFeatures(ctx).WebKey {
-		keySet, err = o.Queries.GetWebKeySet(ctx)
-		if err != nil {
-			return nil, err
-		}
-	}
-	legacyKeySet, err := o.Queries.ActivePublicKeys(ctx, time.Now())
+	keySet, err := o.Queries.GetWebKeySet(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error fetching keys: %w", err)
+		return nil, err
 	}
-	appendPublicKeysToWebKeySet(keySet, legacyKeySet)
 	keyID, alg := oidc.GetKeyIDAndAlg(jws)
 	key, err := oidc.FindMatchingKey(keyID, oidc.KeyUseSignature, alg, keySet.Keys...)
 	if err != nil {
 		return nil, fmt.Errorf("invalid signature: %w", err)
 	}
 	return jws.Verify(&key)
-}
-
-func appendPublicKeysToWebKeySet(keyset *jose.JSONWebKeySet, pubkeys *query.PublicKeys) {
-	if pubkeys == nil || len(pubkeys.Keys) == 0 {
-		return
-	}
-	keyset.Keys = slices.Grow(keyset.Keys, len(pubkeys.Keys))
-
-	for _, key := range pubkeys.Keys {
-		keyset.Keys = append(keyset.Keys, jose.JSONWebKey{
-			Key:       key.Key(),
-			KeyID:     key.ID(),
-			Algorithm: key.Algorithm(),
-			Use:       key.Use().String(),
-		})
-	}
 }

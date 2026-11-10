@@ -4,6 +4,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -11,8 +12,11 @@ import (
 	milestone_pb "github.com/zitadel/zitadel/pkg/grpc/milestone"
 )
 
-func listMilestonesToModel(instanceID string, req *admin_pb.ListMilestonesRequest) (*query.MilestonesSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func listMilestonesToModel(defaults systemdefaults.SystemDefaults, instanceID string, req *admin_pb.ListMilestonesRequest) (*query.MilestonesSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := milestoneQueriesToModel(req.GetQueries())
 	instanceIDQuery, err := query.NewTextQuery(query.MilestoneInstanceIDColID, instanceID, query.TextEquals)
 	if err != nil {

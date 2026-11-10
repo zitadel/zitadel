@@ -13,7 +13,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -28,23 +27,24 @@ type Sessions struct {
 }
 
 type Session struct {
-	ID             string
-	CreationDate   time.Time
-	ChangeDate     time.Time
-	Sequence       uint64
-	State          domain.SessionState
-	ResourceOwner  string
-	Creator        string
-	UserFactor     SessionUserFactor
-	PasswordFactor SessionPasswordFactor
-	IntentFactor   SessionIntentFactor
-	WebAuthNFactor SessionWebAuthNFactor
-	TOTPFactor     SessionTOTPFactor
-	OTPSMSFactor   SessionOTPFactor
-	OTPEmailFactor SessionOTPFactor
-	Metadata       map[string][]byte
-	UserAgent      domain.UserAgent
-	Expiration     time.Time
+	ID                 string
+	CreationDate       time.Time
+	ChangeDate         time.Time
+	Sequence           uint64
+	State              domain.SessionState
+	ResourceOwner      string
+	Creator            string
+	UserFactor         SessionUserFactor
+	PasswordFactor     SessionPasswordFactor
+	IntentFactor       SessionIntentFactor
+	WebAuthNFactor     SessionWebAuthNFactor
+	TOTPFactor         SessionTOTPFactor
+	OTPSMSFactor       SessionOTPFactor
+	OTPEmailFactor     SessionOTPFactor
+	RecoveryCodeFactor SessionRecoveryCodeFactor
+	Metadata           map[string][]byte
+	UserAgent          domain.UserAgent
+	Expiration         time.Time
 }
 
 type SessionUserFactor struct {
@@ -74,6 +74,10 @@ type SessionTOTPFactor struct {
 
 type SessionOTPFactor struct {
 	OTPCheckedAt time.Time
+}
+
+type SessionRecoveryCodeFactor struct {
+	RecoveryCodeCheckedAt time.Time
 }
 
 type SessionsSearchQueries struct {
@@ -112,6 +116,24 @@ func sessionCheckPermission(ctx context.Context, resourceOwner string, creator s
 	}
 	// default, check for permission on instance
 	return permissionCheck(ctx, domain.PermissionSessionRead, resourceOwner, "")
+}
+
+func sessionsPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool) sq.SelectBuilder {
+	if !enabled {
+		return query
+	}
+	join, args := PermissionClause(
+		ctx,
+		SessionColumnResourceOwner,
+		domain.PermissionSessionRead,
+		// Allow if user is creator
+		OwnedRowsPermissionOption(SessionColumnCreator),
+		// Allow if session belongs to the user
+		OwnedRowsPermissionOption(SessionColumnUserID),
+		// Allow if session belongs to the same useragent
+		ConnectionPermissionOption(SessionColumnUserAgentFingerprintID, authz.GetCtxData(ctx).AgentID),
+	)
+	return query.JoinClause(join, args...)
 }
 
 func (q *SessionsSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -199,6 +221,10 @@ var (
 		name:  projection.SessionColumnOTPEmailCheckedAt,
 		table: sessionsTable,
 	}
+	SessionColumnRecoveryCodeCheckedAt = Column{
+		name:  projection.SessionColumnRecoveryCodeCheckedAt,
+		table: sessionsTable,
+	}
 	SessionColumnMetadata = Column{
 		name:  projection.SessionColumnMetadata,
 		table: sessionsTable,
@@ -235,6 +261,10 @@ func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, s
 		return nil, err
 	}
 	if sessionToken == "" {
+		// for internal calls, no token or permission check is necessary
+		if permissionCheck == nil {
+			return session, nil
+		}
 		if err := sessionCheckPermission(ctx, session.ResourceOwner, session.Creator, session.UserAgent, session.UserFactor, permissionCheck); err != nil {
 			return nil, err
 		}
@@ -257,7 +287,7 @@ func (q *Queries) sessionByID(ctx context.Context, shouldTriggerBulk bool, id st
 		traceSpan.EndWithError(err)
 	}
 
-	query, scan := prepareSessionQuery(ctx, q.client)
+	query, scan := prepareSessionQuery()
 	stmt, args, err := query.Where(
 		sq.Eq{
 			SessionColumnID.identifier():         id,
@@ -279,21 +309,23 @@ func (q *Queries) sessionByID(ctx context.Context, shouldTriggerBulk bool, id st
 }
 
 func (q *Queries) SearchSessions(ctx context.Context, queries *SessionsSearchQueries, permissionCheck domain.PermissionCheck) (*Sessions, error) {
-	sessions, err := q.searchSessions(ctx, queries)
+	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	sessions, err := q.searchSessions(ctx, queries, permissionCheckV2)
 	if err != nil {
 		return nil, err
 	}
-	if permissionCheck != nil {
+	if permissionCheck != nil && !permissionCheckV2 {
 		sessionsCheckPermission(ctx, sessions, permissionCheck)
 	}
 	return sessions, nil
 }
 
-func (q *Queries) searchSessions(ctx context.Context, queries *SessionsSearchQueries) (sessions *Sessions, err error) {
+func (q *Queries) searchSessions(ctx context.Context, queries *SessionsSearchQueries, permissionCheckV2 bool) (sessions *Sessions, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareSessionsQuery(ctx, q.client)
+	query, scan := prepareSessionsQuery()
+	query = sessionsPermissionCheckV2(ctx, query, permissionCheckV2)
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
 			SessionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -339,7 +371,11 @@ func NewCreationDateQuery(datetime time.Time, compare TimestampComparison) (Sear
 	return NewTimestampQuery(SessionColumnCreationDate, datetime, compare)
 }
 
-func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Session, string, error)) {
+func NewExpirationDateQuery(datetime time.Time, compare TimestampComparison) (SearchQuery, error) {
+	return NewTimestampQuery(SessionColumnExpiration, datetime, compare)
+}
+
+func prepareSessionQuery() (sq.SelectBuilder, func(*sql.Row) (*Session, string, error)) {
 	return sq.Select(
 			SessionColumnID.identifier(),
 			SessionColumnCreationDate.identifier(),
@@ -360,6 +396,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			SessionColumnTOTPCheckedAt.identifier(),
 			SessionColumnOTPSMSCheckedAt.identifier(),
 			SessionColumnOTPEmailCheckedAt.identifier(),
+			SessionColumnRecoveryCodeCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			SessionColumnToken.identifier(),
 			SessionColumnUserAgentFingerprintID.identifier(),
@@ -370,28 +407,29 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 		).From(sessionsTable.identifier()).
 			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
 			LeftJoin(join(HumanUserIDCol, SessionColumnUserID)).
-			LeftJoin(join(UserIDCol, SessionColumnUserID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(UserIDCol, SessionColumnUserID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*Session, string, error) {
 			session := new(Session)
 
 			var (
-				userID              sql.NullString
-				userResourceOwner   sql.NullString
-				userCheckedAt       sql.NullTime
-				loginName           sql.NullString
-				displayName         sql.NullString
-				passwordCheckedAt   sql.NullTime
-				intentCheckedAt     sql.NullTime
-				webAuthNCheckedAt   sql.NullTime
-				webAuthNUserPresent sql.NullBool
-				totpCheckedAt       sql.NullTime
-				otpSMSCheckedAt     sql.NullTime
-				otpEmailCheckedAt   sql.NullTime
-				metadata            database.Map[[]byte]
-				token               sql.NullString
-				userAgentIP         sql.NullString
-				userAgentHeader     database.Map[[]string]
-				expiration          sql.NullTime
+				userID                 sql.NullString
+				userResourceOwner      sql.NullString
+				userCheckedAt          sql.NullTime
+				loginName              sql.NullString
+				displayName            sql.NullString
+				passwordCheckedAt      sql.NullTime
+				intentCheckedAt        sql.NullTime
+				webAuthNCheckedAt      sql.NullTime
+				webAuthNUserPresent    sql.NullBool
+				totpCheckedAt          sql.NullTime
+				otpSMSCheckedAt        sql.NullTime
+				otpEmailCheckedAt      sql.NullTime
+				recoveryCodesCheckedAt sql.NullTime
+				metadata               database.Map[[]byte]
+				token                  sql.NullString
+				userAgentIP            sql.NullString
+				userAgentHeader        database.Map[[]string]
+				expiration             sql.NullTime
 			)
 
 			err := row.Scan(
@@ -414,6 +452,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&totpCheckedAt,
 				&otpSMSCheckedAt,
 				&otpEmailCheckedAt,
+				&recoveryCodesCheckedAt,
 				&metadata,
 				&token,
 				&session.UserAgent.FingerprintID,
@@ -442,6 +481,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			session.TOTPFactor.TOTPCheckedAt = totpCheckedAt.Time
 			session.OTPSMSFactor.OTPCheckedAt = otpSMSCheckedAt.Time
 			session.OTPEmailFactor.OTPCheckedAt = otpEmailCheckedAt.Time
+			session.RecoveryCodeFactor.RecoveryCodeCheckedAt = recoveryCodesCheckedAt.Time
 			session.Metadata = metadata
 			session.UserAgent.Header = http.Header(userAgentHeader)
 			if userAgentIP.Valid {
@@ -452,7 +492,7 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 		}
 }
 
-func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Sessions, error)) {
+func prepareSessionsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Sessions, error)) {
 	return sq.Select(
 			SessionColumnID.identifier(),
 			SessionColumnCreationDate.identifier(),
@@ -473,6 +513,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			SessionColumnTOTPCheckedAt.identifier(),
 			SessionColumnOTPSMSCheckedAt.identifier(),
 			SessionColumnOTPEmailCheckedAt.identifier(),
+			SessionColumnRecoveryCodeCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
 			SessionColumnUserAgentFingerprintID.identifier(),
 			SessionColumnUserAgentIP.identifier(),
@@ -483,7 +524,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 		).From(sessionsTable.identifier()).
 			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
 			LeftJoin(join(HumanUserIDCol, SessionColumnUserID)).
-			LeftJoin(join(UserIDCol, SessionColumnUserID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(UserIDCol, SessionColumnUserID)).
 			PlaceholderFormat(sq.Dollar), func(rows *sql.Rows) (*Sessions, error) {
 			sessions := &Sessions{Sessions: []*Session{}}
 
@@ -491,22 +532,23 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				session := new(Session)
 
 				var (
-					userID              sql.NullString
-					userResourceOwner   sql.NullString
-					userCheckedAt       sql.NullTime
-					loginName           sql.NullString
-					displayName         sql.NullString
-					passwordCheckedAt   sql.NullTime
-					intentCheckedAt     sql.NullTime
-					webAuthNCheckedAt   sql.NullTime
-					webAuthNUserPresent sql.NullBool
-					totpCheckedAt       sql.NullTime
-					otpSMSCheckedAt     sql.NullTime
-					otpEmailCheckedAt   sql.NullTime
-					metadata            database.Map[[]byte]
-					userAgentIP         sql.NullString
-					userAgentHeader     database.Map[[]string]
-					expiration          sql.NullTime
+					userID                 sql.NullString
+					userResourceOwner      sql.NullString
+					userCheckedAt          sql.NullTime
+					loginName              sql.NullString
+					displayName            sql.NullString
+					passwordCheckedAt      sql.NullTime
+					intentCheckedAt        sql.NullTime
+					webAuthNCheckedAt      sql.NullTime
+					webAuthNUserPresent    sql.NullBool
+					totpCheckedAt          sql.NullTime
+					otpSMSCheckedAt        sql.NullTime
+					otpEmailCheckedAt      sql.NullTime
+					recoveryCodesCheckedAt sql.NullTime
+					metadata               database.Map[[]byte]
+					userAgentIP            sql.NullString
+					userAgentHeader        database.Map[[]string]
+					expiration             sql.NullTime
 				)
 
 				err := rows.Scan(
@@ -529,6 +571,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					&totpCheckedAt,
 					&otpSMSCheckedAt,
 					&otpEmailCheckedAt,
+					&recoveryCodesCheckedAt,
 					&metadata,
 					&session.UserAgent.FingerprintID,
 					&userAgentIP,
@@ -553,6 +596,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				session.TOTPFactor.TOTPCheckedAt = totpCheckedAt.Time
 				session.OTPSMSFactor.OTPCheckedAt = otpSMSCheckedAt.Time
 				session.OTPEmailFactor.OTPCheckedAt = otpEmailCheckedAt.Time
+				session.RecoveryCodeFactor.RecoveryCodeCheckedAt = recoveryCodesCheckedAt.Time
 				session.Metadata = metadata
 				session.UserAgent.Header = http.Header(userAgentHeader)
 				if userAgentIP.Valid {

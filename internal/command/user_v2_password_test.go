@@ -5,11 +5,10 @@ import (
 	"testing"
 	"time"
 
-	"golang.org/x/text/language"
-
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -345,6 +344,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 		newCode                     encrypedCodeFunc
 		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 		defaultSecretGenerators     *SecretGenerators
+		loginPaths                  func(*testing.T) LoginPaths
 	}
 	type args struct {
 		ctx              context.Context
@@ -368,6 +368,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 			name: "missing userID",
 			fields: fields{
 				eventstore: expectEventstore(),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -383,6 +384,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -408,6 +410,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -430,6 +433,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -460,7 +464,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 							},
 							10*time.Minute,
 							domain.NotificationTypeEmail,
-							"",
+							"http://example.com/{{.user}}/password/{{.code}}",
 							false,
 							"",
 						),
@@ -468,6 +472,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				newCode:         mockEncryptedCode("code", 10*time.Minute),
+				loginPaths:      expectLoginPathsDefaultPasswordSetURLTemplate("http://example.com/{{.user}}/password/{{.code}}"),
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -509,6 +514,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				newCode:         mockEncryptedCode("code", 10*time.Minute),
+				loginPaths:      expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:     context.Background(),
@@ -582,6 +588,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				defaultSecretGenerators:     defaultGenerators,
 				checkPermission:             newMockPermissionCheckAllowed(),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("code", 10*time.Minute),
+				loginPaths:                  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:              context.Background(),
@@ -651,6 +658,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				checkPermission:         newMockPermissionCheckAllowed(),
 				newCode:                 mockEncryptedCode("code", 10*time.Minute),
 				defaultSecretGenerators: defaultGenerators,
+				loginPaths:              expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:              context.Background(),
@@ -686,7 +694,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 							},
 							10*time.Minute,
 							domain.NotificationTypeEmail,
-							"",
+							"http://example.com/{{.user}}/password/{{.code}}",
 							true,
 							"",
 						),
@@ -694,6 +702,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				newCode:         mockEncryptedCode("code", 10*time.Minute),
+				loginPaths:      expectLoginPathsDefaultPasswordSetURLTemplate("http://example.com/{{.user}}/password/{{.code}}"),
 			},
 			args: args{
 				ctx:        context.Background(),
@@ -717,6 +726,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				newEncryptedCode:            tt.fields.newCode,
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
+				loginPaths:                  tt.fields.loginPaths(t),
 			}
 
 			got, gotPlainCode, err := c.requestPasswordReset(tt.args.ctx, tt.args.userID, tt.args.returnCode, tt.args.urlTmpl, tt.args.notificationType)

@@ -3,23 +3,25 @@ package user
 import (
 	"context"
 
+	"connectrpc.com/connect"
+
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func (s *Server) PasswordReset(ctx context.Context, req *user.PasswordResetRequest) (_ *user.PasswordResetResponse, err error) {
+func (s *Server) PasswordReset(ctx context.Context, req *connect.Request[user.PasswordResetRequest]) (_ *connect.Response[user.PasswordResetResponse], err error) {
 	var details *domain.ObjectDetails
 	var code *string
 
-	switch m := req.GetMedium().(type) {
+	switch m := req.Msg.GetMedium().(type) {
 	case *user.PasswordResetRequest_SendLink:
-		details, code, err = s.command.RequestPasswordResetURLTemplate(ctx, req.GetUserId(), m.SendLink.GetUrlTemplate(), notificationTypeToDomain(m.SendLink.GetNotificationType()))
+		details, code, err = s.command.RequestPasswordResetURLTemplate(ctx, req.Msg.GetUserId(), m.SendLink.GetUrlTemplate(), notificationTypeToDomain(m.SendLink.GetNotificationType()))
 	case *user.PasswordResetRequest_ReturnCode:
-		details, code, err = s.command.RequestPasswordResetReturnCode(ctx, req.GetUserId())
+		details, code, err = s.command.RequestPasswordResetReturnCode(ctx, req.Msg.GetUserId())
 	case nil:
-		details, code, err = s.command.RequestPasswordReset(ctx, req.GetUserId())
+		details, code, err = s.command.RequestPasswordReset(ctx, req.Msg.GetUserId())
 	default:
 		err = zerrors.ThrowUnimplementedf(nil, "USERv2-SDeeg", "verification oneOf %T in method RequestPasswordReset not implemented", m)
 	}
@@ -27,10 +29,10 @@ func (s *Server) PasswordReset(ctx context.Context, req *user.PasswordResetReque
 		return nil, err
 	}
 
-	return &user.PasswordResetResponse{
+	return connect.NewResponse(&user.PasswordResetResponse{
 		Details:          object.DomainToDetailsPb(details),
 		VerificationCode: code,
-	}, nil
+	}), nil
 }
 
 func notificationTypeToDomain(notificationType user.NotificationType) domain.NotificationType {
@@ -46,16 +48,16 @@ func notificationTypeToDomain(notificationType user.NotificationType) domain.Not
 	}
 }
 
-func (s *Server) SetPassword(ctx context.Context, req *user.SetPasswordRequest) (_ *user.SetPasswordResponse, err error) {
+func (s *Server) SetPassword(ctx context.Context, req *connect.Request[user.SetPasswordRequest]) (_ *connect.Response[user.SetPasswordResponse], err error) {
 	var details *domain.ObjectDetails
 
-	switch v := req.GetVerification().(type) {
+	switch v := req.Msg.GetVerification().(type) {
 	case *user.SetPasswordRequest_CurrentPassword:
-		details, err = s.command.ChangePassword(ctx, "", req.GetUserId(), v.CurrentPassword, req.GetNewPassword().GetPassword(), "", req.GetNewPassword().GetChangeRequired())
+		details, err = s.command.ChangePassword(ctx, "", req.Msg.GetUserId(), v.CurrentPassword, req.Msg.GetNewPassword().GetPassword(), "", req.Msg.GetNewPassword().GetChangeRequired())
 	case *user.SetPasswordRequest_VerificationCode:
-		details, err = s.command.SetPasswordWithVerifyCode(ctx, "", req.GetUserId(), v.VerificationCode, req.GetNewPassword().GetPassword(), "", req.GetNewPassword().GetChangeRequired())
+		details, err = s.command.SetPasswordWithVerifyCode(ctx, "", req.Msg.GetUserId(), v.VerificationCode, req.Msg.GetNewPassword().GetPassword(), "", req.Msg.GetNewPassword().GetChangeRequired())
 	case nil:
-		details, err = s.command.SetPassword(ctx, "", req.GetUserId(), req.GetNewPassword().GetPassword(), req.GetNewPassword().GetChangeRequired())
+		details, err = s.command.SetPassword(ctx, "", req.Msg.GetUserId(), req.Msg.GetNewPassword().GetPassword(), req.Msg.GetNewPassword().GetChangeRequired())
 	default:
 		err = zerrors.ThrowUnimplementedf(nil, "USERv2-SFdf2", "verification oneOf %T in method SetPasswordRequest not implemented", v)
 	}
@@ -63,7 +65,7 @@ func (s *Server) SetPassword(ctx context.Context, req *user.SetPasswordRequest) 
 		return nil, err
 	}
 
-	return &user.SetPasswordResponse{
+	return connect.NewResponse(&user.SetPasswordResponse{
 		Details: object.DomainToDetailsPb(details),
-	}, nil
+	}), nil
 }

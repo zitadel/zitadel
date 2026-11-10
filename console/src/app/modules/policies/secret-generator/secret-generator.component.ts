@@ -5,6 +5,7 @@ import { SecretGenerator, SecretGeneratorType } from 'src/app/proto/generated/zi
   selector: 'cnsl-secret-generator',
   templateUrl: './secret-generator.component.html',
   styleUrls: ['./secret-generator.component.scss'],
+  standalone: false,
 })
 export class SecretGeneratorComponent {
   public generators: SecretGenerator.AsObject[] = [];
@@ -18,6 +19,7 @@ export class SecretGeneratorComponent {
     SecretGeneratorType.SECRET_GENERATOR_TYPE_APP_SECRET,
     SecretGeneratorType.SECRET_GENERATOR_TYPE_OTP_SMS,
     SecretGeneratorType.SECRET_GENERATOR_TYPE_OTP_EMAIL,
+    SecretGeneratorType.SECRET_GENERATOR_TYPE_INVITE_CODE,
   ];
 
   constructor() {}

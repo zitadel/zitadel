@@ -9,7 +9,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -79,13 +78,13 @@ func (q *Queries) OIDCSettingsByAggID(ctx context.Context, aggregateID string) (
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareOIDCSettingsQuery(ctx, q.client)
+	stmt, scan := prepareOIDCSettingsQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		OIDCSettingsColumnAggregateID.identifier(): aggregateID,
 		OIDCSettingsColumnInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-s9nle", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-s9nle", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -95,7 +94,7 @@ func (q *Queries) OIDCSettingsByAggID(ctx context.Context, aggregateID string) (
 	return settings, err
 }
 
-func prepareOIDCSettingsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*OIDCSettings, error)) {
+func prepareOIDCSettingsQuery() (sq.SelectBuilder, func(*sql.Row) (*OIDCSettings, error)) {
 	return sq.Select(
 			OIDCSettingsColumnAggregateID.identifier(),
 			OIDCSettingsColumnCreationDate.identifier(),
@@ -106,7 +105,7 @@ func prepareOIDCSettingsQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			OIDCSettingsColumnIdTokenLifetime.identifier(),
 			OIDCSettingsColumnRefreshTokenIdleExpiration.identifier(),
 			OIDCSettingsColumnRefreshTokenExpiration.identifier()).
-			From(oidcSettingsTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(oidcSettingsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*OIDCSettings, error) {
 			oidcSettings := new(OIDCSettings)

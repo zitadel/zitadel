@@ -5,8 +5,11 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/base64"
+	"errors"
 	"io"
 	"unicode/utf8"
+
+	"github.com/go-jose/go-jose/v4"
 
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -17,6 +20,7 @@ type AESCrypto struct {
 	keys            map[string]string
 	encryptionKeyID string
 	keyIDs          []string
+	legacyToken     bool
 }
 
 func NewAESCrypto(config *KeyConfig, keyStorage KeyStorage) (*AESCrypto, error) {
@@ -28,6 +32,7 @@ func NewAESCrypto(config *KeyConfig, keyStorage KeyStorage) (*AESCrypto, error) 
 		keys:            keys,
 		encryptionKeyID: config.EncryptionKeyID,
 		keyIDs:          ids,
+		legacyToken:     config.LegacyToken,
 	}, nil
 }
 
@@ -67,6 +72,81 @@ func (a *AESCrypto) EncryptionKeyID() string {
 
 func (a *AESCrypto) DecryptionKeyIDs() []string {
 	return a.keyIDs
+}
+
+func (a *AESCrypto) EncryptToken(data string) (string, error) {
+	encrypter, err := jose.NewEncrypter(jose.A256GCM, jose.Recipient{
+		Algorithm: jose.A256GCMKW,
+		Key:       a.encryptionKey(),
+		KeyID:     a.encryptionKeyID,
+	}, nil)
+	if err != nil {
+		return "", zerrors.ThrowInternal(err, "CRYPTO-Woox2", "Errors.Internal")
+	}
+
+	encrypted, err := encrypter.Encrypt([]byte(data))
+	if err != nil {
+		return "", zerrors.ThrowInternal(err, "CRYPTO-Woox3", "Errors.Internal")
+	}
+
+	serialized, err := encrypted.CompactSerialize()
+	if err != nil {
+		return "", zerrors.ThrowInternal(err, "CRYPT-Woox4", "Errors.Internal")
+	}
+	return serialized, nil
+}
+
+func (a *AESCrypto) DecryptToken(value string) (string, error) {
+	key, err := a.decryptionKey(a.encryptionKeyID)
+	if err != nil {
+		return "", err
+	}
+	decrypted, err := a.decryptA256GCM(value, key)
+	if err == nil {
+		return decrypted, nil
+	}
+	if !a.legacyToken {
+		return "", err
+	}
+	decrypted, err2 := a.decryptLegacyToken(value, key)
+	if err2 != nil {
+		return "", errors.Join(err, err2)
+	}
+	return decrypted, nil
+}
+
+func (a *AESCrypto) LegacyTokenEnabled() bool {
+	return a.legacyToken
+}
+
+func (a *AESCrypto) decryptA256GCM(value string, key string) (string, error) {
+	jwe, err := jose.ParseEncrypted(value, []jose.KeyAlgorithm{jose.A256GCMKW}, []jose.ContentEncryption{jose.A256GCM})
+	if err != nil {
+		return "", zerrors.ThrowPreconditionFailed(err, "CRYPT-ha6Oh", "malformed encrypted value")
+	}
+	decrypted, err := jwe.Decrypt(key)
+	if err != nil {
+		return "", zerrors.ThrowUnauthenticated(err, "CRYPT-OhN2u", "failed to decrypt value")
+	}
+	if !utf8.Valid(decrypted) {
+		return "", zerrors.ThrowPreconditionFailed(err, "CRYPT-Koh1u", "non-UTF-8 in decrypted string")
+	}
+	return string(decrypted), nil
+}
+
+func (a *AESCrypto) decryptLegacyToken(value string, key string) (string, error) {
+	text, err := base64.RawURLEncoding.DecodeString(value)
+	if err != nil {
+		return "", zerrors.ThrowPreconditionFailed(err, "CRYPT-Eep6o", "malformed encrypted value")
+	}
+	decrypted, err := DecryptAES(text, key)
+	if err != nil {
+		return "", err
+	}
+	if !utf8.Valid(decrypted) {
+		return "", zerrors.ThrowPreconditionFailed(err, "CRYPT-ohGh6", "non-UTF-8 in decrypted string")
+	}
+	return string(decrypted), nil
 }
 
 func (a *AESCrypto) encryptionKey() string {

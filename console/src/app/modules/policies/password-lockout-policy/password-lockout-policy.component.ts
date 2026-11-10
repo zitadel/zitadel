@@ -16,6 +16,7 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
   selector: 'cnsl-password-lockout-policy',
   templateUrl: './password-lockout-policy.component.html',
   styleUrls: ['./password-lockout-policy.component.scss'],
+  standalone: false,
 })
 export class PasswordLockoutPolicyComponent implements OnInit {
   @Input() public service!: ManagementService | AdminService;
@@ -116,10 +117,9 @@ export class PasswordLockoutPolicyComponent implements OnInit {
   }
 
   public savePolicy(): void {
-    let promise: Promise<any>;
     if (this.lockoutData) {
       if (this.service instanceof AdminService) {
-        promise = this.service
+        this.service
           .updateLockoutPolicy(this.lockoutData.maxPasswordAttempts, this.lockoutData.maxOtpAttempts)
           .then(() => {
             this.toast.showInfo('POLICY.TOAST.SET', true);
@@ -130,7 +130,7 @@ export class PasswordLockoutPolicyComponent implements OnInit {
           });
       } else {
         if ((this.lockoutData as LockoutPolicy.AsObject).isDefault) {
-          promise = (this.service as ManagementService)
+          (this.service as ManagementService)
             .addCustomLockoutPolicy(this.lockoutData.maxPasswordAttempts, this.lockoutData.maxOtpAttempts)
             .then(() => {
               this.toast.showInfo('POLICY.TOAST.SET', true);
@@ -140,7 +140,7 @@ export class PasswordLockoutPolicyComponent implements OnInit {
               this.toast.showError(error);
             });
         } else {
-          promise = (this.service as ManagementService)
+          (this.service as ManagementService)
             .updateCustomLockoutPolicy(this.lockoutData.maxPasswordAttempts, this.lockoutData.maxOtpAttempts)
             .then(() => {
               this.toast.showInfo('POLICY.TOAST.SET', true);

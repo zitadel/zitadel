@@ -105,6 +105,7 @@ InitMFAOTPSMS:
   Title: Kétfaktoros hitelesítés
   DescriptionPhone: Hozd létre a kétfaktoros hitelesítést. Add meg a telefonszámod a hitelesítéshez.
   DescriptionCode: Hozd létre a kétfaktoros hitelesítést. Add meg a kapott kódot a telefonszámod hitelesítéséhez.
+  CountryCodeLabel: Ország
   PhoneLabel: Telefon
   CodeLabel: Kód
   EditButtonText: Szerkesztés
@@ -235,6 +236,10 @@ RegistrationUser:
   Indonesian: Indonéz
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Nem
   Female: Nő
   Male: Férfi
@@ -277,6 +282,10 @@ ExternalRegistrationUserOverview:
   Indonesian: Indonéz
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Felhasználási feltételek
   TosConfirm: Elfogadom a
   TosLinkText: TOS
@@ -323,6 +332,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Külső felhasználó nem található
   Description: Külső felhasználó nem található. Szeretnéd összekapcsolni a felhasználódat vagy automatikusan regisztrálni egy újat?
+  NoOptionAvailable: Nem található a külső felhasználódhoz tartozó fiók, és új fiók sem hozható létre. Kérjük, lépj kapcsolatba az adminisztrátoroddal vagy a támogatással.
   LinkButtonText: Összekapcsolás
   AutoRegisterButtonText: Regisztráció
   TosAndPrivacyLabel: Felhasználási feltételek
@@ -348,6 +358,10 @@ ExternalNotFound:
   Indonesian: Indonéz
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
 DeviceAuth:
   Title: Eszköz engedélyezése
   UserCode:
@@ -396,8 +410,8 @@ Errors:
       NotFound: Profil nem található
       NotChanged: Profil nem változott
       Empty: Profil üres
-      FirstNameEmpty: A profilban a keresztnév üres
-      LastNameEmpty: A profilban a vezetéknév üres
+      FirstNameEmpty: A profilban az első név mező üres
+      LastNameEmpty: A profilban a vezetéknév mező üres
       IDMissing: Hiányzik a profil azonosító
     Email:
       NotFound: Email nem található
@@ -451,6 +465,7 @@ Errors:
         AlreadyReady: A többfaktoros OTP (OneTimePassword) már be van állítva
         NotExisting: A többfaktoros OTP (OneTimePassword) nem létezik
         InvalidCode: Érvénytelen kód
+        Reused: Ezt a kódot már felhasználták. Kérjük, várjon egy új kódra
         NotReady: A többfaktoros OTP (OneTimePassword) nem áll készen
     Locked: A felhasználó zárolva van
     SomethingWentWrong: Valami elromlott

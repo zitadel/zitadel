@@ -22,6 +22,7 @@ type FilterSearchQueryAsObject =
   selector: 'cnsl-filter',
   templateUrl: './filter.component.html',
   styleUrls: ['./filter.component.scss'],
+  standalone: false,
 })
 export class FilterComponent {
   @Output() public filterChanged: EventEmitter<FilterSearchQuery[]> = new EventEmitter();

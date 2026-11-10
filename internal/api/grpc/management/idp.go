@@ -20,7 +20,7 @@ func (s *Server) GetOrgIDPByID(ctx context.Context, req *mgmt_pb.GetOrgIDPByIDRe
 }
 
 func (s *Server) ListOrgIDPs(ctx context.Context, req *mgmt_pb.ListOrgIDPsRequest) (*mgmt_pb.ListOrgIDPsResponse, error) {
-	queries, err := listIDPsToModel(ctx, req)
+	queries, err := listIDPsToModel(ctx, s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +157,7 @@ func (s *Server) GetProviderByID(ctx context.Context, req *mgmt_pb.GetProviderBy
 }
 
 func (s *Server) ListProviders(ctx context.Context, req *mgmt_pb.ListProvidersRequest) (*mgmt_pb.ListProvidersResponse, error) {
-	queries, err := listProvidersToQuery(ctx, req)
+	queries, err := listProvidersToQuery(ctx, s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -455,6 +455,27 @@ func (s *Server) DeleteProvider(ctx context.Context, req *mgmt_pb.DeleteProvider
 		return nil, err
 	}
 	return &mgmt_pb.DeleteProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddZitadelProvider(ctx context.Context, req *mgmt_pb.AddZitadelProviderRequest) (*mgmt_pb.AddZitadelProviderResponse, error) {
+	id, details, err := s.command.AddOrgZitadelProvider(ctx, authz.GetCtxData(ctx).OrgID, addZitadelProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddZitadelProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateZitadelProvider(ctx context.Context, req *mgmt_pb.UpdateZitadelProviderRequest) (*mgmt_pb.UpdateZitadelProviderResponse, error) {
+	details, err := s.command.UpdateOrgZitadelProvider(ctx, req.Id, authz.GetCtxData(ctx).OrgID, updateZitadelProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateZitadelProviderResponse{
 		Details: object_pb.DomainToChangeDetailsPb(details),
 	}, nil
 }

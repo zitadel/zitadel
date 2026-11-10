@@ -15,13 +15,14 @@ type SAMLRequest struct {
 	ID          string
 	LoginClient string
 
-	ApplicationID string
-	ACSURL        string
-	RelayState    string
-	RequestID     string
-	Binding       string
-	Issuer        string
-	Destination   string
+	ApplicationID  string
+	ACSURL         string
+	RelayState     string
+	RequestID      string
+	Binding        string
+	Issuer         string
+	Destination    string
+	ResponseIssuer string
 }
 
 type CurrentSAMLRequest struct {
@@ -56,6 +57,7 @@ func (c *Commands) AddSAMLRequest(ctx context.Context, samlRequest *SAMLRequest)
 		samlRequest.Binding,
 		samlRequest.Issuer,
 		samlRequest.Destination,
+		samlRequest.ResponseIssuer,
 	))
 	if err != nil {
 		return nil, err
@@ -117,6 +119,9 @@ func (c *Commands) FailSAMLRequest(ctx context.Context, id string, reason domain
 	if writeModel.SAMLRequestState != domain.SAMLRequestStateAdded {
 		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-32lGj1Fhjt", "Errors.SAMLRequest.AlreadyHandled")
 	}
+	if err := c.checkPermission(ctx, domain.PermissionSessionLink, writeModel.ResourceOwner, ""); err != nil {
+		return nil, nil, err
+	}
 	err = c.pushAppendAndReduce(ctx, writeModel, samlrequest.NewFailedEvent(
 		ctx,
 		&samlrequest.NewAggregate(id, authz.GetInstance(ctx).InstanceID()).Aggregate,
@@ -131,15 +136,16 @@ func (c *Commands) FailSAMLRequest(ctx context.Context, id string, reason domain
 func samlRequestWriteModelToCurrentSAMLRequest(writeModel *SAMLRequestWriteModel) (_ *CurrentSAMLRequest) {
 	return &CurrentSAMLRequest{
 		SAMLRequest: &SAMLRequest{
-			ID:            writeModel.AggregateID,
-			LoginClient:   writeModel.LoginClient,
-			ApplicationID: writeModel.ApplicationID,
-			ACSURL:        writeModel.ACSURL,
-			RelayState:    writeModel.RelayState,
-			RequestID:     writeModel.RequestID,
-			Binding:       writeModel.Binding,
-			Issuer:        writeModel.Issuer,
-			Destination:   writeModel.Destination,
+			ID:             writeModel.AggregateID,
+			LoginClient:    writeModel.LoginClient,
+			ApplicationID:  writeModel.ApplicationID,
+			ACSURL:         writeModel.ACSURL,
+			RelayState:     writeModel.RelayState,
+			RequestID:      writeModel.RequestID,
+			Binding:        writeModel.Binding,
+			Issuer:         writeModel.Issuer,
+			Destination:    writeModel.Destination,
+			ResponseIssuer: writeModel.ResponseIssuer,
 		},
 		SessionID:   writeModel.SessionID,
 		UserID:      writeModel.UserID,

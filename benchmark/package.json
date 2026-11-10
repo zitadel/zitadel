@@ -1,0 +1,33 @@
+{
+    "name": "@zitadel/benchmark",
+    "repository": "ssh://git@github.com/zitadel/zitadel.git",
+    "author": "ZITADEL Authors <hi@zitadel.com>",
+    "engines": {
+        "node": "18 || 20"
+    },
+    "license": "Apache-2.0",
+    "devDependencies": {
+        "@babel/core": "7.29.7",
+        "@babel/plugin-transform-class-properties": "^7.29.7",
+        "@babel/plugin-transform-object-rest-spread": "^7.29.7",
+        "@babel/preset-env": "7.29.7",
+        "@babel/preset-typescript": "7.29.7",
+        "@types/k6": ">=2.0.0",
+        "@types/webpack": "5.28.5",
+        "babel-loader": "10.1.1",
+        "clean-webpack-plugin": "4.0.0",
+        "copy-webpack-plugin": "^14.0.0",
+        "prettier": "^3.9.5",
+        "prettier-plugin-organize-imports": "^4.3.0",
+        "typescript": "5.9.3",
+        "webpack": "5.108.4",
+        "webpack-cli": "5.1.4",
+        "webpack-glob-entries": "^1.0.1"
+    },
+    "scripts": {
+        "bundle": "webpack",
+        "lint": "prettier --check src/**",
+        "lint:fix": "prettier --write src",
+        "clean": "rm -rf dist node_modules"
+    }
+}

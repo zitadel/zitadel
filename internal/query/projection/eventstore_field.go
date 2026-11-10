@@ -5,6 +5,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/permission"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
@@ -13,6 +14,7 @@ const (
 	fieldsOrgDomainVerified = "org_domain_verified_fields"
 	fieldsInstanceDomain    = "instance_domain_fields"
 	fieldsMemberships       = "membership_fields"
+	fieldsPermission        = "permission_fields"
 )
 
 func newFillProjectGrantFields(config handler.Config) *handler.FieldHandler {
@@ -79,6 +81,19 @@ func newFillMembershipFields(config handler.Config) *handler.FieldHandler {
 				project.MemberRemovedEventType,
 				project.MemberCascadeRemovedEventType,
 				project.ProjectRemovedType,
+			},
+		},
+	)
+}
+
+func newFillPermissionFields(config handler.Config) *handler.FieldHandler {
+	return handler.NewFieldHandler(
+		&config,
+		permission.PermissionSearchField,
+		map[eventstore.AggregateType][]eventstore.EventType{
+			permission.AggregateType: {
+				permission.AddedType,
+				permission.RemovedType,
 			},
 		},
 	)

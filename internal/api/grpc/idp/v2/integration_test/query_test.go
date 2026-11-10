@@ -4,11 +4,9 @@ package idp_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -68,7 +66,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 				IamCTX,
 				&idp.GetIDPByIDRequest{},
 				func(ctx context.Context, request *idp.GetIDPByIDRequest) *idpAttr {
-					name := fmt.Sprintf("GetIDPByID-%s", gofakeit.AppName())
+					name := integration.IDPName()
 					resp := Instance.AddGenericOAuthProvider(ctx, name)
 					request.Id = resp.Id
 					return &idpAttr{
@@ -76,6 +74,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 						name,
 						&object.Details{
 							Sequence:      resp.Details.Sequence,
+							CreationDate:  resp.Details.CreationDate,
 							ChangeDate:    resp.Details.ChangeDate,
 							ResourceOwner: resp.Details.ResourceOwner,
 						}}
@@ -116,7 +115,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 				UserCTX,
 				&idp.GetIDPByIDRequest{},
 				func(ctx context.Context, request *idp.GetIDPByIDRequest) *idpAttr {
-					name := fmt.Sprintf("GetIDPByID-%s", gofakeit.AppName())
+					name := integration.IDPName()
 					resp := Instance.AddGenericOAuthProvider(IamCTX, name)
 					request.Id = resp.Id
 					return &idpAttr{
@@ -124,6 +123,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 						name,
 						&object.Details{
 							Sequence:      resp.Details.Sequence,
+							CreationDate:  resp.Details.CreationDate,
 							ChangeDate:    resp.Details.ChangeDate,
 							ResourceOwner: resp.Details.ResourceOwner,
 						}}
@@ -137,7 +137,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 				CTX,
 				&idp.GetIDPByIDRequest{},
 				func(ctx context.Context, request *idp.GetIDPByIDRequest) *idpAttr {
-					name := fmt.Sprintf("GetIDPByID-%s", gofakeit.AppName())
+					name := integration.IDPName()
 					resp := Instance.AddOrgGenericOAuthProvider(ctx, name)
 					request.Id = resp.Id
 					return &idpAttr{
@@ -145,6 +145,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 						name,
 						&object.Details{
 							Sequence:      resp.Details.Sequence,
+							CreationDate:  resp.Details.CreationDate,
 							ChangeDate:    resp.Details.ChangeDate,
 							ResourceOwner: resp.Details.ResourceOwner,
 						}}
@@ -185,7 +186,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 				UserCTX,
 				&idp.GetIDPByIDRequest{},
 				func(ctx context.Context, request *idp.GetIDPByIDRequest) *idpAttr {
-					name := fmt.Sprintf("GetIDPByID-%s", gofakeit.AppName())
+					name := integration.IDPName()
 					resp := Instance.AddOrgGenericOAuthProvider(CTX, name)
 					request.Id = resp.Id
 					return &idpAttr{
@@ -193,12 +194,103 @@ func TestServer_GetIDPByID(t *testing.T) {
 						name,
 						&object.Details{
 							Sequence:      resp.Details.Sequence,
+							CreationDate:  resp.Details.CreationDate,
 							ChangeDate:    resp.Details.ChangeDate,
 							ResourceOwner: resp.Details.ResourceOwner,
 						}}
 				},
 			},
 			wantErr: true,
+		},
+		{
+			name: "idp by ID, instance, Zitadel provider, ok",
+			args: args{
+				IamCTX,
+				&idp.GetIDPByIDRequest{},
+				func(ctx context.Context, request *idp.GetIDPByIDRequest) *idpAttr {
+					name := integration.IDPName()
+					resp := Instance.AddZitadelProvider(ctx, name)
+					request.Id = resp.Id
+					return &idpAttr{
+						resp.GetId(),
+						name,
+						&object.Details{
+							Sequence:      resp.Details.Sequence,
+							CreationDate:  resp.Details.CreationDate,
+							ChangeDate:    resp.Details.ChangeDate,
+							ResourceOwner: resp.Details.ResourceOwner,
+						}}
+				},
+			},
+			want: &idp.GetIDPByIDResponse{
+				Idp: &idp.IDP{
+					Details: &object.Details{
+						ChangeDate: timestamppb.Now(),
+					},
+					State: idp.IDPState_IDP_STATE_ACTIVE,
+					Type:  idp.IDPType_IDP_TYPE_ZITADEL,
+					Config: &idp.IDPConfig{
+						Config: &idp.IDPConfig_Zitadel{
+							Zitadel: &idp.ZitadelConfig{
+								ClientId: "test-client",
+								Issuer:   "zitadel.example.com",
+								Scopes:   []string{"email", "profile"},
+								InstanceRolesInfo: []*idp.InstanceRolesInfo{
+									{
+										OrganizationId:     "org1",
+										OrganizationDomain: "org1.com",
+									},
+								},
+							},
+						},
+						Options: &idp.Options{
+							IsCreationAllowed: true,
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "idp by ID, org, Zitadel provider, ok",
+			args: args{
+				CTX,
+				&idp.GetIDPByIDRequest{},
+				func(ctx context.Context, request *idp.GetIDPByIDRequest) *idpAttr {
+					name := integration.IDPName()
+					resp := Instance.AddOrgZitadelProvider(ctx, name)
+					request.Id = resp.Id
+					return &idpAttr{
+						resp.GetId(),
+						name,
+						&object.Details{
+							Sequence:      resp.Details.Sequence,
+							CreationDate:  resp.Details.CreationDate,
+							ChangeDate:    resp.Details.ChangeDate,
+							ResourceOwner: resp.Details.ResourceOwner,
+						}}
+				},
+			},
+			want: &idp.GetIDPByIDResponse{
+				Idp: &idp.IDP{
+					Details: &object.Details{
+						ChangeDate: timestamppb.Now(),
+					},
+					State: idp.IDPState_IDP_STATE_ACTIVE,
+					Type:  idp.IDPType_IDP_TYPE_ZITADEL,
+					Config: &idp.IDPConfig{
+						Config: &idp.IDPConfig_Zitadel{
+							Zitadel: &idp.ZitadelConfig{
+								ClientId: "test-client",
+								Issuer:   "zitadel.example.com",
+								Scopes:   []string{"email", "profile"},
+							},
+						},
+						Options: &idp.Options{
+							IsCreationAllowed: true,
+						},
+					},
+				},
+			},
 		},
 	}
 	for _, tt := range tests {

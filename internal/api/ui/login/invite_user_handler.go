@@ -5,6 +5,9 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -98,7 +101,8 @@ func (l *Login) checkUserInviteCode(w http.ResponseWriter, r *http.Request, auth
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	_, err := l.command.VerifyInviteCodeSetPassword(setUserContext(r.Context(), data.UserID, userOrgID), data.UserID, data.Code, data.Password, userAgentID)
 	if err != nil {
-		l.renderInviteUser(w, r, authReq, data.UserID, data.OrgID, data.LoginName, "", err)
+		logging.WithFields("instanceID", authz.GetInstance(r.Context()).InstanceID(), "userID", data.UserID).WithError(err).Warn("error verifying initial code")
+		l.renderInviteUser(w, r, authReq, data.UserID, data.OrgID, data.LoginName, "", zerrors.ThrowInvalidArgument(nil, "LOGIN-sjk2o", "Errors.User.Code.Invalid"))
 		return
 	}
 	if authReq == nil {
@@ -115,6 +119,10 @@ func (l *Login) resendUserInvite(w http.ResponseWriter, r *http.Request, authReq
 		authRequestID = authReq.ID
 	}
 	_, err := l.command.ResendInviteCode(setUserContext(r.Context(), userID, userOrgID), userID, userOrgID, authRequestID)
+	if !zerrors.IsInternal(err) {
+		logging.WithFields("instanceID", authz.GetInstance(r.Context()).InstanceID(), "userID", userID).WithError(err).Warn("error requesting invite code")
+		err = nil // we ignore errors on resend to not leak information
+	}
 	l.renderInviteUser(w, r, authReq, userID, orgID, loginName, "", err)
 }
 

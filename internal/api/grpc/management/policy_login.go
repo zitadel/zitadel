@@ -66,7 +66,11 @@ func (s *Server) ResetLoginPolicyToDefault(ctx context.Context, req *mgmt_pb.Res
 }
 
 func (s *Server) ListLoginPolicyIDPs(ctx context.Context, req *mgmt_pb.ListLoginPolicyIDPsRequest) (*mgmt_pb.ListLoginPolicyIDPsResponse, error) {
-	res, err := s.query.IDPLoginPolicyLinks(ctx, authz.GetCtxData(ctx).OrgID, ListLoginPolicyIDPsRequestToQuery(req), false)
+	queries, err := ListLoginPolicyIDPsRequestToQuery(s.systemDefaults, req)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.IDPLoginPolicyLinks(ctx, authz.GetCtxData(ctx).OrgID, queries, false)
 	if err != nil {
 		return nil, err
 	}

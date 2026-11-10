@@ -3,6 +3,7 @@ package apple
 import (
 	"context"
 	"errors"
+	"net/http"
 	"testing"
 	"time"
 
@@ -156,7 +157,7 @@ func TestSession_FetchUser(t *testing.T) {
 
 			// call the real discovery endpoint
 			gock.New(issuer).Get(openid.DiscoveryEndpoint).EnableNetworking()
-			provider, err := New(tt.fields.clientID, tt.fields.teamID, tt.fields.keyID, tt.fields.redirectURI, tt.fields.privateKey, tt.fields.scopes)
+			provider, err := New(tt.fields.clientID, tt.fields.teamID, tt.fields.keyID, tt.fields.redirectURI, tt.fields.privateKey, tt.fields.scopes, http.DefaultClient)
 			require.NoError(t, err)
 
 			session := &Session{

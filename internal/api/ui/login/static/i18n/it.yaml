@@ -2,7 +2,7 @@ Login:
   Title: Bentornato!
   Description: Inserisci i tuoi dati di accesso.
   TitleLinking: Accesso per il collegamento degli utenti
-  DescriptionLinking: Inserisci i tuoi dati di accesso per collegare il tuo utente esterno con un utente ZITADEL.
+  DescriptionLinking: Inserisci i tuoi dati di accesso per collegare il tuo utente esterno con un utente Zitadel.
   LoginNameLabel: Nome di accesso
   UsernamePlaceHolder: nome utente
   LoginnamePlaceHolder: nomeutente@dominio
@@ -20,7 +20,7 @@ LDAP:
 
 SelectAccount:
   Title: Seleziona l'account
-  Description: Usa il tuo account ZITADEL
+  Description: Usa il tuo account Zitadel
   TitleLinking: Seleziona l'account per il collegamento dell'utente
   DescriptionLinking: Seleziona il tuo account da collegare al tuo utente esterno.
   OtherUser: Altro utente
@@ -114,10 +114,11 @@ InitMFAOTP:
   NextButtonText: Avanti
   CancelButtonText: annulla
 
-InitMFASMS:
+InitMFAOTPSMS:
   Title: Verificazione a 2 fattori
   DescriptionPhone: Crea il tuo 2 fattori. Inserisci il tuo numero di telefono per verificarlo.
   DescriptionCode: Crea il tuo 2 fattori. Inserisci il codice ricevuto per verificare il tuo numero di telefono.
+  CountryCodeLabel: Paese
   PhoneLabel: Numero di telefono
   CodeLabel: Codice
   EditButtonText: Modifica
@@ -265,6 +266,10 @@ RegistrationUser:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Genere
   Female: Femminile
   Male: Maschile
@@ -306,7 +311,12 @@ ExternalRegistrationUserOverview:
   Dutch: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Termini di servizio
   TosConfirm: Accetto i
   TosLinkText: Termini di servizio
@@ -359,6 +369,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Utente esterno non trovato
   Description: Utente esterno non trovato. Vuoi collegare il tuo utente o registrarne uno nuovo automaticamente.
+  NoOptionAvailable: Non è stato trovato alcun account corrispondente al tuo utente esterno e non è possibile creare un nuovo account. Contatta il tuo amministratore o l'assistenza.
   LinkButtonText: Link
   AutoRegisterButtonText: Registra
   TosAndPrivacyLabel: Termini di servizio
@@ -384,6 +395,10 @@ ExternalNotFound:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
 
 DeviceAuth:
   Title: Autorizzazione del dispositivo
@@ -491,6 +506,7 @@ Errors:
         AlreadyReady: Multifactor OTP (OneTimePassword) è già impostato
         NotExisting: Multifactor OTP (OneTimePassword) non esiste
         InvalidCode: Codice non valido
+        Reused: Questo codice è già stato utilizzato. Attendere un nuovo codice
         NotReady: Multifattore OTP (OneTimePassword) non è pronto
     Locked: L'utente è bloccato
     SomethingWentWrong: Qualcosa è andato storto

@@ -25,6 +25,7 @@ type OIDCClient struct {
 	ClientID                 string                     `json:"client_id,omitempty"`
 	BackChannelLogoutURI     string                     `json:"back_channel_logout_uri,omitempty"`
 	HashedSecret             string                     `json:"client_secret,omitempty"`
+	RegistrationTokenHash    string                     `json:"registration_token,omitempty"`
 	RedirectURIs             []string                   `json:"redirect_uris,omitempty"`
 	ResponseTypes            []domain.OIDCResponseType  `json:"response_types,omitempty"`
 	GrantTypes               []domain.OIDCGrantType     `json:"grant_types,omitempty"`
@@ -89,7 +90,7 @@ func (q *Queries) ActiveOIDCClientByID(ctx context.Context, clientID string, get
 		client.LoginVersion = domain.LoginVersion2
 		client.LoginBaseURI = (*URL)(loginV2.BaseURI)
 	}
-	if instance.ConsoleClientID() == clientID {
+	if instance.ManagementConsoleClientID() == clientID {
 		client.RedirectURIs = append(client.RedirectURIs, http_util.DomainContext(ctx).Origin()+path.RedirectPath)
 		client.PostLogoutRedirectURIs = append(client.PostLogoutRedirectURIs, http_util.DomainContext(ctx).Origin()+path.PostLogoutPath)
 	}

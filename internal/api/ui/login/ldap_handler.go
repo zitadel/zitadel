@@ -66,7 +66,7 @@ func (l *Login) handleLDAPCallback(w http.ResponseWriter, r *http.Request) {
 		l.renderLDAPLogin(w, r, authReq, err)
 		return
 	}
-	session := &ldap.Session{Provider: provider, User: data.Username, Password: data.Password}
+	session := ldap.NewSession(provider, data.Username, data.Password)
 
 	user, err := session.FetchUser(r.Context())
 	if err != nil {

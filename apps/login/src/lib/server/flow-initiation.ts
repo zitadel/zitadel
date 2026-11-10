@@ -1,0 +1,683 @@
+import { getValidLocaleFromUILocales } from "@/lib/auth-utils";
+import { isExternalUrl, isSafeRedirectUri } from "@/lib/client-utils";
+import { getLanguageCookie, setLanguageCookie, type Cookie } from "@/lib/cookies";
+
+import { shouldUILocalesOverrideCookie } from "@/lib/i18n";
+import { idpTypeToSlug } from "@/lib/idp";
+import { createLogger } from "@/lib/logger";
+import { sendLoginname } from "@/lib/server/loginname";
+import { constructUrl } from "@/lib/service-url";
+import { findValidSession } from "@/lib/session";
+import {
+  createCallback,
+  createResponse,
+  getActiveIdentityProviders,
+  getAuthRequest,
+  getOrgsByDomain,
+  getSAMLRequest,
+  getSecuritySettings,
+  ServiceConfig,
+  startIdentityProviderFlow,
+} from "@/lib/zitadel";
+import { create } from "@zitadel/client";
+import { Prompt } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
+import { CreateCallbackRequestSchema, SessionSchema } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { SecuritySettings } from "@zitadel/proto/zitadel/settings/v2/security_settings_pb";
+import escapeHtml from "escape-html";
+import { NextRequest, NextResponse } from "next/server";
+import { buildCSP } from "../csp";
+
+const logger = createLogger("flow-initiation");
+
+const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
+const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/;
+const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
+
+function setCSPHeaders(
+  response: NextResponse,
+  serviceConfig: ServiceConfig,
+  securitySettings: SecuritySettings | undefined,
+): void {
+  const iframeOrigins =
+    securitySettings?.embeddedIframe?.enabled && securitySettings.embeddedIframe.allowedOrigins.length > 0
+      ? securitySettings.embeddedIframe.allowedOrigins
+      : undefined;
+
+  response.headers.set("Content-Security-Policy", buildCSP({ serviceUrl: serviceConfig.baseUrl, iframeOrigins }));
+
+  if (!iframeOrigins) {
+    response.headers.set("X-Frame-Options", "deny");
+  }
+}
+
+/**
+ * Renders a minimal HTML page that immediately POSTs the given fields to
+ * `url`, with a <noscript> fallback button. Used for flows whose next hop
+ * requires a form post instead of a redirect (e.g. SAML POST bindings).
+ * Callers must validate `url` (isSafeRedirectUri) before calling; all values
+ * are HTML-escaped here.
+ */
+function buildAutoSubmitFormResponse(url: string, fields: Record<string, string>): NextResponse {
+  const hiddenInputs = Object.entries(fields)
+    .map(([key, value]) => `<input type="hidden" name="${escapeHtml(key)}" value="${escapeHtml(value)}" />`)
+    .join("\n");
+
+  const html = `
+    <html>
+      <body onload="document.forms[0].submit()">
+        <form action="${escapeHtml(url)}" method="post">
+          ${hiddenInputs}
+          <noscript>
+            <button type="submit">Continue</button>
+          </noscript>
+        </form>
+      </body>
+    </html>
+  `;
+
+  return new NextResponse(html, {
+    headers: { "Content-Type": "text/html" },
+  });
+}
+
+const gotoAccounts = ({
+  request,
+  requestId,
+  organization,
+  orgDomain,
+}: {
+  request: NextRequest;
+  requestId: string;
+  organization?: string;
+  orgDomain?: string;
+}): NextResponse<unknown> => {
+  const accountsUrl = constructUrl(request, "/accounts");
+
+  if (requestId) {
+    accountsUrl.searchParams.set("requestId", requestId);
+  }
+  if (organization) {
+    accountsUrl.searchParams.set("organization", organization);
+  }
+  if (orgDomain) {
+    accountsUrl.searchParams.set("orgDomain", orgDomain);
+  }
+
+  return NextResponse.redirect(accountsUrl);
+};
+
+const gotoLoginname = ({
+  request,
+  requestId,
+  loginHint,
+  organization,
+  orgDomain,
+}: {
+  request: NextRequest;
+  requestId: string;
+  loginHint?: string;
+  organization?: string;
+  orgDomain?: string;
+}): NextResponse<unknown> => {
+  const loginNameUrl = constructUrl(request, "/loginname");
+  loginNameUrl.searchParams.set("requestId", requestId);
+
+  // Prefill only, no auto-submit: see resolveLoginHint.
+  if (loginHint) {
+    loginNameUrl.searchParams.set("loginName", loginHint);
+  }
+  if (organization) {
+    loginNameUrl.searchParams.set("organization", organization);
+  }
+  if (orgDomain) {
+    loginNameUrl.searchParams.set("orgDomain", orgDomain);
+  }
+
+  return NextResponse.redirect(loginNameUrl);
+};
+
+/**
+ * Resolve a login_hint server-side to a redirect straight to the next step
+ * (e.g. /password), skipping the /loginname screen entirely. Returns null when
+ * there is no hint or it can't be resolved (unknown/ambiguous user, transient
+ * error), in which case callers fall back to the prefilled /loginname screen.
+ */
+const resolveLoginHint = async ({
+  request,
+  requestId,
+  loginHint,
+  organization,
+}: {
+  request: NextRequest;
+  requestId: string;
+  loginHint?: string;
+  organization?: string;
+}): Promise<NextResponse<unknown> | null> => {
+  if (!loginHint) {
+    return null;
+  }
+
+  try {
+    // sendLoginname derives enumeration protection (ignoreUnknownUsernames) from the
+    // same organization context server-side, so an unknown hint redirects to the
+    // (fake) /password step like a known one instead of falling back to /loginname
+    // and disclosing that the user does not exist.
+    const res = await sendLoginname({
+      loginName: loginHint,
+      requestId,
+      organization: organization || undefined,
+    });
+
+    if (res && "redirect" in res && res.redirect) {
+      // sendLoginname can return an absolute URL, e.g. the IdP authorize
+      // endpoint when domain discovery resolves to an org that auto-redirects
+      // to its external IdP. Only relative paths may be resolved against the
+      // login's base path — prepending it to an absolute URL produces a
+      // malformed URL like "https://<host>/ui/v2/loginhttps://idp.example/...".
+      if (isExternalUrl(res.redirect)) {
+        if (!isSafeRedirectUri(res.redirect)) {
+          logger.warn("Blocked unsafe login_hint redirect URL", { redirect: res.redirect });
+          return null;
+        }
+        return NextResponse.redirect(res.redirect);
+      }
+      return NextResponse.redirect(constructUrl(request, res.redirect));
+    }
+
+    if (res && "samlData" in res && res.samlData) {
+      // SAML IdP with POST binding: the AuthnRequest must be submitted as a
+      // form post. Render the same auto-submit form used in the idp-scope
+      // branch above and in handleSAMLFlowInitiation, so a login_hint
+      // resolves silently for POST-binding SAML IdPs just like for
+      // redirect-based IdPs.
+      if (!isSafeRedirectUri(res.samlData.url)) {
+        logger.warn("Blocked unsafe SAML post URL from login_hint resolution", { url: res.samlData.url });
+        return null;
+      }
+
+      return buildAutoSubmitFormResponse(res.samlData.url, res.samlData.fields);
+    }
+
+    if (res && "error" in res && res.error) {
+      logger.debug("login_hint could not be resolved, falling back to /loginname", { error: res.error });
+    }
+  } catch (error) {
+    logger.error("Failed to resolve login_hint via sendLoginname:", { error });
+  }
+
+  return null;
+};
+
+/**
+ * Filter sessions by organization, matching the same logic used in
+ * the accounts page and findValidSession.
+ */
+function getEligibleSessions(sessions: Session[], organization?: string): Session[] {
+  if (!organization) {
+    return sessions;
+  }
+  return sessions.filter((s) => s.factors?.user?.organizationId === organization);
+}
+
+/**
+ * Whether the `sessions` cookie references any previous account for the given
+ * organization (or for any org when `organization` is unset).
+ */
+function hasCookieAccount(sessionCookies: Cookie[], organization?: string): boolean {
+  if (!sessionCookies || sessionCookies.length === 0) {
+    return false;
+  }
+  return sessionCookies.some((c) => !!c.loginName && (!organization || c.organization === organization));
+}
+
+export interface FlowInitiationParams {
+  serviceConfig: ServiceConfig;
+  requestId: string;
+  sessions: Session[];
+  sessionCookies: Cookie[];
+  request: NextRequest;
+}
+
+/**
+ * Handle OIDC flow initiation
+ */
+export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Promise<NextResponse> {
+  const { serviceConfig, requestId, sessions, sessionCookies, request } = params;
+
+  const { authRequest } = await getAuthRequest({ serviceConfig, authRequestId: requestId.replace("oidc_", "") });
+
+  const locale = getValidLocaleFromUILocales(authRequest?.uiLocales);
+  if (locale) {
+    const existingLanguage = await getLanguageCookie();
+    if (shouldUILocalesOverrideCookie() || !existingLanguage) {
+      await setLanguageCookie(locale);
+    }
+  }
+
+  let organization = "";
+  let orgDomain = "";
+  let idpId = "";
+
+  if (authRequest?.scope) {
+    const orgScope = authRequest.scope.find((s: string) => ORG_SCOPE_REGEX.test(s));
+    const idpScope = authRequest.scope.find((s: string) => IDP_SCOPE_REGEX.test(s));
+
+    if (orgScope) {
+      const matched = ORG_SCOPE_REGEX.exec(orgScope);
+      organization = matched?.[1] ?? "";
+    } else {
+      const orgDomainScope = authRequest.scope.find((s: string) => ORG_DOMAIN_SCOPE_REGEX.test(s));
+
+      if (orgDomainScope) {
+        const matched = ORG_DOMAIN_SCOPE_REGEX.exec(orgDomainScope);
+        const scopeDomain = matched?.[1] ?? "";
+
+        logger.info("Extracted org domain:", { orgDomain: scopeDomain });
+        if (scopeDomain) {
+          const orgs = await getOrgsByDomain({ serviceConfig, domain: scopeDomain });
+
+          if (orgs.result && orgs.result.length === 1) {
+            organization = orgs.result[0].id ?? "";
+            orgDomain = scopeDomain;
+          }
+        }
+      }
+    }
+
+    if (idpScope) {
+      const matched = IDP_SCOPE_REGEX.exec(idpScope);
+      idpId = matched?.[1] ?? "";
+
+      const identityProviders = await getActiveIdentityProviders({
+        serviceConfig,
+        orgId: organization ? organization : undefined,
+      }).then((resp) => {
+        return resp.identityProviders;
+      });
+
+      const idp = identityProviders.find((idp) => idp.id === idpId);
+
+      if (idp) {
+        const identityProviderType = idp.type;
+
+        if (identityProviderType === IdentityProviderType.LDAP) {
+          const ldapUrl = constructUrl(request, "/ldap");
+          ldapUrl.searchParams.set("requestId", requestId);
+          if (organization) {
+            ldapUrl.searchParams.set("organization", organization);
+          }
+
+          return NextResponse.redirect(ldapUrl);
+        }
+
+        let provider = idpTypeToSlug(identityProviderType);
+
+        const params = new URLSearchParams({
+          requestId: requestId,
+        });
+
+        if (organization) {
+          params.set("organization", organization);
+        }
+
+        const response = await startIdentityProviderFlow({
+          serviceConfig,
+          idpId,
+          urls: {
+            successUrl: constructUrl(request, `/idp/${provider}/process?${params.toString()}`).toString(),
+            failureUrl: constructUrl(request, `/idp/${provider}/failure?${params.toString()}`).toString(),
+            loginHint: authRequest.loginHint,
+          },
+        });
+
+        if (!response || !response.url) {
+          return NextResponse.json({ error: "Could not start IDP flow" }, { status: 500 });
+        }
+
+        // Covers both branches below: the form post (SAML POST binding) and
+        // the redirect. Relative paths and same-host/https URLs pass;
+        // javascript:/data:/file: style schemes are blocked.
+        if (!isSafeRedirectUri(response.url)) {
+          logger.warn("Blocked unsafe IdP URL", { url: response.url });
+          return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
+        }
+
+        if (response.fields) {
+          return buildAutoSubmitFormResponse(response.url, response.fields);
+        }
+
+        let url = response.url;
+        if (url.startsWith("/")) {
+          url = constructUrl(request, url).toString();
+        }
+
+        return NextResponse.redirect(url);
+      }
+    }
+  }
+
+  if (authRequest && authRequest.prompt.includes(Prompt.CREATE)) {
+    const registerUrl = constructUrl(request, "/register");
+    registerUrl.searchParams.set("requestId", requestId);
+
+    if (organization) {
+      registerUrl.searchParams.set("organization", organization);
+    }
+
+    return NextResponse.redirect(registerUrl);
+  }
+
+  // use existing session and hydrate it for oidc
+  if (authRequest && sessions.length) {
+    // Pre-filter sessions by organization so we don't show an empty accounts
+    // page when the org scope excludes all existing browser sessions.
+    const eligibleSessions = getEligibleSessions(sessions, organization);
+
+    if (authRequest.prompt.includes(Prompt.SELECT_ACCOUNT)) {
+      if (eligibleSessions.length === 0) {
+        // No live session is eligible. If the session cookie still references
+        // a previous account (and the RP did not pass a login_hint, which always
+        // takes precedence over the cookie fallback), keep account selection so
+        // the user can pick it.
+        if (authRequest.loginHint || !hasCookieAccount(sessionCookies, organization)) {
+          return gotoLoginname({
+            request,
+            requestId,
+            loginHint: authRequest.loginHint,
+            organization,
+            orgDomain,
+          });
+        }
+      }
+      return gotoAccounts({
+        request,
+        requestId,
+        organization,
+        orgDomain,
+      });
+    } else if (authRequest.prompt.includes(Prompt.LOGIN)) {
+      const hintResponse = await resolveLoginHint({
+        request,
+        requestId,
+        loginHint: authRequest.loginHint,
+        organization,
+      });
+
+      if (hintResponse) {
+        return hintResponse;
+      }
+
+      return gotoLoginname({
+        request,
+        requestId,
+        loginHint: authRequest.loginHint,
+        organization,
+        orgDomain,
+      });
+    } else if (authRequest.prompt.includes(Prompt.NONE)) {
+      let securitySettings: SecuritySettings | undefined;
+      try {
+        securitySettings = await getSecuritySettings({ serviceConfig });
+      } catch (err) {
+        logger.error("Failed to load security settings for CSP in prompt=none flow", {
+          error: err,
+        });
+      }
+      const selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
+
+      const noSessionResponse = NextResponse.json({ error: "No active session found" }, { status: 400 });
+      setCSPHeaders(noSessionResponse, serviceConfig, securitySettings);
+
+      if (!selectedSession || !selectedSession.id) {
+        return noSessionResponse;
+      }
+
+      const cookie = sessionCookies.find((cookie) => cookie.id === selectedSession.id);
+
+      if (!cookie || !cookie.id || !cookie.token) {
+        return noSessionResponse;
+      }
+
+      const session = {
+        sessionId: cookie.id,
+        sessionToken: cookie.token,
+      };
+
+      const { callbackUrl } = await createCallback({
+        serviceConfig,
+        req: create(CreateCallbackRequestSchema, {
+          authRequestId: requestId.replace("oidc_", ""),
+          callbackKind: {
+            case: "session",
+            value: create(SessionSchema, session),
+          },
+        }),
+      });
+
+      if (!isSafeRedirectUri(callbackUrl)) {
+        logger.warn("Blocked unsafe OIDC callback URL (prompt=none)", { callbackUrl });
+        return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
+      }
+      const callbackResponse = NextResponse.redirect(callbackUrl);
+      setCSPHeaders(callbackResponse, serviceConfig, securitySettings);
+      return callbackResponse;
+    } else {
+      let selectedSession = await findValidSession({ serviceConfig, sessions, authRequest, organization });
+
+      if (!selectedSession || !selectedSession.id) {
+        // login_hint matches no session: resolve it straight to the next step.
+        const hintResponse = await resolveLoginHint({
+          request,
+          requestId,
+          loginHint: authRequest.loginHint,
+          organization,
+        });
+
+        if (hintResponse) {
+          return hintResponse;
+        }
+
+        // Prefill loginname (not the account picker) for an unresolved hint or when
+        // no session is eligible: the picker would only list non-matching accounts.
+        // Exception: if the sessions cookie still references a previous account for
+        // this organization, keep the picker so the user can select it (#12252).
+        if (authRequest.loginHint || (eligibleSessions.length === 0 && !hasCookieAccount(sessionCookies, organization))) {
+          return gotoLoginname({
+            request,
+            requestId,
+            loginHint: authRequest.loginHint,
+            organization,
+            orgDomain,
+          });
+        }
+        return gotoAccounts({
+          request,
+          requestId,
+          organization,
+          orgDomain,
+        });
+      }
+
+      const cookie = sessionCookies.find((cookie) => cookie.id === selectedSession.id);
+
+      if (!cookie || !cookie.id || !cookie.token) {
+        return gotoAccounts({
+          request,
+          requestId,
+          organization,
+          orgDomain,
+        });
+      }
+
+      const session = {
+        sessionId: cookie.id,
+        sessionToken: cookie.token,
+      };
+
+      try {
+        const { callbackUrl } = await createCallback({
+          serviceConfig,
+          req: create(CreateCallbackRequestSchema, {
+            authRequestId: requestId.replace("oidc_", ""),
+            callbackKind: {
+              case: "session",
+              value: create(SessionSchema, session),
+            },
+          }),
+        });
+        if (callbackUrl) {
+          if (!isSafeRedirectUri(callbackUrl)) {
+            logger.warn("Blocked unsafe OIDC callback URL", { callbackUrl });
+            return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
+          }
+          return NextResponse.redirect(callbackUrl);
+        } else {
+          logger.info("could not create callback, redirect user to choose other account");
+          return gotoAccounts({
+            request,
+            organization,
+            orgDomain,
+            requestId,
+          });
+        }
+      } catch (error) {
+        logger.error("Error creating callback:", { error });
+        return gotoAccounts({
+          request,
+          requestId,
+          organization,
+          orgDomain,
+        });
+      }
+    }
+  } else {
+    // No live sessions were resolved. If the sessions cookie still references a
+    // previous account and the RP did not pass a login_hint, show account
+    // selection (mirrors Login V1 behavior after RP-initiated logout, #12252).
+    // prompt=none must never render UI and prompt=login goes straight to
+    // /loginname like it does when live sessions exist, so both keep the
+    // existing behavior.
+    if (
+      !authRequest?.loginHint &&
+      !authRequest?.prompt.includes(Prompt.NONE) &&
+      !authRequest?.prompt.includes(Prompt.LOGIN) &&
+      hasCookieAccount(sessionCookies, organization)
+    ) {
+      return gotoAccounts({
+        request,
+        requestId,
+        organization,
+        orgDomain,
+      });
+    }
+
+    // No session: resolve a login_hint straight to the next step if we can.
+    const hintResponse = await resolveLoginHint({
+      request,
+      requestId,
+      loginHint: authRequest?.loginHint,
+      organization,
+    });
+
+    if (hintResponse) {
+      return hintResponse;
+    }
+
+    return gotoLoginname({
+      request,
+      requestId,
+      loginHint: authRequest?.loginHint,
+      organization,
+      orgDomain,
+    });
+  }
+}
+
+/**
+ * Handle SAML flow initiation
+ */
+export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Promise<NextResponse> {
+  const { serviceConfig, requestId, sessions, sessionCookies, request } = params;
+
+  const { samlRequest } = await getSAMLRequest({ serviceConfig, samlRequestId: requestId.replace("saml_", "") });
+
+  if (!samlRequest) {
+    return NextResponse.json({ error: "No samlRequest found" }, { status: 400 });
+  }
+
+  // Early return: No sessions available - redirect to login
+  if (sessions.length === 0) {
+    const loginNameUrl = constructUrl(request, "/loginname");
+    loginNameUrl.searchParams.set("requestId", requestId);
+    return NextResponse.redirect(loginNameUrl);
+  }
+
+  // Try to find a valid session
+  let selectedSession = await findValidSession({ serviceConfig, sessions, samlRequest });
+
+  // Early return: No valid session found - show account selection
+  if (!selectedSession || !selectedSession.id) {
+    return gotoAccounts({
+      request,
+      requestId,
+    });
+  }
+
+  const cookie = sessionCookies.find((cookie) => cookie.id === selectedSession.id);
+
+  // Early return: No valid cookie/token found - show account selection
+  // Note: We need the session token from the cookie to authenticate API calls
+  if (!cookie || !cookie.id || !cookie.token) {
+    return gotoAccounts({
+      request,
+      requestId,
+    });
+  }
+
+  // Valid session and cookie found - attempt to complete SAML flow
+  const session = {
+    sessionId: cookie.id,
+    sessionToken: cookie.token,
+  };
+
+  try {
+    const { url, binding } = await createResponse({
+      serviceConfig,
+      req: create(CreateResponseRequestSchema, {
+        samlRequestId: requestId.replace("saml_", ""),
+        responseKind: {
+          case: "session",
+          value: session,
+        },
+      }),
+    });
+
+    if (url && binding.case === "redirect") {
+      if (!isSafeRedirectUri(url)) {
+        logger.warn("Blocked unsafe SAML redirect URL", { url });
+        return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
+      }
+      return NextResponse.redirect(url);
+    } else if (url && binding.case === "post") {
+      if (!isSafeRedirectUri(url)) {
+        logger.warn("Blocked unsafe SAML post URL", { url });
+        return NextResponse.json({ error: "Unsafe redirect URI was blocked" }, { status: 400 });
+      }
+      return buildAutoSubmitFormResponse(url, {
+        RelayState: binding.value.relayState,
+        SAMLResponse: binding.value.samlResponse,
+      });
+    }
+  } catch (error) {
+    logger.error("SAML createResponse failed:", { error });
+  }
+
+  // Final fallback: SAML response creation failed - show account selection
+  return gotoAccounts({
+    request,
+    requestId,
+  });
+}

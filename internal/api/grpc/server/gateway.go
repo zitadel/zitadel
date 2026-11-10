@@ -20,14 +20,15 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 	client_middleware "github.com/zitadel/zitadel/internal/api/grpc/client/middleware"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
 const (
 	mimeWildcard = "*/*"
+	UnknownPath  = metrics.UnknownPath
 )
 
 var (
@@ -43,9 +44,13 @@ var (
 	httpErrorHandler = runtime.RoutingErrorHandlerFunc(
 		func(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.Marshaler, w http.ResponseWriter, r *http.Request, httpStatus int) {
 			if httpStatus != http.StatusMethodNotAllowed {
+				// Every other routing error is passed on to the configured errorHandler.
 				runtime.DefaultRoutingErrorHandler(ctx, mux, marshaler, w, r, httpStatus)
 				return
 			}
+			// This branch answers without going through the configured errorHandler,
+			// so the URI pattern has to be set here as well.
+			setRequestURIPattern(ctx)
 
 			// Use HTTPStatusError to customize the DefaultHTTPErrorHandler status code
 			err := &runtime.HTTPStatusError{
@@ -131,6 +136,7 @@ func CreateGatewayWithPrefix(
 			client_middleware.UnaryActivityClientInterceptor(),
 		),
 		grpc.WithStatsHandler(client_middleware.DefaultTracingClient()),
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(MaxSendMsgSize)),
 	}
 	connection, err := dial(ctx, port, opts)
 	if err != nil {
@@ -158,6 +164,7 @@ func CreateGateway(
 				client_middleware.UnaryActivityClientInterceptor(),
 			),
 			grpc.WithStatsHandler(client_middleware.DefaultTracingClient()),
+			grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(MaxSendMsgSize)),
 		})
 	if err != nil {
 		return nil, err
@@ -170,7 +177,7 @@ func CreateGateway(
 	}, nil
 }
 
-func RegisterGateway(ctx context.Context, gateway *Gateway, server Server) error {
+func RegisterGateway(ctx context.Context, gateway *Gateway, server WithGateway) error {
 	err := server.RegisterGateway()(ctx, gateway.mux, gateway.connection)
 	if err != nil {
 		return fmt.Errorf("failed to register grpc gateway: %w", err)
@@ -206,9 +213,10 @@ func addInterceptors(
 	accessInterceptor *http_mw.AccessInterceptor,
 ) http.Handler {
 	handler = http_mw.CallDurationHandler(handler)
+	handler = http_mw.RequestDetailsHandler()(handler)
 	handler = http_mw.CORSInterceptor(handler)
 	handler = http_mw.RobotsTagHandler(handler)
-	handler = http_mw.DefaultTelemetryHandler(handler)
+	handler = http_mw.DefaultTraceHandler(handler)
 	handler = http_mw.ActivityHandler(handler)
 	// For some non-obvious reason, the exhaustedCookieInterceptor sends the SetCookie header
 	// only if it follows the http_mw.DefaultTelemetryHandler
@@ -217,6 +225,7 @@ func addInterceptors(
 		metrics.MetricTypeTotalCount,
 		metrics.MetricTypeStatusCode,
 	}, http_utils.Probes...)(handler)
+	handler = http_mw.LogHandler("grpc_gateway", http_utils.Probes...)(handler)
 	return handler
 }
 
@@ -271,10 +280,17 @@ func grpcCredentials(tlsConfig *tls.Config) credentials.TransportCredentials {
 	return creds
 }
 
+// setRequestURIPattern reports the route pattern that served the request, e.g.
+// "/v2/sessions/{session_id}", to tracing and metrics. Both would otherwise fall back to
+// the requested path, which embeds resource IDs and therefore grows without bound.
 func setRequestURIPattern(ctx context.Context) {
 	pattern, ok := runtime.HTTPPathPattern(ctx)
 	if !ok {
-		return
+		// As all unmatched paths will be handled by the gateway, any request not matching a pattern,
+		// means there's no route to the path.
+		// To prevent high cardinality on metrics and tracing, we want to make sure we don't record
+		// the actual path as name (it will still be recorded explicitly in the span http info).
+		pattern = UnknownPath
 	}
 	span := trace.SpanFromContext(ctx)
 	span.SetName(pattern)

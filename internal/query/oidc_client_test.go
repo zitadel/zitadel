@@ -268,8 +268,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 			execMock(t, tt.mock, func(db *sql.DB) {
 				q := &Queries{
 					client: &database.DB{
-						DB:       db,
-						Database: &prepareDB{},
+						DB: db,
 					},
 				}
 				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")

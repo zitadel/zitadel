@@ -8,6 +8,7 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
   selector: 'cnsl-idp-settings',
   templateUrl: './idp-settings.component.html',
   styleUrls: ['./idp-settings.component.scss'],
+  standalone: false,
 })
 export class IdpSettingsComponent implements OnInit {
   @Input() public serviceType!: PolicyComponentServiceType;

@@ -10,8 +10,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/zitadel/logging"
-
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -24,8 +23,7 @@ const (
 )
 
 var (
-	//go:embed 40/cockroach/*.sql
-	//go:embed 40/postgres/*.sql
+	//go:embed 40/*.sql
 	initPushFunc embed.FS
 )
 
@@ -40,7 +38,7 @@ func (mig *InitPushFunc) Execute(ctx context.Context, _ eventstore.Event) (err e
 	}
 	defer func() {
 		closeErr := conn.Close()
-		logging.OnError(closeErr).Debug("failed to release connection")
+		logging.OnError(ctx, closeErr).Debug("failed to release connection")
 		// Force the pool to reopen connections to apply the new types
 		mig.dbClient.Pool.Reset()
 	}()
@@ -49,10 +47,16 @@ func (mig *InitPushFunc) Execute(ctx context.Context, _ eventstore.Event) (err e
 		return err
 	}
 	for _, stmt := range statements {
-		logging.WithFields("file", stmt.file, "migration", mig.String()).Info("execute statement")
+		logging.Info(ctx, "execute statement", "file", stmt.file, "migration", mig.String())
 		if _, err := conn.ExecContext(ctx, stmt.query); err != nil {
 			return fmt.Errorf("%s %s: %w", mig.String(), stmt.file, err)
 		}
+	}
+	// close idle connections to prevent them from using the old prepared statement with the wrong type
+	// and having wrong plan of `eventstore.command2`-type
+	for _, conn := range mig.dbClient.Pool.AcquireAllIdle(ctx) {
+		logging.OnError(ctx, conn.Conn().Close(ctx)).Debug("failed to close idle connection")
+		conn.Release()
 	}
 
 	return nil
@@ -112,5 +116,5 @@ func (mig *InitPushFunc) inTxOrderType(ctx context.Context) (typeName string, er
 }
 
 func (mig *InitPushFunc) filePath(fileName string) string {
-	return path.Join("40", mig.dbClient.Type(), fileName)
+	return path.Join("40", fileName)
 }

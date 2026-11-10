@@ -24,7 +24,7 @@ export class ProjectGrantsDataSource extends DataSource<GrantedProject.AsObject>
     super();
   }
 
-  public loadGrants(projectId: string, pageIndex: number, pageSize: number, sortDirection?: string): void {
+  public loadGrants(projectId: string, pageIndex: number, pageSize: number): void {
     const offset = pageIndex * pageSize;
 
     this.loadingSubject.next(true);

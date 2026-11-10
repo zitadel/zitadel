@@ -1,19 +1,23 @@
 package eventstore
 
-import "time"
+import (
+	"time"
+
+	"github.com/shopspring/decimal"
+)
 
 // ReadModel is the minimum representation of a read model.
 // It implements a basic reducer
 // it might be saved in a database or in memory
 type ReadModel struct {
-	AggregateID       string    `json:"-"`
-	ProcessedSequence uint64    `json:"-"`
-	CreationDate      time.Time `json:"-"`
-	ChangeDate        time.Time `json:"-"`
-	Events            []Event   `json:"-"`
-	ResourceOwner     string    `json:"-"`
-	InstanceID        string    `json:"-"`
-	Position          float64   `json:"-"`
+	AggregateID       string          `json:"-"`
+	ProcessedSequence uint64          `json:"-"`
+	CreationDate      time.Time       `json:"-"`
+	ChangeDate        time.Time       `json:"-"`
+	Events            []Event         `json:"-"`
+	ResourceOwner     string          `json:"-"`
+	InstanceID        string          `json:"-"`
+	Position          decimal.Decimal `json:"-"`
 }
 
 // AppendEvents adds all the events to the read model.

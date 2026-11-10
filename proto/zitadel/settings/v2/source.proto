@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package zitadel.settings.v2;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
+
+// ============================================================================
+// Enums
+// ============================================================================
+
+// Source defines the levels of hierarchy for which settings can be
+// written/retrieved.
+enum Source {
+  SOURCE_UNSPECIFIED = 0;
+  SOURCE_SYSTEM = 1;        // hard-coded default, not settable via API
+  SOURCE_INSTANCE = 2;
+  SOURCE_ORGANIZATION = 3;
+  SOURCE_PROJECT = 4;
+  SOURCE_APPLICATION = 5;
+}

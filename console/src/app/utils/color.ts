@@ -72,7 +72,7 @@ export function getColor(toGen: string): string {
 
 export function getMembershipColor(role: string): Color {
   const hash = hashCode(role);
-  let color = COLORS[hash % COLORS.length];
+  let color: Color;
 
   switch (role) {
     case 'IAM_OWNER':

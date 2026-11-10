@@ -1,0 +1,36 @@
+---
+title: ZITADEL Requirements
+sidebar_label: Requirements
+---
+
+This page lists the infrastructure versions that ZITADEL is tested against and officially supports.
+
+## Database
+
+ZITADEL requires a PostgreSQL database. Versions **14 to 18** are supported.
+
+See the [Database](/self-hosting/manage/database) page for full configuration options, how to pre-create users and databases, and how to rotate credentials.
+
+## Cache (optional)
+
+ZITADEL supports Redis as an optional cache to speed up lookups of frequently needed objects.
+Redis must run in **standalone mode** (Cluster and Sentinel are not yet supported).
+
+See the [Caches](/self-hosting/manage/cache) page for configuration options.
+
+## Container runtime
+
+- **Docker Compose**: v2.x (Compose V1 `docker-compose` CLI is not supported)
+- **Kubernetes**: see the [Kubernetes deployment guide](/self-hosting/deploy/kubernetes)
+
+## Reverse proxy
+
+Any reverse proxy that supports HTTP/2 upstream connections (h2c or h2) works with ZITADEL.
+The following proxies are tested and have dedicated configuration guides:
+
+- **Traefik**: v3.x
+- **NGINX**: v1.x stable releases
+- **Caddy**: v2.x
+- **Apache httpd**: 2.4.x
+
+See the [Reverse Proxy Configuration](/self-hosting/manage/reverseproxy/reverse_proxy) page for details and Docker Compose examples.

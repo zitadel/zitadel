@@ -5,13 +5,14 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -42,27 +43,31 @@ type App struct {
 }
 
 type OIDCApp struct {
-	RedirectURIs             database.TextArray[string]
-	ResponseTypes            database.NumberArray[domain.OIDCResponseType]
-	GrantTypes               database.NumberArray[domain.OIDCGrantType]
-	AppType                  domain.OIDCApplicationType
-	ClientID                 string
-	AuthMethodType           domain.OIDCAuthMethodType
-	PostLogoutRedirectURIs   database.TextArray[string]
-	Version                  domain.OIDCVersion
-	ComplianceProblems       database.TextArray[string]
-	IsDevMode                bool
-	AccessTokenType          domain.OIDCTokenType
-	AssertAccessTokenRole    bool
-	AssertIDTokenRole        bool
-	AssertIDTokenUserinfo    bool
-	ClockSkew                time.Duration
-	AdditionalOrigins        database.TextArray[string]
-	AllowedOrigins           database.TextArray[string]
-	SkipNativeAppSuccessPage bool
-	BackChannelLogoutURI     string
-	LoginVersion             domain.LoginVersion
-	LoginBaseURI             *string
+	RedirectURIs                  database.TextArray[string]
+	ResponseTypes                 database.NumberArray[domain.OIDCResponseType]
+	GrantTypes                    database.NumberArray[domain.OIDCGrantType]
+	AppType                       domain.OIDCApplicationType
+	ClientID                      string
+	AuthMethodType                domain.OIDCAuthMethodType
+	PostLogoutRedirectURIs        database.TextArray[string]
+	Version                       domain.OIDCVersion
+	ComplianceProblems            database.TextArray[string]
+	IsDevMode                     bool
+	AccessTokenType               domain.OIDCTokenType
+	AssertAccessTokenRole         bool
+	AssertIDTokenRole             bool
+	AssertIDTokenUserinfo         bool
+	ClockSkew                     time.Duration
+	AdditionalOrigins             database.TextArray[string]
+	AllowedOrigins                database.TextArray[string]
+	SkipNativeAppSuccessPage      bool
+	BackChannelLogoutURI          string
+	LoginVersion                  domain.LoginVersion
+	LoginBaseURI                  *string
+	IOSTeamID                     string
+	IOSBundleID                   string
+	AndroidPackageName            string
+	AndroidSHA256CertFingerprints database.TextArray[string]
 }
 
 type SAMLApp struct {
@@ -277,6 +282,22 @@ var (
 		name:  projection.AppOIDCConfigColumnLoginBaseURI,
 		table: appOIDCConfigsTable,
 	}
+	AppOIDCConfigColumnIOSTeamID = Column{
+		name:  projection.AppOIDCConfigColumnIOSTeamID,
+		table: appOIDCConfigsTable,
+	}
+	AppOIDCConfigColumnIOSBundleID = Column{
+		name:  projection.AppOIDCConfigColumnIOSBundleID,
+		table: appOIDCConfigsTable,
+	}
+	AppOIDCConfigColumnAndroidPackageName = Column{
+		name:  projection.AppOIDCConfigColumnAndroidPackageName,
+		table: appOIDCConfigsTable,
+	}
+	AppOIDCConfigColumnAndroidSHA256CertFingerprints = Column{
+		name:  projection.AppOIDCConfigColumnAndroidSHA256CertFingerprints,
+		table: appOIDCConfigsTable,
+	}
 )
 
 func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bool, projectID, appID string) (app *App, err error) {
@@ -290,7 +311,7 @@ func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bo
 		traceSpan.EndWithError(err)
 	}
 
-	stmt, scan := prepareAppQuery(ctx, q.client, false)
+	stmt, scan := prepareAppQuery(false)
 	eq := sq.Eq{
 		AppColumnID.identifier():         appID,
 		AppColumnProjectID.identifier():  projectID,
@@ -308,11 +329,24 @@ func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bo
 	return app, err
 }
 
+func (q *Queries) AppByIDWithPermission(ctx context.Context, appID string, activeOnly bool, permissionCheck domain.PermissionCheck) (*App, error) {
+	app, err := q.AppByID(ctx, appID, activeOnly)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := appCheckPermission(ctx, app.ResourceOwner, app.ProjectID, permissionCheck); err != nil {
+		return nil, err
+	}
+
+	return app, nil
+}
+
 func (q *Queries) AppByID(ctx context.Context, appID string, activeOnly bool) (app *App, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareAppQuery(ctx, q.client, activeOnly)
+	stmt, scan := prepareAppQuery(activeOnly)
 	eq := sq.Eq{
 		AppColumnID.identifier():         appID,
 		AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -338,7 +372,7 @@ func (q *Queries) ProjectByClientID(ctx context.Context, appID string) (project 
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareProjectByAppQuery(ctx, q.client)
+	stmt, scan := prepareProjectByAppQuery()
 	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	query, args, err := stmt.Where(sq.And{
 		eq,
@@ -434,7 +468,7 @@ func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string) (id s
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareProjectIDByAppQuery(ctx, q.client)
+	stmt, scan := prepareProjectIDByAppQuery()
 	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	where := sq.And{
 		eq,
@@ -454,27 +488,6 @@ func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string) (id s
 		return err
 	}, query, args...)
 	return id, err
-}
-
-func (q *Queries) ProjectByOIDCClientID(ctx context.Context, id string) (project *Project, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	stmt, scan := prepareProjectByOIDCAppQuery(ctx, q.client)
-	eq := sq.Eq{
-		AppOIDCConfigColumnClientID.identifier(): id,
-		AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
-	}
-	query, args, err := stmt.Where(eq).ToSql()
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-XhJi4", "Errors.Query.SQLStatement")
-	}
-
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		project, err = scan(row)
-		return err
-	}, query, args...)
-	return project, err
 }
 
 func (q *Queries) AppByOIDCClientID(ctx context.Context, clientID string) (app *App, err error) {
@@ -502,7 +515,7 @@ func (q *Queries) AppByClientID(ctx context.Context, clientID string) (app *App,
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareAppQuery(ctx, q.client, true)
+	stmt, scan := prepareAppQuery(true)
 	eq := sq.Eq{
 		AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		AppColumnState.identifier():      domain.AppStateActive,
@@ -527,11 +540,25 @@ func (q *Queries) AppByClientID(ctx context.Context, clientID string) (app *App,
 	return app, err
 }
 
-func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, withOwnerRemoved bool) (apps *Apps, err error) {
+func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, permissionCheck domain.PermissionCheck) (*Apps, error) {
+	apps, err := q.searchApps(ctx, queries, PermissionV2(ctx, permissionCheck))
+	if err != nil {
+		return nil, err
+	}
+
+	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
+		apps.Apps = appsCheckPermission(ctx, apps.Apps, permissionCheck)
+	}
+	return apps, nil
+}
+
+func (q *Queries) searchApps(ctx context.Context, queries *AppSearchQueries, isPermissionV2Enabled bool) (apps *Apps, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareAppsQuery(ctx, q.client)
+	query, scan := prepareAppsQuery()
+	query = appPermissionCheckV2(ctx, query, isPermissionV2Enabled, queries)
+
 	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
@@ -549,6 +576,21 @@ func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, wit
 	return apps, err
 }
 
+func appPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *AppSearchQueries) sq.SelectBuilder {
+	if !enabled {
+		return query
+	}
+
+	join, args := PermissionClause(
+		ctx,
+		AppColumnResourceOwner,
+		domain.PermissionProjectAppRead,
+		SingleOrgPermissionOption(queries.Queries),
+		WithProjectsPermissionOption(AppColumnProjectID),
+	)
+	return query.JoinClause(join, args...)
+}
+
 func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries, shouldTriggerBulk bool) (ids []string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -560,7 +602,7 @@ func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries
 		traceSpan.EndWithError(err)
 	}
 
-	query, scan := prepareClientIDsQuery(ctx, q.client)
+	query, scan := prepareClientIDsQuery()
 	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
@@ -581,7 +623,7 @@ func (q *Queries) OIDCClientLoginVersion(ctx context.Context, clientID string) (
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareLoginVersionByOIDCClientID(ctx, q.client)
+	query, scan := prepareLoginVersionByOIDCClientID()
 	eq := sq.Eq{
 		AppOIDCConfigColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		AppOIDCConfigColumnClientID.identifier():   clientID,
@@ -605,7 +647,7 @@ func (q *Queries) SAMLAppLoginVersion(ctx context.Context, appID string) (loginV
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareLoginVersionBySAMLAppID(ctx, q.client)
+	query, scan := prepareLoginVersionBySAMLAppID()
 	eq := sq.Eq{
 		AppSAMLConfigColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		AppSAMLConfigColumnAppID.identifier():      appID,
@@ -625,15 +667,50 @@ func (q *Queries) SAMLAppLoginVersion(ctx context.Context, appID string) (loginV
 	return loginVersion, nil
 }
 
+func appCheckPermission(ctx context.Context, resourceOwner string, projectID string, permissionCheck domain.PermissionCheck) error {
+	return permissionCheck(ctx, domain.PermissionProjectAppRead, resourceOwner, projectID)
+}
+
+// appsCheckPermission returns only the apps that the user in context has permission to read
+func appsCheckPermission(ctx context.Context, apps []*App, permissionCheck domain.PermissionCheck) []*App {
+	return slices.DeleteFunc(apps, func(app *App) bool {
+		return permissionCheck(ctx, domain.PermissionProjectAppRead, app.ResourceOwner, app.ProjectID) != nil
+	})
+}
+
 func NewAppNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
 	return NewTextQuery(AppColumnName, value, method)
+}
+
+func NewAppStateSearchQuery(value domain.AppState) (SearchQuery, error) {
+	return NewNumberQuery(AppColumnState, int(value), NumberEquals)
 }
 
 func NewAppProjectIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(AppColumnProjectID, id, TextEquals)
 }
 
-func prepareAppQuery(ctx context.Context, db prepareDatabase, activeOnly bool) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+func NewAppClientIDSearchQuery(clientID string) (SearchQuery, error) {
+	oidcClientIDQuery, err := NewTextQuery(AppOIDCConfigColumnClientID, clientID, TextEquals)
+	if err != nil {
+		return nil, err
+	}
+	apiClientIDQuery, err := NewTextQuery(AppAPIConfigColumnClientID, clientID, TextEquals)
+	if err != nil {
+		return nil, err
+	}
+	return NewOrQuery(oidcClientIDQuery, apiClientIDQuery)
+}
+
+func NewAppResourceOwnerSearchQuery(resourceOwner string) (SearchQuery, error) {
+	return NewTextQuery(AppColumnResourceOwner, resourceOwner, TextEquals)
+}
+
+func NewAppSAMLEntityIDSearchQuery(entityID string) (SearchQuery, error) {
+	return NewTextQuery(AppSAMLConfigColumnEntityID, entityID, TextEquals)
+}
+
+func prepareAppQuery(activeOnly bool) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 	query := sq.Select(
 		AppColumnID.identifier(),
 		AppColumnName.identifier(),
@@ -668,6 +745,10 @@ func prepareAppQuery(ctx context.Context, db prepareDatabase, activeOnly bool) (
 		AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
 		AppOIDCConfigColumnLoginVersion.identifier(),
 		AppOIDCConfigColumnLoginBaseURI.identifier(),
+		AppOIDCConfigColumnIOSTeamID.identifier(),
+		AppOIDCConfigColumnIOSBundleID.identifier(),
+		AppOIDCConfigColumnAndroidPackageName.identifier(),
+		AppOIDCConfigColumnAndroidSHA256CertFingerprints.identifier(),
 
 		AppSAMLConfigColumnAppID.identifier(),
 		AppSAMLConfigColumnEntityID.identifier(),
@@ -684,13 +765,13 @@ func prepareAppQuery(ctx context.Context, db prepareDatabase, activeOnly bool) (
 				LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
 				LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)).
 				LeftJoin(join(ProjectColumnID, AppColumnProjectID)).
-				LeftJoin(join(OrgColumnID, AppColumnResourceOwner) + db.Timetravel(call.Took(ctx))),
+				LeftJoin(join(OrgColumnID, AppColumnResourceOwner)),
 			scanApp
 	}
 	return query.
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
-			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))),
+			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)),
 		scanApp
 }
 
@@ -737,6 +818,10 @@ func scanApp(row *sql.Row) (*App, error) {
 		&oidcConfig.backChannelLogoutURI,
 		&oidcConfig.loginVersion,
 		&oidcConfig.loginBaseURI,
+		&oidcConfig.iosTeamID,
+		&oidcConfig.iosBundleID,
+		&oidcConfig.androidPackageName,
+		&oidcConfig.androidSHA256CertFingerprints,
 
 		&samlConfig.appID,
 		&samlConfig.entityID,
@@ -791,6 +876,10 @@ func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 			AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
 			AppOIDCConfigColumnLoginVersion.identifier(),
 			AppOIDCConfigColumnLoginBaseURI.identifier(),
+			AppOIDCConfigColumnIOSTeamID.identifier(),
+			AppOIDCConfigColumnIOSBundleID.identifier(),
+			AppOIDCConfigColumnAndroidPackageName.identifier(),
+			AppOIDCConfigColumnAndroidSHA256CertFingerprints.identifier(),
 		).From(appsTable.identifier()).
 			Join(join(AppOIDCConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*App, error) {
@@ -830,6 +919,10 @@ func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 				&oidcConfig.backChannelLogoutURI,
 				&oidcConfig.loginVersion,
 				&oidcConfig.loginBaseURI,
+				&oidcConfig.iosTeamID,
+				&oidcConfig.iosBundleID,
+				&oidcConfig.androidPackageName,
+				&oidcConfig.androidSHA256CertFingerprints,
 			)
 
 			if err != nil {
@@ -845,13 +938,13 @@ func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 		}
 }
 
-func prepareProjectIDByAppQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (projectID string, err error)) {
+func prepareProjectIDByAppQuery() (sq.SelectBuilder, func(*sql.Row) (projectID string, err error)) {
 	return sq.Select(
 			AppColumnProjectID.identifier(),
 		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
-			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (projectID string, err error) {
 			err = row.Scan(
 				&projectID,
@@ -868,49 +961,7 @@ func prepareProjectIDByAppQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 		}
 }
 
-func prepareProjectByOIDCAppQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Project, error)) {
-	return sq.Select(
-			ProjectColumnID.identifier(),
-			ProjectColumnCreationDate.identifier(),
-			ProjectColumnChangeDate.identifier(),
-			ProjectColumnResourceOwner.identifier(),
-			ProjectColumnState.identifier(),
-			ProjectColumnSequence.identifier(),
-			ProjectColumnName.identifier(),
-			ProjectColumnProjectRoleAssertion.identifier(),
-			ProjectColumnProjectRoleCheck.identifier(),
-			ProjectColumnHasProjectCheck.identifier(),
-			ProjectColumnPrivateLabelingSetting.identifier(),
-		).From(projectsTable.identifier()).
-			Join(join(AppColumnProjectID, ProjectColumnID)).
-			Join(join(AppOIDCConfigColumnAppID, AppColumnID)).
-			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*Project, error) {
-			p := new(Project)
-			err := row.Scan(
-				&p.ID,
-				&p.CreationDate,
-				&p.ChangeDate,
-				&p.ResourceOwner,
-				&p.State,
-				&p.Sequence,
-				&p.Name,
-				&p.ProjectRoleAssertion,
-				&p.ProjectRoleCheck,
-				&p.HasProjectCheck,
-				&p.PrivateLabelingSetting,
-			)
-			if err != nil {
-				if errors.Is(err, sql.ErrNoRows) {
-					return nil, zerrors.ThrowNotFound(err, "QUERY-yxTMh", "Errors.Project.NotFound")
-				}
-				return nil, zerrors.ThrowInternal(err, "QUERY-dj2FF", "Errors.Internal")
-			}
-			return p, nil
-		}
-}
-
-func prepareProjectByAppQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Project, error)) {
+func prepareProjectByAppQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) {
 	return sq.Select(
 			ProjectColumnID.identifier(),
 			ProjectColumnCreationDate.identifier(),
@@ -927,7 +978,7 @@ func prepareProjectByAppQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			Join(join(AppColumnProjectID, ProjectColumnID)).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
-			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Project, error) {
 			p := new(Project)
@@ -954,7 +1005,7 @@ func prepareProjectByAppQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 		}
 }
 
-func prepareAppsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
+func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 	return sq.Select(
 			AppColumnID.identifier(),
 			AppColumnName.identifier(),
@@ -989,6 +1040,10 @@ func prepareAppsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 			AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
 			AppOIDCConfigColumnLoginVersion.identifier(),
 			AppOIDCConfigColumnLoginBaseURI.identifier(),
+			AppOIDCConfigColumnIOSTeamID.identifier(),
+			AppOIDCConfigColumnIOSBundleID.identifier(),
+			AppOIDCConfigColumnAndroidPackageName.identifier(),
+			AppOIDCConfigColumnAndroidSHA256CertFingerprints.identifier(),
 
 			AppSAMLConfigColumnAppID.identifier(),
 			AppSAMLConfigColumnEntityID.identifier(),
@@ -1000,7 +1055,7 @@ func prepareAppsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
-			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Rows) (*Apps, error) {
 			apps := &Apps{Apps: []*App{}}
 
@@ -1046,6 +1101,10 @@ func prepareAppsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 					&oidcConfig.backChannelLogoutURI,
 					&oidcConfig.loginVersion,
 					&oidcConfig.loginBaseURI,
+					&oidcConfig.iosTeamID,
+					&oidcConfig.iosBundleID,
+					&oidcConfig.androidPackageName,
+					&oidcConfig.androidSHA256CertFingerprints,
 
 					&samlConfig.appID,
 					&samlConfig.entityID,
@@ -1072,13 +1131,13 @@ func prepareAppsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 		}
 }
 
-func prepareClientIDsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) ([]string, error)) {
+func prepareClientIDsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]string, error)) {
 	return sq.Select(
 			AppAPIConfigColumnClientID.identifier(),
 			AppOIDCConfigColumnClientID.identifier(),
 		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
-			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar), func(rows *sql.Rows) ([]string, error) {
 			ids := database.TextArray[string]{}
 
@@ -1102,7 +1161,7 @@ func prepareClientIDsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 		}
 }
 
-func prepareLoginVersionByOIDCClientID(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (domain.LoginVersion, error)) {
+func prepareLoginVersionByOIDCClientID() (sq.SelectBuilder, func(*sql.Row) (domain.LoginVersion, error)) {
 	return sq.Select(
 			AppOIDCConfigColumnLoginVersion.identifier(),
 		).From(appOIDCConfigsTable.identifier()).
@@ -1117,7 +1176,7 @@ func prepareLoginVersionByOIDCClientID(ctx context.Context, db prepareDatabase) 
 		}
 }
 
-func prepareLoginVersionBySAMLAppID(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (domain.LoginVersion, error)) {
+func prepareLoginVersionBySAMLAppID() (sq.SelectBuilder, func(*sql.Row) (domain.LoginVersion, error)) {
 	return sq.Select(
 			AppSAMLConfigColumnLoginVersion.identifier(),
 		).From(appSAMLConfigsTable.identifier()).
@@ -1133,26 +1192,30 @@ func prepareLoginVersionBySAMLAppID(ctx context.Context, db prepareDatabase) (sq
 }
 
 type sqlOIDCConfig struct {
-	appID                    sql.NullString
-	version                  sql.NullInt32
-	clientID                 sql.NullString
-	redirectUris             database.TextArray[string]
-	applicationType          sql.NullInt16
-	authMethodType           sql.NullInt16
-	postLogoutRedirectUris   database.TextArray[string]
-	devMode                  sql.NullBool
-	accessTokenType          sql.NullInt16
-	accessTokenRoleAssertion sql.NullBool
-	iDTokenRoleAssertion     sql.NullBool
-	iDTokenUserinfoAssertion sql.NullBool
-	clockSkew                sql.NullInt64
-	additionalOrigins        database.TextArray[string]
-	responseTypes            database.NumberArray[domain.OIDCResponseType]
-	grantTypes               database.NumberArray[domain.OIDCGrantType]
-	skipNativeAppSuccessPage sql.NullBool
-	backChannelLogoutURI     sql.NullString
-	loginVersion             sql.NullInt16
-	loginBaseURI             sql.NullString
+	appID                         sql.NullString
+	version                       sql.NullInt32
+	clientID                      sql.NullString
+	redirectUris                  database.TextArray[string]
+	applicationType               sql.NullInt16
+	authMethodType                sql.NullInt16
+	postLogoutRedirectUris        database.TextArray[string]
+	devMode                       sql.NullBool
+	accessTokenType               sql.NullInt16
+	accessTokenRoleAssertion      sql.NullBool
+	iDTokenRoleAssertion          sql.NullBool
+	iDTokenUserinfoAssertion      sql.NullBool
+	clockSkew                     sql.NullInt64
+	additionalOrigins             database.TextArray[string]
+	responseTypes                 database.NumberArray[domain.OIDCResponseType]
+	grantTypes                    database.NumberArray[domain.OIDCGrantType]
+	skipNativeAppSuccessPage      sql.NullBool
+	backChannelLogoutURI          sql.NullString
+	loginVersion                  sql.NullInt16
+	loginBaseURI                  sql.NullString
+	iosTeamID                     sql.NullString
+	iosBundleID                   sql.NullString
+	androidPackageName            sql.NullString
+	androidSHA256CertFingerprints database.TextArray[string]
 }
 
 func (c sqlOIDCConfig) set(app *App) {
@@ -1160,29 +1223,33 @@ func (c sqlOIDCConfig) set(app *App) {
 		return
 	}
 	app.OIDCConfig = &OIDCApp{
-		Version:                  domain.OIDCVersion(c.version.Int32),
-		ClientID:                 c.clientID.String,
-		RedirectURIs:             c.redirectUris,
-		AppType:                  domain.OIDCApplicationType(c.applicationType.Int16),
-		AuthMethodType:           domain.OIDCAuthMethodType(c.authMethodType.Int16),
-		PostLogoutRedirectURIs:   c.postLogoutRedirectUris,
-		IsDevMode:                c.devMode.Bool,
-		AccessTokenType:          domain.OIDCTokenType(c.accessTokenType.Int16),
-		AssertAccessTokenRole:    c.accessTokenRoleAssertion.Bool,
-		AssertIDTokenRole:        c.iDTokenRoleAssertion.Bool,
-		AssertIDTokenUserinfo:    c.iDTokenUserinfoAssertion.Bool,
-		ClockSkew:                time.Duration(c.clockSkew.Int64),
-		AdditionalOrigins:        c.additionalOrigins,
-		ResponseTypes:            c.responseTypes,
-		GrantTypes:               c.grantTypes,
-		SkipNativeAppSuccessPage: c.skipNativeAppSuccessPage.Bool,
-		BackChannelLogoutURI:     c.backChannelLogoutURI.String,
-		LoginVersion:             domain.LoginVersion(c.loginVersion.Int16),
+		Version:                       domain.OIDCVersion(c.version.Int32),
+		ClientID:                      c.clientID.String,
+		RedirectURIs:                  c.redirectUris,
+		AppType:                       domain.OIDCApplicationType(c.applicationType.Int16),
+		AuthMethodType:                domain.OIDCAuthMethodType(c.authMethodType.Int16),
+		PostLogoutRedirectURIs:        c.postLogoutRedirectUris,
+		IsDevMode:                     c.devMode.Bool,
+		AccessTokenType:               domain.OIDCTokenType(c.accessTokenType.Int16),
+		AssertAccessTokenRole:         c.accessTokenRoleAssertion.Bool,
+		AssertIDTokenRole:             c.iDTokenRoleAssertion.Bool,
+		AssertIDTokenUserinfo:         c.iDTokenUserinfoAssertion.Bool,
+		ClockSkew:                     time.Duration(c.clockSkew.Int64),
+		AdditionalOrigins:             c.additionalOrigins,
+		ResponseTypes:                 c.responseTypes,
+		GrantTypes:                    c.grantTypes,
+		SkipNativeAppSuccessPage:      c.skipNativeAppSuccessPage.Bool,
+		BackChannelLogoutURI:          c.backChannelLogoutURI.String,
+		LoginVersion:                  domain.LoginVersion(c.loginVersion.Int16),
+		IOSTeamID:                     c.iosTeamID.String,
+		IOSBundleID:                   c.iosBundleID.String,
+		AndroidPackageName:            c.androidPackageName.String,
+		AndroidSHA256CertFingerprints: c.androidSHA256CertFingerprints,
 	}
 	if c.loginBaseURI.Valid {
 		app.OIDCConfig.LoginBaseURI = &c.loginBaseURI.String
 	}
-	compliance := domain.GetOIDCCompliance(app.OIDCConfig.Version, app.OIDCConfig.AppType, app.OIDCConfig.GrantTypes, app.OIDCConfig.ResponseTypes, app.OIDCConfig.AuthMethodType, app.OIDCConfig.RedirectURIs)
+	compliance := domain.GetOIDCCompliance(gu.Ptr(app.OIDCConfig.Version), gu.Ptr(app.OIDCConfig.AppType), app.OIDCConfig.GrantTypes, app.OIDCConfig.ResponseTypes, gu.Ptr(app.OIDCConfig.AuthMethodType), app.OIDCConfig.RedirectURIs)
 	app.OIDCConfig.ComplianceProblems = compliance.Problems
 
 	var err error

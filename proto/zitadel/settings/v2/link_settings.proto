@@ -1,0 +1,133 @@
+syntax = "proto3";
+
+package zitadel.settings.v2;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
+
+import "validate/validate.proto";
+
+import "google/protobuf/timestamp.proto";
+import "zitadel/object/v2/object.proto";
+import "zitadel/settings/v2/source.proto";
+
+// ============================================================================
+// Messages
+// ============================================================================
+
+// Ordered list of links displayed in the login footer.
+// The array order determines display order — there is no separate order field.
+// Protobuf `repeated` fields preserve insertion order across all languages.
+message LinkSettings {
+  repeated Link links = 1;
+}
+
+message Link {
+  LinkType type = 1;
+  // Target URL or mailto address for the link.
+  // Must be either a valid absolute URL (e.g., "https://example.com/tos")
+  // or a mailto address (e.g., "mailto:support@example.com").
+  // May contain language placeholders ({{.Lang}}) to support localized destinations.
+  string url = 2 [
+    (validate.rules).string = {
+      pattern: "^(https?://|mailto:).+"
+      min_len: 1;
+    }
+  ];
+  // Translation key for the link text.
+  // Required for CUSTOM links; must be empty for well-known types.
+  //
+  // Well-known types: labels come from the frontend i18n files, not this field.
+  // Custom links: this is a translation key resolved via GetHostedLoginTranslation.
+  // Register display text per language via SetHostedLoginTranslation.
+  string translation_key = 3 [
+    (validate.rules).string = {
+      min_len: 1;
+      ignore_empty: true;
+    }
+  ];
+  LinkTarget target = 4;
+}
+
+// ============================================================================
+// Enums
+// ============================================================================
+
+enum LinkType {
+  LINK_TYPE_UNSPECIFIED = 0;
+  LINK_TYPE_TERMS_OF_SERVICE = 1;
+  LINK_TYPE_PRIVACY_POLICY = 2;
+  LINK_TYPE_HELP = 3;
+  LINK_TYPE_SUPPORT = 4;
+  LINK_TYPE_DOCS = 5;
+  LINK_TYPE_CUSTOM = 6;
+}
+
+enum LinkTarget {
+  LINK_TARGET_UNSPECIFIED = 0;
+  LINK_TARGET_SELF = 1;    // opens in same window
+  LINK_TARGET_BLANK = 2;   // opens in new tab
+}
+
+// ============================================================================
+// Get
+// ============================================================================
+
+// Returns the effective links for the requested scope.
+// Source is tracked for the list as a whole — the entire list
+// is either inherited or overridden, never partially merged.
+
+message GetLinkSettingsRequest {
+  // ctx specifies the context for which the link settings should be returned.
+  // This can be the instance, organization,... according to the hierarchical
+  // model of the settings.
+  // If a lower level of the model is requested but not found, the fallback of
+  // the parent is returned.
+  zitadel.object.v2.RequestContext ctx = 1;
+}
+
+message GetLinkSettingsResponse {
+  LinkSettings settings = 1;
+  Source source = 2;
+}
+
+// ============================================================================
+// Set
+// ============================================================================
+
+message SetLinkSettingsRequest {
+  // ctx specifies the context for which the link settings should be set.
+  // This can be the instance, organization,... according to the hierarchical
+  // model of the settings.
+  zitadel.object.v2.RequestContext ctx = 1;
+  // link is the collection of links to which the setting should be set.
+  //
+  // Validation:
+  //   - Each well-known type (TERMS_OF_SERVICE, PRIVACY_POLICY, etc.)
+  //     may appear at most once.
+  //   - CUSTOM links may appear multiple times.
+  //   - url must be a valid absolute URL or a mailto address.
+  //   - translation_key is required when type is CUSTOM.
+  //   - translation_key must be empty for well-known types.
+  repeated Link links = 2;
+}
+
+message SetLinkSettingsResponse {
+  google.protobuf.Timestamp change_date = 1;
+  LinkSettings settings = 2;
+}
+
+// ============================================================================
+// Reset
+// ============================================================================
+
+message ResetLinkSettingsRequest {
+  // ctx specifies the context for which the link settings should be reset.
+  // This can be the instance, organization,... according to the hierarchical
+  // model of the settings.
+  zitadel.object.v2.RequestContext ctx = 1;
+}
+
+message ResetLinkSettingsResponse {
+  google.protobuf.Timestamp change_date = 1;
+  LinkSettings settings = 2;
+}

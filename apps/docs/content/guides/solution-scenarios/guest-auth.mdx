@@ -1,0 +1,67 @@
+---
+title: Guest users authentication
+description: Learn the concepts and benefits of the Shadow Account architecture to provide secure, frictionless guest experiences before requiring registration.
+---
+
+In certain scenarios, requiring users to create an account *before* they can interact with core features of your product often leads to increased drop-off rates. Whether it is an e-commerce platform requiring authentication to add items to a cart, or a SaaS application requesting an email before granting dashboard access, registration barriers can negatively impact user acquisition.
+
+At the same time, backend microservices generally require cryptographically signed JSON Web Tokens (JWTs) from an Identity Provider (IdP) to authorize and secure these initial interactions. 
+
+**How do you issue a valid token to an anonymous guest without introducing a login barrier?**
+
+The solution is the **Guest Account** (or Shadow Account) architecture.
+
+## What is a Guest Account?
+
+A Guest Account is a temporary identity provisioned for a user the moment they perform a high-intent action within your application, for example, adding items to the cart.
+
+Instead of treating anonymous users as "unauthenticated" entities, the application silently creates a temporary profile for them in ZITADEL. The backend then impersonates this temporary user, generating a valid authentication token that is stored securely on the client side. 
+
+From the user's perspective, they are browsing anonymously. To the backend architecture, they operate as an authenticated user with a valid JWT.
+
+## The Benefits of this Approach
+
+Implementing guest authentication utilizing ZITADEL provides distinct advantages for both user experience and system architecture:
+
+* **Increased Engagement:** Users can interact with the application immediately. Explicit registration is deferred until a transactional commitment is required (e.g., during checkout).
+* **Unified Security Model:** Backend APIs do not require bifurcated authorization logic (e.g., `if (isGuest)`). Every request, regardless of the user's registration state, is authenticated via a cryptographically signed OIDC token.
+* **Seamless Data Retention:** Because the guest session is bound to a persistent underlying ID, all actions (such as populating a cart or setting preferences) are stateful. Upon formal registration, data migration is unnecessary; the system simply updates the existing identity record with explicit credentials.
+* **Automated Lifecycle Management:** By appending a timestamp via a `metadata` attribute upon creation, the IdP can systematically identify and purge abandoned guest accounts using scheduled batch jobs, mitigating database bloat.
+
+---
+
+## How It Works: The Implementation Flow
+
+Implementing this with ZITADEL is efficient because the platform natively supports **OAuth 2.0 Token Exchange (RFC 8693)** and **User Impersonation**. 
+
+Here is the high-level lifecycle of how a guest account moves from an anonymous action to a fully registered user:
+
+
+
+### 1. Silent Provisioning (The Anonymous Intent)
+An unauthenticated user performs an action such as "Add to Cart." The backend intercepts this request and, utilizing a privileged **ZITADEL Service Account**, calls the ZITADEL API to silently provision a temporary user record. 
+* *Mechanism:* The system appends a `metadata` key (e.g., `GUEST_26_02_27`) to the user profile. This attribute flags the account for future garbage collection if the session is abandoned.
+
+### 2. Token Exchange & Impersonation
+Rather than generating a localized session token, the backend requests a standard token from ZITADEL. It executes an **OAuth 2.0 Token Exchange** to trade its Service Account credentials for an **Impersonation Token** representing the newly created guest.
+* *Mechanism:* The frontend receives a standard, valid JWT secured in an `httpOnly` cookie. The user proceeds with their workflow without interruption.
+
+### 3. The Upgrade Path (Frictionless Registration)
+When the user initiates formal registration, the system bypasses standard account creation. Instead, the application updates the existing guest profile in ZITADEL with explicit credentials (Name, Email, and Password).
+* *Mechanism:* The `GUEST` metadata tag is deleted, protecting the account from lifecycle cleanup scripts. The temporary identity is seamlessly converted into a permanent account, retaining all historical state.
+
+
+
+### 4. Edge Case Handling: Cart Merging
+If a guest user authenticates using a *pre-existing* account rather than registering a new one, the application detects a discrepancy between the `sub` claim in the guest cookie and the newly authenticated identity.
+* *Mechanism:* The backend merges the local guest data (e.g., cart items) into the permanent user's database record. Subsequently, it issues a `DeleteUser` API call to ZITADEL to terminate the orphaned guest account.
+
+---
+
+## Dive into the Code
+
+We have developed a complete, open-source Next.js application that demonstrates this exact architecture end-to-end, including NextAuth.js configuration, ZITADEL API integrations, and data merging logic.
+
+👉 **[Explore the GitHub Repository](https://github.com/zitadel/zitadel-guest-accounts.git)**
+
+The repository's `README.md` contains a comprehensive step-by-step guide on configuring your ZITADEL instance (enabling PKCE, Token Exchange, and Impersonation roles) alongside the exact code snippets required to execute the silent provisioning and token exchange flows.

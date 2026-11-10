@@ -135,7 +135,7 @@ func writeModelToPasswordlessInitCode(initCodeModel *HumanPasswordlessInitCodeWr
 		ObjectRoot: writeModelToObjectRoot(initCodeModel.WriteModel),
 		CodeID:     initCodeModel.CodeID,
 		Code:       code,
-		Expiration: initCodeModel.Expiration,
+		Expiration: initCodeModel.CodeExpiration,
 		State:      initCodeModel.State,
 	}
 }

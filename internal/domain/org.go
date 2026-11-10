@@ -43,3 +43,11 @@ const (
 func (s OrgState) Valid() bool {
 	return s > OrgStateUnspecified && s < orgStateMax
 }
+
+func (s OrgState) Exists() bool {
+	return s != OrgStateRemoved && s != OrgStateUnspecified
+}
+
+func (s OrgState) IsActive() bool {
+	return s == OrgStateActive
+}

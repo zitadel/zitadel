@@ -45,9 +45,11 @@ func (n *NotificationQueries) GetActiveSMSConfig(ctx context.Context) (*sms.Conf
 		return &sms.Config{
 			ProviderConfig: provider,
 			WebhookConfig: &webhook.Config{
-				CallURL: config.HTTPConfig.Endpoint,
-				Method:  http.MethodPost,
-				Headers: nil,
+				CallURL:    config.HTTPConfig.Endpoint,
+				Method:     http.MethodPost,
+				Headers:    nil,
+				SigningKey: config.HTTPConfig.SigningKey,
+				Client:     n.httpClient,
 			},
 		}, nil
 	}

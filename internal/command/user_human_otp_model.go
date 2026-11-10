@@ -16,6 +16,7 @@ type HumanTOTPWriteModel struct {
 	Secret           *crypto.CryptoValue
 	CheckFailedCount uint64
 	UserLocked       bool
+	History          *domain.TOTPHistory
 }
 
 func NewHumanTOTPWriteModel(userID, resourceOwner string) *HumanTOTPWriteModel {
@@ -24,6 +25,7 @@ func NewHumanTOTPWriteModel(userID, resourceOwner string) *HumanTOTPWriteModel {
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
+		History: new(domain.TOTPHistory),
 	}
 }
 
@@ -38,6 +40,7 @@ func (wm *HumanTOTPWriteModel) Reduce() error {
 			wm.CheckFailedCount = 0
 		case *user.HumanOTPCheckSucceededEvent:
 			wm.CheckFailedCount = 0
+			wm.History.AddRecent(e.CreatedAt(), e.CodeHash)
 		case *user.HumanOTPCheckFailedEvent:
 			wm.CheckFailedCount++
 		case *user.UserLockedEvent:
@@ -48,7 +51,15 @@ func (wm *HumanTOTPWriteModel) Reduce() error {
 		case *user.HumanOTPRemovedEvent:
 			wm.State = domain.MFAStateRemoved
 		case *user.UserRemovedEvent:
+			wm.Secret = nil
+			wm.CheckFailedCount = 0
+			wm.UserLocked = false
 			wm.State = domain.MFAStateRemoved
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent:
+			wm.Secret = nil
+			wm.CheckFailedCount = 0
+			wm.UserLocked = false
+			wm.State = domain.MFAStateUnspecified
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -59,7 +70,11 @@ func (wm *HumanTOTPWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		EventTypes(user.HumanMFAOTPAddedType,
+		EventTypes(
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
+			user.HumanMFAOTPAddedType,
 			user.HumanMFAOTPVerifiedType,
 			user.HumanMFAOTPRemovedType,
 			user.HumanMFAOTPCheckSucceededType,
@@ -74,6 +89,11 @@ func (wm *HumanTOTPWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
+	}
+	// checkTOTP rechecks the same write model for events which arrived during the
+	// code verification. Bound the query so only those are reduced again.
+	if wm.ProcessedSequence != 0 {
+		query.SequenceGreater(wm.ProcessedSequence)
 	}
 	return query
 }
@@ -129,7 +149,11 @@ func (wm *HumanOTPSMSWriteModel) Reduce() error {
 		case *user.HumanOTPSMSRemovedEvent:
 			wm.otpAdded = false
 		case *user.HumanPhoneRemovedEvent,
-			*user.UserRemovedEvent:
+			*user.UserRemovedEvent,
+			*user.HumanAddedEvent,
+			*user.HumanRegisteredEvent,
+			*user.MachineAddedEvent:
+
 			wm.phoneVerified = false
 			wm.otpAdded = false
 		}
@@ -147,6 +171,9 @@ func (wm *HumanOTPSMSWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanOTPSMSRemovedType,
 			user.HumanPhoneRemovedType,
 			user.UserRemovedType,
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
 		).
 		Builder()
 
@@ -300,7 +327,7 @@ func (wm *HumanOTPEmailWriteModel) Reduce() error {
 			wm.otpAdded = true
 		case *user.HumanOTPEmailRemovedEvent:
 			wm.otpAdded = false
-		case *user.UserRemovedEvent:
+		case *user.UserRemovedEvent, *user.HumanAddedEvent, *user.HumanRegisteredEvent, *user.MachineAddedEvent:
 			wm.emailVerified = false
 			wm.otpAdded = false
 		}
@@ -314,6 +341,9 @@ func (wm *HumanOTPEmailWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
 			user.HumanEmailVerifiedType,
 			user.HumanOTPEmailAddedType,
 			user.HumanOTPEmailRemovedType,

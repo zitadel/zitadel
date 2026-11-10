@@ -18,11 +18,11 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/sessionlogout"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -49,10 +49,11 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 		keyAlgorithm                    crypto.EncryptionAlgorithm
 	}
 	type args struct {
-		ctx              context.Context
-		authRequestID    string
-		complianceCheck  AuthRequestComplianceChecker
-		needRefreshToken bool
+		ctx                  context.Context
+		authRequestID        string
+		complianceCheck      AuthRequestComplianceChecker
+		needRefreshToken     bool
+		backChannelLogoutURI string
 	}
 	type res struct {
 		session *OIDCSession
@@ -137,6 +138,8 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								gu.Ptr("loginHint"),
 								gu.Ptr("hintUserID"),
 								true,
+								"issuer",
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -181,6 +184,8 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								gu.Ptr("loginHint"),
 								gu.Ptr("hintUserID"),
 								true,
+								"issuer",
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -233,6 +238,8 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								gu.Ptr("loginHint"),
 								gu.Ptr("hintUserID"),
 								true,
+								"issuer",
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -330,6 +337,8 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								gu.Ptr("loginHint"),
 								gu.Ptr("hintUserID"),
 								true,
+								"issuer",
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -380,6 +389,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 							false,
 						),
 					),
+					expectFilterActiveOrg("org1"),
 					expectFilter(), // token lifetime
 					expectPush(
 						authrequest.NewCodeExchangedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
@@ -395,7 +405,6 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 						),
 						oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil),
-						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
 						oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
 						authrequest.NewSucceededEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
@@ -433,13 +442,13 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 						Header:        http.Header{"foo": []string{"bar"}},
 					},
 					Reason:       domain.TokenReasonAuthRequest,
-					RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID-rt_refreshTokenID:userID
+					RefreshToken: "V2_oidcSessionID-rt_refreshTokenID:userID",
 				},
 				state: "state",
 			},
 		},
 		{
-			"disable user token event",
+			"add successful, backChannelLogout (feature enabled)",
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -464,6 +473,8 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								gu.Ptr("loginHint"),
 								gu.Ptr("hintUserID"),
 								true,
+								"issuer",
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -514,6 +525,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 							false,
 						),
 					),
+					expectFilterActiveOrg("org1"),
 					expectFilter(), // token lifetime
 					expectPush(
 						authrequest.NewCodeExchangedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
@@ -526,6 +538,13 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								Description:   gu.Ptr("firefox"),
 								Header:        http.Header{"foo": []string{"bar"}},
 							},
+						),
+						sessionlogout.NewBackChannelLogoutRegisteredEvent(context.Background(),
+							&sessionlogout.NewAggregate("sessionID", "instanceID").Aggregate,
+							"V2_oidcSessionID",
+							"userID",
+							"clientID",
+							"backChannelLogoutURI",
 						),
 						oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil),
@@ -541,15 +560,12 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args{
-				ctx: authz.WithFeatures(
-					authz.WithInstanceID(context.Background(), "instanceID"),
-					feature.Features{
-						DisableUserTokenEvent: true,
-					},
-				),
-				authRequestID:    "V2_authRequestID",
-				complianceCheck:  mockAuthRequestComplianceChecker(nil),
-				needRefreshToken: true,
+
+				ctx:                  authz.WithInstanceID(context.Background(), "instanceID"),
+				authRequestID:        "V2_authRequestID",
+				complianceCheck:      mockAuthRequestComplianceChecker(nil),
+				needRefreshToken:     true,
+				backChannelLogoutURI: "backChannelLogoutURI",
 			},
 			res{
 				session: &OIDCSession{
@@ -571,7 +587,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 						Header:        http.Header{"foo": []string{"bar"}},
 					},
 					Reason:       domain.TokenReasonAuthRequest,
-					RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID-rt_refreshTokenID:userID
+					RefreshToken: "V2_oidcSessionID-rt_refreshTokenID:userID",
 				},
 				state: "state",
 			},
@@ -602,6 +618,8 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								gu.Ptr("loginHint"),
 								gu.Ptr("hintUserID"),
 								false,
+								"issuer",
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -649,6 +667,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 							false,
 						),
 					),
+					expectFilterActiveOrg("org1"),
 					expectFilter(), // token lifetime
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -706,9 +725,10 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 				defaultRefreshTokenLifetime:     tt.fields.defaultRefreshTokenLifetime,
 				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
+				authAlgorithm:                   &mockAuthCrypto{},
 			}
 			c.setMilestonesCompletedForTest("instanceID")
-			gotSession, gotState, err := c.CreateOIDCSessionFromAuthRequest(tt.args.ctx, tt.args.authRequestID, tt.args.complianceCheck, tt.args.needRefreshToken)
+			gotSession, gotState, err := c.CreateOIDCSessionFromAuthRequest(tt.args.ctx, tt.args.authRequestID, tt.args.complianceCheck, tt.args.needRefreshToken, tt.args.backChannelLogoutURI)
 			require.ErrorIs(t, err, tt.res.err)
 
 			if gotSession != nil {
@@ -719,6 +739,18 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 			assert.Equal(t, tt.res.session, gotSession)
 			assert.Equal(t, tt.res.state, gotState)
 		})
+	}
+}
+
+// expectImpersonationPermission asserts that the impersonation permission check is
+// executed with the expected permission and that it is scoped to the subject user and
+// its organization. The returned err is passed back to the command.
+func expectImpersonationPermission(t *testing.T, wantPermission string, err error) domain.PermissionCheck {
+	return func(_ context.Context, permission, orgID, userID string) error {
+		assert.Equal(t, wantPermission, permission)
+		assert.Equal(t, "org1", orgID)
+		assert.Equal(t, "userID", userID)
+		return err
 	}
 }
 
@@ -869,6 +901,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 							false,
 						),
 					),
+					expectFilterActiveOrg("org1"),
 					expectFilter(), // token lifetime
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -889,7 +922,6 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 								Issuer: "foo.com",
 							},
 						),
-						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
 					),
 				),
 				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID", "accessTokenID"),
@@ -966,6 +998,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 							false,
 						),
 					),
+					expectFilterActiveOrg("org1"),
 					expectFilter(), // token lifetime
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -1029,107 +1062,6 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 			},
 		},
 		{
-			name: "disable user token event",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						user.NewHumanAddedEvent(
-							context.Background(),
-							&user.NewAggregate("userID", "org1").Aggregate,
-							"username",
-							"firstname",
-							"lastname",
-							"nickname",
-							"displayname",
-							language.Afrikaans,
-							domain.GenderUnspecified,
-							"email",
-							false,
-						),
-					),
-					expectFilter(), // token lifetime
-					expectPush(
-						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-							"userID", "org1", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
-							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
-							&domain.UserAgent{
-								FingerprintID: gu.Ptr("fp1"),
-								IP:            net.ParseIP("1.2.3.4"),
-								Description:   gu.Ptr("firefox"),
-								Header:        http.Header{"foo": []string{"bar"}},
-							},
-						),
-						oidcsession.NewAccessTokenAddedEvent(context.Background(),
-							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest,
-							&domain.TokenActor{
-								UserID: "user2",
-								Issuer: "foo.com",
-							},
-						),
-					),
-				),
-				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID", "accessTokenID"),
-				defaultAccessTokenLifetime:      time.Hour,
-				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
-				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
-				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			},
-			args: args{
-				ctx: authz.WithFeatures(
-					authz.WithInstanceID(context.Background(), "instanceID"),
-					feature.Features{
-						DisableUserTokenEvent: true,
-					},
-				),
-				userID:            "userID",
-				resourceOwner:     "org1",
-				clientID:          "clientID",
-				audience:          []string{"audience"},
-				scope:             []string{"openid", "offline_access"},
-				authMethods:       []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
-				authTime:          testNow,
-				nonce:             "nonce",
-				preferredLanguage: &language.Afrikaans,
-				userAgent: &domain.UserAgent{
-					FingerprintID: gu.Ptr("fp1"),
-					IP:            net.ParseIP("1.2.3.4"),
-					Description:   gu.Ptr("firefox"),
-					Header:        http.Header{"foo": []string{"bar"}},
-				},
-				reason: domain.TokenReasonAuthRequest,
-				actor: &domain.TokenActor{
-					UserID: "user2",
-					Issuer: "foo.com",
-				},
-				needRefreshToken: false,
-				responseType:     domain.OIDCResponseTypeUnspecified,
-			},
-			want: &OIDCSession{
-				TokenID:           "V2_oidcSessionID-at_accessTokenID",
-				ClientID:          "clientID",
-				UserID:            "userID",
-				Audience:          []string{"audience"},
-				Expiration:        time.Time{}.Add(time.Hour),
-				Scope:             []string{"openid", "offline_access"},
-				AuthMethods:       []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
-				AuthTime:          testNow,
-				Nonce:             "nonce",
-				PreferredLanguage: &language.Afrikaans,
-				UserAgent: &domain.UserAgent{
-					FingerprintID: gu.Ptr("fp1"),
-					IP:            net.ParseIP("1.2.3.4"),
-					Description:   gu.Ptr("firefox"),
-					Header:        http.Header{"foo": []string{"bar"}},
-				},
-				Reason: domain.TokenReasonAuthRequest,
-				Actor: &domain.TokenActor{
-					UserID: "user2",
-					Issuer: "foo.com",
-				},
-			},
-		},
-		{
 			name: "with refresh token",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -1148,6 +1080,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 							false,
 						),
 					),
+					expectFilterActiveOrg("org1"),
 					expectFilter(), // token lifetime
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -1167,7 +1100,6 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 								UserID: "user2",
 								Issuer: "foo.com",
 							}),
-						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
 						oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
 					),
@@ -1225,7 +1157,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 					UserID: "user2",
 					Issuer: "foo.com",
 				},
-				RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID-rt_refreshTokenID:userID
+				RefreshToken: "V2_oidcSessionID-rt_refreshTokenID:userID",
 			},
 		},
 		{
@@ -1247,6 +1179,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 							false,
 						),
 					),
+					expectFilterActiveOrg("org1"),
 					expectFilter(), // token lifetime
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -1267,7 +1200,6 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 								Issuer: "foo.com",
 							},
 						),
-						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
 					),
 				),
 				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID", "accessTokenID"),
@@ -1346,6 +1278,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 							false,
 						),
 					),
+					expectFilterActiveOrg("org1"),
 					expectFilter(), // token lifetime
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -1366,7 +1299,6 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 								Issuer: "foo.com",
 							},
 						),
-						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
 					),
 				),
 				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID", "accessTokenID"),
@@ -1443,105 +1375,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 							false,
 						),
 					),
-					expectFilter(), // token lifetime
-					expectPush(
-						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-							"userID", "org1", "sessionID", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
-							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
-							&domain.UserAgent{
-								FingerprintID: gu.Ptr("fp1"),
-								IP:            net.ParseIP("1.2.3.4"),
-								Description:   gu.Ptr("firefox"),
-								Header:        http.Header{"foo": []string{"bar"}},
-							},
-						),
-						oidcsession.NewAccessTokenAddedEvent(context.Background(),
-							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest,
-							&domain.TokenActor{
-								UserID: "user2",
-								Issuer: "foo.com",
-							},
-						),
-						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
-					),
-				),
-				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID", "accessTokenID"),
-				defaultAccessTokenLifetime:      time.Hour,
-				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
-				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
-				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-			},
-			args: args{
-				ctx:                  authz.WithInstanceID(context.Background(), "instanceID"),
-				userID:               "userID",
-				resourceOwner:        "org1",
-				clientID:             "clientID",
-				backChannelLogoutURI: "backChannelLogoutURI",
-				audience:             []string{"audience"},
-				scope:                []string{"openid", "offline_access"},
-				authMethods:          []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
-				authTime:             testNow,
-				nonce:                "nonce",
-				preferredLanguage:    &language.Afrikaans,
-				userAgent: &domain.UserAgent{
-					FingerprintID: gu.Ptr("fp1"),
-					IP:            net.ParseIP("1.2.3.4"),
-					Description:   gu.Ptr("firefox"),
-					Header:        http.Header{"foo": []string{"bar"}},
-				},
-				reason: domain.TokenReasonAuthRequest,
-				actor: &domain.TokenActor{
-					UserID: "user2",
-					Issuer: "foo.com",
-				},
-				needRefreshToken: false,
-				sessionID:        "sessionID",
-			},
-			want: &OIDCSession{
-				TokenID:           "V2_oidcSessionID-at_accessTokenID",
-				ClientID:          "clientID",
-				UserID:            "userID",
-				Audience:          []string{"audience"},
-				Expiration:        time.Time{}.Add(time.Hour),
-				Scope:             []string{"openid", "offline_access"},
-				AuthMethods:       []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
-				AuthTime:          testNow,
-				Nonce:             "nonce",
-				PreferredLanguage: &language.Afrikaans,
-				UserAgent: &domain.UserAgent{
-					FingerprintID: gu.Ptr("fp1"),
-					IP:            net.ParseIP("1.2.3.4"),
-					Description:   gu.Ptr("firefox"),
-					Header:        http.Header{"foo": []string{"bar"}},
-				},
-				Reason: domain.TokenReasonAuthRequest,
-				Actor: &domain.TokenActor{
-					UserID: "user2",
-					Issuer: "foo.com",
-				},
-				SessionID: "sessionID",
-			},
-		},
-		{
-			name: "with backChannelLogoutURI and sessionID, backchannel logout enabled",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						user.NewHumanAddedEvent(
-							context.Background(),
-							&user.NewAggregate("userID", "org1").Aggregate,
-							"username",
-							"firstname",
-							"lastname",
-							"nickname",
-							"displayname",
-							language.Afrikaans,
-							domain.GenderUnspecified,
-							"email",
-							false,
-						),
-					),
+					expectFilterActiveOrg("org1"),
 					expectFilter(), // token lifetime
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -1569,7 +1403,6 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 								Issuer: "foo.com",
 							},
 						),
-						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
 					),
 				),
 				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID", "accessTokenID"),
@@ -1579,7 +1412,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:                  authz.WithFeatures(authz.WithInstanceID(context.Background(), "instanceID"), feature.Features{EnableBackChannelLogout: true}),
+				ctx:                  authz.WithInstanceID(context.Background(), "instanceID"),
 				userID:               "userID",
 				resourceOwner:        "org1",
 				clientID:             "clientID",
@@ -1648,6 +1481,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 							false,
 						),
 					),
+					expectFilterActiveOrg("org1"),
 					expectFilter(), // token lifetime
 				),
 				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID"),
@@ -1655,9 +1489,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
 				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
 				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				checkPermission: domain.PermissionCheck(func(_ context.Context, _, _, _ string) (err error) {
-					return zerrors.ThrowPermissionDenied(nil, "test", "test")
-				}),
+				checkPermission:                 expectImpersonationPermission(t, "impersonation", zerrors.ThrowPermissionDenied(nil, "test", "test")),
 			},
 			args: args{
 				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
@@ -1705,6 +1537,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 							false,
 						),
 					),
+					expectFilterActiveOrg("org1"),
 					expectFilter(), // token lifetime
 					expectPush(
 						user.NewUserImpersonatedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "clientID", &domain.TokenActor{
@@ -1729,7 +1562,6 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 								Issuer: "foo.com",
 							},
 						),
-						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
 					),
 				),
 				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID", "accessTokenID"),
@@ -1737,9 +1569,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
 				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
 				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				checkPermission: domain.PermissionCheck(func(_ context.Context, _, _, _ string) (err error) {
-					return nil
-				}),
+				checkPermission:                 expectImpersonationPermission(t, "impersonation", nil),
 			},
 			args: args{
 				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
@@ -1790,6 +1620,164 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "admin impersonation not allowed",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						user.NewHumanAddedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.Afrikaans,
+							domain.GenderUnspecified,
+							"email",
+							false,
+						),
+					),
+					expectFilterActiveOrg("org1"),
+					expectFilter(), // token lifetime
+				),
+				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID"),
+				defaultAccessTokenLifetime:      time.Hour,
+				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
+				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
+				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				checkPermission:                 expectImpersonationPermission(t, "admin.impersonation", zerrors.ThrowPermissionDenied(nil, "test", "test")),
+			},
+			args: args{
+				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
+				userID:            "userID",
+				resourceOwner:     "org1",
+				clientID:          "clientID",
+				audience:          []string{"audience"},
+				scope:             []string{"openid", "offline_access"},
+				authMethods:       []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				authTime:          testNow,
+				nonce:             "nonce",
+				preferredLanguage: &language.Afrikaans,
+				userAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				reason: domain.TokenReasonAdminImpersonation,
+				actor: &domain.TokenActor{
+					UserID: "user2",
+					Issuer: "foo.com",
+				},
+				needRefreshToken: false,
+				responseType:     domain.OIDCResponseTypeUnspecified,
+			},
+			wantErr: zerrors.ThrowPermissionDenied(nil, "test", "test"),
+		},
+		{
+			name: "admin impersonation allowed",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						user.NewHumanAddedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.Afrikaans,
+							domain.GenderUnspecified,
+							"email",
+							false,
+						),
+					),
+					expectFilterActiveOrg("org1"),
+					expectFilter(), // token lifetime
+					expectPush(
+						user.NewUserImpersonatedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "clientID", &domain.TokenActor{
+							UserID: "user2",
+							Issuer: "foo.com",
+						}),
+						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"userID", "org1", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
+							&domain.UserAgent{
+								FingerprintID: gu.Ptr("fp1"),
+								IP:            net.ParseIP("1.2.3.4"),
+								Description:   gu.Ptr("firefox"),
+								Header:        http.Header{"foo": []string{"bar"}},
+							},
+						),
+						oidcsession.NewAccessTokenAddedEvent(context.Background(),
+							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAdminImpersonation,
+							&domain.TokenActor{
+								UserID: "user2",
+								Issuer: "foo.com",
+							},
+						),
+					),
+				),
+				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID", "accessTokenID"),
+				defaultAccessTokenLifetime:      time.Hour,
+				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
+				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
+				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				checkPermission:                 expectImpersonationPermission(t, "admin.impersonation", nil),
+			},
+			args: args{
+				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
+				userID:            "userID",
+				resourceOwner:     "org1",
+				clientID:          "clientID",
+				audience:          []string{"audience"},
+				scope:             []string{"openid", "offline_access"},
+				authMethods:       []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				authTime:          testNow,
+				nonce:             "nonce",
+				preferredLanguage: &language.Afrikaans,
+				userAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				reason: domain.TokenReasonAdminImpersonation,
+				actor: &domain.TokenActor{
+					UserID: "user2",
+					Issuer: "foo.com",
+				},
+				needRefreshToken: false,
+				responseType:     domain.OIDCResponseTypeUnspecified,
+			},
+			want: &OIDCSession{
+				TokenID:           "V2_oidcSessionID-at_accessTokenID",
+				ClientID:          "clientID",
+				UserID:            "userID",
+				Audience:          []string{"audience"},
+				Expiration:        time.Time{}.Add(time.Hour),
+				Scope:             []string{"openid", "offline_access"},
+				AuthMethods:       []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				AuthTime:          testNow,
+				Nonce:             "nonce",
+				PreferredLanguage: &language.Afrikaans,
+				UserAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				Reason: domain.TokenReasonAdminImpersonation,
+				Actor: &domain.TokenActor{
+					UserID: "user2",
+					Issuer: "foo.com",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1801,6 +1789,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
 				checkPermission:                 tt.fields.checkPermission,
+				authAlgorithm:                   &mockAuthCrypto{},
 			}
 			c.setMilestonesCompletedForTest("instanceID")
 			got, err := c.CreateOIDCSession(tt.args.ctx,
@@ -1833,9 +1822,12 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 }
 
 func mockRefreshTokenComplianceChecker(returnErr error) RefreshTokenComplianceChecker {
-	return func(_ context.Context, wm *OIDCSessionWriteModel, scope []string) ([]string, error) {
+	return func(_ context.Context, wm *OIDCSessionWriteModel, scope []string, clientID string) ([]string, error) {
 		if returnErr != nil {
 			return nil, returnErr
+		}
+		if wm.ClientID != clientID {
+			return nil, zerrors.ThrowInvalidArgument(nil, "test", "invalid clientID")
 		}
 		if len(scope) > 0 {
 			return scope, nil
@@ -1857,6 +1849,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 		ctx             context.Context
 		refreshToken    string
 		scope           []string
+		reqClientID     string
 		complianceCheck RefreshTokenComplianceChecker
 	}
 	type res struct {
@@ -1894,7 +1887,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			},
 			args{
 				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				refreshToken:    "V2_oidcSessionID-rt_refreshTokenID:userID", //V2_oidcSessionID:rt_refreshTokenID:userID
 				complianceCheck: mockRefreshTokenComplianceChecker(nil),
 			},
 			res{
@@ -1923,7 +1916,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			},
 			args{
 				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				refreshToken:    "V2_oidcSessionID-rt_refreshTokenID:userID", //V2_oidcSessionID:rt_refreshTokenID:userID
 				complianceCheck: mockRefreshTokenComplianceChecker(nil),
 			},
 			res{
@@ -1956,7 +1949,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			},
 			args{
 				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				refreshToken:    "V2_oidcSessionID-rt_refreshTokenID:userID", //V2_oidcSessionID:rt_refreshTokenID:userID
 				complianceCheck: mockRefreshTokenComplianceChecker(nil),
 			},
 			res{
@@ -1984,6 +1977,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 								"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
 						),
 					),
+					expectFilter(), // no OrgDeactivated after refresh token issuance
 					expectFilter(
 						user.NewHumanAddedEvent(
 							context.Background(),
@@ -2012,12 +2006,108 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			},
 			args{
 				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				refreshToken:    "V2_oidcSessionID-rt_refreshTokenID:userID", //V2_oidcSessionID:rt_refreshTokenID:userID
 				scope:           []string{"openid", "offline_access"},
 				complianceCheck: mockRefreshTokenComplianceChecker(nil),
 			},
 			res{
 				err: zerrors.ThrowPreconditionFailed(nil, "OIDCS-J39h2", "Errors.User.NotActive"),
+			},
+		},
+		{
+			"org deactivated after refresh token issuance",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusherWithCreationDateNow(
+							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"userID", "org1", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
+								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil),
+						),
+						eventFromEventPusherWithCreationDate(
+							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
+							testNow,
+						),
+					),
+					expectFilter(
+						eventFromEventPusherWithCreationDate(
+							org.NewOrgDeactivatedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate),
+							testNow.Add(time.Minute),
+						),
+					),
+				),
+				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args{
+				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
+				refreshToken:    "V2_oidcSessionID-rt_refreshTokenID:userID",
+				scope:           []string{"openid", "offline_access"},
+				complianceCheck: mockRefreshTokenComplianceChecker(nil),
+			},
+			res{
+				err: zerrors.ThrowPreconditionFailed(nil, "OIDCS-oR9nR", "Errors.OIDCSession.RefreshTokenInvalid"),
+			},
+		},
+		{
+			"refresh with an invalid client id fails",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusherWithCreationDateNow(
+							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"userID", "org1", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
+								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
+						),
+					),
+					expectFilter(), // no OrgDeactivated after refresh token issuance
+					expectFilter(
+						user.NewHumanAddedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.Afrikaans,
+							domain.GenderUnspecified,
+							"email",
+							false,
+						),
+					),
+					expectFilterActiveOrg("org1"),
+					expectFilter(),
+				),
+				idGenerator:  mock.NewIDGeneratorExpectIDs(t),
+				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args{
+				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
+				refreshToken:    "V2_oidcSessionID-rt_refreshTokenID:userID", //V2_oidcSessionID:rt_refreshTokenID:userID
+				scope:           []string{"openid", "offline_access"},
+				reqClientID:     "differentClientID",
+				complianceCheck: mockRefreshTokenComplianceChecker(nil),
+			},
+			res{
+				err: zerrors.ThrowInvalidArgument(nil, "test", "invalid clientID"),
 			},
 		},
 		{
@@ -2041,6 +2131,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 								"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
 						),
 					),
+					expectFilter(), // no OrgDeactivated after refresh token issuance
 					expectFilter(
 						user.NewHumanAddedEvent(
 							context.Background(),
@@ -2056,11 +2147,11 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 							false,
 						),
 					),
+					expectFilterActiveOrg("org1"),
 					expectFilter(), // token lifetime
 					expectPush(
 						oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonRefresh, nil),
-						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
 						oidcsession.NewRefreshTokenRenewedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"rt_refreshTokenID2", 24*time.Hour),
 					),
@@ -2073,8 +2164,9 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			},
 			args{
 				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				refreshToken:    "V2_oidcSessionID-rt_refreshTokenID:userID", //V2_oidcSessionID:rt_refreshTokenID:userID
 				scope:           []string{"openid", "offline_access"},
+				reqClientID:     "clientID",
 				complianceCheck: mockRefreshTokenComplianceChecker(nil),
 			},
 			res{
@@ -2084,7 +2176,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 					ClientID:          "clientID",
 					UserID:            "userID",
 					Audience:          []string{"audience"},
-					RefreshToken:      "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDI6dXNlcklE", // V2_oidcSessionID-rt_refreshTokenID2:userID%
+					RefreshToken:      "V2_oidcSessionID-rt_refreshTokenID2:userID", // V2_oidcSessionID-rt_refreshTokenID2:userID%
 					Expiration:        time.Time{}.Add(time.Hour),
 					Scope:             []string{"openid", "profile", "offline_access"},
 					AuthMethods:       []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
@@ -2106,8 +2198,9 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 				defaultRefreshTokenLifetime:     tt.fields.defaultRefreshTokenLifetime,
 				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
+				authAlgorithm:                   &mockAuthCrypto{},
 			}
-			got, err := c.ExchangeOIDCSessionRefreshAndAccessToken(tt.args.ctx, tt.args.refreshToken, tt.args.scope, tt.args.complianceCheck)
+			got, err := c.ExchangeOIDCSessionRefreshAndAccessToken(tt.args.ctx, tt.args.refreshToken, tt.args.scope, tt.args.reqClientID, tt.args.complianceCheck)
 			require.ErrorIs(t, err, tt.res.err)
 			if got != nil {
 				assert.WithinRange(t, got.AuthTime, tt.res.session.AuthTime.Add(-time.Second), tt.res.session.AuthTime.Add(time.Second))
@@ -2253,6 +2346,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 								"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
 						),
 					),
+					expectFilter(), // no OrgDeactivated after refresh token issuance
 				),
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},

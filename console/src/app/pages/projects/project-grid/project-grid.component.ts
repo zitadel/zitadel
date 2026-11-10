@@ -7,7 +7,6 @@ import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { GrantedProject, Project, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
@@ -44,6 +43,7 @@ import { ToastService } from 'src/app/services/toast.service';
       ]),
     ]),
   ],
+  standalone: false,
 })
 export class ProjectGridComponent implements OnInit, OnDestroy {
   public projectList: Array<Project.AsObject | GrantedProject.AsObject> = [];
@@ -220,13 +220,13 @@ export class ProjectGridComponent implements OnInit, OnDestroy {
   }
 
   private async getPrefixedItem(key: string): Promise<string | null> {
-    const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.session) as Org.AsObject;
-    return localStorage.getItem(`${org?.id}:${key}`);
+    const org = this.storage.getItem(StorageKey.organizationId, StorageLocation.session);
+    return localStorage.getItem(`${org}:${key}`);
   }
 
   private async setPrefixedItem(key: string, value: any): Promise<void> {
-    const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.session) as Org.AsObject;
-    return localStorage.setItem(`${org.id}:${key}`, value);
+    const org = this.storage.getItem(StorageKey.organizationId, StorageLocation.session);
+    return localStorage.setItem(`${org}:${key}`, value);
   }
 
   public navigateToProject(type: ProjectType, item: Project.AsObject | GrantedProject.AsObject, event: any): void {

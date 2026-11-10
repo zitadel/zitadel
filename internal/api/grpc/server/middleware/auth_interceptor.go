@@ -13,13 +13,13 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func AuthorizationInterceptor(verifier authz.APITokenVerifier, authConfig authz.Config) grpc.UnaryServerInterceptor {
+func AuthorizationInterceptor(verifier authz.APITokenVerifier, systemUserPermissions authz.Config, authConfig authz.Config) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		return authorize(ctx, req, info, handler, verifier, authConfig)
+		return authorize(ctx, req, info, handler, verifier, systemUserPermissions, authConfig)
 	}
 }
 
-func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.APITokenVerifier, authConfig authz.Config) (_ interface{}, err error) {
+func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.APITokenVerifier, systemUserPermissions authz.Config, authConfig authz.Config) (_ interface{}, err error) {
 	authOpt, needsToken := verifier.CheckAuthMethod(info.FullMethod)
 	if !needsToken {
 		return handler(ctx, req)
@@ -34,7 +34,7 @@ func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 	}
 
 	orgID, orgDomain := orgIDAndDomainFromRequest(authCtx, req)
-	ctxSetter, err := authz.CheckUserAuthorization(authCtx, req, authToken, orgID, orgDomain, verifier, authConfig, authOpt, info.FullMethod)
+	ctxSetter, err := authz.CheckUserAuthorization(authCtx, req, authToken, orgID, orgDomain, verifier, systemUserPermissions.RolePermissionMappings, authConfig.RolePermissionMappings, authOpt, info.FullMethod)
 	if err != nil {
 		return nil, err
 	}

@@ -21,7 +21,13 @@ import (
 )
 
 func TestServer_JWTProfile(t *testing.T) {
-	user, name, keyData, err := Instance.CreateOIDCJWTProfileClient(CTX)
+	user, name, keyData, err := Instance.CreateOIDCJWTProfileClient(CTX, time.Hour)
+	require.NoError(t, err)
+	_, _, keyDataExpired, err := Instance.CreateOIDCJWTProfileClient(CTX, 10*time.Second)
+	require.NoError(t, err)
+
+	project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
+	_, appKeyData, err := Instance.CreateOIDCWebClientJWT(CTX, redirectURI, logoutRedirectURI, project.GetId())
 	require.NoError(t, err)
 
 	type claims struct {
@@ -34,11 +40,12 @@ func TestServer_JWTProfile(t *testing.T) {
 		orgDomain                  any
 	}
 	tests := []struct {
-		name       string
-		keyData    []byte
-		scope      []string
-		wantClaims claims
-		wantErr    bool
+		name        string
+		keyData     []byte
+		scope       []string
+		wantClaims  claims
+		wantErr     bool
+		expectedErr error
 	}{
 		{
 			name:    "success",
@@ -104,6 +111,20 @@ func TestServer_JWTProfile(t *testing.T) {
 				resourceOwnerPrimaryDomain: Instance.DefaultOrg.PrimaryDomain,
 			},
 		},
+		{
+			name:        "key expired",
+			keyData:     keyDataExpired,
+			scope:       []string{oidc.ScopeOpenID},
+			wantErr:     true,
+			expectedErr: oidc.ErrInvalidGrant().WithDescription("invalid assertion"),
+		},
+		{
+			name:        "key type application",
+			keyData:     appKeyData,
+			scope:       []string{oidc.ScopeOpenID},
+			wantErr:     true,
+			expectedErr: oidc.ErrInvalidGrant().WithDescription("invalid assertion"),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -123,6 +144,10 @@ func TestServer_JWTProfile(t *testing.T) {
 				},
 				time.Minute, time.Second,
 			)
+			if tt.wantErr {
+				assert.ErrorIs(t, err, tt.expectedErr)
+				return
+			}
 
 			provider, err := rp.NewRelyingPartyOIDC(CTX, Instance.OIDCIssuer(), "", "", redirectURI, tt.scope)
 			require.NoError(t, err)

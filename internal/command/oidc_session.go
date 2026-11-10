@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"strings"
 	"time"
@@ -55,7 +54,13 @@ type AuthRequestComplianceChecker func(context.Context, *AuthRequestWriteModel) 
 // CreateOIDCSessionFromAuthRequest creates a new OIDC Session, creates an access token and refresh token.
 // It returns the access token id, expiration and the refresh token.
 // If the underlying [AuthRequest] is a OIDC Auth Code Flow, it will set the code as exchanged.
-func (c *Commands) CreateOIDCSessionFromAuthRequest(ctx context.Context, authReqId string, complianceCheck AuthRequestComplianceChecker, needRefreshToken bool) (session *OIDCSession, state string, err error) {
+func (c *Commands) CreateOIDCSessionFromAuthRequest(
+	ctx context.Context,
+	authReqId string,
+	complianceCheck AuthRequestComplianceChecker,
+	needRefreshToken bool,
+	backChannelLogoutURI string,
+) (session *OIDCSession, state string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -108,6 +113,7 @@ func (c *Commands) CreateOIDCSessionFromAuthRequest(ctx context.Context, authReq
 		sessionModel.PreferredLanguage,
 		sessionModel.UserAgent,
 	)
+	cmd.RegisterLogout(ctx, sessionModel.AggregateID, sessionModel.UserID, authReqModel.ClientID, backChannelLogoutURI)
 
 	if authReqModel.ResponseType != domain.OIDCResponseTypeIDToken {
 		if err = cmd.AddAccessToken(ctx, authReqModel.Scope, sessionModel.UserID, sessionModel.UserResourceOwner, domain.TokenReasonAuthRequest, nil); err != nil {
@@ -156,11 +162,8 @@ func (c *Commands) CreateOIDCSession(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	if reason == domain.TokenReasonImpersonation {
-		if err := c.checkPermission(ctx, "impersonation", resourceOwner, userID); err != nil {
-			return nil, err
-		}
-		cmd.UserImpersonated(ctx, userID, resourceOwner, clientID, actor)
+	if err = cmd.checkPermission(ctx, userID, resourceOwner, clientID, reason, actor); err != nil {
+		return nil, err
 	}
 
 	cmd.AddSession(ctx, userID, resourceOwner, sessionID, clientID, audience, scope, authMethods, authTime, nonce, preferredLanguage, userAgent)
@@ -186,11 +189,11 @@ func (c *Commands) CreateOIDCSession(ctx context.Context,
 	return session, nil
 }
 
-type RefreshTokenComplianceChecker func(ctx context.Context, wm *OIDCSessionWriteModel, requestedScope []string) (scope []string, err error)
+type RefreshTokenComplianceChecker func(ctx context.Context, wm *OIDCSessionWriteModel, requestedScope []string, reqClientID string) (scope []string, err error)
 
 // ExchangeOIDCSessionRefreshAndAccessToken updates an existing OIDC Session, creates a new access and refresh token.
 // It returns the access token id and expiration and the new refresh token.
-func (c *Commands) ExchangeOIDCSessionRefreshAndAccessToken(ctx context.Context, refreshToken string, scope []string, complianceCheck RefreshTokenComplianceChecker) (_ *OIDCSession, err error) {
+func (c *Commands) ExchangeOIDCSessionRefreshAndAccessToken(ctx context.Context, refreshToken string, scope []string, reqClientID string, complianceCheck RefreshTokenComplianceChecker) (_ *OIDCSession, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -198,7 +201,7 @@ func (c *Commands) ExchangeOIDCSessionRefreshAndAccessToken(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	scope, err = complianceCheck(ctx, cmd.oidcSessionWriteModel, scope)
+	scope, err = complianceCheck(ctx, cmd.oidcSessionWriteModel, scope, reqClientID)
 	if err != nil {
 		return nil, err
 	}
@@ -233,6 +236,9 @@ func (c *Commands) OIDCSessionByRefreshToken(ctx context.Context, refreshToken s
 		return nil, zerrors.ThrowPreconditionFailed(err, "OIDCS-SAF31", "Errors.OIDCSession.RefreshTokenInvalid")
 	}
 	if err = writeModel.CheckRefreshToken(refreshTokenID); err != nil {
+		return nil, err
+	}
+	if err = c.checkOrgNotDeactivatedAfter(ctx, writeModel.UserResourceOwner, writeModel.RefreshTokenIssuedAt); err != nil {
 		return nil, err
 	}
 	return writeModel, nil
@@ -288,12 +294,9 @@ func (c *Commands) RevokeOIDCSessionToken(ctx context.Context, token, clientID s
 }
 
 func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, userID, resourceOwner string, pending ...eventstore.Command) (*OIDCSessionEvents, error) {
-	userStateModel, err := c.userStateWriteModel(ctx, userID)
+	userStateModel, err := c.userStateForAuthentication(ctx, userID, resourceOwner, "OIDCS-kj3g2", "OIDCS-oR9nA")
 	if err != nil {
 		return nil, err
-	}
-	if !userStateModel.UserState.IsEnabled() {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDCS-kj3g2", "Errors.User.NotActive")
 	}
 	accessTokenLifetime, refreshTokenLifeTime, refreshTokenIdleLifetime, err := c.tokenTokenLifetimes(ctx)
 	if err != nil {
@@ -307,7 +310,7 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, userID, resource
 	return &OIDCSessionEvents{
 		commands:                 c,
 		idGenerator:              c.idGenerator,
-		encryptionAlg:            c.keyAlgorithm,
+		authAlg:                  c.authAlgorithm,
 		events:                   pending,
 		oidcSessionWriteModel:    NewOIDCSessionWriteModel(sessionID, resourceOwner),
 		userStateModel:           userStateModel,
@@ -318,11 +321,7 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, userID, resource
 }
 
 func (c *Commands) decryptRefreshToken(refreshToken string) (sessionID, refreshTokenID string, err error) {
-	decoded, err := base64.RawURLEncoding.DecodeString(refreshToken)
-	if err != nil {
-		return "", "", zerrors.ThrowInvalidArgument(err, "OIDCS-Cux9a", "Errors.User.RefreshToken.Invalid")
-	}
-	decrypted, err := c.keyAlgorithm.DecryptString(decoded, c.keyAlgorithm.EncryptionKeyID())
+	decrypted, err := c.authAlgorithm.DecryptToken(refreshToken)
 	if err != nil {
 		return "", "", zerrors.ThrowInvalidArgument(err, "OIDCS-Jei0i", "Errors.User.RefreshToken.Invalid")
 	}
@@ -351,12 +350,11 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, refreshToken 
 	if err = sessionWriteModel.CheckRefreshToken(refreshTokenID); err != nil {
 		return nil, err
 	}
-	userStateWriteModel, err := c.userStateWriteModel(ctx, sessionWriteModel.UserID)
-	if err != nil {
+	if err = c.checkOrgNotDeactivatedAfter(ctx, sessionWriteModel.UserResourceOwner, sessionWriteModel.RefreshTokenIssuedAt); err != nil {
 		return nil, err
 	}
-	if !userStateWriteModel.UserState.IsEnabled() {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDCS-J39h2", "Errors.User.NotActive")
+	if _, err = c.userStateForAuthentication(ctx, sessionWriteModel.UserID, sessionWriteModel.UserResourceOwner, "OIDCS-J39h2", "OIDCS-pQ2mB"); err != nil {
+		return nil, err
 	}
 	accessTokenLifetime, refreshTokenLifeTime, refreshTokenIdleLifetime, err := c.tokenTokenLifetimes(ctx)
 	if err != nil {
@@ -365,7 +363,7 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, refreshToken 
 	return &OIDCSessionEvents{
 		commands:                 c,
 		idGenerator:              c.idGenerator,
-		encryptionAlg:            c.keyAlgorithm,
+		authAlg:                  c.authAlgorithm,
 		oidcSessionWriteModel:    sessionWriteModel,
 		accessTokenLifetime:      accessTokenLifetime,
 		refreshTokenLifeTime:     refreshTokenLifeTime,
@@ -376,7 +374,7 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, refreshToken 
 type OIDCSessionEvents struct {
 	commands              *Commands
 	idGenerator           id.Generator
-	encryptionAlg         crypto.EncryptionAlgorithm
+	authAlg               crypto.AuthAlgorithm
 	events                []eventstore.Command
 	oidcSessionWriteModel *OIDCSessionWriteModel
 	userStateModel        *UserV2WriteModel
@@ -445,9 +443,6 @@ func (c *OIDCSessionEvents) RegisterLogout(ctx context.Context, sessionID, userI
 	if sessionID == "" || backChannelLogoutURI == "" {
 		return
 	}
-	if !authz.GetFeatures(ctx).EnableBackChannelLogout {
-		return
-	}
 
 	c.events = append(c.events, sessionlogout.NewBackChannelLogoutRegisteredEvent(
 		ctx,
@@ -466,9 +461,6 @@ func (c *OIDCSessionEvents) AddAccessToken(ctx context.Context, scope []string, 
 	}
 	c.accessTokenID = AccessTokenPrefix + accessTokenID
 	c.events = append(c.events, oidcsession.NewAccessTokenAddedEvent(ctx, c.oidcSessionWriteModel.aggregate, c.accessTokenID, scope, c.accessTokenLifetime, reason, actor))
-	if !authz.GetFeatures(ctx).DisableUserTokenEvent {
-		c.events = append(c.events, user.NewUserTokenV2AddedEvent(ctx, &user.NewAggregate(userID, resourceOwner).Aggregate, c.accessTokenID))
-	}
 	return nil
 }
 
@@ -491,8 +483,46 @@ func (c *OIDCSessionEvents) RenewRefreshToken(ctx context.Context) (err error) {
 	return nil
 }
 
-func (c *OIDCSessionEvents) UserImpersonated(ctx context.Context, userID, resourceOwner, clientID string, actor *domain.TokenActor) {
-	c.events = append(c.events, user.NewUserImpersonatedEvent(ctx, &user.NewAggregate(userID, resourceOwner).Aggregate, clientID, actor))
+// checkPermission verifies that the caller may create a session for the passed reason.
+// The userID and resourceOwner are the ones of the session's subject, so the permission
+// is evaluated on the subject's organization. They are passed explicitly because the
+// oidcSessionWriteModel is not reduced yet at this point and therefore still empty.
+func (c *OIDCSessionEvents) checkPermission(ctx context.Context, userID, resourceOwner, clientID string, reason domain.TokenReason, actor *domain.TokenActor) error {
+	var requiredPermission string
+	switch reason {
+	// Satisfy the linter.
+	// These reasons do not require a permission check.
+	case domain.TokenReasonAuthRequest,
+		domain.TokenReasonRefresh,
+		domain.TokenReasonJWTProfile,
+		domain.TokenReasonClientCredentials,
+		domain.TokenReasonExchange:
+	case domain.TokenReasonImpersonation:
+		requiredPermission = "impersonation"
+		c.userImpersonated(ctx, clientID, actor)
+	case domain.TokenReasonAdminImpersonation:
+		requiredPermission = "admin.impersonation"
+		c.userImpersonated(ctx, clientID, actor)
+	default:
+		// should never happen, but have a failsafe for invalid reasons.
+		return zerrors.ThrowInternal(nil, "COMMAND-Woo8E", "Error.Internal")
+	}
+	if requiredPermission != "" {
+		if err := c.commands.checkPermission(ctx, requiredPermission, resourceOwner, userID); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *OIDCSessionEvents) userImpersonated(ctx context.Context, clientID string, actor *domain.TokenActor) {
+	c.events = append(c.events,
+		user.NewUserImpersonatedEvent(ctx,
+			&c.userStateModel.Aggregate().Aggregate,
+			clientID,
+			actor,
+		),
+	)
 }
 
 func (c *OIDCSessionEvents) generateRefreshToken(userID string) (refreshTokenID, refreshToken string, err error) {
@@ -501,11 +531,11 @@ func (c *OIDCSessionEvents) generateRefreshToken(userID string) (refreshTokenID,
 		return "", "", err
 	}
 	refreshTokenID = RefreshTokenPrefix + refreshTokenID
-	token, err := c.encryptionAlg.Encrypt([]byte(fmt.Sprintf(oidcTokenFormat, c.oidcSessionWriteModel.OIDCRefreshTokenID(refreshTokenID), userID)))
+	token, err := c.authAlg.EncryptToken(fmt.Sprintf(oidcTokenFormat, c.oidcSessionWriteModel.OIDCRefreshTokenID(refreshTokenID), userID))
 	if err != nil {
 		return "", "", err
 	}
-	return refreshTokenID, base64.RawURLEncoding.EncodeToString(token), nil
+	return refreshTokenID, token, nil
 }
 
 func (c *OIDCSessionEvents) PushEvents(ctx context.Context) (*OIDCSession, error) {

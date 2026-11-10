@@ -16,6 +16,7 @@ export enum U2FComponentDestination {
   selector: 'cnsl-dialog-u2f',
   templateUrl: './dialog-u2f.component.html',
   styleUrls: ['./dialog-u2f.component.scss'],
+  standalone: false,
 })
 export class DialogU2FComponent {
   private type!: U2FComponentDestination;

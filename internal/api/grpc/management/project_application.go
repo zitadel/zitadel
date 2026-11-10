@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
@@ -19,17 +20,20 @@ func (s *Server) GetAppByID(ctx context.Context, req *mgmt_pb.GetAppByIDRequest)
 	if err != nil {
 		return nil, err
 	}
+	if app.ResourceOwner != authz.GetCtxData(ctx).OrgID {
+		return nil, zerrors.ThrowNotFound(nil, "MANAG-SFf2a", "Errors.Project.App.NotFound")
+	}
 	return &mgmt_pb.GetAppByIDResponse{
 		App: project_grpc.AppToPb(app),
 	}, nil
 }
 
 func (s *Server) ListApps(ctx context.Context, req *mgmt_pb.ListAppsRequest) (*mgmt_pb.ListAppsResponse, error) {
-	queries, err := ListAppsRequestToModel(req)
+	queries, err := ListAppsRequestToModel(ctx, s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
-	apps, err := s.query.SearchApps(ctx, queries, false)
+	apps, err := s.query.SearchApps(ctx, queries, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -40,19 +44,12 @@ func (s *Server) ListApps(ctx context.Context, req *mgmt_pb.ListAppsRequest) (*m
 }
 
 func (s *Server) ListAppChanges(ctx context.Context, req *mgmt_pb.ListAppChangesRequest) (*mgmt_pb.ListAppChangesResponse, error) {
-	var (
-		limit    uint64
-		sequence uint64
-		asc      bool
-	)
-	if req.Query != nil {
-		limit = uint64(req.Query.Limit)
-		sequence = req.Query.Sequence
-		asc = req.Query.Asc
+	limit, sequence, asc, err := change_grpc.ChangeQueryToModel(s.systemDefaults, req.Query)
+	if err != nil {
+		return nil, err
 	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		AllowTimeTravel().
 		Limit(limit).
 		AwaitOpenTransactions().
 		OrderDesc().
@@ -126,7 +123,7 @@ func (s *Server) AddAPIApp(ctx context.Context, req *mgmt_pb.AddAPIAppRequest) (
 }
 
 func (s *Server) UpdateApp(ctx context.Context, req *mgmt_pb.UpdateAppRequest) (*mgmt_pb.UpdateAppResponse, error) {
-	details, err := s.command.ChangeApplication(ctx, req.ProjectId, UpdateAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.UpdateApplicationName(ctx, req.ProjectId, UpdateAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +137,7 @@ func (s *Server) UpdateOIDCAppConfig(ctx context.Context, req *mgmt_pb.UpdateOID
 	if err != nil {
 		return nil, err
 	}
-	config, err := s.command.ChangeOIDCApplication(ctx, oidcApp, authz.GetCtxData(ctx).OrgID)
+	config, err := s.command.UpdateOIDCApplication(ctx, oidcApp, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +155,7 @@ func (s *Server) UpdateSAMLAppConfig(ctx context.Context, req *mgmt_pb.UpdateSAM
 	if err != nil {
 		return nil, err
 	}
-	config, err := s.command.ChangeSAMLApplication(ctx, samlApp, authz.GetCtxData(ctx).OrgID)
+	config, err := s.command.UpdateSAMLApplication(ctx, samlApp, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -172,7 +169,7 @@ func (s *Server) UpdateSAMLAppConfig(ctx context.Context, req *mgmt_pb.UpdateSAM
 }
 
 func (s *Server) UpdateAPIAppConfig(ctx context.Context, req *mgmt_pb.UpdateAPIAppConfigRequest) (*mgmt_pb.UpdateAPIAppConfigResponse, error) {
-	config, err := s.command.ChangeAPIApplication(ctx, UpdateAPIAppConfigRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	config, err := s.command.UpdateAPIApplication(ctx, UpdateAPIAppConfigRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -268,11 +265,11 @@ func (s *Server) GetAppKey(ctx context.Context, req *mgmt_pb.GetAppKeyRequest) (
 }
 
 func (s *Server) ListAppKeys(ctx context.Context, req *mgmt_pb.ListAppKeysRequest) (*mgmt_pb.ListAppKeysResponse, error) {
-	queries, err := ListAPIClientKeysRequestToQuery(ctx, req)
+	queries, err := ListAPIClientKeysRequestToQuery(ctx, s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
-	keys, err := s.query.SearchAuthNKeys(ctx, queries, false)
+	keys, err := s.query.SearchAuthNKeys(ctx, queries, query.JoinFilterApp, nil)
 	if err != nil {
 		return nil, err
 	}

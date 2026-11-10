@@ -34,7 +34,11 @@ func (s *Server) UpdateLoginPolicy(ctx context.Context, p *admin_pb.UpdateLoginP
 }
 
 func (s *Server) ListLoginPolicyIDPs(ctx context.Context, req *admin_pb.ListLoginPolicyIDPsRequest) (*admin_pb.ListLoginPolicyIDPsResponse, error) {
-	res, err := s.query.IDPLoginPolicyLinks(ctx, authz.GetInstance(ctx).InstanceID(), ListLoginPolicyIDPsRequestToQuery(req), false)
+	queries, err := ListLoginPolicyIDPsRequestToQuery(s.systemDefaults, req)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.IDPLoginPolicyLinks(ctx, authz.GetInstance(ctx).InstanceID(), queries, false)
 	if err != nil {
 		return nil, err
 	}

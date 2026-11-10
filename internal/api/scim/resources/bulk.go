@@ -16,12 +16,14 @@ import (
 	"github.com/zitadel/zitadel/internal/api/scim/metadata"
 	"github.com/zitadel/zitadel/internal/api/scim/schemas"
 	"github.com/zitadel/zitadel/internal/api/scim/serrors"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type BulkHandler struct {
 	cfg                          *scim_config.BulkConfig
 	handlersByPluralResourceName map[schemas.ScimResourceTypePlural]RawResourceHandlerAdapter
+	translator                   *i18n.Translator
 }
 
 type BulkRequest struct {
@@ -56,6 +58,7 @@ func (r *BulkRequest) GetSchemas() []schemas.ScimSchemaType {
 
 func NewBulkHandler(
 	cfg scim_config.BulkConfig,
+	translator *i18n.Translator,
 	handlers ...RawResourceHandlerAdapter,
 ) *BulkHandler {
 	handlersByPluralResourceName := make(map[schemas.ScimResourceTypePlural]RawResourceHandlerAdapter, len(handlers))
@@ -66,6 +69,7 @@ func NewBulkHandler(
 	return &BulkHandler{
 		&cfg,
 		handlersByPluralResourceName,
+		translator,
 	}
 }
 
@@ -140,7 +144,7 @@ func (h *BulkHandler) processOperation(ctx context.Context, op *BulkRequestOpera
 
 		opResp.Status = strconv.Itoa(statusCode)
 		if err != nil {
-			opResp.Error = serrors.MapToScimError(ctx, err)
+			opResp.Error = serrors.MapToScimError(ctx, h.translator, err)
 			opResp.Status = opResp.Error.Status
 		}
 	}()

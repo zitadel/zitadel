@@ -1,0 +1,76 @@
+// https://github.com/tailwindlabs/tailwindcss/discussions/16173
+@use "tailwindcss";
+@config "../../tailwind.config.mjs";
+
+@layer base {
+  h1,
+  .ztdl-h1 {
+    @apply text-center text-2xl;
+  }
+
+  .ztdl-p {
+    @apply text-text-light-secondary-500 dark:text-text-dark-secondary-500 text-sm;
+  }
+}
+
+html {
+  --background-color: #ffffff;
+  --dark-background-color: #000000;
+}
+
+.form-checkbox {
+  position: relative;
+}
+
+.form-checkbox:checked {
+  background-image: none !important;
+  background-color: var(--theme-light-primary-500);
+}
+
+.dark .form-checkbox:checked {
+  background-color: var(--theme-dark-primary-500);
+}
+
+.form-checkbox:checked::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  -webkit-mask-image: url("/checkbox.svg");
+  mask-image: url("/checkbox.svg");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  background-color: var(--theme-light-primary-contrast-500);
+}
+
+.dark .form-checkbox:checked::after {
+  background-color: var(--theme-dark-primary-contrast-500);
+}
+
+.skeleton {
+  --accents-2: var(--theme-light-background-400);
+  --accents-1: var(--theme-light-background-500);
+
+  background-image: linear-gradient(270deg, var(--accents-1), var(--accents-2), var(--accents-2), var(--accents-1));
+  background-size: 400% 100%;
+  animation: skeleton_loading 8s ease-in-out infinite;
+}
+
+.dark .skeleton {
+  --accents-2: var(--theme-dark-background-400);
+  --accents-1: var(--theme-dark-background-500);
+
+  background-image: linear-gradient(270deg, var(--accents-1), var(--accents-2), var(--accents-2), var(--accents-1));
+  background-size: 400% 100%;
+  animation: skeleton_loading 8s ease-in-out infinite;
+}
+
+@keyframes skeleton_loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

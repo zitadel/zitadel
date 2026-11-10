@@ -105,6 +105,7 @@ InitMFAOTPSMS:
   Title: Verifikasi 2 Faktor
   DescriptionPhone: 'Buat 2 faktor Anda. '
   DescriptionCode: 'Buat 2 faktor Anda. '
+  CountryCodeLabel: Negara
   PhoneLabel: Telepon
   CodeLabel: Kode
   EditButtonText: Sunting
@@ -235,6 +236,10 @@ RegistrationUser:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Jenis kelamin
   Female: Perempuan
   Male: Pria
@@ -275,7 +280,12 @@ ExternalRegistrationUserOverview:
   Dutch: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Syarat dan Ketentuan
   TosConfirm: Saya menerima itu
   TosLinkText: KL
@@ -322,6 +332,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Pengguna Eksternal Tidak Ditemukan
   Description: 'Pengguna eksternal tidak ditemukan. '
+  NoOptionAvailable: Tidak ditemukan akun yang cocok dengan pengguna eksternal Anda dan akun baru tidak dapat dibuat. Silakan hubungi administrator atau dukungan Anda.
   LinkButtonText: Link
   AutoRegisterButtonText: Daftar
   TosAndPrivacyLabel: Syarat dan Ketentuan
@@ -347,6 +358,10 @@ ExternalNotFound:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
 DeviceAuth:
   Title: Otorisasi Perangkat
   UserCode:
@@ -396,7 +411,7 @@ Errors:
       NotChanged: Profil tidak berubah
       Empty: Profil kosong
       FirstNameEmpty: Nama depan di profil kosong
-      LastNameEmpty: Nama keluarga di profil kosong
+      LastNameEmpty: Nama belakang di profil kosong
       IDMissing: ID Profil tidak ada
     Email:
       NotFound: Email tidak ditemukan
@@ -450,6 +465,7 @@ Errors:
         AlreadyReady: OTP multifaktor (OneTimePassword) sudah disiapkan
         NotExisting: OTP multifaktor (OneTimePassword) tidak ada
         InvalidCode: Kode tidak valid
+        Reused: Kode ini sudah digunakan. Silakan tunggu kode baru
         NotReady: OTP multifaktor (OneTimePassword) belum siap
     Locked: Pengguna terkunci
     SomethingWentWrong: Ada yang tidak beres

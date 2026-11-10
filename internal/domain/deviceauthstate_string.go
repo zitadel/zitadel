@@ -22,8 +22,9 @@ const _DeviceAuthState_name = "undefinedinitiatedapproveddeniedexpireddoneinvali
 var _DeviceAuthState_index = [...]uint8{0, 9, 18, 26, 32, 39, 43, 50}
 
 func (i DeviceAuthState) String() string {
-	if i >= DeviceAuthState(len(_DeviceAuthState_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_DeviceAuthState_index)-1 {
 		return "DeviceAuthState(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _DeviceAuthState_name[_DeviceAuthState_index[i]:_DeviceAuthState_index[i+1]]
+	return _DeviceAuthState_name[_DeviceAuthState_index[idx]:_DeviceAuthState_index[idx+1]]
 }

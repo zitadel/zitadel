@@ -7,33 +7,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
-
-type transaction struct {
-	database.Tx
-}
-
-var _ crdb.Tx = (*transaction)(nil)
-
-func (t *transaction) Exec(ctx context.Context, query string, args ...interface{}) error {
-	_, err := t.Tx.ExecContext(ctx, query, args...)
-	return err
-}
-
-func (t *transaction) Commit(ctx context.Context) error {
-	return t.Tx.Commit()
-}
-
-func (t *transaction) Rollback(ctx context.Context) error {
-	return t.Tx.Rollback()
-}
 
 // checks whether the error is caused because setup step 39 was not executed
 func isSetupNotExecutedError(err error) bool {
@@ -55,7 +35,7 @@ var (
 
 // pushWithoutFunc implements pushing events before setup step 39 was introduced.
 // TODO: remove with v3
-func (es *Eventstore) pushWithoutFunc(ctx context.Context, client database.ContextQueryExecuter, commands ...eventstore.Command) (events []eventstore.Event, err error) {
+func (es *Eventstore) pushWithoutFunc(ctx context.Context, client database.QueryExecutor, commands ...eventstore.Command) (events []eventstore.Event, err error) {
 	tx, closeTx, err := es.pushTx(ctx, client)
 	if err != nil {
 		return nil, err
@@ -64,7 +44,6 @@ func (es *Eventstore) pushWithoutFunc(ctx context.Context, client database.Conte
 		err = closeTx(err)
 	}()
 
-	// tx is not closed because [crdb.ExecuteInTx] takes care of that
 	var (
 		sequences []*latestSequence
 	)
@@ -90,20 +69,20 @@ func (es *Eventstore) pushWithoutFunc(ctx context.Context, client database.Conte
 	return events, nil
 }
 
-func (es *Eventstore) writeEventsOld(ctx context.Context, tx database.Tx, sequences []*latestSequence, commands []eventstore.Command) ([]eventstore.Event, error) {
+func (es *Eventstore) writeEventsOld(ctx context.Context, tx database.Transaction, sequences []*latestSequence, commands []eventstore.Command) ([]eventstore.Event, error) {
 	events, placeholders, args, err := mapCommands(commands, sequences)
 	if err != nil {
 		return nil, err
 	}
 
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf(pushStmt, strings.Join(placeholders, ", ")), args...)
+	rows, err := tx.Query(ctx, fmt.Sprintf(pushStmt, strings.Join(placeholders, ", ")), args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
 	for i := 0; rows.Next(); i++ {
-		err = rows.Scan(&events[i].(*event).createdAt, &events[i].(*event).position)
+		err = rows.Scan(&events[i].(*event).createdAt, &events[i].(*event).position, &events[i].(*event).inTxOrder)
 		if err != nil {
 			logging.WithError(err).Warn("failed to scan events")
 			return nil, err

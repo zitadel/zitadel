@@ -3,8 +3,10 @@ package idp
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"github.com/crewjam/saml"
 	"github.com/muhlemmer/gu"
+	dsig "github.com/russellhaering/goxmldsig"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
@@ -15,12 +17,12 @@ import (
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
 )
 
-func (s *Server) GetIDPByID(ctx context.Context, req *idp_pb.GetIDPByIDRequest) (*idp_pb.GetIDPByIDResponse, error) {
-	idp, err := s.query.IDPTemplateByID(ctx, true, req.Id, false, s.checkPermission)
+func (s *Server) GetIDPByID(ctx context.Context, req *connect.Request[idp_pb.GetIDPByIDRequest]) (*connect.Response[idp_pb.GetIDPByIDResponse], error) {
+	idp, err := s.query.IDPTemplateByID(ctx, true, req.Msg.GetId(), false, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
-	return &idp_pb.GetIDPByIDResponse{Idp: idpToPb(idp)}, nil
+	return connect.NewResponse(&idp_pb.GetIDPByIDResponse{Idp: idpToPb(idp)}), nil
 }
 
 func idpToPb(idp *query.IDPTemplate) *idp_pb.IDP {
@@ -31,6 +33,7 @@ func idpToPb(idp *query.IDPTemplate) *idp_pb.IDP {
 				Sequence:      idp.Sequence,
 				EventDate:     idp.ChangeDate,
 				ResourceOwner: idp.ResourceOwner,
+				CreationDate:  idp.CreationDate,
 			}),
 		State:  idpStateToPb(idp.State),
 		Name:   idp.Name,
@@ -82,6 +85,8 @@ func idpTypeToPb(idpType domain.IDPType) idp_pb.IDPType {
 		return idp_pb.IDPType_IDP_TYPE_APPLE
 	case domain.IDPTypeSAML:
 		return idp_pb.IDPType_IDP_TYPE_SAML
+	case domain.IDPTypeZitadel:
+		return idp_pb.IDPType_IDP_TYPE_ZITADEL
 	case domain.IDPTypeUnspecified:
 		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
 	default:
@@ -147,6 +152,10 @@ func configToPb(config *query.IDPTemplate) *idp_pb.IDPConfig {
 		samlConfigToPb(idpConfig, config.SAMLIDPTemplate)
 		return idpConfig
 	}
+	if config.ZitadelIDPTemplate != nil {
+		zitadelConfigToPb(idpConfig, config.ZitadelIDPTemplate)
+		return idpConfig
+	}
 	return idpConfig
 }
 
@@ -194,6 +203,7 @@ func jwtConfigToPb(idpConfig *idp_pb.IDPConfig, template *query.JWTIDPTemplate) 
 			Issuer:       template.Issuer,
 			KeysEndpoint: template.KeysEndpoint,
 			HeaderName:   template.HeaderName,
+			Audience:     template.Audience,
 		},
 	}
 }
@@ -333,8 +343,10 @@ func samlConfigToPb(idpConfig *idp_pb.IDPConfig, template *query.SAMLIDPTemplate
 			MetadataXml:                   template.Metadata,
 			Binding:                       bindingToPb(template.Binding),
 			WithSignedRequest:             template.WithSignedRequest,
+			SignatureAlgorithm:            signatureAlgorithmToPb(template.SignatureAlgorithm),
 			NameIdFormat:                  nameIDFormat,
 			TransientMappingAttributeName: gu.Ptr(template.TransientMappingAttributeName),
+			FederatedLogoutEnabled:        gu.Ptr(template.FederatedLogoutEnabled),
 		},
 	}
 }
@@ -366,5 +378,36 @@ func nameIDToPb(format domain.SAMLNameIDFormat) idp_pb.SAMLNameIDFormat {
 		return idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_TRANSIENT
 	default:
 		return idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_UNSPECIFIED
+	}
+}
+
+func signatureAlgorithmToPb(signatureAlgorithm string) idp_pb.SAMLSignatureAlgorithm {
+	switch signatureAlgorithm {
+	case dsig.RSASHA1SignatureMethod:
+		return idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA1
+	case dsig.RSASHA256SignatureMethod:
+		return idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA256
+	case dsig.RSASHA512SignatureMethod:
+		return idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA512
+	default:
+		return idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_UNSPECIFIED
+	}
+}
+
+func zitadelConfigToPb(idpConfig *idp_pb.IDPConfig, template *query.ZitadelIDPTemplate) {
+	instanceRolesInfo := make([]*idp_pb.InstanceRolesInfo, 0, len(template.InstanceRolesInfo))
+	for _, role := range template.InstanceRolesInfo {
+		instanceRolesInfo = append(instanceRolesInfo, &idp_pb.InstanceRolesInfo{
+			OrganizationId:     role.OrganizationID,
+			OrganizationDomain: role.OrganizationDomain,
+		})
+	}
+	idpConfig.Config = &idp_pb.IDPConfig_Zitadel{
+		Zitadel: &idp_pb.ZitadelConfig{
+			ClientId:          template.ClientID,
+			Issuer:            template.Issuer,
+			Scopes:            template.Scopes,
+			InstanceRolesInfo: instanceRolesInfo,
+		},
 	}
 }

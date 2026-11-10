@@ -33,7 +33,7 @@ message CreateUser {
   SetContact contact = 3;
   // Set the initial authenticators of the user.
   SetAuthenticators authenticators = 4;
-  // Optionally set a unique identifier of the user. If unset, ZITADEL will take care of it.
+  // Optionally set a unique identifier of the user. If unset, Zitadel will take care of it.
   optional string user_id = 5 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -73,7 +73,7 @@ message GetUser{
       example: "{\"name\":\"Gigi\",\"description\":\"the giraffe\"}"
     }
   ];
-  // Contact information for the user. ZITADEL will use this in case of internal notifications.
+  // Contact information for the user. Zitadel will use this in case of internal notifications.
   Contact contact = 4;
   // The user's authenticators. They are used to identify and authenticate the user
   // during the authentication process.

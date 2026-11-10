@@ -17,7 +17,11 @@ func (l *Login) handlePasswordReset(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	user, err := l.query.GetUserByLoginName(setContext(r.Context(), authReq.UserOrgID), true, authReq.LoginName)
+	// We check if the user really exists or if it is just a placeholder or an unknown user.
+	// In theory, we could also check for the unknownUserID constant. However, that could disclose
+	// information about the existence of a user to an attacker if they check response times,
+	// since those requests would take shorter than the ones for real users.
+	user, err := l.query.GetUserByID(setContext(r.Context(), authReq.UserOrgID), true, authReq.UserID)
 	if err != nil {
 		if authReq.LoginPolicy.IgnoreUnknownUsernames && zerrors.IsNotFound(err) {
 			err = nil

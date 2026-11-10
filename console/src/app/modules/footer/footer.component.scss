@@ -13,7 +13,7 @@
   $is-dark-theme: map-get($theme, is-dark);
   $back: map-get($background, background);
   $secondary-text: map-get($foreground, secondary-text);
-  $link-hover-color: if($is-dark-theme, $lighter-primary-color, $darker-primary-color);
+  $link-hover-color: if(sass($is-dark-theme): $lighter-primary-color; else: $darker-primary-color);
 
   .footer-wrapper {
     padding: 2rem;
@@ -71,7 +71,7 @@
         .swisssvg {
           width: 14rem;
           margin: 1rem 0;
-          color: if($is-dark-theme, #ffffff60, #00000060);
+          color: if(sass($is-dark-theme): #ffffff60; else: #00000060);
 
           .cross {
             fill: white;

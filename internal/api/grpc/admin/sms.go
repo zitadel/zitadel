@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Server) ListSMSProviders(ctx context.Context, req *admin_pb.ListSMSProvidersRequest) (*admin_pb.ListSMSProvidersResponse, error) {
-	queries, err := listSMSConfigsToModel(req)
+	queries, err := listSMSConfigsToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -71,8 +71,9 @@ func (s *Server) AddSMSProviderHTTP(ctx context.Context, req *admin_pb.AddSMSPro
 		return nil, err
 	}
 	return &admin_pb.AddSMSProviderHTTPResponse{
-		Details: object.DomainToAddDetailsPb(smsConfig.Details),
-		Id:      smsConfig.ID,
+		Details:    object.DomainToAddDetailsPb(smsConfig.Details),
+		Id:         smsConfig.ID,
+		SigningKey: smsConfig.SigningKey,
 	}, nil
 }
 
@@ -82,7 +83,8 @@ func (s *Server) UpdateSMSProviderHTTP(ctx context.Context, req *admin_pb.Update
 		return nil, err
 	}
 	return &admin_pb.UpdateSMSProviderHTTPResponse{
-		Details: object.DomainToChangeDetailsPb(smsConfig.Details),
+		Details:    object.DomainToChangeDetailsPb(smsConfig.Details),
+		SigningKey: smsConfig.SigningKey,
 	}, nil
 }
 

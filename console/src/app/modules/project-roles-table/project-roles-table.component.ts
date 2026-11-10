@@ -1,5 +1,5 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTable } from '@angular/material/table';
 import { Router } from '@angular/router';
@@ -11,11 +11,13 @@ import { PaginatorComponent } from '../paginator/paginator.component';
 import { ProjectRoleDetailDialogComponent } from '../project-role-detail-dialog/project-role-detail-dialog.component';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 import { ProjectRolesDataSource } from './project-roles-table-datasource';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'cnsl-project-roles-table',
   templateUrl: './project-roles-table.component.html',
   styleUrls: ['./project-roles-table.component.scss'],
+  standalone: false,
 })
 export class ProjectRolesTableComponent implements OnInit {
   public INITIAL_PAGE_SIZE: number = 50;
@@ -32,6 +34,8 @@ export class ProjectRolesTableComponent implements OnInit {
   @Output() public changedSelection: EventEmitter<Array<string>> = new EventEmitter();
   @Input() public displayedColumns: string[] = ['key', 'displayname', 'group', 'creationDate', 'changeDate', 'actions'];
 
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor(
     private mgmtService: ManagementService,
     private toast: ToastService,
@@ -47,7 +51,7 @@ export class ProjectRolesTableComponent implements OnInit {
     this.loadRolesPage();
     this.selection.select(...this.selectedKeys);
 
-    this.selection.changed.subscribe(() => {
+    this.selection.changed.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.changedSelection.emit(this.selection.selected);
     });
   }

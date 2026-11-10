@@ -15,6 +15,7 @@ import { minArrayLengthValidator, requiredValidator } from '../form-field/valida
       multi: true,
     },
   ],
+  standalone: false,
 })
 export class StringListComponent implements ControlValueAccessor, OnDestroy {
   @Input() title: string = '';

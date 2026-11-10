@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: 2-Factor Verificatie
   DescriptionPhone: Maak uw 2-factor aan. Voer uw telefoonnummer in om te verifiëren.
   DescriptionCode: Maak uw 2-factor aan. Voer de ontvangen code in om uw telefoonnummer te verifiëren.
+  CountryCodeLabel: Land
   PhoneLabel: Telefoon
   CodeLabel: Code
   EditButtonText: Bewerken
@@ -265,6 +266,10 @@ RegistrationUser:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Geslacht
   Female: Vrouw
   Male: Man
@@ -308,6 +313,10 @@ ExternalRegistrationUserOverview:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Algemene voorwaarden
   TosConfirm: Ik accepteer de
   TosLinkText: AV
@@ -360,6 +369,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Externe Gebruiker Niet Gevonden
   Description: Externe gebruiker niet gevonden. Wilt u uw gebruiker koppelen of automatisch een nieuwe registreren.
+  NoOptionAvailable: Er is geen account gevonden dat overeenkomt met uw externe gebruiker en er kan geen nieuw account worden aangemaakt. Neem contact op met uw beheerder of met de ondersteuning.
   LinkButtonText: Koppelen
   AutoRegisterButtonText: Registreren
   TosAndPrivacyLabel: Algemene voorwaarden
@@ -385,6 +395,10 @@ ExternalNotFound:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
 DeviceAuth:
   Title: Apparaat Autorisatie
   UserCode:
@@ -491,6 +505,7 @@ Errors:
         AlreadyReady: Multifactor OTP (OneTimePassword) is al ingesteld
         NotExisting: Multifactor OTP (OneTimePassword) bestaat niet
         InvalidCode: Ongeldige code
+        Reused: Deze code is al gebruikt. Wacht op een nieuwe code
         NotReady: Multifactor OTP (OneTimePassword) is niet klaar
     Locked: Gebruiker is vergrendeld
     SomethingWentWrong: Er is iets misgegaan

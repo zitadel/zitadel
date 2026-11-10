@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -20,8 +21,11 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
-func ListUsersRequestToModel(req *mgmt_pb.ListUsersRequest) (*query.UserSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func ListUsersRequestToModel(defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListUsersRequest) (*query.UserSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := user_grpc.UserQueriesToQuery(req.Queries, 0 /*start from level 0*/)
 	if err != nil {
 		return nil, err
@@ -73,8 +77,11 @@ func BulkSetUserMetadataToDomain(req *mgmt_pb.BulkSetUserMetadataRequest) []*dom
 	return metadata
 }
 
-func ListUserMetadataToDomain(req *mgmt_pb.ListUserMetadataRequest) (*query.UserMetadataSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func ListUserMetadataToDomain(defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListUserMetadataRequest) (*query.UserMetadataSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := metadata.UserMetadataQueriesToQuery(req.Queries)
 	if err != nil {
 		return nil, err
@@ -206,7 +213,7 @@ func UpdateMachineRequestToCommand(req *mgmt_pb.UpdateMachineRequest, orgID stri
 	}
 }
 
-func ListMachineKeysRequestToQuery(ctx context.Context, req *mgmt_pb.ListMachineKeysRequest) (*query.AuthNKeySearchQueries, error) {
+func ListMachineKeysRequestToQuery(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListMachineKeysRequest) (*query.AuthNKeySearchQueries, error) {
 	resourcOwner, err := query.NewAuthNKeyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
@@ -215,7 +222,10 @@ func ListMachineKeysRequestToQuery(ctx context.Context, req *mgmt_pb.ListMachine
 	if err != nil {
 		return nil, err
 	}
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	return &query.AuthNKeySearchQueries{
 		SearchRequest: query.SearchRequest{
 			Offset: offset,
@@ -284,7 +294,7 @@ func RemovePersonalAccessTokenRequestToCommand(req *mgmt_pb.RemovePersonalAccess
 	}
 }
 
-func ListPersonalAccessTokensRequestToQuery(ctx context.Context, req *mgmt_pb.ListPersonalAccessTokensRequest) (*query.PersonalAccessTokenSearchQueries, error) {
+func ListPersonalAccessTokensRequestToQuery(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListPersonalAccessTokensRequest) (*query.PersonalAccessTokenSearchQueries, error) {
 	resourceOwner, err := query.NewPersonalAccessTokenResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
@@ -293,7 +303,10 @@ func ListPersonalAccessTokensRequestToQuery(ctx context.Context, req *mgmt_pb.Li
 	if err != nil {
 		return nil, err
 	}
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	return &query.PersonalAccessTokenSearchQueries{
 		SearchRequest: query.SearchRequest{
 			Offset: offset,
@@ -319,8 +332,11 @@ func RemoveHumanLinkedIDPRequestToDomain(ctx context.Context, req *mgmt_pb.Remov
 	}
 }
 
-func ListHumanLinkedIDPsRequestToQuery(ctx context.Context, req *mgmt_pb.ListHumanLinkedIDPsRequest) (*query.IDPUserLinksSearchQuery, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func ListHumanLinkedIDPsRequestToQuery(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListHumanLinkedIDPsRequest) (*query.IDPUserLinksSearchQuery, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	userQuery, err := query.NewIDPUserLinksUserIDSearchQuery(req.UserId)
 	if err != nil {
 		return nil, err
@@ -339,8 +355,11 @@ func ListHumanLinkedIDPsRequestToQuery(ctx context.Context, req *mgmt_pb.ListHum
 	}, nil
 }
 
-func ListUserMembershipsRequestToModel(ctx context.Context, req *mgmt_pb.ListUserMembershipsRequest) (*query.MembershipSearchQuery, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func ListUserMembershipsRequestToModel(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListUserMembershipsRequest) (*query.MembershipSearchQuery, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := user_grpc.MembershipQueriesToQuery(req.Queries)
 	if err != nil {
 		return nil, err

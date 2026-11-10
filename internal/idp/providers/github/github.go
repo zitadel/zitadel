@@ -1,6 +1,7 @@
 package github
 
 import (
+	"net/http"
 	"strconv"
 	"time"
 
@@ -13,22 +14,23 @@ import (
 )
 
 const (
-	authURL    = "https://github.com/login/oauth/authorize"
-	tokenURL   = "https://github.com/login/oauth/access_token"
-	profileURL = "https://api.github.com/user"
-	name       = "GitHub"
+	authURL        = "https://github.com/login/oauth/authorize"
+	tokenURL       = "https://github.com/login/oauth/access_token"
+	profileURL     = "https://api.github.com/user"
+	emailURLSuffix = "/emails"
+	name           = "GitHub"
 )
 
 var _ idp.Provider = (*Provider)(nil)
 
 // New creates a GitHub.com provider using the [oauth.Provider] (OAuth 2.0 generic provider)
-func New(clientID, secret, callbackURL string, scopes []string, options ...oauth.ProviderOpts) (*Provider, error) {
-	return NewCustomURL(name, clientID, secret, callbackURL, authURL, tokenURL, profileURL, scopes, options...)
+func New(clientID, secret, callbackURL string, scopes []string, httpClient *http.Client, options ...oauth.ProviderOpts) (*Provider, error) {
+	return NewCustomURL(name, clientID, secret, callbackURL, authURL, tokenURL, profileURL, scopes, httpClient, options...)
 }
 
 // NewCustomURL creates a GitHub provider using the [oauth.Provider] (OAuth 2.0 generic provider)
 // with custom endpoints, e.g. GitHub Enterprise server
-func NewCustomURL(name, clientID, secret, callbackURL, authURL, tokenURL, profileURL string, scopes []string, options ...oauth.ProviderOpts) (*Provider, error) {
+func NewCustomURL(name, clientID, secret, callbackURL, authURL, tokenURL, profileURL string, scopes []string, httpClient *http.Client, options ...oauth.ProviderOpts) (*Provider, error) {
 	rp, err := oauth.New(
 		newConfig(clientID, secret, callbackURL, authURL, tokenURL, scopes),
 		name,
@@ -36,6 +38,7 @@ func NewCustomURL(name, clientID, secret, callbackURL, authURL, tokenURL, profil
 		func() idp.User {
 			return new(User)
 		},
+		httpClient,
 		options...,
 	)
 	if err != nil {
@@ -43,12 +46,14 @@ func NewCustomURL(name, clientID, secret, callbackURL, authURL, tokenURL, profil
 	}
 	return &Provider{
 		Provider: rp,
+		emailURL: profileURL + emailURLSuffix,
 	}, nil
 }
 
 // Provider is the [idp.Provider] implementation for GitHub
 type Provider struct {
 	*oauth.Provider
+	emailURL string
 }
 
 func newConfig(clientID, secret, callbackURL, authURL, tokenURL string, scopes []string) *oauth2.Config {

@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package zitadel.error.v2;
+
+import "google/protobuf/struct.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/error/v2;errorpb";
+
+// ErrorDetail is the ZITADEL standard for rich error responses.
+message ErrorDetail {
+  // The slug is a stable, machine-readable, two-part identifier (e.g., "user.already_exists").
+  // It is intended for programmatic use and does not change across versions, making it suitable for clients to use in their error handling logic.
+  // It is built from a namespace / resource (e.g., "user") and a specific error condition (e.g., "already_exists"), separated by a dot.
+  string slug = 1;
+
+  // The message is a human-readable message in English.
+  // This message is intended for developers and should provide a clear explanation of the error.
+  // It is not meant for end-users and should not be localized.
+  // Clients are encouraged not to present this to their end-users, but rather use their own translation logic based on the slug.
+  string message = 2;
+
+  // The details field is a structured object that can contain additional information about the error.
+  // It is intended to provide more context for developers and can include any relevant data that may help in diagnosing the issue
+  // or clients can use it to provide additional context in their error handling logic.
+  // The content of the details field is not standardized and can vary depending on the error type.
+  // While object details should remain consistent across versions, there's no guarantee that the structure will remain unchanged,
+  // so clients should not rely on a specific structure within the details field.
+  google.protobuf.Struct details = 3;
+}

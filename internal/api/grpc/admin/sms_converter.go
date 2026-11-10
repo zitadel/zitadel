@@ -8,14 +8,18 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	settings_pb "github.com/zitadel/zitadel/pkg/grpc/settings"
 )
 
-func listSMSConfigsToModel(req *admin_pb.ListSMSProvidersRequest) (*query.SMSConfigsSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func listSMSConfigsToModel(defaults systemdefaults.SystemDefaults, req *admin_pb.ListSMSProvidersRequest) (*query.SMSConfigsSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	return &query.SMSConfigsSearchQueries{
 		SearchRequest: query.SearchRequest{
 			Offset: offset,
@@ -56,7 +60,8 @@ func SMSConfigToPb(config *query.SMSConfig) settings_pb.SMSConfig {
 func HTTPConfigToPb(http *query.HTTP) *settings_pb.SMSProvider_Http {
 	return &settings_pb.SMSProvider_Http{
 		Http: &settings_pb.HTTPConfig{
-			Endpoint: http.Endpoint,
+			Endpoint:   http.Endpoint,
+			SigningKey: http.SigningKey,
 		},
 	}
 }
@@ -73,6 +78,8 @@ func TwilioConfigToPb(twilio *query.Twilio) *settings_pb.SMSProvider_Twilio {
 
 func smsStateToPb(state domain.SMSConfigState) settings_pb.SMSProviderConfigState {
 	switch state {
+	case domain.SMSConfigStateUnspecified, domain.SMSConfigStateRemoved:
+		return settings_pb.SMSProviderConfigState_SMS_PROVIDER_CONFIG_INACTIVE
 	case domain.SMSConfigStateInactive:
 		return settings_pb.SMSProviderConfigState_SMS_PROVIDER_CONFIG_INACTIVE
 	case domain.SMSConfigStateActive:
@@ -113,10 +120,13 @@ func addSMSConfigHTTPToConfig(ctx context.Context, req *admin_pb.AddSMSProviderH
 }
 
 func updateSMSConfigHTTPToConfig(ctx context.Context, req *admin_pb.UpdateSMSProviderHTTPRequest) *command.ChangeSMSHTTP {
+	// TODO handle expiration, currently only immediate expiration is supported
+	expirationSigningKey := req.GetExpirationSigningKey() != nil
 	return &command.ChangeSMSHTTP{
-		ResourceOwner: authz.GetInstance(ctx).InstanceID(),
-		ID:            req.Id,
-		Description:   gu.Ptr(req.Description),
-		Endpoint:      gu.Ptr(req.Endpoint),
+		ResourceOwner:        authz.GetInstance(ctx).InstanceID(),
+		ID:                   req.Id,
+		Description:          gu.Ptr(req.Description),
+		Endpoint:             gu.Ptr(req.Endpoint),
+		ExpirationSigningKey: expirationSigningKey,
 	}
 }

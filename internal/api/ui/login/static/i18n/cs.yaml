@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: 2-Faktorové ověření
   DescriptionPhone: Vytvořte svou 2-faktorovou autentizaci. Zadejte své telefonní číslo k jeho ověření.
   DescriptionCode: Vytvořte svou 2-faktorovou autentizaci. Zadejte obdržený kód k ověření vašeho telefonního čísla.
+  CountryCodeLabel: Země
   PhoneLabel: Telefon
   CodeLabel: Kód
   EditButtonText: Upravit
@@ -265,6 +266,10 @@ RegistrationUser:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Pohlaví
   Female: Žena
   Male: Muž
@@ -308,6 +313,10 @@ ExternalRegistrationUserOverview:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Obchodní podmínky
   TosConfirm: Souhlasím s
   TosLinkText: obchodními podmínkami
@@ -360,6 +369,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Externí uživatel nenalezen
   Description: Externí uživatel nebyl nalezen. Chcete propojit svého uživatele nebo automaticky zaregistrovat nového?
+  NoOptionAvailable: Nebyl nalezen žádný účet odpovídající vašemu externímu uživateli a nový účet nelze vytvořit. Obraťte se prosím na svého administrátora nebo na podporu.
   LinkButtonText: Propojit
   AutoRegisterButtonText: Registrovat
   TosAndPrivacyLabel: Obchodní podmínky
@@ -385,6 +395,10 @@ ExternalNotFound:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
 DeviceAuth:
   Title: Autorizace zařízení
   UserCode:
@@ -491,6 +505,7 @@ Errors:
         AlreadyReady: Vícefaktorové OTP (jednorázové heslo) je již nastaveno
         NotExisting: Vícefaktorové OTP (jednorázové heslo) neexistuje
         InvalidCode: Neplatný kód
+        Reused: Tento kód již byl použit. Počkejte prosím na nový kód
         NotReady: Vícefaktorové OTP (jednorázové heslo) není připraveno
     Locked: Uživatel je uzamčen
     SomethingWentWrong: Něco se pokazilo

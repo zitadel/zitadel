@@ -10,59 +10,49 @@ import (
 
 func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) *command.SystemFeatures {
 	return &command.SystemFeatures{
-		LoginDefaultOrg:                 req.LoginDefaultOrg,
-		TriggerIntrospectionProjections: req.OidcTriggerIntrospectionProjections,
-		LegacyIntrospection:             req.OidcLegacyIntrospection,
-		UserSchema:                      req.UserSchema,
-		Actions:                         req.Actions,
-		TokenExchange:                   req.OidcTokenExchange,
-		ImprovedPerformance:             improvedPerformanceListToDomain(req.ImprovedPerformance),
-		OIDCSingleV1SessionTermination:  req.OidcSingleV1SessionTermination,
+		LoginDefaultOrg:                req.LoginDefaultOrg,
+		UserSchema:                     req.UserSchema,
+		ImprovedPerformance:            improvedPerformanceListToDomain(req.ImprovedPerformance),
+		OIDCSingleV1SessionTermination: req.OidcSingleV1SessionTermination,
 	}
 }
 
 func systemFeaturesToPb(f *query.SystemFeatures) *feature_pb.GetSystemFeaturesResponse {
 	return &feature_pb.GetSystemFeaturesResponse{
-		Details:                             object.DomainToDetailsPb(f.Details),
-		LoginDefaultOrg:                     featureSourceToFlagPb(&f.LoginDefaultOrg),
-		OidcTriggerIntrospectionProjections: featureSourceToFlagPb(&f.TriggerIntrospectionProjections),
-		OidcLegacyIntrospection:             featureSourceToFlagPb(&f.LegacyIntrospection),
-		UserSchema:                          featureSourceToFlagPb(&f.UserSchema),
-		OidcTokenExchange:                   featureSourceToFlagPb(&f.TokenExchange),
-		Actions:                             featureSourceToFlagPb(&f.Actions),
-		ImprovedPerformance:                 featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
-		OidcSingleV1SessionTermination:      featureSourceToFlagPb(&f.OIDCSingleV1SessionTermination),
+		Details:         object.DomainToDetailsPb(f.Details),
+		LoginDefaultOrg: featureSourceToFlagPb(&f.LoginDefaultOrg),
+		UserSchema:      featureSourceToFlagPb(&f.UserSchema),
+		OidcTokenExchange: &feature_pb.FeatureFlag{ // TODO: remove in next major version
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
+		},
+		ImprovedPerformance:            featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
+		OidcSingleV1SessionTermination: featureSourceToFlagPb(&f.OIDCSingleV1SessionTermination),
 	}
 }
 
 func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) *command.InstanceFeatures {
 	return &command.InstanceFeatures{
-		LoginDefaultOrg:                 req.LoginDefaultOrg,
-		TriggerIntrospectionProjections: req.OidcTriggerIntrospectionProjections,
-		LegacyIntrospection:             req.OidcLegacyIntrospection,
-		UserSchema:                      req.UserSchema,
-		TokenExchange:                   req.OidcTokenExchange,
-		Actions:                         req.Actions,
-		ImprovedPerformance:             improvedPerformanceListToDomain(req.ImprovedPerformance),
-		WebKey:                          req.WebKey,
-		DebugOIDCParentError:            req.DebugOidcParentError,
-		OIDCSingleV1SessionTermination:  req.OidcSingleV1SessionTermination,
+		LoginDefaultOrg:                req.LoginDefaultOrg,
+		UserSchema:                     req.UserSchema,
+		ImprovedPerformance:            improvedPerformanceListToDomain(req.ImprovedPerformance),
+		DebugOIDCParentError:           req.DebugOidcParentError,
+		OIDCSingleV1SessionTermination: req.OidcSingleV1SessionTermination,
 	}
 }
 
 func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeaturesResponse {
 	return &feature_pb.GetInstanceFeaturesResponse{
-		Details:                             object.DomainToDetailsPb(f.Details),
-		LoginDefaultOrg:                     featureSourceToFlagPb(&f.LoginDefaultOrg),
-		OidcTriggerIntrospectionProjections: featureSourceToFlagPb(&f.TriggerIntrospectionProjections),
-		OidcLegacyIntrospection:             featureSourceToFlagPb(&f.LegacyIntrospection),
-		UserSchema:                          featureSourceToFlagPb(&f.UserSchema),
-		OidcTokenExchange:                   featureSourceToFlagPb(&f.TokenExchange),
-		Actions:                             featureSourceToFlagPb(&f.Actions),
-		ImprovedPerformance:                 featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
-		WebKey:                              featureSourceToFlagPb(&f.WebKey),
-		DebugOidcParentError:                featureSourceToFlagPb(&f.DebugOIDCParentError),
-		OidcSingleV1SessionTermination:      featureSourceToFlagPb(&f.OIDCSingleV1SessionTermination),
+		Details:         object.DomainToDetailsPb(f.Details),
+		LoginDefaultOrg: featureSourceToFlagPb(&f.LoginDefaultOrg),
+		UserSchema:      featureSourceToFlagPb(&f.UserSchema),
+		OidcTokenExchange: &feature_pb.FeatureFlag{ // TODO: remove in next major version
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
+		},
+		ImprovedPerformance:            featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
+		DebugOidcParentError:           featureSourceToFlagPb(&f.DebugOIDCParentError),
+		OidcSingleV1SessionTermination: featureSourceToFlagPb(&f.OIDCSingleV1SessionTermination),
 	}
 }
 
@@ -113,10 +103,8 @@ func improvedPerformanceTypesToPb(types []feature.ImprovedPerformanceType) []fea
 
 func improvedPerformanceTypeToPb(typ feature.ImprovedPerformanceType) feature_pb.ImprovedPerformance {
 	switch typ {
-	case feature.ImprovedPerformanceTypeUnknown:
+	case feature.ImprovedPerformanceTypeUnspecified:
 		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_UNSPECIFIED
-	case feature.ImprovedPerformanceTypeOrgByID:
-		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID
 	case feature.ImprovedPerformanceTypeProjectGrant:
 		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_PROJECT_GRANT
 	case feature.ImprovedPerformanceTypeProject:
@@ -146,9 +134,7 @@ func improvedPerformanceListToDomain(list []feature_pb.ImprovedPerformance) []fe
 func improvedPerformanceToDomain(typ feature_pb.ImprovedPerformance) feature.ImprovedPerformanceType {
 	switch typ {
 	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_UNSPECIFIED:
-		return feature.ImprovedPerformanceTypeUnknown
-	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID:
-		return feature.ImprovedPerformanceTypeOrgByID
+		return feature.ImprovedPerformanceTypeUnspecified
 	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_PROJECT_GRANT:
 		return feature.ImprovedPerformanceTypeProjectGrant
 	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_PROJECT:
@@ -158,6 +144,6 @@ func improvedPerformanceToDomain(typ feature_pb.ImprovedPerformance) feature.Imp
 	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED:
 		return feature.ImprovedPerformanceTypeOrgDomainVerified
 	default:
-		return feature.ImprovedPerformanceTypeUnknown
+		return feature.ImprovedPerformanceTypeUnspecified
 	}
 }

@@ -8,7 +8,7 @@ import (
 // WaitForAndTickWithMaxDuration determine a duration and interval for EventuallyWithT-tests from context timeout and desired max duration
 func WaitForAndTickWithMaxDuration(ctx context.Context, max time.Duration) (time.Duration, time.Duration) {
 	// interval which is used to retry the test
-	tick := time.Millisecond * 100
+	tick := time.Second
 	// tolerance which is used to stop the test for the timeout
 	tolerance := tick * 5
 	// default of the WaitFor is always a defined duration, shortened if the context would time out before

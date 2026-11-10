@@ -32,6 +32,7 @@ const USER_LIMIT = 25;
   selector: 'cnsl-search-user-autocomplete',
   templateUrl: './search-user-autocomplete.component.html',
   styleUrls: ['./search-user-autocomplete.component.scss'],
+  standalone: false,
 })
 export class SearchUserAutocompleteComponent implements OnInit, AfterContentChecked {
   public removable: boolean = true;
@@ -67,11 +68,7 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
       this.unsubscribed$.next(); // clear old subscription
     } else if (this.target === UserTarget.SELF) {
       // feat-3916 show users as soon as I am in the input field of the user
-      const query = new SearchQuery();
-      const lnQuery = new LoginNameQuery();
-      lnQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE);
-      query.setLoginNameQuery(lnQuery);
-      this.userService.listUsers(USER_LIMIT, 0, [query]).then((users) => {
+      this.userService.listUsers(USER_LIMIT, 0, []).then((users) => {
         this.filteredUsers = users.resultList;
       });
 
@@ -90,16 +87,19 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
         takeUntil(this.unsubscribed$),
         tap(() => (this.isLoading = true)),
         switchMap((value) => {
-          const query = new SearchQuery();
-
-          const lnQuery = new LoginNameQuery();
-          lnQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-          lnQuery.setLoginName(value);
-
-          query.setLoginNameQuery(lnQuery);
+          const queries: SearchQuery[] = [];
+          const searchValue = typeof value === 'string' ? value.trim() : '';
+          if (searchValue) {
+            const query = new SearchQuery();
+            const lnQuery = new LoginNameQuery();
+            lnQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+            lnQuery.setLoginName(searchValue);
+            query.setLoginNameQuery(lnQuery);
+            queries.push(query);
+          }
 
           if (this.target === UserTarget.SELF) {
-            return from(this.userService.listUsers(USER_LIMIT, 0, [query]));
+            return from(this.userService.listUsers(USER_LIMIT, 0, queries));
           } else {
             return of();
           }

@@ -1,3 +1,4 @@
+-- filter_offset stores events2.in_tx_order (reused column; not a row OFFSET).
 SELECT
     aggregate_id
     , aggregate_type
@@ -10,4 +11,4 @@ FROM
 WHERE
     instance_id = $1
     AND projection_name = $2
-FOR UPDATE NOWAIT;
+FOR NO KEY UPDATE;

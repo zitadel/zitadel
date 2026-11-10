@@ -1,14 +1,15 @@
 package apple
 
 import (
-	"crypto/x509"
-	"encoding/pem"
+	"crypto/ecdsa"
+	"net/http"
 	"time"
 
 	"github.com/go-jose/go-jose/v4"
 	"github.com/zitadel/oidc/v3/pkg/crypto"
 	openid "github.com/zitadel/oidc/v3/pkg/oidc"
 
+	zcrypto "github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
 )
@@ -25,13 +26,13 @@ type Provider struct {
 	*oidc.Provider
 }
 
-func New(clientID, teamID, keyID, callbackURL string, key []byte, scopes []string, options ...oidc.ProviderOpts) (*Provider, error) {
+func New(clientID, teamID, keyID, callbackURL string, key []byte, scopes []string, httpClient *http.Client, options ...oidc.ProviderOpts) (*Provider, error) {
 	secret, err := clientSecretFromPrivateKey(key, teamID, clientID, keyID)
 	if err != nil {
 		return nil, err
 	}
 	options = append(options, oidc.WithResponseMode("form_post"))
-	rp, err := oidc.New(name, issuer, clientID, secret, callbackURL, scopes, oidc.DefaultMapper, options...)
+	rp, err := oidc.New(name, issuer, clientID, secret, callbackURL, scopes, oidc.DefaultMapper, httpClient, options...)
 	if err != nil {
 		return nil, err
 	}
@@ -42,9 +43,7 @@ func New(clientID, teamID, keyID, callbackURL string, key []byte, scopes []strin
 
 // clientSecretFromPrivateKey uses the private key to create and sign a JWT, which has to be used as client_secret at Apple.
 func clientSecretFromPrivateKey(key []byte, teamID, clientID, keyID string) (string, error) {
-	block, _ := pem.Decode(key)
-	b := block.Bytes
-	pk, err := x509.ParsePKCS8PrivateKey(b)
+	pk, err := BytesToPrivateKey(key)
 	if err != nil {
 		return "", err
 	}
@@ -65,4 +64,8 @@ func clientSecretFromPrivateKey(key []byte, teamID, clientID, keyID string) (str
 		ExpiresAt: openid.FromTime(exp),
 		IssuedAt:  openid.FromTime(iat),
 	}, signer)
+}
+
+func BytesToPrivateKey(key []byte) (*ecdsa.PrivateKey, error) {
+	return zcrypto.BytesToPrivateKeyPKCS8[*ecdsa.PrivateKey](key)
 }

@@ -2,15 +2,14 @@ package eventstore
 
 import (
 	"context"
-	"database/sql"
 	_ "embed"
 	"fmt"
 	"strings"
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -23,11 +22,11 @@ type latestSequence struct {
 //go:embed sequences_query.sql
 var latestSequencesStmt string
 
-func latestSequences(ctx context.Context, tx database.Tx, commands []eventstore.Command) ([]*latestSequence, error) {
+func latestSequences(ctx context.Context, tx database.Transaction, commands []eventstore.Command) ([]*latestSequence, error) {
 	sequences := commandsToSequences(ctx, commands)
 
 	conditions, args := sequencesToSql(sequences)
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf(latestSequencesStmt, strings.Join(conditions, " UNION ALL ")), args...)
+	rows, err := tx.Query(ctx, fmt.Sprintf(latestSequencesStmt, strings.Join(conditions, " UNION ALL ")), args...)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "V3-5jU5z", "Errors.Internal")
 	}
@@ -46,14 +45,7 @@ func latestSequences(ctx context.Context, tx database.Tx, commands []eventstore.
 }
 
 func searchSequenceByCommand(sequences []*latestSequence, command eventstore.Command) *latestSequence {
-	for _, sequence := range sequences {
-		if sequence.aggregate.Type == command.Aggregate().Type &&
-			sequence.aggregate.ID == command.Aggregate().ID &&
-			sequence.aggregate.InstanceID == command.Aggregate().InstanceID {
-			return sequence
-		}
-	}
-	return nil
+	return searchSequence(sequences, command.Aggregate().Type, command.Aggregate().ID, command.Aggregate().InstanceID)
 }
 
 func searchSequence(sequences []*latestSequence, aggregateType eventstore.AggregateType, aggregateID, instanceID string) *latestSequence {
@@ -104,7 +96,7 @@ func sequencesToSql(sequences []*latestSequence) (conditions []string, args []an
 	return conditions, args
 }
 
-func scanToSequence(rows *sql.Rows, sequences []*latestSequence) error {
+func scanToSequence(rows database.Rows, sequences []*latestSequence) error {
 	var aggregateType eventstore.AggregateType
 	var aggregateID, instanceID string
 	var currentSequence uint64

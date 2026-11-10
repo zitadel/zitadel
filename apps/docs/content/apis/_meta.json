@@ -1,0 +1,203 @@
+{
+  "root": true,
+  "pages": [
+    "introduction",
+    {
+      "title": "Core Resources",
+      "pages": [
+        {
+          "title": "V2",
+          "pages": [
+            {
+              "title": "User",
+              "pages": [
+                "../reference/api/user"
+              ]
+            },
+            {
+              "title": "Session",
+              "pages": [
+                "../reference/api/session"
+              ]
+            },
+            {
+              "title": "OIDC",
+              "pages": [
+                "../reference/api/oidc"
+              ]
+            },
+            {
+              "title": "SAML",
+              "pages": [
+                "../reference/api/saml"
+              ]
+            },
+            {
+              "title": "Settings",
+              "pages": [
+                "../reference/api/settings"
+              ]
+            },
+            {
+              "title": "Feature",
+              "pages": [
+                "../reference/api/feature"
+              ]
+            },
+            {
+              "title": "Organization",
+              "pages": [
+                "../reference/api/org"
+              ]
+            },
+            {
+              "title": "Identity Provider",
+              "pages": [
+                "../reference/api/idp"
+              ]
+            },
+            {
+              "title": "Web Key",
+              "pages": [
+                "../reference/api/webkey"
+              ]
+            },
+            {
+              "title": "Action",
+              "pages": [
+                "../reference/api/action"
+              ]
+            },
+            {
+              "title": "Instance",
+              "pages": [
+                "../reference/api/instance"
+              ]
+            },
+            {
+              "title": "Project",
+              "pages": [
+                "../reference/api/project"
+              ]
+            },
+            {
+              "title": "Application",
+              "pages": [
+                "../reference/api/application"
+              ]
+            },
+            {
+              "title": "Authorizations",
+              "pages": [
+                "../reference/api/authorization"
+              ]
+            },
+            {
+              "title": "Internal Permissions",
+              "pages": [
+                "../reference/api/internal_permission"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "V1",
+          "pages": [
+            {
+              "title": "Authenticated User",
+              "pages": [
+                "../reference/api-v1/auth"
+              ]
+            },
+            {
+              "title": "Organization Objects",
+              "pages": [
+                "../reference/api-v1/management"
+              ]
+            },
+            {
+              "title": "Instance Objects",
+              "pages": [
+                "../reference/api-v1/admin"
+              ]
+            },
+            {
+              "title": "Instance Lifecycle",
+              "pages": [
+                "../reference/api-v1/system"
+              ]
+            },
+            "migration_v1_to_v2"
+          ]
+        },
+        {
+          "title": "Assets",
+          "pages": [
+            "assets/assets"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Observability",
+      "pages": [
+        "observability/metrics",
+        "observability/health"
+      ]
+    },
+    {
+      "title": "Provision Users",
+      "pages": [
+        "scim2"
+      ]
+    },
+    {
+      "title": "gRPC Status Codes",
+      "url": "statuscodes"
+    },
+    {
+      "title": "Rate Limits (Cloud)",
+      "url": "/legal/policies/rate-limit-policy"
+    },
+    {
+      "title": "Benchmarks",
+      "pages": [
+        {
+          "title": "v2.65.0",
+          "pages": [
+            "benchmarks/v2.65.0/machine_jwt_profile_grant/index"
+          ]
+        },
+        {
+          "title": "v2.66.0",
+          "pages": [
+            "benchmarks/v2.66.0/machine_jwt_profile_grant/index"
+          ]
+        },
+        {
+          "title": "v2.70.0",
+          "pages": [
+            "benchmarks/v2.70.0/machine_jwt_profile_grant/index",
+            "benchmarks/v2.70.0/oidc_session/index"
+          ]
+        },
+        {
+          "title": "v4",
+          "pages": [
+            "benchmarks/v4/add_session/index",
+            "benchmarks/v4/human_password_login/index",
+            "benchmarks/v4/introspect/index",
+            "benchmarks/v4/machine_client_credentials_login/index",
+            "benchmarks/v4/machine_jwt_profile_grant/index",
+            "benchmarks/v4/machine_pat_login/index",
+            "benchmarks/v4/manipulate_user/index",
+            "benchmarks/v4/oidc_session/index",
+            "benchmarks/v4/otp_session/index",
+            "benchmarks/v4/password_session/index",
+            "benchmarks/v4/user_info/index"
+          ]
+        }
+      ]
+    }
+  ]
+}

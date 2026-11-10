@@ -8,13 +8,7 @@
   >
     <mat-icon class="icon">refresh</mat-icon>
   </button>
-  <cnsl-refresh-table
-    [hideRefresh]="true"
-    [loading]="loading$ | async"
-    [dataSize]="dataSource.data.length"
-    [timestamp]="viewTimestamp"
-    [selection]="selection"
-  >
+  <cnsl-refresh-table [hideRefresh]="true" [loading]="loading$ | async" [timestamp]="viewTimestamp" [selection]="selection">
     <div class="table-wrapper">
       <table class="table" mat-table [dataSource]="dataSource">
         <ng-container matColumnDef="select">
@@ -80,10 +74,12 @@
       </table>
     </div>
 
-    <div *ngIf="(loading$ | async) === false && !dataSource?.data?.length" class="no-content-row">
-      <i class="las la-exclamation"></i>
-      <span>{{ 'USER.EXTERNALIDP.EMPTY' | translate }}</span>
-    </div>
+    @if ((loading$ | async) === false && !dataSource.data.length) {
+      <div class="no-content-row">
+        <i class="las la-exclamation"></i>
+        <span>{{ 'USER.EXTERNALIDP.EMPTY' | translate }}</span>
+      </div>
+    }
 
     <cnsl-paginator
       #paginator

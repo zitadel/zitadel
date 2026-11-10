@@ -7,6 +7,7 @@ export const OVERLAY_DATA = new InjectionToken<any>('OVERLAY_DATA');
   selector: 'cnsl-info-overlay',
   templateUrl: './info-overlay.component.html',
   styleUrls: ['./info-overlay.component.scss'],
+  standalone: false,
 })
 export class InfoOverlayComponent {
   constructor(

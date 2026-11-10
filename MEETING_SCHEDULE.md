@@ -96,7 +96,7 @@ We will showcase the new Login UI, provide insights into the application's archi
 
 * **Architecture of the Login UI**: Explore how server-side and client-side components interact within the new Login UI and NextJS framework.
 * **Session API**: Understand the workings of the Session API
-* **OIDC middleware configuration**: Learn how OIDC functions with the new Login UI and the necessary steps for a complete flow.
+* **OIDC middleware settings**: Learn how OIDC functions with the new Login UI and the necessary steps for a complete flow.
 * **Customization Options / Settings**: Discover how to personalize the login and which ZITADEL settings are implemented.
 * **Outlook**: Gain insights into future features
 * **Q&A**

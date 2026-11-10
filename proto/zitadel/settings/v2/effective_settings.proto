@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package zitadel.settings.v2;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
+
+import "zitadel/settings/v2/link_settings.proto";
+
+// ============================================================================
+// Enums
+// ============================================================================
+
+enum SettingsType {
+  SETTINGS_TYPE_UNSPECIFIED = 0;
+  SETTINGS_TYPE_LINK_SETTINGS = 1;
+}
+
+// ============================================================================
+// Get
+// ============================================================================
+
+message GetEffectiveSettingsRequest {
+  optional string organization_id = 1;
+  optional string project_id = 2;
+  optional string application_id = 3;
+  repeated SettingsType types = 4;  // empty or omitted = return all
+}
+
+message GetEffectiveSettingsResponse {
+  optional LinkSettings links = 7;
+}

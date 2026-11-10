@@ -40,15 +40,6 @@
       }
     }
 
-    &.success {
-      background-color: map-get($background, successinfosection);
-      color: map-get($foreground, successinfosection);
-
-      .icon {
-        color: map-get($foreground, successinfosection);
-      }
-    }
-
     &.warn {
       background-color: map-get($background, warninfosection);
       color: map-get($foreground, warninfosection);

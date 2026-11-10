@@ -1,0 +1,5 @@
+package application
+
+type IsApplicationConfiguration = isApplication_Configuration
+
+type MetaType = isUpdateSAMLApplicationConfigurationRequest_Metadata

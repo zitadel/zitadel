@@ -50,6 +50,8 @@ import {
   AddSMSProviderTwilioResponse,
   AddSMTPConfigRequest,
   AddSMTPConfigResponse,
+  AddZitadelProviderRequest,
+  AddZitadelProviderResponse,
   DeactivateIDPRequest,
   DeactivateIDPResponse,
   DeactivateSMSProviderRequest,
@@ -171,8 +173,6 @@ import {
   ListLoginPolicySecondFactorsResponse,
   ListMilestonesRequest,
   ListMilestonesResponse,
-  ListOrgsRequest,
-  ListOrgsResponse,
   ListProvidersRequest,
   ListProvidersResponse,
   ListSecretGeneratorsRequest,
@@ -306,8 +306,9 @@ import {
   UpdateSMTPConfigPasswordResponse,
   UpdateSMTPConfigRequest,
   UpdateSMTPConfigResponse,
+  UpdateZitadelProviderRequest,
+  UpdateZitadelProviderResponse,
 } from '../proto/generated/zitadel/admin_pb';
-import { Event } from '../proto/generated/zitadel/event_pb';
 import {
   ResetCustomDomainClaimedMessageTextToDefaultRequest,
   ResetCustomDomainClaimedMessageTextToDefaultResponse,
@@ -340,9 +341,6 @@ import {
   MilestoneQuery,
   MilestoneType,
 } from '../proto/generated/zitadel/milestone/v1/milestone_pb';
-import { OrgFieldName, OrgQuery } from '../proto/generated/zitadel/org_pb';
-import { SortDirection } from '@angular/material/sort';
-import { SMTPConfig } from '../proto/generated/zitadel/settings_pb';
 
 export interface OnboardingActions {
   order: number;
@@ -401,16 +399,16 @@ export class AdminService {
               }),
             };
           });
-          const toArray = Object.entries(obj).sort(([key0, a], [key1, b]) => a.order - b.order);
+          const toArray = Object.entries(obj).sort(([_key0, a], [_key1, b]) => a.order - b.order);
 
-          const toDo = toArray.filter(([key, value]) => value.reached === undefined);
-          const done = toArray.filter(([key, value]) => !!value.reached);
+          const toDo = toArray.filter(([_, value]) => value.reached === undefined);
+          const done = toArray.filter(([_, value]) => !!value.reached);
 
           return [...toDo, ...done];
         }),
         tap((milestones) => {
           const total = milestones.length;
-          const done = milestones.map(([type, value]) => value.reached !== undefined).filter((res) => !!res).length;
+          const done = milestones.map(([_, value]) => value.reached !== undefined).filter((res) => !!res).length;
           const percentage = Math.round((done / total) * 100);
           this.progressDone.next(done);
           this.progressTotal.next(total);
@@ -1160,7 +1158,7 @@ export class AdminService {
     return this.grpcService.admin.updateSecretGenerator(req, null).then((resp) => resp.toObject());
   }
 
-  /* org domain policy */
+  /* Organization Domain policy */
 
   public getDomainPolicy(): Promise<GetDomainPolicyResponse.AsObject> {
     const req = new GetDomainPolicyRequest();
@@ -1294,6 +1292,14 @@ export class AdminService {
     return this.grpcService.admin.updateGenericOIDCProvider(req, null).then((resp) => resp.toObject());
   }
 
+  public addZitadelProvider(req: AddZitadelProviderRequest): Promise<AddZitadelProviderResponse.AsObject> {
+    return this.grpcService.admin.addZitadelProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateZitadelProvider(req: UpdateZitadelProviderRequest): Promise<UpdateZitadelProviderResponse.AsObject> {
+    return this.grpcService.admin.updateZitadelProvider(req, null).then((resp) => resp.toObject());
+  }
+
   public addGenericOAuthProvider(req: AddGenericOAuthProviderRequest): Promise<AddGenericOAuthProviderResponse.AsObject> {
     return this.grpcService.admin.addGenericOAuthProvider(req, null).then((resp) => resp.toObject());
   }
@@ -1403,34 +1409,5 @@ export class AdminService {
 
   public listMilestones(req: ListMilestonesRequest): Promise<ListMilestonesResponse.AsObject> {
     return this.grpcService.admin.listMilestones(req, null).then((resp) => resp.toObject());
-  }
-
-  public listOrgs(
-    limit: number,
-    offset: number,
-    queriesList?: OrgQuery[],
-    sortingColumn?: OrgFieldName,
-    sortingDirection?: SortDirection,
-  ): Promise<ListOrgsResponse.AsObject> {
-    const req = new ListOrgsRequest();
-    const query = new ListQuery();
-    if (limit) {
-      query.setLimit(limit);
-    }
-    if (offset) {
-      query.setOffset(offset);
-    }
-    if (sortingDirection) {
-      query.setAsc(sortingDirection === 'asc');
-    }
-    req.setQuery(query);
-    if (sortingColumn) {
-      req.setSortingColumn(sortingColumn);
-    }
-
-    if (queriesList) {
-      req.setQueriesList(queriesList);
-    }
-    return this.grpcService.admin.listOrgs(req, null).then((resp) => resp.toObject());
   }
 }

@@ -114,10 +114,11 @@ InitMFAOTP:
   NextButtonText: siguiente
   CancelButtonText: cancelar
 
-InitMFASMS:
+InitMFAOTPSMS:
   Title: Verificación de doble factor
   DescriptionPhone: Crea tu doble factor de autenticación. Introduce tu número de teléfono para verificarlo.
   DescriptionCode: Crea tu doble factor de autenticación. Ingrese el código recibido para verificar su número de teléfono.
+  CountryCodeLabel: País
   PhoneLabel: Número de teléfono
   CodeLabel: Código
   EditButtonText: editar
@@ -265,6 +266,10 @@ RegistrationUser:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Género
   Female: Mujer
   Male: Hombre
@@ -308,6 +313,10 @@ ExternalRegistrationUserOverview:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Términos y condiciones
   TosConfirm: Acepto los
   TosLinkText: TDS
@@ -360,6 +369,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Usuario externo no encontrado
   Description: Usuario externo no encontrado. ¿Quieres vincular tu usuario o autoregistrar uno nuevo?
+  NoOptionAvailable: No se ha encontrado ninguna cuenta que coincida con su usuario externo y no se puede crear una nueva cuenta. Póngase en contacto con su administrador o con el soporte.
   LinkButtonText: Vincular
   AutoRegisterButtonText: registrar
   TosAndPrivacyLabel: Términos y condiciones
@@ -385,7 +395,11 @@ ExternalNotFound:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
-  
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+
 Footer:
   PoweredBy: Powered By
   Tos: TDS
@@ -419,8 +433,8 @@ Errors:
       NotFound: Perfil no encontrado
       NotChanged: El perfil no ha cambiado
       Empty: El perfil está vacío
-      FirstNameEmpty: El nombre del perfil está vacío
-      LastNameEmpty: Los apellidos del perfil están vacíos
+      FirstNameEmpty: El nombre en el perfil está vacío
+      LastNameEmpty: El apellido en el perfil está vacío
       IDMissing: Falta el ID del perfil
     Email:
       NotFound: Email no encontrado
@@ -474,6 +488,7 @@ Errors:
         AlreadyReady: El multifactor OTP (OneTimePassword) ya está configurado
         NotExisting: El multifactor OTP (OneTimePassword) no existe
         InvalidCode: Código no válido
+        Reused: Este código ya se ha utilizado. Espera a que se genere un nuevo código
         NotReady: El multifactor OTP (OneTimePassword) no está listo
     Locked: El usuario está bloqueado
     SomethingWentWrong: Algo fue mal

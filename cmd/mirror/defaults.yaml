@@ -1,84 +1,183 @@
+Instrumentation:
+  ServiceName: "zitadel-mirror" # ZITADEL_INSTRUMENTATION_SERVICENAME
+  Trace:
+    Fraction: 1.0 # ZITADEL_INSTRUMENTATION_TRACE_FRACTION
+    # Trust incoming trace context from remote services for distributed tracing.
+    # Enable only in controlled environments; defaults to false for security.
+    TrustRemoteSpans: false # ZITADEL_INSTRUMENTATION_TRACE_TRUSTREMOTESPANS
+    Exporter:
+      # The following exporter types are supported:
+      # "none": Disables trace exporting
+      # "stdOut": Exports traces to standard output
+      # "stdErr": Exports traces to standard error
+      # "grpc": Exports traces using the OTEL gRPC exporter (recommended)
+      # "http": Exports traces using the OTEL HTTP exporter
+      # "google": Exports traces to Google Cloud. Need to configure GoogleProjectID below!
+      Type: "none" # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_TYPE
+      # Endpoint of the OTEL collector for grpc and http exporters
+      Endpoint: "" # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_ENDPOINT
+      # Disable TLS for grpc and http exporters
+      Insecure: false # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_INSECURE
+      # Interval for batching traces before export
+      BatchDuration: 1s # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_BATCHDURATION
+      # Project ID for Google Cloud Trace exporter
+      GoogleProjectID: "" # ZITADEL_INSTRUMENTATION_TRACE_EXPORTER_GOOGLEPROJECTID
+  Metric:
+    Exporter:
+      # The following exporter types are supported:
+      # "none": Disables metric exporting
+      # "stdOut": Exports metrics to standard output
+      # "stdErr": Exports metrics to standard error
+      # "grpc": Exports metrics using the OTEL gRPC exporter (recommended)
+      # "http": Exports metrics using the OTEL HTTP exporter
+      # "google": Exports metrics to Google Cloud. Need to configure GoogleProjectID below!
+      # "prometheus": Exposes metrics via an HTTP endpoint for Prometheus to scrape
+      Type: "none" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_TYPE
+      # Endpoint of the OTEL collector for grpc and http exporters
+      Endpoint: "" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_ENDPOINT
+      # Disable TLS for grpc and http exporters
+      Insecure: false # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_INSECURE
+      # Interval at which metrics are exported
+      BatchDuration: 1m # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_BATCHDURATION
+      # Project ID for Google Cloud Trace exporter
+      GoogleProjectID: "" # ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_GOOGLEPROJECTID
+  
+  # Structured logging can print logs on standard error and/or export them using OTEL.
+  Log:
+    # Log lines lower than this level are not emitted.
+    Level: "INFO" # ZITADEL_INSTRUMENTATION_LOG_LEVEL
+    # Streams enable logging for specific parts of the application.
+    Streams: # ZITADEL_INSTRUMENTATION_LOG_STREAMS (comma separated list)
+      - runtime # General runtime logs, such as startup and shutdown messages.
+      - ready # Logs related to readiness and health checks. (zitadel ready command)
+      - request # Logs for incoming API and HTTP requests.
+      - event_handler # Logs for event handling in projections.
+      - queue # Logs for the job queue processing.
+      # - event_pusher # Logs for event pushing to the database. Warning: contains sensitive information.
+    # Mask replaces sensitive information with Value in logs matched by Key
+    Mask:
+      # Keys are the attribute keys to be masked in logs.
+      # Keys are unqualified attribute names and apply to all attributes with the specified name,
+      # regardless of their position in the attribute hierarchy.
+      # Eg. "some_key" matches "some_key" and "parent.some_key" etc.
+      # When the key matches a group of attributes (e.g. slog.Group), all attribute values in the
+      # group are masked and the structure of the group is preserved.
+      # When the key matches a non-group attribute whose value is a nested object/array
+      # (e.g. added via slog.Any), the entire value is replaced with Value and its structure is not preserved.
+      Keys: # ZITADEL_INSTRUMENTATION_LOG_MASK_KEYS (comma separated list)
+        # - "first_name"
+        # - "last_name"
+      # Value is the string that replaces the original value of masked attributes.
+      Value: "****" # ZITADEL_INSTRUMENTATION_LOG_MASK_VALUE
+    # Enable printing structured logs to standard error in the specified format.
+    # When disabled, the legacy Log configuration is used.
+    # Important: when legacy Log is customized, please add a format and customize before upgrading to v5
+    # The following formats are supported:
+    #   - "disabled": Disables logging (or fallback to legacy Log config)
+    #   - "text": Logs are printed on StdErr as human-readable text
+    #   - "json": Logs are printed on StdErr as JSON objects
+    #   - "gcp": JSON formatted logs compatible with Google Cloud Platform logging.
+    #   - "gcp_error_reporting": JSON formatted logs compatible with Google Cloud Platform Error Reporting.
+    Format: "disabled" # ZITADEL_INSTRUMENTATION_LOG_STDERR
+    # Adds the source file and line number where the log line was emitted.
+    # Not to be confused with the source of an error.
+    AddSource: true # ZITADEL_INSTRUMENTATION_LOG_ADDSOURCE
+    # Configure how errors are logged.
+    Errors:
+      # Adds the source file, line number and function where the error was created.
+      ReportLocation: true # ZITADEL_INSTRUMENTATION_LOG_ERRORS_REPORTLOCATION
+      # Adds stack traces to logged errors.
+      StackTrace: false # ZITADEL_INSTRUMENTATION_LOG_ERRORS_STACKTRACE
+    # Exporter configures where the OTEL formatted logs are exported to.
+    # You typically want to disable this unless you have a OTEL collector setup.
+    # Enabling stdOut or stdErr here will result in duplicate logs (of different format)
+    # if there's also a Format set above.
+    Exporter:
+      # The following exporter types are supported:
+      #   - "none": Disables OTEL log exporter
+      #   - "stdOut": Exports OTEL logs to standard output
+      #   - "stdErr": Exports OTEL logs to standard error
+      #   - "grpc": Exports OTEL logs using the OTEL gRPC exporter (recommended)
+      #   - "http": Exports OTEL logs using the OTEL HTTP exporter
+      Type: "none" # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_TYPE
+      # Endpoint of the OTEL collector for grpc and http exporters
+      Endpoint: "" # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_ENDPOINT
+      # Disable TLS for grpc and http exporters
+      Insecure: false # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_INSECURE
+      # Interval at which metrics are exported
+      BatchDuration: 1s # ZITADEL_INSTRUMENTATION_LOG_EXPORTER_BATCHDURATION
+  Profile:
+    Exporter:
+      # The following profiler types are supported:
+      # "none": Disables profiling
+      # "google": Exports profiling data to Google Cloud Profiler
+      Type: "none" # ZITADEL_INSTRUMENTATION_PROFILE_TYPE
+      # Project ID for Google Cloud Profiler
+      GoogleProjectID: "" # ZITADEL_INSTRUMENTATION_PROFILE_GOOGLEPROJECTID
+
 Source:
   cockroach:
-    Host: localhost # ZITADEL_DATABASE_COCKROACH_HOST
-    Port: 26257 # ZITADEL_DATABASE_COCKROACH_PORT
-    Database: zitadel # ZITADEL_DATABASE_COCKROACH_DATABASE
-    MaxOpenConns: 6 # ZITADEL_DATABASE_COCKROACH_MAXOPENCONNS
-    MaxIdleConns: 6 # ZITADEL_DATABASE_COCKROACH_MAXIDLECONNS
-    EventPushConnRatio: 0.33 # ZITADEL_DATABASE_COCKROACH_EVENTPUSHCONNRATIO
-    ProjectionSpoolerConnRatio: 0.33 # ZITADEL_DATABASE_COCKROACH_PROJECTIONSPOOLERCONNRATIO
-    MaxConnLifetime: 30m # ZITADEL_DATABASE_COCKROACH_MAXCONNLIFETIME
-    MaxConnIdleTime: 5m # ZITADEL_DATABASE_COCKROACH_MAXCONNIDLETIME
-    Options: "" # ZITADEL_DATABASE_COCKROACH_OPTIONS
+    Host: localhost # ZITADEL_SOURCE_COCKROACH_HOST
+    Port: 26257 # ZITADEL_SOURCE_COCKROACH_PORT
+    Database: zitadel # ZITADEL_SOURCE_COCKROACH_DATABASE
+    MaxOpenConns: 6 # ZITADEL_SOURCE_COCKROACH_MAXOPENCONNS
+    MaxIdleConns: 6 # ZITADEL_SOURCE_COCKROACH_MAXIDLECONNS
+    MaxConnLifetime: 30m # ZITADEL_SOURCE_COCKROACH_MAXCONNLIFETIME
+    MaxConnIdleTime: 5m # ZITADEL_SOURCE_COCKROACH_MAXCONNIDLETIME
+    Options: "" # ZITADEL_SOURCE_COCKROACH_OPTIONS
     User:
-      Username: zitadel # ZITADEL_DATABASE_COCKROACH_USER_USERNAME
-      Password: "" # ZITADEL_DATABASE_COCKROACH_USER_PASSWORD
+      Username: zitadel # ZITADEL_SOURCE_COCKROACH_USER_USERNAME
+      Password: "" # ZITADEL_SOURCE_COCKROACH_USER_PASSWORD
       SSL:
-        Mode: disable # ZITADEL_DATABASE_COCKROACH_USER_SSL_MODE
-        RootCert: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_ROOTCERT
-        Cert: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_CERT
-        Key: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_KEY
+        Mode: disable # ZITADEL_SOURCE_COCKROACH_USER_SSL_MODE
+        RootCert: "" # ZITADEL_SOURCE_COCKROACH_USER_SSL_ROOTCERT
+        Cert: "" # ZITADEL_SOURCE_COCKROACH_USER_SSL_CERT
+        Key: "" # ZITADEL_SOURCE_COCKROACH_USER_SSL_KEY
   # Postgres is used as soon as a value is set
   # The values describe the possible fields to set values
   postgres:
-    Host: # ZITADEL_DATABASE_POSTGRES_HOST
-    Port: # ZITADEL_DATABASE_POSTGRES_PORT
-    Database: # ZITADEL_DATABASE_POSTGRES_DATABASE
-    MaxOpenConns: # ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS
-    MaxIdleConns: # ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS
-    MaxConnLifetime: # ZITADEL_DATABASE_POSTGRES_MAXCONNLIFETIME
-    MaxConnIdleTime: # ZITADEL_DATABASE_POSTGRES_MAXCONNIDLETIME
-    Options: # ZITADEL_DATABASE_POSTGRES_OPTIONS
+    DSN: "" # ZITADEL_SOURCE_POSTGRES_DSN
+    Host: # ZITADEL_SOURCE_POSTGRES_HOST
+    Port: # ZITADEL_SOURCE_POSTGRES_PORT
+    Database: # ZITADEL_SOURCE_POSTGRES_DATABASE
+    MaxOpenConns: # ZITADEL_SOURCE_POSTGRES_MAXOPENCONNS
+    MaxIdleConns: # ZITADEL_SOURCE_POSTGRES_MAXIDLECONNS
+    MaxConnLifetime: # ZITADEL_SOURCE_POSTGRES_MAXCONNLIFETIME
+    MaxConnIdleTime: # ZITADEL_SOURCE_POSTGRES_MAXCONNIDLETIME
+    Options: # ZITADEL_SOURCE_POSTGRES_OPTIONS
     User:
-      Username: # ZITADEL_DATABASE_POSTGRES_USER_USERNAME
-      Password: # ZITADEL_DATABASE_POSTGRES_USER_PASSWORD
+      Username: # ZITADEL_SOURCE_POSTGRES_USER_USERNAME
+      Password: # ZITADEL_SOURCE_POSTGRES_USER_PASSWORD
       SSL:
-        Mode: # ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE
-        RootCert: # ZITADEL_DATABASE_POSTGRES_USER_SSL_ROOTCERT
-        Cert: # ZITADEL_DATABASE_POSTGRES_USER_SSL_CERT
-        Key: # ZITADEL_DATABASE_POSTGRES_USER_SSL_KEY
+        Mode: # ZITADEL_SOURCE_POSTGRES_USER_SSL_MODE
+        RootCert: # ZITADEL_SOURCE_POSTGRES_USER_SSL_ROOTCERT
+        Cert: # ZITADEL_SOURCE_POSTGRES_USER_SSL_CERT
+        Key: # ZITADEL_SOURCE_POSTGRES_USER_SSL_KEY
 
 Destination:
-  cockroach:
-    Host: localhost # ZITADEL_DATABASE_COCKROACH_HOST
-    Port: 26257 # ZITADEL_DATABASE_COCKROACH_PORT
-    Database: zitadel # ZITADEL_DATABASE_COCKROACH_DATABASE
-    MaxOpenConns: 0 # ZITADEL_DATABASE_COCKROACH_MAXOPENCONNS
-    MaxIdleConns: 0 # ZITADEL_DATABASE_COCKROACH_MAXIDLECONNS
-    MaxConnLifetime: 30m # ZITADEL_DATABASE_COCKROACH_MAXCONNLIFETIME
-    MaxConnIdleTime: 5m # ZITADEL_DATABASE_COCKROACH_MAXCONNIDLETIME
-    EventPushConnRatio: 0.01 # ZITADEL_DATABASE_COCKROACH_EVENTPUSHCONNRATIO
-    ProjectionSpoolerConnRatio: 0.5 # ZITADEL_DATABASE_COCKROACH_PROJECTIONSPOOLERCONNRATIO
-    Options: "" # ZITADEL_DATABASE_COCKROACH_OPTIONS
-    User:
-      Username: zitadel # ZITADEL_DATABASE_COCKROACH_USER_USERNAME
-      Password: "" # ZITADEL_DATABASE_COCKROACH_USER_PASSWORD
-      SSL:
-        Mode: disable # ZITADEL_DATABASE_COCKROACH_USER_SSL_MODE
-        RootCert: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_ROOTCERT
-        Cert: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_CERT
-        Key: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_KEY
-  # Postgres is used as soon as a value is set
-  # The values describe the possible fields to set values
   postgres:
-    Host: # ZITADEL_DATABASE_POSTGRES_HOST
-    Port: # ZITADEL_DATABASE_POSTGRES_PORT
-    Database: # ZITADEL_DATABASE_POSTGRES_DATABASE
-    MaxOpenConns: # ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS
-    MaxIdleConns: # ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS
-    MaxConnLifetime: # ZITADEL_DATABASE_POSTGRES_MAXCONNLIFETIME
-    MaxConnIdleTime: # ZITADEL_DATABASE_POSTGRES_MAXCONNIDLETIME
-    Options: # ZITADEL_DATABASE_POSTGRES_OPTIONS
+    DSN: "" # ZITADEL_DESTINATION_POSTGRES_DSN
+    Host: localhost # ZITADEL_DESTINATION_POSTGRES_HOST
+    Port: 5432 # ZITADEL_DESTINATION_POSTGRES_PORT
+    Database: zitadel # ZITADEL_DESTINATION_POSTGRES_DATABASE
+    MaxOpenConns: 5 # ZITADEL_DESTINATION_POSTGRES_MAXOPENCONNS
+    MaxIdleConns: 2 # ZITADEL_DESTINATION_POSTGRES_MAXIDLECONNS
+    MaxConnLifetime: 30m # ZITADEL_DESTINATION_POSTGRES_MAXCONNLIFETIME
+    MaxConnIdleTime: 5m # ZITADEL_DESTINATION_POSTGRES_MAXCONNIDLETIME
+    Options: "" # ZITADEL_DESTINATION_POSTGRES_OPTIONS
     User:
-      Username: # ZITADEL_DATABASE_POSTGRES_USER_USERNAME
-      Password: # ZITADEL_DATABASE_POSTGRES_USER_PASSWORD
+      Username: zitadel # ZITADEL_DESTINATION_POSTGRES_USER_USERNAME
+      Password: "" # ZITADEL_DESTINATION_POSTGRES_USER_PASSWORD
       SSL:
-        Mode: # ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE
-        RootCert: # ZITADEL_DATABASE_POSTGRES_USER_SSL_ROOTCERT
-        Cert: # ZITADEL_DATABASE_POSTGRES_USER_SSL_CERT
-        Key: # ZITADEL_DATABASE_POSTGRES_USER_SSL_KEY
+        Mode: disable # ZITADEL_DESTINATION_POSTGRES_USER_SSL_MODE
+        RootCert: "" # ZITADEL_DESTINATION_POSTGRES_USER_SSL_ROOTCERT
+        Cert: "" # ZITADEL_DESTINATION_POSTGRES_USER_SSL_CERT
+        Key: "" # ZITADEL_DESTINATION_POSTGRES_USER_SSL_KEY
 
-EventBulkSize: 10000
+EventBulkSize: 10000 # ZITADEL_EVENTBULKSIZE
+# The maximum duration an auth request was last updated before it gets ignored.
+# Default is 30 days
+MaxAuthRequestAge: 720h # ZITADEL_MAXAUTHREQUESTAGE
 
 Projections:
   # The maximum duration a transaction remains open 
@@ -87,14 +186,14 @@ Projections:
   TransactionDuration: 0s # ZITADEL_PROJECTIONS_TRANSACTIONDURATION
   # turn off scheduler during operation
   RequeueEvery: 0s
-  ConcurrentInstances: 7
-  EventBulkLimit: 1000
-  Customizations:
+  ConcurrentInstances: 7 # ZITADEL_PROJECTIONS_CONCURRENTINSTANCES
+  EventBulkLimit: 1000 # ZITADEL_PROJECTIONS_EVENTBULKLIMIT
+  Customizations: 
     notifications:
       MaxFailureCount: 1
 
 Eventstore:
-  MaxRetries: 3
+  MaxRetries: 3 # ZITADEL_EVENTSTORE_MAXRETRIES
 
 Auth:
   Spooler:
@@ -112,3 +211,35 @@ FirstInstance:
 
 Log:
   Level: info
+
+HTTPClient:
+  # Sets the limit of the response body size in bytes, which will be processed by the HTTP client.
+  # If the response body exceeds this limit, the client will return an error.
+  # The default value is 20MB.
+  MaxBodySize: 20971520 # ZITADEL_HTTPCLIENT_MAXBODYSIZE
+  # Sets the timeout for the HTTP client.
+  Timeout: 30s # ZITADEL_HTTPCLIENT_TIMEOUT
+  # Sets the number of allowed redirects for the HTTP client.
+  MaxRedirects: 5 # ZITADEL_HTTPCLIENT_MAXREDIRECTS
+  # Specifies if the HTTP client should follow redirects from HTTPS to HTTP.
+  AllowHTTPSDowngrade: false # ZITADEL_HTTPCLIENT_ALLOWHTTPSDOWNGRADE
+  # Specifies the list of IP addresses or CIDR ranges that are not allowed to be called by the HTTP client.
+  # Note that hosts / domains are matched best-case and wildcards are not supported.
+  # CRITICAL SECURITY NOTE: Domain rules (like "localhost") protect application-layer string matches.
+  # Underneath, the network dialer relies exclusively on the CIDR ranges below to block resolved IPs and prevent DNS Rebinding.
+  # Do not remove the CIDR subnets even if a domain mapping exists.
+  DenyList: # ZITADEL_HTTPCLIENT_DENYLIST (comma separated list)
+    - localhost
+    - "0.0.0.0/8"       # Unspecified IPv4 address range / Local network routing trick protection
+    - "10.0.0.0/8"      # Class A private networks
+    - "100.64.0.0/10"   # Carrier-Grade NAT space
+    - "127.0.0.0/8"     # Loopback addresses (IPv4)
+    - "169.254.0.0/16"  # Link-local subnets (Covers Cloud Metadata Endpoints like AWS/GCP 169.254.169.254)
+    - "172.16.0.0/12"   # Class B private networks
+    - "192.168.0.0/16"  # Class C private networks
+    - "198.18.0.0/15"   # Benchmark/inter-network communication testing
+    - "::/128"          # Unspecified IPv6 address
+    - "::1/128"         # IPv6 loopback address
+    - "::ffff:0:0/96"   # IPv4-mapped IPv6 addresses (Prevents IPv6 encapsulation bypasses)
+    - "fc00::/7"        # Unique local addresses / IPv6 equivalent to private IPv4 subnets
+    - "fe80::/10"       # Link-local addresses / IPv6 equivalent to cloud metadata subnets

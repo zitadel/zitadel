@@ -81,9 +81,10 @@ func UserMetadataListFromSlice(c *actions.FieldConfig, metadata []query.UserMeta
 func GetOrganizationMetadata(ctx context.Context, queries *query.Queries, c *actions.FieldConfig, organizationID string) goja.Value {
 	metadata, err := queries.SearchOrgMetadata(
 		ctx,
-		true,
+		false,
 		organizationID,
 		&query.OrgMetadataSearchQueries{},
+		false,
 		false,
 	)
 	if err != nil {
@@ -175,6 +176,53 @@ func (md *MetadataList) AppendMetadataFunc(call goja.FunctionCall) goja.Value {
 	return nil
 }
 
+// AppendMetadataRawFunc appends a metadata entry storing the value as raw bytes
+// without JSON encoding. In contrast to [MetadataList.AppendMetadataFunc], a string
+// is stored as its plain UTF-8 bytes (e.g. `de` instead of `"de"`).
+// Allowed values are strings and byte arrays (Uint8Array or an array of integers 0-255).
+func (md *MetadataList) AppendMetadataRawFunc(call goja.FunctionCall) goja.Value {
+	if len(call.Arguments) != 2 {
+		panic("exactly 2 (key, value) arguments expected")
+	}
+
+	value := rawMetadataValue(call.Arguments[1].Export())
+	if len(value) == 0 {
+		panic("value must not be empty")
+	}
+
+	md.metadata = append(md.metadata,
+		&Metadata{
+			Key:   call.Arguments[0].Export().(string),
+			Value: call.Arguments[1],
+			value: value,
+		})
+	return nil
+}
+
+// rawMetadataValue converts an exported goja value to raw bytes.
+// Strings are converted to their UTF-8 bytes, Uint8Array is exported as []byte directly
+// and plain arrays must only contain integers in the range 0-255.
+func rawMetadataValue(v interface{}) []byte {
+	switch value := v.(type) {
+	case string:
+		return []byte(value)
+	case []byte:
+		return value
+	case []interface{}:
+		bytes := make([]byte, len(value))
+		for i, item := range value {
+			b, ok := item.(int64)
+			if !ok || b < 0 || b > 255 {
+				panic("array value must only contain integers between 0 and 255")
+			}
+			bytes[i] = byte(b)
+		}
+		return bytes
+	default:
+		panic("value must be a string or byte array")
+	}
+}
+
 func (md *MetadataList) MetadataListFromDomain(runtime *goja.Runtime) interface{} {
 	for i, metadata := range md.metadata {
 		md.metadata[i].Value = metadataByteArrayToValue(metadata.value, runtime)
@@ -204,7 +252,12 @@ func MetadataListToDomain(metadataList *MetadataList) []*domain.Metadata {
 	for i, metadata := range metadataList.metadata {
 		value := metadata.value
 		if len(value) == 0 {
-			value = mapBytesToByteArray(metadata.Value.Export())
+			var err error
+			value, err = json.Marshal(metadata.Value.Export())
+			if err != nil {
+				logging.WithError(err).Debug("unable to marshal")
+				panic(err)
+			}
 		}
 		list[i] = &domain.Metadata{
 			Key:   metadata.Key,
@@ -213,22 +266,4 @@ func MetadataListToDomain(metadataList *MetadataList) []*domain.Metadata {
 	}
 
 	return list
-}
-
-// mapBytesToByteArray is used for backwards compatibility of old metadata.push method
-// converts the Javascript uint8 array which is exported as []interface{} to a []byte
-func mapBytesToByteArray(i interface{}) []byte {
-	bytes, ok := i.([]interface{})
-	if !ok {
-		return nil
-	}
-	value := make([]byte, len(bytes))
-	for i, val := range bytes {
-		b, ok := val.(int64)
-		if !ok {
-			return nil
-		}
-		value[i] = byte(b)
-	}
-	return value
 }

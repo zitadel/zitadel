@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: Zweitfaktor hinzufügen
   DescriptionPhone: Erstelle deinen Zweitfaktor. Gib deine Telefonnummer ein, um sie zu verifizieren.
   DescriptionCode: Erstelle deinen Zweitfaktor. Gib den erhaltenen Code ein, um deine Telefonnummer zu verifizieren.
+  CountryCodeLabel: Land
   PhoneLabel: Telefonnummer
   CodeLabel: Code
   EditButtonText: Bearbeiten
@@ -264,6 +265,10 @@ RegistrationUser:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Geschlecht
   Female: weiblich
   Male: männlich
@@ -307,6 +312,10 @@ ExternalRegistrationUserOverview:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGB
@@ -359,6 +368,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Externes Benutzerkonto nicht gefunden
   Description: Externes Benutzerkonto konnte nicht gefunden werden. Möchtest du deinen Benutzer mit einem bestehenden Benutzer verknüpfen oder ihn als neuen Benutzer registrieren?
+  NoOptionAvailable: Es wurde kein Konto gefunden, das zu Ihrem externen Benutzer passt, und es kann kein neues Konto erstellt werden. Bitte wenden Sie sich an Ihren Administrator oder an den Support.
   LinkButtonText: Verknüpfen
   AutoRegisterButtonText: Registrieren
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
@@ -384,6 +394,10 @@ ExternalNotFound:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
 DeviceAuth:
   Title: Gerät verbinden
   UserCode:
@@ -490,6 +504,7 @@ Errors:
         AlreadyReady: Multifaktor OTP (OneTimePassword) ist bereits eingerichtet
         NotExisting: Multifaktor OTP (OneTimePassword) existiert nicht
         InvalidCode: Code ist ungültig
+        Reused: Dieser Code wurde bereits verwendet. Bitte warten Sie auf einen neuen Code
         NotReady: Multifaktor OTP (OneTimePassword) ist nicht bereit
     Locked: Benutzer ist gesperrt
     SomethingWentWrong: Irgendetwas ist schief gelaufen

@@ -20,6 +20,7 @@ type authZRepo interface {
 	VerifierClientID(ctx context.Context, name string) (clientID, projectID string, err error)
 	ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error)
 	ExistsOrg(ctx context.Context, id, domain string) (string, error)
+	CheckOrgActive(ctx context.Context, orgID string) error
 }
 
 var _ AccessTokenVerifier = (*AccessTokenVerifierFromRepo)(nil)

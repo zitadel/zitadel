@@ -2,11 +2,15 @@ package command
 
 import (
 	"context"
+	"net/url"
 	"strings"
 	"time"
 
+	"github.com/muhlemmer/gu"
+
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	project_repo "github.com/zitadel/zitadel/internal/repository/project"
@@ -16,24 +20,28 @@ import (
 
 type addOIDCApp struct {
 	AddApp
-	Version                     domain.OIDCVersion
-	RedirectUris                []string
-	ResponseTypes               []domain.OIDCResponseType
-	GrantTypes                  []domain.OIDCGrantType
-	ApplicationType             domain.OIDCApplicationType
-	AuthMethodType              domain.OIDCAuthMethodType
-	PostLogoutRedirectUris      []string
-	DevMode                     bool
-	AccessTokenType             domain.OIDCTokenType
-	AccessTokenRoleAssertion    bool
-	IDTokenRoleAssertion        bool
-	IDTokenUserinfoAssertion    bool
-	ClockSkew                   time.Duration
-	AdditionalOrigins           []string
-	SkipSuccessPageForNativeApp bool
-	BackChannelLogoutURI        string
-	LoginVersion                domain.LoginVersion
-	LoginBaseURI                string
+	Version                       domain.OIDCVersion
+	RedirectUris                  []string
+	ResponseTypes                 []domain.OIDCResponseType
+	GrantTypes                    []domain.OIDCGrantType
+	ApplicationType               domain.OIDCApplicationType
+	AuthMethodType                domain.OIDCAuthMethodType
+	PostLogoutRedirectUris        []string
+	DevMode                       bool
+	AccessTokenType               domain.OIDCTokenType
+	AccessTokenRoleAssertion      bool
+	IDTokenRoleAssertion          bool
+	IDTokenUserinfoAssertion      bool
+	ClockSkew                     time.Duration
+	AdditionalOrigins             []string
+	SkipSuccessPageForNativeApp   bool
+	BackChannelLogoutURI          string
+	LoginVersion                  domain.LoginVersion
+	LoginBaseURI                  string
+	IOSTeamID                     string
+	IOSBundleID                   string
+	AndroidPackageName            string
+	AndroidSHA256CertFingerprints []string
 
 	ClientID          string
 	ClientSecret      string
@@ -114,12 +122,17 @@ func (c *Commands) AddOIDCAppCommand(app *addOIDCApp) preparation.Validation {
 					app.BackChannelLogoutURI,
 					app.LoginVersion,
 					app.LoginBaseURI,
+					app.IOSTeamID,
+					app.IOSBundleID,
+					app.AndroidPackageName,
+					app.AndroidSHA256CertFingerprints,
 				),
 			}, nil
 		}, nil
 	}
 }
 
+// TODO: Combine with AddOIDCApplication and addOIDCApplicationWithID
 func (c *Commands) AddOIDCApplicationWithID(ctx context.Context, oidcApp *domain.OIDCApp, resourceOwner, appID string) (_ *domain.OIDCApp, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -132,7 +145,7 @@ func (c *Commands) AddOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-lxowmp", "Errors.Project.App.AlreadyExisting")
 	}
 
-	if err := c.checkProjectExists(ctx, oidcApp.AggregateID, resourceOwner); err != nil {
+	if _, err := c.checkProjectExists(ctx, oidcApp.AggregateID, resourceOwner); err != nil {
 		return nil, err
 	}
 	return c.addOIDCApplicationWithID(ctx, oidcApp, resourceOwner, appID)
@@ -142,16 +155,32 @@ func (c *Commands) AddOIDCApplication(ctx context.Context, oidcApp *domain.OIDCA
 	if oidcApp == nil || oidcApp.AggregateID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-34Fm0", "Errors.Project.App.Invalid")
 	}
-	if err := c.checkProjectExists(ctx, oidcApp.AggregateID, resourceOwner); err != nil {
+
+	projectResOwner, err := c.checkProjectExists(ctx, oidcApp.AggregateID, resourceOwner)
+	if err != nil {
 		return nil, err
 	}
+	if resourceOwner == "" {
+		resourceOwner = projectResOwner
+	}
+
 	if oidcApp.AppName == "" || !oidcApp.IsValid() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-1n8df", "Errors.Project.App.Invalid")
 	}
 
-	appID, err := c.idGenerator.Next()
+	appID := oidcApp.AppID
+	if appID == "" {
+		appID, err = c.idGenerator.Next()
+		if err != nil {
+			return nil, err
+		}
+	}
+	existingApp, err := c.getOIDCAppWriteModel(ctx, oidcApp.AggregateID, appID, resourceOwner)
 	if err != nil {
 		return nil, err
+	}
+	if existingApp.State != domain.AppStateUnspecified {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-lxowmp", "Errors.Project.App.AlreadyExisting")
 	}
 
 	return c.addOIDCApplicationWithID(ctx, oidcApp, resourceOwner, appID)
@@ -162,6 +191,26 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 	defer func() { span.EndWithError(err) }()
 
 	addedApplication := NewOIDCApplicationWriteModel(oidcApp.AggregateID, resourceOwner)
+	if err := c.eventstore.FilterToQueryReducer(ctx, addedApplication); err != nil {
+		return nil, err
+	}
+	if err := c.checkPermissionUpdateApplication(ctx, addedApplication.ResourceOwner, addedApplication.AggregateID); err != nil {
+		return nil, err
+	}
+
+	return c.pushOIDCApplication(ctx, addedApplication, oidcApp, appID)
+}
+
+// pushOIDCApplication writes the application-added and oidc-config-added events for a new
+// OIDC application onto the project aggregate. Authorization must already have been
+// performed by the caller: either through an app.write permission check (see
+// addOIDCApplicationWithID) or, for dynamic client registration, at the registration endpoint
+// through the instance's security settings and registration mode (see AddDynamicOIDCClient).
+//
+// extraEvents are appended to the same push, so callers can persist additional state about
+// the application atomically with its creation (dynamic client registration uses this to
+// store the registration access token hash).
+func (c *Commands) pushOIDCApplication(ctx context.Context, addedApplication *OIDCApplicationWriteModel, oidcApp *domain.OIDCApp, appID string, extraEvents ...eventstore.Command) (_ *domain.OIDCApp, err error) {
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
 
 	oidcApp.AppID = appID
@@ -181,30 +230,42 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 	if err != nil {
 		return nil, err
 	}
+
+	backchannelLogoutURI, err := c.validateBackchannelLogoutURI(oidcApp)
+	if err != nil {
+		return nil, err
+	}
+
 	events = append(events, project_repo.NewOIDCConfigAddedEvent(ctx,
 		projectAgg,
-		oidcApp.OIDCVersion,
+		gu.Value(oidcApp.OIDCVersion),
 		oidcApp.AppID,
 		oidcApp.ClientID,
 		oidcApp.EncodedHash,
 		trimStringSliceWhiteSpaces(oidcApp.RedirectUris),
 		oidcApp.ResponseTypes,
 		oidcApp.GrantTypes,
-		oidcApp.ApplicationType,
-		oidcApp.AuthMethodType,
+		gu.Value(oidcApp.ApplicationType),
+		gu.Value(oidcApp.AuthMethodType),
 		trimStringSliceWhiteSpaces(oidcApp.PostLogoutRedirectUris),
-		oidcApp.DevMode,
-		oidcApp.AccessTokenType,
-		oidcApp.AccessTokenRoleAssertion,
-		oidcApp.IDTokenRoleAssertion,
-		oidcApp.IDTokenUserinfoAssertion,
-		oidcApp.ClockSkew,
+		gu.Value(oidcApp.DevMode),
+		gu.Value(oidcApp.AccessTokenType),
+		gu.Value(oidcApp.AccessTokenRoleAssertion),
+		gu.Value(oidcApp.IDTokenRoleAssertion),
+		gu.Value(oidcApp.IDTokenUserinfoAssertion),
+		gu.Value(oidcApp.ClockSkew),
 		trimStringSliceWhiteSpaces(oidcApp.AdditionalOrigins),
-		oidcApp.SkipNativeAppSuccessPage,
-		strings.TrimSpace(oidcApp.BackChannelLogoutURI),
-		oidcApp.LoginVersion,
-		strings.TrimSpace(oidcApp.LoginBaseURI),
+		gu.Value(oidcApp.SkipNativeAppSuccessPage),
+		backchannelLogoutURI,
+		gu.Value(oidcApp.LoginVersion),
+		strings.TrimSpace(gu.Value(oidcApp.LoginBaseURI)),
+		strings.TrimSpace(gu.Value(oidcApp.IOSTeamID)),
+		strings.TrimSpace(gu.Value(oidcApp.IOSBundleID)),
+		strings.TrimSpace(gu.Value(oidcApp.AndroidPackageName)),
+		trimStringSliceWhiteSpaces(oidcApp.AndroidSHA256CertFingerprints),
 	))
+
+	events = append(events, extraEvents...)
 
 	addedApplication.AppID = oidcApp.AppID
 	postCommit, err := c.applicationCreatedMilestone(ctx, &events)
@@ -226,7 +287,21 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 	return result, nil
 }
 
-func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCApp, resourceOwner string) (*domain.OIDCApp, error) {
+func (c *Commands) validateBackchannelLogoutURI(oidcApp *domain.OIDCApp) (string, error) {
+	backchannelLogoutURL := strings.TrimSpace(gu.Value(oidcApp.BackChannelLogoutURI))
+	if backchannelLogoutURL != "" {
+		url, err := url.Parse(backchannelLogoutURL)
+		if err != nil {
+			return "", zerrors.ThrowInvalidArgument(err, "PROJECT-iZL2Ac", "Errors.Project.App.Invalid.BackchannelLogoutURL")
+		}
+		if err := denylist.IsURLBlocked(c.denyList, url, c.ipLookupFunction); err != nil {
+			return "", zerrors.ThrowInvalidArgument(err, "PROJECT-msNebo", "Errors.Project.App.Blocked.BackchannelLogoutURL")
+		}
+	}
+	return backchannelLogoutURL, nil
+}
+
+func (c *Commands) UpdateOIDCApplication(ctx context.Context, oidc *domain.OIDCApp, resourceOwner string) (*domain.OIDCApp, error) {
 	if !oidc.IsValid() || oidc.AppID == "" || oidc.AggregateID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-5m9fs", "Errors.Project.App.OIDCConfigInvalid")
 	}
@@ -241,30 +316,14 @@ func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 	if !existingOIDC.IsOIDC() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-GBr34", "Errors.Project.App.IsNotOIDC")
 	}
-	projectAgg := ProjectAggregateFromWriteModel(&existingOIDC.WriteModel)
-	changedEvent, hasChanged, err := existingOIDC.NewChangedEvent(
-		ctx,
-		projectAgg,
-		oidc.AppID,
-		trimStringSliceWhiteSpaces(oidc.RedirectUris),
-		trimStringSliceWhiteSpaces(oidc.PostLogoutRedirectUris),
-		oidc.ResponseTypes,
-		oidc.GrantTypes,
-		oidc.ApplicationType,
-		oidc.AuthMethodType,
-		oidc.OIDCVersion,
-		oidc.AccessTokenType,
-		oidc.DevMode,
-		oidc.AccessTokenRoleAssertion,
-		oidc.IDTokenRoleAssertion,
-		oidc.IDTokenUserinfoAssertion,
-		oidc.ClockSkew,
-		trimStringSliceWhiteSpaces(oidc.AdditionalOrigins),
-		oidc.SkipNativeAppSuccessPage,
-		strings.TrimSpace(oidc.BackChannelLogoutURI),
-		oidc.LoginVersion,
-		strings.TrimSpace(oidc.LoginBaseURI),
-	)
+	if err := c.eventstore.FilterToQueryReducer(ctx, existingOIDC); err != nil {
+		return nil, err
+	}
+	if err := c.checkPermissionUpdateApplication(ctx, existingOIDC.ResourceOwner, existingOIDC.AggregateID); err != nil {
+		return nil, err
+	}
+
+	changedEvent, hasChanged, err := c.oidcApplicationChangeEvent(ctx, existingOIDC, oidc)
 	if err != nil {
 		return nil, err
 	}
@@ -286,6 +345,65 @@ func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 	return result, nil
 }
 
+// oidcApplicationChangeEvent builds the oidc-config-changed event that brings an existing
+// OIDC application to the desired state. It assumes the existing write model has been loaded
+// and reduced and that authorization has already been performed by the caller (an app.write
+// permission check for UpdateOIDCApplication, the registration access token for
+// UpdateDynamicOIDCClient). It reports whether anything actually changed.
+func (c *Commands) oidcApplicationChangeEvent(ctx context.Context, existingOIDC *OIDCApplicationWriteModel, oidc *domain.OIDCApp) (*project_repo.OIDCConfigChangedEvent, bool, error) {
+	projectAgg := ProjectAggregateFromWriteModelWithCTX(ctx, &existingOIDC.WriteModel)
+	var backChannelLogout, loginBaseURI, iosTeamID, iosBundleID, androidPackageName *string
+	if oidc.BackChannelLogoutURI != nil {
+		bcl, err := c.validateBackchannelLogoutURI(oidc)
+		if err != nil {
+			return nil, false, err
+		}
+		backChannelLogout = gu.Ptr(bcl)
+	}
+
+	if oidc.LoginBaseURI != nil {
+		loginBaseURI = gu.Ptr(strings.TrimSpace(*oidc.LoginBaseURI))
+	}
+	if oidc.IOSTeamID != nil {
+		iosTeamID = gu.Ptr(strings.TrimSpace(*oidc.IOSTeamID))
+	}
+	if oidc.IOSBundleID != nil {
+		iosBundleID = gu.Ptr(strings.TrimSpace(*oidc.IOSBundleID))
+	}
+	if oidc.AndroidPackageName != nil {
+		androidPackageName = gu.Ptr(strings.TrimSpace(*oidc.AndroidPackageName))
+	}
+
+	return existingOIDC.NewChangedEvent(
+		ctx,
+		projectAgg,
+		oidc.AppID,
+		trimStringSliceWhiteSpaces(oidc.RedirectUris),
+		trimStringSliceWhiteSpaces(oidc.PostLogoutRedirectUris),
+		oidc.ResponseTypes,
+		oidc.GrantTypes,
+		oidc.ApplicationType,
+		oidc.AuthMethodType,
+		oidc.OIDCVersion,
+		oidc.AccessTokenType,
+		oidc.DevMode,
+		oidc.AccessTokenRoleAssertion,
+		oidc.IDTokenRoleAssertion,
+		oidc.IDTokenUserinfoAssertion,
+		oidc.ClockSkew,
+		trimStringSliceWhiteSpaces(oidc.AdditionalOrigins),
+		oidc.SkipNativeAppSuccessPage,
+		backChannelLogout,
+		oidc.LoginVersion,
+		loginBaseURI,
+		iosTeamID,
+		iosBundleID,
+		androidPackageName,
+		trimStringSliceWhiteSpaces(oidc.AndroidSHA256CertFingerprints),
+	)
+}
+
+// Deprecated: use [ChangeApplicationSecret], which supports both OIDC and API applications.
 func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, appID, resourceOwner string) (*domain.OIDCApp, error) {
 	if projectID == "" || appID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-99i83", "Errors.IDMissing")
@@ -301,6 +419,11 @@ func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, a
 	if !existingOIDC.IsOIDC() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Ghrh3", "Errors.Project.App.IsNotOIDC")
 	}
+
+	if err := c.checkPermissionUpdateApplication(ctx, existingOIDC.ResourceOwner, existingOIDC.AggregateID); err != nil {
+		return nil, err
+	}
+
 	encodedHash, plain, err := c.newHashedSecret(ctx, c.eventstore.Filter) //nolint:staticcheck
 	if err != nil {
 		return nil, err
@@ -320,37 +443,6 @@ func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, a
 	result := oidcWriteModelToOIDCConfig(existingOIDC)
 	result.ClientSecretString = plain
 	return result, err
-}
-
-func (c *Commands) VerifyOIDCClientSecret(ctx context.Context, projectID, appID, secret string) (err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	app, err := c.getOIDCAppWriteModel(ctx, projectID, appID, "")
-	if err != nil {
-		return err
-	}
-	if !app.State.Exists() {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-D8hba", "Errors.Project.App.NotExisting")
-	}
-	if !app.IsOIDC() {
-		return zerrors.ThrowInvalidArgument(nil, "COMMAND-BHgn2", "Errors.Project.App.IsNotOIDC")
-	}
-	if app.HashedSecret == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-D6hba", "Errors.Project.App.OIDCConfigInvalid")
-	}
-
-	projectAgg := ProjectAggregateFromWriteModel(&app.WriteModel)
-	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
-	updated, err := c.secretHasher.Verify(app.HashedSecret, secret)
-	spanPasswordComparison.EndWithError(err)
-	if err != nil {
-		return zerrors.ThrowInvalidArgument(err, "COMMAND-Bz542", "Errors.Project.App.ClientSecretInvalid")
-	}
-	if updated != "" {
-		c.oidcUpdateSecret(ctx, projectAgg, appID, updated)
-	}
-	return nil
 }
 
 func (c *Commands) OIDCUpdateSecret(ctx context.Context, appID, projectID, resourceOwner, updated string) {

@@ -2,16 +2,15 @@ package setup
 
 import (
 	"context"
-	"embed"
+	_ "embed"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 var (
-	//go:embed 08/cockroach/08.sql
-	//go:embed 08/postgres/08.sql
-	tokenIndexes08 embed.FS
+	//go:embed 08/08.sql
+	tokenIndexes08 string
 )
 
 type AuthTokenIndexes struct {
@@ -19,11 +18,7 @@ type AuthTokenIndexes struct {
 }
 
 func (mig *AuthTokenIndexes) Execute(ctx context.Context, _ eventstore.Event) error {
-	stmt, err := readStmt(tokenIndexes08, "08", mig.dbClient.Type(), "08.sql")
-	if err != nil {
-		return err
-	}
-	_, err = mig.dbClient.ExecContext(ctx, stmt)
+	_, err := mig.dbClient.ExecContext(ctx, tokenIndexes08)
 	return err
 }
 

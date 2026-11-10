@@ -29,6 +29,7 @@ import { ProviderNextService } from '../provider-next/provider-next.service';
 @Component({
   selector: 'cnsl-provider-google',
   templateUrl: './provider-google.component.html',
+  standalone: false,
 })
 export class ProviderGoogleComponent {
   public showOptional: boolean = false;
@@ -208,7 +209,7 @@ export class ProviderGoogleComponent {
         this.loading = true;
         (this.service as ManagementService)
           .updateGoogleProvider(req)
-          .then((idp) => {
+          .then(() => {
             setTimeout(() => {
               this.loading = false;
               this.close();
@@ -233,7 +234,7 @@ export class ProviderGoogleComponent {
         this.loading = true;
         (this.service as AdminService)
           .updateGoogleProvider(req)
-          .then((idp) => {
+          .then(() => {
             setTimeout(() => {
               this.loading = false;
               this.close();

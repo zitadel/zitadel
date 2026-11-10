@@ -2,6 +2,7 @@ package azuread
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/oauth2"
@@ -88,7 +89,7 @@ func WithOAuthOptions(opts ...oauth.ProviderOpts) ProviderOptions {
 
 // New creates an AzureAD provider using the [oauth.Provider] (OAuth 2.0 generic provider).
 // By default, it uses the [CommonTenant] and unverified emails.
-func New(name, clientID, clientSecret, redirectURI string, scopes []string, opts ...ProviderOptions) (*Provider, error) {
+func New(name, clientID, clientSecret, redirectURI string, scopes []string, httpClient *http.Client, opts ...ProviderOptions) (*Provider, error) {
 	provider := &Provider{
 		tenant:  CommonTenant,
 		options: make([]oauth.ProviderOpts, 0),
@@ -104,6 +105,7 @@ func New(name, clientID, clientSecret, redirectURI string, scopes []string, opts
 		func() idp.User {
 			return &User{isEmailVerified: provider.emailVerified}
 		},
+		httpClient,
 		provider.options...,
 	)
 	if err != nil {
@@ -152,22 +154,26 @@ func ensureMinimalScope(scopes []string) []string {
 	return scopes
 }
 
+func (p *Provider) User() idp.User {
+	return p.Provider.User()
+}
+
 // User represents the structure return on the userinfo endpoint and implements the [idp.User] interface
 //
 // AzureAD does not return an `email_verified` claim.
 // The verification can be automatically activated on the provider ([WithEmailVerified])
 type User struct {
-	ID                string               `json:"id"`
-	BusinessPhones    []domain.PhoneNumber `json:"businessPhones"`
-	DisplayName       string               `json:"displayName"`
-	FirstName         string               `json:"givenName"`
-	JobTitle          string               `json:"jobTitle"`
-	Email             domain.EmailAddress  `json:"mail"`
-	MobilePhone       domain.PhoneNumber   `json:"mobilePhone"`
-	OfficeLocation    string               `json:"officeLocation"`
-	PreferredLanguage string               `json:"preferredLanguage"`
-	LastName          string               `json:"surname"`
-	UserPrincipalName string               `json:"userPrincipalName"`
+	ID                string               `json:"id,omitempty"`
+	BusinessPhones    []domain.PhoneNumber `json:"businessPhones,omitempty"`
+	DisplayName       string               `json:"displayName,omitempty"`
+	FirstName         string               `json:"givenName,omitempty"`
+	JobTitle          string               `json:"jobTitle,omitempty"`
+	Email             domain.EmailAddress  `json:"mail,omitempty"`
+	MobilePhone       domain.PhoneNumber   `json:"mobilePhone,omitempty"`
+	OfficeLocation    string               `json:"officeLocation,omitempty"`
+	PreferredLanguage string               `json:"preferredLanguage,omitempty"`
+	LastName          string               `json:"surname,omitempty"`
+	UserPrincipalName string               `json:"userPrincipalName,omitempty"`
 	isEmailVerified   bool
 }
 

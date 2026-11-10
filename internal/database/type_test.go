@@ -5,6 +5,7 @@ import (
 	"database/sql/driver"
 	"testing"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -312,7 +313,7 @@ func TestTextArray_Value(t *testing.T) {
 			"set",
 			TextArray[string]{"a", "s", "d", "f"},
 			res{
-				want: driver.Value([]byte("{a,s,d,f}")),
+				want: driver.Value([]byte(`{"a","s","d","f"}`)),
 			},
 		},
 	}
@@ -328,6 +329,17 @@ func TestTextArray_Value(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestTextArray_ValueScanRoundTrip(t *testing.T) {
+	original := TextArray[string]{"a,b", `say "hi"`, `a\b`}
+
+	value, err := original.Value()
+	require.NoError(t, err)
+
+	var scanned TextArray[string]
+	require.NoError(t, scanned.Scan(value))
+	assert.Equal(t, original, scanned)
 }
 
 type typedByte byte
@@ -449,6 +461,92 @@ func TestDuration_Scan(t *testing.T) {
 			}
 
 			assert.Equal(t, tt.res.want, tt.m)
+		})
+	}
+}
+
+func TestJSONArray_Scan(t *testing.T) {
+	type args struct {
+		src any
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *JSONArray[string]
+		wantErr bool
+	}{
+		{
+			name:    "nil",
+			args:    args{src: nil},
+			want:    new(JSONArray[string]),
+			wantErr: false,
+		},
+		{
+			name:    "zero bytes",
+			args:    args{src: []byte("")},
+			want:    new(JSONArray[string]),
+			wantErr: false,
+		},
+		{
+			name:    "empty",
+			args:    args{src: []byte("[]")},
+			want:    gu.Ptr(JSONArray[string]{}),
+			wantErr: false,
+		},
+		{
+			name:    "ok",
+			args:    args{src: []byte("[\"a\", \"b\"]")},
+			want:    gu.Ptr(JSONArray[string]{"a", "b"}),
+			wantErr: false,
+		},
+		{
+			name:    "json error",
+			args:    args{src: []byte("{\"a\": \"b\"}")},
+			want:    new(JSONArray[string]),
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := new(JSONArray[string])
+			err := got.Scan(tt.args.src)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestJSONArray_Value(t *testing.T) {
+	tests := []struct {
+		name string
+		a    []string
+		want driver.Value
+	}{
+		{
+			name: "nil",
+			a:    nil,
+			want: nil,
+		},
+		{
+			name: "empty",
+			a:    []string{},
+			want: []byte("[]"),
+		},
+		{
+			name: "ok",
+			a:    []string{"a", "b"},
+			want: []byte("[\"a\",\"b\"]"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewJSONArray(tt.a).Value()
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

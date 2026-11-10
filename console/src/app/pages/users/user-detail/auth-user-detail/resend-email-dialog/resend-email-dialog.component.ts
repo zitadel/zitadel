@@ -11,6 +11,7 @@ export type ResendEmailDialogResult = { send: true; email: string } | { send: fa
   selector: 'cnsl-resend-email-dialog',
   templateUrl: './resend-email-dialog.component.html',
   styleUrls: ['./resend-email-dialog.component.scss'],
+  standalone: false,
 })
 export class ResendEmailDialogComponent {
   public email: string = '';

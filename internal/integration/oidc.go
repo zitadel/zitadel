@@ -7,9 +7,11 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/client"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/client/rs"
@@ -18,6 +20,7 @@ import (
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	oidc_internal "github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/app"
 	"github.com/zitadel/zitadel/pkg/grpc/authn"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
@@ -133,13 +136,9 @@ func (i *Instance) CreateOIDCInactivateProjectClient(ctx context.Context, redire
 	return client, err
 }
 
-func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, redirectURI string, loginVersion *app.LoginVersion) (*management.AddOIDCAppResponse, error) {
-	project, err := i.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
-		Name: fmt.Sprintf("project-%d", time.Now().UnixNano()),
-	})
-	if err != nil {
-		return nil, err
-	}
+func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, t *testing.T, redirectURI string, loginVersion *app.LoginVersion) (*management.AddOIDCAppResponse, error) {
+	project := i.CreateProject(ctx, t, "", ProjectName(), false, false)
+
 	resp, err := i.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
 		ProjectId:                project.GetId(),
 		Name:                     fmt.Sprintf("app-%d", time.Now().UnixNano()),
@@ -178,28 +177,9 @@ func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, redirectURI
 	})
 }
 
-func (i *Instance) CreateOIDCTokenExchangeClient(ctx context.Context) (client *management.AddOIDCAppResponse, keyData []byte, err error) {
-	project, err := i.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
-		Name: fmt.Sprintf("project-%d", time.Now().UnixNano()),
-	})
-	if err != nil {
-		return nil, nil, err
-	}
+func (i *Instance) CreateOIDCTokenExchangeClient(ctx context.Context, t *testing.T) (client *management.AddOIDCAppResponse, keyData []byte, err error) {
+	project := i.CreateProject(ctx, t, "", ProjectName(), false, false)
 	return i.CreateOIDCWebClientJWT(ctx, "", "", project.GetId(), app.OIDCGrantType_OIDC_GRANT_TYPE_TOKEN_EXCHANGE, app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE, app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN)
-}
-
-func (i *Instance) CreateProject(ctx context.Context) (*management.AddProjectResponse, error) {
-	return i.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
-		Name: fmt.Sprintf("project-%d", time.Now().UnixNano()),
-	})
-}
-
-func (i *Instance) CreateProjectWithPermissionCheck(ctx context.Context, projectRoleCheck, hasProjectCheck bool) (*management.AddProjectResponse, error) {
-	return i.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
-		Name:             fmt.Sprintf("project-%d", time.Now().UnixNano()),
-		HasProjectCheck:  hasProjectCheck,
-		ProjectRoleCheck: projectRoleCheck,
-	})
 }
 
 func (i *Instance) CreateAPIClientJWT(ctx context.Context, projectID string) (*management.AddAPIAppResponse, error) {
@@ -395,7 +375,7 @@ func CheckRedirect(req *http.Request) (*url.URL, error) {
 }
 
 func (i *Instance) CreateOIDCCredentialsClient(ctx context.Context) (machine *management.AddMachineUserResponse, name, clientID, clientSecret string, err error) {
-	name = gofakeit.Username()
+	name = Username()
 	machine, err = i.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
 		Name:            name,
 		UserName:        name,
@@ -414,7 +394,7 @@ func (i *Instance) CreateOIDCCredentialsClient(ctx context.Context) (machine *ma
 }
 
 func (i *Instance) CreateOIDCCredentialsClientInactive(ctx context.Context) (machine *management.AddMachineUserResponse, name, clientID, clientSecret string, err error) {
-	name = gofakeit.Username()
+	name = Username()
 	machine, err = i.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
 		Name:            name,
 		UserName:        name,
@@ -438,8 +418,8 @@ func (i *Instance) CreateOIDCCredentialsClientInactive(ctx context.Context) (mac
 	return machine, name, secret.GetClientId(), secret.GetClientSecret(), nil
 }
 
-func (i *Instance) CreateOIDCJWTProfileClient(ctx context.Context) (machine *management.AddMachineUserResponse, name string, keyData []byte, err error) {
-	name = gofakeit.Username()
+func (i *Instance) CreateOIDCJWTProfileClient(ctx context.Context, keyLifetime time.Duration) (machine *management.AddMachineUserResponse, name string, keyData []byte, err error) {
+	name = Username()
 	machine, err = i.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
 		Name:            name,
 		UserName:        name,
@@ -451,7 +431,7 @@ func (i *Instance) CreateOIDCJWTProfileClient(ctx context.Context) (machine *man
 	keyResp, err := i.Client.Mgmt.AddMachineKey(ctx, &management.AddMachineKeyRequest{
 		UserId:         machine.GetUserId(),
 		Type:           authn.KeyType_KEY_TYPE_JSON,
-		ExpirationDate: timestamppb.New(time.Now().Add(time.Hour)),
+		ExpirationDate: timestamppb.New(time.Now().Add(keyLifetime)),
 	})
 	if err != nil {
 		return nil, "", nil, err
@@ -465,4 +445,38 @@ func (i *Instance) CreateOIDCJWTProfileClient(ctx context.Context) (machine *man
 	})
 
 	return machine, name, keyResp.GetKeyDetails(), nil
+}
+
+// SetImpersonationPolicy sets EnableImpersonation on the instance security policy and waits
+// until the change is visible again, so a subsequent token exchange doesn't race the projection.
+func (i *Instance) SetImpersonationPolicy(ctx context.Context, t *testing.T, value bool) {
+	iamCTX := i.WithAuthorization(ctx, UserTypeIAMOwner)
+
+	policy, err := i.Client.Admin.GetSecurityPolicy(iamCTX, &admin.GetSecurityPolicyRequest{})
+	require.NoError(t, err)
+	if policy.GetPolicy().GetEnableImpersonation() != value {
+		_, err = i.Client.Admin.SetSecurityPolicy(iamCTX, &admin.SetSecurityPolicyRequest{
+			EnableImpersonation: value,
+		})
+		require.NoError(t, err)
+	}
+
+	retryDuration, tick := WaitForAndTickWithMaxDuration(iamCTX, time.Minute)
+	require.EventuallyWithT(t,
+		func(ttt *assert.CollectT) {
+			f, err := i.Client.Admin.GetSecurityPolicy(iamCTX, &admin.GetSecurityPolicyRequest{})
+			assert.NoError(ttt, err)
+			assert.Equal(ttt, value, f.GetPolicy().GetEnableImpersonation())
+		},
+		retryDuration,
+		tick,
+		"timed out waiting for ensuring impersonation policy")
+}
+
+func (i *Instance) CreateDeviceAuthorizationRequest(ctx context.Context, clientID string, scopes ...string) (*oidc.DeviceAuthorizationResponse, error) {
+	provider, err := i.CreateRelyingParty(ctx, clientID, "", scopes...)
+	if err != nil {
+		return nil, err
+	}
+	return rp.DeviceAuthorization(ctx, scopes, provider, nil)
 }

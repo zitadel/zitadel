@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -35,7 +34,7 @@ func TestServer_ListIAMMemberRoles(t *testing.T) {
 }
 
 func TestServer_ListIAMMembers(t *testing.T) {
-	user := Instance.CreateHumanUserVerified(AdminCTX, Instance.DefaultOrg.Id, gofakeit.Email(), gofakeit.Phone())
+	user := Instance.CreateHumanUserVerified(AdminCTX, Instance.DefaultOrg.Id, integration.Email(), integration.Phone())
 	_, err := Client.AddIAMMember(AdminCTX, &admin_pb.AddIAMMemberRequest{
 		UserId: user.GetUserId(),
 		Roles:  iamRoles,
@@ -116,7 +115,7 @@ func TestServer_ListIAMMembers(t *testing.T) {
 }
 
 func TestServer_AddIAMMember(t *testing.T) {
-	user := Instance.CreateHumanUserVerified(AdminCTX, Instance.DefaultOrg.Id, gofakeit.Email(), gofakeit.Phone())
+	user := Instance.CreateHumanUserVerified(AdminCTX, Instance.DefaultOrg.Id, integration.Email(), integration.Phone())
 	type args struct {
 		ctx context.Context
 		req *admin_pb.AddIAMMemberRequest
@@ -190,7 +189,7 @@ func TestServer_AddIAMMember(t *testing.T) {
 }
 
 func TestServer_UpdateIAMMember(t *testing.T) {
-	user := Instance.CreateHumanUserVerified(AdminCTX, Instance.DefaultOrg.Id, gofakeit.Email(), gofakeit.Phone())
+	user := Instance.CreateHumanUserVerified(AdminCTX, Instance.DefaultOrg.Id, integration.Email(), integration.Phone())
 	_, err := Client.AddIAMMember(AdminCTX, &admin_pb.AddIAMMemberRequest{
 		UserId: user.GetUserId(),
 		Roles:  []string{"IAM_OWNER"},
@@ -271,7 +270,7 @@ func TestServer_UpdateIAMMember(t *testing.T) {
 }
 
 func TestServer_RemoveIAMMember(t *testing.T) {
-	user := Instance.CreateHumanUserVerified(AdminCTX, Instance.DefaultOrg.Id, gofakeit.Email(), gofakeit.Phone())
+	user := Instance.CreateHumanUserVerified(AdminCTX, Instance.DefaultOrg.Id, integration.Email(), integration.Phone())
 	_, err := Client.AddIAMMember(AdminCTX, &admin_pb.AddIAMMemberRequest{
 		UserId: user.GetUserId(),
 		Roles:  []string{"IAM_OWNER"},

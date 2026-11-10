@@ -1,6 +1,7 @@
 package eventstore
 
 import (
+	"slices"
 	"sync"
 
 	"github.com/zitadel/logging"
@@ -8,7 +9,7 @@ import (
 
 var (
 	subscriptions = map[AggregateType][]*Subscription{}
-	subsMutext    sync.Mutex
+	subsMutex     sync.RWMutex
 )
 
 type Subscription struct {
@@ -27,8 +28,8 @@ func SubscribeAggregates(eventQueue chan Event, aggregates ...AggregateType) *Su
 		types:  types,
 	}
 
-	subsMutext.Lock()
-	defer subsMutext.Unlock()
+	subsMutex.Lock()
+	defer subsMutex.Unlock()
 
 	for _, aggregate := range aggregates {
 		subscriptions[aggregate] = append(subscriptions[aggregate], sub)
@@ -45,8 +46,8 @@ func SubscribeEventTypes(eventQueue chan Event, types map[AggregateType][]EventT
 		types:  types,
 	}
 
-	subsMutext.Lock()
-	defer subsMutext.Unlock()
+	subsMutex.Lock()
+	defer subsMutex.Unlock()
 
 	for aggregate := range types {
 		subscriptions[aggregate] = append(subscriptions[aggregate], sub)
@@ -56,8 +57,8 @@ func SubscribeEventTypes(eventQueue chan Event, types map[AggregateType][]EventT
 }
 
 func (es *Eventstore) notify(events []Event) {
-	subsMutext.Lock()
-	defer subsMutext.Unlock()
+	subsMutex.RLock()
+	defer subsMutex.RUnlock()
 	for _, event := range events {
 		subs, ok := subscriptions[event.Aggregate().Type]
 		if !ok {
@@ -71,14 +72,11 @@ func (es *Eventstore) notify(events []Event) {
 				continue
 			}
 			//subscription for certain events
-			for _, eventType := range eventTypes {
-				if event.Type() == eventType {
-					select {
-					case sub.Events <- event:
-					default:
-						logging.Debug("unable to push event")
-					}
-					break
+			if slices.Contains(eventTypes, event.Type()) {
+				select {
+				case sub.Events <- event:
+				default:
+					logging.Debug("unable to push event")
 				}
 			}
 		}
@@ -86,8 +84,8 @@ func (es *Eventstore) notify(events []Event) {
 }
 
 func (s *Subscription) Unsubscribe() {
-	subsMutext.Lock()
-	defer subsMutext.Unlock()
+	subsMutex.Lock()
+	defer subsMutex.Unlock()
 	for aggregate := range s.types {
 		subs, ok := subscriptions[aggregate]
 		if !ok {

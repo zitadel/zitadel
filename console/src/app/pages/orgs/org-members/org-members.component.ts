@@ -16,6 +16,7 @@ import { OrgMembersDataSource } from './org-members-datasource';
   selector: 'cnsl-org-members',
   templateUrl: './org-members.component.html',
   styleUrls: ['./org-members.component.scss'],
+  standalone: false,
 })
 export class OrgMembersComponent {
   public INITIALPAGESIZE: number = 25;

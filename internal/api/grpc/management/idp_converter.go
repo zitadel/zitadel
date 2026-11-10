@@ -5,11 +5,13 @@ import (
 
 	"github.com/crewjam/saml"
 	"github.com/muhlemmer/gu"
+	dsig "github.com/russellhaering/goxmldsig"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -89,8 +91,11 @@ func updateJWTConfigToDomain(req *mgmt_pb.UpdateOrgIDPJWTConfigRequest) *domain.
 	}
 }
 
-func listIDPsToModel(ctx context.Context, req *mgmt_pb.ListOrgIDPsRequest) (queries *query.IDPSearchQueries, err error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func listIDPsToModel(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListOrgIDPsRequest) (queries *query.IDPSearchQueries, err error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	q, err := idpQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
@@ -152,8 +157,11 @@ func userLinksToDomain(idps []*query.IDPUserLink) []*domain.UserIDPLink {
 	return links
 }
 
-func listProvidersToQuery(ctx context.Context, req *mgmt_pb.ListProvidersRequest) (*query.IDPTemplateSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func listProvidersToQuery(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListProvidersRequest) (*query.IDPTemplateSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := providerQueriesToQuery(req.Queries)
 	if err != nil {
 		return nil, err
@@ -209,6 +217,7 @@ func addGenericOAuthProviderToCommand(req *mgmt_pb.AddGenericOAuthProviderReques
 		Scopes:                req.Scopes,
 		IDAttribute:           req.IdAttribute,
 		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
+		UsePKCE:               req.UsePkce,
 	}
 }
 
@@ -223,6 +232,7 @@ func updateGenericOAuthProviderToCommand(req *mgmt_pb.UpdateGenericOAuthProvider
 		Scopes:                req.Scopes,
 		IDAttribute:           req.IdAttribute,
 		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
+		UsePKCE:               req.UsePkce,
 	}
 }
 
@@ -234,6 +244,7 @@ func addGenericOIDCProviderToCommand(req *mgmt_pb.AddGenericOIDCProviderRequest)
 		ClientSecret:     req.ClientSecret,
 		Scopes:           req.Scopes,
 		IsIDTokenMapping: req.IsIdTokenMapping,
+		UsePKCE:          req.UsePkce,
 		IDPOptions:       idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
@@ -246,28 +257,31 @@ func updateGenericOIDCProviderToCommand(req *mgmt_pb.UpdateGenericOIDCProviderRe
 		ClientSecret:     req.ClientSecret,
 		Scopes:           req.Scopes,
 		IsIDTokenMapping: req.IsIdTokenMapping,
+		UsePKCE:          req.UsePkce,
 		IDPOptions:       idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 
 func addJWTProviderToCommand(req *mgmt_pb.AddJWTProviderRequest) command.JWTProvider {
 	return command.JWTProvider{
-		Name:        req.Name,
-		Issuer:      req.Issuer,
-		JWTEndpoint: req.JwtEndpoint,
-		KeyEndpoint: req.KeysEndpoint,
-		HeaderName:  req.HeaderName,
+		Name:        req.GetName(),
+		Issuer:      req.GetIssuer(),
+		JWTEndpoint: req.GetJwtEndpoint(),
+		KeyEndpoint: req.GetKeysEndpoint(),
+		HeaderName:  req.GetHeaderName(),
+		Audience:    req.GetAudience(),
 		IDPOptions:  idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 
 func updateJWTProviderToCommand(req *mgmt_pb.UpdateJWTProviderRequest) command.JWTProvider {
 	return command.JWTProvider{
-		Name:        req.Name,
-		Issuer:      req.Issuer,
-		JWTEndpoint: req.JwtEndpoint,
-		KeyEndpoint: req.KeysEndpoint,
-		HeaderName:  req.HeaderName,
+		Name:        req.GetName(),
+		Issuer:      req.GetIssuer(),
+		JWTEndpoint: req.GetJwtEndpoint(),
+		KeyEndpoint: req.GetKeysEndpoint(),
+		HeaderName:  req.GetHeaderName(),
+		Audience:    req.GetAudience(),
 		IDPOptions:  idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
@@ -469,14 +483,17 @@ func addSAMLProviderToCommand(req *mgmt_pb.AddSAMLProviderRequest) *command.SAML
 	if req.NameIdFormat != nil {
 		nameIDFormat = gu.Ptr(idp_grpc.SAMLNameIDFormatToDomain(req.GetNameIdFormat()))
 	}
+
 	return &command.SAMLProvider{
 		Name:                          req.Name,
 		Metadata:                      req.GetMetadataXml(),
 		MetadataURL:                   req.GetMetadataUrl(),
 		Binding:                       bindingToCommand(req.Binding),
 		WithSignedRequest:             req.WithSignedRequest,
+		SignatureAlgorithm:            signatureAlgorithmToCommand(req.GetSignatureAlgorithm()),
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
+		FederatedLogoutEnabled:        req.GetFederatedLogoutEnabled(),
 		IDPOptions:                    idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
@@ -486,14 +503,17 @@ func updateSAMLProviderToCommand(req *mgmt_pb.UpdateSAMLProviderRequest) *comman
 	if req.NameIdFormat != nil {
 		nameIDFormat = gu.Ptr(idp_grpc.SAMLNameIDFormatToDomain(req.GetNameIdFormat()))
 	}
+
 	return &command.SAMLProvider{
 		Name:                          req.Name,
 		Metadata:                      req.GetMetadataXml(),
 		MetadataURL:                   req.GetMetadataUrl(),
 		Binding:                       bindingToCommand(req.Binding),
 		WithSignedRequest:             req.WithSignedRequest,
+		SignatureAlgorithm:            signatureAlgorithmToCommand(req.GetSignatureAlgorithm()),
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
+		FederatedLogoutEnabled:        req.GetFederatedLogoutEnabled(),
 		IDPOptions:                    idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
@@ -510,5 +530,42 @@ func bindingToCommand(binding idp_pb.SAMLBinding) string {
 		return saml.HTTPArtifactBinding
 	default:
 		return ""
+	}
+}
+
+func signatureAlgorithmToCommand(signatureAlgorithm idp_pb.SAMLSignatureAlgorithm) string {
+	switch signatureAlgorithm {
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_UNSPECIFIED:
+		return ""
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA1:
+		return dsig.RSASHA1SignatureMethod
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA256:
+		return dsig.RSASHA256SignatureMethod
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA512:
+		return dsig.RSASHA512SignatureMethod
+	default:
+		return ""
+	}
+}
+
+func addZitadelProviderToCommand(req *mgmt_pb.AddZitadelProviderRequest) command.ZitadelProvider {
+	return command.ZitadelProvider{
+		Name:         req.Name,
+		Issuer:       req.Issuer,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateZitadelProviderToCommand(req *mgmt_pb.UpdateZitadelProviderRequest) command.ZitadelProvider {
+	return command.ZitadelProvider{
+		Name:         req.Name,
+		Issuer:       req.Issuer,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }

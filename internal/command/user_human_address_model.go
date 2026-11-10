@@ -63,7 +63,19 @@ func (wm *HumanAddressWriteModel) Reduce() error {
 				wm.StreetAddress = *e.StreetAddress
 			}
 		case *user.UserRemovedEvent:
+			wm.Country = ""
+			wm.Locality = ""
+			wm.PostalCode = ""
+			wm.Region = ""
+			wm.StreetAddress = ""
 			wm.State = domain.AddressStateRemoved
+		case *user.MachineAddedEvent:
+			wm.Country = ""
+			wm.Locality = ""
+			wm.PostalCode = ""
+			wm.Region = ""
+			wm.StreetAddress = ""
+			wm.State = domain.AddressStateUnspecified
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -80,6 +92,7 @@ func (wm *HumanAddressWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserV1AddressChangedType,
 			user.HumanAddedType,
 			user.HumanRegisteredType,
+			user.MachineAddedEventType,
 			user.HumanAddressChangedType,
 			user.UserRemovedType).
 		Builder()

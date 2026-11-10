@@ -1,53 +1,64 @@
 package domain
 
 import (
+	"net/netip"
+	"net/url"
+	"slices"
 	"strings"
 	"time"
+
+	"github.com/muhlemmer/gu"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 const (
-	http                          = "http://"
-	httpLocalhostWithPort         = "http://localhost:"
-	httpLocalhostWithoutPort      = "http://localhost/"
-	httpLoopbackV4WithPort        = "http://127.0.0.1:"
-	httpLoopbackV4WithoutPort     = "http://127.0.0.1/"
-	httpLoopbackV6WithPort        = "http://[::1]:"
-	httpLoopbackV6WithoutPort     = "http://[::1]/"
-	httpLoopbackV6LongWithPort    = "http://[0:0:0:0:0:0:0:1]:"
-	httpLoopbackV6LongWithoutPort = "http://[0:0:0:0:0:0:0:1]/"
-	https                         = "https://"
+	httpScheme        = "http://"
+	httpsScheme       = "https://"
+	localhostHostname = "localhost"
 )
 
 type OIDCApp struct {
 	models.ObjectRoot
 
-	AppID                    string
-	AppName                  string
-	ClientID                 string
-	EncodedHash              string
-	ClientSecretString       string
+	AppID              string
+	AppName            string
+	ClientID           string
+	EncodedHash        string
+	ClientSecretString string
+	// RegistrationAccessToken is the plain registration access token (RFC 7592 §3) of a
+	// dynamically registered client. It is only populated transiently on registration and
+	// rotation so the registration endpoint can return it to the client; it is never
+	// persisted (only its hash is, see project.OIDCConfigRegistrationTokenChangedEvent).
+	RegistrationAccessToken  string
 	RedirectUris             []string
 	ResponseTypes            []OIDCResponseType
 	GrantTypes               []OIDCGrantType
-	ApplicationType          OIDCApplicationType
-	AuthMethodType           OIDCAuthMethodType
+	ApplicationType          *OIDCApplicationType
+	AuthMethodType           *OIDCAuthMethodType
 	PostLogoutRedirectUris   []string
-	OIDCVersion              OIDCVersion
+	OIDCVersion              *OIDCVersion
 	Compliance               *Compliance
-	DevMode                  bool
-	AccessTokenType          OIDCTokenType
-	AccessTokenRoleAssertion bool
-	IDTokenRoleAssertion     bool
-	IDTokenUserinfoAssertion bool
-	ClockSkew                time.Duration
+	DevMode                  *bool
+	AccessTokenType          *OIDCTokenType
+	AccessTokenRoleAssertion *bool
+	IDTokenRoleAssertion     *bool
+	IDTokenUserinfoAssertion *bool
+	ClockSkew                *time.Duration
 	AdditionalOrigins        []string
-	SkipNativeAppSuccessPage bool
-	BackChannelLogoutURI     string
-	LoginVersion             LoginVersion
-	LoginBaseURI             string
+	SkipNativeAppSuccessPage *bool
+	BackChannelLogoutURI     *string
+	LoginVersion             *LoginVersion
+	LoginBaseURI             *string
+	// IOSTeamID and IOSBundleID are Associated Domains / passkey trust fields.
+	// Both must be set together, or both empty. Composed as TEAMID.BUNDLEID in AASA.
+	IOSTeamID   *string
+	IOSBundleID *string
+	// AndroidPackageName and AndroidSHA256CertFingerprints are Digital Asset Links /
+	// passkey trust fields. Package name is required when fingerprints are non-empty.
+	AndroidPackageName            *string
+	AndroidSHA256CertFingerprints []string
 
 	State AppState
 }
@@ -69,7 +80,7 @@ func (a *OIDCApp) setClientSecret(encodedHash string) {
 }
 
 func (a *OIDCApp) requiresClientSecret() bool {
-	return a.AuthMethodType == OIDCAuthMethodTypeBasic || a.AuthMethodType == OIDCAuthMethodTypePost
+	return a.AuthMethodType != nil && (*a.AuthMethodType == OIDCAuthMethodTypeBasic || *a.AuthMethodType == OIDCAuthMethodTypePost)
 }
 
 type OIDCVersion int32
@@ -137,7 +148,7 @@ const (
 )
 
 func (a *OIDCApp) IsValid() bool {
-	if a.ClockSkew > time.Second*5 || a.ClockSkew < time.Second*0 || !a.OriginsValid() {
+	if (a.ClockSkew != nil && (*a.ClockSkew > time.Second*5 || *a.ClockSkew < time.Second*0)) || !a.OriginsValid() || !a.AppLinkConfigValid() {
 		return false
 	}
 	grantTypes := a.getRequiredGrantTypes()
@@ -151,6 +162,19 @@ func (a *OIDCApp) IsValid() bool {
 		}
 	}
 	return true
+}
+
+// AppLinkConfigValid checks sibling rules for iOS/Android association fields.
+// Nil and blank (after trim) are treated the same: both iOS fields must be set or
+// both empty; Android package name is required whenever fingerprints are present.
+func (a *OIDCApp) AppLinkConfigValid() bool {
+	teamID := strings.TrimSpace(gu.Value(a.IOSTeamID))
+	bundleID := strings.TrimSpace(gu.Value(a.IOSBundleID))
+	if (teamID == "") != (bundleID == "") {
+		return false
+	}
+	packageName := strings.TrimSpace(gu.Value(a.AndroidPackageName))
+	return len(a.AndroidSHA256CertFingerprints) == 0 || packageName != ""
 }
 
 func (a *OIDCApp) OriginsValid() bool {
@@ -204,30 +228,25 @@ func ContainsOIDCGrantTypes(shouldContain, list []OIDCGrantType) bool {
 }
 
 func containsOIDCGrantType(grantTypes []OIDCGrantType, grantType OIDCGrantType) bool {
-	for _, gt := range grantTypes {
-		if gt == grantType {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(grantTypes, grantType)
 }
 
 func (a *OIDCApp) FillCompliance() {
 	a.Compliance = GetOIDCCompliance(a.OIDCVersion, a.ApplicationType, a.GrantTypes, a.ResponseTypes, a.AuthMethodType, a.RedirectUris)
 }
 
-func GetOIDCCompliance(version OIDCVersion, appType OIDCApplicationType, grantTypes []OIDCGrantType, responseTypes []OIDCResponseType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
-	switch version {
-	case OIDCVersionV1:
+func GetOIDCCompliance(version *OIDCVersion, appType *OIDCApplicationType, grantTypes []OIDCGrantType, responseTypes []OIDCResponseType, authMethod *OIDCAuthMethodType, redirectUris []string) *Compliance {
+	if version != nil && *version == OIDCVersionV1 {
 		return GetOIDCV1Compliance(appType, grantTypes, authMethod, redirectUris)
 	}
+
 	return &Compliance{
 		NoneCompliant: true,
 		Problems:      []string{"Application.OIDC.UnsupportedVersion"},
 	}
 }
 
-func GetOIDCV1Compliance(appType OIDCApplicationType, grantTypes []OIDCGrantType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
+func GetOIDCV1Compliance(appType *OIDCApplicationType, grantTypes []OIDCGrantType, authMethod *OIDCAuthMethodType, redirectUris []string) *Compliance {
 	compliance := &Compliance{NoneCompliant: false}
 
 	checkGrantTypesCombination(compliance, grantTypes)
@@ -247,7 +266,7 @@ func checkGrantTypesCombination(compliance *Compliance, grantTypes []OIDCGrantTy
 	}
 }
 
-func checkRedirectURIs(compliance *Compliance, grantTypes []OIDCGrantType, appType OIDCApplicationType, redirectUris []string) {
+func checkRedirectURIs(compliance *Compliance, grantTypes []OIDCGrantType, appType *OIDCApplicationType, redirectUris []string) {
 	// See #5684 for OIDCGrantTypeDeviceCode and redirectUris further explanation
 	if len(redirectUris) == 0 && (!containsOIDCGrantType(grantTypes, OIDCGrantTypeDeviceCode) || (containsOIDCGrantType(grantTypes, OIDCGrantTypeDeviceCode) && containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode))) {
 		compliance.NoneCompliant = true
@@ -266,53 +285,58 @@ func checkRedirectURIs(compliance *Compliance, grantTypes []OIDCGrantType, appTy
 	}
 }
 
-func checkApplicationType(compliance *Compliance, appType OIDCApplicationType, authMethod OIDCAuthMethodType) {
-	switch appType {
-	case OIDCApplicationTypeNative:
-		GetOIDCV1NativeApplicationCompliance(compliance, authMethod)
-	case OIDCApplicationTypeUserAgent:
-		GetOIDCV1UserAgentApplicationCompliance(compliance, authMethod)
+func checkApplicationType(compliance *Compliance, appType *OIDCApplicationType, authMethod *OIDCAuthMethodType) {
+	if appType != nil {
+		switch *appType {
+		case OIDCApplicationTypeNative:
+			GetOIDCV1NativeApplicationCompliance(compliance, authMethod)
+		case OIDCApplicationTypeUserAgent:
+			GetOIDCV1UserAgentApplicationCompliance(compliance, authMethod)
+		case OIDCApplicationTypeWeb:
+			return
+		}
 	}
+
 	if compliance.NoneCompliant {
 		compliance.Problems = append([]string{"Application.OIDC.V1.NotCompliant"}, compliance.Problems...)
 	}
 }
 
-func GetOIDCV1NativeApplicationCompliance(compliance *Compliance, authMethod OIDCAuthMethodType) {
-	if authMethod != OIDCAuthMethodTypeNone {
+func GetOIDCV1NativeApplicationCompliance(compliance *Compliance, authMethod *OIDCAuthMethodType) {
+	if authMethod != nil && *authMethod != OIDCAuthMethodTypeNone {
 		compliance.NoneCompliant = true
 		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.AuthMethodType.NotNone")
 	}
 }
 
-func GetOIDCV1UserAgentApplicationCompliance(compliance *Compliance, authMethod OIDCAuthMethodType) {
-	if authMethod != OIDCAuthMethodTypeNone {
+func GetOIDCV1UserAgentApplicationCompliance(compliance *Compliance, authMethod *OIDCAuthMethodType) {
+	if authMethod != nil && *authMethod != OIDCAuthMethodTypeNone {
 		compliance.NoneCompliant = true
 		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.UserAgent.AuthMethodType.NotNone")
 	}
 }
 
-func CheckRedirectUrisCode(compliance *Compliance, appType OIDCApplicationType, redirectUris []string) {
+func CheckRedirectUrisCode(compliance *Compliance, appType *OIDCApplicationType, redirectUris []string) {
 	if urlsAreHttps(redirectUris) {
 		return
 	}
-	if urlContainsPrefix(redirectUris, http) {
-		if appType == OIDCApplicationTypeUserAgent {
+	if urlContainsPrefix(redirectUris, httpScheme) {
+		if appType != nil && *appType == OIDCApplicationTypeUserAgent {
 			compliance.NoneCompliant = true
 			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb")
 		}
-		if appType == OIDCApplicationTypeNative && !onlyLocalhostIsHttp(redirectUris) {
+		if appType != nil && *appType == OIDCApplicationTypeNative && !onlyLocalhostIsHttp(redirectUris) {
 			compliance.NoneCompliant = true
 			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.RedirectUris.MustBeHttpLocalhost")
 		}
 	}
-	if containsCustom(redirectUris) && appType != OIDCApplicationTypeNative {
+	if containsCustom(redirectUris) && appType != nil && *appType != OIDCApplicationTypeNative {
 		compliance.NoneCompliant = true
 		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.CustomOnlyForNative")
 	}
 }
 
-func CheckRedirectUrisImplicit(compliance *Compliance, appType OIDCApplicationType, redirectUris []string) {
+func CheckRedirectUrisImplicit(compliance *Compliance, appType *OIDCApplicationType, redirectUris []string) {
 	if urlsAreHttps(redirectUris) {
 		return
 	}
@@ -320,8 +344,8 @@ func CheckRedirectUrisImplicit(compliance *Compliance, appType OIDCApplicationTy
 		compliance.NoneCompliant = true
 		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.CustomNotAllowed")
 	}
-	if urlContainsPrefix(redirectUris, http) {
-		if appType == OIDCApplicationTypeNative {
+	if urlContainsPrefix(redirectUris, httpScheme) {
+		if appType != nil && *appType == OIDCApplicationTypeNative {
 			if !onlyLocalhostIsHttp(redirectUris) {
 				compliance.NoneCompliant = true
 				compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.RedirectUris.MustBeHttpLocalhost")
@@ -333,20 +357,20 @@ func CheckRedirectUrisImplicit(compliance *Compliance, appType OIDCApplicationTy
 	}
 }
 
-func CheckRedirectUrisImplicitAndCode(compliance *Compliance, appType OIDCApplicationType, redirectUris []string) {
+func CheckRedirectUrisImplicitAndCode(compliance *Compliance, appType *OIDCApplicationType, redirectUris []string) {
 	if urlsAreHttps(redirectUris) {
 		return
 	}
-	if containsCustom(redirectUris) && appType != OIDCApplicationTypeNative {
+	if containsCustom(redirectUris) && appType != nil && *appType != OIDCApplicationTypeNative {
 		compliance.NoneCompliant = true
 		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Implicit.RedirectUris.CustomNotAllowed")
 	}
-	if urlContainsPrefix(redirectUris, http) {
-		if appType == OIDCApplicationTypeUserAgent {
+	if urlContainsPrefix(redirectUris, httpScheme) {
+		if appType != nil && *appType == OIDCApplicationTypeUserAgent {
 			compliance.NoneCompliant = true
 			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Code.RedirectUris.HttpOnlyForWeb")
 		}
-		if !onlyLocalhostIsHttp(redirectUris) && appType == OIDCApplicationTypeNative {
+		if !onlyLocalhostIsHttp(redirectUris) && appType != nil && *appType == OIDCApplicationTypeNative {
 			compliance.NoneCompliant = true
 			compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.Native.RedirectUris.MustBeHttpLocalhost")
 		}
@@ -358,7 +382,7 @@ func CheckRedirectUrisImplicitAndCode(compliance *Compliance, appType OIDCApplic
 
 func urlsAreHttps(uris []string) bool {
 	for _, uri := range uris {
-		if !strings.HasPrefix(uri, https) {
+		if !strings.HasPrefix(uri, httpsScheme) {
 			return false
 		}
 	}
@@ -376,31 +400,59 @@ func urlContainsPrefix(uris []string, prefix string) bool {
 
 func containsCustom(uris []string) bool {
 	for _, uri := range uris {
-		if !strings.HasPrefix(uri, http) && !strings.HasPrefix(uri, https) {
+		if !strings.HasPrefix(uri, httpScheme) && !strings.HasPrefix(uri, httpsScheme) {
 			return true
 		}
 	}
 	return false
 }
 
+// OIDCRedirectURIsRequireNative reports whether the given redirect URIs can only be
+// compliant for a native application, because they use a custom scheme. It lets a caller
+// that has to infer the application type (see the dynamic client registration endpoint)
+// stay in agreement with CheckRedirectUrisCode and CheckRedirectUrisImplicitAndCode, which
+// reserve custom schemes for native applications.
+func OIDCRedirectURIsRequireNative(redirectURIs []string) bool {
+	return containsCustom(redirectURIs)
+}
+
+// onlyLocalhostIsHttp returns true if:
+//
+//   - input string slice is empty
+//   - all parseable URIs with scheme `http` in the string slice are localhost/loopback URIs (in all possible forms)
+//
+// It will return false if:
+//   - any of the input URIs cannot be parsed
+//   - any of the parseable input URIs with scheme `http` is not localhost/loopback
 func onlyLocalhostIsHttp(uris []string) bool {
 	for _, uri := range uris {
-		if strings.HasPrefix(uri, http) && !isHTTPLoopbackLocalhost(uri) {
+		url, err := url.ParseRequestURI(uri)
+
+		if err != nil {
+			return false
+		}
+
+		if url.Scheme == "http" {
+			hostname := url.Hostname()
+
+			if hostname == localhostHostname {
+				continue
+			}
+
+			address, err := netip.ParseAddr(hostname)
+
+			if err != nil {
+				return false
+			}
+
+			if address.IsLoopback() {
+				continue
+			}
+
 			return false
 		}
 	}
 	return true
-}
-
-func isHTTPLoopbackLocalhost(uri string) bool {
-	return strings.HasPrefix(uri, httpLocalhostWithoutPort) ||
-		strings.HasPrefix(uri, httpLocalhostWithPort) ||
-		strings.HasPrefix(uri, httpLoopbackV4WithoutPort) ||
-		strings.HasPrefix(uri, httpLoopbackV4WithPort) ||
-		strings.HasPrefix(uri, httpLoopbackV6WithoutPort) ||
-		strings.HasPrefix(uri, httpLoopbackV6WithPort) ||
-		strings.HasPrefix(uri, httpLoopbackV6LongWithoutPort) ||
-		strings.HasPrefix(uri, httpLoopbackV6LongWithPort)
 }
 
 func OIDCOriginAllowList(redirectURIs, additionalOrigins []string) ([]string, error) {

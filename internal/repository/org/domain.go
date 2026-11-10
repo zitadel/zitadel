@@ -117,7 +117,8 @@ func NewDomainVerificationAddedEvent(
 	aggregate *eventstore.Aggregate,
 	domain string,
 	validationType domain.OrgDomainValidationType,
-	validationCode *crypto.CryptoValue) *DomainVerificationAddedEvent {
+	validationCode *crypto.CryptoValue,
+) *DomainVerificationAddedEvent {
 	return &DomainVerificationAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -190,7 +191,7 @@ func (e *DomainVerifiedEvent) Payload() interface{} {
 }
 
 func (e *DomainVerifiedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddOrgDomainUniqueConstraint(e.Domain)}
+	return []*eventstore.UniqueConstraint{NewAddOrgDomainUniqueConstraint(e.Domain).WithOwners(eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ID))}
 }
 
 func (e *DomainVerifiedEvent) Fields() []*eventstore.FieldOperation {

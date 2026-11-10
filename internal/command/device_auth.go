@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -15,7 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddDeviceAuth(ctx context.Context, clientID, deviceCode, userCode string, expires time.Time, scopes, audience []string, needRefreshToken bool) (*domain.ObjectDetails, error) {
+func (c *Commands) AddDeviceAuth(ctx context.Context, clientID, deviceCode, userCode, orgID string, expires time.Time, scopes, audience []string, needRefreshToken bool) (*domain.ObjectDetails, error) {
 	aggr := deviceauth.NewAggregate(deviceCode, authz.GetInstance(ctx).InstanceID())
 	model := NewDeviceAuthWriteModel(deviceCode, aggr.ResourceOwner)
 
@@ -29,6 +30,7 @@ func (c *Commands) AddDeviceAuth(ctx context.Context, clientID, deviceCode, user
 		scopes,
 		audience,
 		needRefreshToken,
+		orgID,
 	))
 	if err != nil {
 		return nil, err
@@ -59,7 +61,76 @@ func (c *Commands) ApproveDeviceAuth(
 	if !model.State.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Hief9", "Errors.DeviceAuth.NotFound")
 	}
+	if model.State != domain.DeviceAuthStateInitiated {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-GEJL3", "Errors.DeviceAuth.AlreadyHandled")
+	}
+	if model.OrganizationID != "" && model.OrganizationID != userOrgID {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-3tgws", "Errors.User.NotAllowedOrg")
+	}
 	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewApprovedEvent(ctx, model.aggregate, userID, userOrgID, authMethods, authTime, preferredLanguage, userAgent, sessionID))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(model, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+
+	return writeModelToObjectDetails(&model.WriteModel), nil
+}
+
+func (c *Commands) ApproveDeviceAuthWithSession(
+	ctx context.Context,
+	deviceCode,
+	sessionID,
+	sessionToken string,
+	projectPermissionCheck domain.ProjectPermissionCheck,
+) (*domain.ObjectDetails, error) {
+	model, err := c.getDeviceAuthWriteModelByDeviceCode(ctx, deviceCode)
+	if err != nil {
+		return nil, err
+	}
+	if !model.State.Exists() {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-D2hf2", "Errors.DeviceAuth.NotFound")
+	}
+	if model.State != domain.DeviceAuthStateInitiated {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-D30Jf", "Errors.DeviceAuth.AlreadyHandled")
+	}
+	if err := c.checkPermission(ctx, domain.PermissionSessionLink, model.ResourceOwner, ""); err != nil {
+		return nil, err
+	}
+
+	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID())
+	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
+	if err != nil {
+		return nil, err
+	}
+	if err = sessionWriteModel.CheckIsActive(); err != nil {
+		return nil, err
+	}
+	if err := c.sessionTokenVerifier(ctx, sessionToken, sessionWriteModel.AggregateID, sessionWriteModel.TokenID); err != nil {
+		return nil, err
+	}
+	if projectPermissionCheck != nil {
+		if err := projectPermissionCheck(ctx, model.ClientID, sessionWriteModel.UserID); err != nil {
+			return nil, err
+		}
+	}
+	if model.OrganizationID != "" && model.OrganizationID != sessionWriteModel.UserResourceOwner {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-D2j34", "Errors.User.NotAllowedOrg")
+	}
+
+	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewApprovedEvent(
+		ctx,
+		model.aggregate,
+		sessionWriteModel.UserID,
+		sessionWriteModel.UserResourceOwner,
+		sessionWriteModel.AuthMethodTypes(),
+		sessionWriteModel.AuthenticationTime(),
+		sessionWriteModel.PreferredLanguage,
+		sessionWriteModel.UserAgent,
+		sessionID,
+	))
 	if err != nil {
 		return nil, err
 	}
@@ -78,6 +149,9 @@ func (c *Commands) CancelDeviceAuth(ctx context.Context, id string, reason domai
 	}
 	if !model.State.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-gee5A", "Errors.DeviceAuth.NotFound")
+	}
+	if err := c.checkPermission(ctx, domain.PermissionSessionLink, model.ResourceOwner, ""); err != nil {
+		return nil, err
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewCanceledEvent(ctx, model.aggregate, reason))
 	if err != nil {
@@ -117,13 +191,17 @@ func (e DeviceAuthStateError) Error() string {
 // As devices can poll at various intervals, an explicit state takes precedence over expiry.
 // This is to prevent cases where users might approve or deny the authorization on time, but the next poll
 // happens after expiry.
-func (c *Commands) CreateOIDCSessionFromDeviceAuth(ctx context.Context, deviceCode string) (_ *OIDCSession, err error) {
+func (c *Commands) CreateOIDCSessionFromDeviceAuth(ctx context.Context, deviceCode, backChannelLogoutURI, clientID string) (_ *OIDCSession, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	deviceAuthModel, err := c.getDeviceAuthWriteModelByDeviceCode(ctx, deviceCode)
 	if err != nil {
 		return nil, err
+	}
+
+	if deviceAuthModel.ClientID != clientID {
+		return nil, oidc.ErrInvalidClient().WithDescription("client_id does not correspond to the client_id in the authorization request")
 	}
 
 	switch deviceAuthModel.State {
@@ -162,6 +240,7 @@ func (c *Commands) CreateOIDCSessionFromDeviceAuth(ctx context.Context, deviceCo
 		deviceAuthModel.PreferredLanguage,
 		deviceAuthModel.UserAgent,
 	)
+	cmd.RegisterLogout(ctx, deviceAuthModel.SessionID, deviceAuthModel.UserID, deviceAuthModel.ClientID, backChannelLogoutURI)
 	if err = cmd.AddAccessToken(ctx, deviceAuthModel.Scopes, deviceAuthModel.UserID, deviceAuthModel.UserOrgID, domain.TokenReasonAuthRequest, nil); err != nil {
 		return nil, err
 	}

@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/zitadel/logging"
-	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
@@ -24,12 +23,12 @@ type instanceInterceptor struct {
 	translator      *i18n.Translator
 }
 
-func InstanceInterceptor(verifier authz.InstanceVerifier, externalDomain string, ignoredPrefixes ...string) *instanceInterceptor {
+func InstanceInterceptor(verifier authz.InstanceVerifier, externalDomain string, translator *i18n.Translator, ignoredPrefixes ...string) *instanceInterceptor {
 	return &instanceInterceptor{
 		verifier:        verifier,
 		externalDomain:  externalDomain,
 		ignoredPrefixes: ignoredPrefixes,
-		translator:      newZitadelTranslator(),
+		translator:      translator,
 	}
 }
 
@@ -49,14 +48,18 @@ func (a *instanceInterceptor) HandlerFunc(next http.Handler) http.HandlerFunc {
 		origin := zitadel_http.DomainContext(r.Context())
 		logging.WithFields("origin", origin.Origin(), "externalDomain", a.externalDomain).WithError(err).Error("unable to set instance")
 
+		statusCode := http.StatusInternalServerError
+		if zerrors.IsNotFound(err) {
+			statusCode = http.StatusNotFound
+		}
 		zErr := new(zerrors.ZitadelError)
 		if errors.As(err, &zErr) {
 			zErr.SetMessage(a.translator.LocalizeFromRequest(r, zErr.GetMessage(), nil))
-			http.Error(w, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s): %s", origin, a.externalDomain, zErr), http.StatusNotFound)
+			http.Error(w, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s): %s", origin, a.externalDomain, zErr), statusCode)
 			return
 		}
 
-		http.Error(w, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s)", origin, a.externalDomain), http.StatusNotFound)
+		http.Error(w, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s)", origin, a.externalDomain), statusCode)
 	}
 }
 
@@ -89,19 +92,13 @@ func setInstance(ctx context.Context, verifier authz.InstanceVerifier) (_ contex
 	defer func() { span.EndWithError(err) }()
 
 	requestContext := zitadel_http.DomainContext(ctx)
-	if requestContext.InstanceHost == "" {
-		return nil, zerrors.ThrowNotFound(err, "INST-zWq7X", "Errors.IAM.NotFound")
+	if requestContext.InstanceDomain() == "" {
+		return nil, zerrors.ThrowNotFound(err, "INST-zWq7X", "Errors.Instance.NotFound")
 	}
-	instance, err := verifier.InstanceByHost(authCtx, requestContext.InstanceHost, requestContext.PublicHost)
+	instance, err := verifier.InstanceByHost(authCtx, requestContext.InstanceDomain(), requestContext.RequestedDomain())
 	if err != nil {
 		return nil, err
 	}
 	span.End()
 	return authz.WithInstance(ctx, instance), nil
-}
-
-func newZitadelTranslator() *i18n.Translator {
-	translator, err := i18n.NewZitadelTranslator(language.English)
-	logging.OnError(err).Panic("unable to get translator")
-	return translator
 }

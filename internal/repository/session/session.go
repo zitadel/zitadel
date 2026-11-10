@@ -15,24 +15,25 @@ import (
 )
 
 const (
-	sessionEventPrefix     = "session."
-	AddedType              = sessionEventPrefix + "added"
-	UserCheckedType        = sessionEventPrefix + "user.checked"
-	PasswordCheckedType    = sessionEventPrefix + "password.checked"
-	IntentCheckedType      = sessionEventPrefix + "intent.checked"
-	WebAuthNChallengedType = sessionEventPrefix + "webAuthN.challenged"
-	WebAuthNCheckedType    = sessionEventPrefix + "webAuthN.checked"
-	TOTPCheckedType        = sessionEventPrefix + "totp.checked"
-	OTPSMSChallengedType   = sessionEventPrefix + "otp.sms.challenged"
-	OTPSMSSentType         = sessionEventPrefix + "otp.sms.sent"
-	OTPSMSCheckedType      = sessionEventPrefix + "otp.sms.checked"
-	OTPEmailChallengedType = sessionEventPrefix + "otp.email.challenged"
-	OTPEmailSentType       = sessionEventPrefix + "otp.email.sent"
-	OTPEmailCheckedType    = sessionEventPrefix + "otp.email.checked"
-	TokenSetType           = sessionEventPrefix + "token.set"
-	MetadataSetType        = sessionEventPrefix + "metadata.set"
-	LifetimeSetType        = sessionEventPrefix + "lifetime.set"
-	TerminateType          = sessionEventPrefix + "terminated"
+	sessionEventPrefix      = "session."
+	AddedType               = sessionEventPrefix + "added"
+	UserCheckedType         = sessionEventPrefix + "user.checked"
+	PasswordCheckedType     = sessionEventPrefix + "password.checked"
+	IntentCheckedType       = sessionEventPrefix + "intent.checked"
+	WebAuthNChallengedType  = sessionEventPrefix + "webAuthN.challenged"
+	WebAuthNCheckedType     = sessionEventPrefix + "webAuthN.checked"
+	TOTPCheckedType         = sessionEventPrefix + "totp.checked"
+	OTPSMSChallengedType    = sessionEventPrefix + "otp.sms.challenged"
+	OTPSMSSentType          = sessionEventPrefix + "otp.sms.sent"
+	OTPSMSCheckedType       = sessionEventPrefix + "otp.sms.checked"
+	OTPEmailChallengedType  = sessionEventPrefix + "otp.email.challenged"
+	OTPEmailSentType        = sessionEventPrefix + "otp.email.sent"
+	OTPEmailCheckedType     = sessionEventPrefix + "otp.email.checked"
+	RecoveryCodeCheckedType = sessionEventPrefix + "recoveryCode.checked"
+	TokenSetType            = sessionEventPrefix + "token.set"
+	MetadataSetType         = sessionEventPrefix + "metadata.set"
+	LifetimeSetType         = sessionEventPrefix + "lifetime.set"
+	TerminateType           = sessionEventPrefix + "terminated"
 )
 
 type AddedEvent struct {
@@ -660,7 +661,7 @@ func NewLifetimeSetEvent(
 type TerminateEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	TriggerOrigin string `json:"triggerOrigin,omitempty"`
+	TriggeredAtOrigin string `json:"triggerOrigin,omitempty"`
 }
 
 func (e *TerminateEvent) Payload() interface{} {
@@ -669,6 +670,10 @@ func (e *TerminateEvent) Payload() interface{} {
 
 func (e *TerminateEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
+}
+
+func (e *TerminateEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
 }
 
 func NewTerminateEvent(
@@ -681,6 +686,7 @@ func NewTerminateEvent(
 			aggregate,
 			TerminateType,
 		),
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
 }
 
@@ -688,4 +694,37 @@ func TerminateEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &TerminateEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
+}
+
+type RecoveryCodeCheckedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	CheckedAt time.Time `json:"checkedAt"`
+}
+
+func (e *RecoveryCodeCheckedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *RecoveryCodeCheckedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func (e *RecoveryCodeCheckedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewRecoveryCodeCheckedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	checkedAt time.Time,
+) *RecoveryCodeCheckedEvent {
+	return &RecoveryCodeCheckedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			RecoveryCodeCheckedType,
+		),
+		CheckedAt: checkedAt,
+	}
 }

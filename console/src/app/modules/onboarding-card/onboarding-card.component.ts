@@ -7,6 +7,7 @@ import { ONBOARDING_MILESTONES } from 'src/app/utils/onboarding';
   selector: 'cnsl-onboarding-card',
   templateUrl: './onboarding-card.component.html',
   styleUrls: ['./onboarding-card.component.scss'],
+  standalone: false,
 })
 export class OnboardingCardComponent implements OnInit {
   public percentageChanged: EventEmitter<number> = new EventEmitter<number>();

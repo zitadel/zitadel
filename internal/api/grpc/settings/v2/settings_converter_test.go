@@ -46,6 +46,7 @@ func Test_loginSettingsToPb(t *testing.T) {
 			domain.SecondFactorTypeU2F,
 			domain.SecondFactorTypeOTPEmail,
 			domain.SecondFactorTypeOTPSMS,
+			domain.SecondFactorTypeRecoveryCodes,
 		},
 		MultiFactors: []domain.MultiFactorType{
 			domain.MultiFactorTypeU2FWithPIN,
@@ -55,6 +56,7 @@ func Test_loginSettingsToPb(t *testing.T) {
 
 	want := &settings.LoginSettings{
 		AllowUsernamePassword:      true,
+		AllowLocalAuthentication:   true,
 		AllowRegister:              true,
 		AllowExternalIdp:           true,
 		ForceMfa:                   true,
@@ -76,6 +78,7 @@ func Test_loginSettingsToPb(t *testing.T) {
 			settings.SecondFactorType_SECOND_FACTOR_TYPE_U2F,
 			settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP_EMAIL,
 			settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP_SMS,
+			settings.SecondFactorType_SECOND_FACTOR_TYPE_RECOVERY_CODES,
 		},
 		MultiFactors: []settings.MultiFactorType{
 			settings.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION,
@@ -153,8 +156,13 @@ func Test_secondFactorTypeToPb(t *testing.T) {
 		want settings.SecondFactorType
 	}{
 		{
+			// making sure it doesn't break existing mappings
 			args: args{domain.SecondFactorTypeTOTP},
-			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP,
+			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_OTP, //nolint:staticcheck
+		},
+		{
+			args: args{domain.SecondFactorTypeTOTP},
+			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_TOTP,
 		},
 		{
 			args: args{domain.SecondFactorTypeU2F},
@@ -175,6 +183,10 @@ func Test_secondFactorTypeToPb(t *testing.T) {
 		{
 			args: args{99},
 			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_UNSPECIFIED,
+		},
+		{
+			args: args{domain.SecondFactorTypeRecoveryCodes},
+			want: settings.SecondFactorType_SECOND_FACTOR_TYPE_RECOVERY_CODES,
 		},
 	}
 	for _, tt := range tests {
@@ -500,6 +512,10 @@ func Test_idpTypeToPb(t *testing.T) {
 			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_SAML,
 		},
 		{
+			args: args{domain.IDPTypeZitadel},
+			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_ZITADEL,
+		},
+		{
 			args: args{99},
 			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_UNSPECIFIED,
 		},
@@ -520,13 +536,25 @@ func Test_securityPolicyToSettingsPb(t *testing.T) {
 			AllowedOrigins: []string{"foo", "bar"},
 		},
 		EnableImpersonation: true,
+		DynamicClientRegistration: &settings.DynamicClientRegistrationSettings{
+			Enabled:              true,
+			AllowUnauthenticated: true,
+		},
 	}
 	got := securityPolicyToSettingsPb(&query.SecurityPolicy{
 		EnableIframeEmbedding: true,
 		AllowedOrigins:        []string{"foo", "bar"},
 		EnableImpersonation:   true,
+
+		EnableDynamicClientRegistration:               true,
+		AllowUnauthenticatedDynamicClientRegistration: true,
 	})
 	assert.Equal(t, want, got)
+}
+
+func Test_securityPolicyToSettingsPb_dynamicClientRegistrationDisabled(t *testing.T) {
+	got := securityPolicyToSettingsPb(&query.SecurityPolicy{})
+	assert.Equal(t, &settings.DynamicClientRegistrationSettings{}, got.GetDynamicClientRegistration())
 }
 
 func Test_securitySettingsToCommand(t *testing.T) {
@@ -534,6 +562,9 @@ func Test_securitySettingsToCommand(t *testing.T) {
 		EnableIframeEmbedding: true,
 		AllowedOrigins:        []string{"foo", "bar"},
 		EnableImpersonation:   true,
+
+		EnableDynamicClientRegistration:               true,
+		AllowUnauthenticatedDynamicClientRegistration: true,
 	}
 	got := securitySettingsToCommand(&settings.SetSecuritySettingsRequest{
 		EmbeddedIframe: &settings.EmbeddedIframeSettings{
@@ -541,6 +572,18 @@ func Test_securitySettingsToCommand(t *testing.T) {
 			AllowedOrigins: []string{"foo", "bar"},
 		},
 		EnableImpersonation: true,
+		DynamicClientRegistration: &settings.DynamicClientRegistrationSettings{
+			Enabled:              true,
+			AllowUnauthenticated: true,
+		},
 	})
 	assert.Equal(t, want, got)
+}
+
+// A request that omits dynamic_client_registration must leave the feature off rather than
+// panicking on the nil message.
+func Test_securitySettingsToCommand_dynamicClientRegistrationOmitted(t *testing.T) {
+	got := securitySettingsToCommand(&settings.SetSecuritySettingsRequest{})
+	assert.False(t, got.EnableDynamicClientRegistration)
+	assert.False(t, got.AllowUnauthenticatedDynamicClientRegistration)
 }

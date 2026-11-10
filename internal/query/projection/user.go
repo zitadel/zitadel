@@ -100,8 +100,10 @@ func (*userProjection) Init() *old_handler.Check {
 			handler.NewColumn(UserTypeCol, handler.ColumnTypeEnum),
 		},
 			handler.NewPrimaryKey(UserInstanceIDCol, UserIDCol),
-			handler.WithIndex(handler.NewIndex("username", []string{UserUsernameCol})),
-			handler.WithIndex(handler.NewIndex("resource_owner", []string{UserResourceOwnerCol})),
+			handler.WithIndex(handler.NewIndex("username_lower", []string{UserInstanceIDCol, "LOWER(" + UserUsernameCol + ")"})),
+			handler.WithIndex(handler.NewIndex("instance_resource_owner", []string{UserInstanceIDCol, UserResourceOwnerCol, UserIDCol},
+				handler.WithInclude(UserTypeCol), // org-scoped COUNT with type filter can be index-only
+			)),
 		),
 		handler.NewSuffixedTable([]*handler.InitColumn{
 			handler.NewColumn(HumanUserIDCol, handler.ColumnTypeText),
@@ -124,6 +126,8 @@ func (*userProjection) Init() *old_handler.Check {
 			handler.NewPrimaryKey(HumanUserInstanceIDCol, HumanUserIDCol),
 			UserHumanSuffix,
 			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
+			handler.WithIndex(handler.NewIndex("email", []string{HumanUserInstanceIDCol, "LOWER(" + HumanEmailCol + ")"})),
+			handler.WithIndex(handler.NewIndex("phone_lower", []string{HumanUserInstanceIDCol, "LOWER(" + HumanPhoneCol + ")"})),
 		),
 		handler.NewSuffixedTable([]*handler.InitColumn{
 			handler.NewColumn(MachineUserIDCol, handler.ColumnTypeText),

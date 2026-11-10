@@ -1,3 +1,11 @@
+<!--
+Please inform yourself about the contribution guidelines on submitting a PR here: https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#submit-a-pull-request-pr. Take note of how PR/commit titles should be written and replace the template texts in the sections below. Don't remove any of the sections. It is important that the commit history clearly shows what is changed and why.
+Important: By submitting a contribution you agree to the terms from our Licensing Policy as described here: https://github.com/zitadel/zitadel/blob/main/LICENSING.md#community-contributions.
+-->
+
+> [!IMPORTANT]
+> Our engineering team is currently focused on the [next generation of ZITADEL](https://github.com/zitadel/nextgen), so our capacity to review community pull requests is limited. We cannot guarantee that your pull request will be reviewed or merged. For larger changes, please open an issue or discussion before you begin. Thank you for contributing and for your understanding.
+
 # Which Problems Are Solved
 
 Replace this example text with a concise list of problems that this PR solves.
@@ -16,6 +24,7 @@ Replace this example text with a concise list of additional changes that this PR
 For example:
 - The docs explicitly describe that the property XY is mandatory
 - Adds missing translations for validations.
+- Terminology updates follow issue #5888 and `TERMINOLOGY.md` (including catalog updates for newly introduced terms).
 
 # Additional Context
 

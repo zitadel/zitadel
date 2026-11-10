@@ -4,6 +4,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	policy_grpc "github.com/zitadel/zitadel/internal/api/grpc/policy"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/query"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
@@ -30,13 +31,16 @@ func updateLoginPolicyToCommand(p *admin_pb.UpdateLoginPolicyRequest) *command.C
 	}
 }
 
-func ListLoginPolicyIDPsRequestToQuery(req *admin_pb.ListLoginPolicyIDPsRequest) *query.IDPLoginPolicyLinksSearchQuery {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func ListLoginPolicyIDPsRequestToQuery(defaults systemdefaults.SystemDefaults, req *admin_pb.ListLoginPolicyIDPsRequest) (*query.IDPLoginPolicyLinksSearchQuery, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	return &query.IDPLoginPolicyLinksSearchQuery{
 		SearchRequest: query.SearchRequest{
 			Offset: offset,
 			Limit:  limit,
 			Asc:    asc,
 		},
-	}
+	}, nil
 }

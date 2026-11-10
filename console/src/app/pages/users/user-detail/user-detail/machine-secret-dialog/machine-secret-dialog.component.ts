@@ -5,6 +5,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
   selector: 'cnsl-machine-secret-dialog',
   templateUrl: './machine-secret-dialog.component.html',
   styleUrls: ['./machine-secret-dialog.component.scss'],
+  standalone: false,
 })
 export class MachineSecretDialogComponent {
   public copied: string = '';

@@ -99,7 +99,7 @@ func (e *RemovedEvent) Fields() []*eventstore.FieldOperation {
 
 func NewRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, role, permission string) *RemovedEvent {
 	return &RemovedEvent{
-		BaseEvent:  eventstore.NewBaseEventForPush(ctx, aggregate, AddedType),
+		BaseEvent:  eventstore.NewBaseEventForPush(ctx, aggregate, RemovedType),
 		Role:       role,
 		Permission: permission,
 	}

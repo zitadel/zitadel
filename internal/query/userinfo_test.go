@@ -395,7 +395,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 					Human:              nil,
 					Machine: &Machine{
 						Name:        "tests",
-						Description: "My test service user",
+						Description: "My test service account",
 					},
 				},
 				Org: &UserInfoOrg{
@@ -429,8 +429,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			execMock(t, tt.mock, func(db *sql.DB) {
 				q := &Queries{
 					client: &database.DB{
-						DB:       db,
-						Database: &prepareDB{},
+						DB: db,
 					},
 				}
 				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")
@@ -476,8 +475,7 @@ func TestQueries_GetOIDCUserinfoClientByID(t *testing.T) {
 			execMock(t, tt.mock, func(db *sql.DB) {
 				q := &Queries{
 					client: &database.DB{
-						DB:       db,
-						Database: &prepareDB{},
+						DB: db,
 					},
 				}
 				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")

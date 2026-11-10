@@ -5,6 +5,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
   selector: 'cnsl-code-dialog',
   templateUrl: './code-dialog.component.html',
   styleUrls: ['./code-dialog.component.scss'],
+  standalone: false,
 })
 export class CodeDialogComponent {
   public code: string = '';

@@ -3,12 +3,12 @@ package setup
 import (
 	"context"
 	"database/sql"
-	"embed"
+	_ "embed"
 	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -18,9 +18,8 @@ var (
 	correctCreationDate10CreateTable string
 	//go:embed 10/10_fill_table.sql
 	correctCreationDate10FillTable string
-	//go:embed 10/cockroach/10_update.sql
-	//go:embed 10/postgres/10_update.sql
-	correctCreationDate10Update embed.FS
+	//go:embed 10/10_update.sql
+	correctCreationDate10Update string
 	//go:embed 10/10_count_wrong_events.sql
 	correctCreationDate10CountWrongEvents string
 	//go:embed 10/10_empty_table.sql
@@ -37,47 +36,39 @@ func (mig *CorrectCreationDate) Execute(ctx context.Context, _ eventstore.Event)
 	defer cancel()
 
 	for i := 0; ; i++ {
-		logging.WithFields("mig", mig.String(), "iteration", i).Debug("start iteration")
+		logCtx := logging.With(ctx, "mig", mig.String(), "iteration", i)
+		logging.Info(logCtx, "start iteration")
 		var affected int64
-		err = crdb.ExecuteTx(ctx, mig.dbClient.DB, nil, func(tx *sql.Tx) error {
-			if mig.dbClient.Type() == "cockroach" {
-				if _, err := tx.Exec("SET experimental_enable_temp_tables=on"); err != nil {
-					return err
-				}
-			}
-			_, err := tx.ExecContext(ctx, correctCreationDate10CreateTable)
+		err = crdb.ExecuteTx(logCtx, mig.dbClient.DB, nil, func(tx *sql.Tx) error {
+			_, err := tx.ExecContext(logCtx, correctCreationDate10CreateTable)
 			if err != nil {
 				return err
 			}
-			logging.WithFields("mig", mig.String(), "iteration", i).Debug("temp table created")
+			logging.Debug(logCtx, "temp table created")
 
-			_, err = tx.ExecContext(ctx, correctCreationDate10Truncate)
+			_, err = tx.ExecContext(logCtx, correctCreationDate10Truncate)
 			if err != nil {
 				return err
 			}
-			_, err = tx.ExecContext(ctx, correctCreationDate10FillTable)
+			_, err = tx.ExecContext(logCtx, correctCreationDate10FillTable)
 			if err != nil {
 				return err
 			}
-			logging.WithFields("mig", mig.String(), "iteration", i).Debug("temp table filled")
+			logging.Debug(logCtx, "temp table filled")
 
-			res := tx.QueryRowContext(ctx, correctCreationDate10CountWrongEvents)
+			res := tx.QueryRowContext(logCtx, correctCreationDate10CountWrongEvents)
 			if err := res.Scan(&affected); err != nil || affected == 0 {
 				return err
 			}
 
-			updateStmt, err := readStmt(correctCreationDate10Update, "10", mig.dbClient.Type(), "10_update.sql")
+			_, err = tx.ExecContext(logCtx, correctCreationDate10Update)
 			if err != nil {
 				return err
 			}
-			_, err = tx.ExecContext(ctx, updateStmt)
-			if err != nil {
-				return err
-			}
-			logging.WithFields("mig", mig.String(), "iteration", i, "count", affected).Debug("creation dates updated")
+			logging.Debug(logCtx, "creation dates updated")
 			return nil
 		})
-		logging.WithFields("mig", mig.String(), "iteration", i).Debug("end iteration")
+		logging.Debug(logCtx, "end iteration")
 		if affected == 0 || err != nil {
 			return err
 		}

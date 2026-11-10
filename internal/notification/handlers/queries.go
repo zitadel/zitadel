@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"context"
-	"time"
+	"net/http"
 
 	"github.com/go-jose/go-jose/v4"
 	"golang.org/x/text/language"
@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 )
 
+//go:generate mockgen -typed -package mock -destination ./mock/queries.mock.go . Queries
 type Queries interface {
 	ActiveLabelPolicyByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (*query.LabelPolicy, error)
 	MailTemplateByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (*query.MailTemplate, error)
@@ -30,7 +31,6 @@ type Queries interface {
 	GetInstanceRestrictions(ctx context.Context) (restrictions query.Restrictions, err error)
 	InstanceByID(ctx context.Context, id string) (instance authz.Instance, err error)
 	GetActiveSigningWebKey(ctx context.Context) (*jose.JSONWebKey, error)
-	ActivePrivateSigningKey(ctx context.Context, t time.Time) (keys *query.PrivateKeys, err error)
 
 	ActiveInstances() []string
 }
@@ -45,6 +45,7 @@ type NotificationQueries struct {
 	UserDataCrypto     crypto.EncryptionAlgorithm
 	SMTPPasswordCrypto crypto.EncryptionAlgorithm
 	SMSTokenCrypto     crypto.EncryptionAlgorithm
+	httpClient         *http.Client
 }
 
 func NewNotificationQueries(
@@ -57,6 +58,7 @@ func NewNotificationQueries(
 	userDataCrypto crypto.EncryptionAlgorithm,
 	smtpPasswordCrypto crypto.EncryptionAlgorithm,
 	smsTokenCrypto crypto.EncryptionAlgorithm,
+	httpClient *http.Client,
 ) *NotificationQueries {
 	return &NotificationQueries{
 		Queries:            baseQueries,
@@ -68,5 +70,6 @@ func NewNotificationQueries(
 		UserDataCrypto:     userDataCrypto,
 		SMTPPasswordCrypto: smtpPasswordCrypto,
 		SMSTokenCrypto:     smsTokenCrypto,
+		httpClient:         httpClient,
 	}
 }

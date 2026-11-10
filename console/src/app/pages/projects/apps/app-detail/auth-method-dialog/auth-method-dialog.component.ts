@@ -5,6 +5,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
   selector: 'cnsl-auth-method-dialog',
   templateUrl: './auth-method-dialog.component.html',
   styleUrls: ['./auth-method-dialog.component.scss'],
+  standalone: false,
 })
 export class AuthMethodDialogComponent {
   public authmethod: string = '';

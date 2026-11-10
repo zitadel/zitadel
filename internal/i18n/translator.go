@@ -32,32 +32,28 @@ type Message struct {
 }
 
 // NewZitadelTranslator translates to all supported languages, as the ZITADEL texts are not customizable.
-func NewZitadelTranslator(defaultLanguage language.Tag) (*Translator, error) {
+func NewZitadelTranslator(defaultLanguage language.Tag) *Translator {
 	return newTranslator(ZITADEL, defaultLanguage, SupportedLanguages(), "")
 }
 
-func NewNotificationTranslator(defaultLanguage language.Tag, allowedLanguages []language.Tag) (*Translator, error) {
+func NewNotificationTranslator(defaultLanguage language.Tag, allowedLanguages []language.Tag) *Translator {
 	return newTranslator(NOTIFICATION, defaultLanguage, allowedLanguages, "")
 }
 
-func NewLoginTranslator(defaultLanguage language.Tag, allowedLanguages []language.Tag, cookieName string) (*Translator, error) {
+func NewLoginTranslator(defaultLanguage language.Tag, allowedLanguages []language.Tag, cookieName string) *Translator {
 	return newTranslator(LOGIN, defaultLanguage, allowedLanguages, cookieName)
 }
 
-func newTranslator(ns Namespace, defaultLanguage language.Tag, allowedLanguages []language.Tag, cookieName string) (*Translator, error) {
+func newTranslator(ns Namespace, defaultLanguage language.Tag, allowedLanguages []language.Tag, cookieName string) *Translator {
 	t := new(Translator)
-	var err error
 	t.allowedLanguages = allowedLanguages
 	if len(t.allowedLanguages) == 0 {
 		t.allowedLanguages = SupportedLanguages()
 	}
-	t.bundle, err = newBundle(ns, defaultLanguage, t.allowedLanguages)
-	if err != nil {
-		return nil, err
-	}
+	t.bundle = newBundle(ns, defaultLanguage, t.allowedLanguages)
 	t.cookieHandler = http_util.NewCookieHandler()
 	t.cookieName = cookieName
-	return t, nil
+	return t
 }
 
 func (t *Translator) SupportedLanguages() []language.Tag {

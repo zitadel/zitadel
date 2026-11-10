@@ -3,7 +3,7 @@ package renderer
 import (
 	"context"
 	"html/template"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 
@@ -43,7 +43,7 @@ func (r *Renderer) RenderTemplate(w http.ResponseWriter, req *http.Request, tran
 	}
 }
 
-func (r *Renderer) NewTranslator(ctx context.Context, allowedLanguages []language.Tag) (*i18n.Translator, error) {
+func (r *Renderer) NewTranslator(ctx context.Context, allowedLanguages []language.Tag) *i18n.Translator {
 	return i18n.NewLoginTranslator(authz.GetInstance(ctx).DefaultLanguage(), allowedLanguages, r.cookieName)
 }
 
@@ -107,7 +107,7 @@ func (r *Renderer) addFileToTemplate(dir http.FileSystem, tmpl *template.Templat
 		return err
 	}
 	defer f.Close()
-	content, err := ioutil.ReadAll(f)
+	content, err := io.ReadAll(f)
 	if err != nil {
 		return err
 	}

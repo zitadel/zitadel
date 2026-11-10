@@ -3,6 +3,7 @@ package idp
 import (
 	"github.com/crewjam/saml"
 	"github.com/muhlemmer/gu"
+	dsig "github.com/russellhaering/goxmldsig"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
@@ -414,6 +415,8 @@ func providerTypeToPb(idpType domain.IDPType) idp_pb.ProviderType {
 		return idp_pb.ProviderType_PROVIDER_TYPE_APPLE
 	case domain.IDPTypeSAML:
 		return idp_pb.ProviderType_PROVIDER_TYPE_SAML
+	case domain.IDPTypeZitadel:
+		return idp_pb.ProviderType_PROVIDER_TYPE_ZITADEL
 	case domain.IDPTypeUnspecified:
 		return idp_pb.ProviderType_PROVIDER_TYPE_UNSPECIFIED
 	default:
@@ -479,6 +482,10 @@ func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
 		samlConfigToPb(providerConfig, config.SAMLIDPTemplate)
 		return providerConfig
 	}
+	if config.ZitadelIDPTemplate != nil {
+		zitadelConfigToPb(providerConfig, config.ZitadelIDPTemplate)
+		return providerConfig
+	}
 	return providerConfig
 }
 
@@ -504,6 +511,7 @@ func oauthConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OAut
 			UserEndpoint:          template.UserEndpoint,
 			Scopes:                template.Scopes,
 			IdAttribute:           template.IDAttribute,
+			UsePkce:               template.UsePKCE,
 		},
 	}
 }
@@ -515,6 +523,7 @@ func oidcConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OIDCI
 			Issuer:           template.Issuer,
 			Scopes:           template.Scopes,
 			IsIdTokenMapping: template.IsIDTokenMapping,
+			UsePkce:          template.UsePKCE,
 		},
 	}
 }
@@ -526,6 +535,7 @@ func jwtConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.JWTIDP
 			Issuer:       template.Issuer,
 			KeysEndpoint: template.KeysEndpoint,
 			HeaderName:   template.HeaderName,
+			Audience:     template.Audience,
 		},
 	}
 }
@@ -665,8 +675,28 @@ func samlConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.SAMLI
 			MetadataXml:                   template.Metadata,
 			Binding:                       bindingToPb(template.Binding),
 			WithSignedRequest:             template.WithSignedRequest,
+			SignatureAlgorithm:            gu.Ptr(signatureAlgorithmToPb(template.SignatureAlgorithm)),
 			NameIdFormat:                  nameIDFormat,
 			TransientMappingAttributeName: gu.Ptr(template.TransientMappingAttributeName),
+			FederatedLogoutEnabled:        gu.Ptr(template.FederatedLogoutEnabled),
+		},
+	}
+}
+
+func zitadelConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.ZitadelIDPTemplate) {
+	instanceRolesInfo := make([]*idp_pb.InstanceRolesInfo, 0, len(template.InstanceRolesInfo))
+	for _, role := range template.InstanceRolesInfo {
+		instanceRolesInfo = append(instanceRolesInfo, &idp_pb.InstanceRolesInfo{
+			OrganizationDomain: role.OrganizationDomain,
+			OrganizationId:     role.OrganizationID,
+		})
+	}
+	providerConfig.Config = &idp_pb.ProviderConfig_Zitadel{
+		Zitadel: &idp_pb.ZitadelConfig{
+			ClientId:          template.ClientID,
+			Issuer:            template.Issuer,
+			Scopes:            template.Scopes,
+			InstanceRolesInfo: instanceRolesInfo,
 		},
 	}
 }
@@ -698,5 +728,18 @@ func nameIDToPb(format domain.SAMLNameIDFormat) idp_pb.SAMLNameIDFormat {
 		return idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_TRANSIENT
 	default:
 		return idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_UNSPECIFIED
+	}
+}
+
+func signatureAlgorithmToPb(signatureAlgorithm string) idp_pb.SAMLSignatureAlgorithm {
+	switch signatureAlgorithm {
+	case dsig.RSASHA1SignatureMethod:
+		return idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA1
+	case dsig.RSASHA256SignatureMethod:
+		return idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA256
+	case dsig.RSASHA512SignatureMethod:
+		return idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA512
+	default:
+		return idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_UNSPECIFIED
 	}
 }

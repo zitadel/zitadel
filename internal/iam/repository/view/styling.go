@@ -19,7 +19,7 @@ func GetStylingByAggregateIDAndState(db *gorm.DB, table, aggregateID, instanceID
 	query := repository.PrepareGetByQuery(table, aggregateIDQuery, stateQuery, instanceIDQuery, ownerRemovedQuery)
 	err := query(db, policy)
 	if zerrors.IsNotFound(err) {
-		return nil, zerrors.ThrowNotFound(nil, "VIEW-68G11", "Errors.IAM.LabelPolicy.NotExisting")
+		return nil, zerrors.ThrowNotFound(nil, "VIEW-68G11", "Errors.Instance.LabelPolicy.NotExisting")
 	}
 	return policy, err
 }

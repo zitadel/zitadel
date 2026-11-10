@@ -402,7 +402,9 @@ func (u *UserView) setPasswordData(event eventstore.Event) error {
 	u.PasswordSet = password.Secret != nil || password.EncodedHash != ""
 	u.PasswordInitRequired = !u.PasswordSet
 	u.PasswordChangeRequired = password.ChangeRequired
-	u.PasswordChanged = event.CreatedAt()
+	if u.PasswordSet {
+		u.PasswordChanged = event.CreatedAt()
+	}
 	return nil
 }
 

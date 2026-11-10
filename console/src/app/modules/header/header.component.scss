@@ -64,7 +64,7 @@
           // z-index: 502;
 
           &:hover {
-            background-color: if($is-dark-theme, #ffffff10, #00000010);
+            background-color: if(sass($is-dark-theme): #ffffff10; else: #00000010);
           }
 
           @media only screen and (max-width: 700px) {
@@ -97,7 +97,7 @@
             transition: all ease 0.2s;
 
             &:hover {
-              background-color: if($is-dark-theme, #ffffff10, #00000010);
+              background-color: if(sass($is-dark-theme): #ffffff10; else: #00000010);
             }
 
             .svgspan {
@@ -146,7 +146,7 @@
           }
 
           &:hover {
-            background-color: if($is-dark-theme, #ffffff10, #00000010);
+            background-color: if(sass($is-dark-theme): #ffffff10; else: #00000010);
           }
 
           .mob {
@@ -274,7 +274,7 @@
           border-radius: 50%;
           transition: border ease 0.15s;
           padding: 0;
-          border: 2px solid if($is-dark-theme, #ffffff80, #00000010);
+          border: 2px solid if(sass($is-dark-theme): #ffffff80; else: #00000010);
           outline: none;
           background: none;
 
@@ -284,7 +284,7 @@
 
           &:hover,
           &:focus {
-            border: 2px solid if($is-dark-theme, #fff, map-get($primary, 200));
+            border: 2px solid if(sass($is-dark-theme): #fff; else: map-get($primary, 200));
           }
 
           .docs {

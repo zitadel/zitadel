@@ -9,7 +9,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -48,6 +47,14 @@ var (
 		name:  projection.SecurityPolicyColumnEnableImpersonation,
 		table: securityPolicyTable,
 	}
+	SecurityPolicyColumnEnableDynamicClientRegistration = Column{
+		name:  projection.SecurityPolicyColumnEnableDynamicClientRegistration,
+		table: securityPolicyTable,
+	}
+	SecurityPolicyColumnAllowUnauthenticatedDynamicClientRegistration = Column{
+		name:  projection.SecurityPolicyColumnAllowUnauthenticatedDynamicClientRegistration,
+		table: securityPolicyTable,
+	}
 )
 
 type SecurityPolicy struct {
@@ -60,15 +67,18 @@ type SecurityPolicy struct {
 	EnableIframeEmbedding bool
 	AllowedOrigins        database.TextArray[string]
 	EnableImpersonation   bool
+
+	EnableDynamicClientRegistration               bool
+	AllowUnauthenticatedDynamicClientRegistration bool
 }
 
 func (q *Queries) SecurityPolicy(ctx context.Context) (policy *SecurityPolicy, err error) {
-	stmt, scan := prepareSecurityPolicyQuery(ctx, q.client)
+	stmt, scan := prepareSecurityPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		SecurityPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-Sf6d1", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Sf6d1", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -78,7 +88,7 @@ func (q *Queries) SecurityPolicy(ctx context.Context) (policy *SecurityPolicy, e
 	return policy, err
 }
 
-func prepareSecurityPolicyQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*SecurityPolicy, error)) {
+func prepareSecurityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*SecurityPolicy, error)) {
 	return sq.Select(
 			SecurityPolicyColumnInstanceID.identifier(),
 			SecurityPolicyColumnCreationDate.identifier(),
@@ -87,8 +97,10 @@ func prepareSecurityPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 			SecurityPolicyColumnSequence.identifier(),
 			SecurityPolicyColumnEnableIframeEmbedding.identifier(),
 			SecurityPolicyColumnAllowedOrigins.identifier(),
-			SecurityPolicyColumnEnableImpersonation.identifier()).
-			From(securityPolicyTable.identifier() + db.Timetravel(call.Took(ctx))).
+			SecurityPolicyColumnEnableImpersonation.identifier(),
+			SecurityPolicyColumnEnableDynamicClientRegistration.identifier(),
+			SecurityPolicyColumnAllowUnauthenticatedDynamicClientRegistration.identifier()).
+			From(securityPolicyTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*SecurityPolicy, error) {
 			securityPolicy := new(SecurityPolicy)
@@ -101,6 +113,8 @@ func prepareSecurityPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 				&securityPolicy.EnableIframeEmbedding,
 				&securityPolicy.AllowedOrigins,
 				&securityPolicy.EnableImpersonation,
+				&securityPolicy.EnableDynamicClientRegistration,
+				&securityPolicy.AllowUnauthenticatedDynamicClientRegistration,
 			)
 			if err != nil && !errors.Is(err, sql.ErrNoRows) { // ignore not found errors
 				return nil, zerrors.ThrowInternal(err, "QUERY-Dfrt2", "Errors.Internal")

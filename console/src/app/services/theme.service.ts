@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-declare const tinycolor: any;
-
 export interface Color {
   name: string;
   hex: string;

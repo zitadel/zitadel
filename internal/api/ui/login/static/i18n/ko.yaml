@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: 2단계 인증
   DescriptionPhone: 2단계 인증을 설정하세요. 전화번호를 입력하여 인증하세요.
   DescriptionCode: 2단계 인증을 설정하세요. 받은 코드를 입력하여 전화번호를 인증하세요.
+  CountryCodeLabel: 국가
   PhoneLabel: 전화번호
   CodeLabel: 코드
   EditButtonText: 수정
@@ -265,6 +266,10 @@ RegistrationUser:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: 성별
   Female: 여성
   Male: 남성
@@ -308,6 +313,10 @@ ExternalRegistrationUserOverview:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: 동의사항
   TosConfirm: 이용 약관에 동의합니다.
   TosLinkText: 이용 약관
@@ -360,6 +369,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: 외부 사용자 찾을 수 없음
   Description: 외부 사용자를 찾을 수 없습니다. 사용자 계정을 연결하거나 새 계정을 자동 등록하시겠습니까?
+  NoOptionAvailable: 외부 사용자와 일치하는 계정을 찾을 수 없으며 새 계정도 생성할 수 없습니다. 관리자 또는 지원팀에 문의하세요.
   LinkButtonText: 연결
   AutoRegisterButtonText: 등록
   TosAndPrivacyLabel: 동의사항
@@ -385,6 +395,10 @@ ExternalNotFound:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
 DeviceAuth:
   Title: 기기 인증
   UserCode:
@@ -436,8 +450,8 @@ Errors:
       NotFound: 프로필을 찾을 수 없습니다
       NotChanged: 프로필이 변경되지 않았습니다
       Empty: 프로필이 비어 있습니다
-      FirstNameEmpty: 프로필에 이름이 비어 있습니다
-      LastNameEmpty: 프로필에 성이 비어 있습니다
+      FirstNameEmpty: 프로필의 이름 필드가 비어 있습니다
+      LastNameEmpty: 프로필의 성 필드가 비어 있습니다
       IDMissing: 프로필 ID가 없습니다
     Email:
       NotFound: 이메일을 찾을 수 없습니다
@@ -491,6 +505,7 @@ Errors:
         AlreadyReady: 다중 인증 OTP(일회용 비밀번호)가 이미 설정되었습니다
         NotExisting: 다중 인증 OTP(일회용 비밀번호)가 존재하지 않습니다
         InvalidCode: 잘못된 코드입니다
+        Reused: 이 코드는 이미 사용되었습니다. 새 코드를 기다려 주세요
         NotReady: 다중 인증 OTP(일회용 비밀번호)가 준비되지 않았습니다
     Locked: 사용자가 잠겼습니다
     SomethingWentWrong: 문제가 발생했습니다

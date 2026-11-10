@@ -12,9 +12,11 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	z_oidc "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	instance_pb "github.com/zitadel/zitadel/pkg/grpc/instance"
+	member_pb "github.com/zitadel/zitadel/pkg/grpc/member"
 	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
@@ -156,7 +158,7 @@ func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInst
 	}
 
 	if defaultInstance.Org.Human != nil {
-		// used to not overwrite the default human later
+		// used to not overwrite the default User (human) later
 		humanCopy := *defaultInstance.Org.Human
 		instance.Org.Human = &humanCopy
 	} else {
@@ -200,8 +202,11 @@ func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInst
 	return &instance
 }
 
-func ListInstancesRequestToModel(req *system_pb.ListInstancesRequest) (*query.InstanceSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func ListInstancesRequestToModel(defaults systemdefaults.SystemDefaults, req *system_pb.ListInstancesRequest) (*query.InstanceSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := instance_grpc.InstanceQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
@@ -230,8 +235,11 @@ func fieldNameToInstanceColumn(fieldName instance_pb.FieldName) query.Column {
 	}
 }
 
-func ListInstanceDomainsRequestToModel(req *system_pb.ListDomainsRequest) (*query.InstanceDomainSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func ListInstanceDomainsRequestToModel(defaults systemdefaults.SystemDefaults, req *system_pb.ListDomainsRequest) (*query.InstanceDomainSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := instance_grpc.DomainQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
@@ -262,8 +270,11 @@ func fieldNameToInstanceDomainColumn(fieldName instance_pb.DomainFieldName) quer
 	}
 }
 
-func ListIAMMembersRequestToQuery(req *system_pb.ListIAMMembersRequest) (*query.IAMMembersQuery, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func ListIAMMembersRequestToQuery(defaults systemdefaults.SystemDefaults, req *system_pb.ListIAMMembersRequest) (*query.IAMMembersQuery, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := member_grpc.MemberQueriesToQuery(req.Queries)
 	if err != nil {
 		return nil, err
@@ -271,12 +282,29 @@ func ListIAMMembersRequestToQuery(req *system_pb.ListIAMMembersRequest) (*query.
 	return &query.IAMMembersQuery{
 		MembersQuery: query.MembersQuery{
 			SearchRequest: query.SearchRequest{
-				Offset: offset,
-				Limit:  limit,
-				Asc:    asc,
-				// SortingColumn: model.IAMMemberSearchKey, //TOOD: not implemented in proto
+				Offset:        offset,
+				Limit:         limit,
+				Asc:           asc,
+				SortingColumn: fieldNameToMemberColumn(req.SortingColumn),
 			},
 			Queries: queries,
 		},
 	}, nil
+}
+
+func fieldNameToMemberColumn(fieldName member_pb.MemberFieldColumnName) query.Column {
+	switch fieldName {
+	case member_pb.MemberFieldColumnName_MEMBER_FIELD_NAME_UNSPECIFIED:
+		return query.InstanceMemberInstanceID
+	case member_pb.MemberFieldColumnName_MEMBER_FIELD_NAME_USER_ID:
+		return query.InstanceMemberUserID
+	case member_pb.MemberFieldColumnName_MEMBER_FIELD_NAME_CREATION_DATE:
+		return query.InstanceMemberCreationDate
+	case member_pb.MemberFieldColumnName_MEMBER_FIELD_NAME_CHANGE_DATE:
+		return query.InstanceMemberChangeDate
+	case member_pb.MemberFieldColumnName_MEMBER_FIELD_NAME_USER_RESOURCE_OWNER:
+		return query.InstanceMemberResourceOwner
+	default:
+		return query.Column{}
+	}
 }

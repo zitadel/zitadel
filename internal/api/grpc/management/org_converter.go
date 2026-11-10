@@ -8,14 +8,19 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/metadata"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	org_grpc "github.com/zitadel/zitadel/internal/api/grpc/org"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
-func ListOrgDomainsRequestToModel(req *mgmt_pb.ListOrgDomainsRequest) (*query.OrgDomainSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func ListOrgDomainsRequestToModel(defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListOrgDomainsRequest) (*query.OrgDomainSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := org_grpc.DomainQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
@@ -26,7 +31,7 @@ func ListOrgDomainsRequestToModel(req *mgmt_pb.ListOrgDomainsRequest) (*query.Or
 			Limit:  limit,
 			Asc:    asc,
 		},
-		//SortingColumn: //TODO: sorting
+		//  SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil
 }
@@ -67,13 +72,28 @@ func SetPrimaryOrgDomainRequestToDomain(ctx context.Context, req *mgmt_pb.SetPri
 	}
 }
 
-func UpdateOrgMemberRequestToDomain(ctx context.Context, req *mgmt_pb.UpdateOrgMemberRequest) *domain.Member {
-	return domain.NewMember(authz.GetCtxData(ctx).OrgID, req.UserId, req.Roles...)
+func AddOrgMemberRequestToCommand(req *mgmt_pb.AddOrgMemberRequest, orgID string) *command.AddOrgMember {
+	return &command.AddOrgMember{
+		OrgID:  orgID,
+		UserID: req.UserId,
+		Roles:  req.Roles,
+	}
 }
 
-func ListOrgMembersRequestToModel(ctx context.Context, req *mgmt_pb.ListOrgMembersRequest) (*query.OrgMembersQuery, error) {
+func UpdateOrgMemberRequestToCommand(req *mgmt_pb.UpdateOrgMemberRequest, orgID string) *command.ChangeOrgMember {
+	return &command.ChangeOrgMember{
+		OrgID:  orgID,
+		UserID: req.UserId,
+		Roles:  req.Roles,
+	}
+}
+
+func ListOrgMembersRequestToModel(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListOrgMembersRequest) (*query.OrgMembersQuery, error) {
 	ctxData := authz.GetCtxData(ctx)
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := member_grpc.MemberQueriesToQuery(req.Queries)
 	if err != nil {
 		return nil, err
@@ -89,7 +109,7 @@ func ListOrgMembersRequestToModel(ctx context.Context, req *mgmt_pb.ListOrgMembe
 				Offset: offset,
 				Limit:  limit,
 				Asc:    asc,
-				//SortingColumn: //TODO: sorting
+				// SortingColumn: //TODO: sorting
 			},
 			Queries: queries,
 		},
@@ -108,8 +128,11 @@ func BulkSetOrgMetadataToDomain(req *mgmt_pb.BulkSetOrgMetadataRequest) []*domai
 	return metadata
 }
 
-func ListOrgMetadataToDomain(req *mgmt_pb.ListOrgMetadataRequest) (*query.OrgMetadataSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func ListOrgMetadataToDomain(defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListOrgMetadataRequest) (*query.OrgMetadataSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := metadata.OrgMetadataQueriesToQuery(req.Queries)
 	if err != nil {
 		return nil, err

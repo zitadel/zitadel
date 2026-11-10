@@ -4,13 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -105,6 +105,50 @@ type ProjectGrantSearchQueries struct {
 	Queries []SearchQuery
 }
 
+func projectGrantsCheckPermission(ctx context.Context, projectGrants *ProjectGrants, permissionCheck domain.PermissionCheck) {
+	projectGrants.ProjectGrants = slices.DeleteFunc(projectGrants.ProjectGrants,
+		func(projectGrant *ProjectGrant) bool {
+			return projectGrantCheckPermission(ctx, projectGrant.ResourceOwner, projectGrant.ProjectID, projectGrant.GrantID, projectGrant.GrantedOrgID, permissionCheck) != nil
+		},
+	)
+}
+
+func projectGrantCheckPermission(ctx context.Context, resourceOwner, projectID, grantID, grantedOrgID string, permissionCheck domain.PermissionCheck) error {
+	if err := permissionCheck(ctx, domain.PermissionProjectGrantRead, resourceOwner, grantID); err != nil {
+		if err := permissionCheck(ctx, domain.PermissionProjectGrantRead, grantedOrgID, grantID); err != nil {
+			if err := permissionCheck(ctx, domain.PermissionProjectGrantRead, resourceOwner, projectID); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// TODO: add permission check on project grant level
+func projectGrantPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *ProjectGrantSearchQueries) sq.SelectBuilder {
+	if !enabled {
+		return query
+	}
+	join, args := PermissionClause(
+		ctx,
+		ProjectGrantColumnResourceOwner,
+		domain.PermissionProjectGrantRead,
+		SingleOrgPermissionOption(queries.Queries),
+	)
+	return query.JoinClause(join, args...)
+}
+
+func (q *Queries) GetProjectGrantByIDWithPermission(ctx context.Context, shouldTriggerBulk bool, id string, permissionCheck domain.PermissionCheck) (*ProjectGrant, error) {
+	projectGrant, err := q.ProjectGrantByID(ctx, shouldTriggerBulk, id)
+	if err != nil {
+		return nil, err
+	}
+	if err := projectCheckPermission(ctx, projectGrant.ResourceOwner, projectGrant.GrantID, permissionCheck); err != nil {
+		return nil, err
+	}
+	return projectGrant, nil
+}
+
 func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, id string) (grant *ProjectGrant, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -116,14 +160,14 @@ func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, 
 		traceSpan.EndWithError(err)
 	}
 
-	stmt, scan := prepareProjectGrantQuery(ctx, q.client)
+	stmt, scan := prepareProjectGrantQuery()
 	eq := sq.Eq{
 		ProjectGrantColumnGrantID.identifier():    id,
 		ProjectGrantColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-Nf93d", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Nf93d", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -137,7 +181,7 @@ func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, granted
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareProjectGrantQuery(ctx, q.client)
+	stmt, scan := prepareProjectGrantQuery()
 	eq := sq.Eq{
 		ProjectGrantColumnGrantID.identifier():      id,
 		ProjectGrantColumnGrantedOrgID.identifier(): grantedOrg,
@@ -145,7 +189,7 @@ func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, granted
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-MO9fs", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-MO9fs", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -155,11 +199,25 @@ func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, granted
 	return grant, err
 }
 
-func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrantSearchQueries) (grants *ProjectGrants, err error) {
+func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrantSearchQueries, permissionCheck domain.PermissionCheck) (grants *ProjectGrants, err error) {
+	// removed as permission v2 is not implemented yet for project grant level permissions
+	// permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	projectsGrants, err := q.searchProjectGrants(ctx, queries, false)
+	if err != nil {
+		return nil, err
+	}
+	if permissionCheck != nil { // && !authz.GetFeatures(ctx).PermissionCheckV2 {
+		projectGrantsCheckPermission(ctx, projectsGrants, permissionCheck)
+	}
+	return projectsGrants, nil
+}
+
+func (q *Queries) searchProjectGrants(ctx context.Context, queries *ProjectGrantSearchQueries, permissionCheckV2 bool) (grants *ProjectGrants, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareProjectGrantsQuery(ctx, q.client)
+	query, scan := prepareProjectGrantsQuery()
+	query = projectGrantPermissionCheckV2(ctx, query, permissionCheckV2, queries)
 	eq := sq.Eq{
 		ProjectGrantColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
@@ -180,6 +238,7 @@ func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrant
 	return grants, err
 }
 
+// SearchProjectGrantsByProjectIDAndRoleKey is used internally to remove the roles of a project grant, so no permission check necessary
 func (q *Queries) SearchProjectGrantsByProjectIDAndRoleKey(ctx context.Context, projectID, roleKey string) (projects *ProjectGrants, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -196,11 +255,31 @@ func (q *Queries) SearchProjectGrantsByProjectIDAndRoleKey(ctx context.Context, 
 	if err != nil {
 		return nil, err
 	}
-	return q.SearchProjectGrants(ctx, searchQuery)
+	return q.SearchProjectGrants(ctx, searchQuery, nil)
 }
 
 func NewProjectGrantProjectIDSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(ProjectGrantColumnProjectID, value, TextEquals)
+}
+
+func (q *ProjectGrantSearchQueries) AppendPermissionQueries(permissions []string) error {
+	if !authz.HasGlobalPermission(permissions) {
+		ids := authz.GetAllPermissionCtxIDs(permissions)
+		query, err := NewProjectGrantIDsSearchQuery(ids)
+		if err != nil {
+			return err
+		}
+		q.Queries = append(q.Queries, query)
+	}
+	return nil
+}
+
+func NewProjectGrantProjectIDsSearchQuery(ids []string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(ProjectGrantColumnProjectID, list, ListIn)
 }
 
 func NewProjectGrantIDsSearchQuery(values []string) (SearchQuery, error) {
@@ -244,18 +323,6 @@ func (q *ProjectGrantSearchQueries) AppendGrantedOrgQuery(orgID string) error {
 	return nil
 }
 
-func (q *ProjectGrantSearchQueries) AppendPermissionQueries(permissions []string) error {
-	if !authz.HasGlobalPermission(permissions) {
-		ids := authz.GetAllPermissionCtxIDs(permissions)
-		query, err := NewProjectGrantIDsSearchQuery(ids)
-		if err != nil {
-			return err
-		}
-		q.Queries = append(q.Queries, query)
-	}
-	return nil
-}
-
 func (q *ProjectGrantSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
@@ -264,7 +331,7 @@ func (q *ProjectGrantSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBui
 	return query
 }
 
-func prepareProjectGrantQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant, error)) {
+func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant, error)) {
 	resourceOwnerOrgTable := orgsTable.setAlias(ProjectGrantResourceOwnerTableAlias)
 	resourceOwnerIDColumn := OrgColumnID.setTable(resourceOwnerOrgTable)
 	grantedOrgTable := orgsTable.setAlias(ProjectGrantGrantedOrgTableAlias)
@@ -286,7 +353,7 @@ func prepareProjectGrantQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			PlaceholderFormat(sq.Dollar).
 			LeftJoin(join(ProjectColumnID, ProjectGrantColumnProjectID)).
 			LeftJoin(join(resourceOwnerIDColumn, ProjectGrantColumnResourceOwner)).
-			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID) + db.Timetravel(call.Took(ctx))),
+			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID)),
 		func(row *sql.Row) (*ProjectGrant, error) {
 			grant := new(ProjectGrant)
 			var (
@@ -323,7 +390,7 @@ func prepareProjectGrantQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 		}
 }
 
-func prepareProjectGrantsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*ProjectGrants, error)) {
+func prepareProjectGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectGrants, error)) {
 	resourceOwnerOrgTable := orgsTable.setAlias(ProjectGrantResourceOwnerTableAlias)
 	resourceOwnerIDColumn := OrgColumnID.setTable(resourceOwnerOrgTable)
 	grantedOrgTable := orgsTable.setAlias(ProjectGrantGrantedOrgTableAlias)
@@ -346,7 +413,7 @@ func prepareProjectGrantsQuery(ctx context.Context, db prepareDatabase) (sq.Sele
 			PlaceholderFormat(sq.Dollar).
 			LeftJoin(join(ProjectColumnID, ProjectGrantColumnProjectID)).
 			LeftJoin(join(resourceOwnerIDColumn, ProjectGrantColumnResourceOwner)).
-			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID) + db.Timetravel(call.Took(ctx))),
+			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID)),
 		func(rows *sql.Rows) (*ProjectGrants, error) {
 			projects := make([]*ProjectGrant, 0)
 			var (

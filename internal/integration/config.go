@@ -20,17 +20,15 @@ type Config struct {
 	WebAuthNName string
 }
 
-var (
-	//go:embed config/client.yaml
-	clientYAML []byte
-)
+//go:embed config/client.yaml
+var clientYAML []byte
 
 var (
 	tmpDir       string
 	loadedConfig Config
 )
 
-// TmpDir returns the absolute path to the projects's temp directory.
+// TmpDir returns the absolute path to the project's temp directory.
 func TmpDir() string {
 	return tmpDir
 }
@@ -49,5 +47,6 @@ func init() {
 	if err := loadedConfig.Log.SetLogger(); err != nil {
 		panic(err)
 	}
-	SystemToken = systemUserToken()
+	SystemToken = createSystemUserToken()
+	SystemUserWithNoPermissionsToken = createSystemUserWithNoPermissionsToken()
 }

@@ -33,7 +33,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "no resource owner, error",
+			name: "no Organization ID, error",
 			fields: fields{
 				eventstore: eventstoreExpect(t),
 			},
@@ -383,7 +383,7 @@ func TestCommandSide_RemoveCustomMessageText(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "no resource owner, error",
+			name: "no Organization ID, error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,

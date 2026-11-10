@@ -1,35 +1,43 @@
 <div class="footer-wrapper">
   <div class="footer-row">
-    <div class="footer-links" *ngIf="authService.privacypolicy$ | async as pP">
-      <a target="_blank" *ngIf="pP?.tosLink" rel="noreferrer" [href]="pP?.tosLink" external>
-        <span>{{ 'FOOTER.LINKS.TOS' | translate }}</span>
-        <i class="las la-external-link-alt"></i>
-      </a>
-      <a target="_blank" *ngIf="pP?.privacyLink" rel="noreferrer" [href]="pP?.privacyLink" external>
-        <span>{{ 'FOOTER.LINKS.PP' | translate }}</span>
-        <i class="las la-external-link-alt"></i>
-      </a>
-    </div>
+    @if (authService.privacypolicy$ | async; as pP) {
+      <div class="footer-links">
+        @if (pP?.tosLink) {
+          <a target="_blank" rel="noreferrer" [href]="pP?.tosLink" external>
+            <span>{{ 'FOOTER.LINKS.TOS' | translate }}</span>
+            <i class="las la-external-link-alt"></i>
+          </a>
+        }
+        @if (pP?.privacyLink) {
+          <a target="_blank" rel="noreferrer" [href]="pP?.privacyLink" external>
+            <span>{{ 'FOOTER.LINKS.PP' | translate }}</span>
+            <i class="las la-external-link-alt"></i>
+          </a>
+        }
+      </div>
+    }
 
-    <div class="footer-socials" *ngIf="authService.labelpolicy$ | async as lP">
-      <ng-container *ngIf="lP?.disableWatermark === false">
-        <a target="_blank" rel="noreferrer" href="https://github.com/zitadel">
-          <i class="text-3xl lab la-github"></i>
-        </a>
-        <a target="_blank" rel="noreferrer" href="https://twitter.com/zitadel">
-          <fa-icon [icon]="faXTwitter" size="xl"></fa-icon>
-        </a>
-        <a target="_blank" rel="noreferrer" href="https://www.linkedin.com/company/zitadel/">
-          <i class="text-3xl lab la-linkedin"></i>
-        </a>
-        <a target="_blank" rel="noreferrer" href="https://zitadel.com/chat">
-          <i class="text-3xl lab la-discord"></i>
-        </a>
-        <a target="_blank" rel="noreferrer" href="https://www.youtube.com/channel/UCUAWJUNYaRn1yIVrZxEfsuA">
-          <i class="text-3xl lab la-youtube"></i>
-        </a>
-      </ng-container>
-    </div>
+    @if (authService.labelpolicy$ | async; as lP) {
+      <div class="footer-socials">
+        @if (lP?.disableWatermark === false) {
+          <a target="_blank" rel="noreferrer" href="https://github.com/zitadel">
+            <i class="text-3xl lab la-github"></i>
+          </a>
+          <a target="_blank" rel="noreferrer" href="https://twitter.com/zitadel">
+            <fa-icon [icon]="faXTwitter" size="xl"></fa-icon>
+          </a>
+          <a target="_blank" rel="noreferrer" href="https://www.linkedin.com/company/zitadel/">
+            <i class="text-3xl lab la-linkedin"></i>
+          </a>
+          <a target="_blank" rel="noreferrer" href="https://zitadel.com/chat">
+            <i class="text-3xl lab la-discord"></i>
+          </a>
+          <a target="_blank" rel="noreferrer" href="https://www.youtube.com/channel/UCUAWJUNYaRn1yIVrZxEfsuA">
+            <i class="text-3xl lab la-youtube"></i>
+          </a>
+        }
+      </div>
+    }
 
     <div class="theme">
       <cnsl-theme-setting></cnsl-theme-setting>

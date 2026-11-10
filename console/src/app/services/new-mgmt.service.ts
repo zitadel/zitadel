@@ -1,14 +1,21 @@
 import { Injectable } from '@angular/core';
 import { GrpcService } from './grpc.service';
 import {
+  AddOrgResponse,
+  AddProjectGrantRequestSchema,
+  DeactivateOrgResponse,
   GenerateMachineSecretRequestSchema,
   GenerateMachineSecretResponse,
+  GetDefaultPasswordComplexityPolicyResponse,
   GetLoginPolicyRequestSchema,
   GetLoginPolicyResponse,
+  GetPasswordComplexityPolicyResponse,
   ListUserMetadataRequestSchema,
   ListUserMetadataResponse,
+  ReactivateOrgResponse,
   RemoveMachineSecretRequestSchema,
   RemoveMachineSecretResponse,
+  RemoveOrgResponse,
   RemoveUserMetadataRequestSchema,
   RemoveUserMetadataResponse,
   ResendHumanEmailVerificationRequestSchema,
@@ -17,13 +24,14 @@ import {
   ResendHumanInitializationResponse,
   ResendHumanPhoneVerificationRequestSchema,
   ResendHumanPhoneVerificationResponse,
-  SendHumanResetPasswordNotificationRequest_Type,
   SendHumanResetPasswordNotificationRequestSchema,
   SendHumanResetPasswordNotificationResponse,
   SetUserMetadataRequestSchema,
   SetUserMetadataResponse,
   UpdateMachineRequestSchema,
   UpdateMachineResponse,
+  UpdateOrgRequestSchema,
+  UpdateOrgResponse,
 } from '@zitadel/proto/zitadel/management_pb';
 import { MessageInitShape, create } from '@bufbuild/protobuf';
 
@@ -62,11 +70,10 @@ export class NewMgmtService {
   }
 
   public sendHumanResetPasswordNotification(
-    userId: string,
-    type: SendHumanResetPasswordNotificationRequest_Type,
+    req: MessageInitShape<typeof SendHumanResetPasswordNotificationRequestSchema>,
   ): Promise<SendHumanResetPasswordNotificationResponse> {
     return this.grpcService.mgmtNew.sendHumanResetPasswordNotification(
-      create(SendHumanResetPasswordNotificationRequestSchema, { userId, type }),
+      create(SendHumanResetPasswordNotificationRequestSchema, req),
     );
   }
 
@@ -88,5 +95,37 @@ export class NewMgmtService {
     req: MessageInitShape<typeof RemoveUserMetadataRequestSchema>,
   ): Promise<RemoveUserMetadataResponse> {
     return this.grpcService.mgmtNew.removeUserMetadata(create(RemoveUserMetadataRequestSchema, req));
+  }
+
+  public getPasswordComplexityPolicy(): Promise<GetPasswordComplexityPolicyResponse> {
+    return this.grpcService.mgmtNew.getPasswordComplexityPolicy({});
+  }
+
+  public getDefaultPasswordComplexityPolicy(): Promise<GetDefaultPasswordComplexityPolicyResponse> {
+    return this.grpcService.mgmtNew.getDefaultPasswordComplexityPolicy({});
+  }
+
+  public updateOrg(req: MessageInitShape<typeof UpdateOrgRequestSchema>): Promise<UpdateOrgResponse> {
+    return this.grpcService.mgmtNew.updateOrg(req);
+  }
+
+  public removeOrg(): Promise<RemoveOrgResponse> {
+    return this.grpcService.mgmtNew.removeOrg({});
+  }
+
+  public reactivateOrg(): Promise<ReactivateOrgResponse> {
+    return this.grpcService.mgmtNew.reactivateOrg({});
+  }
+
+  public deactivateOrg(): Promise<DeactivateOrgResponse> {
+    return this.grpcService.mgmtNew.deactivateOrg({});
+  }
+
+  public addOrg(name: string): Promise<AddOrgResponse> {
+    return this.grpcService.mgmtNew.addOrg({ name });
+  }
+
+  public addProjectGrant(req: MessageInitShape<typeof AddProjectGrantRequestSchema>) {
+    return this.grpcService.mgmtNew.addProjectGrant(req);
   }
 }

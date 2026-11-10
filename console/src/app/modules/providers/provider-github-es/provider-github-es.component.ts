@@ -29,6 +29,7 @@ import { ProviderNextService } from '../provider-next/provider-next.service';
 @Component({
   selector: 'cnsl-provider-github-es',
   templateUrl: './provider-github-es.component.html',
+  standalone: false,
 })
 export class ProviderGithubESComponent {
   public showOptional: boolean = false;
@@ -218,7 +219,7 @@ export class ProviderGithubESComponent {
       this.loading = true;
       this.service
         .updateGitHubEnterpriseServerProvider(req)
-        .then((idp) => {
+        .then(() => {
           setTimeout(() => {
             this.loading = false;
             this.close();

@@ -23,6 +23,9 @@ func (l *Login) handleMFAPrompt(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
+	if !l.checkMFAPromptStep(w, r, authReq) {
+		return
+	}
 	if !data.Skip {
 		mfaVerifyData := new(mfaVerifyData)
 		mfaVerifyData.MFAType = data.MFAProvider

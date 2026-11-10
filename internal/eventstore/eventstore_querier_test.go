@@ -4,10 +4,12 @@ import (
 	"context"
 	"testing"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-func TestCRDB_Filter(t *testing.T) {
+func TestEventstore_Filter(t *testing.T) {
 	type args struct {
 		searchQuery *eventstore.SearchQueryBuilder
 	}
@@ -120,18 +122,18 @@ func TestCRDB_Filter(t *testing.T) {
 
 				events, err := db.Filter(context.Background(), tt.args.searchQuery)
 				if (err != nil) != tt.wantErr {
-					t.Errorf("CRDB.query() error = %v, wantErr %v", err, tt.wantErr)
+					t.Errorf("eventstore.query() error = %v, wantErr %v", err, tt.wantErr)
 				}
 
 				if len(events) != tt.res.eventCount {
-					t.Errorf("CRDB.query() expected event count: %d got %d", tt.res.eventCount, len(events))
+					t.Errorf("eventstore.query() expected event count: %d got %d", tt.res.eventCount, len(events))
 				}
 			})
 		}
 	}
 }
 
-func TestCRDB_LatestSequence(t *testing.T) {
+func TestEventstore_LatestPosition(t *testing.T) {
 	type args struct {
 		searchQuery *eventstore.SearchQueryBuilder
 	}
@@ -139,7 +141,7 @@ func TestCRDB_LatestSequence(t *testing.T) {
 		existingEvents []eventstore.Command
 	}
 	type res struct {
-		sequence float64
+		position decimal.Decimal
 	}
 	tests := []struct {
 		name    string
@@ -151,7 +153,7 @@ func TestCRDB_LatestSequence(t *testing.T) {
 		{
 			name: "aggregate type filter no sequence",
 			args: args{
-				searchQuery: eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
+				searchQuery: eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxPosition).
 					AddQuery().
 					AggregateTypes("not found").
 					Builder(),
@@ -168,7 +170,7 @@ func TestCRDB_LatestSequence(t *testing.T) {
 		{
 			name: "aggregate type filter sequence",
 			args: args{
-				searchQuery: eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
+				searchQuery: eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxPosition).
 					AddQuery().
 					AggregateTypes(eventstore.AggregateType(t.Name())).
 					Builder(),
@@ -202,12 +204,12 @@ func TestCRDB_LatestSequence(t *testing.T) {
 					return
 				}
 
-				sequence, err := db.LatestSequence(context.Background(), tt.args.searchQuery)
+				position, err := db.LatestPosition(context.Background(), tt.args.searchQuery)
 				if (err != nil) != tt.wantErr {
-					t.Errorf("CRDB.query() error = %v, wantErr %v", err, tt.wantErr)
+					t.Errorf("eventstore.query() error = %v, wantErr %v", err, tt.wantErr)
 				}
-				if tt.res.sequence > sequence {
-					t.Errorf("CRDB.query() expected sequence: %v got %v", tt.res.sequence, sequence)
+				if tt.res.position.GreaterThan(position) {
+					t.Errorf("eventstore.query() expected position: %v got %v", tt.res.position, position)
 				}
 			})
 		}

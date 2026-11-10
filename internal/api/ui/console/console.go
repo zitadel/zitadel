@@ -97,7 +97,7 @@ func (f *file) Stat() (_ fs.FileInfo, err error) {
 	return f, nil
 }
 
-func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, callDurationInterceptor, instanceHandler func(http.Handler) http.Handler, limitingAccessInterceptor *middleware.AccessInterceptor, customerPortal string) (http.Handler, error) {
+func Start(config Config, issuer op.IssuerFromRequest, callDurationInterceptor, instanceHandler func(http.Handler) http.Handler, limitingAccessInterceptor *middleware.AccessInterceptor, customerPortal string) (http.Handler, error) {
 	fSys, err := fs.Sub(static, "static")
 	if err != nil {
 		return nil, err
@@ -114,20 +114,26 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, call
 	handler.Use(security, limitingAccessInterceptor.WithoutLimiting().Handle)
 
 	env := handler.NewRoute().Path(envRequestPath).Subrouter()
-	env.Use(callDurationInterceptor, middleware.TelemetryHandler(), instanceHandler)
+	env.Use(
+		callDurationInterceptor,
+		middleware.RequestDetailsHandler(),
+		middleware.TraceHandler(),
+		middleware.LogHandler("console"),
+		instanceHandler,
+	)
 	env.HandleFunc("", func(w http.ResponseWriter, r *http.Request) {
-		url := http_util.BuildOrigin(r.Host, externalSecure)
+		url := http_util.DomainContext(r.Context()).Origin()
 		ctx := r.Context()
 		instance := authz.GetInstance(ctx)
 		instanceMgmtURL, err := templateInstanceManagementURL(config.InstanceManagementURL, instance)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("unable to template instance management url for console: %v", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("unable to template instance management url for the management console: %v", err), http.StatusInternalServerError)
 			return
 		}
 		limited := limitingAccessInterceptor.Limit(w, r)
-		environmentJSON, err := createEnvironmentJSON(url, issuer(r), instance.ConsoleClientID(), customerPortal, instanceMgmtURL, config.PostHog.URL, config.PostHog.Token, limited)
+		environmentJSON, err := createEnvironmentJSON(url, issuer(r), instance.ManagementConsoleClientID(), customerPortal, instanceMgmtURL, config.PostHog.URL, config.PostHog.Token, limited)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("unable to marshal env for console: %v", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("unable to marshal env for the management console: %v", err), http.StatusInternalServerError)
 			return
 		}
 		_, err = w.Write(environmentJSON)

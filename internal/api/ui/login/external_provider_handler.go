@@ -3,11 +3,13 @@ package login
 import (
 	"context"
 	"errors"
+	"html/template"
 	"net/http"
 	"net/url"
 	"slices"
 	"strings"
 
+	crewjam_saml "github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
@@ -18,8 +20,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/domain/federatedlogout"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/apple"
@@ -33,6 +37,7 @@ import (
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml/requesttracker"
+	"github.com/zitadel/zitadel/internal/idp/providers/zitadel"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -43,6 +48,21 @@ const (
 	queryRelayState            = "RelayState"
 	queryMethod                = "method"
 	tmplExternalNotFoundOption = "externalnotfoundoption"
+	// zitadelProjectRolesClaim is the token claim a ZITADEL provider uses to convey
+	// a user's project roles ({role: {orgID: orgDomain}}).
+	zitadelProjectRolesClaim = "urn:zitadel:iam:org:project:roles"
+)
+
+var (
+	samlFormPost = template.Must(template.New("saml-post-form").Parse(`<!DOCTYPE html><html><body>
+<form method="post" action="{{.URL}}" id="SAMLRequestForm">
+{{range $key, $value := .Fields}}
+<input type="hidden" name="{{$key}}" value="{{$value}}" />
+{{end}}
+<input id="SAMLSubmitButton" type="submit" value="Submit" />
+</form>
+<script>document.getElementById('SAMLSubmitButton').style.visibility="hidden";document.getElementById('SAMLRequestForm').submit();</script>
+</body></html>`))
 )
 
 type externalIDPData struct {
@@ -52,6 +72,12 @@ type externalIDPData struct {
 type externalIDPCallbackData struct {
 	State string `schema:"state"`
 	Code  string `schema:"code"`
+
+	// Error and ErrorDescription are the OAuth2/OIDC error response parameters the IDP may return on
+	// the callback (e.g. when the user cancels consent). They are used for logging/handling the failure;
+	// they are not IDP-authenticated and are not trusted to drive any security decision.
+	Error            string `schema:"error"`
+	ErrorDescription string `schema:"error_description"`
 
 	RelayState string `schema:"RelayState"`
 	Method     string `schema:"Method"`
@@ -149,14 +175,7 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, identityProvider.ID, userAgentID)
-	if err != nil {
-		l.externalAuthFailed(w, r, authReq, err)
-		return
-	}
 	var provider idp.Provider
-
 	switch identityProvider.Type {
 	case domain.IDPTypeOAuth:
 		provider, err = l.oauthProvider(r.Context(), identityProvider)
@@ -182,6 +201,8 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		provider, err = l.ldapProvider(r.Context(), identityProvider)
 	case domain.IDPTypeSAML:
 		provider, err = l.samlProvider(r.Context(), identityProvider)
+	case domain.IDPTypeZitadel:
+		provider, err = l.zitadelProvider(r.Context(), identityProvider)
 	case domain.IDPTypeUnspecified:
 		fallthrough
 	default:
@@ -199,14 +220,27 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		return
 	}
 
-	content, redirect := session.GetAuth(r.Context())
-	if redirect {
-		http.Redirect(w, r, content, http.StatusFound)
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	err = l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, identityProvider.ID, userAgentID, session.PersistentParameters())
+	if err != nil {
+		l.externalAuthFailed(w, r, authReq, err)
 		return
 	}
-	_, err = w.Write([]byte(content))
+	auth, err := session.GetAuth(r.Context())
 	if err != nil {
-		l.renderError(w, r, authReq, err)
+		l.renderInternalError(w, r, authReq, err)
+		return
+	}
+	switch a := auth.(type) {
+	case *idp.RedirectAuth:
+		http.Redirect(w, r, a.RedirectURL, http.StatusFound)
+		return
+	case *idp.FormAuth:
+		err = samlFormPost.Execute(w, a)
+		if err != nil {
+			l.renderError(w, r, authReq, err)
+			return
+		}
 		return
 	}
 }
@@ -266,88 +300,111 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 		return
 	}
+	// The IDP may return an OAuth2/OIDC error response (error/error_description) on the callback, e.g.
+	// when the user cancels consent. Handle it explicitly so it is logged with context instead of
+	// surfacing later as an opaque code-exchange failure. We then route it through the normal failure
+	// path, which - like any external-auth failure - falls back to local auth when the login policy
+	// allows it. (Note: this error signal is not IDP-authenticated, but treating it as a security
+	// boundary adds no protection: an attacker can force the same fallback with a garbage code, and the
+	// downgrade only ever affects their own auth request.)
+	if data.Error != "" {
+		logging.WithFields(
+			"instance", authz.GetInstance(r.Context()).InstanceID(),
+			"idpConfigID", authReq.SelectedIDPConfigID,
+			"error", data.Error,
+			"errorDescription", data.ErrorDescription,
+		).Info("external authentication returned an error on callback")
+		l.externalAuthCallbackFailed(w, r, authReq, nil, nil, zerrors.ThrowInvalidArgument(nil, "LOGIN-Ni2gs", "Errors.User.ExternalIDP.LoginFailedSwitchLocal"))
+		return
+	}
 	identityProvider, err := l.getIDPByID(r, authReq.SelectedIDPConfigID)
 	if err != nil {
 		l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 		return
 	}
-	var provider idp.Provider
 	var session idp.Session
 	switch identityProvider.Type {
 	case domain.IDPTypeOAuth:
-		provider, err = l.oauthProvider(r.Context(), identityProvider)
+		provider, err := l.oauthProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &oauth.Session{Provider: provider.(*oauth.Provider), Code: data.Code}
+		session = oauth.NewSession(provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeOIDC:
-		provider, err = l.oidcProvider(r.Context(), identityProvider)
+		provider, err := l.oidcProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &openid.Session{Provider: provider.(*openid.Provider), Code: data.Code}
+		session = openid.NewSession(provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeAzureAD:
-		provider, err = l.azureProvider(r.Context(), identityProvider)
+		provider, err := l.azureProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &azuread.Session{Provider: provider.(*azuread.Provider), Code: data.Code}
+		session = azuread.NewSession(provider, data.Code)
 	case domain.IDPTypeGitHub:
-		provider, err = l.githubProvider(r.Context(), identityProvider)
+		provider, err := l.githubProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &oauth.Session{Provider: provider.(*github.Provider).Provider, Code: data.Code}
+		session = github.NewSession(provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGitHubEnterprise:
-		provider, err = l.githubEnterpriseProvider(r.Context(), identityProvider)
+		provider, err := l.githubEnterpriseProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &oauth.Session{Provider: provider.(*github.Provider).Provider, Code: data.Code}
+		session = github.NewSession(provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGitLab:
-		provider, err = l.gitlabProvider(r.Context(), identityProvider)
+		provider, err := l.gitlabProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &openid.Session{Provider: provider.(*gitlab.Provider).Provider, Code: data.Code}
+		session = openid.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGitLabSelfHosted:
-		provider, err = l.gitlabSelfHostedProvider(r.Context(), identityProvider)
+		provider, err := l.gitlabSelfHostedProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &openid.Session{Provider: provider.(*gitlab.Provider).Provider, Code: data.Code}
+		session = openid.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGoogle:
-		provider, err = l.googleProvider(r.Context(), identityProvider)
+		provider, err := l.googleProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &openid.Session{Provider: provider.(*google.Provider).Provider, Code: data.Code}
+		session = openid.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeApple:
-		provider, err = l.appleProvider(r.Context(), identityProvider)
+		provider, err := l.appleProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &apple.Session{Session: &openid.Session{Provider: provider.(*apple.Provider).Provider, Code: data.Code}, UserFormValue: data.User}
+		session = apple.NewSession(provider, data.Code, data.User)
 	case domain.IDPTypeSAML:
-		provider, err = l.samlProvider(r.Context(), identityProvider)
+		provider, err := l.samlProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session, err = saml.NewSession(provider.(*saml.Provider), authReq.SAMLRequestID, r)
+		session, err = saml.NewSession(provider, authReq.SAMLRequestID, r)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
+	case domain.IDPTypeZitadel:
+		provider, err := l.zitadelProvider(r.Context(), identityProvider)
+		if err != nil {
+			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		session = openid.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeJWT,
 		domain.IDPTypeLDAP,
 		domain.IDPTypeUnspecified:
@@ -439,8 +496,12 @@ func (l *Login) handleExternalUserAuthenticated(
 	callback func(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest),
 ) {
 	externalUser := mapIDPUserToExternalUser(user, provider.ID)
+	// a ZITADEL provider may convey support-user project roles, which are carried through to user creation
+	if provider.Type == domain.IDPTypeZitadel {
+		externalUser.ProjectRoles = projectRolesFromIDPUser(user)
+	}
 	// ensure the linked IDP is added to the login policy
-	if err := l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, provider.ID, authReq.AgentID); err != nil {
+	if err := l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, provider.ID, authReq.AgentID, authReq.SelectedIDPConfigArgs); err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
@@ -473,62 +534,83 @@ func (l *Login) handleExternalUserAuthenticated(
 		l.renderError(w, r, authReq, err)
 		return
 	}
+	// if a user was linked, we don't want to do any more renderings
+	var userLinked bool
 	// if action is done and no user linked then link or register
 	if zerrors.IsNotFound(externalErr) {
-		l.externalUserNotExisting(w, r, authReq, provider, externalUser, externalUserChange)
-		return
+		userLinked = l.createOrLinkUser(w, r, authReq, provider, externalUser, externalUserChange)
+		if !userLinked {
+			return
+		}
 	}
 	if provider.IsAutoUpdate || externalUserChange {
 		err = l.updateExternalUser(r.Context(), authReq, externalUser)
-		if err != nil {
+		if err != nil && !userLinked {
 			l.renderError(w, r, authReq, err)
 			return
 		}
 	}
 	if len(externalUser.Metadatas) > 0 {
-		_, err = l.command.BulkSetUserMetadata(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, externalUser.Metadatas...)
-		if err != nil {
+		err = l.bulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, externalUser.Metadatas)
+		if err != nil && !userLinked {
 			l.renderError(w, r, authReq, err)
 			return
 		}
 	}
+	// (re)assign the support-user instance membership for an existing user
+	// so that the role assignment remains idempotent
+	// in case user creation succeeded but role assignment failed in a previous request.
+	err = l.ensureSupportUserInstanceMembership(r, provider, authReq, externalUser)
+	if err != nil && !userLinked {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	// if a user was just linked we don't render further errors (see above),
+	// but a failed support-membership grant must still be observable, so logging it.
+	logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to grant support user instance membership")
 	callback(w, r, authReq)
 }
 
 // checkAutoLinking checks if a user with the provided information (username or email) already exists within ZITADEL.
 // The decision, which information will be checked is based on the IdP template option.
-// The function returns a boolean whether a user was found or not.
+// The function returns a boolean whether a user was found or not, resp. if it was linked.
 // If single a user was found, it will be automatically linked.
-func (l *Login) checkAutoLinking(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser) bool {
+// Before the actual linking, it will check if the user's organization allows external IdP and
+// has activated the correspond IdP.
+func (l *Login) checkAutoLinking(r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser, human *domain.Human) (bool, error) {
 	queries := make([]query.SearchQuery, 0, 2)
 	switch provider.AutoLinking {
 	case domain.AutoLinkingOptionUnspecified:
 		// is auto linking is disable, we shouldn't even get here, but in case we do we can directly return
-		return false
+		return false, nil
 	case domain.AutoLinkingOptionUsername:
 		// if we're checking for usernames there are to options:
 		//
-		// If no specific org has been requested (by id or domain scope), we'll check the provided username against
+		// If no specific org has been requested (by id or domain scope), we'll check the provided username (loginname) against
 		// all existing loginnames and directly use that result to either prompt or continue with other idp options.
 		if authReq.RequestedOrgID == "" {
 			user, err := l.query.GetNotifyUserByLoginName(r.Context(), false, externalUser.PreferredUsername)
 			if err != nil {
-				return false
+				return false, nil
 			}
-			l.autoLinkUser(w, r, authReq, user)
-			return true
+			return l.autoLinkUser(r, authReq, user)
 		}
-		// If a specific org has been requested, we'll check the provided username against usernames (of that org).
-		usernameQuery, err := query.NewUserUsernameSearchQuery(externalUser.PreferredUsername, query.TextEqualsIgnoreCase)
+		// If a specific org has been requested, we'll check the username (org policy (suffixed or not) is already applied)
+		// against usernames (of that org).
+		usernameQuery, err := query.NewUserUsernameSearchQuery(human.Username, query.TextEqualsIgnoreCase)
 		if err != nil {
-			return false
+			return false, nil
 		}
 		queries = append(queries, usernameQuery)
 	case domain.AutoLinkingOptionEmail:
-		// Email will always be checked against verified email addresses.
+		// When checking for email matches, we need to make sure that both (the one from the IdP and the one in Zitadel)
+		// are verified to prevent potential account takeovers.
+		if !externalUser.IsEmailVerified {
+			return false, nil
+		}
 		emailQuery, err := query.NewUserVerifiedEmailSearchQuery(string(externalUser.Email))
 		if err != nil {
-			return false
+			return false, nil
 		}
 		queries = append(queries, emailQuery)
 	}
@@ -536,38 +618,54 @@ func (l *Login) checkAutoLinking(w http.ResponseWriter, r *http.Request, authReq
 	if authReq.RequestedOrgID != "" {
 		resourceOwnerQuery, err := query.NewUserResourceOwnerSearchQuery(authReq.RequestedOrgID, query.TextEquals)
 		if err != nil {
-			return false
+			return false, nil
 		}
 		queries = append(queries, resourceOwnerQuery)
 	}
 	user, err := l.query.GetNotifyUser(r.Context(), false, queries...)
 	if err != nil {
-		return false
+		return false, nil
 	}
-	l.autoLinkUser(w, r, authReq, user)
-	return true
+	return l.autoLinkUser(r, authReq, user)
 }
 
-func (l *Login) autoLinkUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, user *query.NotifyUser) {
-	if err := l.authRepo.SelectUser(r.Context(), authReq.ID, user.ID, authReq.AgentID); err != nil {
-		l.renderError(w, r, authReq, err)
-		return
+func (l *Login) checkAutoLinkingAllowedForUserAndIdP(r *http.Request, authReq *domain.AuthRequest, user *query.NotifyUser) (bool, error) {
+	policy, err := l.getLoginPolicy(r, user.ResourceOwner)
+	if err != nil {
+		return false, err
+	}
+	if !policy.AllowExternalIDPs {
+		return false, nil
+	}
+	return slices.ContainsFunc(policy.IDPLinks, func(link *query.IDPLoginPolicyLink) bool {
+		return link.IDPID == authReq.SelectedIDPConfigID
+	}), nil
+}
+
+// autoLink user will link the external user to the found user in case the user's organization
+// has the corresponding IdP activated. In case it doesn't, the function returns false and no error.
+func (l *Login) autoLinkUser(r *http.Request, authReq *domain.AuthRequest, user *query.NotifyUser) (bool, error) {
+	if allowed, err := l.checkAutoLinkingAllowedForUserAndIdP(r, authReq, user); err != nil || !allowed {
+		return false, nil
+	}
+	if err := l.authRepo.SelectUser(r.Context(), authReq.ID, user.ID, authReq.AgentID, false); err != nil {
+		return false, err
 	}
 	if err := l.authRepo.LinkExternalUsers(r.Context(), authReq.ID, authReq.AgentID, domain.BrowserInfoFromRequest(r)); err != nil {
-		l.renderError(w, r, authReq, err)
-		return
+		return false, err
 	}
-	l.renderNextStep(w, r, authReq)
+	authReq.UserID = user.ID
+	return true, nil
 }
 
-// externalUserNotExisting is called if an externalAuthentication couldn't find a corresponding externalID
+// createOrLinkUser is called if an externalAuthentication couldn't find a corresponding externalID
 // possible solutions are:
 //
 // * auto creation
 // * external not found overview:
 //   - creation by user
 //   - linking to existing user
-func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser, changed bool) {
+func (l *Login) createOrLinkUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser, changed bool) (userLinked bool) {
 	resourceOwner := determineResourceOwner(r.Context(), authReq)
 	orgIAMPolicy, err := l.getOrgDomainPolicy(r, resourceOwner)
 	if err != nil {
@@ -578,8 +676,13 @@ func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, 
 	human, idpLink, _ := mapExternalUserToLoginUser(externalUser, orgIAMPolicy.UserLoginMustBeDomain)
 	// let's check if auto-linking is enabled and if the user would be found by the corresponding option
 	if provider.AutoLinking != domain.AutoLinkingOptionUnspecified {
-		if l.checkAutoLinking(w, r, authReq, provider, externalUser) {
-			return
+		userLinked, err = l.checkAutoLinking(r, authReq, provider, externalUser, human)
+		if err != nil {
+			l.renderError(w, r, authReq, err)
+			return false
+		}
+		if userLinked {
+			return userLinked
 		}
 	}
 
@@ -602,11 +705,12 @@ func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, 
 			return
 		}
 	}
-	l.autoCreateExternalUser(w, r, authReq)
+	l.autoCreateExternalUser(w, r, provider, authReq)
+	return false
 }
 
 // autoCreateExternalUser takes the externalUser and creates it automatically (without user interaction)
-func (l *Login) autoCreateExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
+func (l *Login) autoCreateExternalUser(w http.ResponseWriter, r *http.Request, provider *query.IDPTemplate, authReq *domain.AuthRequest) {
 	if len(authReq.LinkingUsers) == 0 {
 		l.renderError(w, r, authReq, zerrors.ThrowPreconditionFailed(nil, "LOGIN-asfg3", "Errors.ExternalIDP.NoExternalUserData"))
 		return
@@ -615,17 +719,22 @@ func (l *Login) autoCreateExternalUser(w http.ResponseWriter, r *http.Request, a
 	// TODO (LS): how do we get multiple and why do we use the last of them (taken as is)?
 	linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
 
-	l.registerExternalUser(w, r, authReq, linkingUser)
+	l.registerExternalUser(w, r, provider, authReq, linkingUser)
 }
 
 // renderExternalNotFoundOption renders a page, where the user is able to edit the IDP data,
 // create a new externalUser of link to existing on (based on the IDP template)
 func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.DomainPolicy, human *domain.Human, idpLink *domain.UserIDPLink, err error) {
+	if authReq == nil {
+		l.renderError(w, r, nil, err)
+		return
+	}
 	resourceOwner := determineResourceOwner(r.Context(), authReq)
 	if orgIAMPolicy == nil {
-		orgIAMPolicy, err = l.getOrgDomainPolicy(r, resourceOwner)
-		if err != nil {
-			l.renderError(w, r, authReq, err)
+		var policyErr error
+		orgIAMPolicy, policyErr = l.getOrgDomainPolicy(r, resourceOwner)
+		if policyErr != nil {
+			l.renderError(w, r, authReq, policyErr)
 			return
 		}
 	}
@@ -636,19 +745,23 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 		human, idpLink, _ = mapExternalUserToLoginUser(linkingUser, orgIAMPolicy.UserLoginMustBeDomain)
 	}
 
-	labelPolicy, err := l.getLabelPolicy(r, resourceOwner)
-	if err != nil {
-		l.renderError(w, r, authReq, err)
+	labelPolicy, policyErr := l.getLabelPolicy(r, resourceOwner)
+	if policyErr != nil {
+		l.renderError(w, r, authReq, policyErr)
 		return
 	}
 
-	idpTemplate, err := l.getIDPByID(r, idpLink.IDPConfigID)
-	if err != nil {
-		l.renderError(w, r, authReq, err)
+	idpTemplate, idpErr := l.getIDPByID(r, idpLink.IDPConfigID)
+	if idpErr != nil {
+		l.renderError(w, r, authReq, idpErr)
 		return
 	}
 	if !idpTemplate.IsCreationAllowed && !idpTemplate.IsLinkingAllowed {
-		l.renderError(w, r, authReq, zerrors.ThrowPreconditionFailed(nil, "LOGIN-3kl44", "Errors.User.ExternalIDP.NoOptionAllowed"))
+		if err != nil {
+			l.renderError(w, r, authReq, err)
+			return
+		}
+		l.renderExternalNotFoundNoOption(w, r, authReq, idpTemplate)
 		return
 	}
 
@@ -690,6 +803,26 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalNotFoundOption], data, funcs)
 }
 
+// renderExternalNotFoundNoOption renders a page informing the user that their external user does not
+// match any existing ZITADEL user and that neither creating nor linking a user is possible.
+// The message can be customized per instance and organization with the ExternalNotFound.NoOptionAvailable
+// login text.
+func (l *Login) renderExternalNotFoundNoOption(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpTemplate *query.IDPTemplate) {
+	ctx := r.Context()
+	logging.WithFields(
+		"instance", authz.GetInstance(ctx).InstanceID(),
+		"authReq", authReq.ID,
+		"idpConfigID", idpTemplate.ID,
+	).Info("external user not found and neither creation nor linking is possible")
+
+	providerName := domain.IDPName(idpTemplate.Name, idpTemplate.Type)
+	translator := l.getTranslator(ctx, authReq)
+	data := l.getBaseData(r, authReq, translator, "ExternalNotFound.Title", "", nil)
+	data.ErrMessage = l.renderer.LocalizeFromRequest(translator, r, domain.LoginKeyExternalNotFoundNoOptionAvailable,
+		map[string]interface{}{"ProviderName": providerName})
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplError], data, nil)
+}
+
 // handleExternalNotFoundOptionCheck takes the data from the submitted externalNotFound page
 // and either links or creates an externalUser
 func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http.Request) {
@@ -729,15 +862,29 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, zerrors.ThrowPreconditionFailed(nil, "LOGIN-dsfd3", "Errors.ExternalIDP.CreationNotAllowed"))
 		return
 	}
-	linkingUser := mapExternalNotFoundOptionFormDataToLoginUser(data)
-	l.registerExternalUser(w, r, authReq, linkingUser)
+	// This page is only ever reached after a genuine IDP callback populated authReq.LinkingUsers
+	// (via SetLinkingUser, gated by a real session.FetchUser). If it is empty, the request did not
+	// originate from a verified external authentication and must be rejected - otherwise the external
+	// identity would be taken solely from attacker-controlled POST fields (GHSA-738m-7888-jfv8).
+	// This mirrors the guard in autoCreateExternalUser.
+	if len(authReq.LinkingUsers) == 0 {
+		l.renderError(w, r, authReq, zerrors.ThrowPreconditionFailed(nil, "LOGIN-Dju3f", "Errors.ExternalIDP.NoExternalUserData"))
+		return
+	}
+	linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
+	externalUser := mapExternalNotFoundOptionFormDataToLoginUser(data, linkingUser)
+	// the form only carries the editable profile fields, so preserve the ZITADEL project
+	// roles captured at authentication (stored on the linking user) to keep the
+	// support-user instance membership grant working on the manual creation path.
+	preserveProjectRoles(externalUser, authReq.LinkingUsers)
+	l.registerExternalUser(w, r, idpTemplate, authReq, externalUser)
 }
 
 // registerExternalUser creates an externalUser with the provided data
 // incl. execution of pre and post creation actions
 //
 // it is called from either the [autoCreateExternalUser] or [handleExternalNotFoundOptionCheck]
-func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) {
+func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, provider *query.IDPTemplate, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) {
 	resourceOwner := determineResourceOwner(r.Context(), authReq)
 
 	orgIamPolicy, err := l.getOrgDomainPolicy(r, resourceOwner)
@@ -773,7 +920,79 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 		l.renderError(w, r, authReq, err)
 		return
 	}
+	// a ZITADEL provider may grant a support user an instance membership based on the roles present in its token claim.
+	if err = l.ensureSupportUserInstanceMembership(r, provider, authReq, externalUser); err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
 	l.renderNextStep(w, r, authReq)
+}
+
+// ensureSupportUserInstanceMembership makes sure an external user holds the instance member
+// roles conveyed by their `urn:zitadel:iam:org:project:roles` claim when they authenticated
+// via a ZITADEL provider.
+func (l *Login) ensureSupportUserInstanceMembership(r *http.Request, provider *query.IDPTemplate, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) error {
+	roles := supportUserInstanceRoles(provider, externalUser)
+	if len(roles) == 0 {
+		return nil
+	}
+	member := &command.AddInstanceMember{
+		InstanceID: authz.GetInstance(r.Context()).InstanceID(),
+		UserID:     authReq.UserID,
+		Roles:      roles,
+	}
+	_, err := l.command.EnsureInstanceMemberRolesFromLogin(setContext(r.Context(), ""), member)
+	if err != nil && !zerrors.IsErrorAlreadyExists(err) {
+		return err
+	}
+	return nil
+}
+
+// supportUserInstanceRoles returns the instance member roles an external user must hold,
+// derived from the IAM roles of their ZITADEL project roles claim. Only roles claimed for an
+// organization configured in the IDP's InstanceRolesInfo are returned so that the set of
+// organizations able to confer instance roles stays under the control of the instance admins.
+func supportUserInstanceRoles(provider *query.IDPTemplate, externalUser *domain.ExternalUser) []string {
+	// instance-wide role grants may only originate from an instance-scoped IDP.
+	// An organization-scoped provider must never confer instance membership, even if
+	// its InstanceRolesInfo is somehow populated (e.g. stale data): honoring it would
+	// let an org owner escalate themselves to instance-level roles.
+	if provider.OwnerType != domain.IdentityProviderTypeSystem {
+		return nil
+	}
+	// only a ZITADEL provider conveys support-user project roles
+	if provider.Type != domain.IDPTypeZitadel || provider.ZitadelIDPTemplate == nil {
+		return nil
+	}
+	var roles []string
+	for role, claimOrgs := range externalUser.ProjectRoles {
+		// only an IAM role can be conferred by an instance membership
+		if !strings.HasPrefix(role, domain.IAMRolePrefix) {
+			continue
+		}
+		// a claim org must be the same as a configured organization (ID and domain)
+		if !claimMatchesConfiguredOrg(claimOrgs, provider.ZitadelIDPTemplate) {
+			continue
+		}
+		roles = append(roles, role)
+	}
+	// the claim is a map, so sort to keep the resulting role set deterministic
+	slices.Sort(roles)
+	return roles
+}
+
+// claimMatchesConfiguredOrg reports whether any organization from the roles claim
+// (orgID → orgDomain) exactly matches an organization (by ID and domain)
+// configured in the ZITADEL IDP's InstanceRolesInfo.
+func claimMatchesConfiguredOrg(claimOrgs map[string]string, zitadelTemplate *query.ZitadelIDPTemplate) bool {
+	for orgID, orgDomain := range claimOrgs {
+		for _, configured := range zitadelTemplate.InstanceRolesInfo {
+			if configured.OrganizationID == orgID && configured.OrganizationDomain == orgDomain {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // updateExternalUser will update the existing user (email, phone, profile) with data provided by the IDP
@@ -997,6 +1216,7 @@ func (l *Login) googleProvider(ctx context.Context, identityProvider *query.IDPT
 		secret,
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
 		identityProvider.GoogleIDPTemplate.Scopes,
+		l.httpClient,
 	)
 }
 
@@ -1005,11 +1225,17 @@ func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTem
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]openid.ProviderOpts, 1, 2)
+	opts := make([]openid.ProviderOpts, 1, 3)
 	opts[0] = openid.WithSelectAccount()
 	if identityProvider.OIDCIDPTemplate.IsIDTokenMapping {
 		opts = append(opts, openid.WithIDTokenMapping())
 	}
+
+	if identityProvider.OIDCIDPTemplate.UsePKCE {
+		// we do not pass any cookie handler, since we store the verifier internally, rather than in a cookie
+		opts = append(opts, openid.WithRelyingPartyOption(rp.WithPKCE(nil)))
+	}
+
 	return openid.New(identityProvider.Name,
 		identityProvider.OIDCIDPTemplate.Issuer,
 		identityProvider.OIDCIDPTemplate.ClientID,
@@ -1017,6 +1243,7 @@ func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTem
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
 		identityProvider.OIDCIDPTemplate.Scopes,
 		openid.DefaultMapper,
+		l.httpClient,
 		opts...,
 	)
 }
@@ -1028,7 +1255,9 @@ func (l *Login) jwtProvider(identityProvider *query.IDPTemplate) (*jwt.Provider,
 		identityProvider.JWTIDPTemplate.Endpoint,
 		identityProvider.JWTIDPTemplate.KeysEndpoint,
 		identityProvider.JWTIDPTemplate.HeaderName,
+		identityProvider.JWTIDPTemplate.Audience,
 		l.idpConfigAlg,
+		l.httpClient,
 	)
 }
 
@@ -1047,6 +1276,12 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 		RedirectURL: l.baseURL(ctx) + EndpointExternalLoginCallback,
 		Scopes:      identityProvider.OAuthIDPTemplate.Scopes,
 	}
+
+	opts := make([]oauth.ProviderOpts, 0, 1)
+	if identityProvider.OAuthIDPTemplate.UsePKCE {
+		// we do not pass any cookie handler, since we store the verifier internally, rather than in a cookie
+		opts = append(opts, oauth.WithRelyingPartyOption(rp.WithPKCE(nil)))
+	}
 	return oauth.New(
 		config,
 		identityProvider.Name,
@@ -1054,26 +1289,32 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 		func() idp.User {
 			return oauth.NewUserMapper(identityProvider.OAuthIDPTemplate.IDAttribute)
 		},
+		l.httpClient,
+		opts...,
 	)
 }
 
 func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*saml.Provider, error) {
-	key, err := crypto.Decrypt(identityProvider.SAMLIDPTemplate.Key, l.idpConfigAlg)
+	key, err := crypto.Decrypt(identityProvider.Key, l.idpConfigAlg)
 	if err != nil {
 		return nil, err
 	}
 	opts := make([]saml.ProviderOpts, 0, 6)
-	if identityProvider.SAMLIDPTemplate.WithSignedRequest {
+	if identityProvider.WithSignedRequest {
 		opts = append(opts, saml.WithSignedRequest())
 	}
-	if identityProvider.SAMLIDPTemplate.Binding != "" {
-		opts = append(opts, saml.WithBinding(identityProvider.SAMLIDPTemplate.Binding))
+	if identityProvider.Binding != "" {
+		opts = append(opts, saml.WithBinding(identityProvider.Binding))
 	}
-	if identityProvider.SAMLIDPTemplate.NameIDFormat.Valid {
-		opts = append(opts, saml.WithNameIDFormat(identityProvider.SAMLIDPTemplate.NameIDFormat.V))
+	if identityProvider.WithSignedRequest &&
+		identityProvider.SignatureAlgorithm != "" {
+		opts = append(opts, saml.WithSignatureAlgorithm(identityProvider.SignatureAlgorithm))
 	}
-	if identityProvider.SAMLIDPTemplate.TransientMappingAttributeName != "" {
-		opts = append(opts, saml.WithTransientMappingAttributeName(identityProvider.SAMLIDPTemplate.TransientMappingAttributeName))
+	if identityProvider.NameIDFormat.Valid {
+		opts = append(opts, saml.WithNameIDFormat(identityProvider.NameIDFormat.V))
+	}
+	if identityProvider.TransientMappingAttributeName != "" {
+		opts = append(opts, saml.WithTransientMappingAttributeName(identityProvider.TransientMappingAttributeName))
 	}
 	opts = append(opts,
 		saml.WithEntityID(http_utils.DomainContext(ctx).Origin()+"/idps/"+identityProvider.ID+"/saml/metadata"),
@@ -1099,9 +1340,10 @@ func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTem
 	return saml.New(
 		identityProvider.Name,
 		l.baseURL(ctx)+EndpointExternalLogin+"/",
-		identityProvider.SAMLIDPTemplate.Metadata,
-		identityProvider.SAMLIDPTemplate.Certificate,
+		identityProvider.Metadata,
+		identityProvider.Certificate,
 		key,
+		l.httpClient,
 		opts...,
 	)
 }
@@ -1124,6 +1366,7 @@ func (l *Login) azureProvider(ctx context.Context, identityProvider *query.IDPTe
 		secret,
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
 		identityProvider.AzureADIDPTemplate.Scopes,
+		l.httpClient,
 		opts...,
 	)
 }
@@ -1138,6 +1381,7 @@ func (l *Login) githubProvider(ctx context.Context, identityProvider *query.IDPT
 		secret,
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
 		identityProvider.GitHubIDPTemplate.Scopes,
+		l.httpClient,
 	)
 }
 
@@ -1155,6 +1399,7 @@ func (l *Login) githubEnterpriseProvider(ctx context.Context, identityProvider *
 		identityProvider.GitHubEnterpriseIDPTemplate.TokenEndpoint,
 		identityProvider.GitHubEnterpriseIDPTemplate.UserEndpoint,
 		identityProvider.GitHubIDPTemplate.Scopes,
+		l.httpClient,
 	)
 }
 
@@ -1168,6 +1413,7 @@ func (l *Login) gitlabProvider(ctx context.Context, identityProvider *query.IDPT
 		secret,
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
 		identityProvider.GitLabIDPTemplate.Scopes,
+		l.httpClient,
 	)
 }
 
@@ -1183,6 +1429,7 @@ func (l *Login) gitlabSelfHostedProvider(ctx context.Context, identityProvider *
 		secret,
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
 		identityProvider.GitLabSelfHostedIDPTemplate.Scopes,
+		l.httpClient,
 	)
 }
 
@@ -1198,6 +1445,23 @@ func (l *Login) appleProvider(ctx context.Context, identityProvider *query.IDPTe
 		l.baseURL(ctx)+EndpointExternalLoginCallbackFormPost,
 		privateKey,
 		identityProvider.AppleIDPTemplate.Scopes,
+		l.httpClient,
+	)
+}
+
+func (l *Login) zitadelProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*zitadel.Provider, error) {
+	secret, err := crypto.DecryptString(identityProvider.ZitadelIDPTemplate.ClientSecret, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	return zitadel.New(
+		identityProvider.ZitadelIDPTemplate.Issuer,
+		identityProvider.ZitadelIDPTemplate.ClientID,
+		secret,
+		l.baseURL(ctx)+EndpointExternalLoginCallback,
+		identityProvider.ZitadelIDPTemplate.Scopes,
+		l.httpClient,
+		openid.WithSelectAccount(),
 	)
 }
 
@@ -1206,7 +1470,8 @@ func (l *Login) appendUserGrants(ctx context.Context, userGrants []*domain.UserG
 		return nil
 	}
 	for _, grant := range userGrants {
-		_, err := l.command.AddUserGrant(setContext(ctx, resourceOwner), grant, resourceOwner)
+		grant.ResourceOwner = resourceOwner
+		_, err := l.command.AddUserGrant(setContext(ctx, resourceOwner), grant, nil)
 		if err != nil {
 			return err
 		}
@@ -1264,6 +1529,8 @@ func tokens(session idp.Session) *oidc.Tokens[*oidc.IDTokenClaims] {
 		return s.Tokens
 	case *oauth.Session:
 		return s.Tokens
+	case *github.Session:
+		return s.Tokens()
 	case *azuread.Session:
 		return s.Tokens()
 	case *apple.Session:
@@ -1325,12 +1592,20 @@ func mapExternalUserToLoginUser(externalUser *domain.ExternalUser, mustBeDomain 
 	return human, externalIDP, externalUser.Metadatas
 }
 
-func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOptionFormData) *domain.ExternalUser {
-	isEmailVerified := formData.ExternalEmailVerified && formData.Email == formData.ExternalEmail
-	isPhoneVerified := formData.ExternalPhoneVerified && formData.Phone == formData.ExternalPhone
+// mapExternalNotFoundOptionFormDataToLoginUser builds the externalUser to be created from the
+// submitted "external account not found" page. The identity and verification of that user must
+// originate from the genuine, protocol-verified IDP callback (carried in linkingUser), never from
+// the request body: the external-* form fields are only echoed back for display and are fully
+// attacker-controlled. We therefore take IDPConfigID/ExternalUserID from linkingUser, and only keep
+// the email/phone "verified" flag when the (user-editable) form value still matches what the IDP
+// actually returned. The remaining fields (name, nickname, language, and the possibly-edited
+// email/phone) are legitimately editable on this page and are taken from the form.
+func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOptionFormData, linkingUser *domain.ExternalUser) *domain.ExternalUser {
+	isEmailVerified := linkingUser.IsEmailVerified && formData.Email == linkingUser.Email
+	isPhoneVerified := linkingUser.IsPhoneVerified && formData.Phone == linkingUser.Phone
 	return &domain.ExternalUser{
-		IDPConfigID:       formData.ExternalIDPConfigID,
-		ExternalUserID:    formData.ExternalIDPExtUserID,
+		IDPConfigID:       linkingUser.IDPConfigID,
+		ExternalUserID:    linkingUser.ExternalUserID,
 		PreferredUsername: formData.Username,
 		DisplayName:       string(formData.Email),
 		FirstName:         formData.Firstname,
@@ -1389,6 +1664,124 @@ func (l *Login) getUserLinks(ctx context.Context, userID, idpID string) (*query.
 	)
 }
 
+type federatedLogoutData struct {
+	SessionID string `schema:"sessionID"`
+}
+
+const (
+	federatedLogoutDataSessionID = "sessionID"
+)
+
+func ExternalLogoutPath(sessionID string) string {
+	v := url.Values{}
+	v.Set(federatedLogoutDataSessionID, sessionID)
+	return HandlerPrefix + EndpointExternalLogout + "?" + v.Encode()
+}
+
+// handleExternalLogout is called when a user signed out of ZITADEL with a federated logout
+func (l *Login) handleExternalLogout(w http.ResponseWriter, r *http.Request) {
+	data := new(federatedLogoutData)
+	err := l.parser.Parse(r, data)
+	if err != nil {
+		l.renderError(w, r, nil, err)
+		return
+	}
+
+	logoutRequest, ok := l.caches.federatedLogouts.Get(r.Context(), federatedlogout.IndexRequestID, federatedlogout.Key(authz.GetInstance(r.Context()).InstanceID(), data.SessionID))
+	if !ok || logoutRequest.State != federatedlogout.StateCreated || logoutRequest.FingerPrintID != authz.GetCtxData(r.Context()).AgentID {
+		l.renderError(w, r, nil, zerrors.ThrowNotFound(nil, "LOGIN-ADK21", "Errors.ExternalIDP.LogoutRequestNotFound"))
+		return
+	}
+
+	provider, err := l.externalLogoutProvider(r, logoutRequest.IDPID)
+	if err != nil {
+		l.renderError(w, r, nil, err)
+		return
+	}
+
+	nameID, err := l.externalUserID(r.Context(), logoutRequest.UserID, logoutRequest.IDPID)
+	if err != nil {
+		l.renderError(w, r, nil, err)
+		return
+	}
+
+	err = samlLogoutRequest(w, r, provider, nameID, logoutRequest.SessionID)
+	if err != nil {
+		l.renderError(w, r, nil, err)
+		return
+	}
+	logoutRequest.State = federatedlogout.StateRedirected
+	l.caches.federatedLogouts.Set(r.Context(), logoutRequest)
+}
+
+func (l *Login) externalLogoutProvider(r *http.Request, providerID string) (*saml.Provider, error) {
+	identityProvider, err := l.getIDPByID(r, providerID)
+	if err != nil {
+		return nil, err
+	}
+	if identityProvider.Type != domain.IDPTypeSAML {
+		return nil, zerrors.ThrowInvalidArgument(nil, "LOGIN-ADK21", "Errors.ExternalIDP.IDPTypeNotImplemented")
+	}
+	return l.samlProvider(r.Context(), identityProvider)
+}
+
+func samlLogoutRequest(w http.ResponseWriter, r *http.Request, provider *saml.Provider, nameID, sessionID string) error {
+	mw, err := provider.GetSP()
+	if err != nil {
+		return err
+	}
+	// We ignore the configured binding and only check the available SLO endpoints from the metadata.
+	// For example, Azure documents that only redirect binding is possible and also only provides a redirect SLO in the metadata.
+	slo := mw.ServiceProvider.GetSLOBindingLocation(crewjam_saml.HTTPRedirectBinding)
+	if slo != "" {
+		return samlRedirectLogoutRequest(w, r, mw.ServiceProvider, slo, nameID, sessionID)
+	}
+	slo = mw.ServiceProvider.GetSLOBindingLocation(crewjam_saml.HTTPPostBinding)
+	return samlPostLogoutRequest(w, mw.ServiceProvider, slo, nameID, sessionID)
+}
+
+func samlRedirectLogoutRequest(w http.ResponseWriter, r *http.Request, sp crewjam_saml.ServiceProvider, slo, nameID, sessionID string) error {
+	lr, err := sp.MakeLogoutRequest(slo, nameID)
+	if err != nil {
+		return err
+	}
+	http.Redirect(w, r, lr.Redirect(sessionID).String(), http.StatusFound)
+	return nil
+}
+
+var (
+	samlSLOPostTemplate = template.Must(template.New("samlSLOPost").Parse(`<!DOCTYPE html><html><body>{{.Form}}</body></html>`))
+)
+
+type samlSLOPostData struct {
+	Form template.HTML
+}
+
+func samlPostLogoutRequest(w http.ResponseWriter, sp crewjam_saml.ServiceProvider, slo, nameID, sessionID string) error {
+	lr, err := sp.MakeLogoutRequest(slo, nameID)
+	if err != nil {
+		return err
+	}
+
+	return samlSLOPostTemplate.Execute(w, &samlSLOPostData{Form: template.HTML(lr.Post(sessionID))})
+}
+
+func (l *Login) externalUserID(ctx context.Context, userID, idpID string) (string, error) {
+	userIDQuery, err := query.NewIDPUserLinksUserIDSearchQuery(userID)
+	if err != nil {
+		return "", err
+	}
+	idpIDQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(idpID)
+	if err != nil {
+		return "", err
+	}
+	links, err := l.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userIDQuery, idpIDQuery}}, nil)
+	if err != nil || len(links.Links) != 1 {
+		return "", zerrors.ThrowPreconditionFailed(err, "LOGIN-ADK21", "Errors.User.ExternalIDP.NotFound")
+	}
+	return links.Links[0].ProvidedUserID, nil
+}
+
 // IdPError wraps an error from an external IDP to be able to distinguish it from other errors and to display it
 // more prominent (popup style) .
 // It's used if an error occurs during the login process with an external IDP and local authentication is allowed,
@@ -1417,5 +1810,53 @@ func WrapIdPError(err error) *IdPError {
 	if errors.As(err, &zErr) {
 		id = zErr.ID
 	}
-	return &IdPError{err: zerrors.CreateZitadelError(err, id, "Errors.User.ExternalIDP.LoginFailedSwitchLocal")}
+	return &IdPError{err: zerrors.CreateZitadelError(zerrors.KindPreconditionFailed, err, id, "Errors.User.ExternalIDP.LoginFailedSwitchLocal", 1)}
+}
+
+// projectRolesFromIDPUser extracts the ZITADEL project-roles claim from an IDP
+// user's OIDC userinfo and returns it as a map {role: {orgID: orgDomain}}.
+// It returns nil when the user is not an OIDC user or the claim is absent or malformed.
+func projectRolesFromIDPUser(user idp.User) map[string]map[string]string {
+	oidcUser, ok := user.(*openid.User)
+	if !ok || oidcUser.UserInfo == nil {
+		return nil
+	}
+	rawRoles, ok := oidcUser.Claims[zitadelProjectRolesClaim].(map[string]any)
+	if !ok {
+		return nil
+	}
+	roles := make(map[string]map[string]string, len(rawRoles))
+	for role, rawOrgs := range rawRoles {
+		orgs, ok := rawOrgs.(map[string]any)
+		if !ok {
+			continue
+		}
+		orgMap := make(map[string]string, len(orgs))
+		for orgID, rawDomain := range orgs {
+			// skip entries whose domain is not a string.
+			domainName, ok := rawDomain.(string)
+			if !ok {
+				continue
+			}
+			orgMap[orgID] = domainName
+		}
+		if len(orgMap) == 0 {
+			continue
+		}
+		roles[role] = orgMap
+	}
+	if len(roles) == 0 {
+		return nil
+	}
+	return roles
+}
+
+// preserveProjectRoles carries the ZITADEL project roles captured at authentication
+// onto the form-mapped external user. The "external user not found" form only submits profile fields.
+// The roles claim is restored from the most recent linking user stored on the auth request.
+func preserveProjectRoles(user *domain.ExternalUser, linkingUsers []*domain.ExternalUser) {
+	if user == nil || len(linkingUsers) == 0 {
+		return
+	}
+	user.ProjectRoles = linkingUsers[len(linkingUsers)-1].ProjectRoles
 }

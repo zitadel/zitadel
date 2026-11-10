@@ -3,11 +3,13 @@ package command
 import (
 	"context"
 	"net"
+	"net/url"
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
@@ -23,11 +25,25 @@ type AddSMTPConfig struct {
 	Description    string
 	Host           string
 	User           string
-	Password       string
 	Tls            bool
 	From           string
 	FromName       string
 	ReplyToAddress string
+	PlainAuth      *PlainAuth
+	XOAuth2Auth    *XOAuth2Auth
+}
+
+type PlainAuth struct {
+	Password string
+}
+type XOAuth2Auth struct {
+	TokenEndpoint         string
+	Scopes                []string
+	ClientCredentialsAuth *OAuth2ClientCredentials
+}
+type OAuth2ClientCredentials struct {
+	ClientId     string
+	ClientSecret string
 }
 
 func (c *Commands) AddSMTPConfig(ctx context.Context, config *AddSMTPConfig) (err error) {
@@ -55,14 +71,6 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, config *AddSMTPConfig) (er
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-EvAtufIinh", "Errors.Invalid.Argument")
 	}
 
-	var smtpPassword *crypto.CryptoValue
-	if config.Password != "" {
-		smtpPassword, err = crypto.Encrypt([]byte(config.Password), c.smtpEncryption)
-		if err != nil {
-			return err
-		}
-	}
-
 	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, config.ResourceOwner, config.ID, senderDomain)
 	if err != nil {
 		return err
@@ -71,6 +79,36 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, config *AddSMTPConfig) (er
 	err = checkSenderAddress(smtpConfigWriteModel)
 	if err != nil {
 		return err
+	}
+
+	var plainAuth *instance.PlainAuth
+	var xoauth2Auth *instance.XOAuth2Auth
+
+	if config.XOAuth2Auth != nil {
+		xoauth2Auth = &instance.XOAuth2Auth{
+			TokenEndpoint: config.XOAuth2Auth.TokenEndpoint,
+			Scopes:        config.XOAuth2Auth.Scopes,
+		}
+
+		if config.XOAuth2Auth.ClientCredentialsAuth != nil {
+			clientSecret, err := crypto.Encrypt([]byte(config.XOAuth2Auth.ClientCredentialsAuth.ClientSecret), c.smtpEncryption)
+			if err != nil {
+				return err
+			}
+			xoauth2Auth.ClientCredentials = &instance.XOAuth2ClientCredentials{
+				ClientId:     config.XOAuth2Auth.ClientCredentialsAuth.ClientId,
+				ClientSecret: clientSecret,
+			}
+		}
+	}
+	if config.PlainAuth != nil {
+		plainAuth = &instance.PlainAuth{}
+		if config.PlainAuth.Password != "" {
+			plainAuth.Password, err = crypto.Encrypt([]byte(config.PlainAuth.Password), c.smtpEncryption)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	err = c.pushAppendAndReduce(ctx,
@@ -86,12 +124,14 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, config *AddSMTPConfig) (er
 			replyTo,
 			hostAndPort,
 			config.User,
-			smtpPassword,
+			plainAuth,
+			xoauth2Auth,
 		),
 	)
 	if err != nil {
 		return err
 	}
+
 	config.Details = writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel)
 	return nil
 }
@@ -104,11 +144,12 @@ type ChangeSMTPConfig struct {
 	Description    string
 	Host           string
 	User           string
-	Password       string
 	Tls            bool
 	From           string
 	FromName       string
 	ReplyToAddress string
+	PlainAuth      *PlainAuth
+	XOAuth2Auth    *XOAuth2Auth
 }
 
 func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *ChangeSMTPConfig) error {
@@ -132,15 +173,6 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *ChangeSMTPConfi
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-kZNVkuL32L", "Errors.Invalid.Argument")
 	}
 
-	var smtpPassword *crypto.CryptoValue
-	var err error
-	if config.Password != "" {
-		smtpPassword, err = crypto.Encrypt([]byte(config.Password), c.smtpEncryption)
-		if err != nil {
-			return err
-		}
-	}
-
 	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, config.ResourceOwner, config.ID, senderDomain)
 	if err != nil {
 		return err
@@ -155,6 +187,35 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *ChangeSMTPConfi
 		return err
 	}
 
+	var plainAuth *instance.PlainAuth
+	var xoauth2Auth *instance.XOAuth2Auth
+
+	if config.PlainAuth != nil {
+		plainAuth = &instance.PlainAuth{}
+		if config.PlainAuth.Password != "" {
+			plainAuth.Password, err = crypto.Encrypt([]byte(config.PlainAuth.Password), c.smtpEncryption)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	if config.XOAuth2Auth != nil {
+		xoauth2Auth = &instance.XOAuth2Auth{
+			TokenEndpoint: config.XOAuth2Auth.TokenEndpoint,
+			Scopes:        config.XOAuth2Auth.Scopes,
+		}
+		if config.XOAuth2Auth.ClientCredentialsAuth != nil {
+			xoauth2Auth.ClientCredentials = &instance.XOAuth2ClientCredentials{
+				ClientId: config.XOAuth2Auth.ClientCredentialsAuth.ClientId,
+			}
+			if config.XOAuth2Auth.ClientCredentialsAuth.ClientSecret != "" {
+				xoauth2Auth.ClientCredentials.ClientSecret, err = crypto.Encrypt([]byte(config.XOAuth2Auth.ClientCredentialsAuth.ClientSecret), c.smtpEncryption)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
 	changedEvent, hasChanged, err := smtpConfigWriteModel.NewChangedEvent(
 		ctx,
 		InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel),
@@ -166,7 +227,8 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *ChangeSMTPConfi
 		replyTo,
 		hostAndPort,
 		config.User,
-		smtpPassword,
+		plainAuth,
+		xoauth2Auth,
 	)
 	if err != nil {
 		return err
@@ -230,6 +292,7 @@ type AddSMTPConfigHTTP struct {
 
 	Description string
 	Endpoint    string
+	SigningKey  string
 }
 
 func (c *Commands) AddSMTPConfigHTTP(ctx context.Context, config *AddSMTPConfigHTTP) (err error) {
@@ -243,10 +306,20 @@ func (c *Commands) AddSMTPConfigHTTP(ctx context.Context, config *AddSMTPConfigH
 		}
 	}
 
+	if err := c.validateNotificationWebhookEndpoint(config.Endpoint); err != nil {
+		return err
+	}
+
 	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, config.ResourceOwner, config.ID, "")
 	if err != nil {
 		return err
 	}
+
+	code, err := c.newSigningKey(ctx, c.eventstore.Filter, c.smtpEncryption) //nolint
+	if err != nil {
+		return err
+	}
+	config.SigningKey = code.PlainCode()
 
 	err = c.pushAppendAndReduce(ctx, smtpConfigWriteModel, instance.NewSMTPConfigHTTPAddedEvent(
 		ctx,
@@ -254,6 +327,7 @@ func (c *Commands) AddSMTPConfigHTTP(ctx context.Context, config *AddSMTPConfigH
 		config.ID,
 		config.Description,
 		config.Endpoint,
+		code.Crypted,
 	))
 	if err != nil {
 		return err
@@ -267,8 +341,10 @@ type ChangeSMTPConfigHTTP struct {
 	ResourceOwner string
 	ID            string
 
-	Description string
-	Endpoint    string
+	Description          string
+	Endpoint             string
+	ExpirationSigningKey bool
+	SigningKey           *string
 }
 
 func (c *Commands) ChangeSMTPConfigHTTP(ctx context.Context, config *ChangeSMTPConfigHTTP) (err error) {
@@ -277,6 +353,10 @@ func (c *Commands) ChangeSMTPConfigHTTP(ctx context.Context, config *ChangeSMTPC
 	}
 	if config.ID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-2MHkV8ObWo", "Errors.IDMissing")
+	}
+
+	if err := c.validateNotificationWebhookEndpoint(config.Endpoint); err != nil {
+		return err
 	}
 
 	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, config.ResourceOwner, config.ID, "")
@@ -288,12 +368,23 @@ func (c *Commands) ChangeSMTPConfigHTTP(ctx context.Context, config *ChangeSMTPC
 		return zerrors.ThrowNotFound(nil, "COMMAND-xIrdledqv4", "Errors.SMTPConfig.NotFound")
 	}
 
+	var changedSigningKey *crypto.CryptoValue
+	if config.ExpirationSigningKey {
+		code, err := c.newSigningKey(ctx, c.eventstore.Filter, c.smtpEncryption) //nolint
+		if err != nil {
+			return err
+		}
+		changedSigningKey = code.Crypted
+		config.SigningKey = &code.Plain
+	}
+
 	changedEvent, hasChanged, err := smtpConfigWriteModel.NewHTTPChangedEvent(
 		ctx,
 		InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel),
 		config.ID,
 		config.Description,
 		config.Endpoint,
+		changedSigningKey,
 	)
 	if err != nil {
 		return err
@@ -409,34 +500,50 @@ func (c *Commands) RemoveSMTPConfig(ctx context.Context, resourceOwner, id strin
 }
 
 func (c *Commands) TestSMTPConfig(ctx context.Context, instanceID, id, email string, config *smtp.Config) error {
-	password := config.SMTP.Password
 
 	if email == "" {
 		return zerrors.ThrowInvalidArgument(nil, "SMTP-p9uy", "Errors.SMTPConfig.TestEmailNotFound")
 	}
 
-	if id == "" && password == "" {
+	if id == "" && config.SMTP.PlainAuth != nil && config.SMTP.PlainAuth.Password == "" {
 		return zerrors.ThrowInvalidArgument(nil, "SMTP-p9kj", "Errors.SMTPConfig.TestPassword")
 	}
 
-	// If the password is not sent it'd mean that the password hasn't been changed for
-	// the stored configuration identified by its id so we can try to retrieve it
-	if id != "" && password == "" {
+	if id == "" && config.SMTP.XOAuth2Auth != nil &&
+		config.SMTP.XOAuth2Auth.ClientCredentialsAuth != nil &&
+		config.SMTP.XOAuth2Auth.ClientCredentialsAuth.ClientSecret == "" {
+		return zerrors.ThrowInvalidArgument(nil, "SMTP-9OP96s", "Errors.SMTPConfig.TestClientSecret")
+	}
+
+	if config.SMTP.PlainAuth != nil && config.SMTP.PlainAuth.Password == "" {
 		smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
 		if err != nil {
 			return err
 		}
-		if !smtpConfigWriteModel.State.Exists() || smtpConfigWriteModel.SMTPConfig == nil {
+		if !smtpConfigWriteModel.State.Exists() || smtpConfigWriteModel.SMTPConfig == nil || smtpConfigWriteModel.SMTPConfig.PlainAuth == nil {
 			return zerrors.ThrowNotFound(nil, "SMTP-p9cc", "Errors.SMTPConfig.NotFound")
 		}
 
-		password, err = crypto.DecryptString(smtpConfigWriteModel.SMTPConfig.Password, c.smtpEncryption)
+		config.SMTP.PlainAuth.Password, err = crypto.DecryptString(smtpConfigWriteModel.SMTPConfig.PlainAuth.Password, c.smtpEncryption)
 		if err != nil {
 			return err
 		}
 	}
 
-	config.SMTP.Password = password
+	if config.SMTP.XOAuth2Auth != nil && config.SMTP.XOAuth2Auth.ClientCredentialsAuth != nil && config.SMTP.XOAuth2Auth.ClientCredentialsAuth.ClientSecret == "" {
+		smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
+		if err != nil {
+			return err
+		}
+		if !smtpConfigWriteModel.State.Exists() || smtpConfigWriteModel.SMTPConfig == nil || smtpConfigWriteModel.SMTPConfig.XOAuth2Auth == nil {
+			return zerrors.ThrowNotFound(nil, "SMTP-p9c2", "Errors.SMTPConfig.NotFound")
+		}
+
+		config.SMTP.XOAuth2Auth.ClientCredentialsAuth.ClientSecret, err = crypto.DecryptString(smtpConfigWriteModel.SMTPConfig.XOAuth2Auth.ClientCredentials.ClientSecret, c.smtpEncryption)
+		if err != nil {
+			return err
+		}
+	}
 
 	// Try to send an email
 	err := smtp.TestConfiguration(config, email)
@@ -465,9 +572,36 @@ func (c *Commands) TestSMTPConfigById(ctx context.Context, instanceID, id, email
 		return zerrors.ThrowNotFound(nil, "SMTP-99klw", "Errors.SMTPConfig.NotFound")
 	}
 
-	password, err := crypto.DecryptString(smtpConfigWriteModel.SMTPConfig.Password, c.smtpEncryption)
-	if err != nil {
-		return err
+	var plainAuth *smtp.PlainAuthConfig
+	var xoauth2Auth *smtp.XOAuth2AuthConfig
+
+	if smtpConfigWriteModel.SMTPConfig.PlainAuth != nil {
+		password, err := crypto.DecryptString(smtpConfigWriteModel.SMTPConfig.PlainAuth.Password, c.smtpEncryption)
+		if err != nil {
+			return err
+		}
+		plainAuth = &smtp.PlainAuthConfig{
+			User:     smtpConfigWriteModel.SMTPConfig.User,
+			Password: password,
+		}
+	}
+
+	if smtpConfigWriteModel.SMTPConfig.XOAuth2Auth != nil {
+		xoauth2Auth = &smtp.XOAuth2AuthConfig{
+			User:          smtpConfigWriteModel.SMTPConfig.User,
+			TokenEndpoint: smtpConfigWriteModel.SMTPConfig.XOAuth2Auth.TokenEndpoint,
+			Scopes:        smtpConfigWriteModel.SMTPConfig.XOAuth2Auth.Scopes,
+		}
+		if smtpConfigWriteModel.SMTPConfig.XOAuth2Auth.ClientCredentials != nil {
+			clientSecret, err := crypto.DecryptString(smtpConfigWriteModel.SMTPConfig.XOAuth2Auth.ClientCredentials.ClientSecret, c.smtpEncryption)
+			if err != nil {
+				return err
+			}
+			xoauth2Auth.ClientCredentialsAuth = &smtp.OAuth2ClientCredentials{
+				ClientId:     smtpConfigWriteModel.SMTPConfig.XOAuth2Auth.ClientCredentials.ClientId,
+				ClientSecret: clientSecret,
+			}
+		}
 	}
 
 	smtpConfig := &smtp.Config{
@@ -475,9 +609,9 @@ func (c *Commands) TestSMTPConfigById(ctx context.Context, instanceID, id, email
 		From:     smtpConfigWriteModel.SMTPConfig.SenderAddress,
 		FromName: smtpConfigWriteModel.SMTPConfig.SenderName,
 		SMTP: smtp.SMTP{
-			Host:     smtpConfigWriteModel.SMTPConfig.Host,
-			User:     smtpConfigWriteModel.SMTPConfig.User,
-			Password: password,
+			Host:        smtpConfigWriteModel.SMTPConfig.Host,
+			PlainAuth:   plainAuth,
+			XOAuth2Auth: xoauth2Auth,
 		},
 	}
 
@@ -561,7 +695,8 @@ func (c *Commands) prepareAddAndActivateSMTPConfig(a *instance.Aggregate, descri
 					replyTo,
 					hostAndPort,
 					user,
-					smtpPassword,
+					&instance.PlainAuth{Password: smtpPassword},
+					nil,
 				),
 				instance.NewSMTPConfigActivatedEvent(
 					ctx,
@@ -571,6 +706,20 @@ func (c *Commands) prepareAddAndActivateSMTPConfig(a *instance.Aggregate, descri
 			}, nil
 		}, nil
 	}
+}
+
+func (c *Commands) validateNotificationWebhookEndpoint(endpoint string) error {
+	if endpoint == "" {
+		return nil
+	}
+	uri, err := url.Parse(endpoint)
+	if err != nil {
+		return zerrors.ThrowInvalidArgument(err, "COMMAND-Sz84nFo3aK", "Errors.Invalid.Argument")
+	}
+	if err := denylist.IsURLBlocked(c.denyList, uri, c.ipLookupFunction); err != nil {
+		return zerrors.ThrowInvalidArgument(err, "COMMAND-Uf0294nKls", "Errors.NotificationProvider.Blocked.Endpoint")
+	}
+	return nil
 }
 
 func getSMTPConfigWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, id, domain string) (_ *IAMSMTPConfigWriteModel, err error) {

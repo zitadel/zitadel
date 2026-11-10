@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/org"
 	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -32,7 +33,7 @@ func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserReques
 		return nil, err
 	}
 	queries := &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantUserID}}
-	grants, err := s.query.UserGrants(ctx, queries, true)
+	grants, err := s.query.UserGrants(ctx, queries, true, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +48,11 @@ func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserReques
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.RemoveUser(ctx, ctxData.UserID, ctxData.ResourceOwner, cascadingMemberships(memberships.Memberships), userGrantsToIDs(grants.UserGrants)...)
+	groupIDs, err := s.getGroupsByUserID(ctx, ctxData.UserID)
+	if err != nil {
+		return nil, err
+	}
+	details, err := s.command.RemoveUser(ctx, ctxData.UserID, ctxData.ResourceOwner, cascadingMemberships(memberships.Memberships), userGrantsToIDs(grants.UserGrants), groupIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -57,19 +62,12 @@ func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserReques
 }
 
 func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserChangesRequest) (*auth_pb.ListMyUserChangesResponse, error) {
-	var (
-		limit    uint64
-		sequence uint64
-		asc      bool
-	)
-	if req.Query != nil {
-		limit = uint64(req.Query.Limit)
-		sequence = req.Query.Sequence
-		asc = req.Query.Asc
+	limit, sequence, asc, err := change.ChangeQueryToModel(s.defaults, req.Query)
+	if err != nil {
+		return nil, err
 	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		AllowTimeTravel().
 		Limit(limit).
 		OrderDesc().
 		AwaitOpenTransactions().
@@ -94,11 +92,11 @@ func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserC
 }
 
 func (s *Server) ListMyMetadata(ctx context.Context, req *auth_pb.ListMyMetadataRequest) (*auth_pb.ListMyMetadataResponse, error) {
-	queries, err := ListUserMetadataToQuery(req)
+	queries, err := ListUserMetadataToQuery(s.defaults, req)
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUserMetadata(ctx, true, authz.GetCtxData(ctx).UserID, queries, false)
+	res, err := s.query.SearchUserMetadata(ctx, true, authz.GetCtxData(ctx).UserID, queries, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -148,11 +146,11 @@ func ctxToObjectRoot(ctx context.Context) models.ObjectRoot {
 }
 
 func (s *Server) ListMyUserGrants(ctx context.Context, req *auth_pb.ListMyUserGrantsRequest) (*auth_pb.ListMyUserGrantsResponse, error) {
-	queries, err := ListMyUserGrantsRequestToQuery(ctx, req)
+	queries, err := ListMyUserGrantsRequestToQuery(ctx, s.defaults, req)
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.UserGrants(ctx, queries, false)
+	res, err := s.query.UserGrants(ctx, queries, false, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +161,7 @@ func (s *Server) ListMyUserGrants(ctx context.Context, req *auth_pb.ListMyUserGr
 }
 
 func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProjectOrgsRequest) (*auth_pb.ListMyProjectOrgsResponse, error) {
-	queries, err := ListMyProjectOrgsRequestToQuery(req)
+	queries, err := ListMyProjectOrgsRequestToQuery(s.defaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +179,7 @@ func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProje
 			return nil, err
 		}
 
-		grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantProjectID, userGrantUserID}}, false)
+		grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantProjectID, userGrantUserID}}, false, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -258,8 +256,11 @@ func appendIfNotExists(array []string, value string) []string {
 	return append(array, value)
 }
 
-func ListMyProjectOrgsRequestToQuery(req *auth_pb.ListMyProjectOrgsRequest) (*query.OrgSearchQueries, error) {
-	offset, limit, asc := obj_grpc.ListQueryToModel(req.Query)
+func ListMyProjectOrgsRequestToQuery(defaults systemdefaults.SystemDefaults, req *auth_pb.ListMyProjectOrgsRequest) (*query.OrgSearchQueries, error) {
+	offset, limit, asc, err := obj_grpc.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := org.OrgQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
@@ -321,4 +322,28 @@ func userGrantsToIDs(userGrants []*query.UserGrant) []string {
 		converted[i] = grant.ID
 	}
 	return converted
+}
+
+func (s *Server) getGroupsByUserID(ctx context.Context, userID string) ([]string, error) {
+	groupUserQuery, err := query.NewGroupUsersUserIDsSearchQuery([]string{userID})
+	if err != nil {
+		return nil, err
+	}
+	groupUsers, err := s.query.SearchGroupUsers(ctx,
+		&query.GroupUsersSearchQuery{
+			Queries: []query.SearchQuery{
+				groupUserQuery,
+			},
+		}, nil)
+	if err != nil {
+		return nil, err
+	}
+	if len(groupUsers.GroupUsers) == 0 {
+		return nil, nil
+	}
+	groupIDs := make([]string, 0, len(groupUsers.GroupUsers))
+	for _, groupUser := range groupUsers.GroupUsers {
+		groupIDs = append(groupIDs, groupUser.GroupID)
+	}
+	return groupIDs, nil
 }

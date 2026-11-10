@@ -1,0 +1,35 @@
+{
+  "domain|INVALID_ARGUMENT|Errors.Invalid.Event.Type": {
+    "why": "ZITADEL's event-sourcing layer rejects a stored event when its recorded type doesn't match the specific decoder reading it back — for example a 'removed' event handed to the 'domain policy changed' decoder. This flags a mismatch between an event's persisted type tag and the code path deserializing it, not a problem with the API call that surfaced it."
+  },
+  "domain|INTERNAL|unable to unmarshal event": {
+    "why": "A stored event's JSON payload fails to decode into its target Go struct while ZITADEL replays event history to rebuild an object's state or a projection. The cause is corrupted or schema-mismatched data already in the eventstore, not anything in the request that triggered the replay."
+  },
+  "domain|FAILED_PRECONDITION|No changes": {
+    "why": "An update command — changing an action, an identity provider configuration, a policy, or a similar resource — arrived with every field already equal to the resource's current value, leaving nothing new to persist. Change at least one property from its existing value before resubmitting."
+  },
+  "domain|INTERNAL|An internal error occurred": {
+    "why": "Generic fallback used by the auth request cache when a SQL query against the auth_requests table fails, or when a cached auth request can't be marshaled to or unmarshaled from its stored JSON form. The cause sits in backend storage — database connectivity, a corrupted cache row — rather than in the request payload."
+  },
+  "domain|INTERNAL|unable to unmarshal policy": {
+    "why": "The same class of failure as the generic event-unmarshal error, scoped to policy events such as domain policy and notification policy: the JSON payload stored for a policy-added or policy-changed event doesn't decode into the struct ZITADEL expects when replaying it. Points to corrupted or version-mismatched event data, not a malformed request."
+  },
+  "notification|INVALID_ARGUMENT|reduce.wrong.event.type %s": {
+    "why": "A notification projection's reduce function — for OTP/SMS codes, back-channel logout, quota notifications, and similar handlers — received an event whose concrete Go type doesn't match the single event type it's registered to process. This is an internal event-routing inconsistency inside the notification handler itself, unrelated to whatever request generated the underlying event."
+  },
+  "crypto|INTERNAL|An internal error occurred": {
+    "why": "Surfaces while reconstructing a stored web key (JWKS signing key) configuration: the persisted config-type tag is unspecified or isn't one of RSA, ECDSA, or ED25519, or the stored JSON for the key's parameters fails to unmarshal. Indicates corrupted or unrecognized stored key configuration, not invalid input from the caller."
+  },
+  "domain|INTERNAL|reduce.wrong.event.type %s": {
+    "why": "ZITADEL derives a feature flag's level and key by splitting its stored event type string (e.g. feature.instance.<key>.set) on dots and validating each segment against the known feature enums. A stored type without the expected four segments, or naming a level/key the feature registry no longer recognizes, causes this — a mismatch between stored data and current code, not a value the caller supplied."
+  },
+  "domain|INTERNAL|unable to unmarshal label policy": {
+    "why": "The same generic event-unmarshal failure found elsewhere in the eventstore: a persisted event's JSON payload doesn't decode into its target struct on replay. The message text is copy-pasted across unrelated event mappers — member added/removed/cascade-removed and project grant-member events use it too — so it doesn't necessarily mean a label policy event was involved."
+  },
+  "notification|FAILED_PRECONDITION|Errors.Notification.Channels.NotPresent": {
+    "why": "ZITADEL tried to deliver a notification (verification code, password reset link, OTP, etc.) by email or SMS but the instance has no usable provider configured for that channel — no SMTP or webhook provider for email, no Twilio or webhook provider for SMS. Configure a provider for the channel before triggering messages that depend on it."
+  },
+  "crypto|PERMISSION_DENIED|Intent Token is invalid": {
+    "why": "The token presented to complete an IDP intent (an external login or account-linking callback) fails validation: it's empty, not valid base64url, can't be decrypted with the server's key, or decrypts to an intent ID different from the one being completed. Supply the exact, unmodified token returned at the end of the IDP callback together with the matching intent ID."
+  }
+}

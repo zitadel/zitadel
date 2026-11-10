@@ -7,21 +7,23 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 	"github.com/zitadel/zitadel/internal/api/assets"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/auth/repository"
+	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain/federatedlogout"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -42,6 +44,16 @@ type Config struct {
 	DefaultLogoutURLV2                string
 	PublicKeyCacheMaxAge              time.Duration
 	DefaultBackChannelLogoutLifetime  time.Duration
+	BackChannelLogout                 handlers.BackChannelLogoutWorkerConfig
+}
+
+// BackChannelLogoutConfig returns the BackChannelLogoutWorkerConfig and takes the deprecated TokenLifetime into account.
+func (c *Config) BackChannelLogoutConfig() *handlers.BackChannelLogoutWorkerConfig {
+	if c.DefaultBackChannelLogoutLifetime == 0 {
+		return &c.BackChannelLogout
+	}
+	c.BackChannelLogout.TokenLifetime = c.DefaultBackChannelLogoutLifetime
+	return &c.BackChannelLogout
 }
 
 type EndpointConfig struct {
@@ -53,6 +65,7 @@ type EndpointConfig struct {
 	EndSession    *Endpoint
 	Keys          *Endpoint
 	DeviceAuth    *Endpoint
+	Registration  *Endpoint
 }
 
 type Endpoint struct {
@@ -72,9 +85,10 @@ type OPStorage struct {
 	defaultIdTokenLifetime            time.Duration
 	defaultRefreshTokenIdleExpiration time.Duration
 	defaultRefreshTokenExpiration     time.Duration
-	encAlg                            crypto.EncryptionAlgorithm
-	locker                            crdb.Locker
+	authAlg                           crypto.AuthAlgorithm
 	assetAPIPrefix                    func(ctx context.Context) string
+	contextToIssuer                   func(context.Context) string
+	federateLogoutCache               cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout]
 }
 
 // Provider is used to overload certain [op.Provider] methods
@@ -87,14 +101,14 @@ type Provider struct {
 // IDTokenHintVerifier configures a Verifier and supported signing algorithms based on the Web Key feature in the context.
 func (o *Provider) IDTokenHintVerifier(ctx context.Context) *op.IDTokenHintVerifier {
 	return op.NewIDTokenHintVerifier(op.IssuerFromContext(ctx), o.idTokenHintKeySet, op.WithSupportedIDTokenHintSigningAlgorithms(
-		supportedSigningAlgs(ctx)...,
+		supportedSigningAlgs()...,
 	))
 }
 
 // AccessTokenVerifier configures a Verifier and supported signing algorithms based on the Web Key feature in the context.
 func (o *Provider) AccessTokenVerifier(ctx context.Context) *op.AccessTokenVerifier {
 	return op.NewAccessTokenVerifier(op.IssuerFromContext(ctx), o.accessTokenKeySet, op.WithSupportedAccessTokenSigningAlgorithms(
-		supportedSigningAlgs(ctx)...,
+		supportedSigningAlgs()...,
 	))
 }
 
@@ -106,25 +120,39 @@ func NewServer(
 	command *command.Commands,
 	query *query.Queries,
 	repo repository.Repository,
-	encryptionAlg crypto.EncryptionAlgorithm,
+	authAlg crypto.AuthAlgorithm,
+	targetEncryptionAlgorithm crypto.EncryptionAlgorithm,
 	cryptoKey []byte,
 	es *eventstore.Eventstore,
-	projections *database.DB,
 	userAgentCookie, instanceHandler func(http.Handler) http.Handler,
 	accessHandler *middleware.AccessInterceptor,
 	fallbackLogger *slog.Logger,
 	hashConfig crypto.HashConfig,
+	federatedLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
+	httpClient *http.Client,
 ) (*Server, error) {
 	opConfig, err := createOPConfig(config, defaultLogoutRedirectURI, cryptoKey)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
-	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections)
+	storage := newStorage(config, command, query, repo, authAlg, es, ContextToIssuer, federatedLogoutCache)
 	keyCache := newPublicKeyCache(ctx, config.PublicKeyCacheMaxAge, queryKeyFunc(query))
 	accessTokenKeySet := newOidcKeySet(keyCache, withKeyExpiryCheck(true))
 	idTokenHintKeySet := newOidcKeySet(keyCache)
 
-	var options []op.Option
+	alg := op.NewAES256GCMCrypto(opConfig.CryptoKey, "")
+	if authAlg.LegacyTokenEnabled() {
+		alg = op.NewCompositeCrypto(
+			alg,
+			[]op.Decrypter{
+				alg,
+				op.NewAESCrypto(opConfig.CryptoKey),
+			},
+		)
+	}
+	options := []op.Option{
+		op.WithCrypto(alg),
+	}
 	if !externalSecure {
 		options = append(options, op.WithAllowInsecure())
 	}
@@ -160,31 +188,78 @@ func NewServer(
 		jwksCacheControlMaxAge:     config.JWKSCacheControlMaxAge,
 		fallbackLogger:             fallbackLogger,
 		hasher:                     hasher,
-		encAlg:                     encryptionAlg,
-		opCrypto:                   op.NewAESCrypto(opConfig.CryptoKey),
+		encAlg:                     authAlg,
+		targetEncryptionAlgorithm:  targetEncryptionAlgorithm,
+		opCrypto:                   alg,
 		assetAPIPrefix:             assets.AssetAPI(),
+		httpClient:                 httpClient,
+		registrationEndpoint:       registrationEndpoint(config.CustomEndpoints),
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
-	server.Handler = op.RegisterLegacyServer(server,
-		server.authorizeCallbackHandler,
+
+	// We register the routes via op.RegisterServer (instead of op.RegisterLegacyServer)
+	// so that the dynamic client registration route can be added through the same
+	// WithSetRouter hook as the authorize callback. op.RegisterLegacyServer appends its
+	// own WithHTTPMiddleware after the caller options, which would violate chi's
+	// "all middlewares before routes" rule once we add a route via WithSetRouter.
+	// This mirrors op.RegisterLegacyServer; op.NewIssuerInterceptor reproduces the issuer
+	// middleware it would otherwise add.
+	server.Handler = op.RegisterServer(server, server.Endpoints(),
 		op.WithFallbackLogger(fallbackLogger),
 		op.WithHTTPMiddleware(
+			middleware.CallDurationHandler,
+			middleware.RequestDetailsHandler(),
 			middleware.MetricsHandler(metricTypes),
-			middleware.TelemetryHandler(),
+			middleware.TraceHandler(),
+			middleware.LogHandler("oidc"),
+			middleware.RecoverHandler(writeRecoverError),
 			middleware.NoCacheInterceptor().Handler,
 			instanceHandler,
 			userAgentCookie,
 			http_utils.CopyHeadersToContext,
 			accessHandler.HandleWithPublicAuthPathPrefixes(publicAuthPathPrefixes(config.CustomEndpoints)),
 			middleware.ActivityHandler,
-		))
+			op.NewIssuerInterceptor(server.IssuerFromRequest).Handler,
+		),
+		op.WithSetRouter(func(r chi.Router) {
+			r.HandleFunc(server.Endpoints().Authorization.Relative()+authCallbackPathSuffix, server.authorizeCallbackHandler)
+			r.Method(http.MethodPost, server.registrationEndpoint.Relative(), http.HandlerFunc(server.dynamicClientRegistration))
+			r.Method(http.MethodGet, server.registrationEndpoint.Relative()+"/{client_id}", http.HandlerFunc(server.getDynamicClientRegistration))
+			r.Method(http.MethodPut, server.registrationEndpoint.Relative()+"/{client_id}", http.HandlerFunc(server.updateDynamicClientRegistration))
+			r.Method(http.MethodDelete, server.registrationEndpoint.Relative()+"/{client_id}", http.HandlerFunc(server.deleteDynamicClientRegistration))
+		}),
+	)
 
 	return server, nil
 }
 
+// authCallbackPathSuffix mirrors the unexported suffix used by op.RegisterLegacyServer to
+// register the authorize callback handler under the authorization endpoint.
+// Keep in sync with github.com/zitadel/oidc/v3/pkg/op (authCallbackPathSuffix). The
+// existing authorization-flow integration tests exercise this route and would fail if the
+// library changed the suffix.
+const authCallbackPathSuffix = "/callback"
+
+// registrationEndpoint builds the dynamic client registration endpoint, optionally
+// overridden through the custom endpoint configuration.
+// registrationEndpoint resolves the OAuth 2.0 Dynamic Client Registration endpoint
+// (RFC 7591). The path is configured in defaults.yaml like the other OIDC endpoints, so it
+// can be overridden by environment variable; the literal below is only the fallback for a
+// Server constructed without endpoint configuration.
+func registrationEndpoint(endpointConfig *EndpointConfig) *op.Endpoint {
+	if endpointConfig != nil && endpointConfig.Registration != nil {
+		return op.NewEndpointWithURL(endpointConfig.Registration.Path, endpointConfig.Registration.URL)
+	}
+	return op.NewEndpoint("/oauth/v2/register")
+}
+
+func ContextToIssuer(ctx context.Context) string {
+	return http_utils.DomainContext(ctx).Origin()
+}
+
 func IssuerFromContext(_ bool) (op.IssuerFromRequest, error) {
 	return func(r *http.Request) string {
-		return http_utils.DomainContext(r.Context()).Origin()
+		return ContextToIssuer(r.Context())
 	}, nil
 }
 
@@ -220,7 +295,16 @@ func createOPConfig(config Config, defaultLogoutRedirectURI string, cryptoKey []
 	return opConfig, nil
 }
 
-func newStorage(config Config, command *command.Commands, query *query.Queries, repo repository.Repository, encAlg crypto.EncryptionAlgorithm, es *eventstore.Eventstore, db *database.DB) *OPStorage {
+func newStorage(
+	config Config,
+	command *command.Commands,
+	query *query.Queries,
+	repo repository.Repository,
+	authAlg crypto.AuthAlgorithm,
+	es *eventstore.Eventstore,
+	contextToIssuer func(context.Context) string,
+	federateLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
+) *OPStorage {
 	return &OPStorage{
 		repo:                              repo,
 		command:                           command,
@@ -233,9 +317,10 @@ func newStorage(config Config, command *command.Commands, query *query.Queries, 
 		defaultIdTokenLifetime:            config.DefaultIdTokenLifetime,
 		defaultRefreshTokenIdleExpiration: config.DefaultRefreshTokenIdleExpiration,
 		defaultRefreshTokenExpiration:     config.DefaultRefreshTokenExpiration,
-		encAlg:                            encAlg,
-		locker:                            crdb.NewLocker(db.DB, locksTable, signingKey),
+		authAlg:                           authAlg,
 		assetAPIPrefix:                    assets.AssetAPI(),
+		contextToIssuer:                   contextToIssuer,
+		federateLogoutCache:               federateLogoutCache,
 	}
 }
 

@@ -20,6 +20,7 @@ enum SMSProviderType {
   selector: 'cnsl-dialog-add-sms-provider',
   templateUrl: './dialog-add-sms-provider.component.html',
   styleUrls: ['./dialog-add-sms-provider.component.scss'],
+  standalone: false,
 })
 export class DialogAddSMSProviderComponent {
   public SMSProviderType: any = SMSProviderType;
@@ -47,7 +48,7 @@ export class DialogAddSMSProviderComponent {
     });
 
     this.smsProviders = data.smsProviders;
-    if (!!this.twilio) {
+    if (this.twilio) {
       this.twilioForm.patchValue(this.twilio);
     } else {
       this.twilioForm.addControl('token', new FormControl('', requiredValidator));

@@ -43,6 +43,7 @@ type AuthRequest struct {
 	ApplicationResourceOwner string
 	PrivateLabelingSetting   PrivateLabelingSetting
 	SelectedIDPConfigID      string
+	SelectedIDPConfigArgs    map[string]any
 	LinkingUsers             []*ExternalUser
 	PossibleSteps            []NextStep `json:"-"`
 	PasswordVerified         bool
@@ -103,6 +104,11 @@ type ExternalUser struct {
 	Phone             PhoneNumber
 	IsPhoneVerified   bool
 	Metadatas         []*Metadata
+	// ProjectRoles holds the ZITADEL `urn:zitadel:iam:org:project:roles` claim
+	// ({role: {orgID: orgDomain}}) as returned by a ZITADEL provider. It is
+	// captured at authentication and carried through to user creation, where it
+	// is used to grant the support-user instance membership.
+	ProjectRoles map[string]map[string]string
 }
 
 type Prompt int32
@@ -139,6 +145,7 @@ const (
 	MFATypeU2FUserVerification
 	MFATypeOTPSMS
 	MFATypeOTPEmail
+	MFATypeRecoveryCode
 )
 
 func (m MFAType) UserAuthMethodType() UserAuthMethodType {
@@ -153,6 +160,8 @@ func (m MFAType) UserAuthMethodType() UserAuthMethodType {
 		return UserAuthMethodTypeOTPSMS
 	case MFATypeOTPEmail:
 		return UserAuthMethodTypeOTPEmail
+	case MFATypeRecoveryCode:
+		return UserAuthMethodTypeRecoveryCode
 	default:
 		return UserAuthMethodTypeUnspecified
 	}
@@ -226,24 +235,18 @@ func (a *AuthRequest) AppendAudIfNotExisting(aud string) {
 }
 
 func (a *AuthRequest) GetScopeOrgPrimaryDomain() string {
-	switch request := a.Request.(type) {
-	case *AuthRequestOIDC:
-		for _, scope := range request.Scopes {
-			if strings.HasPrefix(scope, OrgDomainPrimaryScope) {
-				return strings.TrimPrefix(scope, OrgDomainPrimaryScope)
-			}
+	for _, scope := range a.Request.GetScopes() {
+		if strings.HasPrefix(scope, OrgDomainPrimaryScope) {
+			return strings.TrimPrefix(scope, OrgDomainPrimaryScope)
 		}
 	}
 	return ""
 }
 
 func (a *AuthRequest) GetScopeOrgID() string {
-	switch request := a.Request.(type) {
-	case *AuthRequestOIDC:
-		for _, scope := range request.Scopes {
-			if strings.HasPrefix(scope, OrgIDScope) {
-				return strings.TrimPrefix(scope, OrgIDScope)
-			}
+	for _, scope := range a.Request.GetScopes() {
+		if strings.HasPrefix(scope, OrgIDScope) {
+			return strings.TrimPrefix(scope, OrgIDScope)
 		}
 	}
 	return ""

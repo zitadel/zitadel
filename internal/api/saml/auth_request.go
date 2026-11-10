@@ -32,9 +32,10 @@ func (p *Provider) CreateResponse(ctx context.Context, authReq models.AuthReques
 		RelayState:      authReq.GetRelayState(),
 		AcsUrl:          authReq.GetAccessConsumerServiceURL(),
 		RequestID:       authReq.GetAuthRequestID(),
-		Issuer:          authReq.GetDestination(),
 		Audience:        authReq.GetIssuer(),
+		Issuer:          p.GetEntityID(ctx),
 	}
+
 	samlResponse, err := p.AuthCallbackResponse(ctx, authReq, resp)
 	if err != nil {
 		return "", "", err

@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/action"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 type ActionWriteModel struct {
@@ -55,6 +56,10 @@ func (wm *ActionWriteModel) Reduce() error {
 		case *action.ReactivatedEvent:
 			wm.State = domain.ActionStateActive
 		case *action.RemovedEvent:
+			wm.Name = ""
+			wm.Script = ""
+			wm.Timeout = 0
+			wm.AllowedToFail = false
 			wm.State = domain.ActionStateRemoved
 		}
 	}
@@ -140,6 +145,8 @@ func (wm *ActionExistsModel) Reduce() error {
 					break
 				}
 			}
+		case *org.OrgAddedEvent, *org.OrgRemovedEvent:
+			wm.checkedIDs = nil
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -151,8 +158,10 @@ func (wm *ActionExistsModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		AggregateTypes(action.AggregateType).
 		AggregateIDs(wm.actionIDs...).
-		EventTypes(action.AddedEventType,
-			action.RemovedEventType).
+		EventTypes(action.AddedEventType, action.RemovedEventType).
+		Or().
+		AggregateTypes(org.AggregateType).
+		EventTypes(org.OrgAddedEventType, org.OrgRemovedEventType).
 		Builder()
 }
 
@@ -174,6 +183,8 @@ func NewActionsListByOrgModel(resourceOwner string) *ActionsListByOrgModel {
 func (wm *ActionsListByOrgModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
+		case *org.OrgAddedEvent, *org.OrgRemovedEvent:
+			wm.Actions = make(map[string]*ActionWriteModel)
 		case *action.AddedEvent:
 			wm.Actions[e.Aggregate().ID] = &ActionWriteModel{
 				WriteModel: eventstore.WriteModel{
@@ -198,10 +209,13 @@ func (wm *ActionsListByOrgModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
-		AggregateTypes(action.AggregateType).
+		AggregateTypes(action.AggregateType, org.AggregateType).
 		EventTypes(action.AddedEventType,
 			action.DeactivatedEventType,
 			action.ReactivatedEventType,
-			action.RemovedEventType).
+			action.RemovedEventType,
+			org.OrgAddedEventType,
+			org.OrgRemovedEventType,
+		).
 		Builder()
 }

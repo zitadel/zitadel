@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	exec "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/target"
 )
 
 const (
@@ -75,6 +76,15 @@ func (p *executionProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  exec.RemovedEventType,
 					Reduce: p.reduceExecutionRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: target.AggregateType,
+			EventReducers: []handler.EventReducer{
+				{
+					Event:  target.RemovedEventType,
+					Reduce: p.reduceTargetRemoved,
 				},
 			},
 		},
@@ -150,6 +160,21 @@ func (p *executionProjection) reduceExecutionSet(event eventstore.Event) (*handl
 	}
 
 	return handler.NewMultiStatement(e, stmts...), nil
+}
+
+func (p *executionProjection) reduceTargetRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*target.RemovedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	return handler.NewDeleteStatement(
+		e,
+		[]handler.Condition{
+			handler.NewCond(ExecutionTargetInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(ExecutionTargetTargetIDCol, e.Aggregate().ID),
+		},
+		handler.WithTableSuffix(ExecutionTargetSuffix),
+	), nil
 }
 
 func (p *executionProjection) reduceExecutionRemoved(event eventstore.Event) (*handler.Statement, error) {

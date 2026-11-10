@@ -6,14 +6,15 @@ import (
 	"net/http"
 	"time"
 
+	"connectrpc.com/connect"
 	"github.com/muhlemmer/gu"
 	"golang.org/x/text/language"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	object "github.com/zitadel/zitadel/internal/api/grpc/object/v2beta"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -31,18 +32,18 @@ var (
 	}
 )
 
-func (s *Server) GetSession(ctx context.Context, req *session.GetSessionRequest) (*session.GetSessionResponse, error) {
-	res, err := s.query.SessionByID(ctx, true, req.GetSessionId(), req.GetSessionToken(), s.checkPermission)
+func (s *Server) GetSession(ctx context.Context, req *connect.Request[session.GetSessionRequest]) (*connect.Response[session.GetSessionResponse], error) {
+	res, err := s.query.SessionByID(ctx, true, req.Msg.GetSessionId(), req.Msg.GetSessionToken(), s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
-	return &session.GetSessionResponse{
+	return connect.NewResponse(&session.GetSessionResponse{
 		Session: sessionToPb(res),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ListSessions(ctx context.Context, req *session.ListSessionsRequest) (*session.ListSessionsResponse, error) {
-	queries, err := listSessionsRequestToQuery(ctx, req)
+func (s *Server) ListSessions(ctx context.Context, req *connect.Request[session.ListSessionsRequest]) (*connect.Response[session.ListSessionsResponse], error) {
+	queries, err := listSessionsRequestToQuery(ctx, s.systemDefaults, req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -50,18 +51,18 @@ func (s *Server) ListSessions(ctx context.Context, req *session.ListSessionsRequ
 	if err != nil {
 		return nil, err
 	}
-	return &session.ListSessionsResponse{
+	return connect.NewResponse(&session.ListSessionsResponse{
 		Details:  object.ToListDetails(sessions.SearchResponse),
 		Sessions: sessionsToPb(sessions.Sessions),
-	}, nil
+	}), nil
 }
 
-func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRequest) (*session.CreateSessionResponse, error) {
-	checks, metadata, userAgent, lifetime, err := s.createSessionRequestToCommand(ctx, req)
+func (s *Server) CreateSession(ctx context.Context, req *connect.Request[session.CreateSessionRequest]) (*connect.Response[session.CreateSessionResponse], error) {
+	checks, metadata, userAgent, lifetime, err := s.createSessionRequestToCommand(ctx, req.Msg)
 	if err != nil {
 		return nil, err
 	}
-	challengeResponse, cmds, err := s.challengesToCommand(req.GetChallenges(), checks)
+	challengeResponse, cmds, err := s.challengesToCommand(req.Msg.GetChallenges(), checks)
 	if err != nil {
 		return nil, err
 	}
@@ -71,43 +72,43 @@ func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRe
 		return nil, err
 	}
 
-	return &session.CreateSessionResponse{
+	return connect.NewResponse(&session.CreateSessionResponse{
 		Details:      object.DomainToDetailsPb(set.ObjectDetails),
 		SessionId:    set.ID,
 		SessionToken: set.NewToken,
 		Challenges:   challengeResponse,
-	}, nil
+	}), nil
 }
 
-func (s *Server) SetSession(ctx context.Context, req *session.SetSessionRequest) (*session.SetSessionResponse, error) {
-	checks, err := s.setSessionRequestToCommand(ctx, req)
+func (s *Server) SetSession(ctx context.Context, req *connect.Request[session.SetSessionRequest]) (*connect.Response[session.SetSessionResponse], error) {
+	checks, err := s.setSessionRequestToCommand(ctx, req.Msg)
 	if err != nil {
 		return nil, err
 	}
-	challengeResponse, cmds, err := s.challengesToCommand(req.GetChallenges(), checks)
+	challengeResponse, cmds, err := s.challengesToCommand(req.Msg.GetChallenges(), checks)
 	if err != nil {
 		return nil, err
 	}
 
-	set, err := s.command.UpdateSession(ctx, req.GetSessionId(), cmds, req.GetMetadata(), req.GetLifetime().AsDuration())
+	set, err := s.command.UpdateSession(ctx, req.Msg.GetSessionId(), cmds, req.Msg.GetMetadata(), req.Msg.GetLifetime().AsDuration())
 	if err != nil {
 		return nil, err
 	}
-	return &session.SetSessionResponse{
+	return connect.NewResponse(&session.SetSessionResponse{
 		Details:      object.DomainToDetailsPb(set.ObjectDetails),
 		SessionToken: set.NewToken,
 		Challenges:   challengeResponse,
-	}, nil
+	}), nil
 }
 
-func (s *Server) DeleteSession(ctx context.Context, req *session.DeleteSessionRequest) (*session.DeleteSessionResponse, error) {
-	details, err := s.command.TerminateSession(ctx, req.GetSessionId(), req.GetSessionToken())
+func (s *Server) DeleteSession(ctx context.Context, req *connect.Request[session.DeleteSessionRequest]) (*connect.Response[session.DeleteSessionResponse], error) {
+	details, err := s.command.TerminateSession(ctx, req.Msg.GetSessionId(), req.Msg.GetSessionToken())
 	if err != nil {
 		return nil, err
 	}
-	return &session.DeleteSessionResponse{
+	return connect.NewResponse(&session.DeleteSessionResponse{
 		Details: object.DomainToDetailsPb(details),
-	}, nil
+	}), nil
 }
 
 func sessionsToPb(sessions []*query.Session) []*session.Session {
@@ -237,8 +238,11 @@ func userFactorToPb(factor query.SessionUserFactor) *session.UserFactor {
 	}
 }
 
-func listSessionsRequestToQuery(ctx context.Context, req *session.ListSessionsRequest) (*query.SessionsSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToQuery(req.Query)
+func listSessionsRequestToQuery(ctx context.Context, defaults systemdefaults.SystemDefaults, req *session.ListSessionsRequest) (*query.SessionsSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToQuery(defaults, req.GetQuery())
+	if err != nil {
+		return nil, err
+	}
 	queries, err := sessionQueriesToQuery(ctx, req.GetQueries())
 	if err != nil {
 		return nil, err
@@ -255,18 +259,13 @@ func listSessionsRequestToQuery(ctx context.Context, req *session.ListSessionsRe
 }
 
 func sessionQueriesToQuery(ctx context.Context, queries []*session.SearchQuery) (_ []query.SearchQuery, err error) {
-	q := make([]query.SearchQuery, len(queries)+1)
+	q := make([]query.SearchQuery, len(queries))
 	for i, v := range queries {
 		q[i], err = sessionQueryToQuery(v)
 		if err != nil {
 			return nil, err
 		}
 	}
-	creatorQuery, err := query.NewSessionCreatorSearchQuery(authz.GetCtxData(ctx).UserID)
-	if err != nil {
-		return nil, err
-	}
-	q[len(queries)] = creatorQuery
 	return q, nil
 }
 
@@ -297,10 +296,10 @@ func fieldNameToSessionColumn(field session.SessionFieldName) query.Column {
 	case session.SessionFieldName_SESSION_FIELD_NAME_CREATION_DATE:
 		return query.SessionColumnCreationDate
 	case session.SessionFieldName_SESSION_FIELD_NAME_UNSPECIFIED:
-		// Handle all remaining cases so the linter succeeds
-		return query.Column{}
+		// sort by the ID by default, so the results can be paginated reliably
+		return query.SessionColumnID
 	default:
-		return query.Column{}
+		return query.SessionColumnID
 	}
 }
 
@@ -351,6 +350,13 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 		}
 		if !user.State.IsEnabled() {
 			return nil, zerrors.ThrowPreconditionFailed(nil, "SESSION-Gj4ko", "Errors.User.NotActive")
+		}
+		org, err := s.query.OrgByID(ctx, user.ResourceOwner)
+		if err != nil {
+			return nil, err
+		}
+		if !org.State.IsActive() {
+			return nil, zerrors.ThrowPreconditionFailed(nil, "SESSION-oL9nT", "Errors.User.NotActive")
 		}
 
 		var preferredLanguage *language.Tag
@@ -488,7 +494,7 @@ type userSearchByID struct {
 }
 
 func (u userSearchByID) search(ctx context.Context, q *query.Queries) (*query.User, error) {
-	return q.GetUserByID(ctx, true, u.id)
+	return q.GetUserByID(ctx, false, u.id)
 }
 
 type userSearchByLoginName struct {
@@ -496,5 +502,5 @@ type userSearchByLoginName struct {
 }
 
 func (u userSearchByLoginName) search(ctx context.Context, q *query.Queries) (*query.User, error) {
-	return q.GetUserByLoginName(ctx, true, u.loginName)
+	return q.GetUserByLoginName(ctx, false, u.loginName)
 }

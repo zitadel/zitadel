@@ -7,6 +7,7 @@ import (
 	"crypto/rand"
 	"io"
 	"testing"
+	"time"
 
 	"github.com/go-jose/go-jose/v4"
 	"github.com/stretchr/testify/assert"
@@ -610,7 +611,7 @@ func TestCommands_DeleteWebKey(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    *domain.ObjectDetails
+		want    time.Time
 		wantErr error
 	}{
 		{
@@ -624,14 +625,73 @@ func TestCommands_DeleteWebKey(t *testing.T) {
 			wantErr: io.ErrClosedPipe,
 		},
 		{
-			name: "not found error",
+			name: "not found",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
-			args:    args{"key1"},
-			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-ooCa7", "Errors.WebKey.NotFound"),
+			args: args{"key1"},
+			want: time.Time{},
+		},
+		{
+			name: "previously deleted",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(mustNewWebkeyAddedEvent(ctx,
+							webkey.NewAggregate("key1", "instance1"),
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "alg",
+								KeyID:      "encKey",
+								Crypted:    []byte("crypted"),
+							},
+							&jose.JSONWebKey{
+								Key:       &key.PublicKey,
+								KeyID:     "key1",
+								Algorithm: string(jose.ES384),
+								Use:       crypto.KeyUsageSigning.String(),
+							},
+							&crypto.WebKeyECDSAConfig{
+								Curve: crypto.EllipticCurveP384,
+							},
+						)),
+						eventFromEventPusher(webkey.NewActivatedEvent(ctx,
+							webkey.NewAggregate("key1", "instance1"),
+						)),
+						eventFromEventPusher(mustNewWebkeyAddedEvent(ctx,
+							webkey.NewAggregate("key2", "instance1"),
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "alg",
+								KeyID:      "encKey",
+								Crypted:    []byte("crypted"),
+							},
+							&jose.JSONWebKey{
+								Key:       &key.PublicKey,
+								KeyID:     "key2",
+								Algorithm: string(jose.ES384),
+								Use:       crypto.KeyUsageSigning.String(),
+							},
+							&crypto.WebKeyECDSAConfig{
+								Curve: crypto.EllipticCurveP384,
+							},
+						)),
+						eventFromEventPusher(webkey.NewActivatedEvent(ctx,
+							webkey.NewAggregate("key2", "instance1"),
+						)),
+						eventFromEventPusher(webkey.NewDeactivatedEvent(ctx,
+							webkey.NewAggregate("key1", "instance1"),
+						)),
+						eventFromEventPusher(webkey.NewRemovedEvent(ctx,
+							webkey.NewAggregate("key1", "instance1"),
+						)),
+					),
+				),
+			},
+			args: args{"key1"},
+			want: time.Time{},
 		},
 		{
 			name: "key active error",
@@ -722,10 +782,7 @@ func TestCommands_DeleteWebKey(t *testing.T) {
 				),
 			},
 			args: args{"key1"},
-			want: &domain.ObjectDetails{
-				ResourceOwner: "instance1",
-				ID:            "key1",
-			},
+			want: time.Time{},
 		},
 	}
 	for _, tt := range tests {

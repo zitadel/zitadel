@@ -1,12 +1,14 @@
 package query
 
 import (
+	"context"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query/projection"
 )
 
 type MembersQuery struct {
@@ -35,8 +37,17 @@ func NewMemberLastNameSearchQuery(method TextComparison, value string) (SearchQu
 }
 
 func NewMemberUserIDSearchQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(membershipUserID, value, TextEquals)
+	return NewTextQuery(MembershipUserID, value, TextEquals)
 }
+
+func NewMemberInUserIDsSearchQuery(ids []string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(MembershipUserID, list, ListIn)
+}
+
 func NewMemberResourceOwnerSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(membershipResourceOwner, value, TextEquals)
 }
@@ -61,4 +72,13 @@ type Member struct {
 	DisplayName        string
 	AvatarURL          string
 	UserType           domain.UserType
+}
+
+func triggerMemberProjections(ctx context.Context) (context.Context, error) {
+	return triggerBatch(ctx,
+		projection.InstanceMemberProjection,
+		projection.OrgMemberProjection,
+		projection.ProjectMemberProjection,
+		projection.ProjectGrantMemberProjection,
+	)
 }

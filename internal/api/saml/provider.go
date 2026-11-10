@@ -1,11 +1,13 @@
 package saml
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
 	"github.com/zitadel/saml/pkg/provider"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
@@ -16,7 +18,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
 const (
@@ -41,11 +42,13 @@ func NewProvider(
 	repo repository.Repository,
 	encAlg crypto.EncryptionAlgorithm,
 	certEncAlg crypto.EncryptionAlgorithm,
+	targetEncAlg crypto.EncryptionAlgorithm,
 	es *eventstore.Eventstore,
 	projections *database.DB,
 	instanceHandler,
 	userAgentCookie func(http.Handler) http.Handler,
 	accessHandler *middleware.AccessInterceptor,
+	httpClient *http.Client,
 ) (*Provider, error) {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 
@@ -55,10 +58,13 @@ func NewProvider(
 		repo,
 		encAlg,
 		certEncAlg,
+		targetEncAlg,
 		es,
 		projections,
 		fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
 		conf.DefaultLoginURLV2,
+		ContextToIssuer,
+		httpClient,
 	)
 	if err != nil {
 		return nil, err
@@ -66,8 +72,11 @@ func NewProvider(
 
 	options := []provider.Option{
 		provider.WithHttpInterceptors(
+			middleware.CallDurationHandler,
+			middleware.RequestDetailsHandler(),
 			middleware.MetricsHandler(metricTypes),
-			middleware.TelemetryHandler(),
+			middleware.TraceHandler(),
+			middleware.LogHandler("saml"),
 			middleware.NoCacheInterceptor().Handler,
 			instanceHandler,
 			userAgentCookie,
@@ -83,7 +92,7 @@ func NewProvider(
 
 	p, err := provider.NewProvider(
 		provStorage,
-		HandlerPrefix,
+		IssuerFromContext,
 		conf.ProviderConfig,
 		options...,
 	)
@@ -96,20 +105,34 @@ func NewProvider(
 	}, nil
 }
 
+func ContextToIssuer(ctx context.Context) string {
+	return http_utils.DomainContext(ctx).Origin() + HandlerPrefix
+}
+
+func IssuerFromContext(_ bool) (provider.IssuerFromRequest, error) {
+	return func(r *http.Request) string {
+		return ContextToIssuer(r.Context())
+	}, nil
+}
+
 func newStorage(
 	command *command.Commands,
 	query *query.Queries,
 	repo repository.Repository,
 	encAlg crypto.EncryptionAlgorithm,
 	certEncAlg crypto.EncryptionAlgorithm,
+	targetEncAlg crypto.EncryptionAlgorithm,
 	es *eventstore.Eventstore,
 	db *database.DB,
 	defaultLoginURL string,
 	defaultLoginURLV2 string,
+	contextToIssuer func(context.Context) string,
+	actionHttpClient *http.Client,
 ) (*Storage, error) {
 	return &Storage{
 		encAlg:            encAlg,
 		certEncAlg:        certEncAlg,
+		targetEncAlg:      targetEncAlg,
 		locker:            crdb.NewLocker(db.DB, locksTable, signingKey),
 		eventstore:        es,
 		repo:              repo,
@@ -117,6 +140,8 @@ func newStorage(
 		query:             query,
 		defaultLoginURL:   defaultLoginURL,
 		defaultLoginURLv2: defaultLoginURLV2,
+		contextToIssuer:   contextToIssuer,
+		httpClient:        actionHttpClient,
 	}, nil
 }
 

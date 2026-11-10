@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { ShowKeyDialogComponent } from './show-key-dialog.component';
+import { ShowTokenDialogComponent } from './show-token-dialog.component';
 
 describe('ShowKeyDialogComponent', () => {
-  let component: ShowKeyDialogComponent;
-  let fixture: ComponentFixture<ShowKeyDialogComponent>;
+  let component: ShowTokenDialogComponent;
+  let fixture: ComponentFixture<ShowTokenDialogComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ShowKeyDialogComponent],
+      declarations: [ShowTokenDialogComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ShowKeyDialogComponent);
+    fixture = TestBed.createComponent(ShowTokenDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

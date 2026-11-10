@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-func TestCRDB_Push_OneAggregate(t *testing.T) {
+func TestEventstore_Push_OneAggregate(t *testing.T) {
 	type args struct {
 		ctx                  context.Context
 		commands             []eventstore.Command
@@ -202,7 +202,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 					}
 				}
 				if _, err := db.Push(tt.args.ctx, tt.args.commands...); (err != nil) != tt.res.wantErr {
-					t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
+					t.Errorf("eventstore.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 				}
 
 				assertEventCount(t,
@@ -218,7 +218,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 	}
 }
 
-func TestCRDB_Push_MultipleAggregate(t *testing.T) {
+func TestEventstore_Push_MultipleAggregate(t *testing.T) {
 	type args struct {
 		commands []eventstore.Command
 	}
@@ -312,7 +312,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 					},
 				)
 				if _, err := db.Push(context.Background(), tt.args.commands...); (err != nil) != tt.res.wantErr {
-					t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
+					t.Errorf("eventstore.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 				}
 
 				assertEventCount(t, clients[pusherName], tt.res.eventsRes.aggType, tt.res.eventsRes.aggID, tt.res.eventsRes.pushedEventsCount)
@@ -321,7 +321,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 	}
 }
 
-func TestCRDB_Push_Parallel(t *testing.T) {
+func TestEventstore_Push_Parallel(t *testing.T) {
 	type args struct {
 		commands [][]eventstore.Command
 	}
@@ -453,7 +453,7 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 	}
 }
 
-func TestCRDB_Push_ResourceOwner(t *testing.T) {
+func TestEventstore_Push_ResourceOwner(t *testing.T) {
 	type args struct {
 		commands []eventstore.Command
 	}
@@ -587,7 +587,7 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 
 				events, err := db.Push(context.Background(), tt.args.commands...)
 				if err != nil {
-					t.Errorf("CRDB.Push() error = %v", err)
+					t.Errorf("eventstore.Push() error = %v", err)
 				}
 
 				if len(events) != len(tt.res.resourceOwners) {
@@ -604,6 +604,70 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 				assertResourceOwners(t, clients[pusherName], tt.res.resourceOwners, tt.fields.aggregateIDs, tt.fields.aggregateType)
 			})
 		}
+	}
+}
+
+func TestEventstore_Push_ResourceOwner_ReusedAggregateID(t *testing.T) {
+	aggregateType := eventstore.AggregateType(t.Name())
+	aggregateID := "510"
+
+	for pusherName, pusher := range pushers {
+		t.Run(pusherName, func(t *testing.T) {
+			t.Cleanup(cleanupEventstore(clients[pusherName]))
+
+			db := eventstore.NewEventstore(
+				&eventstore.Config{
+					Querier: queriers["v2(inmemory)"],
+					Pusher:  pusher,
+				},
+			)
+
+			initialEvents, err := db.Push(context.Background(),
+				generateCommand(
+					aggregateType,
+					aggregateID,
+					func(e *testEvent) { e.Agg.ResourceOwner = "old" },
+					withEventType("test.initial"),
+				),
+			)
+			if err != nil {
+				t.Fatalf("initial eventstore.Push() error = %v", err)
+			}
+			if len(initialEvents) != 1 {
+				t.Fatalf("initial events length = %d, want 1", len(initialEvents))
+			}
+			if initialEvents[0].Aggregate().ResourceOwner != "old" {
+				t.Fatalf("initial resource owner = %q, want %q", initialEvents[0].Aggregate().ResourceOwner, "old")
+			}
+
+			reusedEvents, err := db.Push(context.Background(),
+				generateEnforcedCommand(
+					aggregateType,
+					aggregateID,
+					func(e *testEvent) { e.Agg.ResourceOwner = "new" },
+					withEventType("test.recreated"),
+				),
+				generateCommand(
+					aggregateType,
+					aggregateID,
+					func(e *testEvent) { e.Agg.ResourceOwner = "ignored" },
+					withEventType("test.followup"),
+				),
+			)
+			if err != nil {
+				t.Fatalf("reused eventstore.Push() error = %v", err)
+			}
+			if len(reusedEvents) != 2 {
+				t.Fatalf("reused events length = %d, want 2", len(reusedEvents))
+			}
+			for i, event := range reusedEvents {
+				if event.Aggregate().ResourceOwner != "new" {
+					t.Fatalf("reused event %d resource owner = %q, want %q", i, event.Aggregate().ResourceOwner, "new")
+				}
+			}
+
+			assertResourceOwnersBySequence(t, clients[pusherName], []string{"old", "new", "new"}, string(aggregateType), aggregateID)
+		})
 	}
 }
 
@@ -656,6 +720,33 @@ func assertResourceOwners(t *testing.T, db *database.DB, resourceOwners, aggrega
 		}
 		return nil
 	}, "SELECT owner FROM eventstore.events2 WHERE aggregate_type = $1 AND aggregate_id = ANY($2) ORDER BY position, in_tx_order", aggregateType, aggregateIDs)
+	if err != nil {
+		t.Error("query failed: ", err)
+		return
+	}
+
+	if eventCount != len(resourceOwners) {
+		t.Errorf("wrong queried event count: want %d, got %d", len(resourceOwners), eventCount)
+	}
+}
+
+func assertResourceOwnersBySequence(t *testing.T, db *database.DB, resourceOwners []string, aggregateType, aggregateID string) {
+	t.Helper()
+
+	eventCount := 0
+	err := db.Query(func(rows *sql.Rows) error {
+		for i := 0; rows.Next(); i++ {
+			var resourceOwner string
+			if err := rows.Scan(&resourceOwner); err != nil {
+				return err
+			}
+			if resourceOwner != resourceOwners[i] {
+				t.Errorf("unexpected resource owner in queried event. want %q, got: %q", resourceOwners[i], resourceOwner)
+			}
+			eventCount++
+		}
+		return nil
+	}, `SELECT owner FROM eventstore.events2 WHERE aggregate_type = $1 AND aggregate_id = $2 ORDER BY "sequence"`, aggregateType, aggregateID)
 	if err != nil {
 		t.Error("query failed: ", err)
 		return

@@ -20,10 +20,10 @@ const (
 	DNSPattern  = "_zitadel-challenge.%s"
 )
 
-func ValidateDomain(domain, token, verifier string, checkType CheckType) error {
+func ValidateDomain(domain, token, verifier string, checkType CheckType, client *http.Client) error {
 	switch checkType {
 	case CheckTypeHTTP:
-		return ValidateDomainHTTP(domain, token, verifier)
+		return ValidateDomainHTTP(domain, token, verifier, client)
 	case CheckTypeDNS:
 		return ValidateDomainDNS(domain, verifier)
 	default:
@@ -31,18 +31,21 @@ func ValidateDomain(domain, token, verifier string, checkType CheckType) error {
 	}
 }
 
-func ValidateDomainHTTP(domain, token, verifier string) error {
-	resp, err := http.Get(tokenUrlHTTP(domain, token))
+func ValidateDomainHTTP(domain, token, verifier string, client *http.Client) error {
+	if client == nil {
+		return zerrors.ThrowInternal(nil, "HTTP-NilCl", "Errors.Internal")
+	}
+	resp, err := client.Get(tokenUrlHTTP(domain, token))
 	if err != nil {
 		return zerrors.ThrowInternal(err, "HTTP-BH42h", "Errors.Internal")
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
 		if resp.StatusCode == 404 {
 			return zerrors.ThrowNotFound(err, "ORG-F4zhw", "Errors.Org.DomainVerificationHTTPNotFound")
 		}
 		return zerrors.ThrowInternal(err, "HTTP-G2zsw", "Errors.Internal")
 	}
-	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "HTTP-HB432", "Errors.Internal")

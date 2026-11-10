@@ -1,0 +1,18 @@
+.instance-roles-info {
+  max-width: 500px;
+
+  .checkbox-desc {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .flex-line {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .formfield {
+      flex: 1;
+    }
+  }
+}

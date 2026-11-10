@@ -25,11 +25,11 @@ const rotate = animation([
   templateUrl: './refresh-table.component.html',
   styleUrls: ['./refresh-table.component.scss'],
   animations: [trigger('rotate', [transition('* => *', [useAnimation(rotate, { params: { time: '1s' } })])])],
+  standalone: false,
 })
 export class RefreshTableComponent implements OnInit {
   @Input() public selection: SelectionModel<any> = new SelectionModel<any>(true, []);
   @Input() public timestamp: Timestamp.AsObject | ConnectTimestamp | undefined = undefined;
-  @Input() public dataSize: number = 0;
   @Input() public emitRefreshAfterTimeoutInMs: number = 0;
   @Input() public loading: boolean | null = false;
   @Input() public emitRefreshOnPreviousRoutes: string[] = [];

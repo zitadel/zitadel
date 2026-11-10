@@ -59,7 +59,7 @@ func (s *Server) GetUserByLoginNameGlobal(ctx context.Context, req *mgmt_pb.GetU
 }
 
 func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (*mgmt_pb.ListUsersResponse, error) {
-	queries, err := ListUsersRequestToModel(req)
+	queries, err := ListUsersRequestToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUsers(ctx, queries, orgID, nil)
+	res, err := s.query.SearchUsers(ctx, queries, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -80,19 +80,12 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 }
 
 func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChangesRequest) (*mgmt_pb.ListUserChangesResponse, error) {
-	var (
-		limit    uint64
-		sequence uint64
-		asc      bool
-	)
-	if req.Query != nil {
-		limit = uint64(req.Query.Limit)
-		sequence = req.Query.Sequence
-		asc = req.Query.Asc
+	limit, sequence, asc, err := change_grpc.ChangeQueryToModel(s.systemDefaults, req.Query)
+	if err != nil {
+		return nil, err
 	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		AllowTimeTravel().
 		Limit(limit).
 		AwaitOpenTransactions().
 		OrderDesc().
@@ -135,7 +128,7 @@ func (s *Server) IsUserUnique(ctx context.Context, req *mgmt_pb.IsUserUniqueRequ
 }
 
 func (s *Server) ListUserMetadata(ctx context.Context, req *mgmt_pb.ListUserMetadataRequest) (*mgmt_pb.ListUserMetadataResponse, error) {
-	metadataQueries, err := ListUserMetadataToDomain(req)
+	metadataQueries, err := ListUserMetadataToDomain(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +136,7 @@ func (s *Server) ListUserMetadata(ctx context.Context, req *mgmt_pb.ListUserMeta
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUserMetadata(ctx, true, req.Id, metadataQueries, false)
+	res, err := s.query.SearchUserMetadata(ctx, true, req.Id, metadataQueries, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +162,7 @@ func (s *Server) GetUserMetadata(ctx context.Context, req *mgmt_pb.GetUserMetada
 
 func (s *Server) SetUserMetadata(ctx context.Context, req *mgmt_pb.SetUserMetadataRequest) (*mgmt_pb.SetUserMetadataResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.SetUserMetadata(ctx, &domain.Metadata{Key: req.Key, Value: req.Value}, req.Id, ctxData.OrgID)
+	result, err := s.command.SetUserMetadata(ctx, &domain.Metadata{Key: req.Key, Value: req.Value}, req.Id, ctxData.OrgID, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +177,7 @@ func (s *Server) SetUserMetadata(ctx context.Context, req *mgmt_pb.SetUserMetada
 
 func (s *Server) BulkSetUserMetadata(ctx context.Context, req *mgmt_pb.BulkSetUserMetadataRequest) (*mgmt_pb.BulkSetUserMetadataResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.BulkSetUserMetadata(ctx, req.Id, ctxData.OrgID, BulkSetUserMetadataToDomain(req)...)
+	result, err := s.command.BulkSetUserMetadata(ctx, req.Id, ctxData.OrgID, nil, BulkSetUserMetadataToDomain(req)...) // permission has already been checked
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +188,7 @@ func (s *Server) BulkSetUserMetadata(ctx context.Context, req *mgmt_pb.BulkSetUs
 
 func (s *Server) RemoveUserMetadata(ctx context.Context, req *mgmt_pb.RemoveUserMetadataRequest) (*mgmt_pb.RemoveUserMetadataResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.RemoveUserMetadata(ctx, req.Key, req.Id, ctxData.OrgID)
+	result, err := s.command.RemoveUserMetadata(ctx, req.Key, req.Id, ctxData.OrgID, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -206,7 +199,7 @@ func (s *Server) RemoveUserMetadata(ctx context.Context, req *mgmt_pb.RemoveUser
 
 func (s *Server) BulkRemoveUserMetadata(ctx context.Context, req *mgmt_pb.BulkRemoveUserMetadataRequest) (*mgmt_pb.BulkRemoveUserMetadataResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.BulkRemoveUserMetadata(ctx, req.Id, ctxData.OrgID, req.Keys...)
+	result, err := s.command.BulkRemoveUserMetadata(ctx, req.Id, ctxData.OrgID, nil, req.Keys...)
 	if err != nil {
 		return nil, err
 	}
@@ -274,7 +267,8 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 	if err != nil {
 		return nil, err
 	}
-	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, human, passwordless, links, initCodeGenerator, phoneCodeGenerator, emailCodeGenerator, passwordlessInitCode)
+	//nolint:staticcheck
+	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, human, passwordless, nil, links, initCodeGenerator, phoneCodeGenerator, emailCodeGenerator, passwordlessInitCode)
 	if err != nil {
 		return nil, err
 	}
@@ -298,7 +292,7 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 
 func (s *Server) AddMachineUser(ctx context.Context, req *mgmt_pb.AddMachineUserRequest) (*mgmt_pb.AddMachineUserResponse, error) {
 	machine := AddMachineUserRequestToCommand(req, authz.GetCtxData(ctx).OrgID)
-	objectDetails, err := s.command.AddMachine(ctx, machine)
+	objectDetails, err := s.command.AddMachine(ctx, machine, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -349,11 +343,11 @@ func (s *Server) UnlockUser(ctx context.Context, req *mgmt_pb.UnlockUserRequest)
 }
 
 func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest) (*mgmt_pb.RemoveUserResponse, error) {
-	memberships, grants, err := s.removeUserDependencies(ctx, req.Id)
+	memberships, grants, groupIDs, err := s.removeUserDependencies(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, memberships, grants...)
+	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, memberships, grants, groupIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -362,28 +356,32 @@ func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest)
 	}, nil
 }
 
-func (s *Server) removeUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, error) {
+func (s *Server) removeUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, []string, error) {
 	userGrantUserQuery, err := query.NewUserGrantUserIDSearchQuery(userID)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{userGrantUserQuery},
-	}, true)
+	}, true, nil)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	membershipsUserQuery, err := query.NewMembershipUserIDQuery(userID)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	memberships, err := s.query.Memberships(ctx, &query.MembershipSearchQuery{
 		Queries: []query.SearchQuery{membershipsUserQuery},
 	}, false)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
-	return cascadingMemberships(memberships.Memberships), userGrantsToIDs(grants.UserGrants), nil
+	groupIDs, err := s.getGroupsByUserID(ctx, userID)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	return cascadingMemberships(memberships.Memberships), userGrantsToIDs(grants.UserGrants), groupIDs, nil
 }
 
 func (s *Server) UpdateUserName(ctx context.Context, req *mgmt_pb.UpdateUserNameRequest) (*mgmt_pb.UpdateUserNameResponse, error) {
@@ -609,6 +607,10 @@ func (s *Server) ListHumanAuthFactors(ctx context.Context, req *mgmt_pb.ListHuma
 	if err != nil {
 		return nil, err
 	}
+	err = query.AppendResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
 	authMethods, err := s.query.SearchUserAuthMethods(ctx, query, nil)
 	if err != nil {
 		return nil, err
@@ -669,6 +671,10 @@ func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHum
 		return nil, err
 	}
 	err = query.AppendStateQuery(domain.MFAStateReady)
+	if err != nil {
+		return nil, err
+	}
+	err = query.AppendResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -753,11 +759,11 @@ func (s *Server) GetMachineKeyByIDs(ctx context.Context, req *mgmt_pb.GetMachine
 }
 
 func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKeysRequest) (*mgmt_pb.ListMachineKeysResponse, error) {
-	query, err := ListMachineKeysRequestToQuery(ctx, req)
+	q, err := ListMachineKeysRequestToQuery(ctx, s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
-	result, err := s.query.SearchAuthNKeys(ctx, query, false)
+	result, err := s.query.SearchAuthNKeys(ctx, q, query.JoinFilterUserMachine, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -775,7 +781,6 @@ func (s *Server) AddMachineKey(ctx context.Context, req *mgmt_pb.AddMachineKeyRe
 	if err != nil {
 		return nil, err
 	}
-
 	// Return key details only if the pubkey wasn't supplied, otherwise the user already has
 	// private key locally
 	var keyDetails []byte
@@ -822,7 +827,7 @@ func (s *Server) GenerateMachineSecret(ctx context.Context, req *mgmt_pb.Generat
 }
 
 func (s *Server) RemoveMachineSecret(ctx context.Context, req *mgmt_pb.RemoveMachineSecretRequest) (*mgmt_pb.RemoveMachineSecretResponse, error) {
-	objectDetails, err := s.command.RemoveMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.RemoveMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -840,7 +845,7 @@ func (s *Server) GetPersonalAccessTokenByIDs(ctx context.Context, req *mgmt_pb.G
 	if err != nil {
 		return nil, err
 	}
-	token, err := s.query.PersonalAccessTokenByID(ctx, true, req.TokenId, false, resourceOwner, aggregateID)
+	token, err := s.query.PersonalAccessTokenByID(ctx, true, req.TokenId, resourceOwner, aggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -850,11 +855,11 @@ func (s *Server) GetPersonalAccessTokenByIDs(ctx context.Context, req *mgmt_pb.G
 }
 
 func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *mgmt_pb.ListPersonalAccessTokensRequest) (*mgmt_pb.ListPersonalAccessTokensResponse, error) {
-	queries, err := ListPersonalAccessTokensRequestToQuery(ctx, req)
+	queries, err := ListPersonalAccessTokensRequestToQuery(ctx, s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
-	result, err := s.query.SearchPersonalAccessTokens(ctx, queries, false)
+	result, err := s.query.SearchPersonalAccessTokens(ctx, queries, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -889,7 +894,7 @@ func (s *Server) RemovePersonalAccessToken(ctx context.Context, req *mgmt_pb.Rem
 }
 
 func (s *Server) ListHumanLinkedIDPs(ctx context.Context, req *mgmt_pb.ListHumanLinkedIDPsRequest) (*mgmt_pb.ListHumanLinkedIDPsResponse, error) {
-	queries, err := ListHumanLinkedIDPsRequestToQuery(ctx, req)
+	queries, err := ListHumanLinkedIDPsRequestToQuery(ctx, s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -902,6 +907,7 @@ func (s *Server) ListHumanLinkedIDPs(ctx context.Context, req *mgmt_pb.ListHuman
 		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.LastRun),
 	}, nil
 }
+
 func (s *Server) RemoveHumanLinkedIDP(ctx context.Context, req *mgmt_pb.RemoveHumanLinkedIDPRequest) (*mgmt_pb.RemoveHumanLinkedIDPResponse, error) {
 	objectDetails, err := s.command.RemoveUserIDPLink(ctx, RemoveHumanLinkedIDPRequestToDomain(ctx, req))
 	if err != nil {
@@ -913,7 +919,7 @@ func (s *Server) RemoveHumanLinkedIDP(ctx context.Context, req *mgmt_pb.RemoveHu
 }
 
 func (s *Server) ListUserMemberships(ctx context.Context, req *mgmt_pb.ListUserMembershipsRequest) (*mgmt_pb.ListUserMembershipsResponse, error) {
-	request, err := ListUserMembershipsRequestToModel(ctx, req)
+	request, err := ListUserMembershipsRequestToModel(ctx, s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -948,18 +954,21 @@ func cascadingIAMMembership(membership *query.IAMMembership) *command.CascadingI
 	}
 	return &command.CascadingIAMMembership{IAMID: membership.IAMID}
 }
+
 func cascadingOrgMembership(membership *query.OrgMembership) *command.CascadingOrgMembership {
 	if membership == nil {
 		return nil
 	}
 	return &command.CascadingOrgMembership{OrgID: membership.OrgID}
 }
+
 func cascadingProjectMembership(membership *query.ProjectMembership) *command.CascadingProjectMembership {
 	if membership == nil {
 		return nil
 	}
 	return &command.CascadingProjectMembership{ProjectID: membership.ProjectID}
 }
+
 func cascadingProjectGrantMembership(membership *query.ProjectGrantMembership) *command.CascadingProjectGrantMembership {
 	if membership == nil {
 		return nil
@@ -973,4 +982,28 @@ func userGrantsToIDs(userGrants []*query.UserGrant) []string {
 		converted[i] = grant.ID
 	}
 	return converted
+}
+
+func (s *Server) getGroupsByUserID(ctx context.Context, userID string) ([]string, error) {
+	groupUserQuery, err := query.NewGroupUsersUserIDsSearchQuery([]string{userID})
+	if err != nil {
+		return nil, err
+	}
+	groupUsers, err := s.query.SearchGroupUsers(ctx,
+		&query.GroupUsersSearchQuery{
+			Queries: []query.SearchQuery{
+				groupUserQuery,
+			},
+		}, nil)
+	if err != nil {
+		return nil, err
+	}
+	if len(groupUsers.GroupUsers) == 0 {
+		return nil, nil
+	}
+	groupIDs := make([]string, 0, len(groupUsers.GroupUsers))
+	for _, groupUser := range groupUsers.GroupUsers {
+		groupIDs = append(groupIDs, groupUser.GroupID)
+	}
+	return groupIDs, nil
 }

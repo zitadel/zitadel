@@ -113,6 +113,25 @@ func NewIDPConfigRemovedEvent(
 	}
 }
 
+func NewIDPConfigRemovedByOwnerEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	configID,
+	name string,
+) *IDPConfigRemovedEvent {
+	return &IDPConfigRemovedEvent{
+		IDPConfigRemovedEvent: *idpconfig.NewIDPConfigRemovedByOwnerEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				IDPConfigRemovedEventType,
+			),
+			configID,
+			name,
+		),
+	}
+}
+
 func IDPConfigRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idpconfig.IDPConfigRemovedEventMapper(event)
 	if err != nil {

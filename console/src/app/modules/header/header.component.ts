@@ -1,35 +1,31 @@
 import { ConnectedPosition, ConnectionPositionPair } from '@angular/cdk/overlay';
-import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, input, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
-import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
-import { AuthenticationService } from 'src/app/services/authentication.service';
 import { BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ActionKeysType } from '../action-keys/action-keys.component';
+import { Organization } from '@zitadel/proto/zitadel/org/v2/org_pb';
+import { Org } from '@zitadel/proto/zitadel/org_pb';
 
 @Component({
   selector: 'cnsl-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
+  standalone: false,
 })
-export class HeaderComponent implements OnDestroy {
-  @ViewChild('input', { static: false }) input!: ElementRef;
-
+export class HeaderComponent {
   @Input() public isDarkTheme: boolean = true;
-  @Input() public user?: User.AsObject;
+  @Input({ required: true }) public user!: User.AsObject;
   public showOrgContext: boolean = false;
 
-  public orgs$: Observable<Org.AsObject[]> = of([]);
-  @Input() public org!: Org.AsObject;
-  @Output() public changedActiveOrg: EventEmitter<Org.AsObject> = new EventEmitter();
-  public orgLoading$: BehaviorSubject<any> = new BehaviorSubject(false);
+  public org = input<Organization | Org | null>();
+
+  @Output() public changedActiveOrg = new EventEmitter<void>();
   public showAccount: boolean = false;
-  private destroy$: Subject<void> = new Subject();
-  public BreadcrumbType: any = BreadcrumbType;
-  public ActionKeysType: any = ActionKeysType;
+  public BreadcrumbType = BreadcrumbType;
+  public ActionKeysType = ActionKeysType;
 
   public positions: ConnectedPosition[] = [
     new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }, 0, 10),
@@ -41,28 +37,15 @@ export class HeaderComponent implements OnDestroy {
     new ConnectionPositionPair({ originX: 'end', originY: 'bottom' }, { overlayX: 'end', overlayY: 'top' }, 0, 10),
   ];
   constructor(
-    public authenticationService: AuthenticationService,
     public authService: GrpcAuthService,
     public mgmtService: ManagementService,
     public breadcrumbService: BreadcrumbService,
     public router: Router,
   ) {}
 
-  public ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  public closeAccountCard(): void {
-    if (this.showAccount) {
-      this.showAccount = false;
-    }
-  }
-
-  public setActiveOrg(org: Org.AsObject): void {
-    this.org = org;
-    this.authService.setActiveOrg(org);
-    this.changedActiveOrg.emit(org);
+  public async setActiveOrg(orgId: string): Promise<void> {
+    await this.authService.getActiveOrg(orgId);
+    this.changedActiveOrg.emit();
   }
 
   public get isOnMe(): boolean {

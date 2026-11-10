@@ -1,6 +1,8 @@
 package org
 
 import (
+	"context"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -26,4 +28,8 @@ func NewAggregate(id string) *Aggregate {
 			ResourceOwner: id,
 		},
 	}
+}
+
+func AggregateFromWriteModel(ctx context.Context, wm *eventstore.WriteModel) *eventstore.Aggregate {
+	return eventstore.AggregateFromWriteModelCtx(ctx, wm, AggregateType, AggregateVersion)
 }

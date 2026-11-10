@@ -41,7 +41,7 @@ func (wm *MachineKeyWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
-		case *user.UserRemovedEvent:
+		default:
 			wm.WriteModel.AppendEvents(e)
 		}
 	}
@@ -50,6 +50,14 @@ func (wm *MachineKeyWriteModel) AppendEvents(events ...eventstore.Event) {
 func (wm *MachineKeyWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
+		case *user.HumanAddedEvent, *user.HumanRegisteredEvent:
+			wm.KeyType = domain.AuthNKeyTypeNONE
+			wm.ExpirationDate = time.Time{}
+			wm.State = domain.MachineKeyStateUnspecified
+		case *user.MachineAddedEvent:
+			wm.KeyType = domain.AuthNKeyTypeNONE
+			wm.ExpirationDate = time.Time{}
+			wm.State = domain.MachineKeyStateUnspecified
 		case *user.MachineKeyAddedEvent:
 			wm.KeyID = e.KeyID
 			wm.KeyType = e.KeyType
@@ -58,6 +66,8 @@ func (wm *MachineKeyWriteModel) Reduce() error {
 		case *user.MachineKeyRemovedEvent:
 			wm.State = domain.MachineKeyStateRemoved
 		case *user.UserRemovedEvent:
+			wm.KeyType = domain.AuthNKeyTypeNONE
+			wm.ExpirationDate = time.Time{}
 			wm.State = domain.MachineKeyStateRemoved
 		}
 	}
@@ -71,6 +81,9 @@ func (wm *MachineKeyWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
 			user.MachineKeyAddedEventType,
 			user.MachineKeyRemovedEventType,
 			user.UserRemovedType).

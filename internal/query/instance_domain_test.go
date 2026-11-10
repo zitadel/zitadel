@@ -18,8 +18,7 @@ var (
 		` projections.instance_domains.is_generated,` +
 		` projections.instance_domains.is_primary,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.instance_domains` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.instance_domains`
 	prepareInstanceDomainsCols = []string{
 		"creation_date",
 		"change_date",
@@ -167,7 +166,7 @@ func Test_InstanceDomainPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

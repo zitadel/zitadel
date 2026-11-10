@@ -9,9 +9,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -25,10 +26,10 @@ type querier interface {
 	conditionFormat(repository.Operation) string
 	placeholder(query string) string
 	eventQuery(useV1 bool) string
-	maxSequenceQuery(useV1 bool) string
+	maxPositionQuery(useV1 bool) string
 	instanceIDsQuery(useV1 bool) string
 	Client() *database.DB
-	orderByEventSequence(desc, shouldOrderBySequence, useV1 bool) string
+	orderByEventSequence(desc, shouldOrderBySequence, orderByCreationDate, useV1 bool) string
 	dialect.Database
 }
 
@@ -65,67 +66,73 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	if where == "" || query == "" {
 		return zerrors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
-	if q.Tx == nil {
-		if travel := prepareTimeTravel(ctx, criteria, q.AllowTimeTravel); travel != "" {
-			query += travel
-		}
-	}
-	query += where
-
-	// instead of using the max function of the database (which doesn't work for postgres)
-	// we select the most recent row
-	if q.Columns == eventstore.ColumnsMaxSequence {
-		q.Limit = 1
-		q.Desc = true
-	}
-
-	// if there is only one subquery we can optimize the query ordering by ordering by sequence
-	var shouldOrderBySequence bool
-	if len(q.SubQueries) == 1 {
-		for _, filter := range q.SubQueries[0] {
-			if filter.Field == repository.FieldAggregateID {
-				shouldOrderBySequence = filter.Operation == repository.OperationEquals
-			}
-		}
-	}
-
-	switch q.Columns {
-	case eventstore.ColumnsEvent,
-		eventstore.ColumnsMaxSequence:
-		query += criteria.orderByEventSequence(q.Desc, shouldOrderBySequence, useV1)
-	}
-
-	if q.Limit > 0 {
-		values = append(values, q.Limit)
-		query += " LIMIT ?"
-	}
-
-	if q.Offset > 0 {
-		values = append(values, q.Offset)
-		query += " OFFSET ?"
-	}
-
-	if q.LockRows {
-		query += " FOR UPDATE"
-		switch q.LockOption {
-		case eventstore.LockOptionWait: // default behavior
-		case eventstore.LockOptionNoWait:
-			query += " NOWAIT"
-		case eventstore.LockOptionSkipLocked:
-			query += " SKIP LOCKED"
-
-		}
-	}
-
-	query = criteria.placeholder(query)
 
 	var contextQuerier interface {
 		QueryContext(context.Context, func(rows *sql.Rows) error, string, ...interface{}) error
+		ExecContext(context.Context, string, ...any) (sql.Result, error)
 	}
 	contextQuerier = criteria.Client()
 	if q.Tx != nil {
 		contextQuerier = &tx{Tx: q.Tx}
 	}
+
+	if q.AwaitOpenTransactions && q.Columns == eventstore.ColumnsEvent {
+		instanceID := authz.GetInstance(ctx).InstanceID()
+		if q.InstanceID != nil {
+			instanceID = q.InstanceID.Value.(string)
+		}
+
+		_, err = contextQuerier.ExecContext(ctx,
+			"select pg_advisory_lock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1)), pg_advisory_unlock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))",
+			instanceID,
+		)
+		if err != nil {
+			return err
+		}
+
+		where += awaitOpenTransactions(useV1)
+	}
+
+	if canScanEventTypesSeparately(q, useV1) {
+		query, values = prepareEventTypeScans(q)
+	} else {
+		query += where
+
+		// instead of using the max function of the database (which doesn't work for postgres)
+		// we select the most recent row
+		if q.Columns == eventstore.ColumnsMaxPosition {
+			q.Limit = 1
+			q.Desc = true
+		}
+
+		// if there is only one subquery we can optimize the query ordering by sequence
+		var shouldOrderBySequence bool
+		if q.EventSortKeyAfter == nil && len(q.SubQueries) == 1 {
+			for _, filter := range q.SubQueries[0] {
+				if filter.Field == repository.FieldAggregateID {
+					shouldOrderBySequence = filter.Operation == repository.OperationEquals
+				}
+			}
+		}
+
+		switch q.Columns {
+		case eventstore.ColumnsEvent,
+			eventstore.ColumnsMaxPosition:
+			query += criteria.orderByEventSequence(q.Desc, shouldOrderBySequence, q.OrderByCreationDate, useV1)
+		}
+
+		if q.Limit > 0 {
+			values = append(values, q.Limit)
+			query += " LIMIT ?"
+		}
+
+		if q.Offset > 0 {
+			values = append(values, q.Offset)
+			query += " OFFSET ?"
+		}
+	}
+
+	query = criteria.placeholder(query)
 
 	err = contextQuerier.QueryContext(ctx,
 		func(rows *sql.Rows) error {
@@ -145,10 +152,73 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	return nil
 }
 
+// canScanEventTypesSeparately reports if the events of the combinations in [repository.SearchQuery.EventTypeScans]
+// can be read one combination at a time: only the instance, the position or sort key and the await of open transactions
+// may restrict the query besides the combinations, and it must be ordered ascending with a limit.
+func canScanEventTypesSeparately(q *repository.SearchQuery, useV1 bool) bool {
+	return !useV1 &&
+		len(q.EventTypeScans) > 0 &&
+		q.Columns == eventstore.ColumnsEvent &&
+		q.Limit > 0 &&
+		!q.Desc &&
+		!q.OrderByCreationDate &&
+		q.Offset == 0 &&
+		q.InstanceID != nil &&
+		q.InstanceIDs == nil &&
+		q.ExcludedInstances == nil &&
+		q.Creator == nil &&
+		q.Owner == nil &&
+		q.Sequence == nil &&
+		q.CreatedAfter == nil &&
+		q.CreatedBefore == nil &&
+		len(q.ExcludeAggregateIDs) == 0
+}
+
+// prepareEventTypeScans reads the events of every combination of aggregate type and event type
+// in sort key order up to the limit, and merges them.
+// Each combination is a range of the es_projection index (instance_id, aggregate_type, event_type, position),
+// which returns its events in position order, so every scan stops at the limit
+// and the query reads at most limit events per combination, however many events match after the position.
+func prepareEventTypeScans(q *repository.SearchQuery) (string, []any) {
+	aggregateTypes := make(database.TextArray[eventstore.AggregateType], len(q.EventTypeScans))
+	eventTypes := make(database.TextArray[eventstore.EventType], len(q.EventTypeScans))
+	for i, typeScan := range q.EventTypeScans {
+		aggregateTypes[i] = typeScan.AggregateType
+		eventTypes[i] = typeScan.EventType
+	}
+	values := []any{aggregateTypes, eventTypes, q.InstanceID.Value}
+
+	conditions := "instance_id = ? AND aggregate_type = scans.scan_aggregate_type AND event_type = scans.scan_event_type"
+	if q.Position != nil {
+		conditions += ` AND "position" >= ?`
+		values = append(values, q.Position.Value)
+	}
+	if q.EventSortKeyAfter != nil {
+		conditions += ` AND (` + eventSortKeySQL + `) > (?, ?, ?, ?, ?, ?)`
+		values = append(values,
+			q.EventSortKeyAfter.Position,
+			q.EventSortKeyAfter.InTxOrder,
+			q.EventSortKeyAfter.InstanceID,
+			q.EventSortKeyAfter.AggregateType,
+			q.EventSortKeyAfter.AggregateID,
+			q.EventSortKeyAfter.Sequence,
+		)
+	}
+	if q.AwaitOpenTransactions {
+		conditions += awaitOpenTransactions(false)
+	}
+	values = append(values, q.Limit, q.Limit)
+
+	return "SELECT events.* FROM UNNEST(?::TEXT[], ?::TEXT[]) AS scans(scan_aggregate_type, scan_event_type)" +
+		" CROSS JOIN LATERAL (SELECT " + eventColumnsSQL + " FROM eventstore.events2 WHERE " + conditions +
+		" ORDER BY " + eventSortKeySQL + " LIMIT ?) AS events" +
+		" ORDER BY " + eventSortKeySQL + " LIMIT ?", values
+}
+
 func prepareColumns(criteria querier, columns eventstore.Columns, useV1 bool) (string, func(s scan, dest interface{}) error) {
 	switch columns {
-	case eventstore.ColumnsMaxSequence:
-		return criteria.maxSequenceQuery(useV1), maxSequenceScanner
+	case eventstore.ColumnsMaxPosition:
+		return criteria.maxPositionQuery(useV1), maxPositionScanner
 	case eventstore.ColumnsInstanceIDs:
 		return criteria.instanceIDsQuery(useV1), instanceIDsScanner
 	case eventstore.ColumnsEvent:
@@ -158,21 +228,15 @@ func prepareColumns(criteria querier, columns eventstore.Columns, useV1 bool) (s
 	}
 }
 
-func prepareTimeTravel(ctx context.Context, criteria querier, allow bool) string {
-	if !allow {
-		return ""
-	}
-	took := call.Took(ctx)
-	return criteria.Timetravel(took)
-}
-
-func maxSequenceScanner(row scan, dest interface{}) (err error) {
-	position, ok := dest.(*sql.NullFloat64)
+func maxPositionScanner(row scan, dest interface{}) (err error) {
+	position, ok := dest.(*decimal.Decimal)
 	if !ok {
-		return zerrors.ThrowInvalidArgumentf(nil, "SQL-NBjA9", "type must be sql.NullInt64 got: %T", dest)
+		return zerrors.ThrowInvalidArgumentf(nil, "SQL-NBjA9", "type must be pointer to decimal.Decimal got: %T", dest)
 	}
-	err = row(position)
+	var res decimal.NullDecimal
+	err = row(&res)
 	if err == nil || errors.Is(err, sql.ErrNoRows) {
+		*position = res.Decimal
 		return nil
 	}
 	return zerrors.ThrowInternal(err, "SQL-bN5xg", "something went wrong")
@@ -201,7 +265,7 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 			return zerrors.ThrowInvalidArgumentf(nil, "SQL-4GP6F", "events scanner: invalid type %T", dest)
 		}
 		event := new(repository.Event)
-		position := new(sql.NullFloat64)
+		position := new(decimal.NullDecimal)
 
 		if useV1 {
 			err = scanner(
@@ -230,6 +294,7 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 				&event.AggregateType,
 				&event.AggregateID,
 				&revision,
+				&event.InTx,
 			)
 			event.Version = eventstore.Version("v" + strconv.Itoa(int(revision)))
 		}
@@ -238,7 +303,7 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 			logging.New().WithError(err).Warn("unable to scan row")
 			return zerrors.ThrowInternal(err, "SQL-M0dsf", "unable to scan row")
 		}
-		event.Pos = position.Float64
+		event.Pos = position.Decimal
 		return reduce(event)
 	}
 }
@@ -283,6 +348,21 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 		args = append(args, additionalArgs...)
 	}
 
+	if query.EventSortKeyAfter != nil && !useV1 {
+		if clauses != "" {
+			clauses += " AND "
+		}
+		clauses += `(` + eventSortKeySQL + `) > (?, ?, ?, ?, ?, ?)`
+		args = append(args,
+			query.EventSortKeyAfter.Position,
+			query.EventSortKeyAfter.InTxOrder,
+			query.EventSortKeyAfter.InstanceID,
+			query.EventSortKeyAfter.AggregateType,
+			query.EventSortKeyAfter.AggregateID,
+			query.EventSortKeyAfter.Sequence,
+		)
+	}
+
 	excludeAggregateIDs := query.ExcludeAggregateIDs
 	if len(excludeAggregateIDs) > 0 {
 		excludeAggregateIDs = append(excludeAggregateIDs, query.InstanceID, query.InstanceIDs, query.Position, query.CreatedAfter, query.CreatedBefore)
@@ -298,22 +378,6 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 			clauses += "aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE " + excludeAggregateIDsClauses + ")"
 		}
 		args = append(args, excludeAggregateIDsArgs...)
-	}
-
-	if query.AwaitOpenTransactions {
-		instanceIDs := make(database.TextArray[string], 0, 3)
-		if query.InstanceID != nil {
-			instanceIDs = append(instanceIDs, query.InstanceID.Value.(string))
-		} else if query.InstanceIDs != nil {
-			instanceIDs = append(instanceIDs, query.InstanceIDs.Value.(database.TextArray[string])...)
-		}
-
-		for i := range instanceIDs {
-			instanceIDs[i] = "zitadel_es_pusher_" + instanceIDs[i]
-		}
-
-		clauses += awaitOpenTransactions(useV1)
-		args = append(args, instanceIDs)
 	}
 
 	if clauses == "" {

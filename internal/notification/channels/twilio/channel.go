@@ -9,7 +9,6 @@ import (
 	verify "github.com/twilio/twilio-go/rest/verify/v2"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/messages"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -39,15 +38,14 @@ func InitChannel(config Config) channels.NotificationChannel {
 			// as it would be a waste of resources and could potentially result in a rate limit.
 			var twilioErr *twilioClient.TwilioRestError
 			if errors.As(err, &twilioErr) && twilioErr.Status >= 400 && twilioErr.Status < 500 {
-				userID, notificationID := userAndNotificationIDsFromEvent(twilioMsg.TriggeringEvent)
 				logging.WithFields(
 					"error", twilioErr.Message,
 					"status", twilioErr.Status,
 					"code", twilioErr.Code,
-					"instanceID", twilioMsg.TriggeringEvent.Aggregate().InstanceID,
-					"userID", userID,
-					"notificationID", notificationID).
-					Warn("twilio create verification error")
+					"instanceID", twilioMsg.InstanceID,
+					"jobID", twilioMsg.JobID,
+					"userID", twilioMsg.UserID,
+				).Warn("twilio create verification error")
 				return channels.NewCancelError(twilioErr)
 			}
 
@@ -75,25 +73,4 @@ func InitChannel(config Config) channels.NotificationChannel {
 		logging.WithFields("message_sid", m.Sid, "status", m.Status).Debug("sms sent")
 		return nil
 	})
-}
-
-func userAndNotificationIDsFromEvent(event eventstore.Event) (userID, notificationID string) {
-	aggID := event.Aggregate().ID
-
-	// we cannot cast to the actual event type because of circular dependencies
-	// so we just check the type...
-	if event.Aggregate().Type != aggregateTypeNotification {
-		// in case it's not a notification event, we can directly return the aggregate ID (as it's a user event)
-		return aggID, ""
-	}
-	// ...and unmarshal the event data from the notification event into a struct that contains the fields we need
-	var data struct {
-		Request struct {
-			UserID string `json:"userID"`
-		} `json:"request"`
-	}
-	if err := event.Unmarshal(&data); err != nil {
-		return "", aggID
-	}
-	return data.Request.UserID, aggID
 }

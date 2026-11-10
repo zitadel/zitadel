@@ -19,7 +19,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "User Schema Service";
     version: "3.0-preview";
-    description: "This API is intended to manage data schemas for users in a ZITADEL instance. This project is in preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.";
+    description: "This API is intended to manage data schemas for users in a Zitadel instance. This project is in preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -27,7 +27,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     }
     license: {
       name: "Apache 2.0",
-      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSING.md";
     };
   };
   schemes: HTTPS;
@@ -42,7 +42,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$CUSTOM-DOMAIN";
+  host: "$CUSTOM_DOMAIN";
   base_path: "/";
 
   external_docs: {
@@ -55,8 +55,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       value: {
         type: TYPE_OAUTH2;
         flow: FLOW_ACCESS_CODE;
-        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        authorization_url: "$CUSTOM_DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM_DOMAIN/oauth/v2/token";
         scopes: {
           scope: {
             key: "openid";
@@ -107,7 +107,7 @@ service ZITADELUserSchemas {
 
   // Search user schemas
   //
-  // Search all matching user schemas. By default, we will return all user schema of your instance. Make sure to include a limit and sorting for pagination.
+  // Search all matching user schemas. By default, the first 100 user schemas of your instance are returned (the default and the maximum limit of 1000 can be configured). Make sure to include a limit and sorting for pagination.
   rpc SearchUserSchemas (SearchUserSchemasRequest) returns (SearchUserSchemasResponse) {
     option (google.api.http) = {
       post: "/resources/v3alpha/user_schemas/_search"

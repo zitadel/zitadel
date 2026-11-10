@@ -1,31 +1,22 @@
 package domain
 
 import (
-	"encoding/base64"
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func NewRefreshToken(userID, tokenID string, algorithm crypto.EncryptionAlgorithm) (string, error) {
+func NewRefreshToken(userID, tokenID string, algorithm crypto.AuthAlgorithm) (string, error) {
 	return RefreshToken(userID, tokenID, tokenID, algorithm)
 }
 
-func RefreshToken(userID, tokenID, token string, algorithm crypto.EncryptionAlgorithm) (string, error) {
-	encrypted, err := algorithm.Encrypt([]byte(userID + ":" + tokenID + ":" + token))
-	if err != nil {
-		return "", err
-	}
-	return base64.RawURLEncoding.EncodeToString(encrypted), nil
+func RefreshToken(userID, tokenID, token string, algorithm crypto.AuthAlgorithm) (string, error) {
+	return algorithm.EncryptToken(userID + ":" + tokenID + ":" + token)
 }
 
-func FromRefreshToken(refreshToken string, algorithm crypto.EncryptionAlgorithm) (userID, tokenID, token string, err error) {
-	decoded, err := base64.RawURLEncoding.DecodeString(refreshToken)
-	if err != nil {
-		return "", "", "", zerrors.ThrowInvalidArgument(err, "DOMAIN-BGDhn", "Errors.User.RefreshToken.Invalid")
-	}
-	decrypted, err := algorithm.DecryptString(decoded, algorithm.EncryptionKeyID())
+func FromRefreshToken(refreshToken string, algorithm crypto.AuthAlgorithm) (userID, tokenID, token string, err error) {
+	decrypted, err := algorithm.DecryptToken(refreshToken)
 	if err != nil {
 		return "", "", "", zerrors.ThrowInvalidArgument(err, "DOMAIN-rie9A", "Errors.User.RefreshToken.Invalid")
 	}

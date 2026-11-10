@@ -3,13 +3,16 @@ package admin
 import (
 	"github.com/crewjam/saml"
 	"github.com/muhlemmer/gu"
+	dsig "github.com/russellhaering/goxmldsig"
 
 	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
@@ -86,8 +89,11 @@ func updateJWTConfigToDomain(req *admin_pb.UpdateIDPJWTConfigRequest) *domain.JW
 	}
 }
 
-func listIDPsToModel(instanceID string, req *admin_pb.ListIDPsRequest) (*query.IDPSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func listIDPsToModel(defaults systemdefaults.SystemDefaults, instanceID string, req *admin_pb.ListIDPsRequest) (*query.IDPSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := idpQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
@@ -161,8 +167,11 @@ func idpUserLinksToDomain(idps []*query.IDPUserLink) []*domain.UserIDPLink {
 	return externalIDPs
 }
 
-func listProvidersToQuery(instanceID string, req *admin_pb.ListProvidersRequest) (*query.IDPTemplateSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func listProvidersToQuery(defaults systemdefaults.SystemDefaults, instanceID string, req *admin_pb.ListProvidersRequest) (*query.IDPTemplateSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := providerQueriesToQuery(req.Queries)
 	if err != nil {
 		return nil, err
@@ -215,6 +224,7 @@ func addGenericOAuthProviderToCommand(req *admin_pb.AddGenericOAuthProviderReque
 		UserEndpoint:          req.UserEndpoint,
 		Scopes:                req.Scopes,
 		IDAttribute:           req.IdAttribute,
+		UsePKCE:               req.UsePkce,
 		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
@@ -229,6 +239,7 @@ func updateGenericOAuthProviderToCommand(req *admin_pb.UpdateGenericOAuthProvide
 		UserEndpoint:          req.UserEndpoint,
 		Scopes:                req.Scopes,
 		IDAttribute:           req.IdAttribute,
+		UsePKCE:               req.UsePkce,
 		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
@@ -241,6 +252,7 @@ func addGenericOIDCProviderToCommand(req *admin_pb.AddGenericOIDCProviderRequest
 		ClientSecret:     req.ClientSecret,
 		Scopes:           req.Scopes,
 		IsIDTokenMapping: req.IsIdTokenMapping,
+		UsePKCE:          req.UsePkce,
 		IDPOptions:       idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
@@ -253,28 +265,31 @@ func updateGenericOIDCProviderToCommand(req *admin_pb.UpdateGenericOIDCProviderR
 		ClientSecret:     req.ClientSecret,
 		Scopes:           req.Scopes,
 		IsIDTokenMapping: req.IsIdTokenMapping,
+		UsePKCE:          req.UsePkce,
 		IDPOptions:       idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 
 func addJWTProviderToCommand(req *admin_pb.AddJWTProviderRequest) command.JWTProvider {
 	return command.JWTProvider{
-		Name:        req.Name,
-		Issuer:      req.Issuer,
-		JWTEndpoint: req.JwtEndpoint,
-		KeyEndpoint: req.KeysEndpoint,
-		HeaderName:  req.HeaderName,
+		Name:        req.GetName(),
+		Issuer:      req.GetIssuer(),
+		JWTEndpoint: req.GetJwtEndpoint(),
+		KeyEndpoint: req.GetKeysEndpoint(),
+		HeaderName:  req.GetHeaderName(),
+		Audience:    req.GetAudience(),
 		IDPOptions:  idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 
 func updateJWTProviderToCommand(req *admin_pb.UpdateJWTProviderRequest) command.JWTProvider {
 	return command.JWTProvider{
-		Name:        req.Name,
-		Issuer:      req.Issuer,
-		JWTEndpoint: req.JwtEndpoint,
-		KeyEndpoint: req.KeysEndpoint,
-		HeaderName:  req.HeaderName,
+		Name:        req.GetName(),
+		Issuer:      req.GetIssuer(),
+		JWTEndpoint: req.GetJwtEndpoint(),
+		KeyEndpoint: req.GetKeysEndpoint(),
+		HeaderName:  req.GetHeaderName(),
+		Audience:    req.GetAudience(),
 		IDPOptions:  idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
@@ -476,14 +491,17 @@ func addSAMLProviderToCommand(req *admin_pb.AddSAMLProviderRequest) *command.SAM
 	if req.NameIdFormat != nil {
 		nameIDFormat = gu.Ptr(idp_grpc.SAMLNameIDFormatToDomain(req.GetNameIdFormat()))
 	}
+
 	return &command.SAMLProvider{
 		Name:                          req.Name,
 		Metadata:                      req.GetMetadataXml(),
 		MetadataURL:                   req.GetMetadataUrl(),
 		Binding:                       bindingToCommand(req.Binding),
 		WithSignedRequest:             req.WithSignedRequest,
+		SignatureAlgorithm:            signatureAlgorithmToCommand(req.GetSignatureAlgorithm()),
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
+		FederatedLogoutEnabled:        req.GetFederatedLogoutEnabled(),
 		IDPOptions:                    idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
@@ -493,14 +511,17 @@ func updateSAMLProviderToCommand(req *admin_pb.UpdateSAMLProviderRequest) *comma
 	if req.NameIdFormat != nil {
 		nameIDFormat = gu.Ptr(idp_grpc.SAMLNameIDFormatToDomain(req.GetNameIdFormat()))
 	}
+
 	return &command.SAMLProvider{
 		Name:                          req.Name,
 		Metadata:                      req.GetMetadataXml(),
 		MetadataURL:                   req.GetMetadataUrl(),
 		Binding:                       bindingToCommand(req.Binding),
 		WithSignedRequest:             req.WithSignedRequest,
+		SignatureAlgorithm:            signatureAlgorithmToCommand(req.GetSignatureAlgorithm()),
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
+		FederatedLogoutEnabled:        req.GetFederatedLogoutEnabled(),
 		IDPOptions:                    idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
@@ -518,4 +539,57 @@ func bindingToCommand(binding idp_pb.SAMLBinding) string {
 	default:
 		return ""
 	}
+}
+
+func signatureAlgorithmToCommand(signatureAlgorithm idp_pb.SAMLSignatureAlgorithm) string {
+	switch signatureAlgorithm {
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_UNSPECIFIED:
+		return ""
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA1:
+		return dsig.RSASHA1SignatureMethod
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA256:
+		return dsig.RSASHA256SignatureMethod
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA512:
+		return dsig.RSASHA512SignatureMethod
+	default:
+		return ""
+	}
+}
+
+func addZitadelProviderToCommand(req *admin_pb.AddZitadelProviderRequest) command.ZitadelProvider {
+	return command.ZitadelProvider{
+		Name:              req.Name,
+		Issuer:            req.Issuer,
+		ClientID:          req.ClientId,
+		ClientSecret:      req.ClientSecret,
+		Scopes:            req.Scopes,
+		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+		InstanceRolesInfo: instanceRolesInfoToCommand(req.InstanceRolesInfo),
+	}
+}
+
+func updateZitadelProviderToCommand(req *admin_pb.UpdateZitadelProviderRequest) command.ZitadelProvider {
+	return command.ZitadelProvider{
+		Name:              req.Name,
+		Issuer:            req.Issuer,
+		ClientID:          req.ClientId,
+		ClientSecret:      req.ClientSecret,
+		Scopes:            req.Scopes,
+		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+		InstanceRolesInfo: instanceRolesInfoToCommand(req.InstanceRolesInfo),
+	}
+}
+
+func instanceRolesInfoToCommand(reqInstanceRolesInfo []*idp_pb.InstanceRolesInfo) []idp.RolesInfo {
+	if reqInstanceRolesInfo == nil {
+		return nil
+	}
+	instanceRolesInfo := make([]idp.RolesInfo, 0, len(reqInstanceRolesInfo))
+	for _, info := range reqInstanceRolesInfo {
+		instanceRolesInfo = append(instanceRolesInfo, idp.RolesInfo{
+			OrganizationID:     info.OrganizationId,
+			OrganizationDomain: info.OrganizationDomain,
+		})
+	}
+	return instanceRolesInfo
 }

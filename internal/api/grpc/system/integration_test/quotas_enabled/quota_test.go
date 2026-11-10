@@ -31,27 +31,10 @@ func TestServer_QuotaNotification_Limit(t *testing.T) {
 	percent := 50
 	percentAmount := amount * percent / 100
 
-	_, err := integration.SystemClient().SetQuota(CTX, &system.SetQuotaRequest{
-		InstanceId:    instance.Instance.Id,
-		Unit:          quota_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED,
-		From:          timestamppb.Now(),
-		ResetInterval: durationpb.New(time.Minute * 5),
-		Amount:        uint64(amount),
-		Limit:         true,
-		Notifications: []*quota_pb.Notification{
-			{
-				Percent: uint32(percent),
-				Repeat:  true,
-				CallUrl: callURL,
-			},
-			{
-				Percent: 100,
-				Repeat:  true,
-				CallUrl: callURL,
-			},
-		},
+	setQuota(t, instance.Instance.Id, amount, true, []*quota_pb.Notification{
+		{Percent: uint32(percent), Repeat: true, CallUrl: callURL},
+		{Percent: 100, Repeat: true, CallUrl: callURL},
 	})
-	require.NoError(t, err)
 
 	sub := sink.Subscribe(CTX, sink.ChannelQuota)
 	defer sub.Close()
@@ -72,6 +55,22 @@ func TestServer_QuotaNotification_Limit(t *testing.T) {
 	require.Error(t, limitErr)
 }
 
+func setQuota(t *testing.T, instanceID string, amount int, limit bool, notifications []*quota_pb.Notification) {
+	_, err := integration.SystemClient().SetQuota(CTX, &system.SetQuotaRequest{
+		InstanceId:    instanceID,
+		Unit:          quota_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED,
+		From:          timestamppb.Now(),
+		ResetInterval: durationpb.New(time.Minute * 5),
+		Amount:        uint64(amount),
+		Limit:         limit,
+		Notifications: notifications,
+	})
+	require.NoError(t, err)
+
+	// wait for some time as there is an eventual consistency until the quota is applied and used in the interceptor
+	time.Sleep(time.Second * 5)
+}
+
 func TestServer_QuotaNotification_NoLimit(t *testing.T) {
 	instance := integration.NewInstance(CTX)
 	iamCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -80,27 +79,10 @@ func TestServer_QuotaNotification_NoLimit(t *testing.T) {
 	percent := 50
 	percentAmount := amount * percent / 100
 
-	_, err := integration.SystemClient().SetQuota(CTX, &system.SetQuotaRequest{
-		InstanceId:    instance.Instance.Id,
-		Unit:          quota_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED,
-		From:          timestamppb.Now(),
-		ResetInterval: durationpb.New(time.Minute * 5),
-		Amount:        uint64(amount),
-		Limit:         false,
-		Notifications: []*quota_pb.Notification{
-			{
-				Percent: uint32(percent),
-				Repeat:  false,
-				CallUrl: callURL,
-			},
-			{
-				Percent: 100,
-				Repeat:  true,
-				CallUrl: callURL,
-			},
-		},
+	setQuota(t, instance.Instance.Id, amount, false, []*quota_pb.Notification{
+		{Percent: uint32(percent), Repeat: false, CallUrl: callURL},
+		{Percent: 100, Repeat: true, CallUrl: callURL},
 	})
-	require.NoError(t, err)
 
 	sub := sink.Subscribe(CTX, sink.ChannelQuota)
 	defer sub.Close()

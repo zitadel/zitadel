@@ -3,6 +3,7 @@ package actions
 import (
 	"context"
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -55,6 +56,41 @@ function testFunc() {
 				}
 				return false
 			},
+		},
+		{
+			name: "require file is disabled",
+			args: args{
+				api: nil,
+				script: `
+require('./some-file.js');
+function testFunc() {}`,
+				name: "testFunc",
+				opts: []Option{},
+			},
+			wantErr: func(err error) bool {
+				gojaErr := new(goja.Exception)
+				if errors.As(err, &gojaErr) {
+					return strings.Contains(gojaErr.Value().String(), ErrFileLoad.Error())
+				}
+				return false
+			},
+		},
+		{
+			name: "require custom module still possible",
+			args: args{
+				api: nil,
+				script: `
+require('zitadel/http');
+function testFunc() {}`,
+				name: "testFunc",
+				opts: []Option{
+					// We need to pass the option to allow loading the module via require('zitadel/http') in the script.
+					// Otherwise, the loader will assume it's a file and fail.
+					// No client is needed here, because the module is not used.
+					WithHTTP(context.Background(), nil),
+				},
+			},
+			wantErr: func(err error) bool { return err == nil },
 		},
 	}
 

@@ -1,14 +1,14 @@
 import { Injectable, Injector, Type } from '@angular/core';
 import { BehaviorSubject, combineLatestWith, from, Observable, of, shareReplay, switchMap, take } from 'rxjs';
-import { filter, map, tap } from 'rxjs/operators';
-import { EnvironmentService } from '../../../services/environment.service';
+import { filter, map } from 'rxjs/operators';
+import { EnvironmentService } from 'src/app/services/environment.service';
 import { CopyUrl } from './provider-next.component';
-import { ManagementService } from '../../../services/mgmt.service';
-import { AdminService } from '../../../services/admin.service';
-import { IDPOwnerType } from '../../../proto/generated/zitadel/idp_pb';
-import { ToastService } from '../../../services/toast.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
+import { AdminService } from 'src/app/services/admin.service';
+import { IDPOwnerType } from 'src/app/proto/generated/zitadel/idp_pb';
+import { ToastService } from 'src/app/services/toast.service';
 import { Data, ParamMap } from '@angular/router';
-import { LoginPolicyService } from '../../../services/login-policy.service';
+import { LoginPolicyService } from 'src/app/services/login-policy.service';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
 @Injectable({
@@ -16,10 +16,10 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 })
 export class ProviderNextService {
   constructor(
-    private env: EnvironmentService,
-    private toast: ToastService,
-    private loginPolicySvc: LoginPolicyService,
-    private injector: Injector,
+    private readonly env: EnvironmentService,
+    private readonly toast: ToastService,
+    private readonly loginPolicySvc: LoginPolicyService,
+    private readonly injector: Injector,
   ) {}
 
   service(routeData: Observable<Data>): Observable<ManagementService | AdminService> {
@@ -80,12 +80,31 @@ export class ProviderNextService {
     );
   }
 
-  callbackUrls(): Observable<CopyUrl[]> {
+  callbackUrls(formPost: boolean = false): Observable<CopyUrl[]> {
     return this.env.env.pipe(
       map((env) => [
         {
-          label: 'ZITADEL Callback URL',
-          url: `${env.issuer}/ui/login/login/externalidp/callback`,
+          label: 'Login V1 Callback URL',
+          url: `${env.issuer}/ui/login/login/externalidp/callback${formPost ? '/form' : ''}`,
+        },
+        {
+          label: 'Login V2 Callback URL',
+          url: `${env.issuer}/idps/callback`,
+        },
+      ]),
+    );
+  }
+
+  jwtCallbackUrls(): Observable<CopyUrl[]> {
+    return this.env.env.pipe(
+      map((env) => [
+        {
+          label: 'Login V1 Callback URL',
+          url: `${env.issuer}/ui/login/idps/jwt`,
+        },
+        {
+          label: 'Login V2 Callback URL',
+          url: `${env.issuer}/idps/jwt`,
         },
       ]),
     );

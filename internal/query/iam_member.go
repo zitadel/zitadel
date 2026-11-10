@@ -7,7 +7,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -71,7 +70,7 @@ func (q *Queries) IAMMembers(ctx context.Context, queries *IAMMembersQuery) (mem
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareInstanceMembersQuery(ctx, q.client)
+	query, scan := prepareInstanceMembersQuery()
 	eq := sq.Eq{InstanceMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
@@ -94,7 +93,7 @@ func (q *Queries) IAMMembers(ctx context.Context, queries *IAMMembersQuery) (mem
 	return members, err
 }
 
-func prepareInstanceMembersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Members, error)) {
+func prepareInstanceMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, error)) {
 	return sq.Select(
 			InstanceMemberCreationDate.identifier(),
 			InstanceMemberChangeDate.identifier(),
@@ -116,7 +115,7 @@ func prepareInstanceMembersQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			LeftJoin(join(HumanUserIDCol, InstanceMemberUserID)).
 			LeftJoin(join(MachineUserIDCol, InstanceMemberUserID)).
 			LeftJoin(join(UserIDCol, InstanceMemberUserID)).
-			LeftJoin(join(LoginNameUserIDCol, InstanceMemberUserID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(LoginNameUserIDCol, InstanceMemberUserID)).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),

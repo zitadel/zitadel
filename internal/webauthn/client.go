@@ -80,3 +80,7 @@ func (c *Client) CreateAssertionResponse(optionsPb *structpb.Struct, verifyUser 
 	}
 	return resp, nil
 }
+
+func (c *Client) KeyID() []byte {
+	return c.credential.ID
+}

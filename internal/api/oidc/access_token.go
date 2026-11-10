@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/op"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -53,7 +52,7 @@ func (s *Server) verifyAccessToken(ctx context.Context, tkn string) (_ *accessTo
 		tokenID, subject = split[0], split[1]
 	} else {
 		verifier := op.NewAccessTokenVerifier(op.IssuerFromContext(ctx), s.accessTokenKeySet,
-			op.WithSupportedAccessTokenSigningAlgorithms(supportedSigningAlgs(ctx)...),
+			op.WithSupportedAccessTokenSigningAlgorithms(supportedSigningAlgs()...),
 		)
 		claims, err := op.VerifyAccessToken[*oidc.AccessTokenClaims](ctx, tkn, verifier)
 		if err != nil {
@@ -122,7 +121,7 @@ func (s *Server) assertClientScopesForPAT(ctx context.Context, token *accessToke
 	if err != nil {
 		return zerrors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
 	}
-	roles, err := s.query.SearchProjectRoles(ctx, authz.GetFeatures(ctx).TriggerIntrospectionProjections, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
+	roles, err := s.query.SearchProjectRoles(ctx, false, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, nil)
 	if err != nil {
 		return err
 	}

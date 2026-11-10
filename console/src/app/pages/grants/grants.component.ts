@@ -15,6 +15,7 @@ export enum GrantType {
   selector: 'cnsl-grants',
   templateUrl: './grants.component.html',
   styleUrls: ['./grants.component.scss'],
+  standalone: false,
 })
 export class GrantsComponent implements OnDestroy {
   public grantContext: UserGrantContext = UserGrantContext.NONE;

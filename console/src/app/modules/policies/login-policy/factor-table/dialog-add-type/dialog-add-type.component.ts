@@ -11,6 +11,7 @@ enum LoginMethodComponentType {
   selector: 'cnsl-dialog-add-type',
   templateUrl: './dialog-add-type.component.html',
   styleUrls: ['./dialog-add-type.component.scss'],
+  standalone: false,
 })
 export class DialogAddTypeComponent {
   public LoginMethodComponentType: any = LoginMethodComponentType;

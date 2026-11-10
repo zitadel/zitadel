@@ -47,7 +47,7 @@ func (e *OrgAddedEvent) Payload() interface{} {
 }
 
 func (e *OrgAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddOrgNameUniqueConstraint(e.Name)}
+	return []*eventstore.UniqueConstraint{NewAddOrgNameUniqueConstraint(e.Name).WithOwners(eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ID))}
 }
 
 func (e *OrgAddedEvent) Fields() []*eventstore.FieldOperation {
@@ -124,7 +124,7 @@ func (e *OrgChangedEvent) Payload() interface{} {
 func (e *OrgChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{
 		NewRemoveOrgNameUniqueConstraint(e.oldName),
-		NewAddOrgNameUniqueConstraint(e.Name),
+		NewAddOrgNameUniqueConstraint(e.Name).WithOwners(eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ID)),
 	}
 }
 
@@ -275,13 +275,14 @@ func OrgReactivatedEventMapper(event eventstore.Event) (eventstore.Event, error)
 }
 
 type OrgRemovedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-	name                 string
-	usernames            []string
-	loginMustBeDomain    bool
-	domains              []string
-	externalIDPs         []*domain.UserIDPLink
-	samlEntityIDs        []string
+	eventstore.BaseEvent        `json:"-"`
+	name                        string
+	usernames                   []string
+	organizationScopedUsernames bool
+	domains                     []string
+	externalIDPs                []*domain.UserIDPLink
+	samlEntityIDs               []string
+	removeByOwner               bool
 }
 
 func (e *OrgRemovedEvent) Payload() interface{} {
@@ -289,11 +290,16 @@ func (e *OrgRemovedEvent) Payload() interface{} {
 }
 
 func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	if e.removeByOwner {
+		return []*eventstore.UniqueConstraint{
+			eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ID),
+		}
+	}
 	constraints := []*eventstore.UniqueConstraint{
 		NewRemoveOrgNameUniqueConstraint(e.name),
 	}
 	for _, name := range e.usernames {
-		constraints = append(constraints, user.NewRemoveUsernameUniqueConstraint(name, e.Aggregate().ID, e.loginMustBeDomain))
+		constraints = append(constraints, user.NewRemoveUsernameUniqueConstraint(name, e.Aggregate().ID, e.organizationScopedUsernames))
 	}
 	for _, domain := range e.domains {
 		constraints = append(constraints, NewRemoveOrgDomainUniqueConstraint(domain))
@@ -314,20 +320,26 @@ func (e *OrgRemovedEvent) Fields() []*eventstore.FieldOperation {
 	}
 }
 
-func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string, usernames []string, loginMustBeDomain bool, domains []string, externalIDPs []*domain.UserIDPLink, samlEntityIDs []string) *OrgRemovedEvent {
+func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string, usernames []string, organizationScopedUsernames bool, domains []string, externalIDPs []*domain.UserIDPLink, samlEntityIDs []string) *OrgRemovedEvent {
 	return &OrgRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			OrgRemovedEventType,
 		),
-		name:              name,
-		usernames:         usernames,
-		domains:           domains,
-		externalIDPs:      externalIDPs,
-		samlEntityIDs:     samlEntityIDs,
-		loginMustBeDomain: loginMustBeDomain,
+		name:                        name,
+		usernames:                   usernames,
+		domains:                     domains,
+		externalIDPs:                externalIDPs,
+		samlEntityIDs:               samlEntityIDs,
+		organizationScopedUsernames: organizationScopedUsernames,
 	}
+}
+
+func NewOrgRemovedByOwnerEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string) *OrgRemovedEvent {
+	removed := NewOrgRemovedEvent(ctx, aggregate, name, nil, false, nil, nil, nil)
+	removed.removeByOwner = true
+	return removed
 }
 
 func OrgRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {

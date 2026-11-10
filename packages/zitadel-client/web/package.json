@@ -1,0 +1,6 @@
+{
+  "name": "@zitadel/client-web",
+  "main": "../dist/web.js",
+  "types": "../dist/web.d.ts",
+  "type": "module"
+}

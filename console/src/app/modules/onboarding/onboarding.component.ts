@@ -7,6 +7,7 @@ import { ONBOARDING_MILESTONES } from 'src/app/utils/onboarding';
   selector: 'cnsl-onboarding',
   templateUrl: './onboarding.component.html',
   styleUrls: ['./onboarding.component.scss'],
+  standalone: false,
 })
 export class OnboardingComponent {
   public actions = this.adminService.progressMilestones;

@@ -6,9 +6,11 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	org_pb "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
 func DomainToDetailsPb(objectDetail *domain.ObjectDetails) *object.Details {
@@ -18,6 +20,9 @@ func DomainToDetailsPb(objectDetail *domain.ObjectDetails) *object.Details {
 	}
 	if !objectDetail.EventDate.IsZero() {
 		details.ChangeDate = timestamppb.New(objectDetail.EventDate)
+	}
+	if !objectDetail.CreationDate.IsZero() {
+		details.CreationDate = timestamppb.New(objectDetail.CreationDate)
 	}
 	return details
 }
@@ -31,11 +36,11 @@ func ToListDetails(response query.SearchResponse) *object.ListDetails {
 
 	return details
 }
-func ListQueryToQuery(query *object.ListQuery) (offset, limit uint64, asc bool) {
-	if query == nil {
-		return 0, 0, false
-	}
-	return query.Offset, uint64(query.Limit), query.Asc
+
+// ListQueryToQuery converts the list query into offset, limit and sorting order.
+// The limit is defaulted and checked by [systemdefaults.SystemDefaults.QueryLimit].
+func ListQueryToQuery(defaults systemdefaults.SystemDefaults, query *object.ListQuery) (offset, limit uint64, asc bool, err error) {
+	return defaults.PaginationToQuery(query)
 }
 
 func ResourceOwnerFromReq(ctx context.Context, req *object.RequestContext) string {
@@ -68,5 +73,51 @@ func TextMethodToQuery(method object.TextQueryMethod) query.TextComparison {
 		return query.TextEndsWithIgnoreCase
 	default:
 		return -1
+	}
+}
+
+func DomainsToPb(domains []*query.Domain) []*org_pb.Domain {
+	d := make([]*org_pb.Domain, len(domains))
+	for i, domain := range domains {
+		d[i] = DomainToPb(domain)
+	}
+	return d
+}
+
+func DomainToPb(d *query.Domain) *org_pb.Domain {
+	return &org_pb.Domain{
+		OrganizationId: d.OrgID,
+		DomainName:     d.Domain,
+		IsVerified:     d.IsVerified,
+		IsPrimary:      d.IsPrimary,
+		ValidationType: DomainValidationTypeFromModel(d.ValidationType),
+	}
+}
+
+func DomainValidationTypeFromModel(validationType domain.OrgDomainValidationType) org_pb.DomainValidationType {
+	switch validationType {
+	case domain.OrgDomainValidationTypeDNS:
+		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS
+	case domain.OrgDomainValidationTypeHTTP:
+		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP
+	case domain.OrgDomainValidationTypeUnspecified:
+		// added to please golangci-lint
+		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_UNSPECIFIED
+	default:
+		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_UNSPECIFIED
+	}
+}
+
+func DomainValidationTypeToDomain(validationType org_pb.DomainValidationType) domain.OrgDomainValidationType {
+	switch validationType {
+	case org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP:
+		return domain.OrgDomainValidationTypeHTTP
+	case org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS:
+		return domain.OrgDomainValidationTypeDNS
+	case org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_UNSPECIFIED:
+		// added to please golangci-lint
+		return domain.OrgDomainValidationTypeUnspecified
+	default:
+		return domain.OrgDomainValidationTypeUnspecified
 	}
 }

@@ -19,7 +19,7 @@ func (s *Server) GetMyInstance(ctx context.Context, _ *admin_pb.GetMyInstanceReq
 }
 
 func (s *Server) ListInstanceDomains(ctx context.Context, req *admin_pb.ListInstanceDomainsRequest) (*admin_pb.ListInstanceDomainsResponse, error) {
-	queries, err := ListInstanceDomainsRequestToModel(req)
+	queries, err := ListInstanceDomainsRequestToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,8 @@ func (s *Server) ListInstanceDomains(ctx context.Context, req *admin_pb.ListInst
 		return nil, err
 	}
 	return &admin_pb.ListInstanceDomainsResponse{
-		Result: instance_grpc.DomainsToPb(domains.Domains),
+		Result:        instance_grpc.DomainsToPb(domains.Domains),
+		SortingColumn: req.SortingColumn,
 		Details: object.ToListDetails(
 			domains.Count,
 			domains.Sequence,
@@ -39,7 +40,7 @@ func (s *Server) ListInstanceDomains(ctx context.Context, req *admin_pb.ListInst
 }
 
 func (s *Server) ListInstanceTrustedDomains(ctx context.Context, req *admin_pb.ListInstanceTrustedDomainsRequest) (*admin_pb.ListInstanceTrustedDomainsResponse, error) {
-	queries, err := ListInstanceTrustedDomainsRequestToModel(req)
+	queries, err := ListInstanceTrustedDomainsRequestToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +49,8 @@ func (s *Server) ListInstanceTrustedDomains(ctx context.Context, req *admin_pb.L
 		return nil, err
 	}
 	return &admin_pb.ListInstanceTrustedDomainsResponse{
-		Result: instance_grpc.TrustedDomainsToPb(domains.Domains),
+		Result:        instance_grpc.TrustedDomainsToPb(domains.Domains),
+		SortingColumn: req.SortingColumn,
 		Details: object.ToListDetails(
 			domains.Count,
 			domains.Sequence,
@@ -68,7 +70,7 @@ func (s *Server) AddInstanceTrustedDomain(ctx context.Context, req *admin_pb.Add
 }
 
 func (s *Server) RemoveInstanceTrustedDomain(ctx context.Context, req *admin_pb.RemoveInstanceTrustedDomainRequest) (*admin_pb.RemoveInstanceTrustedDomainResponse, error) {
-	details, err := s.command.RemoveTrustedDomain(ctx, req.Domain)
+	details, err := s.command.RemoveTrustedDomain(ctx, req.Domain, true)
 	if err != nil {
 		return nil, err
 	}

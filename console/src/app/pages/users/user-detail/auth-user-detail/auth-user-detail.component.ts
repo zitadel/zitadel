@@ -1,26 +1,13 @@
-import { MediaMatcher } from '@angular/cdk/layout';
-import { Component, DestroyRef, EventEmitter, OnInit } from '@angular/core';
+import { Component, computed, DestroyRef, effect, OnInit, signal } from '@angular/core';
 import { Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
-import {
-  combineLatestWith,
-  defer,
-  EMPTY,
-  fromEvent,
-  mergeWith,
-  Observable,
-  of,
-  shareReplay,
-  Subject,
-  switchMap,
-  take,
-} from 'rxjs';
+import { defer, EMPTY, lastValueFrom, Observable, of, shareReplay, Subject, switchMap } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
-import { InfoDialogComponent } from 'src/app/modules/info-dialog/info-dialog.component';
+import { InfoDialogComponent, InfoDialogData, InfoDialogResult } from 'src/app/modules/info-dialog/info-dialog.component';
 import {
   MetadataDialogComponent,
   MetadataDialogData,
@@ -37,7 +24,7 @@ import { formatPhone } from 'src/app/utils/formatPhone';
 import { EditDialogComponent, EditDialogData, EditDialogResult, EditDialogType } from './edit-dialog/edit-dialog.component';
 import { LanguagesService } from 'src/app/services/languages.service';
 import { Gender, HumanProfile, HumanUser, User, UserState } from '@zitadel/proto/zitadel/user/v2/user_pb';
-import { catchError, filter, map, startWith, tap, withLatestFrom } from 'rxjs/operators';
+import { catchError, filter, map, startWith } from 'rxjs/operators';
 import { pairwiseStartWith } from 'src/app/utils/pairwiseStartWith';
 import { NewAuthService } from 'src/app/services/new-auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -45,14 +32,10 @@ import { NewMgmtService } from 'src/app/services/new-mgmt.service';
 import { Metadata } from '@zitadel/proto/zitadel/metadata_pb';
 import { UserService } from 'src/app/services/user.service';
 import { LoginPolicy } from '@zitadel/proto/zitadel/policy_pb';
-import { query } from '@angular/animations';
-
-type UserQuery = { state: 'success'; value: User } | { state: 'error'; value: string } | { state: 'loading'; value?: User };
+import { QueryClient } from '@tanstack/angular-query-experimental';
 
 type MetadataQuery =
-  | { state: 'success'; value: Metadata[] }
-  | { state: 'loading'; value: Metadata[] }
-  | { state: 'error'; value: string };
+  { state: 'success'; value: Metadata[] } | { state: 'loading'; value: Metadata[] } | { state: 'error'; error: any };
 
 type UserWithHumanType = Omit<User, 'type'> & { type: { case: 'human'; value: HumanUser } };
 
@@ -60,6 +43,7 @@ type UserWithHumanType = Omit<User, 'type'> & { type: { case: 'human'; value: Hu
   selector: 'cnsl-auth-user-detail',
   templateUrl: './auth-user-detail.component.html',
   styleUrls: ['./auth-user-detail.component.scss'],
+  standalone: false,
 })
 export class AuthUserDetailComponent implements OnInit {
   protected readonly genders: Gender[] = [Gender.MALE, Gender.FEMALE, Gender.DIVERSE];
@@ -69,14 +53,13 @@ export class AuthUserDetailComponent implements OnInit {
   protected readonly UserState = UserState;
 
   protected USERGRANTCONTEXT: UserGrantContext = UserGrantContext.AUTHUSER;
-  protected readonly refreshChanges$: EventEmitter<void> = new EventEmitter();
   protected readonly refreshMetadata$ = new Subject<true>();
 
   protected readonly settingsList: SidenavSetting[] = [
     { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' },
     { id: 'security', i18nKey: 'USER.SETTINGS.SECURITY' },
     { id: 'idp', i18nKey: 'USER.SETTINGS.IDP' },
-    { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS' },
+    { id: 'grants', i18nKey: 'USER.SETTINGS.ROLEASSIGNMENTS' },
     { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS' },
     {
       id: 'metadata',
@@ -84,146 +67,94 @@ export class AuthUserDetailComponent implements OnInit {
       requiredRoles: { [PolicyComponentServiceType.MGMT]: ['user.read'] },
     },
   ];
-  protected readonly user$: Observable<UserQuery>;
   protected readonly metadata$: Observable<MetadataQuery>;
-  private readonly savedLanguage$: Observable<string>;
-  protected readonly currentSetting$: Observable<string | undefined>;
+  protected readonly currentSetting$ = signal<SidenavSetting>(this.settingsList[0]);
   protected readonly loginPolicy$: Observable<LoginPolicy>;
-  protected readonly userName$: Observable<string>;
+  protected readonly user = this.userService.userQuery();
+  protected readonly refreshChanges$ = new Subject<void>();
+
+  protected readonly userName = computed(() => {
+    const user = this.user.data();
+    if (!user) {
+      return '';
+    }
+    if (user.type.case === 'human') {
+      return user.type.value.profile?.displayName ?? '';
+    }
+    if (user.type.case === 'machine') {
+      return user.type.value.name;
+    }
+    return '';
+  });
 
   constructor(
-    public translate: TranslateService,
+    private translate: TranslateService,
     private toast: ToastService,
-    public grpcAuthService: GrpcAuthService,
+    protected grpcAuthService: GrpcAuthService,
     private dialog: MatDialog,
     private auth: AuthenticationService,
     private breadcrumbService: BreadcrumbService,
-    private mediaMatcher: MediaMatcher,
     public langSvc: LanguagesService,
     private readonly route: ActivatedRoute,
     private readonly newAuthService: NewAuthService,
     private readonly newMgmtService: NewMgmtService,
     private readonly userService: UserService,
     private readonly destroyRef: DestroyRef,
-    private readonly router: Router,
+    private readonly queryClient: QueryClient,
   ) {
-    this.currentSetting$ = this.getCurrentSetting$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-    this.user$ = this.getUser$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-    this.userName$ = this.getUserName(this.user$);
-    this.savedLanguage$ = this.getSavedLanguage$(this.user$);
-    this.metadata$ = this.getMetadata$(this.user$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.metadata$ = this.getMetadata$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
 
     this.loginPolicy$ = defer(() => this.newMgmtService.getLoginPolicy()).pipe(
       catchError(() => EMPTY),
       map(({ policy }) => policy),
       filter(Boolean),
     );
-  }
 
-  getUserName(user$: Observable<UserQuery>) {
-    return user$.pipe(
-      map((query) => {
-        const user = this.user(query);
-        if (!user) {
-          return '';
-        }
-        if (user.type.case === 'human') {
-          return user.type.value.profile?.displayName ?? '';
-        }
-        if (user.type.case === 'machine') {
-          return user.type.value.name;
-        }
-        return '';
-      }),
-    );
-  }
+    effect(() => {
+      const user = this.user.data();
+      if (!user || user.type.case !== 'human') {
+        return;
+      }
 
-  getSavedLanguage$(user$: Observable<UserQuery>) {
-    return user$.pipe(
-      switchMap((query) => {
-        if (query.state !== 'success' || query.value.type.case !== 'human') {
-          return EMPTY;
-        }
-        return query.value.type.value.profile?.preferredLanguage ?? EMPTY;
-      }),
-      startWith(this.translate.defaultLang),
-    );
+      this.breadcrumbService.setBreadcrumb([
+        new Breadcrumb({
+          type: BreadcrumbType.AUTHUSER,
+          name: user.type.value.profile?.displayName,
+          routerLink: ['/users', 'me'],
+        }),
+      ]);
+    });
+
+    effect(() => {
+      const error = this.user.error();
+      if (error) {
+        this.toast.showError(error);
+      }
+    });
   }
 
   ngOnInit(): void {
-    this.user$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((query) => {
-      if ((query.state === 'loading' || query.state === 'success') && query.value?.type.case === 'human') {
-        this.breadcrumbService.setBreadcrumb([
-          new Breadcrumb({
-            type: BreadcrumbType.AUTHUSER,
-            name: query.value.type.value.profile?.displayName,
-            routerLink: ['/users', 'me'],
-          }),
-        ]);
-      }
-    });
-    this.user$.pipe(mergeWith(this.metadata$), takeUntilDestroyed(this.destroyRef)).subscribe((query) => {
+    this.metadata$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((query) => {
       if (query.state == 'error') {
-        this.toast.showError(query.value);
+        this.toast.showError(query.error);
       }
     });
 
-    this.savedLanguage$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((savedLanguage) => this.translate.use(savedLanguage));
+    const param = this.route.snapshot.queryParamMap.get('id');
+    if (!param) {
+      return;
+    }
+    const setting = this.settingsList.find(({ id }) => id === param);
+    if (!setting) {
+      return;
+    }
+    this.currentSetting$.set(setting);
   }
 
-  private getCurrentSetting$(): Observable<string | undefined> {
-    const mediaq: string = '(max-width: 500px)';
-    const matcher = this.mediaMatcher.matchMedia(mediaq);
-    const small$ = fromEvent(matcher, 'change', ({ matches }: MediaQueryListEvent) => matches).pipe(
-      startWith(matcher.matches),
-    );
-
-    return this.route.queryParamMap.pipe(
-      map((params) => params.get('id')),
-      filter(Boolean),
-      startWith('general'),
-      withLatestFrom(small$),
-      map(([id, small]) => (small ? undefined : id)),
-    );
-  }
-
-  private getUser$(): Observable<UserQuery> {
-    return this.refreshChanges$.pipe(
-      startWith(true),
-      switchMap(() => this.getMyUser()),
-      pairwiseStartWith(undefined),
-      map(([prev, curr]) => {
-        if (prev?.state === 'success' && curr.state === 'loading') {
-          return { state: 'loading', value: prev.value } as const;
-        }
-        return curr;
-      }),
-    );
-  }
-
-  private getMyUser(): Observable<UserQuery> {
-    return defer(() => this.userService.getMyUser()).pipe(
-      map((user) => ({ state: 'success' as const, value: user })),
-      catchError((error) => of({ state: 'error', value: error.message ?? '' } as const)),
-      startWith({ state: 'loading' } as const),
-    );
-  }
-
-  getMetadata$(user$: Observable<UserQuery>): Observable<MetadataQuery> {
+  getMetadata$(): Observable<MetadataQuery> {
     return this.refreshMetadata$.pipe(
       startWith(true),
-      combineLatestWith(user$),
-      switchMap(([_, user]) => {
-        if (!(user.state === 'success' || user.state === 'loading')) {
-          return EMPTY;
-        }
-        if (!user.value) {
-          return EMPTY;
-        }
-        return this.getMetadataById(user.value.userId);
-      }),
+      switchMap(() => this.getMetadata()),
       pairwiseStartWith(undefined),
       map(([prev, curr]) => {
         if (prev?.state === 'success' && curr.state === 'loading') {
@@ -234,50 +165,55 @@ export class AuthUserDetailComponent implements OnInit {
     );
   }
 
-  private getMetadataById(userId: string): Observable<MetadataQuery> {
-    return defer(() => this.newMgmtService.listUserMetadata(userId)).pipe(
+  private getMetadata(): Observable<MetadataQuery> {
+    return defer(() => this.newAuthService.listMyMetadata()).pipe(
       map((metadata) => ({ state: 'success', value: metadata.result }) as const),
       startWith({ state: 'loading', value: [] as Metadata[] } as const),
-      catchError((err) => of({ state: 'error', value: err.message ?? '' } as const)),
+      catchError((error) => of({ state: 'error', error } as const)),
     );
   }
 
-  public changeUsername(user: User): void {
+  protected invalidateUser() {
+    this.refreshChanges$.next();
+    return this.queryClient.invalidateQueries({
+      queryKey: this.userService.userQueryOptions().queryKey,
+    });
+  }
+
+  protected async changeUsername(user: User) {
     const data = {
-      confirmKey: 'ACTIONS.CHANGE' as const,
-      cancelKey: 'ACTIONS.CANCEL' as const,
-      labelKey: 'ACTIONS.NEWVALUE' as const,
-      titleKey: 'USER.PROFILE.CHANGEUSERNAME_TITLE' as const,
-      descriptionKey: 'USER.PROFILE.CHANGEUSERNAME_DESC' as const,
+      confirmKey: 'ACTIONS.CHANGE',
+      cancelKey: 'ACTIONS.CANCEL',
+      labelKey: 'ACTIONS.NEWVALUE',
+      titleKey: 'USER.PROFILE.CHANGEUSERNAME_TITLE',
+      descriptionKey: 'USER.PROFILE.CHANGEUSERNAME_DESC',
       value: user.username,
-    };
-    const dialogRef = this.dialog.open<EditDialogComponent, typeof data, EditDialogResult>(EditDialogComponent, {
+      type: EditDialogType.GENERIC,
+    } as const satisfies EditDialogData;
+
+    const dialogRef = this.dialog.open<EditDialogComponent, EditDialogData, EditDialogResult>(EditDialogComponent, {
       data,
       width: '400px',
     });
 
-    dialogRef
-      .afterClosed()
-      .pipe(
-        map((value) => value?.value),
-        filter(Boolean),
-        filter((value) => user.username != value),
-        switchMap((username) => this.userService.updateUser({ userId: user.userId, username })),
-      )
-      .subscribe({
-        next: () => {
-          this.toast.showInfo('USER.TOAST.USERNAMECHANGED', true);
-          this.refreshChanges$.emit();
-        },
-        error: (error) => {
-          this.toast.showError(error);
-        },
-      });
+    const { value: username } = (await lastValueFrom(dialogRef.afterClosed())) ?? {};
+    if (!username || user.username === username) {
+      // no changes made
+      return;
+    }
+
+    try {
+      await this.userService.updateUser({ userId: user.userId, username });
+      this.toast.showInfo('USER.TOAST.USERNAMECHANGED', true);
+      await this.invalidateUser();
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
-  public saveProfile(user: User, profile: HumanProfile): void {
-    this.userService
-      .updateUser({
+  public async saveProfile(user: User, profile: HumanProfile) {
+    try {
+      await this.userService.updateUser({
         userId: user.userId,
         profile: {
           givenName: profile.givenName,
@@ -287,31 +223,27 @@ export class AuthUserDetailComponent implements OnInit {
           preferredLanguage: profile.preferredLanguage,
           gender: profile.gender,
         },
-      })
-      .then(() => {
-        this.toast.showInfo('USER.TOAST.SAVED', true);
-        this.refreshChanges$.emit();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
       });
+      this.toast.showInfo('USER.TOAST.SAVED', true);
+      await this.invalidateUser();
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
-  public enteredPhoneCode(code: string): void {
-    this.newAuthService
-      .verifyMyPhone(code)
-      .then(() => {
-        this.toast.showInfo('USER.TOAST.PHONESAVED', true);
-        this.refreshChanges$.emit();
-        this.promptSetupforSMSOTP();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
+  public async enteredPhoneCode(code: string) {
+    try {
+      await this.newAuthService.verifyMyPhone(code);
+      this.toast.showInfo('USER.TOAST.PHONESAVED', true);
+      await this.invalidateUser();
+      await this.promptSetupforSMSOTP();
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
-  public promptSetupforSMSOTP(): void {
-    const dialogRef = this.dialog.open(InfoDialogComponent, {
+  public async promptSetupforSMSOTP() {
+    const dialogRef = this.dialog.open<InfoDialogComponent, InfoDialogData, InfoDialogResult>(InfoDialogComponent, {
       data: {
         confirmKey: 'ACTIONS.CONTINUE',
         cancelKey: 'ACTIONS.CANCEL',
@@ -321,71 +253,63 @@ export class AuthUserDetailComponent implements OnInit {
       width: '400px',
     });
 
-    dialogRef
-      .afterClosed()
-      .pipe(
-        filter(Boolean),
-        switchMap(() => this.newAuthService.addMyAuthFactorOTPSMS()),
-        switchMap(() => this.translate.get('USER.MFA.OTPSMSSUCCESS').pipe(take(1))),
-      )
-      .subscribe({
-        next: (msg) => this.toast.showInfo(msg),
-        error: (err) => this.toast.showError(err),
-      });
+    const confirmed = await lastValueFrom(dialogRef.afterClosed());
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await this.newAuthService.addMyAuthFactorOTPSMS();
+      this.toast.showInfo('USER.MFA.OTPSMSSUCCESS', true);
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
   public changedLanguage(language: string): void {
     this.translate.use(language);
   }
 
-  public resendEmailVerification(user: User): void {
-    this.newMgmtService
-      .resendHumanEmailVerification(user.userId)
-      .then(() => {
-        this.toast.showInfo('USER.TOAST.EMAILVERIFICATIONSENT', true);
-        this.refreshChanges$.emit();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
-  }
-
-  public resendPhoneVerification(user: User): void {
-    this.newMgmtService
-      .resendHumanPhoneVerification(user.userId)
-      .then(() => {
-        this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
-        this.refreshChanges$.emit();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
-  }
-
-  public deletePhone(user: User): void {
-    this.userService
-      .removePhone(user.userId)
-      .then(() => {
-        this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
-        this.refreshChanges$.emit();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
-  }
-
-  public openEditDialog(user: UserWithHumanType, type: EditDialogType): void {
-    switch (type) {
-      case EditDialogType.PHONE:
-        this.openEditPhoneDialog(user);
-        return;
-      case EditDialogType.EMAIL:
-        this.openEditEmailDialog(user);
-        return;
+  public async resendEmailVerification(user: User) {
+    try {
+      await this.newMgmtService.resendHumanEmailVerification(user.userId);
+      this.toast.showInfo('USER.TOAST.EMAILVERIFICATIONSENT', true);
+      await this.invalidateUser();
+    } catch (error) {
+      this.toast.showError(error);
     }
   }
 
-  private openEditEmailDialog(user: UserWithHumanType) {
+  public async resendPhoneVerification(user: User) {
+    try {
+      await this.newMgmtService.resendHumanPhoneVerification(user.userId);
+      this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
+      await this.invalidateUser();
+    } catch (error) {
+      this.toast.showError(error);
+    }
+  }
+
+  public async deletePhone(user: User) {
+    try {
+      await this.userService.removePhone(user.userId);
+      this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
+      await this.invalidateUser();
+    } catch (error) {
+      this.toast.showError(error);
+    }
+  }
+
+  public async openEditDialog(user: UserWithHumanType, type: EditDialogType) {
+    switch (type) {
+      case EditDialogType.PHONE:
+        return this.openEditPhoneDialog(user);
+      case EditDialogType.EMAIL:
+        return this.openEditEmailDialog(user);
+    }
+  }
+
+  private async openEditEmailDialog(user: UserWithHumanType) {
     const data: EditDialogData = {
       confirmKey: 'ACTIONS.SAVE',
       cancelKey: 'ACTIONS.CANCEL',
@@ -394,35 +318,32 @@ export class AuthUserDetailComponent implements OnInit {
       descriptionKey: 'USER.LOGINMETHODS.EMAIL.EDITDESC',
       value: user.type.value?.email?.email,
       type: EditDialogType.EMAIL,
-    } as const;
+    } as const satisfies EditDialogData;
 
     const dialogRefEmail = this.dialog.open<EditDialogComponent, EditDialogData, EditDialogResult>(EditDialogComponent, {
       data,
       width: '400px',
     });
 
-    dialogRefEmail
-      .afterClosed()
-      .pipe(
-        filter((resp): resp is Required<EditDialogResult> => !!resp?.value),
-        switchMap(({ value, isVerified }) =>
-          this.userService.setEmail({
-            userId: user.userId,
-            email: value,
-            verification: isVerified ? { case: 'isVerified', value: isVerified } : { case: undefined },
-          }),
-        ),
-      )
-      .subscribe({
-        next: () => {
-          this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
-          this.refreshChanges$.emit();
-        },
-        error: (error) => this.toast.showError(error),
+    const { value, isVerified } = (await lastValueFrom(dialogRefEmail.afterClosed())) ?? {};
+    if (!value) {
+      return;
+    }
+
+    try {
+      await this.userService.setEmail({
+        userId: user.userId,
+        email: value,
+        verification: isVerified ? { case: 'isVerified', value: isVerified } : { case: undefined },
       });
+      this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
+      await this.invalidateUser();
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
-  private openEditPhoneDialog(user: UserWithHumanType) {
+  private async openEditPhoneDialog(user: UserWithHumanType) {
     const data = {
       confirmKey: 'ACTIONS.SAVE',
       cancelKey: 'ACTIONS.CANCEL',
@@ -431,32 +352,30 @@ export class AuthUserDetailComponent implements OnInit {
       descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
       value: user.type.value.phone?.phone,
       type: EditDialogType.PHONE,
-      validator: Validators.compose([phoneValidator, requiredValidator]),
-    };
-    const dialogRefPhone = this.dialog.open<EditDialogComponent, typeof data, { value: string; isVerified: boolean }>(
-      EditDialogComponent,
-      { data, width: '400px' },
-    );
+      validator: Validators.compose([phoneValidator, requiredValidator]) ?? undefined,
+    } as const satisfies EditDialogData;
 
-    dialogRefPhone
-      .afterClosed()
-      .pipe(
-        map((resp) => formatPhone(resp?.value)),
-        filter(Boolean),
-        switchMap(({ phone }) => this.userService.setPhone({ userId: user.userId, phone })),
-      )
-      .subscribe({
-        next: () => {
-          this.toast.showInfo('USER.TOAST.PHONESAVED', true);
-          this.refreshChanges$.emit();
-        },
-        error: (error) => {
-          this.toast.showError(error);
-        },
-      });
+    const dialogRefPhone = this.dialog.open<EditDialogComponent, EditDialogData, EditDialogResult>(EditDialogComponent, {
+      data,
+      width: '400px',
+    });
+
+    const { value } = (await lastValueFrom(dialogRefPhone.afterClosed())) ?? {};
+    const formatted = formatPhone(value);
+    if (!formatted) {
+      return;
+    }
+
+    try {
+      await this.userService.setPhone({ userId: user.userId, phone: formatted.phone });
+      this.toast.showInfo('USER.TOAST.PHONESAVED', true);
+      await this.invalidateUser();
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
-  public deleteUser(user: User): void {
+  public async deleteUser(user: User) {
     const data = {
       confirmKey: 'USER.DIALOG.DELETE_BTN',
       cancelKey: 'ACTIONS.CANCEL',
@@ -465,32 +384,32 @@ export class AuthUserDetailComponent implements OnInit {
     };
 
     const dialogRef = this.dialog.open<WarnDialogComponent, typeof data, boolean>(WarnDialogComponent, {
+      data,
       width: '400px',
     });
 
-    dialogRef
-      .afterClosed()
-      .pipe(
-        filter(Boolean),
-        switchMap(() => this.userService.deleteUser(user.userId)),
-      )
-      .subscribe({
-        next: () => {
-          this.toast.showInfo('USER.PAGES.DELETEACCOUNT_SUCCESS', true);
-          this.auth.signout();
-        },
-        error: (error) => this.toast.showError(error),
-      });
+    const confirmed = await lastValueFrom(dialogRef.afterClosed());
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await this.userService.deleteUser(user.userId);
+      this.toast.showInfo('USER.PAGES.DELETEACCOUNT_SUCCESS', true);
+      this.auth.signout();
+    } catch (error) {
+      this.toast.showError(error);
+    }
   }
 
-  public editMetadata(user: User, metadata: Metadata[]): void {
+  public async editMetadata(user: User, metadata: Metadata[]) {
     const setFcn = (key: string, value: string) =>
       this.newMgmtService.setUserMetadata({
         key,
         value: Buffer.from(value),
         id: user.userId,
       });
-    const removeFcn = (key: string): Promise<any> => this.newMgmtService.removeUserMetadata({ key, id: user.userId });
+    const removeFcn = (key: string) => this.newMgmtService.removeUserMetadata({ key, id: user.userId });
 
     const dialogRef = this.dialog.open<MetadataDialogComponent, MetadataDialogData>(MetadataDialogComponent, {
       data: {
@@ -500,34 +419,11 @@ export class AuthUserDetailComponent implements OnInit {
       },
     });
 
-    dialogRef
-      .afterClosed()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.refreshMetadata$.next(true);
-      });
+    await lastValueFrom(dialogRef.afterClosed());
+    this.refreshMetadata$.next(true);
   }
 
-  protected readonly query = query;
-
-  protected user(user: UserQuery): User | undefined {
-    if (user.state === 'success' || user.state === 'loading') {
-      return user.value;
-    }
-    return;
-  }
-
-  public async goToSetting(setting: string) {
-    await this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { id: setting },
-      queryParamsHandling: 'merge',
-      skipLocationChange: true,
-    });
-  }
-
-  public humanUser(userQuery: UserQuery): UserWithHumanType | undefined {
-    const user = this.user(userQuery);
+  public humanUser(user: User | undefined): UserWithHumanType | undefined {
     if (user?.type.case === 'human') {
       return { ...user, type: user.type };
     }

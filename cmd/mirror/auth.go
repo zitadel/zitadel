@@ -3,14 +3,16 @@ package mirror
 import (
 	"context"
 	_ "embed"
+	"errors"
 	"io"
+	"strconv"
 	"time"
 
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
 )
 
@@ -21,9 +23,19 @@ func authCmd() *cobra.Command {
 		Long: `mirrors the auth requests table from one database to another
 ZITADEL needs to be initialized and set up with the --for-mirror flag
 Only auth requests are mirrored`,
-		Run: func(cmd *cobra.Command, args []string) {
-			config := mustNewMigrationConfig(viper.GetViper())
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				logging.OnError(cmd.Context(), err).Error("zitadel mirror auth command failed")
+			}()
+			config, shutdown, err := newMigrationConfig(cmd, viper.GetViper())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				err = errors.Join(err, shutdown(cmd.Context()))
+			}()
 			copyAuth(cmd.Context(), config)
+			return nil
 		},
 	}
 
@@ -34,30 +46,34 @@ Only auth requests are mirrored`,
 
 func copyAuth(ctx context.Context, config *Migration) {
 	sourceClient, err := database.Connect(config.Source, false)
-	logging.OnError(err).Fatal("unable to connect to source database")
+	logging.OnError(ctx, err).Fatal("unable to connect to source database")
 	defer sourceClient.Close()
 
 	destClient, err := database.Connect(config.Destination, false)
-	logging.OnError(err).Fatal("unable to connect to destination database")
+	logging.OnError(ctx, err).Fatal("unable to connect to destination database")
 	defer destClient.Close()
 
-	copyAuthRequests(ctx, sourceClient, destClient)
+	copyAuthRequests(ctx, sourceClient, destClient, config.MaxAuthRequestAge)
 }
 
-func copyAuthRequests(ctx context.Context, source, dest *database.DB) {
+func copyAuthRequests(ctx context.Context, source, dest *database.DB, maxAuthRequestAge time.Duration) {
 	start := time.Now()
 
+	logging.Info(ctx, "creating index on auth.auth_requests.change_date to speed up copy in source database")
+	_, err := source.ExecContext(ctx, "CREATE INDEX CONCURRENTLY IF NOT EXISTS auth_requests_change_date ON auth.auth_requests (change_date)")
+	logging.OnError(ctx, err).Fatal("unable to create index on auth.auth_requests.change_date")
+
 	sourceConn, err := source.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire connection")
+	logging.OnError(ctx, err).Fatal("unable to acquire connection")
 	defer sourceConn.Close()
 
 	r, w := io.Pipe()
 	errs := make(chan error, 1)
 
 	go func() {
-		err = sourceConn.Raw(func(driverConn interface{}) error {
+		err = sourceConn.Raw(func(driverConn any) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
-			_, err := conn.PgConn().CopyTo(ctx, w, "COPY (SELECT id, regexp_replace(request::TEXT, '\\\\u0000', '', 'g')::JSON request, code, request_type, creation_date, change_date, instance_id FROM auth.auth_requests "+instanceClause()+") TO STDOUT")
+			_, err := conn.PgConn().CopyTo(ctx, w, "COPY (SELECT id, regexp_replace(request::TEXT, '\\\\u0000', '', 'g')::JSON request, code, request_type, creation_date, change_date, instance_id FROM auth.auth_requests "+instanceClause()+" AND change_date > NOW() - INTERVAL '"+strconv.FormatFloat(maxAuthRequestAge.Seconds(), 'f', -1, 64)+" seconds') TO STDOUT")
 			w.Close()
 			return err
 		})
@@ -65,11 +81,11 @@ func copyAuthRequests(ctx context.Context, source, dest *database.DB) {
 	}()
 
 	destConn, err := dest.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire connection")
+	logging.OnError(ctx, err).Fatal("unable to acquire connection")
 	defer destConn.Close()
 
 	var affected int64
-	err = destConn.Raw(func(driverConn interface{}) error {
+	err = destConn.Raw(func(driverConn any) error {
 		conn := driverConn.(*stdlib.Conn).Conn()
 
 		if shouldReplace {
@@ -84,7 +100,7 @@ func copyAuthRequests(ctx context.Context, source, dest *database.DB) {
 
 		return err
 	})
-	logging.OnError(err).Fatal("unable to copy auth requests to destination")
-	logging.OnError(<-errs).Fatal("unable to copy auth requests from source")
-	logging.WithFields("took", time.Since(start), "count", affected).Info("auth requests migrated")
+	logging.OnError(ctx, err).Fatal("unable to copy auth requests to destination")
+	logging.OnError(ctx, <-errs).Fatal("unable to copy auth requests from source")
+	logging.Info(ctx, "auth requests migrated", "took", time.Since(start), "count", affected)
 }

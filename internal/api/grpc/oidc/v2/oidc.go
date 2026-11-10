@@ -3,13 +3,14 @@ package oidc
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/op"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
-	"github.com/zitadel/zitadel/internal/api/http"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -17,15 +18,63 @@ import (
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
 )
 
-func (s *Server) GetAuthRequest(ctx context.Context, req *oidc_pb.GetAuthRequestRequest) (*oidc_pb.GetAuthRequestResponse, error) {
-	authRequest, err := s.query.AuthRequestByID(ctx, true, req.GetAuthRequestId(), true)
+func (s *Server) GetAuthRequest(ctx context.Context, req *connect.Request[oidc_pb.GetAuthRequestRequest]) (*connect.Response[oidc_pb.GetAuthRequestResponse], error) {
+	authRequest, err := s.query.AuthRequestByID(ctx, true, req.Msg.GetAuthRequestId(), true)
 	if err != nil {
 		logging.WithError(err).Error("query authRequest by ID")
 		return nil, err
 	}
-	return &oidc_pb.GetAuthRequestResponse{
+	return connect.NewResponse(&oidc_pb.GetAuthRequestResponse{
 		AuthRequest: authRequestToPb(authRequest),
-	}, nil
+	}), nil
+}
+
+func (s *Server) CreateCallback(ctx context.Context, req *connect.Request[oidc_pb.CreateCallbackRequest]) (*connect.Response[oidc_pb.CreateCallbackResponse], error) {
+	switch v := req.Msg.GetCallbackKind().(type) {
+	case *oidc_pb.CreateCallbackRequest_Error:
+		return s.failAuthRequest(ctx, req.Msg.GetAuthRequestId(), v.Error)
+	case *oidc_pb.CreateCallbackRequest_Session:
+		return s.linkSessionToAuthRequest(ctx, req.Msg.GetAuthRequestId(), v.Session)
+	default:
+		return nil, zerrors.ThrowUnimplementedf(nil, "OIDCv2-zee7A", "verification oneOf %T in method CreateCallback not implemented", v)
+	}
+}
+
+func (s *Server) GetDeviceAuthorizationRequest(ctx context.Context, req *connect.Request[oidc_pb.GetDeviceAuthorizationRequestRequest]) (*connect.Response[oidc_pb.GetDeviceAuthorizationRequestResponse], error) {
+	deviceRequest, err := s.query.DeviceAuthRequestByUserCode(ctx, req.Msg.GetUserCode(), true)
+	if err != nil {
+		return nil, err
+	}
+	encrypted, err := s.authAlg.EncryptToken(deviceRequest.DeviceCode)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&oidc_pb.GetDeviceAuthorizationRequestResponse{
+		DeviceAuthorizationRequest: &oidc_pb.DeviceAuthorizationRequest{
+			Id:          encrypted,
+			ClientId:    deviceRequest.ClientID,
+			Scope:       deviceRequest.Scopes,
+			AppName:     deviceRequest.AppName,
+			ProjectName: deviceRequest.ProjectName,
+		},
+	}), nil
+}
+
+func (s *Server) AuthorizeOrDenyDeviceAuthorization(ctx context.Context, req *connect.Request[oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest]) (*connect.Response[oidc_pb.AuthorizeOrDenyDeviceAuthorizationResponse], error) {
+	deviceCode, err := s.authAlg.DecryptToken(req.Msg.GetDeviceAuthorizationId())
+	if err != nil {
+		return nil, err
+	}
+	switch req.Msg.GetDecision().(type) {
+	case *oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session:
+		_, err = s.command.ApproveDeviceAuthWithSession(ctx, deviceCode, req.Msg.GetSession().GetSessionId(), req.Msg.GetSession().GetSessionToken(), s.checkPermission)
+	case *oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Deny:
+		_, err = s.command.CancelDeviceAuth(ctx, deviceCode, domain.DeviceAuthCanceledDenied)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&oidc_pb.AuthorizeOrDenyDeviceAuthorizationResponse{}), nil
 }
 
 func authRequestToPb(a *query.AuthRequest) *oidc_pb.AuthRequest {
@@ -87,18 +136,7 @@ func (s *Server) checkPermission(ctx context.Context, clientID string, userID st
 	return nil
 }
 
-func (s *Server) CreateCallback(ctx context.Context, req *oidc_pb.CreateCallbackRequest) (*oidc_pb.CreateCallbackResponse, error) {
-	switch v := req.GetCallbackKind().(type) {
-	case *oidc_pb.CreateCallbackRequest_Error:
-		return s.failAuthRequest(ctx, req.GetAuthRequestId(), v.Error)
-	case *oidc_pb.CreateCallbackRequest_Session:
-		return s.linkSessionToAuthRequest(ctx, req.GetAuthRequestId(), v.Session)
-	default:
-		return nil, zerrors.ThrowUnimplementedf(nil, "OIDCv2-zee7A", "verification oneOf %T in method CreateCallback not implemented", v)
-	}
-}
-
-func (s *Server) failAuthRequest(ctx context.Context, authRequestID string, ae *oidc_pb.AuthorizationError) (*oidc_pb.CreateCallbackResponse, error) {
+func (s *Server) failAuthRequest(ctx context.Context, authRequestID string, ae *oidc_pb.AuthorizationError) (*connect.Response[oidc_pb.CreateCallbackResponse], error) {
 	details, aar, err := s.command.FailAuthRequest(ctx, authRequestID, errorReasonToDomain(ae.GetError()))
 	if err != nil {
 		return nil, err
@@ -108,19 +146,23 @@ func (s *Server) failAuthRequest(ctx context.Context, authRequestID string, ae *
 	if err != nil {
 		return nil, err
 	}
-	return &oidc_pb.CreateCallbackResponse{
+	return connect.NewResponse(&oidc_pb.CreateCallbackResponse{
 		Details:     object.DomainToDetailsPb(details),
 		CallbackUrl: callback,
-	}, nil
+	}), nil
 }
 
-func (s *Server) linkSessionToAuthRequest(ctx context.Context, authRequestID string, session *oidc_pb.Session) (*oidc_pb.CreateCallbackResponse, error) {
+func (s *Server) linkSessionToAuthRequest(ctx context.Context, authRequestID string, session *oidc_pb.Session) (*connect.Response[oidc_pb.CreateCallbackResponse], error) {
 	details, aar, err := s.command.LinkSessionToAuthRequest(ctx, authRequestID, session.GetSessionId(), session.GetSessionToken(), true, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
 	authReq := &oidc.AuthRequestV2{CurrentAuthRequest: aar}
-	ctx = op.ContextWithIssuer(ctx, http.DomainContext(ctx).Origin())
+	issuer := authReq.Issuer
+	if issuer == "" {
+		issuer = http_utils.DomainContext(ctx).Origin()
+	}
+	ctx = op.ContextWithIssuer(ctx, issuer)
 	var callback string
 	if aar.ResponseType == domain.OIDCResponseTypeCode {
 		callback, err = oidc.CreateCodeCallbackURL(ctx, authReq, s.op.Provider())
@@ -130,10 +172,10 @@ func (s *Server) linkSessionToAuthRequest(ctx context.Context, authRequestID str
 	if err != nil {
 		return nil, err
 	}
-	return &oidc_pb.CreateCallbackResponse{
+	return connect.NewResponse(&oidc_pb.CreateCallbackResponse{
 		Details:     object.DomainToDetailsPb(details),
 		CallbackUrl: callback,
-	}, nil
+	}), nil
 }
 
 func errorReasonToDomain(errorReason oidc_pb.ErrorReason) domain.OIDCErrorReason {

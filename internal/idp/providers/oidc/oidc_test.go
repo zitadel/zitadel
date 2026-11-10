@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/h2non/gock"
@@ -31,7 +32,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 		want   idp.Session
 	}{
 		{
-			name: "successful auth",
+			name: "successful auth without PKCE",
 			fields: fields{
 				name:         "oidc",
 				issuer:       "https://issuer.com",
@@ -55,6 +56,31 @@ func TestProvider_BeginAuth(t *testing.T) {
 			},
 			want: &Session{AuthURL: "https://issuer.com/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState"},
 		},
+		{
+			name: "successful auth with PKCE",
+			fields: fields{
+				name:         "oidc",
+				issuer:       "https://issuer.com",
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
+				userMapper:   DefaultMapper,
+				httpMock: func(issuer string) {
+					gock.New(issuer).
+						Get(oidc.DiscoveryEndpoint).
+						Reply(200).
+						JSON(&oidc.DiscoveryConfiguration{
+							Issuer:                issuer,
+							AuthorizationEndpoint: issuer + "/authorize",
+							TokenEndpoint:         issuer + "/token",
+							UserinfoEndpoint:      issuer + "/userinfo",
+						})
+				},
+				opts: []ProviderOpts{WithSelectAccount(), WithRelyingPartyOption(rp.WithPKCE(nil))},
+			},
+			want: &Session{AuthURL: "https://issuer.com/authorize?client_id=clientID&code_challenge=2ZoH_a01aprzLkwVbjlPsBo4m8mJ_zOKkaDqYM7Oh5w&code_challenge_method=S256&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -63,17 +89,20 @@ func TestProvider_BeginAuth(t *testing.T) {
 			a := assert.New(t)
 			r := require.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.userMapper, tt.fields.opts...)
+			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.userMapper, http.DefaultClient, tt.fields.opts...)
 			r.NoError(err)
+			provider.generateVerifier = func() string {
+				return "pkceOAuthVerifier"
+			}
 
 			ctx := context.Background()
 			session, err := provider.BeginAuth(ctx, "testState")
 			r.NoError(err)
 
-			wantHeaders, wantContent := tt.want.GetAuth(ctx)
-			gotHeaders, gotContent := session.GetAuth(ctx)
-			a.Equal(wantHeaders, gotHeaders)
-			a.Equal(wantContent, gotContent)
+			wantAuth, wantErr := tt.want.GetAuth(ctx)
+			gotAuth, gotErr := session.GetAuth(ctx)
+			a.Equal(wantAuth, gotAuth)
+			a.ErrorIs(gotErr, wantErr)
 		})
 	}
 }
@@ -180,7 +209,7 @@ func TestProvider_Options(t *testing.T) {
 			tt.fields.httpMock(tt.fields.issuer)
 			a := assert.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.userMapper, tt.fields.opts...)
+			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.userMapper, http.DefaultClient, tt.fields.opts...)
 			require.NoError(t, err)
 
 			a.Equal(tt.want.name, provider.Name())

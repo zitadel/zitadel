@@ -99,6 +99,7 @@ func TestCommands_CreateSAMLSessionFromSAMLRequest(t *testing.T) {
 								"binding",
 								"issuer",
 								"destination",
+								"responseissuer",
 							),
 						),
 					),
@@ -129,6 +130,7 @@ func TestCommands_CreateSAMLSessionFromSAMLRequest(t *testing.T) {
 								"binding",
 								"issuer",
 								"destination",
+								"responseissuer",
 							),
 						),
 						eventFromEventPusher(
@@ -167,6 +169,7 @@ func TestCommands_CreateSAMLSessionFromSAMLRequest(t *testing.T) {
 								"binding",
 								"issuer",
 								"destination",
+								"responseissuer",
 							),
 						),
 						eventFromEventPusher(
@@ -248,6 +251,7 @@ func TestCommands_CreateSAMLSessionFromSAMLRequest(t *testing.T) {
 								"binding",
 								"issuer",
 								"destination",
+								"responseissuer",
 							),
 						),
 						eventFromEventPusher(
@@ -295,6 +299,7 @@ func TestCommands_CreateSAMLSessionFromSAMLRequest(t *testing.T) {
 							false,
 						),
 					),
+					expectFilterActiveOrg("org1"),
 					expectPush(
 						samlsession.NewAddedEvent(context.Background(), &samlsession.NewAggregate("V2_samlSessionID", "org1").Aggregate,
 							"userID", "org1", "sessionID", "issuer", []string{"issuer"},
@@ -330,6 +335,7 @@ func TestCommands_CreateSAMLSessionFromSAMLRequest(t *testing.T) {
 				idGenerator:  tt.fields.idGenerator,
 				keyAlgorithm: tt.fields.keyAlgorithm,
 			}
+			c.setMilestonesCompletedForTest("instanceID")
 			err := c.CreateSAMLSessionFromSAMLRequest(tt.args.ctx, tt.args.samlRequestID, tt.args.complianceCheck, tt.args.samlResponseID, tt.args.samlResponseLifetime)
 			require.ErrorIs(t, err, tt.res.err)
 		})

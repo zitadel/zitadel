@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"slices"
+
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
@@ -20,17 +22,17 @@ const (
 	ProjectRoleStateRemoved
 )
 
-func NewProjectRole(projectID, key string) *ProjectRole {
-	return &ProjectRole{ObjectRoot: models.ObjectRoot{AggregateID: projectID}, Key: key}
+func (s ProjectRoleState) Exists() bool {
+	return s != ProjectRoleStateUnspecified && s != ProjectRoleStateRemoved
 }
 
 func (p *ProjectRole) IsValid() bool {
 	return p.AggregateID != "" && p.Key != ""
 }
 
-func containsRoleKey(roleKey string, validRoles []string) bool {
-	for _, validRole := range validRoles {
-		if roleKey == validRole {
+func HasInvalidRoles(validRoles, roles []string) bool {
+	for _, roleKey := range roles {
+		if !slices.Contains(validRoles, roleKey) {
 			return true
 		}
 	}

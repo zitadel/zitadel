@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -26,6 +27,7 @@ type command struct {
 	Payload       Payload
 	Creator       string
 	Owner         string
+	EnforceOwner  bool
 }
 
 func (c *command) Aggregate() *eventstore.Aggregate {
@@ -42,7 +44,8 @@ type event struct {
 	command   *command
 	createdAt time.Time
 	sequence  uint64
-	position  float64
+	position  decimal.Decimal
+	inTxOrder uint32
 }
 
 // TODO: remove on v3
@@ -105,6 +108,7 @@ func commandToEvent(cmd eventstore.Command) (_ eventstore.Event, err error) {
 		Payload:       payload,
 		Creator:       cmd.Creator(),
 		Owner:         cmd.Aggregate().ResourceOwner,
+		EnforceOwner:  eventstore.ShouldEnforceResourceOwner(cmd),
 	}
 
 	return &event{
@@ -152,9 +156,14 @@ func (e *event) Sequence() uint64 {
 	return e.sequence
 }
 
-// Sequence implements [eventstore.Event]
-func (e *event) Position() float64 {
+// Position implements [eventstore.Event]
+func (e *event) Position() decimal.Decimal {
 	return e.position
+}
+
+// InTxOrder implements [eventstore.Event]
+func (e *event) InTxOrder() uint32 {
+	return e.inTxOrder
 }
 
 // Unmarshal implements [eventstore.Event]

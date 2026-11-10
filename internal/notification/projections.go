@@ -2,28 +2,34 @@ package notification
 
 import (
 	"context"
-	"time"
+	"fmt"
+	"net/http"
+	"net/url"
 
+	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	_ "github.com/zitadel/zitadel/internal/notification/statik"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/queue"
 )
 
 var (
 	projections []*handler.Handler
-	worker      *handlers.NotificationWorker
 )
 
 func Register(
 	ctx context.Context,
 	userHandlerCustomConfig, quotaHandlerCustomConfig, telemetryHandlerCustomConfig, backChannelLogoutHandlerCustomConfig projection.CustomConfig,
 	notificationWorkerConfig handlers.WorkerConfig,
+	backChannelLogoutWorkerConfig *handlers.BackChannelLogoutWorkerConfig,
 	telemetryCfg handlers.TelemetryPusherConfig,
 	externalDomain string,
 	externalPort uint16,
@@ -31,44 +37,82 @@ func Register(
 	commands *command.Commands,
 	queries *query.Queries,
 	es *eventstore.Eventstore,
-	otpEmailTmpl, fileSystemPath string,
-	userEncryption, smtpEncryption, smsEncryption, keysEncryptionAlg crypto.EncryptionAlgorithm,
-	tokenLifetime time.Duration,
-	client *database.DB,
+	otpEmailTmpl func(origin *url.URL) string,
+	fileSystemPath string,
+	userEncryption, smtpEncryption, smsEncryption crypto.EncryptionAlgorithm,
+	queue *queue.Queue,
+	httpClient *http.Client,
 ) {
-	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption)
+	if !notificationWorkerConfig.LegacyEnabled {
+		queue.ShouldStart()
+	}
+
+	// make sure the slice does not contain old values
+	projections = nil
+
+	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption, httpClient)
 	c := newChannels(q)
-	projections = append(projections, handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl, notificationWorkerConfig.LegacyEnabled))
+	projections = append(projections, handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl, notificationWorkerConfig, queue))
 	projections = append(projections, handlers.NewQuotaNotifier(ctx, projection.ApplyCustomConfig(quotaHandlerCustomConfig), commands, q, c))
 	projections = append(projections, handlers.NewBackChannelLogoutNotifier(
 		ctx,
 		projection.ApplyCustomConfig(backChannelLogoutHandlerCustomConfig),
+		q,
+		queue,
+		backChannelLogoutWorkerConfig.MaxAttempts,
+	))
+	queue.AddWorkers(ctx, handlers.NewBackChannelLogoutWorker(
 		commands,
 		q,
 		es,
-		keysEncryptionAlg,
+		queue,
 		c,
-		tokenLifetime,
+		backChannelLogoutWorkerConfig,
+		id.SonyFlakeGenerator(),
+		httpClient,
 	))
 	if telemetryCfg.Enabled {
 		projections = append(projections, handlers.NewTelemetryPusher(ctx, telemetryCfg, projection.ApplyCustomConfig(telemetryHandlerCustomConfig), commands, q, c))
 	}
-	worker = handlers.NewNotificationWorker(notificationWorkerConfig, commands, q, es, client, c)
+	if !notificationWorkerConfig.LegacyEnabled {
+		queue.AddWorkers(ctx, handlers.NewNotificationWorker(notificationWorkerConfig, commands, q, c))
+	}
 }
 
 func Start(ctx context.Context) {
 	for _, projection := range projections {
 		projection.Start(ctx)
 	}
-	worker.Start(ctx)
+}
+
+func SetCurrentState(ctx context.Context, es *eventstore.Eventstore) error {
+	if len(projections) == 0 {
+		return nil
+	}
+	position, err := es.LatestPosition(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxPosition).InstanceID(authz.GetInstance(ctx).InstanceID()).OrderDesc().Limit(1))
+	if err != nil {
+		return err
+	}
+
+	for i, projection := range projections {
+		logging.WithFields("name", projection.ProjectionName(), "instance", authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("set current state of notification projection")
+		_, err = projection.Trigger(ctx, handler.WithMinPosition(position))
+		if err != nil {
+			return err
+		}
+		logging.WithFields("name", projection.ProjectionName(), "instance", authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("current state of notification projection set")
+	}
+	return nil
 }
 
 func ProjectInstance(ctx context.Context) error {
-	for _, projection := range projections {
+	for i, projection := range projections {
+		logging.WithFields("name", projection.ProjectionName(), "instance", authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("starting notification projection")
 		_, err := projection.Trigger(ctx)
 		if err != nil {
 			return err
 		}
+		logging.WithFields("name", projection.ProjectionName(), "instance", authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("notification projection done")
 	}
 	return nil
 }

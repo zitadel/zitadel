@@ -4,14 +4,15 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"net/url"
 	"testing"
 	"time"
 
+	"github.com/riverqueue/river"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -26,8 +27,10 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/notification"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -61,33 +64,41 @@ const (
 func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 	tests := []struct {
 		name string
-		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, want)
+		test func(*gomock.Controller, *mock.MockQueries, *mock.MockQueue) (fields, args, want)
 	}{
 		{
 			name: "with event trigger",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, q *mock.MockQueue) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testcode")
-				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-					UserID:            userID,
-					UserResourceOwner: orgID,
-					TriggerOrigin:     eventOrigin,
-					URLTemplate: fmt.Sprintf("%s/ui/login/user/init?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&passwordset={{.PasswordSet}}&authRequestID=%s",
-						eventOrigin, userID, orgID, authRequestID),
-					Code:                          code,
-					CodeExpiry:                    time.Hour,
-					EventType:                     user.HumanInitialCodeAddedType,
-					NotificationType:              domain.NotificationTypeEmail,
-					MessageType:                   domain.InitCodeMessageType,
-					UnverifiedNotificationChannel: true,
-					Args:                          &domain.NotificationArguments{AuthRequestID: authRequestID},
-					AggregateID:                   "",
-					AggregateResourceOwner:        "",
-					IsOTP:                         false,
-					RequiresPreviousDomain:        false,
-				}).Return(nil)
+				q.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						Aggregate: &eventstore.Aggregate{
+							ID:            userID,
+							InstanceID:    instanceID,
+							ResourceOwner: orgID,
+						},
+						UserID:            userID,
+						UserResourceOwner: orgID,
+						TriggeredAtOrigin: eventOrigin,
+						URLTemplate: fmt.Sprintf("%s/ui/login/user/init?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&passwordset={{.PasswordSet}}&authRequestID=%s",
+							eventOrigin, userID, orgID, authRequestID),
+						Code:                          code,
+						CodeExpiry:                    time.Hour,
+						EventType:                     user.HumanInitialCodeAddedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.InitCodeMessageType,
+						UnverifiedNotificationChannel: true,
+						Args:                          &domain.NotificationArguments{AuthRequestID: authRequestID},
+						IsOTP:                         false,
+						RequiresPreviousDomain:        false,
+					},
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   q,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 						}),
@@ -110,7 +121,7 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 		},
 		{
 			name: "without event trigger",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testcode")
 				queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
 					Domains: []*query.InstanceDomain{{
@@ -118,27 +129,35 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 						IsPrimary: true,
 					}},
 				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-					UserID:            userID,
-					UserResourceOwner: orgID,
-					TriggerOrigin:     fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
-					URLTemplate: fmt.Sprintf("%s://%s:%d/ui/login/user/init?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&passwordset={{.PasswordSet}}&authRequestID=%s",
-						externalProtocol, instancePrimaryDomain, externalPort, userID, orgID, authRequestID),
-					Code:                          code,
-					CodeExpiry:                    time.Hour,
-					EventType:                     user.HumanInitialCodeAddedType,
-					NotificationType:              domain.NotificationTypeEmail,
-					MessageType:                   domain.InitCodeMessageType,
-					UnverifiedNotificationChannel: true,
-					Args:                          &domain.NotificationArguments{AuthRequestID: authRequestID},
-					AggregateID:                   "",
-					AggregateResourceOwner:        "",
-					IsOTP:                         false,
-					RequiresPreviousDomain:        false,
-				}).Return(nil)
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						Aggregate: &eventstore.Aggregate{
+							ID:            userID,
+							InstanceID:    instanceID,
+							ResourceOwner: orgID,
+						},
+						UserID:            userID,
+						UserResourceOwner: orgID,
+						TriggeredAtOrigin: fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
+						URLTemplate: fmt.Sprintf("%s://%s:%d/ui/login/user/init?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&passwordset={{.PasswordSet}}&authRequestID=%s",
+							externalProtocol, instancePrimaryDomain, externalPort, userID, orgID, authRequestID),
+						Code:                          code,
+						CodeExpiry:                    time.Hour,
+						EventType:                     user.HumanInitialCodeAddedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.InitCodeMessageType,
+						UnverifiedNotificationChannel: true,
+						Args:                          &domain.NotificationArguments{AuthRequestID: authRequestID},
+						IsOTP:                         false,
+						RequiresPreviousDomain:        false,
+					},
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 						}),
@@ -163,15 +182,15 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			queries := mock.NewMockQueries(ctrl)
-			commands := mock.NewMockCommands(ctrl)
-			f, a, w := tt.test(ctrl, queries, commands)
-			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reduceInitCodeAdded(a.event)
+			queue := mock.NewMockQueue(ctrl)
+			f, a, w := tt.test(ctrl, queries, queue)
+			stmt, err := newUserNotifier(t, ctrl, queries, f).reduceInitCodeAdded(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
 				assert.NoError(t, err)
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -184,33 +203,41 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 	tests := []struct {
 		name string
-		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, want)
+		test func(*gomock.Controller, *mock.MockQueries, *mock.MockQueue) (fields, args, want)
 	}{
 		{
 			name: "with event trigger",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testcode")
-				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-					UserID:            userID,
-					UserResourceOwner: orgID,
-					TriggerOrigin:     eventOrigin,
-					URLTemplate: fmt.Sprintf("%s/ui/login/mail/verification?userID=%s&code={{.Code}}&orgID=%s&authRequestID=%s",
-						eventOrigin, userID, orgID, authRequestID),
-					Code:                          code,
-					CodeExpiry:                    time.Hour,
-					EventType:                     user.HumanEmailCodeAddedType,
-					NotificationType:              domain.NotificationTypeEmail,
-					MessageType:                   domain.VerifyEmailMessageType,
-					UnverifiedNotificationChannel: true,
-					Args:                          &domain.NotificationArguments{AuthRequestID: authRequestID},
-					AggregateID:                   "",
-					AggregateResourceOwner:        "",
-					IsOTP:                         false,
-					RequiresPreviousDomain:        false,
-				}).Return(nil)
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						Aggregate: &eventstore.Aggregate{
+							ID:            userID,
+							InstanceID:    instanceID,
+							ResourceOwner: orgID,
+						},
+						UserID:            userID,
+						UserResourceOwner: orgID,
+						TriggeredAtOrigin: eventOrigin,
+						URLTemplate: fmt.Sprintf("%s/ui/login/mail/verification?userID=%s&code={{.Code}}&orgID=%s&authRequestID=%s",
+							eventOrigin, userID, orgID, authRequestID),
+						Code:                          code,
+						CodeExpiry:                    time.Hour,
+						EventType:                     user.HumanEmailCodeAddedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.VerifyEmailMessageType,
+						UnverifiedNotificationChannel: true,
+						Args:                          &domain.NotificationArguments{AuthRequestID: authRequestID},
+						IsOTP:                         false,
+						RequiresPreviousDomain:        false,
+					},
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 						}),
@@ -235,7 +262,7 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 		},
 		{
 			name: "without event trigger",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testcode")
 				queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
 					Domains: []*query.InstanceDomain{{
@@ -244,27 +271,35 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 					}},
 				}, nil)
 
-				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-					UserID:            userID,
-					UserResourceOwner: orgID,
-					TriggerOrigin:     fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
-					URLTemplate: fmt.Sprintf("%s://%s:%d/ui/login/mail/verification?userID=%s&code={{.Code}}&orgID=%s&authRequestID=%s",
-						externalProtocol, instancePrimaryDomain, externalPort, userID, orgID, authRequestID),
-					Code:                          code,
-					CodeExpiry:                    time.Hour,
-					EventType:                     user.HumanEmailCodeAddedType,
-					NotificationType:              domain.NotificationTypeEmail,
-					MessageType:                   domain.VerifyEmailMessageType,
-					UnverifiedNotificationChannel: true,
-					Args:                          &domain.NotificationArguments{AuthRequestID: authRequestID},
-					AggregateID:                   "",
-					AggregateResourceOwner:        "",
-					IsOTP:                         false,
-					RequiresPreviousDomain:        false,
-				}).Return(nil)
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						Aggregate: &eventstore.Aggregate{
+							ID:            userID,
+							InstanceID:    instanceID,
+							ResourceOwner: orgID,
+						},
+						UserID:            userID,
+						UserResourceOwner: orgID,
+						TriggeredAtOrigin: fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
+						URLTemplate: fmt.Sprintf("%s://%s:%d/ui/login/mail/verification?userID=%s&code={{.Code}}&orgID=%s&authRequestID=%s",
+							externalProtocol, instancePrimaryDomain, externalPort, userID, orgID, authRequestID),
+						Code:                          code,
+						CodeExpiry:                    time.Hour,
+						EventType:                     user.HumanEmailCodeAddedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.VerifyEmailMessageType,
+						UnverifiedNotificationChannel: true,
+						Args:                          &domain.NotificationArguments{AuthRequestID: authRequestID},
+						IsOTP:                         false,
+						RequiresPreviousDomain:        false,
+					},
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 						}),
@@ -288,12 +323,12 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 		},
 		{
 			name: "return code",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				w.noOperation = true
 				_, code := cryptoValue(t, ctrl, "testcode")
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).MockQuerier,
 						}),
@@ -321,9 +356,9 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			queries := mock.NewMockQueries(ctrl)
-			commands := mock.NewMockCommands(ctrl)
-			f, a, w := tt.test(ctrl, queries, commands)
-			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reduceEmailCodeAdded(a.event)
+			queue := mock.NewMockQueue(ctrl)
+			f, a, w := tt.test(ctrl, queries, queue)
+			stmt, err := newUserNotifier(t, ctrl, queries, f).reduceEmailCodeAdded(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -333,7 +368,7 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 				assert.Nil(t, stmt.Execute)
 				return
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -346,33 +381,41 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 	tests := []struct {
 		name string
-		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, want)
+		test func(*gomock.Controller, *mock.MockQueries, *mock.MockQueue) (fields, args, want)
 	}{
 		{
 			name: "with event trigger",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testcode")
-				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-					UserID:            userID,
-					UserResourceOwner: orgID,
-					TriggerOrigin:     eventOrigin,
-					URLTemplate: fmt.Sprintf("%s/ui/login/password/init?userID=%s&code={{.Code}}&orgID=%s&authRequestID=%s",
-						eventOrigin, userID, orgID, authRequestID),
-					Code:                          code,
-					CodeExpiry:                    time.Hour,
-					EventType:                     user.HumanPasswordCodeAddedType,
-					NotificationType:              domain.NotificationTypeEmail,
-					MessageType:                   domain.PasswordResetMessageType,
-					UnverifiedNotificationChannel: true,
-					Args:                          &domain.NotificationArguments{AuthRequestID: authRequestID},
-					AggregateID:                   "",
-					AggregateResourceOwner:        "",
-					IsOTP:                         false,
-					RequiresPreviousDomain:        false,
-				}).Return(nil)
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						Aggregate: &eventstore.Aggregate{
+							ID:            userID,
+							InstanceID:    instanceID,
+							ResourceOwner: orgID,
+						},
+						UserID:            userID,
+						UserResourceOwner: orgID,
+						TriggeredAtOrigin: eventOrigin,
+						URLTemplate: fmt.Sprintf("%s/ui/login/password/init?userID=%s&code={{.Code}}&orgID=%s&authRequestID=%s",
+							eventOrigin, userID, orgID, authRequestID),
+						Code:                          code,
+						CodeExpiry:                    time.Hour,
+						EventType:                     user.HumanPasswordCodeAddedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.PasswordResetMessageType,
+						UnverifiedNotificationChannel: true,
+						Args:                          &domain.NotificationArguments{AuthRequestID: authRequestID},
+						IsOTP:                         false,
+						RequiresPreviousDomain:        false,
+					},
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 						}),
@@ -397,7 +440,7 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 		},
 		{
 			name: "asset url without event trigger url",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testcode")
 				queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
 					Domains: []*query.InstanceDomain{{
@@ -405,27 +448,35 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 						IsPrimary: true,
 					}},
 				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-					UserID:            userID,
-					UserResourceOwner: orgID,
-					TriggerOrigin:     fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
-					URLTemplate: fmt.Sprintf("%s://%s:%d/ui/login/password/init?userID=%s&code={{.Code}}&orgID=%s&authRequestID=%s",
-						externalProtocol, instancePrimaryDomain, externalPort, userID, orgID, authRequestID),
-					Code:                          code,
-					CodeExpiry:                    time.Hour,
-					EventType:                     user.HumanPasswordCodeAddedType,
-					NotificationType:              domain.NotificationTypeEmail,
-					MessageType:                   domain.PasswordResetMessageType,
-					UnverifiedNotificationChannel: true,
-					Args:                          &domain.NotificationArguments{AuthRequestID: authRequestID},
-					AggregateID:                   "",
-					AggregateResourceOwner:        "",
-					IsOTP:                         false,
-					RequiresPreviousDomain:        false,
-				}).Return(nil)
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						Aggregate: &eventstore.Aggregate{
+							ID:            userID,
+							InstanceID:    instanceID,
+							ResourceOwner: orgID,
+						},
+						UserID:            userID,
+						UserResourceOwner: orgID,
+						TriggeredAtOrigin: fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
+						URLTemplate: fmt.Sprintf("%s://%s:%d/ui/login/password/init?userID=%s&code={{.Code}}&orgID=%s&authRequestID=%s",
+							externalProtocol, instancePrimaryDomain, externalPort, userID, orgID, authRequestID),
+						Code:                          code,
+						CodeExpiry:                    time.Hour,
+						EventType:                     user.HumanPasswordCodeAddedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.PasswordResetMessageType,
+						UnverifiedNotificationChannel: true,
+						Args:                          &domain.NotificationArguments{AuthRequestID: authRequestID},
+						IsOTP:                         false,
+						RequiresPreviousDomain:        false,
+					},
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 						}),
@@ -449,28 +500,36 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 		},
 		{
 			name: "external code",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
-				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-					UserID:            userID,
-					UserResourceOwner: orgID,
-					TriggerOrigin:     eventOrigin,
-					URLTemplate: fmt.Sprintf("%s/ui/login/password/init?userID=%s&code={{.Code}}&orgID=%s&authRequestID=%s",
-						eventOrigin, userID, orgID, authRequestID),
-					Code:                          nil,
-					CodeExpiry:                    0,
-					EventType:                     user.HumanPasswordCodeAddedType,
-					NotificationType:              domain.NotificationTypeSms,
-					MessageType:                   domain.PasswordResetMessageType,
-					UnverifiedNotificationChannel: true,
-					Args:                          &domain.NotificationArguments{AuthRequestID: authRequestID},
-					AggregateID:                   "",
-					AggregateResourceOwner:        "",
-					IsOTP:                         false,
-					RequiresPreviousDomain:        false,
-				}).Return(nil)
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						Aggregate: &eventstore.Aggregate{
+							ID:            userID,
+							InstanceID:    instanceID,
+							ResourceOwner: orgID,
+						},
+						UserID:            userID,
+						UserResourceOwner: orgID,
+						TriggeredAtOrigin: eventOrigin,
+						URLTemplate: fmt.Sprintf("%s/ui/login/password/init?userID=%s&code={{.Code}}&orgID=%s&authRequestID=%s",
+							eventOrigin, userID, orgID, authRequestID),
+						Code:                          nil,
+						CodeExpiry:                    0,
+						EventType:                     user.HumanPasswordCodeAddedType,
+						NotificationType:              domain.NotificationTypeSms,
+						MessageType:                   domain.PasswordResetMessageType,
+						UnverifiedNotificationChannel: true,
+						Args:                          &domain.NotificationArguments{AuthRequestID: authRequestID},
+						IsOTP:                         false,
+						RequiresPreviousDomain:        false,
+					},
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 						}),
@@ -497,12 +556,12 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 		},
 		{
 			name: "return code",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				w.noOperation = true
 				_, code := cryptoValue(t, ctrl, "testcode")
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).MockQuerier,
 						}),
@@ -532,9 +591,9 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			queries := mock.NewMockQueries(ctrl)
-			commands := mock.NewMockCommands(ctrl)
-			f, a, w := tt.test(ctrl, queries, commands)
-			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reducePasswordCodeAdded(a.event)
+			queue := mock.NewMockQueue(ctrl)
+			f, a, w := tt.test(ctrl, queries, queue)
+			stmt, err := newUserNotifier(t, ctrl, queries, f).reducePasswordCodeAdded(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -544,7 +603,7 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 				assert.Nil(t, stmt.Execute)
 				return
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -557,31 +616,39 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 func Test_userNotifier_reduceDomainClaimed(t *testing.T) {
 	tests := []struct {
 		name string
-		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, want)
+		test func(*gomock.Controller, *mock.MockQueries, *mock.MockQueue) (fields, args, want)
 	}{{
 		name: "with event trigger",
-		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
-			commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-				UserID:            userID,
-				UserResourceOwner: orgID,
-				TriggerOrigin:     eventOrigin,
-				URLTemplate: fmt.Sprintf("%s/ui/login/login?orgID=%s",
-					eventOrigin, orgID),
-				Code:                          nil,
-				CodeExpiry:                    0,
-				EventType:                     user.UserDomainClaimedType,
-				NotificationType:              domain.NotificationTypeEmail,
-				MessageType:                   domain.DomainClaimedMessageType,
-				UnverifiedNotificationChannel: true,
-				Args:                          &domain.NotificationArguments{TempUsername: "newUsername"},
-				AggregateID:                   "",
-				AggregateResourceOwner:        "",
-				IsOTP:                         false,
-				RequiresPreviousDomain:        true,
-			}).Return(nil)
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
+			queue.EXPECT().Insert(
+				gomock.Any(),
+				&notification.Request{
+					Aggregate: &eventstore.Aggregate{
+						ID:            userID,
+						InstanceID:    instanceID,
+						ResourceOwner: orgID,
+					},
+					UserID:            userID,
+					UserResourceOwner: orgID,
+					TriggeredAtOrigin: eventOrigin,
+					URLTemplate: fmt.Sprintf("%s/ui/login/login?orgID=%s",
+						eventOrigin, orgID),
+					Code:                          nil,
+					CodeExpiry:                    0,
+					EventType:                     user.UserDomainClaimedType,
+					NotificationType:              domain.NotificationTypeEmail,
+					MessageType:                   domain.DomainClaimedMessageType,
+					UnverifiedNotificationChannel: true,
+					Args:                          &domain.NotificationArguments{TempUsername: "newUsername"},
+					IsOTP:                         false,
+					RequiresPreviousDomain:        true,
+				},
+				gomock.Any(),
+				gomock.Any(),
+			).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
+					queries: queries,
+					queue:   queue,
 					es: eventstore.NewEventstore(&eventstore.Config{
 						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 					}),
@@ -601,34 +668,42 @@ func Test_userNotifier_reduceDomainClaimed(t *testing.T) {
 		},
 	}, {
 		name: "without event trigger",
-		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
 				Domains: []*query.InstanceDomain{{
 					Domain:    instancePrimaryDomain,
 					IsPrimary: true,
 				}},
 			}, nil)
-			commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-				UserID:            userID,
-				UserResourceOwner: orgID,
-				TriggerOrigin:     fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
-				URLTemplate: fmt.Sprintf("%s://%s:%d/ui/login/login?orgID=%s",
-					externalProtocol, instancePrimaryDomain, externalPort, orgID),
-				Code:                          nil,
-				CodeExpiry:                    0,
-				EventType:                     user.UserDomainClaimedType,
-				NotificationType:              domain.NotificationTypeEmail,
-				MessageType:                   domain.DomainClaimedMessageType,
-				UnverifiedNotificationChannel: true,
-				Args:                          &domain.NotificationArguments{TempUsername: "newUsername"},
-				AggregateID:                   "",
-				AggregateResourceOwner:        "",
-				IsOTP:                         false,
-				RequiresPreviousDomain:        true,
-			}).Return(nil)
+			queue.EXPECT().Insert(
+				gomock.Any(),
+				&notification.Request{
+					Aggregate: &eventstore.Aggregate{
+						ID:            userID,
+						InstanceID:    instanceID,
+						ResourceOwner: orgID,
+					},
+					UserID:            userID,
+					UserResourceOwner: orgID,
+					TriggeredAtOrigin: fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
+					URLTemplate: fmt.Sprintf("%s://%s:%d/ui/login/login?orgID=%s",
+						externalProtocol, instancePrimaryDomain, externalPort, orgID),
+					Code:                          nil,
+					CodeExpiry:                    0,
+					EventType:                     user.UserDomainClaimedType,
+					NotificationType:              domain.NotificationTypeEmail,
+					MessageType:                   domain.DomainClaimedMessageType,
+					UnverifiedNotificationChannel: true,
+					Args:                          &domain.NotificationArguments{TempUsername: "newUsername"},
+					IsOTP:                         false,
+					RequiresPreviousDomain:        true,
+				},
+				gomock.Any(),
+				gomock.Any(),
+			).Return(nil)
 			return fields{
-					queries:  queries,
-					commands: commands,
+					queries: queries,
+					queue:   queue,
 					es: eventstore.NewEventstore(&eventstore.Config{
 						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 					}),
@@ -650,15 +725,15 @@ func Test_userNotifier_reduceDomainClaimed(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			queries := mock.NewMockQueries(ctrl)
-			commands := mock.NewMockCommands(ctrl)
-			f, a, w := tt.test(ctrl, queries, commands)
-			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reduceDomainClaimed(a.event)
+			queue := mock.NewMockQueue(ctrl)
+			f, a, w := tt.test(ctrl, queries, queue)
+			stmt, err := newUserNotifier(t, ctrl, queries, f).reduceDomainClaimed(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
 				assert.NoError(t, err)
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -671,32 +746,40 @@ func Test_userNotifier_reduceDomainClaimed(t *testing.T) {
 func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 	tests := []struct {
 		name string
-		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, want)
+		test func(*gomock.Controller, *mock.MockQueries, *mock.MockQueue) (fields, args, want)
 	}{
 		{
 			name: "with event trigger",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testcode")
-				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-					UserID:                        userID,
-					UserResourceOwner:             orgID,
-					TriggerOrigin:                 eventOrigin,
-					URLTemplate:                   fmt.Sprintf("%s/ui/login/login/passwordless/init?userID=%s&orgID=%s&codeID=%s&code={{.Code}}", eventOrigin, userID, orgID, codeID),
-					Code:                          code,
-					CodeExpiry:                    time.Hour,
-					EventType:                     user.HumanPasswordlessInitCodeAddedType,
-					NotificationType:              domain.NotificationTypeEmail,
-					MessageType:                   domain.PasswordlessRegistrationMessageType,
-					UnverifiedNotificationChannel: false,
-					Args:                          &domain.NotificationArguments{CodeID: codeID},
-					AggregateID:                   "",
-					AggregateResourceOwner:        "",
-					IsOTP:                         false,
-					RequiresPreviousDomain:        false,
-				}).Return(nil)
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						Aggregate: &eventstore.Aggregate{
+							ID:            userID,
+							InstanceID:    instanceID,
+							ResourceOwner: orgID,
+						},
+						UserID:                        userID,
+						UserResourceOwner:             orgID,
+						TriggeredAtOrigin:             eventOrigin,
+						URLTemplate:                   fmt.Sprintf("%s/ui/login/login/passwordless/init?userID=%s&orgID=%s&codeID=%s&code={{.Code}}", eventOrigin, userID, orgID, codeID),
+						Code:                          code,
+						CodeExpiry:                    time.Hour,
+						EventType:                     user.HumanPasswordlessInitCodeAddedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.PasswordlessRegistrationMessageType,
+						UnverifiedNotificationChannel: false,
+						Args:                          &domain.NotificationArguments{CodeID: codeID},
+						IsOTP:                         false,
+						RequiresPreviousDomain:        false,
+					},
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 						}),
@@ -721,7 +804,7 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 		},
 		{
 			name: "without event trigger",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testCode")
 				queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
 					Domains: []*query.InstanceDomain{{
@@ -729,26 +812,34 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 						IsPrimary: true,
 					}},
 				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-					UserID:                        userID,
-					UserResourceOwner:             orgID,
-					TriggerOrigin:                 fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
-					URLTemplate:                   fmt.Sprintf("%s://%s:%d/ui/login/login/passwordless/init?userID=%s&orgID=%s&codeID=%s&code={{.Code}}", externalProtocol, instancePrimaryDomain, externalPort, userID, orgID, codeID),
-					Code:                          code,
-					CodeExpiry:                    time.Hour,
-					EventType:                     user.HumanPasswordlessInitCodeAddedType,
-					NotificationType:              domain.NotificationTypeEmail,
-					MessageType:                   domain.PasswordlessRegistrationMessageType,
-					UnverifiedNotificationChannel: false,
-					Args:                          &domain.NotificationArguments{CodeID: codeID},
-					AggregateID:                   "",
-					AggregateResourceOwner:        "",
-					IsOTP:                         false,
-					RequiresPreviousDomain:        false,
-				}).Return(nil)
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						Aggregate: &eventstore.Aggregate{
+							ID:            userID,
+							InstanceID:    instanceID,
+							ResourceOwner: orgID,
+						},
+						UserID:                        userID,
+						UserResourceOwner:             orgID,
+						TriggeredAtOrigin:             fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
+						URLTemplate:                   fmt.Sprintf("%s://%s:%d/ui/login/login/passwordless/init?userID=%s&orgID=%s&codeID=%s&code={{.Code}}", externalProtocol, instancePrimaryDomain, externalPort, userID, orgID, codeID),
+						Code:                          code,
+						CodeExpiry:                    time.Hour,
+						EventType:                     user.HumanPasswordlessInitCodeAddedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.PasswordlessRegistrationMessageType,
+						UnverifiedNotificationChannel: false,
+						Args:                          &domain.NotificationArguments{CodeID: codeID},
+						IsOTP:                         false,
+						RequiresPreviousDomain:        false,
+					},
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 						}),
@@ -772,12 +863,12 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 		},
 		{
 			name: "return code",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				w.noOperation = true
 				_, code := cryptoValue(t, ctrl, "testcode")
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).MockQuerier,
 						}),
@@ -805,9 +896,9 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			queries := mock.NewMockQueries(ctrl)
-			commands := mock.NewMockCommands(ctrl)
-			f, a, w := tt.test(ctrl, queries, commands)
-			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reducePasswordlessCodeRequested(a.event)
+			queue := mock.NewMockQueue(ctrl)
+			f, a, w := tt.test(ctrl, queries, queue)
+			stmt, err := newUserNotifier(t, ctrl, queries, f).reducePasswordlessCodeRequested(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -817,7 +908,7 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 				assert.Nil(t, stmt.Execute)
 				return
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -830,34 +921,42 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 	tests := []struct {
 		name string
-		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, want)
+		test func(*gomock.Controller, *mock.MockQueries, *mock.MockQueue) (fields, args, want)
 	}{
 		{
 			name: "with event trigger",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				queries.EXPECT().NotificationPolicyByOrg(gomock.Any(), gomock.Any(), orgID, gomock.Any()).Return(&query.NotificationPolicy{
 					PasswordChange: true,
 				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-					UserID:                        userID,
-					UserResourceOwner:             orgID,
-					TriggerOrigin:                 eventOrigin,
-					URLTemplate:                   fmt.Sprintf("%s/ui/console?login_hint={{.PreferredLoginName}}", eventOrigin),
-					Code:                          nil,
-					CodeExpiry:                    0,
-					EventType:                     user.HumanPasswordChangedType,
-					NotificationType:              domain.NotificationTypeEmail,
-					MessageType:                   domain.PasswordChangeMessageType,
-					UnverifiedNotificationChannel: true,
-					Args:                          nil,
-					AggregateID:                   "",
-					AggregateResourceOwner:        "",
-					IsOTP:                         false,
-					RequiresPreviousDomain:        false,
-				}).Return(nil)
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						Aggregate: &eventstore.Aggregate{
+							ID:            userID,
+							InstanceID:    instanceID,
+							ResourceOwner: orgID,
+						},
+						UserID:                        userID,
+						UserResourceOwner:             orgID,
+						TriggeredAtOrigin:             eventOrigin,
+						URLTemplate:                   fmt.Sprintf("%s/ui/console?login_hint={{.PreferredLoginName}}", eventOrigin),
+						Code:                          nil,
+						CodeExpiry:                    0,
+						EventType:                     user.HumanPasswordChangedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.PasswordChangeMessageType,
+						UnverifiedNotificationChannel: true,
+						Args:                          nil,
+						IsOTP:                         false,
+						RequiresPreviousDomain:        false,
+					},
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 						}),
@@ -877,7 +976,7 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 		},
 		{
 			name: "without event trigger",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				queries.EXPECT().NotificationPolicyByOrg(gomock.Any(), gomock.Any(), orgID, gomock.Any()).Return(&query.NotificationPolicy{
 					PasswordChange: true,
 				}, nil)
@@ -887,27 +986,35 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 						IsPrimary: true,
 					}},
 				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-					UserID:            userID,
-					UserResourceOwner: orgID,
-					TriggerOrigin:     fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
-					URLTemplate: fmt.Sprintf("%s://%s:%d/ui/console?login_hint={{.PreferredLoginName}}",
-						externalProtocol, instancePrimaryDomain, externalPort),
-					Code:                          nil,
-					CodeExpiry:                    0,
-					EventType:                     user.HumanPasswordChangedType,
-					NotificationType:              domain.NotificationTypeEmail,
-					MessageType:                   domain.PasswordChangeMessageType,
-					UnverifiedNotificationChannel: true,
-					Args:                          nil,
-					AggregateID:                   "",
-					AggregateResourceOwner:        "",
-					IsOTP:                         false,
-					RequiresPreviousDomain:        false,
-				}).Return(nil)
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						Aggregate: &eventstore.Aggregate{
+							ID:            userID,
+							InstanceID:    instanceID,
+							ResourceOwner: orgID,
+						},
+						UserID:            userID,
+						UserResourceOwner: orgID,
+						TriggeredAtOrigin: fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
+						URLTemplate: fmt.Sprintf("%s://%s:%d/ui/console?login_hint={{.PreferredLoginName}}",
+							externalProtocol, instancePrimaryDomain, externalPort),
+						Code:                          nil,
+						CodeExpiry:                    0,
+						EventType:                     user.HumanPasswordChangedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.PasswordChangeMessageType,
+						UnverifiedNotificationChannel: true,
+						Args:                          nil,
+						IsOTP:                         false,
+						RequiresPreviousDomain:        false,
+					},
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 						}),
@@ -925,13 +1032,38 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 			},
 		}, {
 			name: "no notification",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				queries.EXPECT().NotificationPolicyByOrg(gomock.Any(), gomock.Any(), orgID, gomock.Any()).Return(&query.NotificationPolicy{
 					PasswordChange: false,
 				}, nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
+						es: eventstore.NewEventstore(&eventstore.Config{
+							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+						}),
+					}, args{
+						event: &user.HumanPasswordChangedEvent{
+							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+								InstanceID:    instanceID,
+								AggregateID:   userID,
+								ResourceOwner: sql.NullString{String: orgID},
+								CreationDate:  time.Now().UTC(),
+								Typ:           user.HumanPasswordChangedType,
+							}),
+						},
+					}, w
+			},
+		}, {
+			name: "notification policy not found",
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
+				queries.EXPECT().NotificationPolicyByOrg(gomock.Any(), gomock.Any(), orgID, gomock.Any()).Return(
+					nil,
+					zerrors.ThrowNotFound(nil, "QUERY-x0so2p", "Errors.NotificationPolicy.NotFound"),
+				)
+				return fields{
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 						}),
@@ -953,15 +1085,15 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			queries := mock.NewMockQueries(ctrl)
-			commands := mock.NewMockCommands(ctrl)
-			f, a, w := tt.test(ctrl, queries, commands)
-			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reducePasswordChanged(a.event)
+			queue := mock.NewMockQueue(ctrl)
+			f, a, w := tt.test(ctrl, queries, queue)
+			stmt, err := newUserNotifier(t, ctrl, queries, f).reducePasswordChanged(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
 				assert.NoError(t, err)
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -974,11 +1106,11 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 	tests := []struct {
 		name string
-		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, want)
+		test func(*gomock.Controller, *mock.MockQueries, *mock.MockQueue) (fields, args, want)
 	}{
 		{
 			name: "url with event trigger",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testCode")
 				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), sessionID, gomock.Any(), nil).Return(&query.Session{
 					ID:            sessionID,
@@ -988,31 +1120,39 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 						ResourceOwner: orgID,
 					},
 				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-					UserID:                        userID,
-					UserResourceOwner:             orgID,
-					TriggerOrigin:                 eventOrigin,
-					URLTemplate:                   fmt.Sprintf("%s/otp/verify?loginName={{.LoginName}}&code={{.Code}}", eventOrigin),
-					Code:                          code,
-					CodeExpiry:                    time.Hour,
-					EventType:                     session.OTPEmailChallengedType,
-					NotificationType:              domain.NotificationTypeEmail,
-					MessageType:                   domain.VerifyEmailOTPMessageType,
-					UnverifiedNotificationChannel: false,
-					Args: &domain.NotificationArguments{
-						Domain:    eventOriginDomain,
-						Expiry:    1 * time.Hour,
-						Origin:    eventOrigin,
-						SessionID: sessionID,
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						Aggregate: &eventstore.Aggregate{
+							ID:            sessionID,
+							InstanceID:    instanceID,
+							ResourceOwner: instanceID,
+						},
+						UserID:                        userID,
+						UserResourceOwner:             orgID,
+						TriggeredAtOrigin:             eventOrigin,
+						URLTemplate:                   fmt.Sprintf("%s/otp/verify?loginName={{.LoginName}}&code={{.Code}}", eventOrigin),
+						Code:                          code,
+						CodeExpiry:                    time.Hour,
+						EventType:                     session.OTPEmailChallengedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.VerifyEmailOTPMessageType,
+						UnverifiedNotificationChannel: false,
+						Args: &domain.NotificationArguments{
+							Domain:    eventOriginDomain,
+							Expiry:    1 * time.Hour,
+							Origin:    eventOrigin,
+							SessionID: sessionID,
+						},
+						IsOTP:                  true,
+						RequiresPreviousDomain: false,
 					},
-					AggregateID:            sessionID,
-					AggregateResourceOwner: instanceID,
-					IsOTP:                  true,
-					RequiresPreviousDomain: false,
-				}).Return(nil)
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 						}),
@@ -1036,7 +1176,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 		},
 		{
 			name: "without event trigger",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testCode")
 				queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
 					Domains: []*query.InstanceDomain{{
@@ -1052,31 +1192,39 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 						ResourceOwner: orgID,
 					},
 				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-					UserID:                        userID,
-					UserResourceOwner:             orgID,
-					TriggerOrigin:                 fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
-					URLTemplate:                   fmt.Sprintf("%s://%s:%d/otp/verify?loginName={{.LoginName}}&code={{.Code}}", externalProtocol, instancePrimaryDomain, externalPort),
-					Code:                          code,
-					CodeExpiry:                    time.Hour,
-					EventType:                     session.OTPEmailChallengedType,
-					NotificationType:              domain.NotificationTypeEmail,
-					MessageType:                   domain.VerifyEmailOTPMessageType,
-					UnverifiedNotificationChannel: false,
-					Args: &domain.NotificationArguments{
-						Domain:    instancePrimaryDomain,
-						Expiry:    1 * time.Hour,
-						Origin:    fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
-						SessionID: sessionID,
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						UserID:                        userID,
+						UserResourceOwner:             orgID,
+						TriggeredAtOrigin:             fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
+						URLTemplate:                   fmt.Sprintf("%s://%s:%d/otp/verify?loginName={{.LoginName}}&code={{.Code}}", externalProtocol, instancePrimaryDomain, externalPort),
+						Code:                          code,
+						CodeExpiry:                    time.Hour,
+						EventType:                     session.OTPEmailChallengedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.VerifyEmailOTPMessageType,
+						UnverifiedNotificationChannel: false,
+						Args: &domain.NotificationArguments{
+							Domain:    instancePrimaryDomain,
+							Expiry:    1 * time.Hour,
+							Origin:    fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
+							SessionID: sessionID,
+						},
+						Aggregate: &eventstore.Aggregate{
+							ID:            sessionID,
+							InstanceID:    instanceID,
+							ResourceOwner: instanceID,
+						},
+						IsOTP:                  true,
+						RequiresPreviousDomain: false,
 					},
-					AggregateID:            sessionID,
-					AggregateResourceOwner: instanceID,
-					IsOTP:                  true,
-					RequiresPreviousDomain: false,
-				}).Return(nil)
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 						}),
@@ -1098,12 +1246,12 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 		},
 		{
 			name: "return code",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				w.noOperation = true
 				_, code := cryptoValue(t, ctrl, "testCode")
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).MockQuerier,
 						}),
@@ -1127,7 +1275,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 		},
 		{
 			name: "url template",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testCode")
 				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), sessionID, gomock.Any(), nil).Return(&query.Session{
 					ID:            sessionID,
@@ -1137,31 +1285,39 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 						ResourceOwner: orgID,
 					},
 				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-					UserID:                        userID,
-					UserResourceOwner:             orgID,
-					TriggerOrigin:                 eventOrigin,
-					URLTemplate:                   "/verify-otp?sessionID={{.SessionID}}",
-					Code:                          code,
-					CodeExpiry:                    time.Hour,
-					EventType:                     session.OTPEmailChallengedType,
-					NotificationType:              domain.NotificationTypeEmail,
-					MessageType:                   domain.VerifyEmailOTPMessageType,
-					UnverifiedNotificationChannel: false,
-					Args: &domain.NotificationArguments{
-						Domain:    eventOriginDomain,
-						Expiry:    1 * time.Hour,
-						Origin:    eventOrigin,
-						SessionID: sessionID,
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						UserID:                        userID,
+						UserResourceOwner:             orgID,
+						TriggeredAtOrigin:             eventOrigin,
+						URLTemplate:                   "/verify-otp?sessionID={{.SessionID}}",
+						Code:                          code,
+						CodeExpiry:                    time.Hour,
+						EventType:                     session.OTPEmailChallengedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.VerifyEmailOTPMessageType,
+						UnverifiedNotificationChannel: false,
+						Args: &domain.NotificationArguments{
+							Domain:    eventOriginDomain,
+							Expiry:    1 * time.Hour,
+							Origin:    eventOrigin,
+							SessionID: sessionID,
+						},
+						Aggregate: &eventstore.Aggregate{
+							ID:            sessionID,
+							InstanceID:    instanceID,
+							ResourceOwner: instanceID,
+						},
+						IsOTP:                  true,
+						RequiresPreviousDomain: false,
 					},
-					AggregateID:            sessionID,
-					AggregateResourceOwner: instanceID,
-					IsOTP:                  true,
-					RequiresPreviousDomain: false,
-				}).Return(nil)
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 						}),
@@ -1188,9 +1344,9 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			queries := mock.NewMockQueries(ctrl)
-			commands := mock.NewMockCommands(ctrl)
-			f, a, w := tt.test(ctrl, queries, commands)
-			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reduceSessionOTPEmailChallenged(a.event)
+			queue := mock.NewMockQueue(ctrl)
+			f, a, w := tt.test(ctrl, queries, queue)
+			stmt, err := newUserNotifier(t, ctrl, queries, f).reduceSessionOTPEmailChallenged(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1200,7 +1356,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 				assert.Nil(t, stmt.Execute)
 				return
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1213,48 +1369,53 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 	tests := []struct {
 		name string
-		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, want)
+		test func(*gomock.Controller, *mock.MockQueries, *mock.MockQueue) (fields, args, want)
 	}{
 		{
 			name: "with event trigger",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				testCode := "testcode"
 				_, code := cryptoValue(t, ctrl, testCode)
-				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), sessionID, gomock.Any(), nil).Return(&query.Session{
-					ID:            sessionID,
-					ResourceOwner: instanceID,
-					UserFactor: query.SessionUserFactor{
-						UserID:        userID,
-						ResourceOwner: orgID,
+
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						UserID:                        "", // Empty since no session events are provided
+						UserResourceOwner:             "", // Empty since no session events are provided
+						TriggeredAtOrigin:             eventOrigin,
+						URLTemplate:                   "",
+						Code:                          code,
+						CodeExpiry:                    time.Hour,
+						EventType:                     session.OTPSMSChallengedType,
+						NotificationType:              domain.NotificationTypeSms,
+						MessageType:                   domain.VerifySMSOTPMessageType,
+						UnverifiedNotificationChannel: false,
+						Args: &domain.NotificationArguments{
+							Domain:    eventOriginDomain,
+							Expiry:    1 * time.Hour,
+							Origin:    eventOrigin,
+							SessionID: sessionID,
+						},
+						Aggregate: &eventstore.Aggregate{
+							ID:            sessionID,
+							InstanceID:    instanceID,
+							ResourceOwner: instanceID,
+						},
+						IsOTP:                  true,
+						RequiresPreviousDomain: false,
 					},
-				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-					UserID:                        userID,
-					UserResourceOwner:             orgID,
-					TriggerOrigin:                 eventOrigin,
-					URLTemplate:                   "",
-					Code:                          code,
-					CodeExpiry:                    time.Hour,
-					EventType:                     session.OTPSMSChallengedType,
-					NotificationType:              domain.NotificationTypeSms,
-					MessageType:                   domain.VerifySMSOTPMessageType,
-					UnverifiedNotificationChannel: false,
-					Args: &domain.NotificationArguments{
-						Domain:    eventOriginDomain,
-						Expiry:    1 * time.Hour,
-						Origin:    eventOrigin,
-						SessionID: sessionID,
-					},
-					AggregateID:            sessionID,
-					AggregateResourceOwner: instanceID,
-					IsOTP:                  true,
-					RequiresPreviousDomain: false,
-				}).Return(nil)
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
+
+				mockQuerier := es_repo_mock.NewMockQuerier(ctrl)
+				mockQuerier.EXPECT().FilterToReducer(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
+
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+							Querier: mockQuerier,
 						}),
 					}, args{
 						event: &session.OTPSMSChallengedEvent{
@@ -1275,7 +1436,7 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 		},
 		{
 			name: "without event trigger",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				testCode := "testcode"
 				_, code := cryptoValue(t, ctrl, testCode)
 				queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
@@ -1284,41 +1445,46 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 						IsPrimary: true,
 					}},
 				}, nil)
-				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), sessionID, gomock.Any(), nil).Return(&query.Session{
-					ID:            sessionID,
-					ResourceOwner: instanceID,
-					UserFactor: query.SessionUserFactor{
-						UserID:        userID,
-						ResourceOwner: orgID,
+
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						UserID:                        "", // Empty since no session events are provided
+						UserResourceOwner:             "", // Empty since no session events are provided
+						TriggeredAtOrigin:             fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
+						URLTemplate:                   "",
+						Code:                          code,
+						CodeExpiry:                    time.Hour,
+						EventType:                     session.OTPSMSChallengedType,
+						NotificationType:              domain.NotificationTypeSms,
+						MessageType:                   domain.VerifySMSOTPMessageType,
+						UnverifiedNotificationChannel: false,
+						Args: &domain.NotificationArguments{
+							Domain:    instancePrimaryDomain,
+							Expiry:    1 * time.Hour,
+							Origin:    fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
+							SessionID: sessionID,
+						},
+						Aggregate: &eventstore.Aggregate{
+							ID:            sessionID,
+							InstanceID:    instanceID,
+							ResourceOwner: instanceID,
+						},
+						IsOTP:                  true,
+						RequiresPreviousDomain: false,
 					},
-				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-					UserID:                        userID,
-					UserResourceOwner:             orgID,
-					TriggerOrigin:                 fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
-					URLTemplate:                   "",
-					Code:                          code,
-					CodeExpiry:                    time.Hour,
-					EventType:                     session.OTPSMSChallengedType,
-					NotificationType:              domain.NotificationTypeSms,
-					MessageType:                   domain.VerifySMSOTPMessageType,
-					UnverifiedNotificationChannel: false,
-					Args: &domain.NotificationArguments{
-						Domain:    instancePrimaryDomain,
-						Expiry:    1 * time.Hour,
-						Origin:    fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
-						SessionID: sessionID,
-					},
-					AggregateID:            sessionID,
-					AggregateResourceOwner: instanceID,
-					IsOTP:                  true,
-					RequiresPreviousDomain: false,
-				}).Return(nil)
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
+
+				mockQuerier := es_repo_mock.NewMockQuerier(ctrl)
+				mockQuerier.EXPECT().FilterToReducer(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
+
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+							Querier: mockQuerier,
 						}),
 					}, args{
 						event: &session.OTPSMSChallengedEvent{
@@ -1338,42 +1504,46 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 		},
 		{
 			name: "external code",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
-				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), sessionID, gomock.Any(), nil).Return(&query.Session{
-					ID:            sessionID,
-					ResourceOwner: instanceID,
-					UserFactor: query.SessionUserFactor{
-						UserID:        userID,
-						ResourceOwner: orgID,
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						UserID:                        "", // Empty since no session events are provided
+						UserResourceOwner:             "", // Empty since no session events are provided
+						TriggeredAtOrigin:             eventOrigin,
+						URLTemplate:                   "",
+						Code:                          nil,
+						CodeExpiry:                    0,
+						EventType:                     session.OTPSMSChallengedType,
+						NotificationType:              domain.NotificationTypeSms,
+						MessageType:                   domain.VerifySMSOTPMessageType,
+						UnverifiedNotificationChannel: false,
+						Args: &domain.NotificationArguments{
+							Domain:    eventOriginDomain,
+							Expiry:    0 * time.Hour,
+							Origin:    eventOrigin,
+							SessionID: sessionID,
+						},
+						Aggregate: &eventstore.Aggregate{
+							ID:            sessionID,
+							InstanceID:    instanceID,
+							ResourceOwner: instanceID,
+						},
+						IsOTP:                  true,
+						RequiresPreviousDomain: false,
 					},
-				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-					UserID:                        userID,
-					UserResourceOwner:             orgID,
-					TriggerOrigin:                 eventOrigin,
-					URLTemplate:                   "",
-					Code:                          nil,
-					CodeExpiry:                    0,
-					EventType:                     session.OTPSMSChallengedType,
-					NotificationType:              domain.NotificationTypeSms,
-					MessageType:                   domain.VerifySMSOTPMessageType,
-					UnverifiedNotificationChannel: false,
-					Args: &domain.NotificationArguments{
-						Domain:    eventOriginDomain,
-						Expiry:    0 * time.Hour,
-						Origin:    eventOrigin,
-						SessionID: sessionID,
-					},
-					AggregateID:            sessionID,
-					AggregateResourceOwner: instanceID,
-					IsOTP:                  true,
-					RequiresPreviousDomain: false,
-				}).Return(nil)
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
+
+				mockQuerier := es_repo_mock.NewMockQuerier(ctrl)
+				mockQuerier.EXPECT().FilterToReducer(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
+
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+							Querier: mockQuerier,
 						}),
 					}, args{
 						event: &session.OTPSMSChallengedEvent{
@@ -1394,12 +1564,12 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 		},
 		{
 			name: "return code",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				w.noOperation = true
 				_, code := cryptoValue(t, ctrl, "testCode")
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).MockQuerier,
 						}),
@@ -1425,9 +1595,9 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			queries := mock.NewMockQueries(ctrl)
-			commands := mock.NewMockCommands(ctrl)
-			f, a, w := tt.test(ctrl, queries, commands)
-			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reduceSessionOTPSMSChallenged(a.event)
+			queue := mock.NewMockQueue(ctrl)
+			f, a, w := tt.test(ctrl, queries, queue)
+			stmt, err := newUserNotifier(t, ctrl, queries, f).reduceSessionOTPSMSChallenged(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1437,7 +1607,7 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 				assert.Nil(t, stmt.Execute)
 				return
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1450,35 +1620,43 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 	tests := []struct {
 		name string
-		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, want)
+		test func(*gomock.Controller, *mock.MockQueries, *mock.MockQueue) (fields, args, want)
 	}{
 		{
 			name: "with event trigger",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testcode")
-				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-					UserID:                        userID,
-					UserResourceOwner:             orgID,
-					TriggerOrigin:                 eventOrigin,
-					URLTemplate:                   fmt.Sprintf("%s/ui/login/user/invite?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&authRequestID=%s", eventOrigin, userID, orgID, authRequestID),
-					Code:                          code,
-					CodeExpiry:                    time.Hour,
-					EventType:                     user.HumanInviteCodeAddedType,
-					NotificationType:              domain.NotificationTypeEmail,
-					MessageType:                   domain.InviteUserMessageType,
-					UnverifiedNotificationChannel: true,
-					Args: &domain.NotificationArguments{
-						ApplicationName: "ZITADEL",
-						AuthRequestID:   authRequestID,
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						UserID:                        userID,
+						UserResourceOwner:             orgID,
+						TriggeredAtOrigin:             eventOrigin,
+						URLTemplate:                   fmt.Sprintf("%s/ui/login/user/invite?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&authRequestID=%s", eventOrigin, userID, orgID, authRequestID),
+						Code:                          code,
+						CodeExpiry:                    time.Hour,
+						EventType:                     user.HumanInviteCodeAddedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.InviteUserMessageType,
+						UnverifiedNotificationChannel: true,
+						Args: &domain.NotificationArguments{
+							ApplicationName: "ZITADEL",
+							AuthRequestID:   authRequestID,
+						},
+						Aggregate: &eventstore.Aggregate{
+							ID:            userID,
+							InstanceID:    instanceID,
+							ResourceOwner: orgID,
+						},
+						IsOTP:                  false,
+						RequiresPreviousDomain: false,
 					},
-					AggregateID:            "",
-					AggregateResourceOwner: "",
-					IsOTP:                  false,
-					RequiresPreviousDomain: false,
-				}).Return(nil)
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 						}),
@@ -1503,7 +1681,7 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 		},
 		{
 			name: "without event trigger",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testCode")
 				queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
 					Domains: []*query.InstanceDomain{{
@@ -1511,29 +1689,37 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 						IsPrimary: true,
 					}},
 				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-					UserID:                        userID,
-					UserResourceOwner:             orgID,
-					TriggerOrigin:                 fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
-					URLTemplate:                   fmt.Sprintf("%s://%s:%d/ui/login/user/invite?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&authRequestID=%s", externalProtocol, instancePrimaryDomain, externalPort, userID, orgID, authRequestID),
-					Code:                          code,
-					CodeExpiry:                    time.Hour,
-					EventType:                     user.HumanInviteCodeAddedType,
-					NotificationType:              domain.NotificationTypeEmail,
-					MessageType:                   domain.InviteUserMessageType,
-					UnverifiedNotificationChannel: true,
-					Args: &domain.NotificationArguments{
-						ApplicationName: "ZITADEL",
-						AuthRequestID:   authRequestID,
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						UserID:                        userID,
+						UserResourceOwner:             orgID,
+						TriggeredAtOrigin:             fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
+						URLTemplate:                   fmt.Sprintf("%s://%s:%d/ui/login/user/invite?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&authRequestID=%s", externalProtocol, instancePrimaryDomain, externalPort, userID, orgID, authRequestID),
+						Code:                          code,
+						CodeExpiry:                    time.Hour,
+						EventType:                     user.HumanInviteCodeAddedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.InviteUserMessageType,
+						UnverifiedNotificationChannel: true,
+						Args: &domain.NotificationArguments{
+							ApplicationName: "ZITADEL",
+							AuthRequestID:   authRequestID,
+						},
+						Aggregate: &eventstore.Aggregate{
+							ID:            userID,
+							InstanceID:    instanceID,
+							ResourceOwner: orgID,
+						},
+						IsOTP:                  false,
+						RequiresPreviousDomain: false,
 					},
-					AggregateID:            "",
-					AggregateResourceOwner: "",
-					IsOTP:                  false,
-					RequiresPreviousDomain: false,
-				}).Return(nil)
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 						}),
@@ -1557,12 +1743,12 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 		},
 		{
 			name: "return code",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				w.noOperation = true
 				_, code := cryptoValue(t, ctrl, "testcode")
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).MockQuerier,
 						}),
@@ -1587,31 +1773,39 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 		},
 		{
 			name: "url template",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testcode")
-				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-					UserID:                        userID,
-					UserResourceOwner:             orgID,
-					TriggerOrigin:                 eventOrigin,
-					URLTemplate:                   "/passwordless-init?userID={{.UserID}}",
-					Code:                          code,
-					CodeExpiry:                    time.Hour,
-					EventType:                     user.HumanInviteCodeAddedType,
-					NotificationType:              domain.NotificationTypeEmail,
-					MessageType:                   domain.InviteUserMessageType,
-					UnverifiedNotificationChannel: true,
-					Args: &domain.NotificationArguments{
-						ApplicationName: "ZITADEL",
-						AuthRequestID:   authRequestID,
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						UserID:                        userID,
+						UserResourceOwner:             orgID,
+						TriggeredAtOrigin:             eventOrigin,
+						URLTemplate:                   "/passwordless-init?userID={{.UserID}}",
+						Code:                          code,
+						CodeExpiry:                    time.Hour,
+						EventType:                     user.HumanInviteCodeAddedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.InviteUserMessageType,
+						UnverifiedNotificationChannel: true,
+						Args: &domain.NotificationArguments{
+							ApplicationName: "ZITADEL",
+							AuthRequestID:   authRequestID,
+						},
+						Aggregate: &eventstore.Aggregate{
+							ID:            userID,
+							InstanceID:    instanceID,
+							ResourceOwner: orgID,
+						},
+						IsOTP:                  false,
+						RequiresPreviousDomain: false,
 					},
-					AggregateID:            "",
-					AggregateResourceOwner: "",
-					IsOTP:                  false,
-					RequiresPreviousDomain: false,
-				}).Return(nil)
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 						}),
@@ -1636,31 +1830,39 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 		},
 		{
 			name: "application name",
-			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testcode")
-				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
-					UserID:                        userID,
-					UserResourceOwner:             orgID,
-					TriggerOrigin:                 eventOrigin,
-					URLTemplate:                   fmt.Sprintf("%s/ui/login/user/invite?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&authRequestID=%s", eventOrigin, userID, orgID, authRequestID),
-					Code:                          code,
-					CodeExpiry:                    time.Hour,
-					EventType:                     user.HumanInviteCodeAddedType,
-					NotificationType:              domain.NotificationTypeEmail,
-					MessageType:                   domain.InviteUserMessageType,
-					UnverifiedNotificationChannel: true,
-					Args: &domain.NotificationArguments{
-						ApplicationName: "APP",
-						AuthRequestID:   authRequestID,
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						UserID:                        userID,
+						UserResourceOwner:             orgID,
+						TriggeredAtOrigin:             eventOrigin,
+						URLTemplate:                   fmt.Sprintf("%s/ui/login/user/invite?userID=%s&loginname={{.LoginName}}&code={{.Code}}&orgID=%s&authRequestID=%s", eventOrigin, userID, orgID, authRequestID),
+						Code:                          code,
+						CodeExpiry:                    time.Hour,
+						EventType:                     user.HumanInviteCodeAddedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.InviteUserMessageType,
+						UnverifiedNotificationChannel: true,
+						Args: &domain.NotificationArguments{
+							ApplicationName: "APP",
+							AuthRequestID:   authRequestID,
+						},
+						Aggregate: &eventstore.Aggregate{
+							ID:            userID,
+							InstanceID:    instanceID,
+							ResourceOwner: orgID,
+						},
+						IsOTP:                  false,
+						RequiresPreviousDomain: false,
 					},
-					AggregateID:            "",
-					AggregateResourceOwner: "",
-					IsOTP:                  false,
-					RequiresPreviousDomain: false,
-				}).Return(nil)
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
 				return fields{
-						queries:  queries,
-						commands: commands,
+						queries: queries,
+						queue:   queue,
 						es: eventstore.NewEventstore(&eventstore.Config{
 							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
 						}),
@@ -1689,9 +1891,9 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			queries := mock.NewMockQueries(ctrl)
-			commands := mock.NewMockCommands(ctrl)
-			f, a, w := tt.test(ctrl, queries, commands)
-			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reduceInviteCodeAdded(a.event)
+			queue := mock.NewMockQueue(ctrl)
+			f, a, w := tt.test(ctrl, queries, queue)
+			stmt, err := newUserNotifier(t, ctrl, queries, f).reduceInviteCodeAdded(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1701,7 +1903,7 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 				assert.Nil(t, stmt.Execute)
 				return
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1713,6 +1915,7 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 
 type fields struct {
 	queries        *mock.MockQueries
+	queue          *mock.MockQueue
 	commands       *mock.MockCommands
 	es             *eventstore.Eventstore
 	userDataCrypto crypto.EncryptionAlgorithm
@@ -1726,13 +1929,12 @@ type fieldsWorker struct {
 	SMSTokenCrypto crypto.EncryptionAlgorithm
 	now            nowFunc
 	backOff        func(current time.Duration) time.Duration
-	maxAttempts    uint8
 }
 type args struct {
 	event eventstore.Event
 }
 type argsWorker struct {
-	event eventstore.Event
+	job *river.Job[*notification.Request]
 }
 type want struct {
 	noOperation bool
@@ -1745,11 +1947,11 @@ type wantWorker struct {
 	err        assert.ErrorAssertionFunc
 }
 
-func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQueries, f fields, a args, w want) *userNotifier {
+func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQueries, f fields) *userNotifier {
 	queries.EXPECT().NotificationProviderByIDAndType(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes().Return(&query.DebugNotificationProvider{}, nil)
 	smtpAlg, _ := cryptoValue(t, ctrl, "smtppw")
 	return &userNotifier{
-		commands: f.commands,
+		queue: f.queue,
 		queries: NewNotificationQueries(
 			f.queries,
 			f.es,
@@ -1760,8 +1962,11 @@ func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQu
 			f.userDataCrypto,
 			smtpAlg,
 			f.SMSTokenCrypto,
+			nil,
 		),
-		otpEmailTmpl: defaultOTPEmailTemplate,
+		otpEmailTmpl: func(origin *url.URL) string {
+			return origin.String() + defaultOTPEmailTemplate
+		},
 	}
 }
 
@@ -1840,7 +2045,7 @@ func expectTemplateWithNotifyUserQueriesSMS(queries *mock.MockQueries) {
 	queries.EXPECT().CustomTextListByTemplate(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(2).Return(&query.CustomTexts{}, nil)
 }
 
-func cryptoValue(t *testing.T, ctrl *gomock.Controller, value string) (*crypto.MockEncryptionAlgorithm, *crypto.CryptoValue) {
+func cryptoValue(t *testing.T, ctrl *gomock.Controller, value string) (crypto.EncryptionAlgorithm, *crypto.CryptoValue) {
 	encAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
 	encAlg.EXPECT().Algorithm().AnyTimes().Return("enc")
 	encAlg.EXPECT().EncryptionKeyID().AnyTimes().Return("id")

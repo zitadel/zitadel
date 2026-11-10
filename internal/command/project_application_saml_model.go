@@ -2,7 +2,7 @@ package command
 
 import (
 	"context"
-	"reflect"
+	"slices"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -112,7 +112,23 @@ func (wm *SAMLApplicationWriteModel) Reduce() error {
 		case *project.SAMLConfigChangedEvent:
 			wm.appendChangeSAMLEvent(e)
 		case *project.ProjectRemovedEvent:
+			wm.AppName = ""
+			wm.EntityID = ""
+			wm.Metadata = nil
+			wm.MetadataURL = ""
+			wm.LoginVersion = domain.LoginVersionUnspecified
+			wm.LoginBaseURI = ""
+			wm.saml = false
 			wm.State = domain.AppStateRemoved
+		case *project.ProjectAddedEvent:
+			wm.AppName = ""
+			wm.EntityID = ""
+			wm.Metadata = nil
+			wm.MetadataURL = ""
+			wm.LoginVersion = domain.LoginVersionUnspecified
+			wm.LoginBaseURI = ""
+			wm.saml = false
+			wm.State = domain.AppStateUnspecified
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -153,6 +169,7 @@ func (wm *SAMLApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			project.ProjectAddedType,
 			project.ApplicationAddedType,
 			project.ApplicationChangedType,
 			project.ApplicationDeactivatedType,
@@ -170,26 +187,26 @@ func (wm *SAMLApplicationWriteModel) NewChangedEvent(
 	appID string,
 	entityID string,
 	metadata []byte,
-	metadataURL string,
-	loginVersion domain.LoginVersion,
-	loginBaseURI string,
+	metadataURL *string,
+	loginVersion *domain.LoginVersion,
+	loginBaseURI *string,
 ) (*project.SAMLConfigChangedEvent, bool, error) {
 	changes := make([]project.SAMLConfigChanges, 0)
 	var err error
-	if !reflect.DeepEqual(wm.Metadata, metadata) {
+	if metadata != nil && !slices.Equal(wm.Metadata, metadata) {
 		changes = append(changes, project.ChangeMetadata(metadata))
 	}
-	if wm.MetadataURL != metadataURL {
-		changes = append(changes, project.ChangeMetadataURL(metadataURL))
+	if metadataURL != nil && wm.MetadataURL != *metadataURL {
+		changes = append(changes, project.ChangeMetadataURL(*metadataURL))
 	}
 	if wm.EntityID != entityID {
 		changes = append(changes, project.ChangeEntityID(entityID))
 	}
-	if wm.LoginVersion != loginVersion {
-		changes = append(changes, project.ChangeSAMLLoginVersion(loginVersion))
+	if loginVersion != nil && wm.LoginVersion != *loginVersion {
+		changes = append(changes, project.ChangeSAMLLoginVersion(*loginVersion))
 	}
-	if wm.LoginBaseURI != loginBaseURI {
-		changes = append(changes, project.ChangeSAMLLoginBaseURI(loginBaseURI))
+	if loginBaseURI != nil && wm.LoginBaseURI != *loginBaseURI {
+		changes = append(changes, project.ChangeSAMLLoginBaseURI(*loginBaseURI))
 	}
 
 	if len(changes) == 0 {

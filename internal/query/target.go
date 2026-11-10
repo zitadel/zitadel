@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -64,6 +65,10 @@ var (
 		name:  projection.TargetSigningKey,
 		table: targetTable,
 	}
+	TargetColumnPayloadType = Column{
+		name:  projection.TargetPayloadType,
+		table: targetTable,
+	}
 )
 
 type Targets struct {
@@ -79,12 +84,13 @@ type Target struct {
 	domain.ObjectDetails
 
 	Name             string
-	TargetType       domain.TargetType
+	TargetType       target_domain.TargetType
 	Endpoint         string
 	Timeout          time.Duration
 	InterruptOnError bool
 	signingKey       *crypto.CryptoValue
 	SigningKey       string
+	PayloadType      target_domain.PayloadType
 }
 
 func (t *Target) decryptSigningKey(alg crypto.EncryptionAlgorithm) error {
@@ -116,8 +122,8 @@ func (q *Queries) SearchTargets(ctx context.Context, queries *TargetSearchQuerie
 	eq := sq.Eq{
 		TargetColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	query, scan := prepareTargetsQuery(ctx, q.client)
-	targets, err := genericRowsQueryWithState[*Targets](ctx, q.client, targetTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
+	query, scan := prepareTargetsQuery()
+	targets, err := genericRowsQueryWithState(ctx, q.client, targetTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
 	if err != nil {
 		return nil, err
 	}
@@ -134,8 +140,8 @@ func (q *Queries) GetTargetByID(ctx context.Context, id string) (*Target, error)
 		TargetColumnID.identifier():         id,
 		TargetColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	query, scan := prepareTargetQuery(ctx, q.client)
-	target, err := genericRowQuery[*Target](ctx, q.client, query.Where(eq), scan)
+	query, scan := prepareTargetQuery()
+	target, err := genericRowQuery(ctx, q.client, query.Where(eq), scan)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +159,7 @@ func NewTargetInIDsSearchQuery(values []string) (SearchQuery, error) {
 	return NewInTextQuery(TargetColumnID, values)
 }
 
-func prepareTargetsQuery(context.Context, prepareDatabase) (sq.SelectBuilder, func(rows *sql.Rows) (*Targets, error)) {
+func prepareTargetsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Targets, error)) {
 	return sq.Select(
 			TargetColumnID.identifier(),
 			TargetColumnCreationDate.identifier(),
@@ -165,6 +171,7 @@ func prepareTargetsQuery(context.Context, prepareDatabase) (sq.SelectBuilder, fu
 			TargetColumnURL.identifier(),
 			TargetColumnInterruptOnError.identifier(),
 			TargetColumnSigningKey.identifier(),
+			TargetColumnPayloadType.identifier(),
 			countColumn.identifier(),
 		).From(targetTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
@@ -184,6 +191,7 @@ func prepareTargetsQuery(context.Context, prepareDatabase) (sq.SelectBuilder, fu
 					&target.Endpoint,
 					&target.InterruptOnError,
 					&target.signingKey,
+					&target.PayloadType,
 					&count,
 				)
 				if err != nil {
@@ -205,7 +213,7 @@ func prepareTargetsQuery(context.Context, prepareDatabase) (sq.SelectBuilder, fu
 		}
 }
 
-func prepareTargetQuery(context.Context, prepareDatabase) (sq.SelectBuilder, func(row *sql.Row) (*Target, error)) {
+func prepareTargetQuery() (sq.SelectBuilder, func(row *sql.Row) (*Target, error)) {
 	return sq.Select(
 			TargetColumnID.identifier(),
 			TargetColumnCreationDate.identifier(),
@@ -217,6 +225,7 @@ func prepareTargetQuery(context.Context, prepareDatabase) (sq.SelectBuilder, fun
 			TargetColumnURL.identifier(),
 			TargetColumnInterruptOnError.identifier(),
 			TargetColumnSigningKey.identifier(),
+			TargetColumnPayloadType.identifier(),
 		).From(targetTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Target, error) {
@@ -232,6 +241,7 @@ func prepareTargetQuery(context.Context, prepareDatabase) (sq.SelectBuilder, fun
 				&target.Endpoint,
 				&target.InterruptOnError,
 				&target.signingKey,
+				&target.PayloadType,
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {

@@ -16,7 +16,7 @@ import (
 
 func TestCommandSide_SetUserMetadata(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type (
 		args struct {
@@ -24,6 +24,7 @@ func TestCommandSide_SetUserMetadata(t *testing.T) {
 			orgID    string
 			userID   string
 			metadata *domain.Metadata
+			check    PermissionCheck
 		}
 	)
 	type res struct {
@@ -39,8 +40,7 @@ func TestCommandSide_SetUserMetadata(t *testing.T) {
 		{
 			name: "user not existing, pre condition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -60,8 +60,50 @@ func TestCommandSide_SetUserMetadata(t *testing.T) {
 		{
 			name: "invalid metadata, pre condition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"",
+								"firstname lastname",
+								language.Und,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"key",
+								[]byte("value"),
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+				metadata: &domain.Metadata{
+					Key: "key",
+				},
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "add metadata, no permission",
+			fields: fields{
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -85,18 +127,21 @@ func TestCommandSide_SetUserMetadata(t *testing.T) {
 				orgID:  "org1",
 				userID: "user1",
 				metadata: &domain.Metadata{
-					Key: "key",
+					Key:   "key",
+					Value: []byte("value"),
+				},
+				check: func(resourceOwner, aggregateID string) error {
+					return zerrors.ThrowPermissionDenied(nil, "id", "permission denied")
 				},
 			},
 			res: res{
-				err: zerrors.IsErrorInvalidArgument,
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 		{
 			name: "add metadata, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -110,6 +155,231 @@ func TestCommandSide_SetUserMetadata(t *testing.T) {
 								domain.GenderUnspecified,
 								"email@test.ch",
 								true,
+							),
+						),
+					),
+					expectFilter(),
+					expectPush(
+						user.NewMetadataSetEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key",
+							[]byte("value"),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+				metadata: &domain.Metadata{
+					Key:   "key",
+					Value: []byte("value"),
+				},
+			},
+			res: res{
+				want: &domain.Metadata{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Key:   "key",
+					Value: []byte("value"),
+					State: domain.MetadataStateActive,
+				},
+			},
+		},
+		{
+			name: "add metadata, reset, invalid",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"",
+								"firstname lastname",
+								language.Und,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"key",
+								[]byte("value"),
+							),
+						),
+						eventFromEventPusher(
+							user.NewMetadataRemovedAllEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+				metadata: &domain.Metadata{
+					Key: "key",
+				},
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "add metadata with same key, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"",
+								"firstname lastname",
+								language.Und,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"key",
+								[]byte("value"),
+							),
+						),
+					),
+					expectPush(
+						user.NewMetadataSetEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key",
+							[]byte("value2"),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+				metadata: &domain.Metadata{
+					Key:   "key",
+					Value: []byte("value2"),
+				},
+			},
+			res: res{
+				want: &domain.Metadata{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Key:   "key",
+					Value: []byte("value2"),
+					State: domain.MetadataStateActive,
+				},
+			},
+		},
+		{
+			name: "add metadata with same key and value, ok (ignore)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"",
+								"firstname lastname",
+								language.Und,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"key",
+								[]byte("value"),
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+				metadata: &domain.Metadata{
+					Key:   "key",
+					Value: []byte("value"),
+				},
+			},
+			res: res{
+				want: &domain.Metadata{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Key:   "key",
+					Value: []byte("value"),
+					State: domain.MetadataStateActive,
+				},
+			},
+		},
+		{
+			name: "add deleted metadata with same value, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"",
+								"firstname lastname",
+								language.Und,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"key",
+								[]byte("value"),
+							),
+						),
+						eventFromEventPusher(
+							user.NewMetadataRemovedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"key",
 							),
 						),
 					),
@@ -147,9 +417,9 @@ func TestCommandSide_SetUserMetadata(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.SetUserMetadata(tt.args.ctx, tt.args.metadata, tt.args.userID, tt.args.orgID)
+			got, err := r.SetUserMetadata(tt.args.ctx, tt.args.metadata, tt.args.userID, tt.args.orgID, tt.args.check)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -165,13 +435,14 @@ func TestCommandSide_SetUserMetadata(t *testing.T) {
 
 func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type (
 		args struct {
 			ctx          context.Context
 			orgID        string
 			userID       string
+			check        PermissionCheck
 			metadataList []*domain.Metadata
 		}
 	)
@@ -186,11 +457,9 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "empty meta data list, pre condition error",
+			name: "empty metadata list, pre condition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -204,8 +473,7 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 		{
 			name: "user not existing, pre condition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -223,10 +491,9 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 			},
 		},
 		{
-			name: "invalid metadata, pre condition error",
+			name: "empty metadata value, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -243,6 +510,7 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(),
 				),
 			},
 			args: args{
@@ -255,14 +523,15 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zerrors.IsErrorInvalidArgument,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
 			},
 		},
 		{
-			name: "add metadata, ok",
+			name: "add metadata, no permission",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -279,6 +548,132 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 							),
 						),
 					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+				check: func(resourceOwner, aggregateID string) error {
+					return zerrors.ThrowPermissionDenied(nil, "id", "permission-denied")
+				},
+				metadataList: []*domain.Metadata{
+					{Key: "key", Value: []byte("value")},
+					{Key: "key1", Value: []byte("value1")},
+				},
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
+		{
+			name: "add metadata, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"",
+								"firstname lastname",
+								language.Und,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"key1",
+								[]byte("value1"),
+							)),
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"key2",
+								[]byte("value2"),
+							)),
+					),
+					expectPush(
+						user.NewMetadataRemovedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key1",
+						),
+						user.NewMetadataSetEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key2",
+							[]byte("update"),
+						),
+						user.NewMetadataSetEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key3",
+							[]byte("add"),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+				metadataList: []*domain.Metadata{
+					{Key: "key1"}, // delete
+					{Key: "key2", Value: []byte("update")},
+					{Key: "key3", Value: []byte("add")},
+					{Key: "key4"}, // ignore
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "re add deleted metadata, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"",
+								"firstname lastname",
+								language.Und,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"key",
+								[]byte("value"),
+							)),
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"key1",
+								[]byte("value1"),
+							)),
+						eventFromEventPusher(
+							user.NewMetadataRemovedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"key",
+							)),
+					),
 					expectPush(
 						user.NewMetadataSetEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -287,8 +682,8 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 						),
 						user.NewMetadataSetEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
-							"key1",
-							[]byte("value1"),
+							"key2",
+							[]byte("value2"),
 						),
 					),
 				),
@@ -300,6 +695,122 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 				metadataList: []*domain.Metadata{
 					{Key: "key", Value: []byte("value")},
 					{Key: "key1", Value: []byte("value1")},
+					{Key: "key2", Value: []byte("value2")},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "add and delete metadata, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"",
+								"firstname lastname",
+								language.Und,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"key1",
+								[]byte("value1"),
+							),
+						),
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"key2",
+								[]byte("value2"),
+							),
+						),
+					),
+					expectPush(
+						user.NewMetadataSetEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key1",
+							[]byte("updated_value1"),
+						),
+						user.NewMetadataRemovedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key2",
+						),
+						user.NewMetadataSetEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key3",
+							[]byte("value3"),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+				metadataList: []*domain.Metadata{
+					{Key: "key1", Value: []byte("updated_value1")},
+					{Key: "key2"},
+					{Key: "key3", Value: []byte("value3")},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "delete non existing key, ok (ignored)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"",
+								"firstname lastname",
+								language.Und,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"key1",
+								[]byte("value1"),
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+				metadataList: []*domain.Metadata{
+					{Key: "key2"},
 				},
 			},
 			res: res{
@@ -312,9 +823,9 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.BulkSetUserMetadata(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.metadataList...)
+			got, err := r.BulkSetUserMetadata(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.check, tt.args.metadataList...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -330,7 +841,7 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 
 func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type (
 		args struct {
@@ -338,6 +849,7 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 			orgID       string
 			userID      string
 			metadataKey string
+			check       PermissionCheck
 		}
 	)
 	type res struct {
@@ -353,8 +865,7 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 		{
 			name: "user not existing, pre condition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -371,9 +882,7 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 		{
 			name: "invalid metadata, pre condition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:         context.Background(),
@@ -386,10 +895,9 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 			},
 		},
 		{
-			name: "meta data not existing, not found error",
+			name: "metadata not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -420,10 +928,44 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 			},
 		},
 		{
+			name: "remove metadata, no permission",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"",
+								"firstname lastname",
+								language.Und,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:         context.Background(),
+				orgID:       "org1",
+				userID:      "user1",
+				metadataKey: "key",
+				check: func(resourceOwner, aggregateID string) error {
+					return zerrors.ThrowPermissionDenied(nil, "id", "permission denied")
+				},
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
+		{
 			name: "remove metadata, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -473,9 +1015,9 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.RemoveUserMetadata(tt.args.ctx, tt.args.metadataKey, tt.args.userID, tt.args.orgID)
+			got, err := r.RemoveUserMetadata(tt.args.ctx, tt.args.metadataKey, tt.args.userID, tt.args.orgID, tt.args.check)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -491,13 +1033,14 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 
 func TestCommandSide_BulkRemoveUserMetadata(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type (
 		args struct {
 			ctx          context.Context
 			orgID        string
 			userID       string
+			check        PermissionCheck
 			metadataList []string
 		}
 	)
@@ -512,11 +1055,9 @@ func TestCommandSide_BulkRemoveUserMetadata(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "empty meta data list, pre condition error",
+			name: "empty metadata list, pre condition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -530,8 +1071,7 @@ func TestCommandSide_BulkRemoveUserMetadata(t *testing.T) {
 		{
 			name: "user not existing, pre condition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -548,8 +1088,7 @@ func TestCommandSide_BulkRemoveUserMetadata(t *testing.T) {
 		{
 			name: "remove metadata keys not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -590,8 +1129,7 @@ func TestCommandSide_BulkRemoveUserMetadata(t *testing.T) {
 		{
 			name: "invalid metadata, pre condition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -637,10 +1175,44 @@ func TestCommandSide_BulkRemoveUserMetadata(t *testing.T) {
 			},
 		},
 		{
+			name: "remove metadata, no permission",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"",
+								"firstname lastname",
+								language.Und,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:          context.Background(),
+				orgID:        "org1",
+				userID:       "user1",
+				metadataList: []string{"key", "key1"},
+				check: func(resourceOwner, aggregateID string) error {
+					return zerrors.ThrowPermissionDenied(nil, "id", "permission denied")
+				},
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
+		{
 			name: "remove metadata, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -701,9 +1273,9 @@ func TestCommandSide_BulkRemoveUserMetadata(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.BulkRemoveUserMetadata(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.metadataList...)
+			got, err := r.BulkRemoveUserMetadata(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.check, tt.args.metadataList...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

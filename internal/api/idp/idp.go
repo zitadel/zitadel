@@ -3,6 +3,7 @@ package idp
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -15,10 +16,13 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
+	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain/federatedlogout"
 	"github.com/zitadel/zitadel/internal/form"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/apple"
@@ -31,6 +35,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	saml2 "github.com/zitadel/zitadel/internal/idp/providers/saml"
+	"github.com/zitadel/zitadel/internal/idp/providers/zitadel"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -44,6 +49,8 @@ const (
 	metadataPath    = idpPrefix + "/saml/metadata"
 	acsPath         = idpPrefix + "/saml/acs"
 	certificatePath = idpPrefix + "/saml/certificate"
+	sloPath         = idpPrefix + "/saml/slo"
+	jwtPath         = "/jwt"
 
 	paramIntentID         = "id"
 	paramToken            = "token"
@@ -62,6 +69,7 @@ type Handler struct {
 	callbackURL         func(ctx context.Context) string
 	samlRootURL         func(ctx context.Context, idpID string) string
 	loginSAMLRootURL    func(ctx context.Context) string
+	caches              *Caches
 }
 
 type externalIDPCallbackData struct {
@@ -104,6 +112,7 @@ func NewHandler(
 	queries *query.Queries,
 	encryptionAlgorithm crypto.EncryptionAlgorithm,
 	instanceInterceptor func(next http.Handler) http.Handler,
+	federatedLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
 ) http.Handler {
 	h := &Handler{
 		commands:            commands,
@@ -113,6 +122,7 @@ func NewHandler(
 		callbackURL:         CallbackURL(),
 		samlRootURL:         SAMLRootURL(),
 		loginSAMLRootURL:    LoginSAMLRootURL(),
+		caches:              &Caches{federatedLogouts: federatedLogoutCache},
 	}
 
 	router := mux.NewRouter()
@@ -121,7 +131,13 @@ func NewHandler(
 	router.HandleFunc(metadataPath, h.handleMetadata)
 	router.HandleFunc(certificatePath, h.handleCertificate)
 	router.HandleFunc(acsPath, h.handleACS)
+	router.HandleFunc(sloPath, h.handleSLO)
+	router.HandleFunc(jwtPath, h.handleJWT)
 	return router
+}
+
+type Caches struct {
+	federatedLogouts cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout]
 }
 
 func parseSAMLRequest(r *http.Request) *externalSAMLIDPCallbackData {
@@ -270,6 +286,14 @@ func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// The provider/certificate used to verify the response is selected from the request path (data.IDPID),
+	// but the user is resolved under the intent's IDP. Make sure they are the same IDP, otherwise an
+	// assertion signed by one SAML IDP could be accepted for an intent targeting a different one.
+	if err := checkSAMLIntentIDP(data.IDPID, intent.IDPID); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	session, err := saml2.NewSession(samlProvider, intent.RequestID, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -287,9 +311,92 @@ func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
 	userID, err := h.checkExternalUser(ctx, intent.IDPID, idpUser.GetID())
 	logging.WithFields("intent", intent.AggregateID).OnError(err).Error("could not check if idp user already exists")
 
-	token, err := h.commands.SucceedSAMLIDPIntent(ctx, intent, idpUser, userID, session.Assertion)
+	token, err := h.commands.SucceedSAMLIDPIntent(ctx, intent, idpUser, userID, session)
 	if err != nil {
 		redirectToFailureURLErr(w, r, intent, zerrors.ThrowInternal(err, "IDP-JdD3g", "Errors.Intent.TokenCreationFailed"))
+		return
+	}
+	redirectToSuccessURL(w, r, intent, token, userID)
+}
+
+func (h *Handler) handleJWT(w http.ResponseWriter, r *http.Request) {
+	intentID, err := h.intentIDFromJWTRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	intent, err := h.commands.GetActiveIntent(r.Context(), intentID)
+	if err != nil {
+		if zerrors.IsNotFound(err) {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		redirectToFailureURLErr(w, r, intent, err)
+		return
+	}
+	idpConfig, err := h.getProvider(r.Context(), intent.IDPID)
+	if err != nil {
+		cmdErr := h.commands.FailIDPIntent(r.Context(), intent, err.Error())
+		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
+		redirectToFailureURLErr(w, r, intent, err)
+		return
+	}
+	jwtIDP, ok := idpConfig.(*jwt.Provider)
+	if !ok {
+		err := zerrors.ThrowInvalidArgument(nil, "IDP-JK23ed", "Errors.ExternalIDP.IDPTypeNotImplemented")
+		cmdErr := h.commands.FailIDPIntent(r.Context(), intent, err.Error())
+		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
+		redirectToFailureURLErr(w, r, intent, err)
+		return
+	}
+	h.handleJWTExtraction(w, r, intent, jwtIDP)
+}
+
+func (h *Handler) intentIDFromJWTRequest(r *http.Request) (string, error) {
+	// for compatibility of the old JWT provider we use the auth request id parameter to pass the intent id
+	intentID := r.FormValue(jwt.QueryAuthRequestID)
+	// for compatibility of the old JWT provider we use the user agent id parameter to pass the encrypted intent id
+	encryptedIntentID := r.FormValue(jwt.QueryUserAgentID)
+	if err := h.checkIntentID(intentID, encryptedIntentID); err != nil {
+		return "", err
+	}
+	return intentID, nil
+}
+
+func (h *Handler) checkIntentID(intentID, encryptedIntentID string) error {
+	if intentID == "" || encryptedIntentID == "" {
+		return zerrors.ThrowInvalidArgument(nil, "LOGIN-adfzz", "Errors.AuthRequest.MissingParameters")
+	}
+	id, err := base64.RawURLEncoding.DecodeString(encryptedIntentID)
+	if err != nil {
+		return err
+	}
+	decryptedIntentID, err := h.encryptionAlgorithm.DecryptString(id, h.encryptionAlgorithm.EncryptionKeyID())
+	if err != nil {
+		return err
+	}
+	if intentID != decryptedIntentID {
+		return zerrors.ThrowInvalidArgument(nil, "LOGIN-adfzz", "Errors.AuthRequest.MissingParameters")
+	}
+	return nil
+}
+
+func (h *Handler) handleJWTExtraction(w http.ResponseWriter, r *http.Request, intent *command.IDPIntentWriteModel, identityProvider *jwt.Provider) {
+	session := jwt.NewSessionFromRequest(identityProvider, r)
+	user, err := session.FetchUser(r.Context())
+	if err != nil {
+		cmdErr := h.commands.FailIDPIntent(r.Context(), intent, err.Error())
+		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
+		redirectToFailureURLErr(w, r, intent, err)
+		return
+	}
+
+	userID, err := h.checkExternalUser(r.Context(), intent.IDPID, user.GetID())
+	logging.WithFields("intent", intent.AggregateID).OnError(err).Error("could not check if idp user already exists")
+
+	token, err := h.commands.SucceedIDPIntent(r.Context(), intent, user, session, userID)
+	if err != nil {
+		redirectToFailureURLErr(w, r, intent, err)
 		return
 	}
 	redirectToSuccessURL(w, r, intent, token, userID)
@@ -328,7 +435,7 @@ func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	idpUser, idpSession, err := h.fetchIDPUserFromCode(ctx, provider, data.Code, data.User)
+	idpUser, idpSession, err := h.fetchIDPUserFromCode(ctx, provider, data.Code, data.User, intent.IDPArguments)
 	if err != nil {
 		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
 		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
@@ -349,6 +456,43 @@ func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	redirectToSuccessURL(w, r, intent, token, userID)
+}
+
+func (h *Handler) handleSLO(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	data := parseSAMLRequest(r)
+
+	logoutState, ok := h.caches.federatedLogouts.Get(ctx, federatedlogout.IndexRequestID, federatedlogout.Key(authz.GetInstance(ctx).InstanceID(), data.RelayState))
+	if !ok || logoutState.State != federatedlogout.StateRedirected {
+		err := zerrors.ThrowNotFound(nil, "SAML-3uor2", "Errors.Intent.NotFound")
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Make sure the callback matches the IDP the logout was started on / intended for, so a logout
+	// response cannot be consumed through a different SAML IDP's path.
+	if err := checkSAMLIntentIDP(data.IDPID, logoutState.IDPID); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	provider, err := h.getProvider(ctx, data.IDPID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if _, ok = provider.(*saml2.Provider); !ok {
+		err := zerrors.ThrowInvalidArgument(nil, "SAML-ui9wyux0hp", "Errors.Intent.IDPInvalid")
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// We could also parse and validate the response here, but for example Azure does not sign it and thus would already fail.
+	// Also we can't really act on it if it fails.
+
+	err = h.caches.federatedLogouts.Delete(ctx, federatedlogout.IndexRequestID, federatedlogout.Key(logoutState.InstanceID, logoutState.SessionID))
+	logging.WithFields("instanceID", logoutState.InstanceID, "sessionID", logoutState.SessionID).OnError(err).Error("could not delete federated logout")
+	http.Redirect(w, r, logoutState.PostLogoutRedirectURI, http.StatusFound)
 }
 
 func (h *Handler) tryMigrateExternalUser(ctx context.Context, idpID string, idpUser idp.User, idpSession idp.Session) (userID string, err error) {
@@ -410,23 +554,25 @@ func redirectToFailureURL(w http.ResponseWriter, r *http.Request, i *command.IDP
 	http.Redirect(w, r, i.FailureURL.String(), http.StatusFound)
 }
 
-func (h *Handler) fetchIDPUserFromCode(ctx context.Context, identityProvider idp.Provider, code string, appleUser string) (user idp.User, idpTokens idp.Session, err error) {
+func (h *Handler) fetchIDPUserFromCode(ctx context.Context, identityProvider idp.Provider, code string, appleUser string, idpArguments map[string]any) (user idp.User, idpTokens idp.Session, err error) {
 	var session idp.Session
 	switch provider := identityProvider.(type) {
 	case *oauth.Provider:
-		session = &oauth.Session{Provider: provider, Code: code}
+		session = oauth.NewSession(provider, code, idpArguments)
 	case *openid.Provider:
-		session = &openid.Session{Provider: provider, Code: code}
+		session = openid.NewSession(provider, code, idpArguments)
 	case *azuread.Provider:
-		session = &azuread.Session{Provider: provider, Code: code}
+		session = azuread.NewSession(provider, code)
 	case *github.Provider:
-		session = &oauth.Session{Provider: provider.Provider, Code: code}
+		session = github.NewSession(provider, code, idpArguments)
 	case *gitlab.Provider:
-		session = &openid.Session{Provider: provider.Provider, Code: code}
+		session = openid.NewSession(provider.Provider, code, idpArguments)
 	case *google.Provider:
-		session = &openid.Session{Provider: provider.Provider, Code: code}
+		session = openid.NewSession(provider.Provider, code, idpArguments)
+	case *zitadel.Provider:
+		session = openid.NewSession(provider.Provider, code, idpArguments)
 	case *apple.Provider:
-		session = &apple.Session{Session: &openid.Session{Provider: provider.Provider, Code: code}, UserFormValue: appleUser}
+		session = apple.NewSession(provider, code, appleUser)
 	case *jwt.Provider, *ldap.Provider, *saml2.Provider:
 		return nil, nil, zerrors.ThrowInvalidArgument(nil, "IDP-52jmn", "Errors.ExternalIDP.IDPTypeNotImplemented")
 	default:
@@ -438,6 +584,17 @@ func (h *Handler) fetchIDPUserFromCode(ctx context.Context, identityProvider idp
 		return nil, nil, err
 	}
 	return user, session, nil
+}
+
+// checkSAMLIntentIDP ensures the IdP named in the request path (which selects the certificate used to
+// verify the assertion/response) is the same IdP the intent or federated logout was started for.
+// Without this check an assertion signed by one SAML IdP is accepted for an intent targeting a
+// different one (IdP confusion).
+func checkSAMLIntentIDP(requestIDPID, intentIDPID string) error {
+	if requestIDPID != intentIDPID {
+		return zerrors.ThrowInvalidArgument(nil, "SAML-9aj20fb1xl", "Errors.Intent.IDPInvalid")
+	}
+	return nil
 }
 
 func (h *Handler) checkExternalUser(ctx context.Context, idpID, externalUserID string) (userID string, err error) {

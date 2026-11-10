@@ -22,7 +22,7 @@ type RefreshTokenRepo struct {
 	Eventstore   *eventstore.Eventstore
 	View         *view.View
 	SearchLimit  uint64
-	KeyAlgorithm crypto.EncryptionAlgorithm
+	KeyAlgorithm crypto.AuthAlgorithm
 }
 
 func (r *RefreshTokenRepo) RefreshTokenByToken(ctx context.Context, refreshToken string) (*usr_model.RefreshTokenView, error) {

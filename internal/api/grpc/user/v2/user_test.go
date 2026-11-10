@@ -11,7 +11,6 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -22,8 +21,8 @@ import (
 )
 
 func Test_idpIntentToIDPIntentPb(t *testing.T) {
-	decryption := func(err error) crypto.EncryptionAlgorithm {
-		mCrypto := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
+	decryption := func(err error) crypto.AuthEncryptionAlgorithm {
+		mCrypto := crypto.NewMockAuthEncryptionAlgorithm(gomock.NewController(t))
 		mCrypto.EXPECT().Algorithm().Return("enc")
 		mCrypto.EXPECT().DecryptionKeyIDs().Return([]string{"id"})
 		mCrypto.EXPECT().DecryptString(gomock.Any(), gomock.Any()).DoAndReturn(
@@ -38,7 +37,7 @@ func Test_idpIntentToIDPIntentPb(t *testing.T) {
 
 	type args struct {
 		intent *command.IDPIntentWriteModel
-		alg    crypto.EncryptionAlgorithm
+		alg    crypto.AuthEncryptionAlgorithm
 	}
 	type res struct {
 		resp *user.RetrieveIdentityProviderIntentResponse
@@ -50,8 +49,8 @@ func Test_idpIntentToIDPIntentPb(t *testing.T) {
 		res  res
 	}{
 		{
-			"decryption invalid key id error",
-			args{
+			name: "decryption invalid key id error",
+			args: args{
 				intent: &command.IDPIntentWriteModel{
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "intentID",
@@ -77,13 +76,13 @@ func Test_idpIntentToIDPIntentPb(t *testing.T) {
 				},
 				alg: decryption(zerrors.ThrowInternal(nil, "id", "invalid key id")),
 			},
-			res{
+			res: res{
 				resp: nil,
 				err:  zerrors.ThrowInternal(nil, "id", "invalid key id"),
 			},
 		}, {
-			"successful oauth",
-			args{
+			name: "successful oauth",
+			args: args{
 				intent: &command.IDPIntentWriteModel{
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "intentID",
@@ -108,7 +107,7 @@ func Test_idpIntentToIDPIntentPb(t *testing.T) {
 				},
 				alg: decryption(nil),
 			},
-			res{
+			res: res{
 				resp: &user.RetrieveIdentityProviderIntentResponse{
 					Details: &object_pb.Details{
 						Sequence:      123,
@@ -139,8 +138,8 @@ func Test_idpIntentToIDPIntentPb(t *testing.T) {
 			},
 		},
 		{
-			"successful oauth with linked user",
-			args{
+			name: "successful oauth with linked user",
+			args: args{
 				intent: &command.IDPIntentWriteModel{
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "intentID",
@@ -165,7 +164,7 @@ func Test_idpIntentToIDPIntentPb(t *testing.T) {
 				},
 				alg: decryption(nil),
 			},
-			res{
+			res: res{
 				resp: &user.RetrieveIdentityProviderIntentResponse{
 					Details: &object_pb.Details{
 						Sequence:      123,
@@ -196,8 +195,8 @@ func Test_idpIntentToIDPIntentPb(t *testing.T) {
 				err: nil,
 			},
 		}, {
-			"successful ldap",
-			args{
+			name: "successful ldap",
+			args: args{
 				intent: &command.IDPIntentWriteModel{
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "intentID",
@@ -219,7 +218,7 @@ func Test_idpIntentToIDPIntentPb(t *testing.T) {
 					State:  domain.IDPIntentStateSucceeded,
 				},
 			},
-			res{
+			res: res{
 				resp: &user.RetrieveIdentityProviderIntentResponse{
 					Details: &object_pb.Details{
 						Sequence:      123,
@@ -256,8 +255,8 @@ func Test_idpIntentToIDPIntentPb(t *testing.T) {
 				err: nil,
 			},
 		}, {
-			"successful ldap with linked user",
-			args{
+			name: "successful ldap with linked user",
+			args: args{
 				intent: &command.IDPIntentWriteModel{
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "intentID",
@@ -279,7 +278,7 @@ func Test_idpIntentToIDPIntentPb(t *testing.T) {
 					State:  domain.IDPIntentStateSucceeded,
 				},
 			},
-			res{
+			res: res{
 				resp: &user.RetrieveIdentityProviderIntentResponse{
 					Details: &object_pb.Details{
 						Sequence:      123,
@@ -322,7 +321,7 @@ func Test_idpIntentToIDPIntentPb(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := idpIntentToIDPIntentPb(tt.args.intent, tt.args.alg)
 			require.ErrorIs(t, err, tt.res.err)
-			grpc.AllFieldsEqual(t, tt.res.resp.ProtoReflect(), got.ProtoReflect(), grpc.CustomMappers)
+			assert.EqualExportedValues(t, tt.res.resp, got)
 		})
 	}
 }
@@ -334,16 +333,16 @@ func Test_authMethodTypesToPb(t *testing.T) {
 		want        []user.AuthenticationMethodType
 	}{
 		{
-			"empty list",
-			nil,
-			[]user.AuthenticationMethodType{},
+			name:        "empty list",
+			methodTypes: nil,
+			want:        []user.AuthenticationMethodType{},
 		},
 		{
-			"list",
-			[]domain.UserAuthMethodType{
+			name: "list",
+			methodTypes: []domain.UserAuthMethodType{
 				domain.UserAuthMethodTypePasswordless,
 			},
-			[]user.AuthenticationMethodType{
+			want: []user.AuthenticationMethodType{
 				user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSKEY,
 			},
 		},
@@ -362,44 +361,49 @@ func Test_authMethodTypeToPb(t *testing.T) {
 		want       user.AuthenticationMethodType
 	}{
 		{
-			"uspecified",
-			domain.UserAuthMethodTypeUnspecified,
-			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_UNSPECIFIED,
+			name:       "uspecified",
+			methodType: domain.UserAuthMethodTypeUnspecified,
+			want:       user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_UNSPECIFIED,
 		},
 		{
-			"totp",
-			domain.UserAuthMethodTypeTOTP,
-			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_TOTP,
+			name:       "totp",
+			methodType: domain.UserAuthMethodTypeTOTP,
+			want:       user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_TOTP,
 		},
 		{
-			"u2f",
-			domain.UserAuthMethodTypeU2F,
-			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_U2F,
+			name:       "u2f",
+			methodType: domain.UserAuthMethodTypeU2F,
+			want:       user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_U2F,
 		},
 		{
-			"passkey",
-			domain.UserAuthMethodTypePasswordless,
-			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSKEY,
+			name:       "passkey",
+			methodType: domain.UserAuthMethodTypePasswordless,
+			want:       user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSKEY,
 		},
 		{
-			"password",
-			domain.UserAuthMethodTypePassword,
-			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSWORD,
+			name:       "password",
+			methodType: domain.UserAuthMethodTypePassword,
+			want:       user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSWORD,
 		},
 		{
-			"idp",
-			domain.UserAuthMethodTypeIDP,
-			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_IDP,
+			name:       "idp",
+			methodType: domain.UserAuthMethodTypeIDP,
+			want:       user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_IDP,
 		},
 		{
-			"otp sms",
-			domain.UserAuthMethodTypeOTPSMS,
-			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_OTP_SMS,
+			name:       "otp sms",
+			methodType: domain.UserAuthMethodTypeOTPSMS,
+			want:       user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_OTP_SMS,
 		},
 		{
-			"otp email",
-			domain.UserAuthMethodTypeOTPEmail,
-			user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_OTP_EMAIL,
+			name:       "otp email",
+			methodType: domain.UserAuthMethodTypeOTPEmail,
+			want:       user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_OTP_EMAIL,
+		},
+		{
+			name:       "recovery code",
+			methodType: domain.UserAuthMethodTypeRecoveryCode,
+			want:       user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_RECOVERY_CODE,
 		},
 	}
 	for _, tt := range tests {

@@ -90,7 +90,7 @@ func NewSMSConfigTwilioChangedEvent(
 	changes []SMSConfigTwilioChanges,
 ) (*SMSConfigTwilioChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "IAM-smn8e", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "INST-smn8e", "Errors.NoChangesFound")
 	}
 	changeEvent := &SMSConfigTwilioChangedEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
@@ -183,9 +183,10 @@ func (e *SMSConfigTwilioTokenChangedEvent) UniqueConstraints() []*eventstore.Uni
 type SMSConfigHTTPAddedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	ID          string `json:"id,omitempty"`
-	Description string `json:"description,omitempty"`
-	Endpoint    string `json:"endpoint,omitempty"`
+	ID          string              `json:"id,omitempty"`
+	Description string              `json:"description,omitempty"`
+	Endpoint    string              `json:"endpoint,omitempty"`
+	SigningKey  *crypto.CryptoValue `json:"signingKey"`
 }
 
 func NewSMSConfigHTTPAddedEvent(
@@ -194,6 +195,7 @@ func NewSMSConfigHTTPAddedEvent(
 	id,
 	description,
 	endpoint string,
+	signingKey *crypto.CryptoValue,
 ) *SMSConfigHTTPAddedEvent {
 	return &SMSConfigHTTPAddedEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
@@ -204,6 +206,7 @@ func NewSMSConfigHTTPAddedEvent(
 		ID:          id,
 		Description: description,
 		Endpoint:    endpoint,
+		SigningKey:  signingKey,
 	}
 }
 
@@ -222,9 +225,10 @@ func (e *SMSConfigHTTPAddedEvent) UniqueConstraints() []*eventstore.UniqueConstr
 type SMSConfigHTTPChangedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	ID          string  `json:"id,omitempty"`
-	Description *string `json:"description,omitempty"`
-	Endpoint    *string `json:"endpoint,omitempty"`
+	ID          string              `json:"id,omitempty"`
+	Description *string             `json:"description,omitempty"`
+	Endpoint    *string             `json:"endpoint,omitempty"`
+	SigningKey  *crypto.CryptoValue `json:"signingKey,omitempty"`
 }
 
 func NewSMSConfigHTTPChangedEvent(
@@ -234,7 +238,7 @@ func NewSMSConfigHTTPChangedEvent(
 	changes []SMSConfigHTTPChanges,
 ) (*SMSConfigHTTPChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "IAM-smn8e", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "INST-smn8e", "Errors.NoChangesFound")
 	}
 	changeEvent := &SMSConfigHTTPChangedEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
@@ -260,6 +264,11 @@ func ChangeSMSConfigHTTPDescription(description string) func(event *SMSConfigHTT
 func ChangeSMSConfigHTTPEndpoint(endpoint string) func(event *SMSConfigHTTPChangedEvent) {
 	return func(e *SMSConfigHTTPChangedEvent) {
 		e.Endpoint = &endpoint
+	}
+}
+func ChangeSMSConfigHTTPSigningKey(signingKey *crypto.CryptoValue) func(event *SMSConfigHTTPChangedEvent) {
+	return func(e *SMSConfigHTTPChangedEvent) {
+		e.SigningKey = signingKey
 	}
 }
 

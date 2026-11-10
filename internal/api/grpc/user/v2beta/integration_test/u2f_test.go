@@ -22,9 +22,9 @@ func TestServer_RegisterU2F(t *testing.T) {
 
 	// We also need a user session
 	Instance.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, userID)
 	Instance.RegisterUserPasskey(CTX, otherUser)
-	_, sessionTokenOtherUser, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
+	_, sessionTokenOtherUser, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, otherUser)
 
 	type args struct {
 		ctx context.Context
@@ -108,7 +108,7 @@ func TestServer_RegisterU2F(t *testing.T) {
 func TestServer_VerifyU2FRegistration(t *testing.T) {
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	Instance.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, userID)
 	ctx := integration.WithAuthorizationToken(CTX, sessionToken)
 
 	pkr, err := Client.RegisterU2F(ctx, &user.RegisterU2FRequest{

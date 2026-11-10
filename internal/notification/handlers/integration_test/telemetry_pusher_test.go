@@ -56,8 +56,8 @@ func TestServer_TelemetryPushMilestones(t *testing.T) {
 	// create the session to be used for the authN of the clients
 	sessionID, sessionToken, _, _ := instance.CreatePasswordSession(t, iamOwnerCtx, instance.AdminUserID, "Password1!")
 
-	console := consoleOIDCConfig(t, instance)
-	loginToClient(t, instance, console.GetClientId(), console.GetRedirectUris()[0], sessionID, sessionToken)
+	managementConsole := managementConsoleOIDCConfig(t, instance)
+	loginToClient(t, instance, managementConsole.GetClientId(), managementConsole.GetRedirectUris()[0], sessionID, sessionToken)
 	awaitMilestone(t, sub, instance.ID(), milestone.AuthenticationSucceededOnInstance)
 
 	// make sure the client has been projected
@@ -98,7 +98,7 @@ func loginToClient(t *testing.T, instance *integration.Instance, clientID, redir
 	require.NoError(t, err)
 }
 
-func consoleOIDCConfig(t *testing.T, instance *integration.Instance) *app.OIDCConfig {
+func managementConsoleOIDCConfig(t *testing.T, instance *integration.Instance) *app.OIDCConfig {
 	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
 	projects, err := instance.Client.Mgmt.ListProjects(iamOwnerCtx, &management.ListProjectsRequest{
@@ -121,7 +121,7 @@ func consoleOIDCConfig(t *testing.T, instance *integration.Instance) *app.OIDCCo
 			{
 				Query: &app.AppQuery_NameQuery{
 					NameQuery: &app.AppNameQuery{
-						Name:   "Console",
+						Name:   "Management Console",
 						Method: object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS,
 					},
 				},

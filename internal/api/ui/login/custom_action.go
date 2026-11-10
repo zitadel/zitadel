@@ -40,7 +40,7 @@ func (l *Login) runPostExternalAuthenticationActions(
 		// so let's do a workaround and resourceOwnerOfUserIDPLink if there would be a IDP link
 		resourceOwner, err = l.resourceOwnerOfUserIDPLink(ctx, authRequest.SelectedIDPConfigID, user.ExternalUserID)
 		logging.WithFields("authReq", authRequest.ID, "idpID", authRequest.SelectedIDPConfigID).OnError(err).
-			Warn("could not determine resource owner for runPostExternalAuthenticationActions, fall back to default org id")
+			Warn("could not determine Organization ID for runPostExternalAuthenticationActions, fall back to default org id")
 	}
 	// fallback to default org id
 	if resourceOwner == "" {
@@ -99,6 +99,7 @@ func (l *Login) runPostExternalAuthenticationActions(
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
+				actions.SetFields("appendMetadataRaw", metadataList.AppendMetadataRawFunc),
 			),
 		),
 	)
@@ -127,9 +128,10 @@ func (l *Login) runPostExternalAuthenticationActions(
 						return func(goja.FunctionCall) goja.Value {
 							metadata, err := l.query.SearchOrgMetadata(
 								ctx,
-								true,
+								false,
 								resourceOwner,
 								&query.OrgMetadataSearchQueries{},
+								false,
 								false,
 							)
 							if err != nil {
@@ -151,7 +153,7 @@ func (l *Login) runPostExternalAuthenticationActions(
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx, l.httpClient), actions.WithUUID(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
@@ -169,6 +171,7 @@ const (
 	authMethodOTP          authMethod = "OTP"
 	authMethodOTPSMS       authMethod = "OTP SMS"
 	authMethodOTPEmail     authMethod = "OTP Email"
+	authMethodRecoveryCode authMethod = "recovery code"
 	authMethodU2F          authMethod = "U2F"
 	authMethodPasswordless authMethod = "passwordless"
 )
@@ -199,6 +202,7 @@ func (l *Login) runPostInternalAuthenticationActions(
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
+				actions.SetFields("appendMetadataRaw", metadataList.AppendMetadataRawFunc),
 			),
 		),
 	)
@@ -224,7 +228,7 @@ func (l *Login) runPostInternalAuthenticationActions(
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx, l.httpClient), actions.WithUUID(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
@@ -302,6 +306,7 @@ func (l *Login) runPreCreationActions(
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
+				actions.SetFields("appendMetadataRaw", metadataList.AppendMetadataRawFunc),
 			),
 		),
 	)
@@ -321,9 +326,10 @@ func (l *Login) runPreCreationActions(
 						return func(goja.FunctionCall) goja.Value {
 							metadata, err := l.query.SearchOrgMetadata(
 								ctx,
-								true,
+								false,
 								resourceOwner,
 								&query.OrgMetadataSearchQueries{},
+								false,
 								false,
 							)
 							if err != nil {
@@ -343,7 +349,7 @@ func (l *Login) runPreCreationActions(
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx, l.httpClient), actions.WithUUID(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
@@ -397,9 +403,10 @@ func (l *Login) runPostCreationActions(
 						return func(goja.FunctionCall) goja.Value {
 							metadata, err := l.query.SearchOrgMetadata(
 								ctx,
-								true,
+								false,
 								resourceOwner,
 								&query.OrgMetadataSearchQueries{},
+								false,
 								false,
 							)
 							if err != nil {
@@ -419,7 +426,7 @@ func (l *Login) runPostCreationActions(
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithUUID(actionCtx))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx, l.httpClient), actions.WithUUID(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
@@ -430,7 +437,7 @@ func (l *Login) runPostCreationActions(
 }
 
 func tokenCtxFields(tokens *oidc.Tokens[*oidc.IDTokenClaims]) []actions.FieldOption {
-	var accessToken, idToken string
+	var accessToken, idToken, refreshToken string
 	getClaim := func(claim string) interface{} {
 		return nil
 	}
@@ -443,9 +450,11 @@ func tokenCtxFields(tokens *oidc.Tokens[*oidc.IDTokenClaims]) []actions.FieldOpt
 			actions.SetFields("idToken", idToken),
 			actions.SetFields("getClaim", getClaim),
 			actions.SetFields("claimsJSON", claimsJSON),
+			actions.SetFields("refreshToken", refreshToken),
 		}
 	}
 	accessToken = tokens.AccessToken
+	refreshToken = tokens.RefreshToken
 	idToken = tokens.IDToken
 	if tokens.IDTokenClaims != nil {
 		getClaim = func(claim string) interface{} {
@@ -464,6 +473,7 @@ func tokenCtxFields(tokens *oidc.Tokens[*oidc.IDTokenClaims]) []actions.FieldOpt
 		actions.SetFields("idToken", idToken),
 		actions.SetFields("getClaim", getClaim),
 		actions.SetFields("claimsJSON", claimsJSON),
+		actions.SetFields("refreshToken", refreshToken),
 	}
 }
 

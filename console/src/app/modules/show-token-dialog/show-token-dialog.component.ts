@@ -8,6 +8,7 @@ import { InfoSectionType } from '../info-section/info-section.component';
   selector: 'cnsl-show-token-dialog',
   templateUrl: './show-token-dialog.component.html',
   styleUrls: ['./show-token-dialog.component.scss'],
+  standalone: false,
 })
 export class ShowTokenDialogComponent {
   public tokenResponse!: AddPersonalAccessTokenResponse.AsObject;

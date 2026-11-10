@@ -5,8 +5,7 @@ import (
 	_ "embed"
 	"fmt"
 
-	"github.com/zitadel/logging"
-
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
@@ -34,7 +33,7 @@ func (mig *DeleteStaleOrgFields) Execute(ctx context.Context, _ eventstore.Event
 		return err
 	}
 	for i, instance := range instances {
-		logging.WithFields("instance_id", instance, "migration", mig.String(), "progress", fmt.Sprintf("%d/%d", i+1, len(instances))).Info("execute delete query")
+		logging.Info(ctx, "execute delete query", "instance", instance, "migration", mig.String(), "progress", fmt.Sprintf("%d/%d", i+1, len(instances)))
 		if _, err := mig.eventstore.Client().ExecContext(ctx, deleteStaleOrgFields, instance); err != nil {
 			return err
 		}

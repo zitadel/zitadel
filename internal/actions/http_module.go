@@ -5,22 +5,19 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"net"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 
 	"github.com/dop251/goja"
 	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func WithHTTP(ctx context.Context) Option {
+func WithHTTP(ctx context.Context, client *http.Client) Option {
 	return func(c *runConfig) {
 		c.modules["zitadel/http"] = func(runtime *goja.Runtime, module *goja.Object) {
-			requireHTTP(ctx, &http.Client{Transport: &transport{lookup: net.LookupIP}}, runtime, module)
+			requireHTTP(ctx, client, runtime, module)
 		}
 	}
 }
@@ -169,42 +166,4 @@ func parseHeaders(headers *goja.Object) http.Header {
 		}
 	}
 	return h
-}
-
-type transport struct {
-	lookup func(string) ([]net.IP, error)
-}
-
-func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
-	if httpConfig == nil {
-		return http.DefaultTransport.RoundTrip(req)
-	}
-	if t.isHostBlocked(httpConfig.DenyList, req.URL) {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ACTIO-N72d0", "host is denied")
-	}
-	return http.DefaultTransport.RoundTrip(req)
-}
-
-func (t *transport) isHostBlocked(denyList []AddressChecker, address *url.URL) bool {
-	host := address.Hostname()
-	ip := net.ParseIP(host)
-	ips := []net.IP{ip}
-	// if the hostname is a domain, we need to check resolve the ip(s), since it might be denied
-	if ip == nil {
-		var err error
-		ips, err = t.lookup(host)
-		if err != nil {
-			return true
-		}
-	}
-	for _, blocked := range denyList {
-		if blocked.Matches(ips, host) {
-			return true
-		}
-	}
-	return false
-}
-
-type AddressChecker interface {
-	Matches([]net.IP, string) bool
 }

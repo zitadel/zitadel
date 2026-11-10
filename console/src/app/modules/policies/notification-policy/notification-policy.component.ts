@@ -22,6 +22,7 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
   selector: 'cnsl-notification-policy',
   templateUrl: './notification-policy.component.html',
   styleUrls: ['./notification-policy.component.scss'],
+  standalone: false,
 })
 export class NotificationPolicyComponent implements OnInit {
   @Input() public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;

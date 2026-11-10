@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
+	"net/http"
 	"net/url"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -11,14 +12,14 @@ import (
 )
 
 const (
-	queryAuthRequestID = "authRequestID"
-	queryUserAgentID   = "userAgentID"
+	QueryAuthRequestID = "authRequestID"
+	QueryUserAgentID   = "userAgentID"
 )
 
 var _ idp.Provider = (*Provider)(nil)
 
 var (
-	ErrMissingUserAgentID = errors.New("userAgentID missing")
+	ErrMissingState = errors.New("state missing")
 )
 
 // Provider is the [idp.Provider] implementation for a JWT provider
@@ -28,11 +29,13 @@ type Provider struct {
 	issuer            string
 	jwtEndpoint       string
 	keysEndpoint      string
+	audience          string
 	isLinkingAllowed  bool
 	isCreationAllowed bool
 	isAutoCreation    bool
 	isAutoUpdate      bool
 	encryptionAlg     crypto.EncryptionAlgorithm
+	httpClient        *http.Client
 }
 
 type ProviderOpts func(provider *Provider)
@@ -67,14 +70,16 @@ func WithAutoUpdate() ProviderOpts {
 }
 
 // New creates a JWT provider
-func New(name, issuer, jwtEndpoint, keysEndpoint, headerName string, encryptionAlg crypto.EncryptionAlgorithm, options ...ProviderOpts) (*Provider, error) {
+func New(name, issuer, jwtEndpoint, keysEndpoint, headerName, audience string, encryptionAlg crypto.EncryptionAlgorithm, httpClient *http.Client, options ...ProviderOpts) (*Provider, error) {
 	provider := &Provider{
 		name:          name,
 		issuer:        issuer,
 		jwtEndpoint:   jwtEndpoint,
 		keysEndpoint:  keysEndpoint,
 		headerName:    headerName,
+		audience:      audience,
 		encryptionAlg: encryptionAlg,
+		httpClient:    httpClient,
 	}
 	for _, option := range options {
 		option(provider)
@@ -92,32 +97,32 @@ func (p *Provider) Name() string {
 // It will create a [Session] with an AuthURL, pointing to the jwtEndpoint
 // with the authRequest and encrypted userAgent ids.
 func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Parameter) (idp.Session, error) {
-	userAgentID, err := userAgentIDFromParams(params...)
-	if err != nil {
-		return nil, err
+	if state == "" {
+		return nil, ErrMissingState
 	}
+	userAgentID := userAgentIDFromParams(state, params...)
 	redirect, err := url.Parse(p.jwtEndpoint)
 	if err != nil {
 		return nil, err
 	}
 	q := redirect.Query()
-	q.Set(queryAuthRequestID, state)
+	q.Set(QueryAuthRequestID, state)
 	nonce, err := p.encryptionAlg.Encrypt([]byte(userAgentID))
 	if err != nil {
 		return nil, err
 	}
-	q.Set(queryUserAgentID, base64.RawURLEncoding.EncodeToString(nonce))
+	q.Set(QueryUserAgentID, base64.RawURLEncoding.EncodeToString(nonce))
 	redirect.RawQuery = q.Encode()
 	return &Session{AuthURL: redirect.String()}, nil
 }
 
-func userAgentIDFromParams(params ...idp.Parameter) (string, error) {
+func userAgentIDFromParams(state string, params ...idp.Parameter) string {
 	for _, param := range params {
 		if id, ok := param.(idp.UserAgentID); ok {
-			return string(id), nil
+			return string(id)
 		}
 	}
-	return "", ErrMissingUserAgentID
+	return state
 }
 
 // IsLinkingAllowed implements the [idp.Provider] interface.

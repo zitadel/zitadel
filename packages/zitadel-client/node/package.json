@@ -1,0 +1,6 @@
+{
+  "name": "@zitadel/client-node",
+  "main": "../dist/node.js",
+  "types": "../dist/node.d.ts",
+  "type": "module"
+}

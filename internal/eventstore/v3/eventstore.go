@@ -13,6 +13,8 @@ import (
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
+	new_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -24,15 +26,16 @@ func init() {
 
 var (
 	// pushPlaceholderFmt defines how data are inserted into the events table
-	pushPlaceholderFmt string
+	pushPlaceholderFmt = "($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $%d)"
 	// uniqueConstraintPlaceholderFmt defines the format of the unique constraint error returned from the database
-	uniqueConstraintPlaceholderFmt string
+	uniqueConstraintPlaceholderFmt = "(%s, %s, %s)"
 
 	_ eventstore.Pusher = (*Eventstore)(nil)
 )
 
 type Eventstore struct {
-	client *database.DB
+	client new_db.Pool
+	queue  eventstore.ExecutionQueue
 }
 
 var (
@@ -95,11 +98,83 @@ var (
 			ElementType: commandType,
 		},
 	}
+	command2Type = &pgtype.Type{
+		Codec: &pgtype.CompositeCodec{
+			Fields: []pgtype.CompositeCodecField{
+				{
+					Name: "instance_id",
+					Type: textType,
+				},
+				{
+					Name: "aggregate_type",
+					Type: textType,
+				},
+				{
+					Name: "aggregate_id",
+					Type: textType,
+				},
+				{
+					Name: "command_type",
+					Type: textType,
+				},
+				{
+					Name: "revision",
+					Type: &pgtype.Type{
+						Name:  "int2",
+						OID:   pgtype.Int2OID,
+						Codec: pgtype.Int2Codec{},
+					},
+				},
+				{
+					Name: "payload",
+					Type: &pgtype.Type{
+						Name: "jsonb",
+						OID:  pgtype.JSONBOID,
+						Codec: &pgtype.JSONBCodec{
+							Marshal:   json.Marshal,
+							Unmarshal: json.Unmarshal,
+						},
+					},
+				},
+				{
+					Name: "creator",
+					Type: textType,
+				},
+				{
+					Name: "owner",
+					Type: textType,
+				},
+				{
+					Name: "enforce_owner",
+					Type: &pgtype.Type{
+						Name:  "bool",
+						OID:   pgtype.BoolOID,
+						Codec: pgtype.BoolCodec{},
+					},
+				},
+			},
+		},
+	}
+	command2ArrayCodec = &pgtype.Type{
+		Codec: &pgtype.ArrayCodec{
+			ElementType: command2Type,
+		},
+	}
 )
 
 var typeMu sync.Mutex
 
 func RegisterEventstoreTypes(ctx context.Context, conn *pgx.Conn) error {
+	err := registerEventstoreType(ctx, conn, "command2", command2Type, command2ArrayCodec)
+	logging.OnError(err).Debug("failed to register command2")
+
+	err = registerEventstoreType(ctx, conn, "command", commandType, commandArrayCodec)
+	logging.OnError(err).Debug("failed to register command")
+
+	return nil
+}
+
+func registerEventstoreType(ctx context.Context, conn *pgx.Conn, typ string, typeCodec, arrayCodec *pgtype.Type) error {
 	// conn.TypeMap is not thread safe
 	typeMu.Lock()
 	defer typeMu.Unlock()
@@ -111,14 +186,14 @@ func RegisterEventstoreTypes(ctx context.Context, conn *pgx.Conn) error {
 		return nil
 	}
 
-	if commandType.OID == 0 || commandArrayCodec.OID == 0 {
-		err := conn.QueryRow(ctx, "select oid, typarray from pg_type where typname = $1 and typnamespace = (select oid from pg_namespace where nspname = $2)", "command", "eventstore").
-			Scan(&commandType.OID, &commandArrayCodec.OID)
+	if typeCodec.OID == 0 || arrayCodec.OID == 0 {
+		err := conn.QueryRow(ctx, "select oid, typarray from pg_type where typname = $1 and typnamespace = (select oid from pg_namespace where nspname = $2)", typ, "eventstore").
+			Scan(&typeCodec.OID, &arrayCodec.OID)
 		if err != nil {
 			logging.WithError(err).Debug("failed to get oid for command type")
 			return nil
 		}
-		if commandType.OID == 0 || commandArrayCodec.OID == 0 {
+		if typeCodec.OID == 0 || arrayCodec.OID == 0 {
 			logging.Debug("oid for command type not found")
 			return nil
 		}
@@ -126,52 +201,44 @@ func RegisterEventstoreTypes(ctx context.Context, conn *pgx.Conn) error {
 
 	m.RegisterTypes([]*pgtype.Type{
 		{
-			Name:  "eventstore.command",
-			Codec: commandType.Codec,
-			OID:   commandType.OID,
+			Name:  "eventstore." + typ,
+			Codec: typeCodec.Codec,
+			OID:   typeCodec.OID,
 		},
 		{
-			Name:  "command",
-			Codec: commandType.Codec,
-			OID:   commandType.OID,
+			Name:  typ,
+			Codec: typeCodec.Codec,
+			OID:   typeCodec.OID,
 		},
 		{
-			Name:  "eventstore._command",
-			Codec: commandArrayCodec.Codec,
-			OID:   commandArrayCodec.OID,
+			Name:  "eventstore._" + typ,
+			Codec: arrayCodec.Codec,
+			OID:   arrayCodec.OID,
 		},
 		{
-			Name:  "_command",
-			Codec: commandArrayCodec.Codec,
-			OID:   commandArrayCodec.OID,
+			Name:  "_" + typ,
+			Codec: arrayCodec.Codec,
+			OID:   arrayCodec.OID,
 		},
 	})
-	dialect.RegisterDefaultPgTypeVariants[command](m, "eventstore.command", "eventstore._command")
-	dialect.RegisterDefaultPgTypeVariants[command](m, "command", "_command")
+	dialect.RegisterDefaultPgTypeVariants[command](m, "eventstore."+typ, "eventstore._"+typ)
+	dialect.RegisterDefaultPgTypeVariants[command](m, typ, "_"+typ)
 
 	return nil
 }
 
-// Client implements the [eventstore.Pusher]
-func (es *Eventstore) Client() *database.DB {
-	return es.client
-}
-
-func NewEventstore(client *database.DB) *Eventstore {
-	switch client.Type() {
-	case "cockroach":
-		pushPlaceholderFmt = "($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $%d)"
-		uniqueConstraintPlaceholderFmt = "('%s', '%s', '%s')"
-	case "postgres":
-		pushPlaceholderFmt = "($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $%d)"
-		uniqueConstraintPlaceholderFmt = "(%s, %s, %s)"
+func NewEventstore(client *database.DB, opts ...EventstoreOption) *Eventstore {
+	es := &Eventstore{
+		client: new_sql.SQLPool(client.DB),
 	}
-
-	return &Eventstore{client: client}
+	for _, opt := range opts {
+		opt(es)
+	}
+	return es
 }
 
 func (es *Eventstore) Health(ctx context.Context) error {
-	return es.client.PingContext(ctx)
+	return es.client.Ping(ctx)
 }
 
 var errTypesNotFound = errors.New("types not found")
@@ -190,28 +257,30 @@ func CheckExecutionPlan(ctx context.Context, conn *sql.Conn) error {
 	})
 }
 
-func (es *Eventstore) pushTx(ctx context.Context, client database.ContextQueryExecuter) (tx database.Tx, deferrable func(err error) error, err error) {
-	tx, ok := client.(database.Tx)
+func (es *Eventstore) pushTx(ctx context.Context, client new_db.QueryExecutor) (tx new_db.Transaction, deferrable func(err error) error, err error) {
+	tx, ok := client.(new_db.Transaction)
 	if ok {
-		return tx, nil, nil
+		return tx, func(err error) error { return err }, nil
 	}
-	beginner, ok := client.(database.Beginner)
+	beginner, ok := client.(new_db.Beginner)
 	if !ok {
 		beginner = es.client
 	}
 
-	isolationLevel := sql.LevelReadCommitted
-	// cockroach requires serializable to execute the push function
-	// because we use [cluster_logical_timestamp()](https://www.cockroachlabs.com/docs/stable/functions-and-operators#system-info-functions)
-	if es.client.Type() == "cockroach" {
-		isolationLevel = sql.LevelSerializable
-	}
-	tx, err = beginner.BeginTx(ctx, &sql.TxOptions{
-		Isolation: isolationLevel,
-		ReadOnly:  false,
+	tx, err = beginner.Begin(ctx, &new_db.TransactionOptions{
+		IsolationLevel: new_db.IsolationLevelReadCommitted,
+		AccessMode:     new_db.AccessModeReadWrite,
 	})
 	if err != nil {
 		return nil, nil, err
 	}
-	return tx, func(err error) error { return database.CloseTransaction(tx, err) }, nil
+	return tx, func(err error) error { return tx.End(ctx, err) }, nil
+}
+
+type EventstoreOption func(*Eventstore)
+
+func WithExecutionQueueOption(queue eventstore.ExecutionQueue) EventstoreOption {
+	return func(es *Eventstore) {
+		es.queue = queue
+	}
 }

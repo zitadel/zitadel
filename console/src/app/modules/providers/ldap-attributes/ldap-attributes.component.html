@@ -7,12 +7,16 @@
   <div class="attribute-more-row">
     <span>{{ 'ACTIONS.MORE' | translate }}</span>
     <button (click)="showMore = !showMore" type="button" mat-icon-button>
-      <mat-icon *ngIf="showMore">keyboard_arrow_up</mat-icon>
-      <mat-icon *ngIf="!showMore">keyboard_arrow_down</mat-icon>
+      @if (showMore) {
+        <mat-icon>keyboard_arrow_up</mat-icon>
+      }
+      @if (!showMore) {
+        <mat-icon>keyboard_arrow_down</mat-icon>
+      }
     </button>
   </div>
 
-  <ng-container *ngIf="showMore">
+  @if (showMore) {
     <cnsl-form-field class="formfield">
       <cnsl-label>{{ 'IDP.AVATARURLATTRIBUTE' | translate }}</cnsl-label>
       <input cnslInput formControlName="avatarUrlAttribute" />
@@ -61,5 +65,5 @@
       <cnsl-label>{{ 'IDP.PROFILEATTRIBUTE' | translate }}</cnsl-label>
       <input cnslInput formControlName="profileAttribute" />
     </cnsl-form-field>
-  </ng-container>
+  }
 </form>

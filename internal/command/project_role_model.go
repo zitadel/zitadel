@@ -17,6 +17,10 @@ type ProjectRoleWriteModel struct {
 	State       domain.ProjectRoleState
 }
 
+func (wm *ProjectRoleWriteModel) GetWriteModel() *eventstore.WriteModel {
+	return &wm.WriteModel
+}
+
 func NewProjectRoleWriteModelWithKey(key, projectID, resourceOwner string) *ProjectRoleWriteModel {
 	return &ProjectRoleWriteModel{
 		WriteModel: eventstore.WriteModel{
@@ -51,7 +55,7 @@ func (wm *ProjectRoleWriteModel) AppendEvents(events ...eventstore.Event) {
 			if e.Key == wm.Key {
 				wm.WriteModel.AppendEvents(e)
 			}
-		case *project.ProjectRemovedEvent:
+		default:
 			wm.WriteModel.AppendEvents(e)
 		}
 	}
@@ -75,6 +79,8 @@ func (wm *ProjectRoleWriteModel) Reduce() error {
 			}
 		case *project.RoleRemovedEvent:
 			wm.State = domain.ProjectRoleStateRemoved
+		case *project.ProjectAddedEvent:
+			wm.State = domain.ProjectRoleStateUnspecified
 		case *project.ProjectRemovedEvent:
 			wm.State = domain.ProjectRoleStateRemoved
 		}
@@ -89,6 +95,7 @@ func (wm *ProjectRoleWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			project.ProjectAddedType,
 			project.RoleAddedType,
 			project.RoleChangedType,
 			project.RoleRemovedType,

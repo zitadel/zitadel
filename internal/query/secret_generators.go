@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -127,28 +126,49 @@ func (q *Queries) SecretGeneratorByType(ctx context.Context, generatorType domai
 	defer func() { span.EndWithError(err) }()
 
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	stmt, scan := prepareSecretGeneratorQuery(ctx, q.client)
+	stmt, scan := prepareSecretGeneratorQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		SecretGeneratorColumnGeneratorType.identifier(): generatorType,
 		SecretGeneratorColumnInstanceID.identifier():    instanceID,
 	}).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-3k99f", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-3k99f", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
 		generator, err = scan(row)
 		return err
 	}, query, args...)
-	logging.OnError(err).WithField("type", generatorType).WithField("instance_id", instanceID).Error("secret generator by type")
-	return generator, err
+	if err == nil {
+		return generator, nil
+	}
+	if !errors.Is(err, sql.ErrNoRows) {
+		logging.OnError(err).WithField("type", generatorType).WithField("instance_id", instanceID).Error("secret generator by type")
+		return nil, err
+	}
+	// if the config was not (yet) stored on the database, fall back to the system / runtime config
+	defaultConfig, ok := q.defaultSecretGenerators[generatorType]
+	if !ok {
+		return nil, err // return the initial not found error
+	}
+	return &SecretGenerator{
+		AggregateID:         instanceID,
+		ResourceOwner:       instanceID,
+		GeneratorType:       generatorType,
+		Length:              defaultConfig.Length,
+		Expiry:              defaultConfig.Expiry,
+		IncludeLowerLetters: defaultConfig.IncludeLowerLetters,
+		IncludeUpperLetters: defaultConfig.IncludeUpperLetters,
+		IncludeDigits:       defaultConfig.IncludeDigits,
+		IncludeSymbols:      defaultConfig.IncludeSymbols,
+	}, nil
 }
 
 func (q *Queries) SearchSecretGenerators(ctx context.Context, queries *SecretGeneratorSearchQueries) (secretGenerators *SecretGenerators, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareSecretGeneratorsQuery(ctx, q.client)
+	query, scan := prepareSecretGeneratorsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
 			SecretGeneratorColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -180,7 +200,7 @@ func NewSecretGeneratorTypeSearchQuery(value int32) (SearchQuery, error) {
 	return NewNumberQuery(SecretGeneratorColumnGeneratorType, value, NumberEquals)
 }
 
-func prepareSecretGeneratorQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*SecretGenerator, error)) {
+func prepareSecretGeneratorQuery() (sq.SelectBuilder, func(*sql.Row) (*SecretGenerator, error)) {
 	return sq.Select(
 			SecretGeneratorColumnAggregateID.identifier(),
 			SecretGeneratorColumnGeneratorType.identifier(),
@@ -194,7 +214,7 @@ func prepareSecretGeneratorQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			SecretGeneratorColumnIncludeUpperLetters.identifier(),
 			SecretGeneratorColumnIncludeDigits.identifier(),
 			SecretGeneratorColumnIncludeSymbols.identifier()).
-			From(secretGeneratorsTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(secretGeneratorsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*SecretGenerator, error) {
 			secretGenerator := new(SecretGenerator)
@@ -222,7 +242,7 @@ func prepareSecretGeneratorQuery(ctx context.Context, db prepareDatabase) (sq.Se
 		}
 }
 
-func prepareSecretGeneratorsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*SecretGenerators, error)) {
+func prepareSecretGeneratorsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SecretGenerators, error)) {
 	return sq.Select(
 			SecretGeneratorColumnAggregateID.identifier(),
 			SecretGeneratorColumnGeneratorType.identifier(),
@@ -237,7 +257,7 @@ func prepareSecretGeneratorsQuery(ctx context.Context, db prepareDatabase) (sq.S
 			SecretGeneratorColumnIncludeDigits.identifier(),
 			SecretGeneratorColumnIncludeSymbols.identifier(),
 			countColumn.identifier()).
-			From(secretGeneratorsTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(secretGeneratorsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*SecretGenerators, error) {
 			secretGenerators := make([]*SecretGenerator, 0)

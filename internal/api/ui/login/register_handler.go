@@ -42,8 +42,14 @@ type registerData struct {
 }
 
 func determineResourceOwner(ctx context.Context, authRequest *domain.AuthRequest) string {
-	if authRequest != nil && authRequest.RequestedOrgID != "" {
+	if authRequest == nil {
+		return authz.GetInstance(ctx).DefaultOrganisationID()
+	}
+	if authRequest.RequestedOrgID != "" {
 		return authRequest.RequestedOrgID
+	}
+	if authRequest.UserOrgID != "" {
+		return authRequest.UserOrgID
 	}
 	return authz.GetInstance(ctx).DefaultOrganisationID()
 }
@@ -133,7 +139,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.SelectUser(r.Context(), authRequest.ID, human.ID, userAgentID)
+	err = l.authRepo.SelectUser(r.Context(), authRequest.ID, human.ID, userAgentID, false)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return

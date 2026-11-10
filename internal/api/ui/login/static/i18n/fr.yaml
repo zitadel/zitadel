@@ -2,7 +2,7 @@ Login:
   Title: Bienvenue!
   Description: Entrez vos données de connexion.
   TitleLinking: Login pour la liaison des utilisateurs
-  DescriptionLinking: Entrez vos données de connexion pour lier votre utilisateur externe avec un utilisateur ZITADEL.
+  DescriptionLinking: Entrez vos données de connexion pour lier votre utilisateur externe avec un utilisateur Zitadel.
   LoginNameLabel: Identifiant
   UsernamePlaceHolder: Nom d'utilisateur
   LoginnamePlaceHolder: Nom d'utilisateur
@@ -20,7 +20,7 @@ LDAP:
 
 SelectAccount:
   Title: Sélectionner un compte
-  Description: Utilisez votre compte ZITADEL.
+  Description: Utilisez votre compte Zitadel.
   TitleLinking: Sélectionnez le compte pour le lien avec l'utilisateur
   DescriptionLinking: Sélectionnez votre compte pour établir un lien avec votre utilisateur externe.
   OtherUser: Autre utilisateur
@@ -118,6 +118,7 @@ InitMFAOTPSMS:
   Title: Vérification à deux facteurs
   DescriptionPhone: Créez votre 2-facteurs. Entrez votre numéro de téléphone pour le vérifier.
   DescriptionCode: Créez votre 2-facteurs. Entrez le code reçu pour vérifier votre numéro de téléphone.
+  CountryCodeLabel: Pays
   PhoneLabel: Numéro de téléphone
   CodeLabel: Code
   EditButtonText: Modifier
@@ -265,6 +266,10 @@ RegistrationUser:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   GenderLabel: Genre
   Female: Femme
   Male: Homme
@@ -308,6 +313,10 @@ ExternalRegistrationUserOverview:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
   TosAndPrivacyLabel: Termes et conditions
   TosConfirm: J'accepte les
   TosLinkText: TOS
@@ -360,6 +369,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Utilisateur externe introuvable
   Description: Utilisateur externe non trouvé. Voulez-vous lier votre utilisateur ou enregistrer automatiquement un nouvel utilisateur ?
+  NoOptionAvailable: Aucun compte correspondant à votre utilisateur externe n'a été trouvé et aucun nouveau compte ne peut être créé. Veuillez contacter votre administrateur ou le support.
   LinkButtonText: Lier
   AutoRegisterButtonText: Enregistrer
   TosAndPrivacyLabel: Termes et conditions
@@ -385,6 +395,10 @@ ExternalNotFound:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
 
 DeviceAuth:
   Title: Autorisation de l'appareil
@@ -492,6 +506,7 @@ Errors:
         AlreadyReady: L'OTP multifactoriel (Mot de passe à usage unique) est déjà configuré.
         NotExisting: OTP multifactoriel (Mot de passe à usage unique) n'existe pas.
         InvalidCode: Code invalide
+        Reused: Ce code a déjà été utilisé. Veuillez attendre un nouveau code
         NotReady: Le système OTP multifactoriel (Mot de passe à usage unique) n'est pas prêt.
     Locked: L'utilisateur est verrouillé
     SomethingWentWrong: Il y a eu un problème

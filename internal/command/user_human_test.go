@@ -8,6 +8,8 @@ import (
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/zitadel/passwap"
 	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
@@ -44,6 +46,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		newCode                     encrypedCodeFunc
 		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 		defaultSecretGenerators     *SecretGenerators
+		loginPaths                  func(*testing.T) LoginPaths
 	}
 	type args struct {
 		ctx             context.Context
@@ -71,6 +74,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			name: "orgid missing, invalid argument error",
 			fields: fields{
 				eventstore: expectEventstore(),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -95,6 +99,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			name: "user invalid, invalid argument error",
 			fields: fields{
 				eventstore: expectEventstore(),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -121,6 +126,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						),
 					),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -153,6 +159,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					expectFilter(),
 					expectFilter(),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -190,9 +197,11 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(),
 					expectFilter(),
 				),
+				loginPaths: expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -231,6 +240,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewHumanAddedEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -260,6 +270,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				newCode:     mockEncryptedCode("userinit", time.Hour),
+				loginPaths:  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -299,6 +310,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewHumanAddedEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -328,6 +340,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				newCode:     mockEncryptedCode("userinit", time.Hour),
+				loginPaths:  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -368,6 +381,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewHumanAddedEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -397,6 +411,78 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				newCode:     mockEncryptedCode("userinit", time.Hour),
+				loginPaths:  expectLoginPathsNoCall,
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &AddHuman{
+					Username:  "username",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Email: Email{
+						Address: "email@test.ch",
+					},
+					PreferredLanguage: AllowedLanguage,
+				},
+				secretGenerator: GetMockSecretGenerator(t),
+				allowInitMail:   true,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					Sequence:      0,
+					EventDate:     time.Time{},
+					ResourceOwner: "org1",
+				},
+				wantID: "user1",
+			},
+		},
+		{
+			name: "add human (with initial code), orgScopedUsername, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								false,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilterOrganizationSettings("org1", true, true),
+					expectPush(
+						user.NewHumanAddedEvent(context.Background(),
+							&userAgg.Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"",
+							"firstname lastname",
+							AllowedLanguage,
+							domain.GenderUnspecified,
+							"email@test.ch",
+							true,
+						),
+						user.NewHumanInitialCodeAddedEvent(context.Background(),
+							&userAgg.Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("userinit"),
+							},
+							time.Hour*1,
+							"",
+						),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				newCode:     mockEncryptedCode("userinit", time.Hour),
+				loginPaths:  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -437,6 +523,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -468,6 +555,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				newCode:            mockEncryptedCode("userinit", time.Hour),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -507,6 +595,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -521,7 +610,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					),
 					expectPush(
 						newAddHumanEvent("$plain$x$password", false, true, "", AllowedLanguage),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -540,6 +629,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				newCode:            mockEncryptedCode("emailCode", time.Hour),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -580,6 +670,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -594,7 +685,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					),
 					expectPush(
 						newAddHumanEvent("$plain$x$password", false, true, "", AllowedLanguage),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -603,7 +694,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 								Crypted:    []byte("emailCode"),
 							},
 							1*time.Hour,
-							"",
+							"http://example.com/{{.user}}/email/{{.code}}",
 							true,
 							"",
 						),
@@ -613,6 +704,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				newCode:            mockEncryptedCode("emailCode", time.Hour),
+				loginPaths:         expectLoginPathsDefaultEmailCodeURLTemplate("http://example.com/{{.user}}/email/{{.code}}"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -654,6 +746,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -673,6 +766,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -714,6 +808,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -736,6 +831,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -777,6 +873,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -799,6 +896,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -840,6 +938,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -862,6 +961,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -915,6 +1015,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -963,6 +1064,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1000,6 +1102,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				loginPaths:         expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1042,6 +1145,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1108,6 +1212,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				codeAlg:                     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phonecode", time.Hour),
 				defaultSecretGenerators:     defaultGenerators,
+				loginPaths:                  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1151,6 +1256,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						newAddHumanEvent("", false, true, "+41711234567", AllowedLanguage),
 						user.NewHumanInitialCodeAddedEvent(
@@ -1174,6 +1280,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				newCode:     mockEncryptedCode("userinit", time.Hour),
+				loginPaths:  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1200,7 +1307,8 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				},
 				wantID: "user1",
 			},
-		}, {
+		},
+		{
 			name: "add human (with return code), ok",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -1215,6 +1323,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1281,6 +1390,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				codeAlg:                     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneCode", time.Hour),
 				defaultSecretGenerators:     defaultGenerators,
+				loginPaths:                  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1325,6 +1435,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						newAddHumanEvent("", false, true, "", AllowedLanguage),
 						user.NewHumanInitialCodeAddedEvent(
@@ -1350,6 +1461,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				newCode:     mockEncryptedCode("userinit", time.Hour),
+				loginPaths:  expectLoginPathsNoCall,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1390,12 +1502,11 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				newEncryptedCode:            tt.fields.newCode,
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
+				loginPaths:                  tt.fields.loginPaths(t),
 			}
 			err := r.AddHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.allowInitMail)
 			if tt.res.err == nil {
-				if !assert.NoError(t, err) {
-					t.FailNow()
-				}
+				require.NoError(t, err)
 			} else if !tt.res.err(err) {
 				t.Errorf("got wrong err: %v ", err)
 				return
@@ -1432,6 +1543,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		orgID                string
 		human                *domain.Human
 		passwordless         bool
+		state                *domain.UserState
 		links                []*domain.UserIDPLink
 		secretGenerator      crypto.Generator
 		passwordlessInitCode crypto.Generator
@@ -1516,6 +1628,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(),
 							expectFilter(),
 						),
@@ -1555,6 +1668,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1584,7 +1698,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
 			},
-		}, {
+		},
+		{
 			name: "add human (with password and initial code), ok",
 			given: func(t *testing.T) (fields, args) {
 				return fields{
@@ -1599,6 +1714,94 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
+							expectFilter(
+								eventFromEventPusher(
+									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+										&user.NewAggregate("user1", "org1").Aggregate,
+										1,
+										false,
+										false,
+										false,
+										false,
+									),
+								),
+							),
+							expectPush(
+								newAddHumanEvent("$plain$x$password", true, true, "", AllowedLanguage),
+								user.NewHumanInitialCodeAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("a"),
+									},
+									time.Hour*1,
+									"",
+								),
+							),
+						),
+						idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+						userPasswordHasher: mockPasswordHasher("x"),
+					},
+					args{
+						ctx:   context.Background(),
+						orgID: "org1",
+						human: &domain.Human{
+							Username: "username",
+							Password: &domain.Password{
+								SecretString:   "password",
+								ChangeRequired: true,
+							},
+							Profile: &domain.Profile{
+								FirstName:         "firstname",
+								LastName:          "lastname",
+								PreferredLanguage: AllowedLanguage,
+							},
+							Email: &domain.Email{
+								EmailAddress: "email@test.ch",
+							},
+						},
+						secretGenerator: GetMockSecretGenerator(t),
+					}
+			},
+			res: res{
+				wantHuman: &domain.Human{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						DisplayName:       "firstname lastname",
+						PreferredLanguage: AllowedLanguage,
+					},
+					Email: &domain.Email{
+						EmailAddress: "email@test.ch",
+					},
+					State: domain.UserStateInitial,
+				},
+			},
+		},
+		{
+			name: "add human (with password and initial code), orgScopedUsername, ok",
+			given: func(t *testing.T) (fields, args) {
+				return fields{
+						eventstore: expectEventstore(
+							expectFilter(
+								eventFromEventPusher(
+									org.NewDomainPolicyAddedEvent(context.Background(),
+										&user.NewAggregate("user1", "org1").Aggregate,
+										false,
+										true,
+										true,
+									),
+								),
+							),
+							expectFilterOrganizationSettings("org1", true, true),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1685,6 +1888,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1765,6 +1969,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1864,6 +2069,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1967,6 +2173,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -2102,6 +2309,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -2197,6 +2405,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -2282,6 +2491,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -2368,6 +2578,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -2513,6 +2724,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -2656,6 +2868,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -2828,6 +3041,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -2985,6 +3199,366 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "add human (with idp, auto creation not allowed) + deactivated state, ok",
+			given: func(t *testing.T) (fields, args) {
+				return fields{
+						eventstore: expectEventstore(
+							expectFilter(
+								eventFromEventPusher(
+									org.NewDomainPolicyAddedEvent(context.Background(),
+										&user.NewAggregate("user1", "org1").Aggregate,
+										true,
+										true,
+										true,
+									),
+								),
+							),
+							expectFilterOrganizationSettings("org1", false, false),
+							expectFilter(
+								eventFromEventPusher(
+									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+										&user.NewAggregate("user1", "org1").Aggregate,
+										1,
+										false,
+										false,
+										false,
+										false,
+									),
+								),
+							),
+							expectFilter(
+								eventFromEventPusher(
+									org.NewIDPConfigAddedEvent(context.Background(),
+										&org.NewAggregate("org1").Aggregate,
+										"idpID",
+										"name",
+										domain.IDPConfigTypeOIDC,
+										domain.IDPConfigStylingTypeUnspecified,
+										false,
+									),
+								),
+								eventFromEventPusher(
+									org.NewIDPOIDCConfigAddedEvent(context.Background(),
+										&org.NewAggregate("org1").Aggregate,
+										"clientID",
+										"idpID",
+										"issuer",
+										"authEndpoint",
+										"tokenEndpoint",
+										nil,
+										domain.OIDCMappingFieldUnspecified,
+										domain.OIDCMappingFieldUnspecified,
+									),
+								),
+								eventFromEventPusher(
+									func() eventstore.Command {
+										e, _ := org.NewOIDCIDPChangedEvent(context.Background(),
+											&org.NewAggregate("org1").Aggregate,
+											"config1",
+											[]idp.OIDCIDPChanges{
+												idp.ChangeOIDCOptions(idp.OptionChanges{IsCreationAllowed: gu.Ptr(false)}),
+											},
+										)
+										return e
+									}(),
+								),
+							),
+							expectFilter(
+								eventFromEventPusher(
+									org.NewIDPConfigAddedEvent(context.Background(),
+										&org.NewAggregate("org1").Aggregate,
+										"idpID",
+										"name",
+										domain.IDPConfigTypeOIDC,
+										domain.IDPConfigStylingTypeUnspecified,
+										false,
+									),
+								),
+								eventFromEventPusher(
+									org.NewIDPOIDCConfigAddedEvent(context.Background(),
+										&org.NewAggregate("org1").Aggregate,
+										"clientID",
+										"idpID",
+										"issuer",
+										"authEndpoint",
+										"tokenEndpoint",
+										nil,
+										domain.OIDCMappingFieldUnspecified,
+										domain.OIDCMappingFieldUnspecified,
+									),
+								),
+								eventFromEventPusher(
+									func() eventstore.Command {
+										e, _ := org.NewOIDCIDPChangedEvent(context.Background(),
+											&org.NewAggregate("org1").Aggregate,
+											"config1",
+											[]idp.OIDCIDPChanges{
+												idp.ChangeOIDCOptions(idp.OptionChanges{
+													IsCreationAllowed: gu.Ptr(true),
+													IsAutoCreation:    gu.Ptr(false),
+												}),
+											},
+										)
+										return e
+									}(),
+								),
+								eventFromEventPusher(
+									org.NewIdentityProviderAddedEvent(context.Background(),
+										&org.NewAggregate("org1").Aggregate,
+										"idpID",
+										domain.IdentityProviderTypeOrg,
+									),
+								),
+							),
+							expectPush(
+								newAddHumanEvent("", false, true, "", AllowedLanguage),
+								user.NewUserIDPLinkAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"idpID",
+									"name",
+									"externalID",
+								),
+								user.NewHumanEmailVerifiedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate),
+								user.NewUserDeactivatedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+								),
+							),
+						),
+						idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+						userPasswordHasher: mockPasswordHasher("x"),
+					},
+					args{
+						ctx:   context.Background(),
+						orgID: "org1",
+						state: func() *domain.UserState {
+							state := domain.UserStateInactive
+							return &state
+						}(),
+						human: &domain.Human{
+							Username: "username",
+							Profile: &domain.Profile{
+								FirstName:         "firstname",
+								LastName:          "lastname",
+								PreferredLanguage: AllowedLanguage,
+							},
+							Email: &domain.Email{
+								EmailAddress:    "email@test.ch",
+								IsEmailVerified: true,
+							},
+						},
+						links: []*domain.UserIDPLink{
+							{
+								IDPConfigID:    "idpID",
+								ExternalUserID: "externalID",
+								DisplayName:    "name",
+							},
+						},
+						secretGenerator: GetMockSecretGenerator(t),
+					}
+			},
+			res: res{
+				wantHuman: &domain.Human{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						DisplayName:       "firstname lastname",
+						PreferredLanguage: AllowedLanguage,
+					},
+					Email: &domain.Email{
+						EmailAddress:    "email@test.ch",
+						IsEmailVerified: true,
+					},
+					State: domain.UserStateInactive,
+				},
+			},
+		},
+		{
+			name: "add human (with idp, auto creation not allowed) + locked state, ok",
+			given: func(t *testing.T) (fields, args) {
+				return fields{
+						eventstore: expectEventstore(
+							expectFilter(
+								eventFromEventPusher(
+									org.NewDomainPolicyAddedEvent(context.Background(),
+										&user.NewAggregate("user1", "org1").Aggregate,
+										true,
+										true,
+										true,
+									),
+								),
+							),
+							expectFilterOrganizationSettings("org1", false, false),
+							expectFilter(
+								eventFromEventPusher(
+									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+										&user.NewAggregate("user1", "org1").Aggregate,
+										1,
+										false,
+										false,
+										false,
+										false,
+									),
+								),
+							),
+							expectFilter(
+								eventFromEventPusher(
+									org.NewIDPConfigAddedEvent(context.Background(),
+										&org.NewAggregate("org1").Aggregate,
+										"idpID",
+										"name",
+										domain.IDPConfigTypeOIDC,
+										domain.IDPConfigStylingTypeUnspecified,
+										false,
+									),
+								),
+								eventFromEventPusher(
+									org.NewIDPOIDCConfigAddedEvent(context.Background(),
+										&org.NewAggregate("org1").Aggregate,
+										"clientID",
+										"idpID",
+										"issuer",
+										"authEndpoint",
+										"tokenEndpoint",
+										nil,
+										domain.OIDCMappingFieldUnspecified,
+										domain.OIDCMappingFieldUnspecified,
+									),
+								),
+								eventFromEventPusher(
+									func() eventstore.Command {
+										e, _ := org.NewOIDCIDPChangedEvent(context.Background(),
+											&org.NewAggregate("org1").Aggregate,
+											"config1",
+											[]idp.OIDCIDPChanges{
+												idp.ChangeOIDCOptions(idp.OptionChanges{IsCreationAllowed: gu.Ptr(false)}),
+											},
+										)
+										return e
+									}(),
+								),
+							),
+							expectFilter(
+								eventFromEventPusher(
+									org.NewIDPConfigAddedEvent(context.Background(),
+										&org.NewAggregate("org1").Aggregate,
+										"idpID",
+										"name",
+										domain.IDPConfigTypeOIDC,
+										domain.IDPConfigStylingTypeUnspecified,
+										false,
+									),
+								),
+								eventFromEventPusher(
+									org.NewIDPOIDCConfigAddedEvent(context.Background(),
+										&org.NewAggregate("org1").Aggregate,
+										"clientID",
+										"idpID",
+										"issuer",
+										"authEndpoint",
+										"tokenEndpoint",
+										nil,
+										domain.OIDCMappingFieldUnspecified,
+										domain.OIDCMappingFieldUnspecified,
+									),
+								),
+								eventFromEventPusher(
+									func() eventstore.Command {
+										e, _ := org.NewOIDCIDPChangedEvent(context.Background(),
+											&org.NewAggregate("org1").Aggregate,
+											"config1",
+											[]idp.OIDCIDPChanges{
+												idp.ChangeOIDCOptions(idp.OptionChanges{
+													IsCreationAllowed: gu.Ptr(true),
+													IsAutoCreation:    gu.Ptr(false),
+												}),
+											},
+										)
+										return e
+									}(),
+								),
+								eventFromEventPusher(
+									org.NewIdentityProviderAddedEvent(context.Background(),
+										&org.NewAggregate("org1").Aggregate,
+										"idpID",
+										domain.IdentityProviderTypeOrg,
+									),
+								),
+							),
+							expectPush(
+								newAddHumanEvent("", false, true, "", AllowedLanguage),
+								user.NewUserIDPLinkAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"idpID",
+									"name",
+									"externalID",
+								),
+								user.NewHumanEmailVerifiedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate),
+								user.NewUserLockedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+								),
+							),
+						),
+						idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+						userPasswordHasher: mockPasswordHasher("x"),
+					},
+					args{
+						ctx:   context.Background(),
+						orgID: "org1",
+						state: func() *domain.UserState {
+							state := domain.UserStateLocked
+							return &state
+						}(),
+						human: &domain.Human{
+							Username: "username",
+							Profile: &domain.Profile{
+								FirstName:         "firstname",
+								LastName:          "lastname",
+								PreferredLanguage: AllowedLanguage,
+							},
+							Email: &domain.Email{
+								EmailAddress:    "email@test.ch",
+								IsEmailVerified: true,
+							},
+						},
+						links: []*domain.UserIDPLink{
+							{
+								IDPConfigID:    "idpID",
+								ExternalUserID: "externalID",
+								DisplayName:    "name",
+							},
+						},
+						secretGenerator: GetMockSecretGenerator(t),
+					}
+			},
+			res: res{
+				wantHuman: &domain.Human{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						DisplayName:       "firstname lastname",
+						PreferredLanguage: AllowedLanguage,
+					},
+					Email: &domain.Email{
+						EmailAddress:    "email@test.ch",
+						IsEmailVerified: true,
+					},
+					State: domain.UserStateLocked,
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -2996,7 +3570,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				newEncryptedCodeWithDefault: f.newEncryptedCodeWithDefault,
 				defaultSecretGenerators:     f.defaultSecretGenerators,
 			}
-			gotHuman, gotCode, err := r.ImportHuman(a.ctx, a.orgID, a.human, a.passwordless, a.links, a.secretGenerator, a.secretGenerator, a.secretGenerator, a.secretGenerator)
+			gotHuman, gotCode, err := r.ImportHuman(a.ctx, a.orgID, a.human, a.passwordless, a.state, a.links, a.secretGenerator, a.secretGenerator, a.secretGenerator, a.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -3434,7 +4008,7 @@ func TestAddHumanCommand(t *testing.T) {
 				hasher: mockPasswordHasher("x"),
 			},
 			want: Want{
-				ValidationErr: zerrors.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.User.Password.NotSupported"),
+				ValidationErr: zerrors.ThrowInvalidArgument(passwap.ErrNoVerifier, "CRYPT-2xK7d", "Errors.Hash.NotSupported"),
 			},
 		},
 		{
@@ -3467,6 +4041,10 @@ func TestAddHumanCommand(t *testing.T) {
 									true,
 								),
 							}, nil
+						}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return expectFilterOrganizationSettingsEvents(ctx, "org1", false, false), nil
 						}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
@@ -3520,6 +4098,87 @@ func TestAddHumanCommand(t *testing.T) {
 									true,
 								),
 							}, nil
+						}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return expectFilterOrganizationSettingsEvents(ctx, "org1", false, false), nil
+						}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return []eventstore.Event{
+								org.NewPasswordComplexityPolicyAddedEvent(
+									ctx,
+									&org.NewAggregate("id").Aggregate,
+									2,
+									false,
+									false,
+									false,
+									false,
+								),
+							}, nil
+						}).
+					Filter(),
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					func() *user.HumanAddedEvent {
+						event := user.NewHumanAddedEvent(
+							context.Background(),
+							&agg.Aggregate,
+							"username",
+							"gigi",
+							"giraffe",
+							"",
+							"gigi giraffe",
+							AllowedLanguage,
+							0,
+							"support@zitadel.com",
+							true,
+						)
+						event.AddPasswordData("$plain$x$password", false)
+						return event
+					}(),
+					user.NewHumanEmailVerifiedEvent(context.Background(), &agg.Aggregate),
+				},
+			},
+		},
+		{
+			name: "correct, orgScopedUsername",
+			fields: fields{
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id"),
+			},
+			args: args{
+				human: &AddHuman{
+					Email:             Email{Address: "support@zitadel.com", Verified: true},
+					FirstName:         "gigi",
+					LastName:          "giraffe",
+					Password:          "password",
+					Username:          "username",
+					PreferredLanguage: AllowedLanguage,
+				},
+				orgID:   "ro",
+				hasher:  mockPasswordHasher("x"),
+				codeAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				filter: NewMultiFilter().Append(
+					func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{}, nil
+					}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return []eventstore.Event{
+								org.NewDomainPolicyAddedEvent(
+									ctx,
+									&org.NewAggregate("id").Aggregate,
+									true,
+									true,
+									true,
+								),
+							}, nil
+						}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							// never set, as only used in creation of instance and org
+							return expectFilterOrganizationSettingsEvents(ctx, "org1", false, false), nil
 						}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
@@ -3591,6 +4250,10 @@ func TestAddHumanCommand(t *testing.T) {
 									true,
 								),
 							}, nil
+						}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return expectFilterOrganizationSettingsEvents(ctx, "org1", false, false), nil
 						}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
@@ -3666,6 +4329,10 @@ func TestAddHumanCommand(t *testing.T) {
 						}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return expectFilterOrganizationSettingsEvents(ctx, "org1", false, false), nil
+						}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 							return []eventstore.Event{
 								org.NewPasswordComplexityPolicyAddedEvent(
 									ctx,
@@ -3735,6 +4402,10 @@ func TestAddHumanCommand(t *testing.T) {
 									true,
 								),
 							}, nil
+						}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return expectFilterOrganizationSettingsEvents(ctx, "org1", false, false), nil
 						}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {

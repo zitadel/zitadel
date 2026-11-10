@@ -1,4 +1,4 @@
-//go:generate enumer -type MemberType -trimprefix MemberType
+//go:generate enumer -type MemberType -trimprefix MemberType -json -sql
 
 package authz
 
@@ -25,13 +25,14 @@ const (
 )
 
 type CtxData struct {
-	UserID            string
-	OrgID             string
-	ProjectID         string
-	AgentID           string
-	PreferredLanguage string
-	ResourceOwner     string
-	SystemMemberships Memberships
+	UserID                string
+	OrgID                 string
+	ProjectID             string
+	AgentID               string
+	PreferredLanguage     string
+	ResourceOwner         string
+	SystemMemberships     Memberships
+	SystemUserPermissions []SystemUserPermissions
 }
 
 func (ctxData CtxData) IsZero() bool {
@@ -50,7 +51,8 @@ type Memberships []*Membership
 type Membership struct {
 	MemberType  MemberType
 	AggregateID string
-	//ObjectID differs from aggregate id if object is sub of an aggregate
+	InstanceID  string
+	// ObjectID differs from aggregate id if object is sub of an aggregate
 	ObjectID string
 
 	Roles []string
@@ -69,6 +71,7 @@ const (
 
 type TokenVerifier interface {
 	ExistsOrg(ctx context.Context, id, domain string) (string, error)
+	CheckOrgActive(ctx context.Context, orgID string) error
 	ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error)
 	AccessTokenVerifier
 	SystemTokenVerifier
@@ -96,7 +99,7 @@ func (s SystemTokenVerifierFunc) VerifySystemToken(ctx context.Context, token st
 	return s(ctx, token, orgID)
 }
 
-func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain string, t APITokenVerifier) (_ CtxData, err error) {
+func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain string, t APITokenVerifier, systemRoleMap []RoleMapping) (_ CtxData, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	tokenWOBearer, err := extractBearerToken(token)
@@ -130,14 +133,22 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 			return CtxData{}, zerrors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
 		}
 	}
+	// Reject tokens whose caller's organization is inactive. Gate resourceOwner, not the
+	// resolved target orgID, so instance admins can still manage a deactivated org.
+	if resourceOwner != "" {
+		if err = t.CheckOrgActive(ctx, resourceOwner); err != nil {
+			return CtxData{}, zerrors.ThrowUnauthenticated(err, "AUTH-oR9nA", "Errors.Org.NotActive")
+		}
+	}
 	return CtxData{
-		UserID:            userID,
-		OrgID:             orgID,
-		ProjectID:         projectID,
-		AgentID:           agentID,
-		PreferredLanguage: prefLang,
-		ResourceOwner:     resourceOwner,
-		SystemMemberships: sysMemberships,
+		UserID:                userID,
+		OrgID:                 orgID,
+		ProjectID:             projectID,
+		AgentID:               agentID,
+		PreferredLanguage:     prefLang,
+		ResourceOwner:         resourceOwner,
+		SystemMemberships:     sysMemberships,
+		SystemUserPermissions: systemMembershipsToUserPermissions(sysMemberships, systemRoleMap),
 	}, nil
 }
 
@@ -148,7 +159,7 @@ func projectIDAndCheckOriginForClientID(ctx context.Context, clientID string, t 
 	projectID, origins, err := t.ProjectIDAndOriginsByClientID(ctx, clientID)
 	logging.WithFields("clientID", clientID).OnError(err).Debug("could not check projectID and origin of clientID (might be service account)")
 
-	// We used to check origins for every token, but service users shouldn't be used publicly (native app / SPA).
+	// We used to check origins for every token, but service accounts shouldn't be used publicly (native app / SPA).
 	// Therefore, mostly won't send an origin and aren't able to configure them anyway.
 	// For the current time we will only check origins for tokens issued to users through apps (code / implicit flow).
 	if projectID == "" {

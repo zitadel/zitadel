@@ -22,7 +22,7 @@ export class ProjectRolesDataSource extends DataSource<Role.AsObject> {
     super();
   }
 
-  public loadRoles(projectId: string, grantId: string, pageIndex: number, pageSize: number, sortDirection?: string): void {
+  public loadRoles(projectId: string, grantId: string, pageIndex: number, pageSize: number): void {
     const offset = pageIndex * pageSize;
 
     this.loadingSubject.next(true);

@@ -7,6 +7,8 @@ import (
 	"slices"
 	"time"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/zitadel/zitadel/internal/v2/database"
 )
 
@@ -723,7 +725,7 @@ func (pc *PositionCondition) Min() *GlobalPosition {
 // PositionGreater prepares the condition as follows
 // if inPositionOrder is set: position = AND in_tx_order > OR or position >
 // if inPositionOrder is NOT set: position >
-func PositionGreater(position float64, inPositionOrder uint32) paginationOpt {
+func PositionGreater(position decimal.Decimal, inPositionOrder uint32) paginationOpt {
 	return func(p *Pagination) {
 		p.ensurePosition()
 		p.position.min = &GlobalPosition{
@@ -743,7 +745,7 @@ func GlobalPositionGreater(position *GlobalPosition) paginationOpt {
 // PositionLess prepares the condition as follows
 // if inPositionOrder is set: position = AND in_tx_order > OR or position >
 // if inPositionOrder is NOT set: position >
-func PositionLess(position float64, inPositionOrder uint32) paginationOpt {
+func PositionLess(position decimal.Decimal, inPositionOrder uint32) paginationOpt {
 	return func(p *Pagination) {
 		p.ensurePosition()
 		p.position.max = &GlobalPosition{

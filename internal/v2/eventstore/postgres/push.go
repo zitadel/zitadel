@@ -171,8 +171,7 @@ func (s *Storage) push(ctx context.Context, tx *sql.Tx, reducer eventstore.Reduc
 			cmd.position.InPositionOrder,
 		)
 
-		stmt.WriteString(s.pushPositionStmt)
-		stmt.WriteString(`)`)
+		stmt.WriteString(", statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()))")
 	}
 	stmt.WriteString(` RETURNING created_at, "position"`)
 
@@ -217,9 +216,25 @@ func uniqueConstraints(ctx context.Context, tx *sql.Tx, commands []*command) (er
 			}
 			switch constraint.Action {
 			case eventstore.UniqueConstraintAdd:
-				stmt.WriteString(`INSERT INTO eventstore.unique_constraints (instance_id, unique_type, unique_field) VALUES (`)
-				stmt.WriteArgs(instance, constraint.UniqueType, constraint.UniqueField)
-				stmt.WriteRune(')')
+				if len(constraint.Owners) == 0 {
+					stmt.WriteString(`INSERT INTO eventstore.unique_constraints (instance_id, unique_type, unique_field) VALUES (`)
+					stmt.WriteArg(instance)
+					stmt.WriteString(`, `)
+					stmt.WriteArg(constraint.UniqueType)
+					stmt.WriteString(`, `)
+					stmt.WriteArg(constraint.UniqueField)
+					stmt.WriteString(`)`)
+				} else {
+					stmt.WriteString(`INSERT INTO eventstore.unique_constraints (instance_id, unique_type, unique_field, owners) VALUES (`)
+					stmt.WriteArg(instance)
+					stmt.WriteString(`, `)
+					stmt.WriteArg(constraint.UniqueType)
+					stmt.WriteString(`, `)
+					stmt.WriteArg(constraint.UniqueField)
+					stmt.WriteString(`, `)
+					stmt.WriteArg(constraint.Owners)
+					stmt.WriteString(`)`)
+				}
 			case eventstore.UniqueConstraintInstanceRemove:
 				stmt.WriteString(`DELETE FROM eventstore.unique_constraints WHERE instance_id = `)
 				stmt.WriteArgs(instance)
@@ -231,6 +246,15 @@ func uniqueConstraints(ctx context.Context, tx *sql.Tx, commands []*command) (er
 					constraint.UniqueType,
 					constraint.UniqueField,
 				)
+			case eventstore.UniqueConstraintRemoveByOwner:
+				if len(constraint.Owners) == 0 {
+					continue
+				}
+				stmt.WriteString(`DELETE FROM eventstore.unique_constraints WHERE instance_id = `)
+				stmt.WriteArgs(instance)
+				stmt.WriteString(` AND owners @> ARRAY[`)
+				stmt.WriteArgs(constraint.Owners[0])
+				stmt.WriteString(`]::text[]`)
 			}
 			_, err := tx.ExecContext(ctx, stmt.String(), stmt.Args()...)
 			if err != nil {
@@ -247,8 +271,8 @@ func uniqueConstraints(ctx context.Context, tx *sql.Tx, commands []*command) (er
 	return nil
 }
 
-// the query is so complex because we accidentally stored unique constraint case sensitive
-// the query checks first if there is a case sensitive match and afterwards if there is a case insensitive match
+// the query is so complex because we accidentally stored unique constraint case-sensitive
+// the query checks first if there is a case-sensitive match and afterward if there is a case-insensitive match
 var deleteUniqueConstraintClause = `
 (instance_id = $1 AND unique_type = $2 AND unique_field = (
     SELECT unique_field from (

@@ -1,41 +1,3 @@
-WITH login_names AS (SELECT 
-  u.id user_id
-  , u.instance_id
-  , u.resource_owner
-  , u.user_name
-  , d.name domain_name
-  , d.is_primary
-  , p.must_be_domain
-  , CASE WHEN p.must_be_domain 
-      THEN concat(u.user_name, '@', d.name)
-      ELSE u.user_name
-    END login_name
-  FROM 
-    projections.login_names3_users u
-  JOIN lateral (
-    SELECT 
-      p.must_be_domain 
-    FROM 
-      projections.login_names3_policies p
-    WHERE
-      u.instance_id = p.instance_id
-      AND (
-        (p.is_default IS TRUE AND p.instance_id = $3)
-        OR (p.instance_id = $3 AND p.resource_owner = u.resource_owner)
-      )
-    ORDER BY is_default
-    LIMIT 1
-  ) p ON TRUE
-  JOIN 
-    projections.login_names3_domains d
-    ON 
-      u.instance_id = d.instance_id
-      AND u.resource_owner = d.resource_owner
-  WHERE
-      u.id = $1
-    AND (u.resource_owner = $2 OR $2 = '')
-    AND u.instance_id = $3
-)
 SELECT 
   u.id
   , u.creation_date
@@ -45,8 +7,8 @@ SELECT
   , u.state
   , u.type
   , u.username
-  , (SELECT array_agg(ln.login_name)::TEXT[] login_names FROM login_names ln GROUP BY ln.user_id, ln.instance_id) login_names
-  , (SELECT ln.login_name login_names_lower FROM login_names ln WHERE ln.is_primary IS TRUE) preferred_login_name
+  , login_names.login_names AS login_names
+  , login_names.preferred_login_name AS preferred_login_name
   , h.user_id
   , h.first_name
   , h.last_name
@@ -79,6 +41,16 @@ LEFT JOIN
   ON
     u.id = m.user_id
     AND u.instance_id = m.instance_id
+LEFT JOIN LATERAL (
+    SELECT
+        ARRAY_AGG(ln.login_name ORDER BY ln.login_name) AS login_names,
+        MAX(CASE WHEN ln.is_primary THEN ln.login_name ELSE NULL END) AS preferred_login_name
+    FROM
+        projections.login_names3 AS ln
+    WHERE
+        ln.user_id = u.id
+        AND ln.instance_id = u.instance_id
+) AS login_names ON TRUE
 WHERE 
   u.id = $1
   AND (u.resource_owner = $2 OR $2 = '')

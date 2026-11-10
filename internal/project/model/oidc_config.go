@@ -3,6 +3,8 @@ package model
 import (
 	"time"
 
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -98,7 +100,7 @@ func GetOIDCCompliance(version OIDCVersion, appType OIDCApplicationType, grantTy
 		for i, grantType := range grantTypes {
 			domainGrantTypes[i] = domain.OIDCGrantType(grantType)
 		}
-		compliance := domain.GetOIDCV1Compliance(domain.OIDCApplicationType(appType), domainGrantTypes, domain.OIDCAuthMethodType(authMethod), redirectUris)
+		compliance := domain.GetOIDCV1Compliance(gu.Ptr(domain.OIDCApplicationType(appType)), domainGrantTypes, gu.Ptr(domain.OIDCAuthMethodType(authMethod)), redirectUris)
 		return &Compliance{
 			NoneCompliant: compliance.NoneCompliant,
 			Problems:      compliance.Problems,

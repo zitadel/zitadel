@@ -21,8 +21,7 @@ var (
 		" projections.restrictions2.sequence," +
 		" projections.restrictions2.disallow_public_org_registration," +
 		" projections.restrictions2.allowed_languages" +
-		" FROM projections.restrictions2" +
-		" AS OF SYSTEM TIME '-1 ms'",
+		" FROM projections.restrictions2",
 	)
 
 	restrictionsCols = []string{
@@ -115,7 +114,7 @@ func Test_RestrictionsPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.want.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.want.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

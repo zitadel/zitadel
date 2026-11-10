@@ -22,7 +22,7 @@ import (
 
 func TestServer_Restrictions_DisallowPublicOrgRegistration(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	regOrgUrl, err := url.Parse("http://" + instance.Domain + ":8080/ui/login/register/org")
+	regOrgUrl, err := url.Parse("http://" + instance.Domain + ":8082/ui/login/register/org")
 	require.NoError(t, err)
 	// The CSRF cookie must be sent with every request.
 	// We can simulate a browser session using a cookie jar.

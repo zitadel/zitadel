@@ -17,6 +17,7 @@ import (
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
@@ -36,6 +37,20 @@ func TestOPStorage_CreateAuthRequest(t *testing.T) {
 
 	id2 := createAuthRequestNoLoginClientHeader(t, Instance, clientIDV2, redirectURI)
 	require.Contains(t, id2, command.IDPrefixV2)
+
+	// valid org scope must succeed
+	_, _, err := Instance.CreateOIDCAuthRequest(CTX, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, redirectURI, oidc.ScopeOpenID, domain.OrgIDScope+Instance.DefaultOrg.Id)
+	require.NoError(t, err)
+
+	_, _, err = Instance.CreateOIDCAuthRequest(CTX, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, redirectURI, oidc.ScopeOpenID, domain.OrgIDScope+Instance.DefaultOrg.Id)
+	require.NoError(t, err)
+
+	// invalid org scope must fail
+	_, _, err = Instance.CreateOIDCAuthRequest(CTX, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, redirectURI, oidc.ScopeOpenID, domain.OrgIDScope+"invalid")
+	require.Error(t, err)
+
+	_, _, err = Instance.CreateOIDCAuthRequest(CTX, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, redirectURI, oidc.ScopeOpenID, domain.OrgIDScope+"invalid")
+	require.Error(t, err)
 }
 
 func TestOPStorage_CreateAccessToken_code(t *testing.T) {
@@ -98,6 +113,62 @@ func TestOPStorage_CreateAccessToken_code(t *testing.T) {
 			// exchange with a used code must fail
 			_, err = exchangeTokens(t, Instance, tt.clientID, code, redirectURI)
 			require.Error(t, err)
+		})
+	}
+}
+
+func TestOPStorage_CreateAccessToken_code_invalid_client(t *testing.T) {
+	tests := []struct {
+		name                 string
+		authorizeClientID    string
+		codeExchangeClientID string
+		authRequestID        func(t testing.TB, instance *integration.Instance, clientID, redirectURI string, scope ...string) string
+	}{
+		{
+			name: "login header",
+			authorizeClientID: func() string {
+				clientID, _ := createClient(t, Instance)
+				return clientID
+			}(),
+			codeExchangeClientID: func() string {
+				clientID, _ := createClient(t, Instance)
+				return clientID
+			}(),
+			authRequestID: createAuthRequest,
+		},
+		{
+			name: "login v2 config",
+			authorizeClientID: func() string {
+				clientID, _ := createClientLoginV2(t, Instance)
+				return clientID
+			}(),
+			codeExchangeClientID: func() string {
+				clientID, _ := createClientLoginV2(t, Instance)
+				return clientID
+			}(),
+			authRequestID: createAuthRequestNoLoginClientHeader,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			authRequestID := createAuthRequest(t, Instance, tt.authorizeClientID, redirectURI)
+			sessionID, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
+			linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+				AuthRequestId: authRequestID,
+				CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionID,
+						SessionToken: sessionToken,
+					},
+				},
+			})
+			require.NoError(t, err)
+
+			code := assertCodeResponse(t, linkResp.GetCallbackUrl())
+			// the client used for code exchange does not match the client in the auth request -> must fail
+			tokens, err := exchangeTokens(t, Instance, tt.codeExchangeClientID, code, redirectURI)
+			require.ErrorContains(t, err, "client_id does not correspond to the client_id in the authorization request")
+			assert.Nil(t, tokens)
 		})
 	}
 }
@@ -276,6 +347,68 @@ func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
 			// refresh with an old refresh_token must fail
 			_, err = rp.RefreshTokens[*oidc.IDTokenClaims](CTX, provider, tokens.RefreshToken, "", "")
 			require.Error(t, err)
+		})
+	}
+}
+
+func TestOPStorage_CreateAccessAndRefreshTokens_refresh_invalid_client(t *testing.T) {
+	tests := []struct {
+		name          string
+		clientID      string
+		otherClientID string
+		authRequestID func(t testing.TB, instance *integration.Instance, clientID, redirectURI string, scope ...string) string
+	}{
+		{
+			name: "login header",
+			clientID: func() string {
+				clientID, _ := createClient(t, Instance)
+				return clientID
+			}(),
+			otherClientID: func() string {
+				clientID, _ := createClient(t, Instance)
+				return clientID
+			}(),
+			authRequestID: createAuthRequest,
+		},
+		{
+			name: "login v2 config",
+			clientID: func() string {
+				clientID, _ := createClientLoginV2(t, Instance)
+				return clientID
+			}(),
+			otherClientID: func() string {
+				clientID, _ := createClient(t, Instance)
+				return clientID
+			}(),
+			authRequestID: createAuthRequestNoLoginClientHeader,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			authRequestID := tt.authRequestID(t, Instance, tt.clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+			sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
+			linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+				AuthRequestId: authRequestID,
+				CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionID,
+						SessionToken: sessionToken,
+					},
+				},
+			})
+			require.NoError(t, err)
+
+			// code exchange
+			code := assertCodeResponse(t, linkResp.GetCallbackUrl())
+			tokens, err := exchangeTokens(t, Instance, tt.clientID, code, redirectURI)
+			require.NoError(t, err)
+			assertTokens(t, tokens, true)
+			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
+
+			// refresh grant with a different client -> must fail
+			newTokens, err := refreshTokens(t, tt.otherClientID, tokens.RefreshToken)
+			require.ErrorContains(t, err, "client_id does not correspond to the client_id in the refresh token")
+			assert.Nil(t, newTokens)
 		})
 	}
 }
@@ -498,7 +631,7 @@ func TestOPStorage_TerminateSession(t *testing.T) {
 	_, err = rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
 	require.NoError(t, err)
 
-	postLogoutRedirect, err := rp.EndSession(CTX, provider, tokens.IDToken, logoutRedirectURI, "state")
+	postLogoutRedirect, err := rp.EndSession(CTX, provider, tokens.IDToken, logoutRedirectURI, "state", "", nil)
 	require.NoError(t, err)
 	assert.Equal(t, logoutRedirectURI+"?state=state", postLogoutRedirect.String())
 
@@ -535,7 +668,7 @@ func TestOPStorage_TerminateSession_refresh_grant(t *testing.T) {
 	_, err = rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
 	require.NoError(t, err)
 
-	postLogoutRedirect, err := rp.EndSession(CTX, provider, tokens.IDToken, logoutRedirectURI, "state")
+	postLogoutRedirect, err := rp.EndSession(CTX, provider, tokens.IDToken, logoutRedirectURI, "state", "", nil)
 	require.NoError(t, err)
 	assert.Equal(t, logoutRedirectURI+"?state=state", postLogoutRedirect.String())
 
@@ -551,12 +684,24 @@ func TestOPStorage_TerminateSession_refresh_grant(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func buildLogoutURL(origin, logoutURLV2, redirectURI string, extraParams map[string]string) *url.URL {
+	u, _ := url.Parse(origin + logoutURLV2 + redirectURI)
+	q := u.Query()
+	for k, v := range extraParams {
+		q.Set(k, v)
+	}
+	q.Set("logout_token", "signed-logout-token") // placeholder
+	u.RawQuery = q.Encode()
+	// Append the redirect URI as a URL-escaped string
+	return u
+}
+
 func TestOPStorage_TerminateSession_empty_id_token_hint(t *testing.T) {
 	tests := []struct {
 		name          string
 		clientID      string
 		authRequestID func(t testing.TB, instance *integration.Instance, clientID, redirectURI string, scope ...string) string
-		logoutURL     string
+		logoutURL     *url.URL
 	}{
 		{
 			name: "login header",
@@ -565,7 +710,7 @@ func TestOPStorage_TerminateSession_empty_id_token_hint(t *testing.T) {
 				return clientID
 			}(),
 			authRequestID: createAuthRequest,
-			logoutURL:     http_utils.BuildOrigin(Instance.Host(), Instance.Config.Secure) + Instance.Config.LogoutURLV2 + logoutRedirectURI + "?state=state",
+			logoutURL:     buildLogoutURL(http_utils.BuildOrigin(Instance.Host(), Instance.Config.Secure), Instance.Config.LogoutURLV2, logoutRedirectURI+"?state=state", map[string]string{"logout_hint": "hint", "ui_locales": "it-IT en-US"}),
 		},
 		{
 			name: "login v2 config",
@@ -574,7 +719,7 @@ func TestOPStorage_TerminateSession_empty_id_token_hint(t *testing.T) {
 				return clientID
 			}(),
 			authRequestID: createAuthRequestNoLoginClientHeader,
-			logoutURL:     http_utils.BuildOrigin(Instance.Host(), Instance.Config.Secure) + Instance.Config.LogoutURLV2 + logoutRedirectURI + "?state=state",
+			logoutURL:     buildLogoutURL(http_utils.BuildOrigin(Instance.Host(), Instance.Config.Secure), Instance.Config.LogoutURLV2, logoutRedirectURI+"?state=state", map[string]string{"logout_hint": "hint", "ui_locales": "it-IT en-US"}),
 		},
 	}
 	for _, tt := range tests {
@@ -601,9 +746,20 @@ func TestOPStorage_TerminateSession_empty_id_token_hint(t *testing.T) {
 			assertTokens(t, tokens, false)
 			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
 
-			postLogoutRedirect, err := rp.EndSession(CTX, provider, "", logoutRedirectURI, "state")
+			postLogoutRedirect, err := rp.EndSession(CTX, provider, "", logoutRedirectURI, "state", "hint", oidc.ParseLocales([]string{"it-IT", "en-US"}))
 			require.NoError(t, err)
-			assert.Equal(t, tt.logoutURL, postLogoutRedirect.String())
+
+			requiredQueries := tt.logoutURL.Query()
+			for key, value := range requiredQueries {
+				if key == "logout_token" {
+					assert.NotEmpty(t, value[0], "logout_token must be present")
+					continue
+				}
+				assert.Equal(t, value[0], postLogoutRedirect.Query().Get(key))
+			}
+			requiredURLWithoutQueries := *tt.logoutURL
+			requiredURLWithoutQueries.RawQuery = ""
+			assert.Equal(t, requiredURLWithoutQueries.String(), postLogoutRedirect.Scheme+"://"+postLogoutRedirect.Host+postLogoutRedirect.Path)
 
 			// userinfo must not fail until login UI terminated session
 			_, err = rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
@@ -659,9 +815,9 @@ func assertTokens(t *testing.T, tokens *oidc.Tokens[*oidc.IDTokenClaims], requir
 	assert.Empty(t, tokens.Extra("state"))
 }
 
-func assertIDTokenClaims(t *testing.T, claims *oidc.IDTokenClaims, userID string, arm []string, sessionStart, sessionChange time.Time, sessionID string) {
+func assertIDTokenClaims(t *testing.T, claims *oidc.IDTokenClaims, userID string, amr oidc.AuthenticationMethodsReferences, sessionStart, sessionChange time.Time, sessionID string) {
 	assert.Equal(t, userID, claims.Subject)
-	assert.Equal(t, arm, claims.AuthenticationMethodsReferences)
+	assert.Equal(t, amr, claims.AuthenticationMethodsReferences)
 	assertOIDCTimeRange(t, claims.AuthTime, sessionStart, sessionChange)
 	assert.Equal(t, sessionID, claims.SessionID)
 	assert.Empty(t, claims.Name)

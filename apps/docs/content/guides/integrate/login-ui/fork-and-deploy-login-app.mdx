@@ -1,0 +1,354 @@
+---
+title: Maintain and Deploy a Customized ZITADEL Login UI
+description: Fork, customize, build, and deploy the ZITADEL Login UI as a self-managed application with ongoing maintenance and upgrade workflows.
+---
+
+The ZITADEL Login UI is an MIT-licensed Next.js application maintained in the [ZITADEL monorepo](https://github.com/zitadel/zitadel). You can customize and deploy it independently, but your fork becomes an application that your team must build, test, secure, monitor, and update.
+
+This guide describes the current workflow for maintaining a customized Login UI. It is intended for teams that need source-code changes beyond the branding and text customization available through ZITADEL settings.
+
+<Callout type="note">
+If you only need to change colors, logos, fonts, or translated login text, first use ZITADEL's supported branding and customization settings. A source fork creates an ongoing maintenance responsibility.
+</Callout>
+
+## Understand the source dependencies
+
+The Login UI is not currently an isolated project in the repository. Its relevant dependency chain is:
+
+```text
+apps/login
+└── packages/zitadel-client
+    └── packages/zitadel-proto
+        └── proto
+```
+
+The root pnpm workspace and Nx configuration also participate in installing, generating, testing, and building these projects. Copying only `apps/login` can therefore fail or silently separate the UI from the API definitions against which it was developed.
+
+For the current monorepo workflow, keep the Login UI and these workspace dependencies on the same upstream ZITADEL revision.
+
+## Choose a fork strategy
+
+### Full repository fork — recommended
+
+Fork the complete `zitadel/zitadel` repository and limit your own changes to `apps/login` wherever possible. This is the simplest model to understand and the least likely to miss a new build-time dependency when upstream changes.
+
+Use two remotes:
+
+```bash
+git clone git@github.com:YOUR_ORGANIZATION/zitadel.git
+cd zitadel
+git remote add upstream https://github.com/zitadel/zitadel.git
+git fetch upstream --tags
+```
+
+Start customization from a released tag rather than an arbitrary commit on `main`:
+
+```bash
+git checkout -b custom-login vX.Y.Z
+```
+
+Replace `vX.Y.Z` with the ZITADEL release you have selected. A release tag gives you a reproducible compatibility baseline and a corresponding changelog.
+
+### History-preserving slim fork — advanced
+
+If repository size or internal policy makes a full fork impractical, you can maintain a filtered fork containing only:
+
+- `apps/login`
+- `packages/zitadel-client`
+- `packages/zitadel-proto`
+- `proto`
+- the root pnpm, lockfile, Node, and Nx configuration required by those projects
+
+Use `git filter-repo` identically both when bootstrapping the fork and during every later synchronization. The list of retained paths and all filter arguments must remain stable so that freshly filtered upstream history shares commit ancestry with your fork.
+
+<Callout type="warn">
+**Important constraints for this model:**
+
+- Bootstrap and update with one shared filtering implementation; do not duplicate the path list in separate scripts.
+- Merge the initial import and subsequent update branches with a merge commit or fast-forward. Do not squash them, because squashing removes the filtered upstream ancestry needed for future three-way merges.
+- Treat any change to the retained path list as a new bootstrap. Adding or removing paths rewrites the filtered commit IDs.
+- Re-run `pnpm install` after filtering or merging so the lockfile is reconciled with the retained workspace.
+- Review the retained path list whenever upstream changes the Login build graph.
+</Callout>
+
+This is a valid Git maintenance technique, but it adds machinery that ZITADEL's normal build does not require. Own and test the filtering automation as part of your fork.
+
+### Why a standalone `apps/login` copy is not recommended today
+
+This section describes the current monorepo workflow while version-matched `@zitadel/client` and `@zitadel/proto` packages are unavailable as npm dependencies for the Login UI. The application consumes their workspace sources from the monorepo. Until version-matched packages are published, retain those sources rather than replacing the workspace dependencies with old npm versions. Progress is tracked in [zitadel/zitadel#12250](https://github.com/zitadel/zitadel/issues/12250).
+
+## Configure a development environment
+
+The current [contribution guide](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#contribute-to-login) documents the required Node.js version (declared in `.nvmrc`), pnpm version (declared in the root `package.json` through Corepack), and Nx (through workspace dependencies). From the repository root:
+
+```bash
+corepack enable
+pnpm install --frozen-lockfile
+pnpm nx run-many --target generate
+```
+
+For a complete, unmodified monorepo checkout, use `pnpm install --frozen-lockfile`, especially in CI. A history-filtered slim fork may need plain `pnpm install` to reconcile the lockfile with the reduced workspace. Do not claim that a filtered lockfile is reproducible until the reconciled lockfile has been committed.
+```
+
+To develop the Login UI against an existing ZITADEL instance, create `apps/login/.env.dev.local`:
+
+```dotenv
+ZITADEL_API_URL=https://your-zitadel-instance.example.com
+ZITADEL_SERVICE_USER_TOKEN=your-login-client-pat
+```
+
+<Callout type="warn">
+Do not commit this file or its token. `ZITADEL_API_URL` must not have a trailing slash.
+</Callout>
+
+Start the development server:
+
+```bash
+pnpm nx run @zitadel/login:dev
+```
+
+The token must belong to a machine user with the Instance Login Client role (`IAM_LOGIN_CLIENT`). See [Connect your self-hosted Login UI to ZITADEL](/self-hosting/manage/login-client) for the supported setup.
+
+## Run the required quality checks
+
+Run the checks for the Login UI and `@zitadel/client` (and ensure `@zitadel/proto` is generated when needed):
+
+```bash
+pnpm nx run-many \
+  --projects @zitadel/login @zitadel/client @zitadel/proto \
+  --targets lint build test
+```
+
+If your update includes `.proto` changes, regenerate the TypeScript clients before testing:
+
+```bash
+pnpm nx run @zitadel/proto:generate
+```
+
+For meaningful Login UI changes, also perform end-to-end tests against a staging ZITADEL instance. At minimum, cover the authentication methods and policies you enable in production:
+
+- Authorization Code Flow with PKCE and callback to the application
+- password, passkey, external identity provider, and applicable MFA/OTP flows
+- registration, account selection, password reset, verification, and logout
+- organization-specific policies, branding, and translated text
+- expected negative cases such as invalid or expired codes
+- desktop and mobile browsers supported by your application
+
+## Build an immutable image
+
+The repository's documented Docker build flow is:
+
+```bash
+pnpm nx run @zitadel/login:build
+docker build -t registry.example.com/identity/zitadel-login:vX.Y.Z-custom.1 apps/login
+docker push registry.example.com/identity/zitadel-login:vX.Y.Z-custom.1
+```
+
+Use an immutable tag that records both the upstream ZITADEL baseline and your customization revision. For example:
+
+```text
+v4.17.0-custom.1
+```
+
+The Login source, `@zitadel/client`, `@zitadel/proto`, and generated proto code must come from the same upstream revision. For ZITADEL Cloud users, test your selected Login release against a staging or test instance.
+```
+
+Also retain the source commit and image digest in your release record. Do not deploy a mutable `latest` tag to production.
+
+## Deploy outside Vercel
+
+Vercel is not required. The Login UI can run as the Node.js application produced by the Next.js build or as a container. In Kubernetes or EKS, run it as a separate Deployment and Service behind your ingress or load balancer.
+
+The following fragment shows the important application settings. Adapt registry authentication, resources, topology, and ingress to your platform:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zitadel-login
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: zitadel-login
+  template:
+    metadata:
+      labels:
+        app: zitadel-login
+    spec:
+      containers:
+        - name: login
+          image: registry.example.com/identity/zitadel-login:vX.Y.Z-custom.1
+          ports:
+            - name: http
+              containerPort: 3000
+          env:
+            - name: ZITADEL_API_URL
+              value: https://zitadel.example.com
+            - name: NEXT_PUBLIC_BASE_PATH
+              value: /ui/v2/login
+            - name: ZITADEL_SERVICE_USER_TOKEN_FILE
+              value: /var/run/secrets/zitadel/login-client.pat
+          volumeMounts:
+            - name: login-client
+              mountPath: /var/run/secrets/zitadel
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /ui/v2/login/ready
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /ui/v2/login/ready
+              port: http
+      volumes:
+        - name: login-client
+          secret:
+            secretName: zitadel-login-client
+            items:
+              - key: token
+                path: login-client.pat
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zitadel-login
+spec:
+  selector:
+    app: zitadel-login
+  ports:
+    - name: http
+      port: 3000
+      targetPort: http
+```
+
+Store the PAT in a Kubernetes Secret or external secrets manager and expose it as a read-only file. Restrict access to the Secret and plan token rotation. Do not bake the PAT into the image.
+
+If `ZITADEL_API_URL` points to an internal Kubernetes service such as `http://zitadel:8080`, add:
+
+```yaml
+- name: CUSTOM_REQUEST_HEADERS
+  value: Host:zitadel.example.com
+```
+
+The `Host` value must be the public ZITADEL instance domain used for instance resolution. If the public ZITADEL URL is used directly as `ZITADEL_API_URL`, this additional override may not be necessary.
+
+Add CPU and memory requests and limits based on load tests from your own authentication traffic. Use multiple replicas, disruption controls, and multi-zone scheduling according to your availability requirements.
+
+## Configure routing and domains
+
+The Login UI contains a server-side component and Next.js middleware that proxies OIDC-related requests to ZITADEL. Correct proxy routing is part of the authentication flow, not only static frontend delivery.
+
+### Same public origin
+
+When the Login UI and ZITADEL share a public origin, route:
+
+- `/ui/v2/login` to the Login UI service
+- all other ZITADEL paths to the ZITADEL API service
+
+Set `NEXT_PUBLIC_BASE_PATH=/ui/v2/login` at build and runtime as required by your packaging. Keep the value consistent with the Login V2 base URI configured in ZITADEL.
+
+### Separate Login domain
+
+If the Login UI uses a separate public domain such as `login.example.com`:
+
+- Serve it over HTTPS.
+- Add the Login domain to the instance's [Trusted Domains](/apis/resources/admin/admin-service-add-instance-trusted-domain).
+- Configure the proxy in front of the Login UI as documented in the [Login App](/guides/integrate/login-ui/login-app#oidc-proxy):
+  - `x-zitadel-public-host`: the public Login UI host, for example `login.example.com`
+  - `x-zitadel-instance-host`: the ZITADEL instance host, for example `auth.example.com`
+
+Test OIDC and SAML callbacks and every configured external identity provider through the public route.
+
+The exact configuration depends on whether the Login UI and ZITADEL share a public origin, use separate domains, or communicate through an internal cluster address. `CUSTOM_REQUEST_HEADERS=Host:<public-zitadel-domain>` is used when the Login container calls ZITADEL through an internal service address and must preserve the public instance host. `x-zitadel-public-host` and `x-zitadel-instance-host` apply to the documented separate-domain/proxy topology. Do not conflate these settings.
+
+<Callout type="warn">
+Do not assume that setting only `ZITADEL_API_URL` replaces the required host-routing behavior for every topology. The [Login App architectural and proxy guidance](/guides/integrate/login-ui/login-app) is the source of truth for these headers.
+</Callout>
+
+## Enable Login V2 safely
+
+For an existing self-hosted ZITADEL installation, follow [Adopt Login V2 on an existing installation](/self-hosting/manage/adopt-login-v2).
+
+Prefer a gradual rollout:
+
+1. Deploy the custom Login UI without changing the instance-wide setting.
+2. Enable the new Login UI for a non-production test application and set its custom base URL.
+3. Run the complete authentication test matrix.
+4. Expand to selected applications.
+5. Enable it instance-wide only after validation, if that is your intended topology.
+
+Keep a break-glass PAT for a machine user with the Instance Owner role (`IAM_OWNER`) so that you can revert the Login V2 setting if interactive login becomes unavailable. Store and audit this credential according to your incident-access policy.
+
+## Keep the fork synchronized
+
+Treat upstream synchronization as a normal application dependency update, not an automatic deployment.
+
+For a full repository fork:
+
+```bash
+git fetch upstream --tags
+git switch custom-login
+git switch -c update-login-vX.Y.Z
+git merge --no-ff vX.Y.Z
+```
+
+Teams may use a different branching model, but the update branch must start from the current customized state.
+
+Resolve conflicts while preserving the intent of your customizations. Then install, generate, test, and build again. For a slim fork, fetch a freshly filtered copy of the same release and merge its history using the identical filter configuration used during bootstrap.
+
+### Recommended update workflow
+
+1. Select a released ZITADEL version and read its release notes and migration guidance.
+2. Merge that release into a dedicated update branch.
+3. Review changes to `apps/login`, `packages/zitadel-client`, `packages/zitadel-proto`, `proto`, and the root build files.
+4. Reconcile dependencies and generated code.
+5. Run lint, build, unit, and staging end-to-end tests.
+6. Build an immutable custom image and scan it using your normal supply-chain controls.
+7. Deploy to staging, then canary or gradually roll out to production.
+8. Retain the previous image digest and configuration for rollback.
+
+<Callout type="warn">
+Do not merge upstream continuously into production without qualification. Login changes can affect cookies, redirects, external IdP callbacks, API contracts, and authentication-policy behavior.
+</Callout>
+
+## Recommended release policy for your fork
+
+ZITADEL releases are the upstream input; your custom Login UI image is your own release artifact. A useful version format is:
+
+```
+upstream-zitadel-version-custom.build-revision
+```
+
+Maintain a short release record containing:
+
+- upstream tag and commit
+- custom fork commit
+- container image digest
+- applicable ZITADEL backend version or tested range
+- configuration changes and migrations
+- test evidence and known limitations
+
+Subscribe to [ZITADEL releases](https://github.com/zitadel/zitadel/releases) and security notices. Decide deliberately which releases to adopt; prioritize security fixes and changes that affect Login V2 or the APIs it consumes.
+
+## Troubleshooting checklist
+
+If the Login UI returns an internal error or an authentication flow redirects incorrectly, verify:
+
+- the PAT is readable and belongs to a user with `IAM_LOGIN_CLIENT`
+- `ZITADEL_API_URL` is reachable from the Login pod and has no trailing slash
+- the public Login domain is trusted by the ZITADEL instance
+- the configured Login V2 base URI exactly matches the public route and base path
+- the ingress sends Login UI traffic to the correct service
+- separate-domain deployments set the `x-zitadel-public-host` and `x-zitadel-instance-host` headers correctly
+- the selected Login source, client package, proto package, and ZITADEL API version were tested together
+- external IdP callback URLs reach the expected public endpoint
+- the prior known-good image and configuration can still be restored
+
+## Related documentation
+
+- [Login App architecture and setup](/guides/integrate/login-ui/login-app)
+- [Contribute to the Login UI](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#contribute-to-login)
+- [Connect your self-hosted Login UI to ZITADEL](/self-hosting/manage/login-client)
+- [Adopt Login V2 on an existing installation](/self-hosting/manage/adopt-login-v2)
+- [ZITADEL releases](https://github.com/zitadel/zitadel/releases)

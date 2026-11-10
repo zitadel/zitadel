@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"bytes"
+	"context"
+	"crypto/fips140"
 	_ "embed"
 	"errors"
 	"io"
@@ -9,8 +11,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/cmd/admin"
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/initialise"
@@ -26,6 +28,9 @@ var (
 
 	//go:embed defaults.yaml
 	defaultConfig []byte
+
+	//go:embed defaults_fips.yaml
+	defaultFipsConfig []byte
 )
 
 func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server) *cobra.Command {
@@ -36,15 +41,16 @@ func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return errors.New("no additional command provided")
 		},
-		Version: build.Version(),
+		Version:      build.Version(),
+		SilenceUsage: true,
 	}
 
 	viper.AutomaticEnv()
 	viper.SetEnvPrefix("ZITADEL")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.SetConfigType("yaml")
-	err := viper.ReadConfig(bytes.NewBuffer(defaultConfig))
-	logging.OnError(err).Fatal("unable to read default config")
+	err := loadDefaultConfig()
+	logging.OnError(context.Background(), err).Fatal("unable to read default config")
 
 	cobra.OnInitialize(initConfig)
 	cmd.PersistentFlags().StringArrayVar(&configFiles, "config", nil, "path to config file to overwrite system defaults")
@@ -66,10 +72,32 @@ func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server
 	return cmd
 }
 
+func loadDefaultConfig() error {
+	return loadDefaultConfigInto(viper.GetViper())
+}
+
+func loadDefaultConfigInto(v *viper.Viper) error {
+	if err := v.ReadConfig(bytes.NewBuffer(defaultConfig)); err != nil {
+		return err
+	}
+	return mergeFipsDefaultConfig(v)
+}
+
+func mergeFipsDefaultConfig(v *viper.Viper) error {
+	if !fips140.Enabled() {
+		return nil
+	}
+	return applyFipsDefaultOverlay(v)
+}
+
+func applyFipsDefaultOverlay(v *viper.Viper) error {
+	return v.MergeConfig(bytes.NewBuffer(defaultFipsConfig))
+}
+
 func initConfig() {
 	for _, file := range configFiles {
 		viper.SetConfigFile(file)
 		err := viper.MergeInConfig()
-		logging.WithFields("file", file).OnError(err).Warn("unable to read config file")
+		logging.OnError(context.Background(), err).Warn("unable to read config file", "file", file)
 	}
 }

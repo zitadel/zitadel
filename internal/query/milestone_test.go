@@ -17,7 +17,7 @@ var (
 		   projections.milestones3.last_pushed_date,
 		   projections.milestones3.type,
 		   COUNT(*) OVER ()
-		FROM projections.milestones3 AS OF SYSTEM TIME '-1 ms'
+		FROM projections.milestones3
 		LEFT JOIN projections.instance_domains ON projections.milestones3.instance_id = projections.instance_domains.instance_id
 		`)
 
@@ -184,7 +184,7 @@ func Test_MilestonesPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

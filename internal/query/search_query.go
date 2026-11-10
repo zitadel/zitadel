@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -22,6 +23,8 @@ type SearchRequest struct {
 	Limit         uint64
 	SortingColumn Column
 	Asc           bool
+
+	sortingConsumed bool
 }
 
 func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -31,15 +34,20 @@ func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	if req.Limit > 0 {
 		query = query.Limit(req.Limit)
 	}
+	return req.consumeSorting(query)
+}
 
-	if !req.SortingColumn.isZero() {
+// consumeSorting sets the sorting column to the query once.
+// subsequent calls will not set the sorting column again.
+func (req *SearchRequest) consumeSorting(query sq.SelectBuilder) sq.SelectBuilder {
+	if !req.sortingConsumed && !req.SortingColumn.isZero() {
 		clause := req.SortingColumn.orderBy()
 		if !req.Asc {
 			clause += " DESC"
 		}
 		query = query.OrderByClause(clause)
+		req.sortingConsumed = true
 	}
-
 	return query
 }
 
@@ -118,11 +126,7 @@ func (q *OrQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (q *OrQuery) comp() sq.Sqlizer {
-	or := make(sq.Or, len(q.queries))
-	for i, query := range q.queries {
-		or[i] = query.comp()
-	}
-	return or
+	return combineSearchQueryComps[sq.Or](q.queries)
 }
 
 type AndQuery struct {
@@ -144,11 +148,62 @@ func (q *AndQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (q *AndQuery) comp() sq.Sqlizer {
-	and := make(sq.And, len(q.queries))
-	for i, query := range q.queries {
-		and[i] = query.comp()
+	return combineSearchQueryComps[sq.And](q.queries)
+}
+
+// combineSearchQueryComps skips nil comps from empty pattern filters.
+// Zero remaining → nil; one → that comp; else Or or And of the rest.
+func combineSearchQueryComps[T sq.And | sq.Or](queries []SearchQuery) sq.Sqlizer {
+	parts := make([]sq.Sqlizer, 0, len(queries))
+	for _, query := range queries {
+		if c := query.comp(); c != nil {
+			parts = append(parts, c)
+		}
 	}
-	return and
+	switch len(parts) {
+	case 0:
+		return nil
+	case 1:
+		return parts[0]
+	default:
+		return sq.Sqlizer(T(parts))
+	}
+}
+
+// noopSearchQuery adds no WHERE clause. Used when an empty pattern filter
+// would otherwise leave only non-selective SubSelect correlates.
+type noopSearchQuery struct{}
+
+func (noopSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query
+}
+
+func (noopSearchQuery) comp() sq.Sqlizer {
+	return nil
+}
+
+func (noopSearchQuery) Col() Column {
+	return Column{}
+}
+
+func isTextPatternComparison(comparison TextComparison) bool {
+	switch comparison {
+	case TextStartsWith,
+		TextStartsWithIgnoreCase,
+		TextEndsWith,
+		TextEndsWithIgnoreCase,
+		TextContains,
+		TextContainsIgnoreCase:
+		return true
+	case TextEquals,
+		TextEqualsIgnoreCase,
+		TextNotEquals,
+		TextNotEqualsIgnoreCase,
+		TextListContains,
+		textCompareMax:
+		return false
+	}
+	return false
 }
 
 func (q *AndQuery) Prepend(queries ...SearchQuery) {
@@ -174,12 +229,17 @@ func (q *NotQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (notQ NotQuery) ToSql() (sql string, args []interface{}, err error) {
-	querySql, queryArgs, queryErr := notQ.query.comp().ToSql()
-	// Handle the error from the query's ToSql() function.
+	inner := notQ.query.comp()
+	// Empty LIKE patterns omit the filter (no constraint) outside NOT.
+	// Inside NOT that would be wrong: keep FALSE deliberately so we still
+	// match nothing, same as the old NOT (LIKE '%') behaviour.
+	if inner == nil {
+		return "FALSE", nil, nil
+	}
+	querySql, queryArgs, queryErr := inner.ToSql()
 	if queryErr != nil {
 		return "", queryArgs, queryErr
 	}
-	// Construct the SQL statement.
 	sql = fmt.Sprintf("NOT (%s)", querySql)
 	return sql, queryArgs, nil
 }
@@ -287,9 +347,7 @@ func NewTextQuery(col Column, value string, compare TextComparison) (*textQuery,
 	}
 	// handle the comparisons which use (i)like and therefore need to escape potential wildcards in the value
 	switch compare {
-	case TextEqualsIgnoreCase,
-		TextNotEqualsIgnoreCase,
-		TextStartsWith,
+	case TextStartsWith,
 		TextStartsWithIgnoreCase,
 		TextEndsWith,
 		TextEndsWithIgnoreCase,
@@ -299,6 +357,8 @@ func NewTextQuery(col Column, value string, compare TextComparison) (*textQuery,
 	case TextEquals,
 		TextListContains,
 		TextNotEquals,
+		TextEqualsIgnoreCase,
+		TextNotEqualsIgnoreCase,
 		textCompareMax:
 		// do nothing
 	}
@@ -334,23 +394,41 @@ func (q *textQuery) comp() sq.Sqlizer {
 	case TextNotEquals:
 		return sq.NotEq{q.Column.identifier(): q.Text}
 	case TextEqualsIgnoreCase:
-		return sq.ILike{q.Column.identifier(): q.Text}
+		return sq.Eq{"LOWER(" + q.Column.identifier() + ")": strings.ToLower(q.Text)}
 	case TextNotEqualsIgnoreCase:
-		return sq.NotILike{q.Column.identifier(): q.Text}
+		return sq.NotEq{"LOWER(" + q.Column.identifier() + ")": strings.ToLower(q.Text)}
 	case TextStartsWith:
+		if q.Text == "" {
+			return nil
+		}
 		return sq.Like{q.Column.identifier(): q.Text + "%"}
 	case TextStartsWithIgnoreCase:
-		return sq.ILike{q.Column.identifier(): q.Text + "%"}
+		if q.Text == "" {
+			return nil
+		}
+		return sq.Like{"LOWER(" + q.Column.identifier() + ")": strings.ToLower(q.Text) + "%"}
 	case TextEndsWith:
+		if q.Text == "" {
+			return nil
+		}
 		return sq.Like{q.Column.identifier(): "%" + q.Text}
 	case TextEndsWithIgnoreCase:
-		return sq.ILike{q.Column.identifier(): "%" + q.Text}
+		if q.Text == "" {
+			return nil
+		}
+		return sq.Like{"LOWER(" + q.Column.identifier() + ")": "%" + strings.ToLower(q.Text)}
 	case TextContains:
+		if q.Text == "" {
+			return nil
+		}
 		return sq.Like{q.Column.identifier(): "%" + q.Text + "%"}
 	case TextContainsIgnoreCase:
-		return sq.ILike{q.Column.identifier(): "%" + q.Text + "%"}
+		if q.Text == "" {
+			return nil
+		}
+		return sq.Like{"LOWER(" + q.Column.identifier() + ")": "%" + strings.ToLower(q.Text) + "%"}
 	case TextListContains:
-		return &listContains{col: q.Column, args: []interface{}{q.Text}}
+		return &listContains{col: q.Column, args: []any{q.Text}}
 	case textCompareMax:
 		return nil
 	}
@@ -571,11 +649,7 @@ func (q *or) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (q *or) comp() sq.Sqlizer {
-	queries := make([]sq.Sqlizer, 0)
-	for _, query := range q.queries {
-		queries = append(queries, query.comp())
-	}
-	return sq.Or(queries)
+	return combineSearchQueryComps[sq.Or](q.queries)
 }
 
 func (q *or) Col() Column {
@@ -647,13 +721,12 @@ func (q *BytesQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 func (q *BytesQuery) comp() sq.Sqlizer {
 	switch q.Compare {
 	case BytesEquals:
-		return sq.Eq{q.Column.identifier(): q.Value}
+		return sq.Expr("sha256("+q.Column.identifier()+") = sha256(?)", q.Value)
 	case BytesNotEquals:
-		return sq.NotEq{q.Column.identifier(): q.Value}
+		return sq.Expr("sha256("+q.Column.identifier()+") <> sha256(?)", q.Value)
 	case bytesCompareMax:
 		return nil
 	}
-
 	return nil
 }
 
@@ -674,6 +747,9 @@ type TimestampQuery struct {
 }
 
 func NewTimestampQuery(c Column, value time.Time, compare TimestampComparison) (*TimestampQuery, error) {
+	if c.isZero() {
+		return nil, ErrMissingColumn
+	}
 	return &TimestampQuery{
 		Column:  c,
 		Compare: compare,

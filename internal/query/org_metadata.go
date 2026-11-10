@@ -10,7 +10,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
+	domain_pkg "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -90,7 +90,7 @@ func (q *Queries) GetOrgMetadataByKey(ctx context.Context, shouldTriggerBulk boo
 		traceSpan.EndWithError(err)
 	}
 
-	query, scan := prepareOrgMetadataQuery(ctx, q.client)
+	query, scan := prepareOrgMetadataQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -104,7 +104,7 @@ func (q *Queries) GetOrgMetadataByKey(ctx context.Context, shouldTriggerBulk boo
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-aDaG2", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-aDaG2", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -114,7 +114,7 @@ func (q *Queries) GetOrgMetadataByKey(ctx context.Context, shouldTriggerBulk boo
 	return metadata, err
 }
 
-func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool, orgID string, queries *OrgMetadataSearchQueries, withOwnerRemoved bool) (metadata *OrgMetadataList, err error) {
+func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool, orgID string, queries *OrgMetadataSearchQueries, withOwnerRemoved, withPermissionCheck bool) (metadata *OrgMetadataList, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -131,10 +131,15 @@ func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool,
 	if !withOwnerRemoved {
 		eq[OrgMetadataOwnerRemovedCol.identifier()] = false
 	}
-	query, scan := prepareOrgMetadataListQuery(ctx, q.client)
+	query, scan := prepareOrgMetadataListQuery()
+	if withPermissionCheck {
+		// We always use the permission v2 check and don't check the feature flag, since it's stable enough to work
+		// in this case and using the old checks only adds more latency, but no benefit.
+		query = orgMetadataPermissionCheckV2(ctx, query, queries)
+	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-Egbld", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Egbld", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -174,7 +179,7 @@ func NewOrgMetadataKeySearchQuery(value string, comparison TextComparison) (Sear
 	return NewTextQuery(OrgMetadataKeyCol, value, comparison)
 }
 
-func prepareOrgMetadataQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*OrgMetadata, error)) {
+func prepareOrgMetadataQuery() (sq.SelectBuilder, func(*sql.Row) (*OrgMetadata, error)) {
 	return sq.Select(
 			OrgMetadataCreationDateCol.identifier(),
 			OrgMetadataChangeDateCol.identifier(),
@@ -183,7 +188,7 @@ func prepareOrgMetadataQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			OrgMetadataKeyCol.identifier(),
 			OrgMetadataValueCol.identifier(),
 		).
-			From(orgMetadataTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(orgMetadataTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*OrgMetadata, error) {
 			m := new(OrgMetadata)
@@ -195,7 +200,6 @@ func prepareOrgMetadataQuery(ctx context.Context, db prepareDatabase) (sq.Select
 				&m.Key,
 				&m.Value,
 			)
-
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
 					return nil, zerrors.ThrowNotFound(err, "QUERY-Rph32", "Errors.Metadata.NotFound")
@@ -206,7 +210,7 @@ func prepareOrgMetadataQuery(ctx context.Context, db prepareDatabase) (sq.Select
 		}
 }
 
-func prepareOrgMetadataListQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*OrgMetadataList, error)) {
+func prepareOrgMetadataListQuery() (sq.SelectBuilder, func(*sql.Rows) (*OrgMetadataList, error)) {
 	return sq.Select(
 			OrgMetadataCreationDateCol.identifier(),
 			OrgMetadataChangeDateCol.identifier(),
@@ -215,7 +219,7 @@ func prepareOrgMetadataListQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			OrgMetadataKeyCol.identifier(),
 			OrgMetadataValueCol.identifier(),
 			countColumn.identifier()).
-			From(orgMetadataTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(orgMetadataTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*OrgMetadataList, error) {
 			metadata := make([]*OrgMetadata, 0)
@@ -249,4 +253,14 @@ func prepareOrgMetadataListQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				},
 			}, nil
 		}
+}
+
+func orgMetadataPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, queries *OrgMetadataSearchQueries) sq.SelectBuilder {
+	join, args := PermissionClause(
+		ctx,
+		OrgMetadataOrgIDCol,
+		domain_pkg.PermissionOrgRead,
+		SingleOrgPermissionOption(queries.Queries),
+	)
+	return query.JoinClause(join, args...)
 }

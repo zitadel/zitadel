@@ -26,8 +26,7 @@ var (
 		` COUNT(*) OVER ()` +
 		` FROM projections.keys4` +
 		` LEFT JOIN projections.keys4_certificate ON projections.keys4.id = projections.keys4_certificate.id AND projections.keys4.instance_id = projections.keys4_certificate.instance_id` +
-		` LEFT JOIN projections.keys4_private ON projections.keys4.id = projections.keys4_private.id AND projections.keys4.instance_id = projections.keys4_private.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` LEFT JOIN projections.keys4_private ON projections.keys4.id = projections.keys4_private.id AND projections.keys4.instance_id = projections.keys4_private.instance_id`
 	prepareCertificateCols = []string{
 		"id",
 		"creation_date",
@@ -142,7 +141,7 @@ func Test_CertificatePrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

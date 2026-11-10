@@ -2,6 +2,7 @@ package key
 
 import (
 	"io"
+	"log/slog"
 	"os"
 	"strings"
 
@@ -40,11 +41,17 @@ func newKey() *cobra.Command {
 		Long: `create new encryption key(s) (encrypted by the provided master key)
 provide key(s) by YAML file and/or by argument
 Requirements:
-- cockroachdb`,
+- postgreSQL`,
 		Example: `new -f keys.yaml
 new key1=somekey key2=anotherkey
 new -f keys.yaml key2=anotherkey`,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			defer func() {
+				if err != nil {
+					slog.Error("zitadel keys new command failed", "err", err)
+				}
+			}()
+
 			keys, err := keysFromArgs(args)
 			if err != nil {
 				return err

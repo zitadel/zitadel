@@ -11,12 +11,12 @@ on:
         type: boolean
     outputs:
         version:
-            value: ${{ jobs.generate.outputs.version }}
+            value: ${{ jobs.semantic.outputs.version }}
         published:
-            value: ${{jobs.generate.outputs.published }}
+            value: ${{jobs.semantic.outputs.published }}
 
 jobs:
-  generate:
+  semantic:
     runs-on: ubuntu-22.04
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -25,15 +25,17 @@ jobs:
       published: ${{ steps.semantic.outputs.new_release_published }}
     steps:
     -
-      name: Source checkout
+      name: Checkout Repository
       uses: actions/checkout@v4
     -
+      name: Download Artifacts
       uses: actions/download-artifact@v4
       if: ${{ !inputs.dry_run }}
       with:
-        path: .artifacts
+        name: zitadel-archives
+        path: .artifacts/pack
     -
-      name: Semantic Release
+      name: Run Semantic Release
       uses: cycjimmy/semantic-release-action@v4
       id: semantic
       env:
@@ -45,7 +47,7 @@ jobs:
           @semantic-release/exec@6.0.3
           @semantic-release/github@10.0.2
     -
-      name: output
+      name: Output Version For Dependent Workflows
       id: output
       run:
         if [[ ! -z "${{ steps.semantic.outputs.new_release_version }}" ]]; then echo "VERSION=v${{ steps.semantic.outputs.new_release_version }}" >> "$GITHUB_OUTPUT"; else echo "VERSION=${{ github.sha }}" >> "$GITHUB_OUTPUT";fi

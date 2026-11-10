@@ -14,6 +14,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -24,6 +25,7 @@ import (
 
 var (
 	creationDate = time.Date(2023, 10, 10, 14, 15, 0, 0, time.UTC)
+	expiration   = creationDate.Add(90 * time.Second)
 )
 
 func Test_sessionsToPb(t *testing.T) {
@@ -126,6 +128,26 @@ func Test_sessionsToPb(t *testing.T) {
 			},
 			Metadata: map[string][]byte{"hello": []byte("world")},
 		},
+		{ // recovery code factor
+			ID:            "999",
+			CreationDate:  now,
+			ChangeDate:    now,
+			Sequence:      123,
+			State:         domain.SessionStateActive,
+			ResourceOwner: "me",
+			Creator:       "he",
+			UserFactor: query.SessionUserFactor{
+				UserID:        "345",
+				UserCheckedAt: past,
+				LoginName:     "donald",
+				DisplayName:   "donald duck",
+				ResourceOwner: "org1",
+			},
+			RecoveryCodeFactor: query.SessionRecoveryCodeFactor{
+				RecoveryCodeCheckedAt: past,
+			},
+			Metadata: map[string][]byte{"hello": []byte("world")},
+		},
 	}
 
 	want := []*session.Session{
@@ -215,6 +237,25 @@ func Test_sessionsToPb(t *testing.T) {
 					OrganizationId: "org1",
 				},
 				Totp: &session.TOTPFactor{
+					VerifiedAt: timestamppb.New(past),
+				},
+			},
+			Metadata: map[string][]byte{"hello": []byte("world")},
+		},
+		{ // recovery code factor
+			Id:           "999",
+			CreationDate: timestamppb.New(now),
+			ChangeDate:   timestamppb.New(now),
+			Sequence:     123,
+			Factors: &session.Factors{
+				User: &session.UserFactor{
+					VerifiedAt:     timestamppb.New(past),
+					Id:             "345",
+					LoginName:      "donald",
+					DisplayName:    "donald duck",
+					OrganizationId: "org1",
+				},
+				RecoveryCode: &session.RecoveryCodeFactor{
 					VerifiedAt: timestamppb.New(past),
 				},
 			},
@@ -315,7 +356,23 @@ func mustNewTimestampQuery(t testing.TB, column query.Column, ts time.Time, comp
 	return q
 }
 
+func mustNewIsNullQuery(t testing.TB, column query.Column) query.SearchQuery {
+	q, err := query.NewIsNullQuery(column)
+	require.NoError(t, err)
+	return q
+}
+
+func mustNewOrQuery(t testing.TB, queries ...query.SearchQuery) query.SearchQuery {
+	q, err := query.NewOrQuery(queries...)
+	require.NoError(t, err)
+	return q
+}
+
 func Test_listSessionsRequestToQuery(t *testing.T) {
+	queryDefaults := systemdefaults.SystemDefaults{
+		DefaultQueryLimit: 100,
+		MaxQueryLimit:     1000,
+	}
 	type args struct {
 		ctx context.Context
 		req *session.ListSessionsRequest
@@ -335,9 +392,10 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 			},
 			want: &query.SessionsSearchQueries{
 				SearchRequest: query.SearchRequest{
-					Offset: 0,
-					Limit:  0,
-					Asc:    false,
+					Offset:        0,
+					Limit:         100,
+					Asc:           false,
+					SortingColumn: query.SessionColumnID,
 				},
 				Queries: []query.SearchQuery{},
 			},
@@ -353,7 +411,7 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 			want: &query.SessionsSearchQueries{
 				SearchRequest: query.SearchRequest{
 					Offset:        0,
-					Limit:         0,
+					Limit:         100,
 					SortingColumn: query.SessionColumnCreationDate,
 					Asc:           false,
 				},
@@ -398,14 +456,21 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 						{Query: &session.SearchQuery_UserAgentQuery{
 							UserAgentQuery: &session.UserAgentQuery{},
 						}},
+						{Query: &session.SearchQuery_ExpirationDateQuery{
+							ExpirationDateQuery: &session.ExpirationDateQuery{
+								ExpirationDate: timestamppb.New(expiration),
+								Method:         objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_LESS_OR_EQUALS,
+							},
+						}},
 					},
 				},
 			},
 			want: &query.SessionsSearchQueries{
 				SearchRequest: query.SearchRequest{
-					Offset: 10,
-					Limit:  20,
-					Asc:    true,
+					Offset:        10,
+					Limit:         20,
+					Asc:           true,
+					SortingColumn: query.SessionColumnID,
 				},
 				Queries: []query.SearchQuery{
 					mustNewListQuery(t, query.SessionColumnID, []interface{}{"1", "2", "3"}, query.ListIn),
@@ -414,8 +479,21 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 					mustNewTimestampQuery(t, query.SessionColumnCreationDate, creationDate, query.TimestampGreater),
 					mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
 					mustNewTextQuery(t, query.SessionColumnUserAgentFingerprintID, "agent", query.TextEquals),
+					mustNewTimestampQuery(t, query.SessionColumnExpiration, expiration, query.TimestampLessOrEquals),
 				},
 			},
+		},
+		{
+			name: "limit exceeds max",
+			args: args{
+				ctx: authz.NewMockContext("123", "456", "789"),
+				req: &session.ListSessionsRequest{
+					Query: &object.ListQuery{
+						Limit: 1001,
+					},
+				},
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "QUERY-4M0fs", "Errors.Query.LimitExceeded"),
 		},
 		{
 			name: "invalid argument error",
@@ -442,7 +520,7 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := listSessionsRequestToQuery(tt.args.ctx, tt.args.req)
+			got, err := listSessionsRequestToQuery(tt.args.ctx, queryDefaults, tt.args.req)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
 		})
@@ -673,6 +751,91 @@ func Test_sessionQueryToQuery(t *testing.T) {
 					},
 				}},
 			want: mustNewTextQuery(t, query.SessionColumnUserAgentFingerprintID, "agent2", query.TextEquals),
+		},
+		{
+			name: "expiration date query with default method",
+			args: args{
+				context.Background(),
+				&session.SearchQuery{
+					Query: &session.SearchQuery_ExpirationDateQuery{
+						ExpirationDateQuery: &session.ExpirationDateQuery{
+							ExpirationDate: timestamppb.New(expiration),
+						},
+					},
+				}},
+			want: mustNewTimestampQuery(t, query.SessionColumnExpiration, expiration, query.TimestampEquals),
+		},
+		{
+			name: "expiration date query with comparison method equals",
+			args: args{
+				context.Background(),
+				&session.SearchQuery{
+					Query: &session.SearchQuery_ExpirationDateQuery{
+						ExpirationDateQuery: &session.ExpirationDateQuery{
+							ExpirationDate: timestamppb.New(expiration),
+							Method:         objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_EQUALS,
+						},
+					},
+				}},
+			want: mustNewTimestampQuery(t, query.SessionColumnExpiration, expiration, query.TimestampEquals),
+		},
+		{
+			name: "expiration date query with comparison method less",
+			args: args{
+				context.Background(),
+				&session.SearchQuery{
+					Query: &session.SearchQuery_ExpirationDateQuery{
+						ExpirationDateQuery: &session.ExpirationDateQuery{
+							ExpirationDate: timestamppb.New(expiration),
+							Method:         objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_LESS,
+						},
+					},
+				}},
+			want: mustNewTimestampQuery(t, query.SessionColumnExpiration, expiration, query.TimestampLess),
+		},
+		{
+			name: "expiration date query with comparison method less or equals",
+			args: args{
+				context.Background(),
+				&session.SearchQuery{
+					Query: &session.SearchQuery_ExpirationDateQuery{
+						ExpirationDateQuery: &session.ExpirationDateQuery{
+							ExpirationDate: timestamppb.New(expiration),
+							Method:         objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_LESS_OR_EQUALS,
+						},
+					},
+				}},
+			want: mustNewTimestampQuery(t, query.SessionColumnExpiration, expiration, query.TimestampLessOrEquals),
+		},
+		{
+			name: "expiration date query with with comparison method greater",
+			args: args{
+				context.Background(),
+				&session.SearchQuery{
+					Query: &session.SearchQuery_ExpirationDateQuery{
+						ExpirationDateQuery: &session.ExpirationDateQuery{
+							ExpirationDate: timestamppb.New(expiration),
+							Method:         objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_GREATER,
+						},
+					},
+				}},
+			want: mustNewOrQuery(t, mustNewTimestampQuery(t, query.SessionColumnExpiration, expiration, query.TimestampGreater),
+				mustNewIsNullQuery(t, query.SessionColumnExpiration)),
+		},
+		{
+			name: "expiration date query with with comparison method greater or equals",
+			args: args{
+				context.Background(),
+				&session.SearchQuery{
+					Query: &session.SearchQuery_ExpirationDateQuery{
+						ExpirationDateQuery: &session.ExpirationDateQuery{
+							ExpirationDate: timestamppb.New(expiration),
+							Method:         objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_GREATER_OR_EQUALS,
+						},
+					},
+				}},
+			want: mustNewOrQuery(t, mustNewTimestampQuery(t, query.SessionColumnExpiration, expiration, query.TimestampGreaterOrEquals),
+				mustNewIsNullQuery(t, query.SessionColumnExpiration)),
 		},
 	}
 	for _, tt := range tests {

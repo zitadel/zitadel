@@ -1,8 +1,8 @@
 import { KeyValue } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, Input, OnInit } from '@angular/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
-import { catchError, debounceTime, scan, take, takeUntil, tap } from 'rxjs/operators';
+import { BehaviorSubject, from, Observable, of } from 'rxjs';
+import { catchError, debounceTime, scan, take, tap } from 'rxjs/operators';
 import { ListMyUserChangesResponse } from 'src/app/proto/generated/zitadel/auth_pb';
 import { Change } from 'src/app/proto/generated/zitadel/change_pb';
 import {
@@ -13,6 +13,7 @@ import {
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export enum ChangeType {
   MYUSER = 'myuser',
@@ -45,17 +46,19 @@ type ListChanges =
   | ListOrgChangesResponse.AsObject
   | ListAppChangesResponse.AsObject;
 
+// todo: update this component to react to input changes
 @Component({
   selector: 'cnsl-changes',
   templateUrl: './changes.component.html',
   styleUrls: ['./changes.component.scss'],
+  standalone: false,
 })
-export class ChangesComponent implements OnInit, OnDestroy {
-  @Input() public changeType: ChangeType = ChangeType.USER;
+export class ChangesComponent implements OnInit {
+  @Input({ required: true }) public changeType!: ChangeType;
   @Input() public id: string = '';
   @Input() public secId: string = '';
   @Input() public sortDirectionAsc: boolean = true;
-  @Input() public refresh!: Observable<void>;
+  @Input() public refresh?: Observable<void>;
   public bottom: boolean = false;
 
   private _done: BehaviorSubject<any> = new BehaviorSubject(false);
@@ -65,28 +68,24 @@ export class ChangesComponent implements OnInit, OnDestroy {
   loading: Observable<boolean> = this._loading.asObservable();
   public data: Observable<MappedChange[]> = this._data.asObservable().pipe(
     scan((acc, val) => {
-      return false ? val.concat(acc) : acc.concat(val);
+      return acc.concat(val);
     }),
   );
   public changes!: ListChanges;
-  private destroyed$: Subject<void> = new Subject();
   constructor(
-    private mgmtUserService: ManagementService,
-    private authUserService: GrpcAuthService,
+    private readonly mgmtUserService: ManagementService,
+    private readonly authUserService: GrpcAuthService,
+    private readonly destroyRef: DestroyRef,
   ) {}
 
   ngOnInit(): void {
     this.init();
     if (this.refresh) {
-      this.refresh.pipe(takeUntil(this.destroyed$), debounceTime(2000)).subscribe(() => {
+      this.refresh.pipe(takeUntilDestroyed(this.destroyRef), debounceTime(2000)).subscribe(() => {
         this._data = new BehaviorSubject([]);
         this.init();
       });
     }
-  }
-
-  ngOnDestroy(): void {
-    this.destroyed$.next();
   }
 
   public init(): void {
@@ -270,7 +269,6 @@ export class ChangesComponent implements OnInit, OnDestroy {
   }
 
   // Order by ascending property value
-  /* eslint-disable */
   valueAscOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
     return a.value.localeCompare(b.value);
   };
@@ -279,5 +277,4 @@ export class ChangesComponent implements OnInit, OnDestroy {
   keyDescOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
     return a.key > b.key ? -1 : b.key > a.key ? 1 : 0;
   };
-  /* eslint-enable */
 }

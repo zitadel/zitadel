@@ -145,8 +145,9 @@ func TestSessionCommands_getHumanWriteModel(t *testing.T) {
 
 func TestCommands_CreateSession(t *testing.T) {
 	type fields struct {
-		idGenerator  id.Generator
-		tokenCreator func(sessionID string) (string, string, error)
+		idGenerator     id.Generator
+		tokenCreator    func(sessionID string) (string, string, error)
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx       context.Context
@@ -195,6 +196,22 @@ func TestCommands_CreateSession(t *testing.T) {
 			},
 		},
 		{
+			"missing permission",
+			fields{
+				idGenerator:     mock.NewIDGeneratorExpectIDs(t, "sessionID"),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args{
+				ctx: context.Background(),
+			},
+			[]expect{
+				expectFilter(),
+			},
+			res{
+				err: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			},
+		},
+		{
 			"negative lifetime",
 			fields{
 				idGenerator: mock.NewIDGeneratorExpectIDs(t, "sessionID"),
@@ -203,6 +220,7 @@ func TestCommands_CreateSession(t *testing.T) {
 						"token",
 						nil
 				},
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx: authz.NewMockContext("instance1", "", ""),
@@ -230,6 +248,7 @@ func TestCommands_CreateSession(t *testing.T) {
 						"token",
 						nil
 				},
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx: authz.NewMockContext("instance1", "", ""),
@@ -275,6 +294,7 @@ func TestCommands_CreateSession(t *testing.T) {
 				eventstore:          expectEventstore(tt.expect...)(t),
 				idGenerator:         tt.fields.idGenerator,
 				sessionTokenCreator: tt.fields.tokenCreator,
+				checkPermission:     tt.fields.checkPermission,
 			}
 			got, err := c.CreateSession(tt.args.ctx, tt.args.checks, tt.args.metadata, tt.args.userAgent, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)
@@ -285,8 +305,8 @@ func TestCommands_CreateSession(t *testing.T) {
 
 func TestCommands_UpdateSession(t *testing.T) {
 	type fields struct {
-		eventstore    func(*testing.T) *eventstore.Eventstore
-		tokenVerifier func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
+		eventstore      func(*testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx       context.Context
@@ -320,6 +340,36 @@ func TestCommands_UpdateSession(t *testing.T) {
 			},
 		},
 		{
+			"no token, no permission",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(context.Background(),
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
+						eventFromEventPusher(
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"tokenID")),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args{
+				ctx:       context.Background(),
+				sessionID: "sessionID",
+			},
+			res{
+				err: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			},
+		},
+		{
 			"no change",
 			fields{
 				eventstore: expectEventstore(
@@ -339,9 +389,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 								"tokenID")),
 					),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return nil
-				},
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx:       context.Background(),
@@ -362,8 +410,8 @@ func TestCommands_UpdateSession(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:           tt.fields.eventstore(t),
-				sessionTokenVerifier: tt.fields.tokenVerifier,
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := c.UpdateSession(tt.args.ctx, tt.args.sessionID, tt.args.checks, tt.args.metadata, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)
@@ -373,15 +421,14 @@ func TestCommands_UpdateSession(t *testing.T) {
 }
 
 func TestCommands_updateSession(t *testing.T) {
-	decryption := func(err error) crypto.EncryptionAlgorithm {
-		mCrypto := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
-		mCrypto.EXPECT().EncryptionKeyID().Return("id")
-		mCrypto.EXPECT().DecryptString(gomock.Any(), gomock.Any()).DoAndReturn(
-			func(code []byte, keyID string) (string, error) {
+	decryption := func(err error) crypto.AuthEncryptionAlgorithm {
+		mCrypto := crypto.NewMockAuthEncryptionAlgorithm(gomock.NewController(t))
+		mCrypto.EXPECT().DecryptToken(gomock.Any()).DoAndReturn(
+			func(token string) (string, error) {
 				if err != nil {
 					return "", err
 				}
-				return string(code), nil
+				return token, nil
 			})
 		return mCrypto
 	}
@@ -657,7 +704,7 @@ func TestCommands_updateSession(t *testing.T) {
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
 						CheckUser("userID", "org1", &language.Afrikaans),
-						CheckIntent("intent", "aW50ZW50"),
+						CheckIntent("intent", "intent"),
 					},
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
@@ -694,7 +741,9 @@ func TestCommands_updateSession(t *testing.T) {
 								"idpUserName",
 								"userID2",
 								nil,
+								nil,
 								"",
+								time.Now().Add(time.Hour),
 							),
 						),
 					),
@@ -706,7 +755,7 @@ func TestCommands_updateSession(t *testing.T) {
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
 						CheckUser("userID", "org1", &language.Afrikaans),
-						CheckIntent("intent", "aW50ZW50"),
+						CheckIntent("intent", "intent"),
 					},
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
@@ -758,6 +807,113 @@ func TestCommands_updateSession(t *testing.T) {
 			},
 		},
 		{
+			"set user, intent token already consumed",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+								"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
+						),
+						eventFromEventPusher(
+							idpintent.NewSucceededEvent(context.Background(),
+								&idpintent.NewAggregate("intent", "instance1").Aggregate,
+								nil,
+								"idpUserID",
+								"idpUsername",
+								"userID",
+								nil,
+								nil,
+								"",
+								time.Now().Add(time.Hour),
+							),
+						),
+						eventFromEventPusher(
+							idpintent.NewConsumedEvent(context.Background(),
+								&idpintent.NewAggregate("intent", "instance1").Aggregate,
+							),
+						),
+					),
+				),
+			},
+			args{
+				ctx: authz.NewMockContext("instance1", "", ""),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
+					sessionCommands: []SessionCommand{
+						CheckUser("userID", "org1", &language.Afrikaans),
+						CheckIntent("intent", "intent"),
+					},
+					createToken: func(sessionID string) (string, string, error) {
+						return "tokenID",
+							"token",
+							nil
+					},
+					intentAlg: decryption(nil),
+					now: func() time.Time {
+						return testNow
+					},
+				},
+				metadata: map[string][]byte{
+					"key": []byte("value"),
+				},
+			},
+			res{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Df4bw", "Errors.Intent.NotSucceeded"),
+			},
+		},
+		{
+			"set user, intent token already expired",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+								"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
+						),
+						eventFromEventPusher(
+							idpintent.NewSucceededEvent(context.Background(),
+								&idpintent.NewAggregate("intent", "instance1").Aggregate,
+								nil,
+								"idpUserID",
+								"idpUsername",
+								"userID",
+								nil,
+								nil,
+								"",
+								time.Now().Add(-time.Hour),
+							),
+						),
+					),
+				),
+			},
+			args{
+				ctx: authz.NewMockContext("instance1", "", ""),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
+					sessionCommands: []SessionCommand{
+						CheckUser("userID", "org1", &language.Afrikaans),
+						CheckIntent("intent", "intent"),
+					},
+					createToken: func(sessionID string) (string, string, error) {
+						return "tokenID",
+							"token",
+							nil
+					},
+					intentAlg: decryption(nil),
+					now: func() time.Time {
+						return testNow
+					},
+				},
+				metadata: map[string][]byte{
+					"key": []byte("value"),
+				},
+			},
+			res{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SAf42", "Errors.Intent.Expired"),
+			},
+		},
+		{
 			"set user, intent, metadata and token",
 			fields{
 				eventstore: expectEventstore(
@@ -768,13 +924,15 @@ func TestCommands_updateSession(t *testing.T) {
 						),
 						eventFromEventPusher(
 							idpintent.NewSucceededEvent(context.Background(),
-								&idpintent.NewAggregate("id", "instance1").Aggregate,
+								&idpintent.NewAggregate("intent", "instance1").Aggregate,
 								nil,
 								"idpUserID",
 								"idpUsername",
 								"userID",
 								nil,
+								nil,
 								"",
+								time.Now().Add(time.Hour),
 							),
 						),
 					),
@@ -783,6 +941,7 @@ func TestCommands_updateSession(t *testing.T) {
 							"userID", "org1", testNow, &language.Afrikaans),
 						session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							testNow),
+						idpintent.NewConsumedEvent(context.Background(), &idpintent.NewAggregate("intent", "org1").Aggregate),
 						session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							map[string][]byte{"key": []byte("value")}),
 						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
@@ -796,7 +955,7 @@ func TestCommands_updateSession(t *testing.T) {
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
 						CheckUser("userID", "org1", &language.Afrikaans),
-						CheckIntent("intent", "aW50ZW50"),
+						CheckIntent("intent", "intent"),
 					},
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
@@ -828,26 +987,26 @@ func TestCommands_updateSession(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
-								"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
-						),
-						eventFromEventPusher(
 							idpintent.NewStartedEvent(context.Background(),
 								&idpintent.NewAggregate("id", "instance1").Aggregate,
 								nil,
 								nil,
 								"idpID",
+								"",
+								nil,
 							),
 						),
 						eventFromEventPusher(
 							idpintent.NewSucceededEvent(context.Background(),
-								&idpintent.NewAggregate("id", "instance1").Aggregate,
+								&idpintent.NewAggregate("intent", "instance1").Aggregate,
 								nil,
 								"idpUserID",
 								"idpUsername",
 								"",
 								nil,
+								nil,
 								"",
+								time.Now().Add(time.Hour),
 							),
 						),
 					),
@@ -865,6 +1024,7 @@ func TestCommands_updateSession(t *testing.T) {
 							"userID", "org1", testNow, &language.Afrikaans),
 						session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							testNow),
+						idpintent.NewConsumedEvent(context.Background(), &idpintent.NewAggregate("intent", "instance1").Aggregate),
 						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							"tokenID"),
 					),
@@ -876,7 +1036,7 @@ func TestCommands_updateSession(t *testing.T) {
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
 						CheckUser("userID", "org1", &language.Afrikaans),
-						CheckIntent("intent", "aW50ZW50"),
+						CheckIntent("intent", "intent"),
 					},
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
@@ -913,6 +1073,23 @@ func TestCommands_updateSession(t *testing.T) {
 	}
 }
 
+// assertTOTPCodeHash asserts that every [user.HumanOTPCheckSucceededEvent] in
+// cmds carries a hash of code and clears it afterwards. The hash is salted with
+// a random value, so it cannot be compared against a precomputed expectation.
+func assertTOTPCodeHash(t *testing.T, cmds []eventstore.Command, code string) {
+	t.Helper()
+	for _, cmd := range cmds {
+		event, ok := cmd.(*user.HumanOTPCheckSucceededEvent)
+		if !ok {
+			continue
+		}
+		if assert.NotNil(t, event.CodeHash, "the OTP check succeeded event must carry a code hash") {
+			assert.True(t, event.CodeHash.Equal(code), "the code hash must match the checked code")
+		}
+		event.CodeHash = nil
+	}
+}
+
 func TestCheckTOTP(t *testing.T) {
 	ctx := authz.NewMockContext("instance1", "org1", "user1")
 
@@ -929,9 +1106,13 @@ func TestCheckTOTP(t *testing.T) {
 	code, err := totp.GenerateCode(key.Secret(), testNow)
 	require.NoError(t, err)
 
+	// hash of a code which is guaranteed to be different from the checked code.
+	otherCodeHash := crypto.NewHMACValue(code + "0")
+
 	type fields struct {
 		sessionWriteModel *SessionWriteModel
 		eventstore        func(*testing.T) *eventstore.Eventstore
+		tarpit            Tarpit
 	}
 
 	tests := []struct {
@@ -950,6 +1131,7 @@ func TestCheckTOTP(t *testing.T) {
 					aggregate: sessAgg,
 				},
 				eventstore: expectEventstore(),
+				tarpit:     expectTarpit(0),
 			},
 			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing"),
 		},
@@ -965,6 +1147,7 @@ func TestCheckTOTP(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilterError(io.ErrClosedPipe),
 				),
+				tarpit: expectTarpit(0),
 			},
 			wantErr: io.ErrClosedPipe,
 		},
@@ -984,6 +1167,7 @@ func TestCheckTOTP(t *testing.T) {
 						),
 					),
 				),
+				tarpit: expectTarpit(0),
 			},
 			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotReady"),
 		},
@@ -1010,6 +1194,7 @@ func TestCheckTOTP(t *testing.T) {
 						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 0, 0, false)),
 					),
 				),
+				tarpit: expectTarpit(1),
 			},
 			wantErrorCommands: []eventstore.Command{
 				user.NewHumanOTPCheckFailedEvent(ctx, userAgg, nil),
@@ -1039,6 +1224,7 @@ func TestCheckTOTP(t *testing.T) {
 						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 1, 1, false)),
 					),
 				),
+				tarpit: expectTarpit(1),
 			},
 			wantErrorCommands: []eventstore.Command{
 				user.NewHumanOTPCheckFailedEvent(ctx, userAgg, nil),
@@ -1066,11 +1252,140 @@ func TestCheckTOTP(t *testing.T) {
 					),
 					expectFilter(), // recheck
 				),
+				tarpit: expectTarpit(0),
 			},
 			wantEventCommands: []eventstore.Command{
-				user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil),
+				// The code hash is salted randomly and therefore not predictable.
+				// It is asserted separately by assertTOTPCodeHash.
+				user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, nil),
 				session.NewTOTPCheckedEvent(ctx, sessAgg, testNow),
 			},
+		},
+		{
+			name: "ok, previous check with a different code",
+			code: code,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:        "user1",
+					UserCheckedAt: testNow,
+					aggregate:     sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
+						),
+						eventFromEventPusher(
+							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, otherCodeHash),
+						),
+					),
+					expectFilter(), // recheck
+				),
+				tarpit: expectTarpit(0),
+			},
+			wantEventCommands: []eventstore.Command{
+				// The code hash is salted randomly and therefore not predictable.
+				// It is asserted separately by assertTOTPCodeHash.
+				user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, nil),
+				session.NewTOTPCheckedEvent(ctx, sessAgg, testNow),
+			},
+		},
+		{
+			name: "ok, previous check of the same code outside of the reuse window",
+			code: code,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:        "user1",
+					UserCheckedAt: testNow,
+					aggregate:     sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
+						),
+						eventFromEventPusher(
+							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
+						),
+						eventFromEventPusherWithCreationDate(
+							user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, crypto.NewHMACValue(code)),
+							time.Now().Add(-2*time.Minute),
+						),
+					),
+					expectFilter(), // recheck
+				),
+				tarpit: expectTarpit(0),
+			},
+			wantEventCommands: []eventstore.Command{
+				// The code hash is salted randomly and therefore not predictable.
+				// It is asserted separately by assertTOTPCodeHash.
+				user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, nil),
+				session.NewTOTPCheckedEvent(ctx, sessAgg, testNow),
+			},
+		},
+		{
+			name: "code reuse error",
+			code: code,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:        "user1",
+					UserCheckedAt: testNow,
+					aggregate:     sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
+						),
+						eventFromEventPusher(
+							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, crypto.NewHMACValue(code)),
+						),
+					),
+					expectFilter(), // recheck
+				),
+				tarpit: expectTarpit(0),
+			},
+			wantErrorCommands: []eventstore.Command{
+				user.NewHumanOTPCheckReusedEvent(ctx, userAgg, nil),
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "TOTP-Auw0a", "Errors.User.MFA.OTP.Reused"),
+		},
+		{
+			name: "code reuse error, used in the meantime",
+			code: code,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:        "user1",
+					UserCheckedAt: testNow,
+					aggregate:     sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
+						),
+						eventFromEventPusher(
+							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
+						),
+					),
+					expectFilter( // recheck
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil, crypto.NewHMACValue(code)),
+						),
+					),
+				),
+				tarpit: expectTarpit(0),
+			},
+			wantErrorCommands: []eventstore.Command{
+				user.NewHumanOTPCheckReusedEvent(ctx, userAgg, nil),
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "TOTP-Auw0a", "Errors.User.MFA.OTP.Reused"),
 		},
 		{
 			name: "ok, but locked in the meantime",
@@ -1094,6 +1409,7 @@ func TestCheckTOTP(t *testing.T) {
 						user.NewUserLockedEvent(ctx, userAgg),
 					),
 				),
+				tarpit: expectTarpit(0),
 			},
 			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SF3fg", "Errors.User.Locked"),
 		},
@@ -1105,8 +1421,200 @@ func TestCheckTOTP(t *testing.T) {
 				eventstore:        tt.fields.eventstore(t),
 				totpAlg:           cryptoAlg,
 				now:               func() time.Time { return testNow },
+				tarpit:            tt.fields.tarpit.tarpit,
 			}
 			gotCmds, err := CheckTOTP(tt.code)(ctx, cmd)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantErrorCommands, gotCmds)
+			assertTOTPCodeHash(t, cmd.eventCommands, tt.code)
+			assert.Equal(t, tt.wantEventCommands, cmd.eventCommands)
+			tt.fields.tarpit.metExpectedCalls(t)
+		})
+	}
+}
+
+func TestCheckRecoveryCode(t *testing.T) {
+	ctx := authz.NewMockContext("instance1", "org1", "user1")
+
+	sessAgg := &session.NewAggregate("session1", "instance1").Aggregate
+	userAgg := &user.NewAggregate("user1", "org1").Aggregate
+	orgAgg := &org.NewAggregate("org1").Aggregate
+
+	hasher := mockPasswordHasher("x")
+	hashedCodes, rawCodes, err := domain.GenerateRecoveryCodes(ctx, 1, domain.RecoveryCodesConfig{
+		Format:   domain.RecoveryCodeFormatUUID,
+		MaxCount: 10,
+		Length:   10,
+	}, hasher)
+	require.NoError(t, err)
+	validCode := rawCodes[0]
+	invalidCode := "invalid-code"
+
+	type fields struct {
+		sessionWriteModel *SessionWriteModel
+		eventstore        func(*testing.T) *eventstore.Eventstore
+		hasher            *crypto.Hasher
+	}
+
+	tests := []struct {
+		name              string
+		code              string
+		fields            fields
+		wantEventCommands []eventstore.Command
+		wantErrorCommands []eventstore.Command
+		wantErr           error
+	}{
+		{
+			name: "missing userID",
+			code: validCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(),
+				hasher:     hasher,
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-4m9s2", "Errors.User.UserIDMissing"),
+		},
+		{
+			name: "filter error",
+			code: validCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:    "user1",
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilterError(io.ErrClosedPipe),
+				),
+				hasher: hasher,
+			},
+			wantErr: io.ErrClosedPipe,
+		},
+		{
+			name: "recovery codes not ready",
+			code: validCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:    "user1",
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(), // No codes added
+				),
+				hasher: hasher,
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-84rgg", "Errors.User.MFA.RecoveryCodes.NotReady"),
+		},
+		{
+			name: "invalid code",
+			code: invalidCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:    "user1",
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, nil),
+						),
+					),
+					expectFilter(), // additional lock check
+					expectFilter(
+						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 0, 0, false)),
+					),
+				),
+				hasher: hasher,
+			},
+			wantErrorCommands: []eventstore.Command{
+				user.NewHumanRecoveryCodeCheckFailedEvent(ctx, userAgg, nil),
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-6uvh0", "Errors.User.MFA.RecoveryCodes.InvalidCode"),
+		},
+		{
+			name: "invalid code, locked",
+			code: invalidCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:    "user1",
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, nil),
+						),
+					),
+					expectFilter(), // additional lock check
+					expectFilter(
+						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 1, 1, false)),
+					),
+				),
+				hasher: hasher,
+			},
+			wantErrorCommands: []eventstore.Command{
+				user.NewHumanRecoveryCodeCheckFailedEvent(ctx, userAgg, nil),
+				user.NewUserLockedEvent(ctx, userAgg),
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-6uvh0", "Errors.User.MFA.RecoveryCodes.InvalidCode"),
+		},
+		{
+			name: "user locked",
+			code: validCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:    "user1",
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, nil),
+						),
+						eventFromEventPusher(
+							user.NewUserLockedEvent(ctx, userAgg),
+						),
+					),
+				),
+				hasher: hasher,
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-2w6oa", "Errors.User.Locked"),
+		},
+		{
+			name: "ok",
+			code: validCode,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:    "user1",
+					aggregate: sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, nil),
+						),
+					),
+					expectFilter(), // additional lock check
+				),
+				hasher: hasher,
+			},
+			wantEventCommands: []eventstore.Command{
+				user.NewHumanRecoveryCodeCheckSucceededEvent(ctx, userAgg, "$plain$x$"+validCode, nil),
+				session.NewRecoveryCodeCheckedEvent(ctx, sessAgg, testNow),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := &SessionCommands{
+				sessionWriteModel: tt.fields.sessionWriteModel,
+				eventstore:        tt.fields.eventstore(t),
+				hasher:            tt.fields.hasher,
+				now:               func() time.Time { return testNow },
+			}
+			gotCmds, err := CheckRecoveryCode(tt.code)(ctx, cmd)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.wantErrorCommands, gotCmds)
 			assert.Equal(t, tt.wantEventCommands, cmd.eventCommands)

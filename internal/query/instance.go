@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"slices"
-	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -16,10 +15,11 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -67,12 +67,12 @@ var (
 		name:  projection.InstanceColumnProjectID,
 		table: instanceTable,
 	}
-	InstanceColumnConsoleID = Column{
-		name:  projection.InstanceColumnConsoleID,
+	InstanceColumnManagementConsoleID = Column{
+		name:  projection.InstanceColumnManagementConsoleID,
 		table: instanceTable,
 	}
-	InstanceColumnConsoleAppID = Column{
-		name:  projection.InstanceColumnConsoleAppID,
+	InstanceColumnManagementConsoleAppID = Column{
+		name:  projection.InstanceColumnManagementConsoleAppID,
 		table: instanceTable,
 	}
 	InstanceColumnDefaultLanguage = Column{
@@ -100,12 +100,12 @@ type Instance struct {
 	Sequence     uint64
 	Name         string
 
-	DefaultOrgID string
-	IAMProjectID string
-	ConsoleID    string
-	ConsoleAppID string
-	DefaultLang  language.Tag
-	Domains      []*InstanceDomain
+	DefaultOrgID           string
+	IAMProjectID           string
+	ManagementConsoleID    string
+	ManagementConsoleAppID string
+	DefaultLang            language.Tag
+	Domains                []*InstanceDomain
 }
 
 type Instances struct {
@@ -151,7 +151,7 @@ func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQu
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	filter, query, scan := prepareInstancesQuery(ctx, q.client)
+	filter, query, scan := prepareInstancesQuery(queries.SortingColumn, queries.Asc)
 	stmt, args, err := query(queries.toQuery(filter)).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-M9fow", "Errors.Query.SQLStatement")
@@ -178,7 +178,7 @@ func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (instanc
 		traceSpan.EndWithError(err)
 	}
 
-	stmt, scan := prepareInstanceDomainQuery(ctx, q.client)
+	stmt, scan := prepareInstanceDomainQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		InstanceColumnID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
@@ -201,20 +201,17 @@ var (
 	instanceByIDQuery string
 )
 
-func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost string) (_ authz.Instance, err error) {
+func (q *Queries) InstanceByHost(ctx context.Context, instanceDomain, publicDomain string) (_ authz.Instance, err error) {
 	var instance *authzInstance
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("unable to get instance by host: instanceHost %s, publicHost %s: %w", instanceHost, publicHost, err)
+			err = fmt.Errorf("unable to get instance by domain: instanceDomain %s, publicHostname %s: %w", instanceDomain, publicDomain, err)
 		} else {
 			q.caches.activeInstances.Add(instance.ID, true)
 		}
 		span.EndWithError(err)
 	}()
-
-	instanceDomain := strings.Split(instanceHost, ":")[0] // remove possible port
-	publicDomain := strings.Split(publicHost, ":")[0]     // remove possible port
 
 	instance, ok := q.caches.instance.Get(ctx, instanceIndexByHost, instanceDomain)
 	if ok {
@@ -247,6 +244,7 @@ func (q *Queries) InstanceByID(ctx context.Context, id string) (_ authz.Instance
 	instance, scan := scanAuthzInstance()
 	err = q.client.QueryRowContext(ctx, scan, instanceByIDQuery, id)
 	logging.OnError(err).WithField("instance_id", id).Warn("instance by ID")
+
 	if err == nil {
 		q.caches.instance.Set(ctx, instance)
 	}
@@ -261,17 +259,20 @@ func (q *Queries) GetDefaultLanguage(ctx context.Context) language.Tag {
 	return instance.DefaultLang
 }
 
-func prepareInstancesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(sq.SelectBuilder) sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+func prepareInstancesQuery(sortBy Column, isAscedingSort bool) (sq.SelectBuilder, func(sq.SelectBuilder) sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
 	instanceFilterTable := instanceTable.setAlias(InstancesFilterTableAlias)
 	instanceFilterIDColumn := InstanceColumnID.setTable(instanceFilterTable)
 	instanceFilterCountColumn := InstancesFilterTableAlias + ".count"
-	return sq.Select(
-			InstanceColumnID.identifier(),
-			countColumn.identifier(),
-		).Distinct().From(instanceTable.identifier()).
+
+	selector := sq.Select(InstanceColumnID.identifier(), countColumn.identifier())
+	if !sortBy.isZero() {
+		selector = sq.Select(InstanceColumnID.identifier(), countColumn.identifier(), sortBy.identifier())
+	}
+
+	return selector.Distinct().From(instanceTable.identifier()).
 			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)),
 		func(builder sq.SelectBuilder) sq.SelectBuilder {
-			return sq.Select(
+			outerQuery := sq.Select(
 				instanceFilterCountColumn,
 				instanceFilterIDColumn.identifier(),
 				InstanceColumnCreationDate.identifier(),
@@ -280,8 +281,8 @@ func prepareInstancesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 				InstanceColumnName.identifier(),
 				InstanceColumnDefaultOrgID.identifier(),
 				InstanceColumnProjectID.identifier(),
-				InstanceColumnConsoleID.identifier(),
-				InstanceColumnConsoleAppID.identifier(),
+				InstanceColumnManagementConsoleID.identifier(),
+				InstanceColumnManagementConsoleAppID.identifier(),
 				InstanceColumnDefaultLanguage.identifier(),
 				InstanceDomainDomainCol.identifier(),
 				InstanceDomainIsPrimaryCol.identifier(),
@@ -291,8 +292,18 @@ func prepareInstancesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 				InstanceDomainSequenceCol.identifier(),
 			).FromSelect(builder, InstancesFilterTableAlias).
 				LeftJoin(join(InstanceColumnID, instanceFilterIDColumn)).
-				LeftJoin(join(InstanceDomainInstanceIDCol, instanceFilterIDColumn) + db.Timetravel(call.Took(ctx))).
+				LeftJoin(join(InstanceDomainInstanceIDCol, instanceFilterIDColumn)).
 				PlaceholderFormat(sq.Dollar)
+
+			if !sortBy.isZero() {
+				sorting := sortBy.identifier()
+				if !isAscedingSort {
+					sorting += " DESC"
+				}
+				return outerQuery.OrderBy(sorting)
+			}
+
+			return outerQuery
 		},
 		func(rows *sql.Rows) (*Instances, error) {
 			instances := make([]*Instance, 0)
@@ -318,8 +329,8 @@ func prepareInstancesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 					&instance.Name,
 					&instance.DefaultOrgID,
 					&instance.IAMProjectID,
-					&instance.ConsoleID,
-					&instance.ConsoleAppID,
+					&instance.ManagementConsoleID,
+					&instance.ManagementConsoleAppID,
 					&lang,
 					&domain,
 					&isPrimary,
@@ -366,7 +377,7 @@ func prepareInstancesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 		}
 }
 
-func prepareInstanceDomainQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Instance, error)) {
+func prepareInstanceDomainQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance, error)) {
 	return sq.Select(
 			InstanceColumnID.identifier(),
 			InstanceColumnCreationDate.identifier(),
@@ -375,8 +386,8 @@ func prepareInstanceDomainQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 			InstanceColumnName.identifier(),
 			InstanceColumnDefaultOrgID.identifier(),
 			InstanceColumnProjectID.identifier(),
-			InstanceColumnConsoleID.identifier(),
-			InstanceColumnConsoleAppID.identifier(),
+			InstanceColumnManagementConsoleID.identifier(),
+			InstanceColumnManagementConsoleAppID.identifier(),
 			InstanceColumnDefaultLanguage.identifier(),
 			InstanceDomainDomainCol.identifier(),
 			InstanceDomainIsPrimaryCol.identifier(),
@@ -386,7 +397,7 @@ func prepareInstanceDomainQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 			InstanceDomainSequenceCol.identifier(),
 		).
 			From(instanceTable.identifier()).
-			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Instance, error) {
 			instance := &Instance{
@@ -410,8 +421,8 @@ func prepareInstanceDomainQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 					&instance.Name,
 					&instance.DefaultOrgID,
 					&instance.IAMProjectID,
-					&instance.ConsoleID,
-					&instance.ConsoleAppID,
+					&instance.ManagementConsoleID,
+					&instance.ManagementConsoleAppID,
 					&lang,
 					&domain,
 					&isPrimary,
@@ -437,7 +448,7 @@ func prepareInstanceDomainQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 				})
 			}
 			if instance.ID == "" {
-				return nil, zerrors.ThrowNotFound(nil, "QUERY-n0wng", "Errors.IAM.NotFound")
+				return nil, zerrors.ThrowNotFound(nil, "QUERY-n0wng", "Errors.Instance.NotFound")
 			}
 			instance.DefaultLang = language.Make(lang)
 			if err := rows.Close(); err != nil {
@@ -448,24 +459,33 @@ func prepareInstanceDomainQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 }
 
 type authzInstance struct {
-	ID              string                     `json:"id,omitempty"`
-	IAMProjectID    string                     `json:"iam_project_id,omitempty"`
-	ConsoleID       string                     `json:"console_id,omitempty"`
-	ConsoleAppID    string                     `json:"console_app_id,omitempty"`
-	DefaultLang     language.Tag               `json:"default_lang,omitempty"`
-	DefaultOrgID    string                     `json:"default_org_id,omitempty"`
-	CSP             csp                        `json:"csp,omitempty"`
-	Impersonation   bool                       `json:"impersonation,omitempty"`
-	IsBlocked       *bool                      `json:"is_blocked,omitempty"`
-	LogRetention    *time.Duration             `json:"log_retention,omitempty"`
-	Feature         feature.Features           `json:"feature,omitempty"`
-	ExternalDomains database.TextArray[string] `json:"external_domains,omitempty"`
-	TrustedDomains  database.TextArray[string] `json:"trusted_domains,omitempty"`
+	ID                     string                     `json:"id,omitempty"`
+	IAMProjectID           string                     `json:"iam_project_id,omitempty"`
+	ManagementConsoleID    string                     `json:"console_id,omitempty"`
+	ManagementConsoleAppID string                     `json:"console_app_id,omitempty"`
+	DefaultLang            language.Tag               `json:"default_lang,omitempty"`
+	DefaultOrgID           string                     `json:"default_org_id,omitempty"`
+	CSP                    csp                        `json:"csp,omitempty"`
+	Impersonation          bool                       `json:"impersonation,omitempty"`
+	DCR                    dcr                        `json:"dcr,omitempty"`
+	IsBlocked              *bool                      `json:"is_blocked,omitempty"`
+	LogRetention           *time.Duration             `json:"log_retention,omitempty"`
+	Feature                feature.Features           `json:"feature,omitempty"`
+	ExternalDomains        database.TextArray[string] `json:"external_domains,omitempty"`
+	TrustedDomains         database.TextArray[string] `json:"trusted_domains,omitempty"`
+	ExecutionTargets       target_domain.Router       `json:"execution_targets,omitzero"`
+	AllowedLangs           []language.Tag             `json:"allowed_langs,omitempty"`
 }
 
 type csp struct {
 	EnableIframeEmbedding bool                       `json:"enable_iframe_embedding,omitempty"`
 	AllowedOrigins        database.TextArray[string] `json:"allowed_origins,omitempty"`
+}
+
+// dcr holds the instance's OAuth 2.0 Dynamic Client Registration (RFC 7591) settings.
+type dcr struct {
+	Enabled              bool `json:"enabled,omitempty"`
+	AllowUnauthenticated bool `json:"allow_unauthenticated,omitempty"`
 }
 
 func (i *authzInstance) InstanceID() string {
@@ -476,16 +496,20 @@ func (i *authzInstance) ProjectID() string {
 	return i.IAMProjectID
 }
 
-func (i *authzInstance) ConsoleClientID() string {
-	return i.ConsoleID
+func (i *authzInstance) ManagementConsoleClientID() string {
+	return i.ManagementConsoleID
 }
 
-func (i *authzInstance) ConsoleApplicationID() string {
-	return i.ConsoleAppID
+func (i *authzInstance) ManagementConsoleApplicationID() string {
+	return i.ManagementConsoleAppID
 }
 
 func (i *authzInstance) DefaultLanguage() language.Tag {
 	return i.DefaultLang
+}
+
+func (i *authzInstance) AllowedLanguages() []language.Tag {
+	return i.AllowedLangs
 }
 
 func (i *authzInstance) DefaultOrganisationID() string {
@@ -503,6 +527,14 @@ func (i *authzInstance) EnableImpersonation() bool {
 	return i.Impersonation
 }
 
+func (i *authzInstance) EnableDynamicClientRegistration() bool {
+	return i.DCR.Enabled
+}
+
+func (i *authzInstance) AllowUnauthenticatedDynamicClientRegistration() bool {
+	return i.DCR.Enabled && i.DCR.AllowUnauthenticated
+}
+
 func (i *authzInstance) Block() *bool {
 	return i.IsBlocked
 }
@@ -515,6 +547,10 @@ func (i *authzInstance) Features() feature.Features {
 	return i.Feature
 }
 
+func (i *authzInstance) ExecutionRouter() target_domain.Router {
+	return i.ExecutionTargets
+}
+
 var errPublicDomain = "public domain %q not trusted"
 
 func (i *authzInstance) checkDomain(instanceDomain, publicDomain string) error {
@@ -523,7 +559,7 @@ func (i *authzInstance) checkDomain(instanceDomain, publicDomain string) error {
 		return nil
 	}
 	if !slices.Contains(i.TrustedDomains, publicDomain) {
-		return zerrors.ThrowNotFound(fmt.Errorf(errPublicDomain, publicDomain), "QUERY-IuGh1", "Errors.IAM.NotFound")
+		return zerrors.ThrowNotFound(fmt.Errorf(errPublicDomain, publicDomain), "QUERY-IuGh1", "Errors.Instance.NotFound")
 	}
 	return nil
 }
@@ -547,28 +583,36 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			lang                  string
 			enableIframeEmbedding sql.NullBool
 			enableImpersonation   sql.NullBool
+			enableDCR             sql.NullBool
+			allowUnauthDCR        sql.NullBool
 			auditLogRetention     database.NullDuration
 			block                 sql.NullBool
 			features              []byte
+			executionTargetsBytes []byte
+			allowedLanguages      database.TextArray[string]
 		)
 		err := row.Scan(
 			&instance.ID,
 			&instance.DefaultOrgID,
 			&instance.IAMProjectID,
-			&instance.ConsoleID,
-			&instance.ConsoleAppID,
+			&instance.ManagementConsoleID,
+			&instance.ManagementConsoleAppID,
 			&lang,
 			&enableIframeEmbedding,
 			&instance.CSP.AllowedOrigins,
 			&enableImpersonation,
+			&enableDCR,
+			&allowUnauthDCR,
 			&auditLogRetention,
 			&block,
 			&features,
 			&instance.ExternalDomains,
 			&instance.TrustedDomains,
+			&executionTargetsBytes,
+			&allowedLanguages,
 		)
 		if errors.Is(err, sql.ErrNoRows) {
-			return zerrors.ThrowNotFound(nil, "QUERY-1kIjX", "Errors.IAM.NotFound")
+			return zerrors.ThrowNotFound(nil, "QUERY-1kIjX", "Errors.Instance.NotFound")
 		}
 		if err != nil {
 			return zerrors.ThrowInternal(err, "QUERY-d3fas", "Errors.Internal")
@@ -582,12 +626,21 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 		}
 		instance.CSP.EnableIframeEmbedding = enableIframeEmbedding.Bool
 		instance.Impersonation = enableImpersonation.Bool
-		if len(features) == 0 {
-			return nil
+		instance.DCR.Enabled = enableDCR.Bool
+		instance.DCR.AllowUnauthenticated = allowUnauthDCR.Bool
+		if len(features) > 0 {
+			if err = json.Unmarshal(features, &instance.Feature); err != nil {
+				return zerrors.ThrowInternal(err, "QUERY-Po8ki", "Errors.Internal")
+			}
 		}
-		if err = json.Unmarshal(features, &instance.Feature); err != nil {
-			return zerrors.ThrowInternal(err, "QUERY-Po8ki", "Errors.Internal")
+		if len(executionTargetsBytes) > 0 {
+			var targets []target_domain.Target
+			if err := json.Unmarshal(executionTargetsBytes, &targets); err != nil {
+				return zerrors.ThrowInternal(err, "QUERY-aeKa2", "Errors.Internal")
+			}
+			instance.ExecutionTargets = target_domain.NewRouter(targets)
 		}
+		instance.AllowedLangs = domain.StringsToLanguages(allowedLanguages)
 		return nil
 	}
 }
@@ -604,6 +657,8 @@ func (c *Caches) registerInstanceInvalidation() {
 	invalidate = cacheInvalidationFunc(c.instance, instanceIndexByID, getResourceOwner)
 	projection.LimitsProjection.RegisterCacheInvalidation(invalidate)
 	projection.RestrictionsProjection.RegisterCacheInvalidation(invalidate)
+	projection.ExecutionProjection.RegisterCacheInvalidation(invalidate)
+	projection.TargetProjection.RegisterCacheInvalidation(invalidate)
 
 	// System feature update should invalidate all instances, so Truncate the cache.
 	projection.SystemFeatureProjection.RegisterCacheInvalidation(func(ctx context.Context, _ []*eventstore.Aggregate) {

@@ -2,9 +2,7 @@ package projection
 
 import (
 	"context"
-	"strings"
-
-	sq "github.com/Masterminds/squirrel"
+	_ "embed"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -24,10 +22,12 @@ const (
 	LoginNamePolicyProjectionTable = LoginNameProjectionTable + "_" + loginNamePolicySuffix
 	LoginNameDomainProjectionTable = LoginNameProjectionTable + "_" + loginNameDomainSuffix
 
-	LoginNameCol           = "login_name"
-	LoginNameUserCol       = "user_id"
-	LoginNameIsPrimaryCol  = "is_primary"
-	LoginNameInstanceIDCol = "instance_id"
+	LoginNameCol              = "login_name"
+	LoginNameUserCol          = "user_id"
+	LoginNameIsPrimaryCol     = "is_primary"
+	LoginNameInstanceIDCol    = "instance_id"
+	LoginNameLowerCol         = "login_name_lower"
+	LoginNameResourceOwnerCol = "resource_owner"
 
 	usersAlias         = "users"
 	policyCustomAlias  = "policy_custom"
@@ -58,105 +58,8 @@ const (
 	LoginNamePoliciesInstanceIDCol    = "instance_id"
 )
 
-var (
-	policyUsers = sq.Select(
-		alias(
-			col(usersAlias, LoginNameUserIDCol),
-			LoginNameUserCol,
-		),
-		col(usersAlias, LoginNameUserUserNameCol),
-		col(usersAlias, LoginNameUserInstanceIDCol),
-		col(usersAlias, LoginNameUserResourceOwnerCol),
-		alias(
-			coalesce(col(policyCustomAlias, LoginNamePoliciesMustBeDomainCol), col(policyDefaultAlias, LoginNamePoliciesMustBeDomainCol)),
-			LoginNamePoliciesMustBeDomainCol,
-		),
-	).From(alias(LoginNameUserProjectionTable, usersAlias)).
-		LeftJoin(
-			leftJoin(LoginNamePolicyProjectionTable, policyCustomAlias,
-				eq(col(policyCustomAlias, LoginNamePoliciesResourceOwnerCol), col(usersAlias, LoginNameUserResourceOwnerCol)),
-				eq(col(policyCustomAlias, LoginNamePoliciesInstanceIDCol), col(usersAlias, LoginNameUserInstanceIDCol)),
-			),
-		).
-		LeftJoin(
-			leftJoin(LoginNamePolicyProjectionTable, policyDefaultAlias,
-				eq(col(policyDefaultAlias, LoginNamePoliciesIsDefaultCol), "true"),
-				eq(col(policyDefaultAlias, LoginNamePoliciesInstanceIDCol), col(usersAlias, LoginNameUserInstanceIDCol)),
-			),
-		)
-
-	loginNamesTable = sq.Select(
-		col(policyUsersAlias, LoginNameUserCol),
-		col(policyUsersAlias, LoginNameUserUserNameCol),
-		col(policyUsersAlias, LoginNameUserResourceOwnerCol),
-		alias(col(policyUsersAlias, LoginNameUserInstanceIDCol),
-			LoginNameInstanceIDCol),
-		col(policyUsersAlias, LoginNamePoliciesMustBeDomainCol),
-		alias(col(domainsAlias, LoginNameDomainNameCol),
-			domainAlias),
-		col(domainsAlias, LoginNameDomainIsPrimaryCol),
-	).FromSelect(policyUsers, policyUsersAlias).
-		LeftJoin(
-			leftJoin(LoginNameDomainProjectionTable, domainsAlias,
-				col(policyUsersAlias, LoginNamePoliciesMustBeDomainCol),
-				eq(col(policyUsersAlias, LoginNameUserResourceOwnerCol), col(domainsAlias, LoginNameDomainResourceOwnerCol)),
-				eq(col(policyUsersAlias, LoginNamePoliciesInstanceIDCol), col(domainsAlias, LoginNameDomainInstanceIDCol)),
-			),
-		)
-
-	viewStmt, _ = sq.Select(
-		LoginNameUserCol,
-		alias(
-			whenThenElse(
-				LoginNamePoliciesMustBeDomainCol,
-				concat(LoginNameUserUserNameCol, "'@'", domainAlias),
-				LoginNameUserUserNameCol),
-			LoginNameCol),
-		alias(coalesce(LoginNameDomainIsPrimaryCol, "true"),
-			LoginNameIsPrimaryCol),
-		LoginNameInstanceIDCol,
-	).FromSelect(loginNamesTable, LoginNameTableAlias).MustSql()
-)
-
-func col(table, name string) string {
-	return table + "." + name
-}
-
-func alias(col, alias string) string {
-	return col + " AS " + alias
-}
-
-func coalesce(values ...string) string {
-	str := "COALESCE("
-	for i, value := range values {
-		if i > 0 {
-			str += ", "
-		}
-		str += value
-	}
-	str += ")"
-	return str
-}
-
-func eq(first, second string) string {
-	return first + " = " + second
-}
-
-func leftJoin(table, alias, on string, and ...string) string {
-	st := table + " " + alias + " ON " + on
-	for _, a := range and {
-		st += " AND " + a
-	}
-	return st
-}
-
-func concat(strs ...string) string {
-	return "CONCAT(" + strings.Join(strs, ", ") + ")"
-}
-
-func whenThenElse(when, then, el string) string {
-	return "(CASE WHEN " + when + " THEN " + then + " ELSE " + el + " END)"
-}
+//go:embed login_name_query.sql
+var loginNameViewStmt string
 
 type loginNameProjection struct{}
 
@@ -170,13 +73,12 @@ func (*loginNameProjection) Name() string {
 
 func (*loginNameProjection) Init() *old_handler.Check {
 	return handler.NewViewCheck(
-		viewStmt,
+		loginNameViewStmt,
 		handler.NewSuffixedTable(
 			[]*handler.InitColumn{
 				handler.NewColumn(LoginNameUserIDCol, handler.ColumnTypeText),
 				handler.NewColumn(LoginNameUserUserNameCol, handler.ColumnTypeText),
-				// TODO: implement computed columns
-				// handler.NewComputedColumn(loginNameUserUserNameLowerCol, handler.ColumnTypeText),
+				handler.NewColumn(loginNameUserUserNameLowerCol, handler.ColumnTypeText, handler.Generated("lower("+LoginNameUserUserNameCol+")", true)),
 				handler.NewColumn(LoginNameUserResourceOwnerCol, handler.ColumnTypeText),
 				handler.NewColumn(LoginNameUserInstanceIDCol, handler.ColumnTypeText),
 			},
@@ -192,33 +94,30 @@ func (*loginNameProjection) Init() *old_handler.Check {
 					),
 				),
 			),
-			// TODO: uncomment the following line when login_names4 will be created
-			// handler.WithIndex(
-			// 	handler.NewIndex("search", []string{LoginNameUserInstanceIDCol, loginNameUserUserNameLowerCol},
-			// 		handler.WithInclude(LoginNameUserResourceOwnerCol),
-			// 	),
-			// ),
+			handler.WithIndex(
+				handler.NewIndex("search", []string{LoginNameUserInstanceIDCol, loginNameUserUserNameLowerCol},
+					handler.WithInclude(LoginNameUserResourceOwnerCol),
+				),
+			),
 		),
 		handler.NewSuffixedTable(
 			[]*handler.InitColumn{
 				handler.NewColumn(LoginNameDomainNameCol, handler.ColumnTypeText),
-				// TODO: implement computed columns
-				// handler.NewComputedColumn(loginNameDomainNameLowerCol, handler.ColumnTypeText),
+				handler.NewColumn(loginNameDomainNameLowerCol, handler.ColumnTypeText, handler.Generated("lower("+LoginNameDomainNameCol+")", true)),
 				handler.NewColumn(LoginNameDomainIsPrimaryCol, handler.ColumnTypeBool, handler.Default(false)),
 				handler.NewColumn(LoginNameDomainResourceOwnerCol, handler.ColumnTypeText),
 				handler.NewColumn(LoginNameDomainInstanceIDCol, handler.ColumnTypeText),
 			},
 			handler.NewPrimaryKey(LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol, LoginNameDomainNameCol),
 			loginNameDomainSuffix,
-			// TODO: uncomment the following line when login_names4 will be created
-			// handler.WithIndex(
-			// 	handler.NewIndex("search", []string{LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol, loginNameDomainNameLowerCol}),
-			// ),
-			// handler.WithIndex(
-			// 	handler.NewIndex("search_result", []string{LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol},
-			// 		handler.WithInclude(LoginNameDomainIsPrimaryCol),
-			// 	),
-			// ),
+			handler.WithIndex(
+				handler.NewIndex("search", []string{LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol, loginNameDomainNameLowerCol}),
+			),
+			handler.WithIndex(
+				handler.NewIndex("search_result", []string{LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol},
+					handler.WithInclude(LoginNameDomainIsPrimaryCol),
+				),
+			),
 		),
 		handler.NewSuffixedTable(
 			[]*handler.InitColumn{
@@ -229,7 +128,9 @@ func (*loginNameProjection) Init() *old_handler.Check {
 			},
 			handler.NewPrimaryKey(LoginNamePoliciesInstanceIDCol, LoginNamePoliciesResourceOwnerCol),
 			loginNamePolicySuffix,
-			handler.WithIndex(handler.NewIndex("is_default", []string{LoginNamePoliciesResourceOwnerCol, LoginNamePoliciesIsDefaultCol})),
+			// this index is not used anymore, but kept for understanding why the default exists on existing systems, TODO: remove in login_names4
+			// handler.WithIndex(handler.NewIndex("is_default", []string{LoginNamePoliciesResourceOwnerCol, LoginNamePoliciesIsDefaultCol})),
+			handler.WithIndex(handler.NewIndex("is_default_owner", []string{LoginNamePoliciesInstanceIDCol, LoginNamePoliciesIsDefaultCol, LoginNamePoliciesResourceOwnerCol}, handler.WithInclude(LoginNamePoliciesMustBeDomainCol))),
 		),
 	)
 }

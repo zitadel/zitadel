@@ -8,7 +8,7 @@ import (
 )
 
 func (s *Server) ListSecretGenerators(ctx context.Context, req *admin_pb.ListSecretGeneratorsRequest) (*admin_pb.ListSecretGeneratorsResponse, error) {
-	queries, err := listSecretGeneratorToModel(req)
+	queries, err := listSecretGeneratorToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}

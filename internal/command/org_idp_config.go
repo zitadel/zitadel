@@ -196,12 +196,21 @@ func (c *Commands) removeIDPConfig(ctx context.Context, existingIDP *OrgIDPConfi
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
-	events := []eventstore.Command{
-		org_repo.NewIDPConfigRemovedEvent(ctx, orgAgg, existingIDP.ConfigID, existingIDP.Name),
+	ownerDeleteReady, err := c.isUniqueConstraintOwnerDeleteReady(ctx)
+	if err != nil {
+		return nil, err
 	}
+	var removed eventstore.Command
+	if ownerDeleteReady {
+		removed = org_repo.NewIDPConfigRemovedByOwnerEvent(ctx, orgAgg, existingIDP.ConfigID, existingIDP.Name)
+	} else {
+		removed = org_repo.NewIDPConfigRemovedEvent(ctx, orgAgg, existingIDP.ConfigID, existingIDP.Name)
+	}
+	events := []eventstore.Command{removed}
 
 	if cascadeRemoveProvider {
 		removeIDPEvents := c.removeIDPFromLoginPolicy(ctx, orgAgg, existingIDP.ConfigID, true, cascadeExternalIDPs...)
+		skipCascadeUniqueConstraints(ownerDeleteReady, removeIDPEvents...)
 		events = append(events, removeIDPEvents...)
 	}
 	return events, nil

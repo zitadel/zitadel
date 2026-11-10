@@ -9,25 +9,58 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func TestAlreadyExistsError(t *testing.T) {
-	var alreadyExistsError interface{} = new(zerrors.AlreadyExistsError)
-	_, ok := alreadyExistsError.(zerrors.AlreadyExists)
-	assert.True(t, ok)
-}
+func TestAlreadyExists(t *testing.T) {
+	parentErr := errors.New("parent error")
+	id := "test_id"
+	message := "test message"
 
-func TestThrowAlreadyExistsf(t *testing.T) {
-	err := zerrors.ThrowAlreadyExistsf(nil, "id", "msg")
-	//nolint:errorlint
-	_, ok := err.(*zerrors.AlreadyExistsError)
-	assert.True(t, ok)
-}
+	t.Run("ThrowAlreadyExists", func(t *testing.T) {
+		err := zerrors.ThrowAlreadyExists(parentErr, id, message)
+		assert.NotNil(t, err)
 
-func TestIsErrorAlreadyExists(t *testing.T) {
-	err := zerrors.ThrowAlreadyExists(nil, "id", "msg")
-	ok := zerrors.IsErrorAlreadyExists(err)
-	assert.True(t, ok)
+		zitadelErr, ok := zerrors.AsZitadelError(err)
+		assert.True(t, ok)
+		assert.Equal(t, zerrors.KindAlreadyExists, zitadelErr.Kind)
 
-	err = errors.New("Already Exists!")
-	ok = zerrors.IsErrorAlreadyExists(err)
-	assert.False(t, ok)
+		zitadelError := new(zerrors.ZitadelError)
+		if errors.As(err, &zitadelError) {
+			assert.Equal(t, parentErr, zitadelError.Unwrap())
+			assert.Equal(t, id, zitadelError.ID)
+			assert.Equal(t, message, zitadelError.Message)
+		} else {
+			t.Errorf("error is not of type ZitadelError")
+		}
+	})
+
+	t.Run("ThrowAlreadyExistsf", func(t *testing.T) {
+		format := "formatted %s"
+		arg := "message"
+		expectedMessage := "formatted message"
+
+		err := zerrors.ThrowAlreadyExistsf(parentErr, id, format, arg)
+		assert.NotNil(t, err)
+
+		zitadelErr, ok := zerrors.AsZitadelError(err)
+		assert.True(t, ok)
+		assert.Equal(t, zerrors.KindAlreadyExists, zitadelErr.Kind)
+
+		zitadelError := new(zerrors.ZitadelError)
+		if errors.As(err, &zitadelError) {
+			assert.Equal(t, parentErr, zitadelError.Unwrap())
+			assert.Equal(t, id, zitadelError.ID)
+			assert.Equal(t, expectedMessage, zitadelError.Message)
+		} else {
+			t.Errorf("error is not of type ZitadelError")
+		}
+	})
+
+	t.Run("IsErrorAlreadyExists", func(t *testing.T) {
+		err := zerrors.ThrowAlreadyExists(parentErr, id, message)
+		isAlreadyExists := zerrors.IsErrorAlreadyExists(err)
+		assert.True(t, isAlreadyExists)
+
+		otherErr := errors.New("some other error")
+		isAlreadyExists = zerrors.IsErrorAlreadyExists(otherErr)
+		assert.False(t, isAlreadyExists)
+	})
 }

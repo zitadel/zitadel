@@ -26,7 +26,6 @@ var (
 		` projections.actions3.allowed_to_fail,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.actions3`
-		// ` AS OF SYSTEM TIME '-1 ms'`
 	prepareActionsCols = []string{
 		"id",
 		"creation_date",
@@ -52,7 +51,6 @@ var (
 		` projections.actions3.timeout,` +
 		` projections.actions3.allowed_to_fail` +
 		` FROM projections.actions3`
-		// ` AS OF SYSTEM TIME '-1 ms'`
 	prepareActionCols = []string{
 		"id",
 		"creation_date",
@@ -289,7 +287,7 @@ func Test_ActionPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }

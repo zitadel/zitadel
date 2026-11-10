@@ -76,11 +76,11 @@ func (o *OPStorage) StoreDeviceAuthorization(ctx context.Context, clientID, devi
 		logger.OnError(err).Error(logMsg)
 		span.EndWithError(err)
 	}()
-	scope, audience, err := o.createAuthRequestScopeAndAudience(ctx, clientID, scope)
+	scope, audience, orgID, err := o.createAuthRequestScopeAndAudience(ctx, clientID, scope)
 	if err != nil {
 		return err
 	}
-	details, err := o.command.AddDeviceAuth(ctx, clientID, deviceCode, userCode, expires, scope, audience, slices.Contains(scope, oidc.ScopeOfflineAccess))
+	details, err := o.command.AddDeviceAuth(ctx, clientID, deviceCode, userCode, orgID, expires, scope, audience, slices.Contains(scope, oidc.ScopeOfflineAccess))
 	if err == nil {
 		logger.SetFields("details", details).Debug(logMsg)
 	}
@@ -88,6 +88,6 @@ func (o *OPStorage) StoreDeviceAuthorization(ctx context.Context, clientID, devi
 	return err
 }
 
-func (o *OPStorage) GetDeviceAuthorizatonState(ctx context.Context, _, deviceCode string) (state *op.DeviceAuthorizationState, err error) {
-	return nil, nil
+func (o *OPStorage) GetDeviceAuthorizatonState(context.Context, string, string) (*op.DeviceAuthorizationState, error) {
+	panic(o.panicErr("GetDeviceAuthorizatonState"))
 }

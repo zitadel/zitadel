@@ -10,8 +10,8 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -82,19 +82,20 @@ func (mig *FillV3Milestones) pushEventsByInstance(ctx context.Context, milestone
 	slices.Sort(order)
 
 	for i, instanceID := range order {
-		logging.WithFields("instance_id", instanceID, "migration", mig.String(), "progress", fmt.Sprintf("%d/%d", i+1, len(order))).Info("filter existing milestone events")
+		logCtx := logging.With(ctx, "instance", instanceID, "migration", mig.String())
+		logging.Info(logCtx, "filter existing milestone events", "progress", fmt.Sprintf("%d/%d", i+1, len(order)))
 
 		// because each Push runs in a separate TX, we need to make sure that events
 		// from a partially executed migration are pushed again.
 		model := command.NewMilestonesReachedWriteModel(instanceID)
-		if err := mig.eventstore.FilterToQueryReducer(ctx, model); err != nil {
+		if err := mig.eventstore.FilterToQueryReducer(logCtx, model); err != nil {
 			return fmt.Errorf("milestones filter: %w", err)
 		}
 		if model.InstanceCreated {
-			logging.WithFields("instance_id", instanceID, "migration", mig.String()).Info("milestone events already migrated")
+			logging.Info(logCtx, "milestone events already migrated")
 			continue // This instance was migrated, skip
 		}
-		logging.WithFields("instance_id", instanceID, "migration", mig.String()).Info("push milestone events")
+		logging.Info(logCtx, "push milestone events")
 
 		aggregate := milestone.NewInstanceAggregate(instanceID)
 

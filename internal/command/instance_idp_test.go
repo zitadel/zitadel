@@ -2,6 +2,9 @@ package command
 
 import (
 	"context"
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
 	"errors"
 	"testing"
 	"time"
@@ -87,13 +90,33 @@ var (
 	</KeyDescriptor>
   </AttributeAuthorityDescriptor>
 </EntityDescriptor>`)
+	validLDAPRootCA = []byte(`-----BEGIN CERTIFICATE-----
+MIIDITCCAgmgAwIBAgIUKjAUmxsHO44X+/TKBNciPgNl1GEwDQYJKoZIhvcNAQEL
+BQAwIDEeMBwGA1UEAwwVbXlzZXJ2aWNlLmV4YW1wbGUuY29tMB4XDTI0MTIxOTEz
+Mzc1MVoXDTI1MTIxOTEzMzc1MVowIDEeMBwGA1UEAwwVbXlzZXJ2aWNlLmV4YW1w
+bGUuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0QYuJsayILRI
+hVT7G1DlitVSXnt1iw3gEXJZfe81Egz06fUbvXF6Yo1LJmwYpqe/rm+hf4FNUb8e
+2O+LH2FieA9FkVe4P2gKOzw87A/KxvpV8stgNgl4LlqRCokbc1AzeE/NiLr5TcTD
+RXm3DUcYxXxinprtDu2jftFysaOZmNAukvE/iL6qS3X6ggVEDDM7tY9n5FV2eJ4E
+p0ImKfypi2aZYROxOK+v5x9ryFRMl4y07lMDvmtcV45uXYmfGNCgG9PNf91Kk/mh
+JxEQbxycJwFoSi9XWljR8ahPdO11LXG7Dsj/RVbY8k2LdKNstl6Ae3aCpbe9u2Pj
+vxYs1bVJuQIDAQABo1MwUTAdBgNVHQ4EFgQU+mRVN5HYJWgnpopReaLhf2cMcoYw
+HwYDVR0jBBgwFoAU+mRVN5HYJWgnpopReaLhf2cMcoYwDwYDVR0TAQH/BAUwAwEB
+/zANBgkqhkiG9w0BAQsFAAOCAQEABJpHVuc9tGhD04infRVlofvqXIUizTlOrjZX
+vozW9pIhSWEHX8o+sJP8AMZLnrsdq+bm0HE0HvgYrw7Lb8pd4FpR46TkFHjeukoj
+izqfgckjIBl2nwPGlynbKA0/U/rTCSxVt7XiAn+lgYUGIpOzNdk06/hRMitrMNB7
+t2C97NseVC4b1ZgyFrozsefCfUmD8IJF0+XJ4Wzmsh0jRrI8koCtVmPYnKn6vw1b
+cZprg/97CWHYrsavd406wOB60CMtYl83Q16ucOF1dretDFqJC5kY+aFLvuqfag2+
+kIaoPV1MnGsxveQyyHdOsEatS5XOv/1OWcmnvePDPxcvb9jCcw==
+-----END CERTIFICATE-----
+`)
 )
 
 func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -270,12 +293,13 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 							"user",
 							"idAttribute",
 							nil,
+							true,
 							idp.Options{},
 						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -287,6 +311,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 					TokenEndpoint:         "token",
 					UserEndpoint:          "user",
 					IDAttribute:           "idAttribute",
+					UsePKCE:               true,
 				},
 			},
 			res: res{
@@ -315,6 +340,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 							"user",
 							"idAttribute",
 							[]string{"user"},
+							true,
 							idp.Options{
 								IsCreationAllowed: true,
 								IsLinkingAllowed:  true,
@@ -325,7 +351,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -338,6 +364,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 					UserEndpoint:          "user",
 					Scopes:                []string{"user"},
 					IDAttribute:           "idAttribute",
+					UsePKCE:               true,
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -377,7 +404,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -569,6 +596,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
+								true,
 								idp.Options{},
 							)),
 					),
@@ -584,6 +612,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 					TokenEndpoint:         "token",
 					UserEndpoint:          "user",
 					IDAttribute:           "idAttribute",
+					UsePKCE:               true,
 				},
 			},
 			res: res{
@@ -611,6 +640,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 								"user",
 								"idAttribute",
 								nil,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -633,6 +663,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 									idp.ChangeOAuthUserEndpoint("new user"),
 									idp.ChangeOAuthScopes([]string{"openid", "profile"}),
 									idp.ChangeOAuthIDAttribute("newAttribute"),
+									idp.ChangeOAuthUsePKCE(true),
 									idp.ChangeOAuthOptions(idp.OptionChanges{
 										IsCreationAllowed: &t,
 										IsLinkingAllowed:  &t,
@@ -645,7 +676,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -659,6 +690,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 					UserEndpoint:          "new user",
 					Scopes:                []string{"openid", "profile"},
 					IDAttribute:           "newAttribute",
+					UsePKCE:               true,
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -696,7 +728,7 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -805,12 +837,13 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 							},
 							nil,
 							false,
+							true,
 							idp.Options{},
 						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -819,6 +852,7 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 					Issuer:       "issuer",
 					ClientID:     "clientID",
 					ClientSecret: "clientSecret",
+					UsePKCE:      true,
 				},
 			},
 			res: res{
@@ -845,6 +879,7 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 							},
 							[]string{openid.ScopeOpenID},
 							true,
+							true,
 							idp.Options{
 								IsCreationAllowed: true,
 								IsLinkingAllowed:  true,
@@ -855,7 +890,7 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -866,6 +901,7 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 					ClientSecret:     "clientSecret",
 					Scopes:           []string{openid.ScopeOpenID},
 					IsIDTokenMapping: true,
+					UsePKCE:          true,
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -905,7 +941,7 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -1029,6 +1065,7 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 								},
 								nil,
 								false,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -1066,6 +1103,7 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 								},
 								nil,
 								false,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -1086,6 +1124,7 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 									}),
 									idp.ChangeOIDCScopes([]string{"openid", "profile"}),
 									idp.ChangeOIDCIsIDTokenMapping(true),
+									idp.ChangeOIDCUsePKCE(true),
 									idp.ChangeOIDCOptions(idp.OptionChanges{
 										IsCreationAllowed: &t,
 										IsLinkingAllowed:  &t,
@@ -1098,7 +1137,7 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -1110,6 +1149,7 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 					ClientSecret:     "newSecret",
 					Scopes:           []string{"openid", "profile"},
 					IsIDTokenMapping: true,
+					UsePKCE:          true,
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -1146,7 +1186,7 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -1253,6 +1293,7 @@ func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
 								},
 								nil,
 								false,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -1277,7 +1318,7 @@ func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -1311,6 +1352,7 @@ func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
 								},
 								nil,
 								false,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -1340,7 +1382,7 @@ func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -1388,7 +1430,7 @@ func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
 func TestCommandSide_MigrateInstanceOIDCToGoogleIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -1475,6 +1517,7 @@ func TestCommandSide_MigrateInstanceOIDCToGoogleIDP(t *testing.T) {
 								},
 								nil,
 								false,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -1494,7 +1537,7 @@ func TestCommandSide_MigrateInstanceOIDCToGoogleIDP(t *testing.T) {
 						),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -1527,6 +1570,7 @@ func TestCommandSide_MigrateInstanceOIDCToGoogleIDP(t *testing.T) {
 								},
 								nil,
 								false,
+								false,
 								idp.Options{},
 							)),
 					),
@@ -1551,7 +1595,7 @@ func TestCommandSide_MigrateInstanceOIDCToGoogleIDP(t *testing.T) {
 						),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -1597,7 +1641,7 @@ func TestCommandSide_AddInstanceAzureADIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -1691,7 +1735,7 @@ func TestCommandSide_AddInstanceAzureADIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -1735,7 +1779,7 @@ func TestCommandSide_AddInstanceAzureADIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -1785,7 +1829,7 @@ func TestCommandSide_AddInstanceAzureADIDP(t *testing.T) {
 func TestCommandSide_UpdateInstanceAzureADIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -1957,7 +2001,7 @@ func TestCommandSide_UpdateInstanceAzureADIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -2006,7 +2050,7 @@ func TestCommandSide_AddInstanceGitHubIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -2079,7 +2123,7 @@ func TestCommandSide_AddInstanceGitHubIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -2120,7 +2164,7 @@ func TestCommandSide_AddInstanceGitHubIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -2168,7 +2212,7 @@ func TestCommandSide_AddInstanceGitHubIDP(t *testing.T) {
 func TestCommandSide_UpdateInstanceGitHubIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -2314,7 +2358,7 @@ func TestCommandSide_UpdateInstanceGitHubIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -2361,7 +2405,7 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -2519,7 +2563,7 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -2567,7 +2611,7 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -2618,7 +2662,7 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -2859,7 +2903,7 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -2909,7 +2953,7 @@ func TestCommandSide_AddInstanceGitLabIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -2982,7 +3026,7 @@ func TestCommandSide_AddInstanceGitLabIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -3023,7 +3067,7 @@ func TestCommandSide_AddInstanceGitLabIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -3070,7 +3114,7 @@ func TestCommandSide_AddInstanceGitLabIDP(t *testing.T) {
 func TestCommandSide_UpdateInstanceGitLabIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -3215,7 +3259,7 @@ func TestCommandSide_UpdateInstanceGitLabIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -3261,7 +3305,7 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -3374,7 +3418,7 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -3418,7 +3462,7 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -3467,7 +3511,7 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -3657,7 +3701,7 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -3705,7 +3749,7 @@ func TestCommandSide_AddInstanceGoogleIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -3778,7 +3822,7 @@ func TestCommandSide_AddInstanceGoogleIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -3819,7 +3863,7 @@ func TestCommandSide_AddInstanceGoogleIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -3866,7 +3910,7 @@ func TestCommandSide_AddInstanceGoogleIDP(t *testing.T) {
 func TestCommandSide_UpdateInstanceGoogleIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -4011,7 +4055,7 @@ func TestCommandSide_UpdateInstanceGoogleIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -4057,7 +4101,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -4238,6 +4282,34 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 		},
 		{
+			"invalid rootCA",
+			fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: LDAPProvider{
+					Name:              "name",
+					Servers:           []string{"server"},
+					StartTLS:          false,
+					BaseDN:            "baseDN",
+					BindDN:            "dn",
+					BindPassword:      "password",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+					UserFilters:       []string{"filter"},
+					Timeout:           time.Second * 30,
+					RootCA:            []byte("certificate"),
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-cwqVVdBwKt", "Errors.Invalid.Argument"))
+				},
+			},
+		},
+		{
 			name: "ok",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -4260,14 +4332,14 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 							[]string{"object"},
 							[]string{"filter"},
 							time.Second*30,
-							[]byte("certificate"),
+							nil,
 							idp.LDAPAttributes{},
 							idp.Options{},
 						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -4282,7 +4354,6 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 					UserObjectClasses: []string{"object"},
 					UserFilters:       []string{"filter"},
 					Timeout:           time.Second * 30,
-					RootCA:            []byte("certificate"),
 				},
 			},
 			res: res{
@@ -4313,7 +4384,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 							[]string{"object"},
 							[]string{"filter"},
 							time.Second*30,
-							[]byte("certificate"),
+							validLDAPRootCA,
 							idp.LDAPAttributes{
 								IDAttribute:                "id",
 								FirstNameAttribute:         "firstName",
@@ -4339,7 +4410,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -4354,7 +4425,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 					UserObjectClasses: []string{"object"},
 					UserFilters:       []string{"filter"},
 					Timeout:           time.Second * 30,
-					RootCA:            []byte("certificate"),
+					RootCA:            validLDAPRootCA,
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                "id",
 						FirstNameAttribute:         "firstName",
@@ -4409,7 +4480,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -4581,6 +4652,32 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 		},
 		{
+			"invalid rootCA",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: LDAPProvider{
+					Name:              "name",
+					Servers:           []string{"server"},
+					BaseDN:            "baseDN",
+					BindDN:            "binddn",
+					BindPassword:      "password",
+					UserBase:          "user",
+					UserObjectClasses: []string{"object"},
+					UserFilters:       []string{"filter"},
+					RootCA:            []byte("certificate"),
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-cwqVVdBwKt", "Errors.Invalid.Argument"))
+				},
+			},
+		},
+		{
 			name: "not found",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -4630,7 +4727,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 								[]string{"object"},
 								[]string{"filter"},
 								time.Second*30,
-								[]byte("certificate"),
+								validLDAPRootCA,
 								idp.LDAPAttributes{},
 								idp.Options{},
 							)),
@@ -4650,7 +4747,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 					UserObjectClasses: []string{"object"},
 					UserFilters:       []string{"filter"},
 					Timeout:           time.Second * 30,
-					RootCA:            []byte("certificate"),
+					RootCA:            validLDAPRootCA,
 				},
 			},
 			res: res{
@@ -4680,7 +4777,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 								[]string{"object"},
 								[]string{"filter"},
 								time.Second*30,
-								[]byte("certificate"),
+								nil,
 								idp.LDAPAttributes{},
 								idp.Options{},
 							)),
@@ -4727,13 +4824,14 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 										IsAutoCreation:    &t,
 										IsAutoUpdate:      &t,
 									}),
+									idp.ChangeLDAPRootCA(validLDAPRootCA),
 								},
 							)
 							return event
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -4749,7 +4847,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 					UserObjectClasses: []string{"new object"},
 					UserFilters:       []string{"new filter"},
 					Timeout:           time.Second * 20,
-					RootCA:            []byte("certificate"),
+					RootCA:            validLDAPRootCA,
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                "new id",
 						FirstNameAttribute:         "new firstName",
@@ -4798,11 +4896,19 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 	}
 }
 
+var (
+	privateKeyPKCS8 = func() []byte {
+		privateKey, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+		data, _ := crypto.PrivateKeyToBytesPKCS8(privateKey)
+		return data
+	}()
+)
+
 func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -4811,7 +4917,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 	type res struct {
 		id   string
 		want *domain.ObjectDetails
-		err  func(error) bool
+		err  error
 	}
 	tests := []struct {
 		name   string
@@ -4830,9 +4936,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 				provider: AppleProvider{},
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-jkn3w", "Errors.IDP.ClientIDMissing"))
-				},
+				err: zerrors.ThrowInvalidArgument(nil, "INST-jkn3w", "Errors.IDP.ClientIDMissing"),
 			},
 		},
 		{
@@ -4848,9 +4952,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Ffg32", "Errors.IDP.TeamIDMissing"))
-				},
+				err: zerrors.ThrowInvalidArgument(nil, "INST-Ffg32", "Errors.IDP.TeamIDMissing"),
 			},
 		},
 		{
@@ -4867,13 +4969,11 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-GDjm5", "Errors.IDP.KeyIDMissing"))
-				},
+				err: zerrors.ThrowInvalidArgument(nil, "INST-GDjm5", "Errors.IDP.KeyIDMissing"),
 			},
 		},
 		{
-			"invalid privateKey",
+			"no privateKey",
 			fields{
 				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -4887,9 +4987,26 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-GVD4n", "Errors.IDP.PrivateKeyMissing"))
+				err: zerrors.ThrowInvalidArgument(nil, "INST-GVD4n", "Errors.IDP.PrivateKeyMissing"),
+			},
+		},
+		{
+			"invalid privateKey",
+			fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: AppleProvider{
+					ClientID:   "clientID",
+					TeamID:     "teamID",
+					KeyID:      "keyID",
+					PrivateKey: []byte("invalid"),
 				},
+			},
+			res{
+				err: zerrors.ThrowInvalidArgument(crypto.ErrEmpty, "INST-Fk38d", "Errors.IDP.InvalidPrivateKey"),
 			},
 		},
 		{
@@ -4908,7 +5025,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
 								KeyID:      "id",
-								Crypted:    []byte("privateKey"),
+								Crypted:    privateKeyPKCS8,
 							},
 							nil,
 							idp.Options{},
@@ -4916,7 +5033,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -4924,7 +5041,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 					ClientID:   "clientID",
 					TeamID:     "teamID",
 					KeyID:      "keyID",
-					PrivateKey: []byte("privateKey"),
+					PrivateKey: privateKeyPKCS8,
 				},
 			},
 			res: res{
@@ -4948,7 +5065,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
 								KeyID:      "id",
-								Crypted:    []byte("privateKey"),
+								Crypted:    privateKeyPKCS8,
 							},
 							[]string{"name", "email"},
 							idp.Options{
@@ -4961,7 +5078,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -4969,7 +5086,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 					ClientID:   "clientID",
 					TeamID:     "teamID",
 					KeyID:      "keyID",
-					PrivateKey: []byte("privateKey"),
+					PrivateKey: privateKeyPKCS8,
 					Scopes:     []string{"name", "email"},
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
@@ -4993,12 +5110,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			id, got, err := c.AddInstanceAppleProvider(tt.args.ctx, tt.args.provider)
-			if tt.res.err == nil {
-				assert.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
+			assert.ErrorIs(t, err, tt.res.err)
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.id, id)
 				assertObjectDetails(t, tt.res.want, got)
@@ -5010,7 +5122,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -5019,7 +5131,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 	}
 	type res struct {
 		want *domain.ObjectDetails
-		err  func(error) bool
+		err  error
 	}
 	tests := []struct {
 		name   string
@@ -5037,9 +5149,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 				provider: AppleProvider{},
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-FRHBH", "Errors.IDMissing"))
-				},
+				err: zerrors.ThrowInvalidArgument(nil, "INST-FRHBH", "Errors.IDMissing"),
 			},
 		},
 		{
@@ -5053,9 +5163,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 				provider: AppleProvider{},
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SFm4l", "Errors.IDP.ClientIDMissing"))
-				},
+				err: zerrors.ThrowInvalidArgument(nil, "INST-SFm4l", "Errors.IDP.ClientIDMissing"),
 			},
 		},
 		{
@@ -5071,9 +5179,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SG34t", "Errors.IDP.TeamIDMissing"))
-				},
+				err: zerrors.ThrowInvalidArgument(nil, "INST-SG34t", "Errors.IDP.TeamIDMissing"),
 			},
 		},
 		{
@@ -5090,9 +5196,26 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Gh4z2", "Errors.IDP.KeyIDMissing"))
+				err: zerrors.ThrowInvalidArgument(nil, "INST-Gh4z2", "Errors.IDP.KeyIDMissing"),
+			},
+		},
+		{
+			"invalid key",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: AppleProvider{
+					ClientID:   "clientID",
+					TeamID:     "teamID",
+					KeyID:      "keyID",
+					PrivateKey: []byte("invalid"),
 				},
+			},
+			res{
+				err: zerrors.ThrowInvalidArgument(nil, "INST-eWSDf", "Errors.IDP.InvalidPrivateKey"),
 			},
 		},
 		{
@@ -5112,7 +5235,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zerrors.IsNotFound,
+				err: zerrors.ThrowNotFound(nil, "INST-SG3bh", "Errors.IDPConfig.NotExisting"),
 			},
 		},
 		{
@@ -5187,7 +5310,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 										CryptoType: crypto.TypeEncryption,
 										Algorithm:  "enc",
 										KeyID:      "id",
-										Crypted:    []byte("newPrivateKey"),
+										Crypted:    privateKeyPKCS8,
 									}),
 									idp.ChangeAppleScopes([]string{"name", "email"}),
 									idp.ChangeAppleOptions(idp.OptionChanges{
@@ -5202,7 +5325,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -5211,7 +5334,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 					ClientID:   "clientID2",
 					TeamID:     "teamID2",
 					KeyID:      "keyID2",
-					PrivateKey: []byte("newPrivateKey"),
+					PrivateKey: privateKeyPKCS8,
 					Scopes:     []string{"name", "email"},
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
@@ -5233,12 +5356,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateInstanceAppleProvider(tt.args.ctx, tt.args.id, tt.args.provider)
-			if tt.res.err == nil {
-				assert.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
+			assert.ErrorIs(t, err, tt.res.err)
 			if tt.res.err == nil {
 				assertObjectDetails(t, tt.res.want, got)
 			}
@@ -5250,7 +5368,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 	type fields struct {
 		eventstore                 func(*testing.T) *eventstore.Eventstore
 		idGenerator                id.Generator
-		secretCrypto               crypto.EncryptionAlgorithm
+		secretCrypto               crypto.AuthEncryptionAlgorithm
 		certificateAndKeyGenerator func(id string) ([]byte, []byte, error)
 	}
 	type args struct {
@@ -5340,14 +5458,16 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 							[]byte("certificate"),
 							"",
 							false,
+							"",
 							nil,
 							"",
+							false,
 							idp.Options{},
 						),
 					),
 				),
 				idGenerator:                id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto:               crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto:               crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 				certificateAndKeyGenerator: func(id string) ([]byte, []byte, error) { return []byte("key"), []byte("certificate"), nil },
 			},
 			args: args{
@@ -5381,8 +5501,10 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 							[]byte("certificate"),
 							"binding",
 							true,
+							"http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
 							gu.Ptr(domain.SAMLNameIDFormatTransient),
 							"customAttribute",
+							true,
 							idp.Options{
 								IsCreationAllowed: true,
 								IsLinkingAllowed:  true,
@@ -5393,7 +5515,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 					),
 				),
 				idGenerator:                id_mock.NewIDGeneratorExpectIDs(t, "id1"),
-				secretCrypto:               crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto:               crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 				certificateAndKeyGenerator: func(id string) ([]byte, []byte, error) { return []byte("key"), []byte("certificate"), nil },
 			},
 			args: args{
@@ -5403,8 +5525,10 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 					Metadata:                      validSAMLMetadata,
 					Binding:                       "binding",
 					WithSignedRequest:             true,
+					SignatureAlgorithm:            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
 					NameIDFormat:                  gu.Ptr(domain.SAMLNameIDFormatTransient),
 					TransientMappingAttributeName: "customAttribute",
+					FederatedLogoutEnabled:        true,
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -5445,7 +5569,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx      context.Context
@@ -5568,8 +5692,10 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 								[]byte("certificate"),
 								"",
 								false,
+								"",
 								nil,
 								"",
+								false,
 								idp.Options{},
 							)),
 					),
@@ -5606,8 +5732,10 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 								[]byte("certificate"),
 								"binding",
 								false,
+								"",
 								gu.Ptr(domain.SAMLNameIDFormatUnspecified),
 								"",
+								false,
 								idp.Options{},
 							)),
 					),
@@ -5623,6 +5751,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 									idp.ChangeSAMLWithSignedRequest(true),
 									idp.ChangeSAMLNameIDFormat(gu.Ptr(domain.SAMLNameIDFormatTransient)),
 									idp.ChangeSAMLTransientMappingAttributeName("customAttribute"),
+									idp.ChangeSAMLFederatedLogoutEnabled(true),
 									idp.ChangeSAMLOptions(idp.OptionChanges{
 										IsCreationAllowed: &t,
 										IsLinkingAllowed:  &t,
@@ -5635,7 +5764,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
@@ -5647,6 +5776,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 					WithSignedRequest:             true,
 					NameIDFormat:                  gu.Ptr(domain.SAMLNameIDFormatTransient),
 					TransientMappingAttributeName: "customAttribute",
+					FederatedLogoutEnabled:        true,
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -5683,7 +5813,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 func TestCommandSide_RegenerateInstanceSAMLProviderCertificate(t *testing.T) {
 	type fields struct {
 		eventstore                 func(*testing.T) *eventstore.Eventstore
-		secretCrypto               crypto.EncryptionAlgorithm
+		secretCrypto               crypto.AuthEncryptionAlgorithm
 		certificateAndKeyGenerator func(id string) ([]byte, []byte, error)
 	}
 	type args struct {
@@ -5748,8 +5878,10 @@ func TestCommandSide_RegenerateInstanceSAMLProviderCertificate(t *testing.T) {
 								[]byte("certificate"),
 								"binding",
 								false,
+								"",
 								gu.Ptr(domain.SAMLNameIDFormatUnspecified),
 								"",
+								false,
 								idp.Options{},
 							)),
 					),
@@ -5771,7 +5903,7 @@ func TestCommandSide_RegenerateInstanceSAMLProviderCertificate(t *testing.T) {
 						}(),
 					),
 				),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 				certificateAndKeyGenerator: func(id string) ([]byte, []byte, error) {
 					return []byte("new key"), []byte("new certificate"), nil
 				},
@@ -5793,6 +5925,872 @@ func TestCommandSide_RegenerateInstanceSAMLProviderCertificate(t *testing.T) {
 				samlCertificateAndKeyGenerator: tt.fields.certificateAndKeyGenerator,
 			}
 			got, err := c.RegenerateInstanceSAMLProviderCertificate(tt.args.ctx, tt.args.id)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assertObjectDetails(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_AddInstanceZitadelIDP(t *testing.T) {
+	pushErr := errors.New("push error")
+	type fields struct {
+		eventstore   func(*testing.T) *eventstore.Eventstore
+		idGenerator  id.Generator
+		secretCrypto crypto.AuthEncryptionAlgorithm
+	}
+	type args struct {
+		ctx      context.Context
+		provider ZitadelProvider
+	}
+	type res struct {
+		id   string
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"invalid name",
+			fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:      authz.WithInstanceID(context.Background(), "instance1"),
+				provider: ZitadelProvider{},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Sgtj5", ""))
+				},
+			},
+		},
+		{
+			"invalid issuer",
+			fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: ZitadelProvider{
+					Name: "name",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Hz6zj", ""))
+				},
+			},
+		},
+		{
+			"invalid clientID",
+			fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: ZitadelProvider{
+					Name:   "name",
+					Issuer: "issuer",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-fb5jm", ""))
+				},
+			},
+		},
+		{
+			"invalid clientSecret",
+			fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: ZitadelProvider{
+					Name:     "name",
+					Issuer:   "issuer",
+					ClientID: "clientID",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Sfdf4", ""))
+				},
+			},
+		},
+		{
+			name: "push error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectPushFailed(
+						pushErr,
+						instance.NewZitadelIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"issuer",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							nil,
+							idp.Options{},
+							[]idp.RolesInfo{
+								{
+									OrganizationID:     "org1",
+									OrganizationDomain: "example-org1.com",
+								},
+								{
+									OrganizationID:     "org2",
+									OrganizationDomain: "example-org2.com",
+								},
+							},
+						),
+					),
+				),
+				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: ZitadelProvider{
+					Name:         "name",
+					Issuer:       "issuer",
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+					InstanceRolesInfo: []idp.RolesInfo{
+						{
+							OrganizationID:     "org1",
+							OrganizationDomain: "example-org1.com",
+						},
+						{
+							OrganizationID:     "org2",
+							OrganizationDomain: "example-org2.com",
+						},
+					},
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, pushErr)
+				},
+			},
+		},
+		{
+			name: "ok, without instance roles info",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectPush(
+						instance.NewZitadelIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"issuer",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							nil,
+							idp.Options{},
+							nil,
+						),
+					),
+				),
+				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: ZitadelProvider{
+					Name:         "name",
+					Issuer:       "issuer",
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+				},
+			},
+			res: res{
+				id:   "id1",
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+		{
+			name: "ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectPush(
+						instance.NewZitadelIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"issuer",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							nil,
+							idp.Options{},
+							[]idp.RolesInfo{
+								{
+									OrganizationID:     "org1",
+									OrganizationDomain: "example-org1.com",
+								},
+								{
+									OrganizationID:     "org2",
+									OrganizationDomain: "example-org2.com",
+								},
+							},
+						),
+					),
+				),
+				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: ZitadelProvider{
+					Name:         "name",
+					Issuer:       "issuer",
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+					InstanceRolesInfo: []idp.RolesInfo{
+						{
+							OrganizationID:     "org1",
+							OrganizationDomain: "example-org1.com",
+						},
+						{
+							OrganizationID:     "org2",
+							OrganizationDomain: "example-org2.com",
+						},
+					},
+				},
+			},
+			res: res{
+				id:   "id1",
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+		{
+			name: "ok all set",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectPush(
+						instance.NewZitadelIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"issuer",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							[]string{openid.ScopeOpenID},
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+							[]idp.RolesInfo{
+								{
+									OrganizationID:     "org1",
+									OrganizationDomain: "example-org1.com",
+								},
+								{
+									OrganizationID:     "org2",
+									OrganizationDomain: "example-org2.com",
+								},
+							},
+						),
+					),
+				),
+				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: ZitadelProvider{
+					Name:         "name",
+					Issuer:       "issuer",
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+					Scopes:       []string{openid.ScopeOpenID},
+					IDPOptions: idp.Options{
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+					},
+					InstanceRolesInfo: []idp.RolesInfo{
+						{
+							OrganizationID:     "org1",
+							OrganizationDomain: "example-org1.com",
+						},
+						{
+							OrganizationID:     "org2",
+							OrganizationDomain: "example-org2.com",
+						},
+					},
+				},
+			},
+			res: res{
+				id:   "id1",
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:          tt.fields.eventstore(t),
+				idGenerator:         tt.fields.idGenerator,
+				idpConfigEncryption: tt.fields.secretCrypto,
+			}
+			idpId, got, err := c.AddInstanceZitadelProvider(tt.args.ctx, tt.args.provider)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.id, idpId)
+				assertObjectDetails(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommands_UpdateInstanceZitadelProvider(t *testing.T) {
+	pushErr := errors.New("push error")
+	type fields struct {
+		eventstore   func(*testing.T) *eventstore.Eventstore
+		secretCrypto crypto.AuthEncryptionAlgorithm
+	}
+	type args struct {
+		ctx      context.Context
+		id       string
+		provider ZitadelProvider
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"invalid name",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx:      authz.WithInstanceID(context.Background(), "instance1"),
+				id:       "idp-id",
+				provider: ZitadelProvider{},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Sgtj5", ""))
+				},
+			},
+		},
+		{
+			"invalid issuer",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "idp-id",
+				provider: ZitadelProvider{
+					Name: "name",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Hz6zj", ""))
+				},
+			},
+		},
+		{
+			"invalid clientID",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "idp-id",
+				provider: ZitadelProvider{
+					Name:   "name",
+					Issuer: "issuer",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-fb5jm", ""))
+				},
+			},
+		},
+		{
+			name: "not found",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "idp-id",
+				provider: ZitadelProvider{
+					Name:     "name",
+					Issuer:   "issuer",
+					ClientID: "clientID",
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "INST-Bg281", "Errors.IDPConfig.NotExisting"))
+				},
+			},
+		},
+		{
+			name: "push error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewZitadelIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{openid.ScopeOpenID, openid.ScopeEmail},
+								idp.Options{},
+								[]idp.RolesInfo{
+									{
+										OrganizationID:     "org1",
+										OrganizationDomain: "example-org1.com",
+									},
+								},
+							)),
+					),
+					expectPushFailed(
+						pushErr,
+						instance.NewZitadelIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							[]idp.ZitadelIDPChanges{
+								idp.ChangeZitadelIDPName("new name"),
+								idp.ChangeZitadelIDPIssuer("new issuer"),
+								idp.ChangeZitadelIDPClientID("clientID2"),
+								idp.ChangeZitadelIDPClientSecret(&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("newSecret"),
+								}),
+								idp.ChangeZitadelIDPInstanceRolesInfo(nil),
+								idp.ChangeZitadelIDPScopes(nil),
+							},
+						),
+					),
+				),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: ZitadelProvider{
+					Name:              "new name",
+					Issuer:            "new issuer",
+					ClientID:          "clientID2",
+					ClientSecret:      "newSecret",
+					Scopes:            nil,
+					InstanceRolesInfo: nil,
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, pushErr)
+				},
+			},
+		},
+		{
+			name: "no changes",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewZitadelIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"idp-id",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "key-id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{openid.ScopeOpenID, openid.ScopeEmail},
+								idp.Options{},
+								[]idp.RolesInfo{
+									{
+										OrganizationID:     "org1",
+										OrganizationDomain: "example-org1.com",
+									},
+									{
+										OrganizationID:     "org2",
+										OrganizationDomain: "example-org2.com",
+									},
+								},
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "idp-id",
+				provider: ZitadelProvider{
+					Name:     "name",
+					Issuer:   "issuer",
+					ClientID: "clientID",
+					Scopes:   []string{openid.ScopeOpenID, openid.ScopeEmail},
+					InstanceRolesInfo: []idp.RolesInfo{
+						{
+							OrganizationID:     "org1",
+							OrganizationDomain: "example-org1.com",
+						},
+						{
+							OrganizationID:     "org2",
+							OrganizationDomain: "example-org2.com",
+						},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+		{
+			name: "change ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewZitadelIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{openid.ScopeOpenID, openid.ScopeEmail},
+								idp.Options{},
+								[]idp.RolesInfo{
+									{
+										OrganizationID:     "org1",
+										OrganizationDomain: "example-org1.com",
+									},
+								},
+							)),
+					),
+					expectPush(
+						func() eventstore.Command {
+							t := true
+							event := instance.NewZitadelIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.ZitadelIDPChanges{
+									idp.ChangeZitadelIDPName("new name"),
+									idp.ChangeZitadelIDPIssuer("new issuer"),
+									idp.ChangeZitadelIDPClientID("clientID2"),
+									idp.ChangeZitadelIDPClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("newSecret"),
+									}),
+									idp.ChangeZitadelIDPScopes([]string{"openid", "profile"}),
+									idp.ChangeZitadelIDPOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+									idp.ChangeZitadelIDPInstanceRolesInfo([]idp.RolesInfo{
+										{
+											OrganizationID:     "org1",
+											OrganizationDomain: "example-org1.com",
+										},
+										{
+											OrganizationID:     "org2",
+											OrganizationDomain: "example-org2.com",
+										},
+									}),
+								},
+							)
+							return event
+						}(),
+					),
+				),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: ZitadelProvider{
+					Name:         "new name",
+					Issuer:       "new issuer",
+					ClientID:     "clientID2",
+					ClientSecret: "newSecret",
+					Scopes:       []string{"openid", "profile"},
+					IDPOptions: idp.Options{
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+					},
+					InstanceRolesInfo: []idp.RolesInfo{
+						{
+							OrganizationID:     "org1",
+							OrganizationDomain: "example-org1.com",
+						},
+						{
+							OrganizationID:     "org2",
+							OrganizationDomain: "example-org2.com",
+						},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+		{
+			name: "change, unset scopes, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewZitadelIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{openid.ScopeOpenID, openid.ScopeEmail},
+								idp.Options{},
+								[]idp.RolesInfo{
+									{
+										OrganizationID:     "org1",
+										OrganizationDomain: "example-org1.com",
+									},
+								},
+							)),
+					),
+					expectPush(
+						func() eventstore.Command {
+							t := true
+							event := instance.NewZitadelIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.ZitadelIDPChanges{
+									idp.ChangeZitadelIDPName("new name"),
+									idp.ChangeZitadelIDPIssuer("new issuer"),
+									idp.ChangeZitadelIDPClientID("clientID2"),
+									idp.ChangeZitadelIDPClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("newSecret"),
+									}),
+									idp.ChangeZitadelIDPScopes(nil),
+									idp.ChangeZitadelIDPOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+									idp.ChangeZitadelIDPInstanceRolesInfo([]idp.RolesInfo{
+										{
+											OrganizationID:     "org1",
+											OrganizationDomain: "example-org1.com",
+										},
+										{
+											OrganizationID:     "org2",
+											OrganizationDomain: "example-org2.com",
+										},
+									}),
+								},
+							)
+							return event
+						}(),
+					),
+				),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: ZitadelProvider{
+					Name:         "new name",
+					Issuer:       "new issuer",
+					ClientID:     "clientID2",
+					ClientSecret: "newSecret",
+					Scopes:       []string{},
+					IDPOptions: idp.Options{
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+					},
+					InstanceRolesInfo: []idp.RolesInfo{
+						{
+							OrganizationID:     "org1",
+							OrganizationDomain: "example-org1.com",
+						},
+						{
+							OrganizationID:     "org2",
+							OrganizationDomain: "example-org2.com",
+						},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+		{
+			name: "change, unset instance roles info, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewZitadelIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{openid.ScopeOpenID, openid.ScopeEmail},
+								idp.Options{},
+								[]idp.RolesInfo{
+									{
+										OrganizationID:     "org1",
+										OrganizationDomain: "example-org1.com",
+									},
+								},
+							)),
+					),
+					expectPush(
+						func() eventstore.Command {
+							t := true
+							event := instance.NewZitadelIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.ZitadelIDPChanges{
+									idp.ChangeZitadelIDPName("new name"),
+									idp.ChangeZitadelIDPIssuer("new issuer"),
+									idp.ChangeZitadelIDPClientID("clientID2"),
+									idp.ChangeZitadelIDPClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("newSecret"),
+									}),
+									idp.ChangeZitadelIDPOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+									idp.ChangeZitadelIDPInstanceRolesInfo(nil),
+								},
+							)
+							return event
+						}(),
+					),
+				),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: ZitadelProvider{
+					Name:         "new name",
+					Issuer:       "new issuer",
+					ClientID:     "clientID2",
+					ClientSecret: "newSecret",
+					Scopes:       []string{openid.ScopeOpenID, openid.ScopeEmail},
+					IDPOptions: idp.Options{
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+					},
+					InstanceRolesInfo: []idp.RolesInfo{},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:          tt.fields.eventstore(t),
+				idpConfigEncryption: tt.fields.secretCrypto,
+			}
+			got, err := c.UpdateInstanceZitadelProvider(tt.args.ctx, tt.args.id, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

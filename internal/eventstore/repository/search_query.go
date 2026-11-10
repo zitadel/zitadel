@@ -1,7 +1,11 @@
 package repository
 
 import (
+	"cmp"
 	"database/sql"
+	"slices"
+
+	"github.com/shopspring/decimal"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -14,13 +18,11 @@ type SearchQuery struct {
 
 	SubQueries            [][]*Filter
 	Tx                    *sql.Tx
-	LockRows              bool
-	LockOption            eventstore.LockOption
-	AllowTimeTravel       bool
 	AwaitOpenTransactions bool
 	Limit                 uint64
 	Offset                uint32
 	Desc                  bool
+	OrderByCreationDate   bool
 
 	InstanceID          *Filter
 	InstanceIDs         *Filter
@@ -32,6 +34,17 @@ type SearchQuery struct {
 	CreatedAfter        *Filter
 	CreatedBefore       *Filter
 	ExcludeAggregateIDs []*Filter
+	EventSortKeyAfter   *eventstore.EventSortKey
+	// EventTypeScans contains the combinations of aggregate type and event type to read separately,
+	// see [eventstore.SearchQueryBuilder.ScanEventTypesSeparately].
+	// It is empty if the sub queries cannot be read that way.
+	EventTypeScans []EventTypeScan
+}
+
+// EventTypeScan is a combination of aggregate type and event type, which is read separately.
+type EventTypeScan struct {
+	AggregateType eventstore.AggregateType
+	EventType     eventstore.EventType
 }
 
 // Filter represents all fields needed to compare a field of an event with a value
@@ -51,12 +64,14 @@ const (
 	OperationGreater
 	// OperationLess compares if the given values is less than the stored one
 	OperationLess
-	//OperationIn checks if a stored value matches one of the passed value list
+	// OperationIn checks if a stored value matches one of the passed value list
 	OperationIn
-	//OperationJSONContains checks if a stored value matches the given json
+	// OperationJSONContains checks if a stored value matches the given json
 	OperationJSONContains
-	//OperationNotIn checks if a stored value does not match one of the passed value list
+	// OperationNotIn checks if a stored value does not match one of the passed value list
 	OperationNotIn
+
+	OperationGreaterOrEquals
 
 	operationCount
 )
@@ -65,25 +80,25 @@ const (
 type Field int32
 
 const (
-	//FieldAggregateType represents the aggregate type field
+	// FieldAggregateType represents the aggregate type field
 	FieldAggregateType Field = iota + 1
-	//FieldAggregateID represents the aggregate id field
+	// FieldAggregateID represents the aggregate id field
 	FieldAggregateID
-	//FieldSequence represents the sequence field
+	// FieldSequence represents the sequence field
 	FieldSequence
-	//FieldResourceOwner represents the resource owner field
+	// FieldResourceOwner represents the resource owner field
 	FieldResourceOwner
-	//FieldInstanceID represents the instance id field
+	// FieldInstanceID represents the instance id field
 	FieldInstanceID
-	//FieldEditorService represents the editor service field
+	// FieldEditorService represents the editor service field
 	FieldEditorService
-	//FieldEditorUser represents the editor user field
+	// FieldEditorUser represents the editor user field
 	FieldEditorUser
-	//FieldEventType represents the event type field
+	// FieldEventType represents the event type field
 	FieldEventType
-	//FieldEventData represents the event data field
+	// FieldEventData represents the event data field
 	FieldEventData
-	//FieldCreationDate represents the creation date field
+	// FieldCreationDate represents the creation date field
 	FieldCreationDate
 	// FieldPosition represents the field of the global sequence
 	FieldPosition
@@ -128,12 +143,17 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 		Limit:                 builder.GetLimit(),
 		Offset:                builder.GetOffset(),
 		Desc:                  builder.GetDesc(),
+		OrderByCreationDate:   builder.GetOrderByCreationDate(),
 		Tx:                    builder.GetTx(),
-		AllowTimeTravel:       builder.GetAllowTimeTravel(),
 		AwaitOpenTransactions: builder.GetAwaitOpenTransactions(),
 		SubQueries:            make([][]*Filter, len(builder.GetQueries())),
+		EventSortKeyAfter:     builder.GetEventSortKeyAfter(),
 	}
-	query.LockRows, query.LockOption = builder.GetLockRows()
+	var err error
+	query.EventTypeScans, err = eventTypeScans(builder)
+	if err != nil {
+		return nil, err
+	}
 
 	for _, f := range []func(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter{
 		instanceIDFilter,
@@ -189,6 +209,35 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 	}
 
 	return query, nil
+}
+
+// eventTypeScans returns the distinct combinations of aggregate type and event type of all sub queries,
+// if [eventstore.SearchQueryBuilder.ScanEventTypesSeparately] was set.
+// Each sub query must filter a single aggregate type and at least one event type, and nothing else,
+// otherwise an error is returned. A single aggregate type is required because event types belong to an aggregate type:
+// a sub query with several aggregate types would combine event types with aggregate types they do not belong to.
+func eventTypeScans(builder *eventstore.SearchQueryBuilder) ([]EventTypeScan, error) {
+	if !builder.GetScanEventTypesSeparately() {
+		return nil, nil
+	}
+	var scans []EventTypeScan
+	for _, query := range builder.GetQueries() {
+		if len(query.GetAggregateTypes()) != 1 ||
+			len(query.GetEventTypes()) == 0 ||
+			len(query.GetAggregateIDs()) > 0 ||
+			len(query.GetEventData()) > 0 ||
+			!query.GetPositionAfter().IsZero() {
+			return nil, zerrors.ThrowInvalidArgument(nil, "REPO-Ahx6e", "scanning event types separately requires sub queries with one aggregate type and event types only")
+		}
+		for _, eventType := range query.GetEventTypes() {
+			scans = append(scans, EventTypeScan{AggregateType: query.GetAggregateTypes()[0], EventType: eventType})
+		}
+	}
+	// sub queries are OR-connected, so a combination listed twice must still be read once
+	slices.SortFunc(scans, func(a, b EventTypeScan) int {
+		return cmp.Or(cmp.Compare(a.AggregateType, b.AggregateType), cmp.Compare(a.EventType, b.EventType))
+	})
+	return slices.Compact(scans), nil
 }
 
 func eventSequenceGreaterFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter {
@@ -252,10 +301,10 @@ func instanceIDsFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuer
 }
 
 func positionAfterFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter {
-	if builder.GetPositionAfter() == 0 {
+	if builder.GetPositionAtLeast().IsZero() {
 		return nil
 	}
-	query.Position = NewFilter(FieldPosition, builder.GetPositionAfter(), OperationGreater)
+	query.Position = NewFilter(FieldPosition, builder.GetPositionAtLeast(), OperationGreaterOrEquals)
 	return query.Position
 }
 
@@ -297,7 +346,7 @@ func eventDataFilter(query *eventstore.SearchQuery) *Filter {
 }
 
 func eventPositionAfterFilter(query *eventstore.SearchQuery) *Filter {
-	if pos := query.GetPositionAfter(); pos != 0 {
+	if pos := query.GetPositionAfter(); !pos.Equal(decimal.Decimal{}) {
 		return NewFilter(FieldPosition, pos, OperationGreater)
 	}
 	return nil

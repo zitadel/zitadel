@@ -62,7 +62,7 @@
       .action-keys-row {
         .key-overlay {
           z-index: 0;
-          background: if($is-dark-theme, #fff, #000);
+          background: if(sass($is-dark-theme): #fff; else: #000);
           opacity: 0.15;
         }
       }

@@ -19,6 +19,7 @@ import { ToastService } from 'src/app/services/toast.service';
   selector: 'cnsl-granted-project-detail',
   templateUrl: './granted-project-detail.component.html',
   styleUrls: ['./granted-project-detail.component.scss'],
+  standalone: false,
 })
 export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
   public projectId: string = '';
@@ -59,20 +60,23 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
     this.projectId = id;
     this.grantId = grantId;
 
-    const breadcrumbs = [
-      new Breadcrumb({
-        type: BreadcrumbType.ORG,
-        routerLink: ['/org'],
-      }),
-      new Breadcrumb({
-        type: BreadcrumbType.GRANTEDPROJECT,
-        name: '',
-        param: { key: 'id', value: id },
-        routerLink: ['/granted-projects', id],
-        isZitadel: this.isZitadel,
-      }),
-    ];
-    this.breadcrumbService.setBreadcrumb(breadcrumbs);
+    const setBreadcrumbs = (name: string) => {
+      const breadcrumbs = [
+        new Breadcrumb({
+          type: BreadcrumbType.ORG,
+          routerLink: ['/org'],
+        }),
+        new Breadcrumb({
+          type: BreadcrumbType.GRANTEDPROJECT,
+          name,
+          param: { key: 'id', value: id },
+          routerLink: ['/granted-projects', id],
+          isZitadel: this.isZitadel,
+        }),
+      ];
+      this.breadcrumbService.setBreadcrumb(breadcrumbs);
+    };
+    setBreadcrumbs('');
 
     this.mgmtService.getIAM().then((iam) => {
       this.isZitadel = iam.iamProjectId === this.projectId;
@@ -84,6 +88,8 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
         .then((proj) => {
           if (proj.grantedProject) {
             this.project = proj.grantedProject;
+            // the project might not be part of the preloaded granted projects
+            setBreadcrumbs(proj.grantedProject.projectName);
           }
         })
         .catch((error) => {

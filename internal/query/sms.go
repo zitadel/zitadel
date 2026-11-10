@@ -9,7 +9,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -36,6 +35,13 @@ type SMSConfig struct {
 	HTTPConfig   *HTTP
 }
 
+func (h *SMSConfig) decryptSigningKey(alg crypto.EncryptionAlgorithm) error {
+	if h.HTTPConfig == nil {
+		return nil
+	}
+	return h.HTTPConfig.decryptSigningKey(alg)
+}
+
 type Twilio struct {
 	SID              string
 	Token            *crypto.CryptoValue
@@ -44,7 +50,21 @@ type Twilio struct {
 }
 
 type HTTP struct {
-	Endpoint string
+	Endpoint   string
+	signingKey *crypto.CryptoValue
+	SigningKey string
+}
+
+func (h *HTTP) decryptSigningKey(alg crypto.EncryptionAlgorithm) error {
+	if h.signingKey == nil {
+		return nil
+	}
+	keyValue, err := crypto.DecryptString(h.signingKey, alg)
+	if err != nil {
+		return zerrors.ThrowInternal(err, "QUERY-bxovy3YXwy", "Errors.Internal")
+	}
+	h.SigningKey = keyValue
+	return nil
 }
 
 type SMSConfigsSearchQueries struct {
@@ -143,13 +163,17 @@ var (
 		name:  projection.SMSHTTPColumnEndpoint,
 		table: smsHTTPTable,
 	}
+	SMSHTTPColumnSigningKey = Column{
+		name:  projection.SMSHTTPColumnSigningKey,
+		table: smsHTTPTable,
+	}
 )
 
 func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (config *SMSConfig, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareSMSConfigQuery(ctx, q.client)
+	query, scan := prepareSMSConfigQuery()
 	stmt, args, err := query.Where(
 		sq.Eq{
 			SMSColumnID.identifier():         id,
@@ -164,14 +188,20 @@ func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (config 
 		config, err = scan(row)
 		return err
 	}, stmt, args...)
-	return config, err
+	if err != nil {
+		return nil, err
+	}
+	if err := config.decryptSigningKey(q.smsEncryptionAlgorithm); err != nil {
+		return nil, err
+	}
+	return config, nil
 }
 
 func (q *Queries) SMSProviderConfigActive(ctx context.Context, instanceID string) (config *SMSConfig, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareSMSConfigQuery(ctx, q.client)
+	query, scan := prepareSMSConfigQuery()
 	stmt, args, err := query.Where(
 		sq.Eq{
 			SMSColumnInstanceID.identifier(): instanceID,
@@ -186,14 +216,20 @@ func (q *Queries) SMSProviderConfigActive(ctx context.Context, instanceID string
 		config, err = scan(row)
 		return err
 	}, stmt, args...)
-	return config, err
+	if err != nil {
+		return nil, err
+	}
+	if err := config.decryptSigningKey(q.smsEncryptionAlgorithm); err != nil {
+		return nil, err
+	}
+	return config, nil
 }
 
 func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearchQueries) (configs *SMSConfigs, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareSMSConfigsQuery(ctx, q.client)
+	query, scan := prepareSMSConfigsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
 			SMSColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -209,15 +245,20 @@ func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearc
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-l4bxm", "Errors.Internal")
 	}
+	for i := range configs.Configs {
+		if err := configs.Configs[i].decryptSigningKey(q.smsEncryptionAlgorithm); err != nil {
+			return nil, err
+		}
+	}
 	configs.State, err = q.latestState(ctx, smsConfigsTable)
-	return configs, err
+	return configs, nil
 }
 
 func NewSMSProviderStateQuery(state domain.SMSConfigState) (SearchQuery, error) {
 	return NewNumberQuery(SMSColumnState, state, NumberEquals)
 }
 
-func prepareSMSConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*SMSConfig, error)) {
+func prepareSMSConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMSConfig, error)) {
 	return sq.Select(
 			SMSColumnID.identifier(),
 			SMSColumnAggregateID.identifier(),
@@ -236,9 +277,10 @@ func prepareSMSConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 
 			SMSHTTPColumnSMSID.identifier(),
 			SMSHTTPColumnEndpoint.identifier(),
+			SMSHTTPColumnSigningKey.identifier(),
 		).From(smsConfigsTable.identifier()).
 			LeftJoin(join(SMSTwilioColumnSMSID, SMSColumnID)).
-			LeftJoin(join(SMSHTTPColumnSMSID, SMSColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(SMSHTTPColumnSMSID, SMSColumnID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*SMSConfig, error) {
 			config := new(SMSConfig)
 
@@ -265,6 +307,7 @@ func prepareSMSConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 
 				&httpConfig.id,
 				&httpConfig.endpoint,
+				&httpConfig.signingKey,
 			)
 
 			if err != nil {
@@ -281,7 +324,7 @@ func prepareSMSConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 		}
 }
 
-func prepareSMSConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*SMSConfigs, error)) {
+func prepareSMSConfigsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SMSConfigs, error)) {
 	return sq.Select(
 			SMSColumnID.identifier(),
 			SMSColumnAggregateID.identifier(),
@@ -300,11 +343,12 @@ func prepareSMSConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 
 			SMSHTTPColumnSMSID.identifier(),
 			SMSHTTPColumnEndpoint.identifier(),
+			SMSHTTPColumnSigningKey.identifier(),
 
 			countColumn.identifier(),
 		).From(smsConfigsTable.identifier()).
 			LeftJoin(join(SMSTwilioColumnSMSID, SMSColumnID)).
-			LeftJoin(join(SMSHTTPColumnSMSID, SMSColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(SMSHTTPColumnSMSID, SMSColumnID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Rows) (*SMSConfigs, error) {
 			configs := &SMSConfigs{Configs: []*SMSConfig{}}
 
@@ -333,6 +377,7 @@ func prepareSMSConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 
 					&httpConfig.id,
 					&httpConfig.endpoint,
+					&httpConfig.signingKey,
 
 					&configs.Count,
 				)
@@ -372,8 +417,9 @@ func (c sqlTwilioConfig) set(smsConfig *SMSConfig) {
 }
 
 type sqlHTTPConfig struct {
-	id       sql.NullString
-	endpoint sql.NullString
+	id         sql.NullString
+	endpoint   sql.NullString
+	signingKey *crypto.CryptoValue
 }
 
 func (c sqlHTTPConfig) setSMS(smsConfig *SMSConfig) {
@@ -381,6 +427,7 @@ func (c sqlHTTPConfig) setSMS(smsConfig *SMSConfig) {
 		return
 	}
 	smsConfig.HTTPConfig = &HTTP{
-		Endpoint: c.endpoint.String,
+		Endpoint:   c.endpoint.String,
+		signingKey: c.signingKey,
 	}
 }

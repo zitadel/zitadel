@@ -28,12 +28,16 @@ import FailedEventsModule from '../failed-events/failed-events.module';
 import IamViewsModule from '../iam-views/iam-views.module';
 import EventsModule from '../events/events.module';
 import { OrgTableModule } from '../org-table/org-table.module';
-import { NotificationSMTPProviderModule } from '../policies/notification-smtp-provider/notification-smtp-provider.module';
 import { FeaturesComponent } from 'src/app/components/features/features.component';
 import OrgListModule from 'src/app/pages/org-list/org-list.module';
+import ActionsTwoModule from '../actions-two/actions-two.module';
+import { provideRouter } from '@angular/router';
+import { OidcWebkeysModule } from '../policies/oidc-webkeys/oidc-webkeys.module';
+import { NotificationSMTPProviderComponent } from '../policies/notification-smtp-provider/notification-smtp-provider.component';
 
 @NgModule({
   declarations: [SettingsListComponent],
+  providers: [provideRouter([])],
   imports: [
     CommonModule,
     FormsModule,
@@ -47,7 +51,7 @@ import OrgListModule from 'src/app/pages/org-list/org-list.module';
     LanguageSettingsModule,
     NotificationPolicyModule,
     IdpSettingsModule,
-    NotificationSMTPProviderModule,
+    NotificationSMTPProviderComponent,
     PrivacyPolicyModule,
     MessageTextsPolicyModule,
     SecurityPolicyModule,
@@ -59,13 +63,14 @@ import OrgListModule from 'src/app/pages/org-list/org-list.module';
     TranslateModule,
     HasRolePipeModule,
     FeaturesComponent,
-    NotificationSMTPProviderModule,
     NotificationSMSProviderModule,
     OIDCConfigurationModule,
+    OidcWebkeysModule,
     SecretGeneratorModule,
     FailedEventsModule,
     IamViewsModule,
     EventsModule,
+    ActionsTwoModule,
   ],
   exports: [SettingsListComponent],
 })

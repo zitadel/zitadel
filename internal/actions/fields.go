@@ -62,10 +62,12 @@ func (f *FieldConfig) set(name string, value interface{}) {
 		logging.WithFields("name", name).Error("tried to overwrite field")
 		panic("tried to overwrite field")
 	}
-	v, ok := value.(func(*FieldConfig) interface{})
-	if ok {
+	switch v := value.(type) {
+	case func(config *FieldConfig) interface{}:
 		f.fields[name] = v(f)
-		return
+	case func(config *FieldConfig) func(call goja.FunctionCall) goja.Value:
+		f.fields[name] = v(f)
+	default:
+		f.fields[name] = value
 	}
-	f.fields[name] = value
 }

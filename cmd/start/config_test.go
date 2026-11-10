@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"net/url"
 	"strings"
 	"testing"
 
@@ -13,13 +14,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/feature"
 )
 
-func TestMustNewConfig(t *testing.T) {
+func Test_readConfig(t *testing.T) {
 	encodedKey := "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF6aStGRlNKTDdmNXl3NEtUd3pnTQpQMzRlUEd5Y20vTStrVDBNN1Y0Q2d4NVYzRWFESXZUUUtUTGZCYUVCNDV6YjlMdGpJWHpEdzByWFJvUzJoTzZ0CmgrQ1lRQ3ozS0N2aDA5QzBJenhaaUIySVMzSC9hVCs1Qng5RUZZK3ZuQWtaamNjYnlHNVlOUnZtdE9sbnZJZUkKSDdxWjB0RXdrUGZGNUdFWk5QSlB0bXkzVUdWN2lvZmRWUVMxeFJqNzMrYU13NXJ2SDREOElkeWlBQzNWZWtJYgpwdDBWajBTVVgzRHdLdG9nMzM3QnpUaVBrM2FYUkYwc2JGaFFvcWRKUkk4TnFnWmpDd2pxOXlmSTV0eXhZc3duCitKR3pIR2RIdlczaWRPRGxtd0V0NUsycGFzaVJJV0syT0dmcSt3MEVjbHRRSGFidXFFUGdabG1oQ2tSZE5maXgKQndJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg=="
 	decodedKey, err := base64.StdEncoding.DecodeString(encodedKey)
 	if err != nil {
@@ -46,10 +48,10 @@ Log:
   Level: info
 `},
 		want: func(t *testing.T, config *Config) {
-			assert.Equal(t, config.Actions.HTTP.DenyList, []actions.AddressChecker{
-				&actions.HostChecker{Domain: "localhost"},
-				&actions.HostChecker{IP: net.ParseIP("127.0.0.1")},
-				&actions.HostChecker{Domain: "foobar"}})
+			assert.Equal(t, config.Actions.HTTP.DenyList, []denylist.AddressChecker{
+				&denylist.HostChecker{Domain: "localhost"},
+				&denylist.HostChecker{IP: net.ParseIP("127.0.0.1")},
+				&denylist.HostChecker{Domain: "foobar"}})
 		},
 	}, {
 		name: "actions deny list string ok",
@@ -62,10 +64,10 @@ Log:
   Level: info
 `},
 		want: func(t *testing.T, config *Config) {
-			assert.Equal(t, config.Actions.HTTP.DenyList, []actions.AddressChecker{
-				&actions.HostChecker{Domain: "localhost"},
-				&actions.HostChecker{IP: net.ParseIP("127.0.0.1")},
-				&actions.HostChecker{Domain: "foobar"}})
+			assert.Equal(t, config.Actions.HTTP.DenyList, []denylist.AddressChecker{
+				&denylist.HostChecker{Domain: "localhost"},
+				&denylist.HostChecker{IP: net.ParseIP("127.0.0.1")},
+				&denylist.HostChecker{Domain: "foobar"}})
 		},
 	}, {
 		name: "features ok",
@@ -73,9 +75,11 @@ Log:
 DefaultInstance:
   Features:
     LoginDefaultOrg: true
-    LegacyIntrospection: true
-    TriggerIntrospectionProjections: true
     UserSchema: true
+    ConsoleUseV2UserApi: true
+    LoginV2:
+      Required: true
+      BaseURI: 'http://zitadel:8080'
 Log:
   Level: info
 Actions:
@@ -84,10 +88,13 @@ Actions:
 `},
 		want: func(t *testing.T, config *Config) {
 			assert.Equal(t, config.DefaultInstance.Features, &command.InstanceFeatures{
-				LoginDefaultOrg:                 gu.Ptr(true),
-				LegacyIntrospection:             gu.Ptr(true),
-				TriggerIntrospectionProjections: gu.Ptr(true),
-				UserSchema:                      gu.Ptr(true),
+				LoginDefaultOrg:               gu.Ptr(true),
+				UserSchema:                    gu.Ptr(true),
+				ManagementConsoleUseV2UserApi: gu.Ptr(true),
+				LoginV2: &feature.LoginV2{
+					Required: true,
+					BaseURI:  &url.URL{Scheme: "http", Host: "zitadel:8080"},
+				},
 			})
 		},
 	}, {
@@ -275,7 +282,8 @@ Actions:
 			v := viper.New()
 			v.SetConfigType("yaml")
 			require.NoError(t, v.ReadConfig(strings.NewReader(tt.args.yaml)))
-			got := MustNewConfig(v)
+			got, err := readConfig(v)
+			require.NoError(t, err)
 			tt.want(t, got)
 		})
 	}

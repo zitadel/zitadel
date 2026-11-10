@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -48,6 +47,7 @@ type IDPTemplate struct {
 	*LDAPIDPTemplate
 	*AppleIDPTemplate
 	*SAMLIDPTemplate
+	*ZitadelIDPTemplate
 }
 
 type IDPTemplates struct {
@@ -64,6 +64,7 @@ type OAuthIDPTemplate struct {
 	UserEndpoint          string
 	Scopes                database.TextArray[string]
 	IDAttribute           string
+	UsePKCE               bool
 }
 
 type OIDCIDPTemplate struct {
@@ -73,6 +74,7 @@ type OIDCIDPTemplate struct {
 	Issuer           string
 	Scopes           database.TextArray[string]
 	IsIDTokenMapping bool
+	UsePKCE          bool
 }
 
 type JWTIDPTemplate struct {
@@ -81,6 +83,7 @@ type JWTIDPTemplate struct {
 	KeysEndpoint string
 	HeaderName   string
 	Endpoint     string
+	Audience     string
 }
 
 type AzureADIDPTemplate struct {
@@ -162,8 +165,19 @@ type SAMLIDPTemplate struct {
 	Certificate                   []byte
 	Binding                       string
 	WithSignedRequest             bool
+	SignatureAlgorithm            string
 	NameIDFormat                  sql.Null[domain.SAMLNameIDFormat]
 	TransientMappingAttributeName string
+	FederatedLogoutEnabled        bool
+}
+
+type ZitadelIDPTemplate struct {
+	IDPID             string
+	ClientID          string
+	ClientSecret      *crypto.CryptoValue
+	Issuer            string
+	Scopes            database.TextArray[string]
+	InstanceRolesInfo database.JSONArray[idp.RolesInfo]
 }
 
 var (
@@ -278,6 +292,10 @@ var (
 		name:  projection.OAuthIDAttributeCol,
 		table: oauthIdpTemplateTable,
 	}
+	OAuthUsePKCECol = Column{
+		name:  projection.OAuthUsePKCECol,
+		table: oauthIdpTemplateTable,
+	}
 )
 
 var (
@@ -313,6 +331,10 @@ var (
 		name:  projection.OIDCIDTokenMappingCol,
 		table: oidcIdpTemplateTable,
 	}
+	OIDCUsePKCECol = Column{
+		name:  projection.OIDCUsePKCECol,
+		table: oidcIdpTemplateTable,
+	}
 )
 
 var (
@@ -342,6 +364,10 @@ var (
 	}
 	JWTHeaderNameCol = Column{
 		name:  projection.JWTHeaderNameCol,
+		table: jwtIdpTemplateTable,
+	}
+	JWTAudienceCol = Column{
+		name:  projection.JWTAudienceCol,
 		table: jwtIdpTemplateTable,
 	}
 )
@@ -707,6 +733,10 @@ var (
 		name:  projection.SAMLWithSignedRequestCol,
 		table: samlIdpTemplateTable,
 	}
+	SAMLSignatureAlgorithmCol = Column{
+		name:  projection.SAMLSignatureAlgorithmCol,
+		table: samlIdpTemplateTable,
+	}
 	SAMLNameIDFormatCol = Column{
 		name:  projection.SAMLNameIDFormatCol,
 		table: samlIdpTemplateTable,
@@ -714,6 +744,45 @@ var (
 	SAMLTransientMappingAttributeNameCol = Column{
 		name:  projection.SAMLTransientMappingAttributeName,
 		table: samlIdpTemplateTable,
+	}
+	SAMLFederatedLogoutEnabledCol = Column{
+		name:  projection.SAMLFederatedLogoutEnabled,
+		table: samlIdpTemplateTable,
+	}
+)
+
+var (
+	zitadelIdpTemplateTable = table{
+		name:          projection.IDPTemplateZitadelTable,
+		instanceIDCol: projection.ZitadelInstanceIDCol,
+	}
+	ZitadelIDCol = Column{
+		name:  projection.ZitadelIDCol,
+		table: zitadelIdpTemplateTable,
+	}
+	ZitadelInstanceIDCol = Column{
+		name:  projection.ZitadelInstanceIDCol,
+		table: zitadelIdpTemplateTable,
+	}
+	ZitadelIssuerCol = Column{
+		name:  projection.ZitadelIssuerCol,
+		table: zitadelIdpTemplateTable,
+	}
+	ZitadelClientIDCol = Column{
+		name:  projection.ZitadelClientIDCol,
+		table: zitadelIdpTemplateTable,
+	}
+	ZitadelClientSecretCol = Column{
+		name:  projection.ZitadelClientSecretCol,
+		table: zitadelIdpTemplateTable,
+	}
+	ZitadelScopesCol = Column{
+		name:  projection.ZitadelScopesCol,
+		table: zitadelIdpTemplateTable,
+	}
+	ZitadelInstanceRolesInfoCol = Column{
+		name:  projection.ZitadelInstanceRolesInfoCol,
+		table: zitadelIdpTemplateTable,
 	}
 )
 
@@ -757,7 +826,7 @@ func (q *Queries) idpTemplateByID(ctx context.Context, shouldTriggerBulk bool, i
 	if !withOwnerRemoved {
 		eq[IDPTemplateOwnerRemovedCol.identifier()] = false
 	}
-	query, scan := prepareIDPTemplateByIDQuery(ctx, q.client)
+	query, scan := prepareIDPTemplateByIDQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -778,7 +847,7 @@ func (q *Queries) IDPTemplates(ctx context.Context, queries *IDPTemplateSearchQu
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareIDPTemplatesQuery(ctx, q.client)
+	query, scan := prepareIDPTemplatesQuery()
 	eq := sq.Eq{
 		IDPTemplateInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
@@ -854,7 +923,7 @@ func (q *IDPTemplateSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuil
 	return query
 }
 
-func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*IDPTemplate, error)) {
+func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTemplate, error)) {
 	return sq.Select(
 			IDPTemplateIDCol.identifier(),
 			IDPTemplateResourceOwnerCol.identifier(),
@@ -879,6 +948,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			OAuthUserEndpointCol.identifier(),
 			OAuthScopesCol.identifier(),
 			OAuthIDAttributeCol.identifier(),
+			OAuthUsePKCECol.identifier(),
 			// oidc
 			OIDCIDCol.identifier(),
 			OIDCIssuerCol.identifier(),
@@ -886,12 +956,14 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			OIDCClientSecretCol.identifier(),
 			OIDCScopesCol.identifier(),
 			OIDCIDTokenMappingCol.identifier(),
+			OIDCUsePKCECol.identifier(),
 			// jwt
 			JWTIDCol.identifier(),
 			JWTIssuerCol.identifier(),
 			JWTEndpointCol.identifier(),
 			JWTKeysEndpointCol.identifier(),
 			JWTHeaderNameCol.identifier(),
+			JWTAudienceCol.identifier(),
 			// azure
 			AzureADIDCol.identifier(),
 			AzureADClientIDCol.identifier(),
@@ -935,8 +1007,10 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			SAMLCertificateCol.identifier(),
 			SAMLBindingCol.identifier(),
 			SAMLWithSignedRequestCol.identifier(),
+			SAMLSignatureAlgorithmCol.identifier(),
 			SAMLNameIDFormatCol.identifier(),
 			SAMLTransientMappingAttributeNameCol.identifier(),
+			SAMLFederatedLogoutEnabledCol.identifier(),
 			// ldap
 			LDAPIDCol.identifier(),
 			LDAPServersCol.identifier(),
@@ -969,6 +1043,13 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			AppleKeyIDCol.identifier(),
 			ApplePrivateKeyCol.identifier(),
 			AppleScopesCol.identifier(),
+			// zitadel
+			ZitadelIDCol.identifier(),
+			ZitadelIssuerCol.identifier(),
+			ZitadelClientIDCol.identifier(),
+			ZitadelClientSecretCol.identifier(),
+			ZitadelScopesCol.identifier(),
+			ZitadelInstanceRolesInfoCol.identifier(),
 		).From(idpTemplateTable.identifier()).
 			LeftJoin(join(OAuthIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(OIDCIDCol, IDPTemplateIDCol)).
@@ -981,7 +1062,8 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(SAMLIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
-			LeftJoin(join(AppleIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(AppleIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(ZitadelIDCol, IDPTemplateIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*IDPTemplate, error) {
 			idpTemplate := new(IDPTemplate)
@@ -996,6 +1078,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			oauthUserEndpoint := sql.NullString{}
 			oauthScopes := database.TextArray[string]{}
 			oauthIDAttribute := sql.NullString{}
+			oauthUserPKCE := sql.NullBool{}
 
 			oidcID := sql.NullString{}
 			oidcIssuer := sql.NullString{}
@@ -1003,12 +1086,14 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			oidcClientSecret := new(crypto.CryptoValue)
 			oidcScopes := database.TextArray[string]{}
 			oidcIDTokenMapping := sql.NullBool{}
+			oidcUserPKCE := sql.NullBool{}
 
 			jwtID := sql.NullString{}
 			jwtIssuer := sql.NullString{}
 			jwtEndpoint := sql.NullString{}
 			jwtKeysEndpoint := sql.NullString{}
 			jwtHeaderName := sql.NullString{}
+			jwtAudience := sql.NullString{}
 
 			azureadID := sql.NullString{}
 			azureadClientID := sql.NullString{}
@@ -1052,8 +1137,10 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			var samlCertificate []byte
 			samlBinding := sql.NullString{}
 			samlWithSignedRequest := sql.NullBool{}
+			samlSignatureAlgorithm := sql.NullString{}
 			samlNameIDFormat := sql.Null[domain.SAMLNameIDFormat]{}
 			samlTransientMappingAttributeName := sql.NullString{}
+			samlFederatedLogoutEnabled := sql.NullBool{}
 
 			ldapID := sql.NullString{}
 			ldapServers := database.TextArray[string]{}
@@ -1087,6 +1174,13 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			applePrivateKey := new(crypto.CryptoValue)
 			appleScopes := database.TextArray[string]{}
 
+			zitadelID := sql.NullString{}
+			zitadelClientID := sql.NullString{}
+			zitadelClientSecret := new(crypto.CryptoValue)
+			zitadelIssuer := sql.NullString{}
+			zitadelScopes := database.TextArray[string]{}
+			zitadelInstanceRolesInfo := database.JSONArray[idp.RolesInfo]{}
+
 			err := row.Scan(
 				&idpTemplate.ID,
 				&idpTemplate.ResourceOwner,
@@ -1111,6 +1205,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&oauthUserEndpoint,
 				&oauthScopes,
 				&oauthIDAttribute,
+				&oauthUserPKCE,
 				// oidc
 				&oidcID,
 				&oidcIssuer,
@@ -1118,12 +1213,14 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&oidcClientSecret,
 				&oidcScopes,
 				&oidcIDTokenMapping,
+				&oidcUserPKCE,
 				// jwt
 				&jwtID,
 				&jwtIssuer,
 				&jwtEndpoint,
 				&jwtKeysEndpoint,
 				&jwtHeaderName,
+				&jwtAudience,
 				// azure
 				&azureadID,
 				&azureadClientID,
@@ -1167,8 +1264,10 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&samlCertificate,
 				&samlBinding,
 				&samlWithSignedRequest,
+				&samlSignatureAlgorithm,
 				&samlNameIDFormat,
 				&samlTransientMappingAttributeName,
+				&samlFederatedLogoutEnabled,
 				// ldap
 				&ldapID,
 				&ldapServers,
@@ -1201,6 +1300,13 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&appleKeyID,
 				&applePrivateKey,
 				&appleScopes,
+				// zitadel
+				&zitadelID,
+				&zitadelIssuer,
+				&zitadelClientID,
+				&zitadelClientSecret,
+				&zitadelScopes,
+				&zitadelInstanceRolesInfo,
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
@@ -1221,6 +1327,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					UserEndpoint:          oauthUserEndpoint.String,
 					Scopes:                oauthScopes,
 					IDAttribute:           oauthIDAttribute.String,
+					UsePKCE:               oauthUserPKCE.Bool,
 				}
 			}
 			if oidcID.Valid {
@@ -1231,6 +1338,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					Issuer:           oidcIssuer.String,
 					Scopes:           oidcScopes,
 					IsIDTokenMapping: oidcIDTokenMapping.Bool,
+					UsePKCE:          oidcUserPKCE.Bool,
 				}
 			}
 			if jwtID.Valid {
@@ -1240,6 +1348,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					KeysEndpoint: jwtKeysEndpoint.String,
 					HeaderName:   jwtHeaderName.String,
 					Endpoint:     jwtEndpoint.String,
+					Audience:     jwtAudience.String,
 				}
 			}
 			if azureadID.Valid {
@@ -1304,8 +1413,10 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					Certificate:                   samlCertificate,
 					Binding:                       samlBinding.String,
 					WithSignedRequest:             samlWithSignedRequest.Bool,
+					SignatureAlgorithm:            samlSignatureAlgorithm.String,
 					NameIDFormat:                  samlNameIDFormat,
 					TransientMappingAttributeName: samlTransientMappingAttributeName.String,
+					FederatedLogoutEnabled:        samlFederatedLogoutEnabled.Bool,
 				}
 			}
 			if ldapID.Valid {
@@ -1348,12 +1459,22 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					Scopes:     appleScopes,
 				}
 			}
-
+			if zitadelID.Valid {
+				idpTemplate.ZitadelIDPTemplate = &ZitadelIDPTemplate{
+					IDPID:             zitadelID.String,
+					ClientID:          zitadelClientID.String,
+					ClientSecret:      zitadelClientSecret,
+					Issuer:            zitadelIssuer.String,
+					Scopes:            zitadelScopes,
+					InstanceRolesInfo: zitadelInstanceRolesInfo,
+				}
+			}
 			return idpTemplate, nil
 		}
 }
 
-func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplates, error)) {
+//nolint:gocognit
+func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplates, error)) {
 	return sq.Select(
 			IDPTemplateIDCol.identifier(),
 			IDPTemplateResourceOwnerCol.identifier(),
@@ -1378,6 +1499,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			OAuthUserEndpointCol.identifier(),
 			OAuthScopesCol.identifier(),
 			OAuthIDAttributeCol.identifier(),
+			OAuthUsePKCECol.identifier(),
 			// oidc
 			OIDCIDCol.identifier(),
 			OIDCIssuerCol.identifier(),
@@ -1385,12 +1507,14 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			OIDCClientSecretCol.identifier(),
 			OIDCScopesCol.identifier(),
 			OIDCIDTokenMappingCol.identifier(),
+			OIDCUsePKCECol.identifier(),
 			// jwt
 			JWTIDCol.identifier(),
 			JWTIssuerCol.identifier(),
 			JWTEndpointCol.identifier(),
 			JWTKeysEndpointCol.identifier(),
 			JWTHeaderNameCol.identifier(),
+			JWTAudienceCol.identifier(),
 			// azure
 			AzureADIDCol.identifier(),
 			AzureADClientIDCol.identifier(),
@@ -1434,8 +1558,10 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			SAMLCertificateCol.identifier(),
 			SAMLBindingCol.identifier(),
 			SAMLWithSignedRequestCol.identifier(),
+			SAMLSignatureAlgorithmCol.identifier(),
 			SAMLNameIDFormatCol.identifier(),
 			SAMLTransientMappingAttributeNameCol.identifier(),
+			SAMLFederatedLogoutEnabledCol.identifier(),
 			// ldap
 			LDAPIDCol.identifier(),
 			LDAPServersCol.identifier(),
@@ -1468,6 +1594,13 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			AppleKeyIDCol.identifier(),
 			ApplePrivateKeyCol.identifier(),
 			AppleScopesCol.identifier(),
+			// zitadel
+			ZitadelIDCol.identifier(),
+			ZitadelIssuerCol.identifier(),
+			ZitadelClientIDCol.identifier(),
+			ZitadelClientSecretCol.identifier(),
+			ZitadelScopesCol.identifier(),
+			ZitadelInstanceRolesInfoCol.identifier(),
 			// count
 			countColumn.identifier(),
 		).From(idpTemplateTable.identifier()).
@@ -1482,7 +1615,8 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(SAMLIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
-			LeftJoin(join(AppleIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(AppleIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(ZitadelIDCol, IDPTemplateIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPTemplates, error) {
 			templates := make([]*IDPTemplate, 0)
@@ -1500,6 +1634,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				oauthUserEndpoint := sql.NullString{}
 				oauthScopes := database.TextArray[string]{}
 				oauthIDAttribute := sql.NullString{}
+				oauthUserPKCE := sql.NullBool{}
 
 				oidcID := sql.NullString{}
 				oidcIssuer := sql.NullString{}
@@ -1507,12 +1642,14 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				oidcClientSecret := new(crypto.CryptoValue)
 				oidcScopes := database.TextArray[string]{}
 				oidcIDTokenMapping := sql.NullBool{}
+				oidcUserPKCE := sql.NullBool{}
 
 				jwtID := sql.NullString{}
 				jwtIssuer := sql.NullString{}
 				jwtEndpoint := sql.NullString{}
 				jwtKeysEndpoint := sql.NullString{}
 				jwtHeaderName := sql.NullString{}
+				jwtAudience := sql.NullString{}
 
 				azureadID := sql.NullString{}
 				azureadClientID := sql.NullString{}
@@ -1556,8 +1693,10 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				var samlCertificate []byte
 				samlBinding := sql.NullString{}
 				samlWithSignedRequest := sql.NullBool{}
+				samlSignatureAlgorithm := sql.NullString{}
 				samlNameIDFormat := sql.Null[domain.SAMLNameIDFormat]{}
 				samlTransientMappingAttributeName := sql.NullString{}
+				samlFederatedLogoutEnabled := sql.NullBool{}
 
 				ldapID := sql.NullString{}
 				ldapServers := database.TextArray[string]{}
@@ -1591,6 +1730,13 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				applePrivateKey := new(crypto.CryptoValue)
 				appleScopes := database.TextArray[string]{}
 
+				zitadelID := sql.NullString{}
+				zitadelIssuer := sql.NullString{}
+				zitadelClientID := sql.NullString{}
+				zitadelClientSecret := new(crypto.CryptoValue)
+				zitadelScopes := database.TextArray[string]{}
+				zitadelInstanceRolesInfo := database.JSONArray[idp.RolesInfo]{}
+
 				err := rows.Scan(
 					&idpTemplate.ID,
 					&idpTemplate.ResourceOwner,
@@ -1615,6 +1761,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&oauthUserEndpoint,
 					&oauthScopes,
 					&oauthIDAttribute,
+					&oauthUserPKCE,
 					// oidc
 					&oidcID,
 					&oidcIssuer,
@@ -1622,12 +1769,14 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&oidcClientSecret,
 					&oidcScopes,
 					&oidcIDTokenMapping,
+					&oidcUserPKCE,
 					// jwt
 					&jwtID,
 					&jwtIssuer,
 					&jwtEndpoint,
 					&jwtKeysEndpoint,
 					&jwtHeaderName,
+					&jwtAudience,
 					// azure
 					&azureadID,
 					&azureadClientID,
@@ -1671,8 +1820,10 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&samlCertificate,
 					&samlBinding,
 					&samlWithSignedRequest,
+					&samlSignatureAlgorithm,
 					&samlNameIDFormat,
 					&samlTransientMappingAttributeName,
+					&samlFederatedLogoutEnabled,
 					// ldap
 					&ldapID,
 					&ldapServers,
@@ -1705,6 +1856,13 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&appleKeyID,
 					&applePrivateKey,
 					&appleScopes,
+					// zitadel
+					&zitadelID,
+					&zitadelIssuer,
+					&zitadelClientID,
+					&zitadelClientSecret,
+					&zitadelScopes,
+					&zitadelInstanceRolesInfo,
 					&count,
 				)
 
@@ -1724,6 +1882,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						UserEndpoint:          oauthUserEndpoint.String,
 						Scopes:                oauthScopes,
 						IDAttribute:           oauthIDAttribute.String,
+						UsePKCE:               oauthUserPKCE.Bool,
 					}
 				}
 				if oidcID.Valid {
@@ -1734,6 +1893,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						Issuer:           oidcIssuer.String,
 						Scopes:           oidcScopes,
 						IsIDTokenMapping: oidcIDTokenMapping.Bool,
+						UsePKCE:          oidcUserPKCE.Bool,
 					}
 				}
 				if jwtID.Valid {
@@ -1743,6 +1903,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						KeysEndpoint: jwtKeysEndpoint.String,
 						HeaderName:   jwtHeaderName.String,
 						Endpoint:     jwtEndpoint.String,
+						Audience:     jwtAudience.String,
 					}
 				}
 				if azureadID.Valid {
@@ -1807,8 +1968,10 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						Certificate:                   samlCertificate,
 						Binding:                       samlBinding.String,
 						WithSignedRequest:             samlWithSignedRequest.Bool,
+						SignatureAlgorithm:            samlSignatureAlgorithm.String,
 						NameIDFormat:                  samlNameIDFormat,
 						TransientMappingAttributeName: samlTransientMappingAttributeName.String,
+						FederatedLogoutEnabled:        samlFederatedLogoutEnabled.Bool,
 					}
 				}
 				if ldapID.Valid {
@@ -1849,6 +2012,16 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						KeyID:      appleKeyID.String,
 						PrivateKey: applePrivateKey,
 						Scopes:     appleScopes,
+					}
+				}
+				if zitadelID.Valid {
+					idpTemplate.ZitadelIDPTemplate = &ZitadelIDPTemplate{
+						IDPID:             zitadelID.String,
+						Issuer:            zitadelIssuer.String,
+						ClientID:          zitadelClientID.String,
+						ClientSecret:      zitadelClientSecret,
+						Scopes:            zitadelScopes,
+						InstanceRolesInfo: zitadelInstanceRolesInfo,
 					}
 				}
 				templates = append(templates, idpTemplate)

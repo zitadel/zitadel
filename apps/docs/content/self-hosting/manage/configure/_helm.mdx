@@ -1,0 +1,6 @@
+To run Zitadel on Kubernetes, use [the official Zitadel Helm chart](https://github.com/zitadel/zitadel-charts).
+Configure Zitadel using native Helm values.
+You can manage secrets through Helm values, letting Helm create Kubernetes secrets.
+Alternatively, reference existing Kubernetes secrets managed outside of Helm.
+See the [referenced secrets example](https://github.com/zitadel/zitadel-charts/tree/main/examples/3-referenced-secrets) in the charts */examples* folder.
+For a quick setup, check out the [insecure Postgres example](https://github.com/zitadel/zitadel-charts/tree/main/examples/1-postgres-insecure).

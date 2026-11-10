@@ -2,6 +2,7 @@ $cnsl-dark-theme-text: #ffffff;
 $cnsl-light-theme-text: hsla(0, 0%, 0%, 0.87);
 
 $caos-dark-primary: (
+  default: #2073c4,
   50: #f1f7fd,
   100: #afd1f2,
   200: #7fb5ea,
@@ -35,6 +36,7 @@ $caos-dark-primary: (
 );
 
 $caos-light-primary: (
+  default: #5469d4,
   50: #ffffff,
   100: #ebedfa,
   200: #bec6ef,
@@ -68,6 +70,7 @@ $caos-light-primary: (
 );
 
 $caos-dark-warn: (
+  default: #ff3b5b,
   50: #ffe7eb,
   100: #ffc4ce,
   200: #ff9dad,
@@ -101,6 +104,7 @@ $caos-dark-warn: (
 );
 
 $caos-light-warn: (
+  default: #cd3d56,
   50: #f9e8eb,
   100: #f0c5cc,
   200: #e69eab,

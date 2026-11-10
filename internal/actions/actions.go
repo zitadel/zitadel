@@ -16,7 +16,10 @@ type Config struct {
 	HTTP HTTPConfig
 }
 
-var ErrHalt = errors.New("interrupt")
+var (
+	ErrHalt     = errors.New("interrupt")
+	ErrFileLoad = errors.New("file-based modules are disabled")
+)
 
 type jsAction func(fields, fields) error
 
@@ -88,7 +91,9 @@ func executeScript(config *runConfig, ctxParam contextFields, apiParam apiFields
 		apiParam(config.apiParam)
 	}
 
-	registry := new(require.Registry)
+	registry := require.NewRegistryWithLoader(func(path string) ([]byte, error) {
+		return nil, ErrFileLoad
+	})
 	registry.Enable(config.vm)
 
 	for name, loader := range config.modules {

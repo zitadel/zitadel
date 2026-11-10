@@ -9,13 +9,9 @@ type Config struct {
 }
 
 type SMTP struct {
-	Host     string
-	User     string
-	Password string
-}
-
-func (smtp *SMTP) HasAuth() bool {
-	return smtp.User != "" && smtp.Password != ""
+	Host        string
+	PlainAuth   *PlainAuthConfig
+	XOAuth2Auth *XOAuth2AuthConfig
 }
 
 type ConfigHTTP struct {

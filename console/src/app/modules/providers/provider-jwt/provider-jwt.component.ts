@@ -29,6 +29,7 @@ import { ProviderNextService } from '../provider-next/provider-next.service';
 @Component({
   selector: 'cnsl-provider-jwt',
   templateUrl: './provider-jwt.component.html',
+  standalone: false,
 })
 export class ProviderJWTComponent {
   public showOptional: boolean = false;
@@ -67,6 +68,7 @@ export class ProviderJWTComponent {
     this.service$,
   );
   public expandWhatNow$ = this.nextSvc.expandWhatNow(this.id$, this.activateLink$, this.justCreated$);
+  protected readonly copyUrls$ = this.nextSvc.jwtCallbackUrls();
 
   constructor(
     private authService: GrpcAuthService,
@@ -115,6 +117,7 @@ export class ProviderJWTComponent {
       issuer: new UntypedFormControl('', [requiredValidator]),
       jwtEndpoint: new UntypedFormControl('', [requiredValidator]),
       keysEndpoint: new UntypedFormControl('', [requiredValidator]),
+      audience: new UntypedFormControl(''),
     });
 
     this.authService
@@ -176,6 +179,7 @@ export class ProviderJWTComponent {
     req.setIssuer(this.issuer?.value);
     req.setJwtEndpoint(this.jwtEndpoint?.value);
     req.setKeysEndpoint(this.keysEndpoint?.value);
+    req.setAudience(this.audience?.value);
     req.setProviderOptions(this.options);
     this.loading = true;
     this.service
@@ -202,12 +206,13 @@ export class ProviderJWTComponent {
       req.setIssuer(this.issuer?.value);
       req.setJwtEndpoint(this.jwtEndpoint?.value);
       req.setKeysEndpoint(this.keysEndpoint?.value);
+      req.setAudience(this.audience?.value);
       req.setProviderOptions(this.options);
 
       this.loading = true;
       this.service
         .updateJWTProvider(req)
-        .then((idp) => {
+        .then(() => {
           setTimeout(() => {
             this.loading = false;
             this.close();
@@ -242,5 +247,9 @@ export class ProviderJWTComponent {
 
   public get keysEndpoint(): AbstractControl | null {
     return this.form.get('keysEndpoint');
+  }
+
+  public get audience(): AbstractControl | null {
+    return this.form.get('audience');
   }
 }

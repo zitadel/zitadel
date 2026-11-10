@@ -1,30 +1,69 @@
 version: 2
 updates:
 - package-ecosystem: npm
-  directory: "/console"
+  groups:
+    console:
+      applies-to: version-updates
+      patterns:
+        - "*"
+      update-types:
+        - "minor"
+        - "patch"
+  directories:
+    - "/console"
+    - "/e2e"
   schedule:
     interval: weekly
     time: "02:00"
   labels:
-   - "npm"
+   - "javascript"
    - "dependencies"
   open-pull-requests-limit: 10
   commit-message:
     prefix: chore
     include: scope
+- package-ecosystem: npm
+  directory: '/login'
+  open-pull-requests-limit: 3
+  schedule:
+    interval: daily
+  groups:
+    prod:
+      dependency-type: production
+    dev:
+      dependency-type: development
+  ignore:
+    - dependency-name: "eslint"
+      versions: [ "9.x" ]
 - package-ecosystem: gomod
+  groups:
+    go:
+      applies-to: version-updates
+      patterns:
+        - "*"
+      update-types:
+        - "minor"
+        - "patch"
   directory: "/"
   schedule:
     interval: weekly
     time: "02:00"
   labels:
-   - "gomod"
+   - "go"
    - "dependencies"
   open-pull-requests-limit: 10
   commit-message:
     prefix: chore
     include: scope
 - package-ecosystem: "docker"
+  groups:
+    docker:
+      applies-to: version-updates
+      patterns:
+        - "*"
+      update-types:
+        - "minor"
+        - "patch"
   directory: "/build"
   schedule:
     interval: "weekly"
@@ -34,6 +73,11 @@ updates:
     prefix: chore
     include: scope
 - package-ecosystem: "github-actions"
+  groups:
+    actions:
+      applies-to: version-updates
+      patterns:
+        - "*"
   directory: "/"
   schedule:
     interval: weekly
@@ -42,3 +86,21 @@ updates:
   commit-message:
     prefix: chore
     include: scope
+- package-ecosystem: npm
+  directory: '/apps/docs'
+  open-pull-requests-limit: 10
+  schedule:
+    interval: weekly
+    time: "02:00"
+  groups:
+    prod:
+      dependency-type: production
+    dev:
+      dependency-type: development
+  commit-message:
+    prefix: chore
+    include: scope
+  labels:
+    - "javascript"
+    - "dependencies"
+    - "area/docs"

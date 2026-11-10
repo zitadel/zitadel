@@ -1,7 +1,6 @@
 package query
 
 import (
-	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
@@ -11,6 +10,7 @@ import (
 	"testing"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 )
 
@@ -34,8 +34,7 @@ var (
 		` FROM (SELECT DISTINCT projections.instances.id, COUNT(*) OVER () FROM projections.instances` +
 		` LEFT JOIN projections.instance_domains ON projections.instances.id = projections.instance_domains.instance_id) AS f` +
 		` LEFT JOIN projections.instances ON f.id = projections.instances.id` +
-		` LEFT JOIN projections.instance_domains ON f.id = projections.instance_domains.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`
+		` LEFT JOIN projections.instance_domains ON f.id = projections.instance_domains.instance_id`
 	instancesCols = []string{
 		"count",
 		"id",
@@ -64,15 +63,15 @@ func Test_InstancePrepares(t *testing.T) {
 	}
 	tests := []struct {
 		name           string
-		prepare        interface{}
+		prepare        any
 		additionalArgs []reflect.Value
 		want           want
-		object         interface{}
+		object         any
 	}{
 		{
 			name: "prepareInstancesQuery no result",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery(ctx, db)
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+				filter, query, scan := prepareInstancesQuery(Column{}, true)
 				return query(filter), scan
 			},
 			want: want{
@@ -86,8 +85,8 @@ func Test_InstancePrepares(t *testing.T) {
 		},
 		{
 			name: "prepareInstancesQuery one result",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery(ctx, db)
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+				filter, query, scan := prepareInstancesQuery(Column{}, true)
 				return query(filter), scan
 			},
 			want: want{
@@ -123,16 +122,16 @@ func Test_InstancePrepares(t *testing.T) {
 				},
 				Instances: []*Instance{
 					{
-						ID:           "id",
-						CreationDate: testNow,
-						ChangeDate:   testNow,
-						Sequence:     20211108,
-						Name:         "test",
-						DefaultOrgID: "global-org-id",
-						IAMProjectID: "project-id",
-						ConsoleID:    "client-id",
-						ConsoleAppID: "app-id",
-						DefaultLang:  language.English,
+						ID:                     "id",
+						CreationDate:           testNow,
+						ChangeDate:             testNow,
+						Sequence:               20211108,
+						Name:                   "test",
+						DefaultOrgID:           "global-org-id",
+						IAMProjectID:           "project-id",
+						ManagementConsoleID:    "client-id",
+						ManagementConsoleAppID: "app-id",
+						DefaultLang:            language.English,
 						Domains: []*InstanceDomain{
 							{
 								CreationDate: testNow,
@@ -150,8 +149,8 @@ func Test_InstancePrepares(t *testing.T) {
 		},
 		{
 			name: "prepareInstancesQuery multiple results",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery(ctx, db)
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+				filter, query, scan := prepareInstancesQuery(Column{}, true)
 				return query(filter), scan
 			},
 			want: want{
@@ -225,16 +224,16 @@ func Test_InstancePrepares(t *testing.T) {
 				},
 				Instances: []*Instance{
 					{
-						ID:           "id",
-						CreationDate: testNow,
-						ChangeDate:   testNow,
-						Sequence:     20211108,
-						Name:         "test",
-						DefaultOrgID: "global-org-id",
-						IAMProjectID: "project-id",
-						ConsoleID:    "client-id",
-						ConsoleAppID: "app-id",
-						DefaultLang:  language.English,
+						ID:                     "id",
+						CreationDate:           testNow,
+						ChangeDate:             testNow,
+						Sequence:               20211108,
+						Name:                   "test",
+						DefaultOrgID:           "global-org-id",
+						IAMProjectID:           "project-id",
+						ManagementConsoleID:    "client-id",
+						ManagementConsoleAppID: "app-id",
+						DefaultLang:            language.English,
 						Domains: []*InstanceDomain{
 							{
 								CreationDate: testNow,
@@ -255,17 +254,18 @@ func Test_InstancePrepares(t *testing.T) {
 								IsPrimary:    true,
 							},
 						},
-					}, {
-						ID:           "id2",
-						CreationDate: testNow,
-						ChangeDate:   testNow,
-						Sequence:     20211108,
-						Name:         "test2",
-						DefaultOrgID: "global-org-id",
-						IAMProjectID: "project-id",
-						ConsoleID:    "client-id",
-						ConsoleAppID: "app-id",
-						DefaultLang:  language.English,
+					},
+					{
+						ID:                     "id2",
+						CreationDate:           testNow,
+						ChangeDate:             testNow,
+						Sequence:               20211108,
+						Name:                   "test2",
+						DefaultOrgID:           "global-org-id",
+						IAMProjectID:           "project-id",
+						ManagementConsoleID:    "client-id",
+						ManagementConsoleAppID: "app-id",
+						DefaultLang:            language.English,
 						Domains: []*InstanceDomain{
 							{
 								CreationDate: testNow,
@@ -283,8 +283,8 @@ func Test_InstancePrepares(t *testing.T) {
 		},
 		{
 			name: "prepareInstancesQuery sql err",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery(ctx, db)
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+				filter, query, scan := prepareInstancesQuery(Column{}, true)
 				return query(filter), scan
 			},
 			want: want{
@@ -304,7 +304,33 @@ func Test_InstancePrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, append(defaultPrepareArgs, tt.additionalArgs...)...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, tt.additionalArgs...)
+		})
+	}
+}
+
+// Mirrors Test_instance_dynamicClientRegistration in the authz package: the query-backed
+// instance must apply the same precedence, so that disabling dynamic client registration
+// closes the endpoint regardless of the open-registration setting.
+func Test_authzInstance_dynamicClientRegistration(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name                     string
+		dcr                      dcr
+		wantEnabled              bool
+		wantAllowUnauthenticated bool
+	}{
+		{name: "disabled", dcr: dcr{}},
+		{name: "disabled but unauthenticated allowed", dcr: dcr{AllowUnauthenticated: true}},
+		{name: "enabled, token mode", dcr: dcr{Enabled: true}, wantEnabled: true},
+		{name: "enabled, open registration", dcr: dcr{Enabled: true, AllowUnauthenticated: true}, wantEnabled: true, wantAllowUnauthenticated: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			i := &authzInstance{DCR: tt.dcr}
+			assert.Equal(t, tt.wantEnabled, i.EnableDynamicClientRegistration())
+			assert.Equal(t, tt.wantAllowUnauthenticated, i.AllowUnauthenticatedDynamicClientRegistration())
 		})
 	}
 }

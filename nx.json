@@ -1,0 +1,71 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "nxCloudId": "688a9021d48dce0efe0f119f",
+  "workspaceLayout": {
+    "libsDir": "packages"
+  },
+  "tui": {
+    "enabled": true
+  },
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*"
+    ]
+  },
+  "targetDefaults": {
+    "nx:run-commands": {
+      "options": {
+        "env": {
+          "COREPACK_ENABLE_DOWNLOAD_PROMPT": "0",
+          "ENABLE_EXPERIMENTAL_COREPACK": "1"
+        }
+      }
+    },
+    "generate": {
+      "cache": true,
+      "inputs": [
+        "default"
+      ]
+    },
+    "build": {
+      "cache": true,
+      "inputs": [
+        "default"
+      ],
+      "dependsOn": [
+        "^build",
+        "generate"
+      ]
+    },
+    "lint": {
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    },
+    "check-links": {
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    },
+    "test": {
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    },
+    "test-unit": {
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    },
+    "test-integration": {
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    }
+  }
+}

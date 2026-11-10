@@ -129,7 +129,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 							"INSTANCE",
 							project.NewApplicationAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
-								"consoleApplicationID",
+								"managementConsoleApplicationID",
 								"app",
 							),
 						),
@@ -138,7 +138,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 							project.NewOIDCConfigAddedEvent(context.Background(),
 								&project.NewAggregate("projectID", "org1").Aggregate,
 								domain.OIDCVersionV1,
-								"consoleApplicationID",
+								"managementConsoleApplicationID",
 								"client1@project",
 								"secret",
 								[]string{"https://test.ch"},
@@ -158,7 +158,10 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 								"",
 								domain.LoginVersionUnspecified,
 								"",
-							),
+								"",
+								"",
+								"",
+								nil),
 						),
 					),
 					expectPush(
@@ -169,7 +172,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 						),
 						newOIDCAppChangedEventInstanceDomain(
 							context.Background(),
-							"consoleApplicationID",
+							"managementConsoleApplicationID",
 							"projectID",
 							"org1",
 						),
@@ -313,8 +316,9 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		domain string
+		ctx             context.Context
+		domain          string
+		errorIfNotFound bool
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -342,7 +346,7 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 			},
 		},
 		{
-			name: "domain not exists, precondition error",
+			name: "domain not exists and errorIfNotFound set to TRUE should return not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -350,12 +354,28 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
-				domain: "domain.ch",
+				ctx:             context.Background(),
+				domain:          "domain.ch",
+				errorIfNotFound: true,
 			},
 			res: res{
 				err: zerrors.IsNotFound,
 			},
+		},
+		{
+			name: "domain not exists and errorIfNotFound set to FALSE should return no error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:             context.Background(),
+				domain:          "domain.ch",
+				errorIfNotFound: false,
+			},
+			res: res{},
 		},
 		{
 			name: "remove domain, ok",
@@ -420,7 +440,7 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveInstanceDomain(tt.args.ctx, tt.args.domain)
+			got, err := r.RemoveInstanceDomain(tt.args.ctx, tt.args.domain, tt.args.errorIfNotFound)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

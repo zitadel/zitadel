@@ -14,15 +14,27 @@ import { ExhaustedService } from './exhausted.service';
 import { AuthInterceptor, AuthInterceptorProvider, NewConnectWebAuthInterceptor } from './interceptors/auth.interceptor';
 import { ExhaustedGrpcInterceptor } from './interceptors/exhausted.grpc.interceptor';
 import { I18nInterceptor } from './interceptors/i18n.interceptor';
-import { OrgInterceptor } from './interceptors/org.interceptor';
-import { StorageService } from './storage.service';
+import { NewConnectWebOrgInterceptor, OrgInterceptor, OrgInterceptorProvider } from './interceptors/org.interceptor';
 import { UserServiceClient } from '../proto/generated/zitadel/user/v2/User_serviceServiceClientPb';
-//@ts-ignore
-import { createUserServiceClient } from '@zitadel/client/v2';
-//@ts-ignore
-import { createAuthServiceClient, createManagementServiceClient } from '@zitadel/client/v1';
+import {
+  createFeatureServiceClient,
+  createUserServiceClient,
+  createSessionServiceClient,
+  createOrganizationServiceClient,
+} from '@zitadel/client/v2';
+import { createAdminServiceClient, createAuthServiceClient, createManagementServiceClient } from '@zitadel/client/v1';
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
-import { FeatureServiceClient } from '../proto/generated/zitadel/feature/v2/Feature_serviceServiceClientPb';
+import { createClientFor } from '@zitadel/client';
+
+import { ActionService } from '@zitadel/proto/zitadel/action/v2/action_service_pb';
+import { ApplicationService } from '@zitadel/proto/zitadel/application/v2/application_service_pb';
+import { AuthorizationService } from '@zitadel/proto/zitadel/authorization/v2/authorization_service_pb';
+import { WebKeyService } from '@zitadel/proto/zitadel/webkey/v2/webkey_service_pb';
+
+const createWebKeyServiceClient = createClientFor(WebKeyService);
+const createActionServiceClient = createClientFor(ActionService);
+const createAuthorizationServiceClient = createClientFor(AuthorizationService);
+const createApplicationServiceClient = createClientFor(ApplicationService);
 
 @Injectable({
   providedIn: 'root',
@@ -31,21 +43,30 @@ export class GrpcService {
   public auth!: AuthServiceClient;
   public mgmt!: ManagementServiceClient;
   public admin!: AdminServiceClient;
-  public feature!: FeatureServiceClient;
   public user!: UserServiceClient;
   public userNew!: ReturnType<typeof createUserServiceClient>;
+  public session!: ReturnType<typeof createSessionServiceClient>;
   public mgmtNew!: ReturnType<typeof createManagementServiceClient>;
   public authNew!: ReturnType<typeof createAuthServiceClient>;
+  public featureNew!: ReturnType<typeof createFeatureServiceClient>;
+  public actionNew!: ReturnType<typeof createActionServiceClient>;
+  public webKey!: ReturnType<typeof createWebKeyServiceClient>;
+  public organizationNew!: ReturnType<typeof createOrganizationServiceClient>;
+  public adminNew!: ReturnType<typeof createAdminServiceClient>;
+  public authorization!: ReturnType<typeof createAuthorizationServiceClient>;
+  public application!: ReturnType<typeof createApplicationServiceClient>;
+
+  public assets!: void;
 
   constructor(
     private readonly envService: EnvironmentService,
     private readonly platformLocation: PlatformLocation,
     private readonly authenticationService: AuthenticationService,
-    private readonly storageService: StorageService,
     private readonly translate: TranslateService,
     private readonly exhaustedService: ExhaustedService,
     private readonly authInterceptor: AuthInterceptor,
     private readonly authInterceptorProvider: AuthInterceptorProvider,
+    private readonly orgInterceptorProvider: OrgInterceptorProvider,
   ) {}
 
   public loadAppEnvironment(): Promise<any> {
@@ -53,7 +74,7 @@ export class GrpcService {
 
     const browserLanguage = this.translate.getBrowserLang();
     const language = browserLanguage?.match(supportedLanguagesRegexp) ? browserLanguage : fallbackLanguage;
-    const init = this.translate.use(language || this.translate.defaultLang).pipe(
+    const init = this.translate.use(language).pipe(
       switchMap(() => this.envService.env),
       tap((env) => {
         if (!env?.api || !env?.issuer) {
@@ -62,50 +83,39 @@ export class GrpcService {
         const interceptors = {
           unaryInterceptors: [
             new ExhaustedGrpcInterceptor(this.exhaustedService, this.envService),
-            new OrgInterceptor(this.storageService),
+            new OrgInterceptor(this.orgInterceptorProvider),
             this.authInterceptor,
             new I18nInterceptor(this.translate),
           ],
         };
 
-        this.auth = new AuthServiceClient(
-          env.api,
-          null,
-          // @ts-ignore
-          interceptors,
-        );
-        this.mgmt = new ManagementServiceClient(
-          env.api,
-          null,
-          // @ts-ignore
-          interceptors,
-        );
-        this.admin = new AdminServiceClient(
-          env.api,
-          null,
-          // @ts-ignore
-          interceptors,
-        );
-        this.feature = new FeatureServiceClient(
-          env.api,
-          null,
-          // @ts-ignore
-          interceptors,
-        );
-        this.user = new UserServiceClient(
-          env.api,
-          null,
-          // @ts-ignore
-          interceptors,
-        );
+        this.auth = new AuthServiceClient(env.api, null, interceptors);
+        this.mgmt = new ManagementServiceClient(env.api, null, interceptors);
+        this.admin = new AdminServiceClient(env.api, null, interceptors);
+        this.user = new UserServiceClient(env.api, null, interceptors);
 
         const transport = createGrpcWebTransport({
           baseUrl: env.api,
           interceptors: [NewConnectWebAuthInterceptor(this.authInterceptorProvider)],
         });
+        const transportOldAPIs = createGrpcWebTransport({
+          baseUrl: env.api,
+          interceptors: [
+            NewConnectWebAuthInterceptor(this.authInterceptorProvider),
+            NewConnectWebOrgInterceptor(this.orgInterceptorProvider),
+          ],
+        });
         this.userNew = createUserServiceClient(transport);
-        this.mgmtNew = createManagementServiceClient(transport);
-        this.authNew = createAuthServiceClient(transport);
+        this.session = createSessionServiceClient(transport);
+        this.mgmtNew = createManagementServiceClient(transportOldAPIs);
+        this.authNew = createAuthServiceClient(transportOldAPIs);
+        this.featureNew = createFeatureServiceClient(transport);
+        this.actionNew = createActionServiceClient(transport);
+        this.webKey = createWebKeyServiceClient(transport);
+        this.organizationNew = createOrganizationServiceClient(transport);
+        this.adminNew = createAdminServiceClient(transportOldAPIs);
+        this.authorization = createAuthorizationServiceClient(transport);
+        this.application = createApplicationServiceClient(transport);
 
         const authConfig: AuthConfig = {
           scope: 'openid profile email',

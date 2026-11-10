@@ -1,9 +1,6 @@
 package command
 
 import (
-	"context"
-
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
@@ -12,12 +9,12 @@ type InstanceMemberWriteModel struct {
 	MemberWriteModel
 }
 
-func NewInstanceMemberWriteModel(ctx context.Context, userID string) *InstanceMemberWriteModel {
+func NewInstanceMemberWriteModel(instanceID, userID string) *InstanceMemberWriteModel {
 	return &InstanceMemberWriteModel{
 		MemberWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   authz.GetInstance(ctx).InstanceID(),
-				ResourceOwner: authz.GetInstance(ctx).InstanceID(),
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
 			},
 			UserID: userID,
 		},

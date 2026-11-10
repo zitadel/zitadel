@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	orgUniqueQuery = "SELECT COUNT(*) = 0 FROM projections.orgs1 LEFT JOIN projections.org_domains2 ON projections.orgs1.id = projections.org_domains2.org_id AND projections.orgs1.instance_id = projections.org_domains2.instance_id AS OF SYSTEM TIME '-1 ms' WHERE (projections.org_domains2.is_verified = $1 AND projections.orgs1.instance_id = $2 AND (projections.org_domains2.domain ILIKE $3 OR projections.orgs1.name ILIKE $4) AND projections.orgs1.org_state <> $5)"
+	orgUniqueQuery = "SELECT COUNT(*) = 0 FROM projections.orgs1 LEFT JOIN projections.org_domains2 ON projections.orgs1.id = projections.org_domains2.org_id AND projections.orgs1.instance_id = projections.org_domains2.instance_id WHERE (projections.org_domains2.is_verified = $1 AND projections.orgs1.instance_id = $2 AND (projections.org_domains2.domain ILIKE $3 OR projections.orgs1.name ILIKE $4) AND projections.orgs1.org_state <> $5)"
 	orgUniqueCols  = []string{"is_unique"}
 
 	prepareOrgsQueryStmt = `SELECT projections.orgs1.id,` +
@@ -31,8 +31,7 @@ var (
 		` projections.orgs1.name,` +
 		` projections.orgs1.primary_domain,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.orgs1` +
-		` AS OF SYSTEM TIME '-1 ms' `
+		` FROM projections.orgs1`
 	prepareOrgsQueryCols = []string{
 		"id",
 		"creation_date",
@@ -51,10 +50,10 @@ var (
 		` projections.orgs1.resource_owner,` +
 		` projections.orgs1.org_state,` +
 		` projections.orgs1.sequence,` +
+		` projections.orgs1.instance_id,` +
 		` projections.orgs1.name,` +
 		` projections.orgs1.primary_domain` +
-		` FROM projections.orgs1` +
-		` AS OF SYSTEM TIME '-1 ms' `
+		` FROM projections.orgs1`
 	prepareOrgQueryCols = []string{
 		"id",
 		"creation_date",
@@ -62,14 +61,14 @@ var (
 		"resource_owner",
 		"org_state",
 		"sequence",
+		"instance_id",
 		"name",
 		"primary_domain",
 	}
 
 	prepareOrgUniqueStmt = `SELECT COUNT(*) = 0` +
 		` FROM projections.orgs1` +
-		` LEFT JOIN projections.org_domains2 ON projections.orgs1.id = projections.org_domains2.org_id AND projections.orgs1.instance_id = projections.org_domains2.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms' `
+		` LEFT JOIN projections.org_domains2 ON projections.orgs1.id = projections.org_domains2.org_id AND projections.orgs1.instance_id = projections.org_domains2.instance_id`
 	prepareOrgUniqueCols = []string{
 		"count",
 	}
@@ -245,6 +244,7 @@ func Test_OrgPrepares(t *testing.T) {
 						"ro",
 						domain.OrgStateActive,
 						uint64(20211108),
+						"instance-id",
 						"org-name",
 						"zitadel.ch",
 					},
@@ -257,6 +257,7 @@ func Test_OrgPrepares(t *testing.T) {
 				ResourceOwner: "ro",
 				State:         domain.OrgStateActive,
 				Sequence:      20211108,
+				instanceID:    "instance-id",
 				Name:          "org-name",
 				Domain:        "zitadel.ch",
 			},
@@ -330,7 +331,7 @@ func Test_OrgPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
 	}
 }
@@ -421,8 +422,7 @@ func TestQueries_IsOrgUnique(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			q := &Queries{
 				client: &database.DB{
-					DB:       client,
-					Database: new(prepareDB),
+					DB: client,
 				},
 			}
 

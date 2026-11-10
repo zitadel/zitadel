@@ -14,6 +14,7 @@ type JWTIDPAddedEvent struct {
 	JWTEndpoint  string `json:"jwtEndpoint,omitempty"`
 	KeysEndpoint string `json:"keysEndpoint,omitempty"`
 	HeaderName   string `json:"headerName,omitempty"`
+	Audience     string `json:"audience,omitempty"`
 	Options
 }
 
@@ -24,7 +25,8 @@ func NewJWTIDPAddedEvent(
 	issuer,
 	jwtEndpoint,
 	keysEndpoint,
-	headerName string,
+	headerName,
+	audience string,
 	options Options,
 ) *JWTIDPAddedEvent {
 	return &JWTIDPAddedEvent{
@@ -35,6 +37,7 @@ func NewJWTIDPAddedEvent(
 		JWTEndpoint:  jwtEndpoint,
 		KeysEndpoint: keysEndpoint,
 		HeaderName:   headerName,
+		Audience:     audience,
 		Options:      options,
 	}
 }
@@ -69,6 +72,7 @@ type JWTIDPChangedEvent struct {
 	JWTEndpoint  *string `json:"jwtEndpoint,omitempty"`
 	KeysEndpoint *string `json:"keysEndpoint,omitempty"`
 	HeaderName   *string `json:"headerName,omitempty"`
+	Audience     *string `json:"audience,omitempty"`
 	OptionChanges
 }
 
@@ -119,6 +123,12 @@ func ChangeJWTKeysEndpoint(keysEndpoint string) func(*JWTIDPChangedEvent) {
 func ChangeJWTHeaderName(headerName string) func(*JWTIDPChangedEvent) {
 	return func(e *JWTIDPChangedEvent) {
 		e.HeaderName = &headerName
+	}
+}
+
+func ChangeJWTAudience(audience string) func(*JWTIDPChangedEvent) {
+	return func(e *JWTIDPChangedEvent) {
+		e.Audience = &audience
 	}
 }
 

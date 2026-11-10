@@ -1,0 +1,13 @@
+playwright-report/
+test-results/
+
+# Local environment file with secrets
+.env
+
+# Local TLS certificates and keys
+certs/*.crt
+certs/*.cer
+certs/*.pem
+certs/*.key
+!certs/.gitkeep
+

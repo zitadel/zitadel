@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -11,18 +12,18 @@ import (
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
-func (s *Server) SetEmail(ctx context.Context, req *user.SetEmailRequest) (resp *user.SetEmailResponse, err error) {
+func (s *Server) SetEmail(ctx context.Context, req *connect.Request[user.SetEmailRequest]) (resp *connect.Response[user.SetEmailResponse], err error) {
 	var email *domain.Email
 
-	switch v := req.GetVerification().(type) {
+	switch v := req.Msg.GetVerification().(type) {
 	case *user.SetEmailRequest_SendCode:
-		email, err = s.command.ChangeUserEmailURLTemplate(ctx, req.GetUserId(), req.GetEmail(), s.userCodeAlg, v.SendCode.GetUrlTemplate())
+		email, err = s.command.ChangeUserEmailURLTemplate(ctx, req.Msg.GetUserId(), req.Msg.GetEmail(), s.userCodeAlg, v.SendCode.GetUrlTemplate())
 	case *user.SetEmailRequest_ReturnCode:
-		email, err = s.command.ChangeUserEmailReturnCode(ctx, req.GetUserId(), req.GetEmail(), s.userCodeAlg)
+		email, err = s.command.ChangeUserEmailReturnCode(ctx, req.Msg.GetUserId(), req.Msg.GetEmail(), s.userCodeAlg)
 	case *user.SetEmailRequest_IsVerified:
-		email, err = s.command.ChangeUserEmailVerified(ctx, req.GetUserId(), req.GetEmail())
+		email, err = s.command.ChangeUserEmailVerified(ctx, req.Msg.GetUserId(), req.Msg.GetEmail())
 	case nil:
-		email, err = s.command.ChangeUserEmail(ctx, req.GetUserId(), req.GetEmail(), s.userCodeAlg)
+		email, err = s.command.ChangeUserEmail(ctx, req.Msg.GetUserId(), req.Msg.GetEmail(), s.userCodeAlg)
 	default:
 		err = zerrors.ThrowUnimplementedf(nil, "USERv2-Ahng0", "verification oneOf %T in method SetEmail not implemented", v)
 	}
@@ -30,26 +31,26 @@ func (s *Server) SetEmail(ctx context.Context, req *user.SetEmailRequest) (resp 
 		return nil, err
 	}
 
-	return &user.SetEmailResponse{
+	return connect.NewResponse(&user.SetEmailResponse{
 		Details: &object.Details{
 			Sequence:      email.Sequence,
 			ChangeDate:    timestamppb.New(email.ChangeDate),
 			ResourceOwner: email.ResourceOwner,
 		},
 		VerificationCode: email.PlainCode,
-	}, nil
+	}), nil
 }
 
-func (s *Server) ResendEmailCode(ctx context.Context, req *user.ResendEmailCodeRequest) (resp *user.ResendEmailCodeResponse, err error) {
+func (s *Server) ResendEmailCode(ctx context.Context, req *connect.Request[user.ResendEmailCodeRequest]) (resp *connect.Response[user.ResendEmailCodeResponse], err error) {
 	var email *domain.Email
 
-	switch v := req.GetVerification().(type) {
+	switch v := req.Msg.GetVerification().(type) {
 	case *user.ResendEmailCodeRequest_SendCode:
-		email, err = s.command.ResendUserEmailCodeURLTemplate(ctx, req.GetUserId(), s.userCodeAlg, v.SendCode.GetUrlTemplate())
+		email, err = s.command.ResendUserEmailCodeURLTemplate(ctx, req.Msg.GetUserId(), s.userCodeAlg, v.SendCode.GetUrlTemplate())
 	case *user.ResendEmailCodeRequest_ReturnCode:
-		email, err = s.command.ResendUserEmailReturnCode(ctx, req.GetUserId(), s.userCodeAlg)
+		email, err = s.command.ResendUserEmailReturnCode(ctx, req.Msg.GetUserId(), s.userCodeAlg)
 	case nil:
-		email, err = s.command.ResendUserEmailCode(ctx, req.GetUserId(), s.userCodeAlg)
+		email, err = s.command.ResendUserEmailCode(ctx, req.Msg.GetUserId(), s.userCodeAlg)
 	default:
 		err = zerrors.ThrowUnimplementedf(nil, "USERv2-faj0l0nj5x", "verification oneOf %T in method ResendEmailCode not implemented", v)
 	}
@@ -57,30 +58,30 @@ func (s *Server) ResendEmailCode(ctx context.Context, req *user.ResendEmailCodeR
 		return nil, err
 	}
 
-	return &user.ResendEmailCodeResponse{
+	return connect.NewResponse(&user.ResendEmailCodeResponse{
 		Details: &object.Details{
 			Sequence:      email.Sequence,
 			ChangeDate:    timestamppb.New(email.ChangeDate),
 			ResourceOwner: email.ResourceOwner,
 		},
 		VerificationCode: email.PlainCode,
-	}, nil
+	}), nil
 }
 
-func (s *Server) VerifyEmail(ctx context.Context, req *user.VerifyEmailRequest) (*user.VerifyEmailResponse, error) {
+func (s *Server) VerifyEmail(ctx context.Context, req *connect.Request[user.VerifyEmailRequest]) (*connect.Response[user.VerifyEmailResponse], error) {
 	details, err := s.command.VerifyUserEmail(ctx,
-		req.GetUserId(),
-		req.GetVerificationCode(),
+		req.Msg.GetUserId(),
+		req.Msg.GetVerificationCode(),
 		s.userCodeAlg,
 	)
 	if err != nil {
 		return nil, err
 	}
-	return &user.VerifyEmailResponse{
+	return connect.NewResponse(&user.VerifyEmailResponse{
 		Details: &object.Details{
 			Sequence:      details.Sequence,
 			ChangeDate:    timestamppb.New(details.EventDate),
 			ResourceOwner: details.ResourceOwner,
 		},
-	}, nil
+	}), nil
 }

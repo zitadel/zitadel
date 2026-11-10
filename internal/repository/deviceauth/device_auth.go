@@ -29,6 +29,7 @@ type AddedEvent struct {
 	Audience         []string
 	State            domain.DeviceAuthState
 	NeedRefreshToken bool
+	OrganizationID   string
 }
 
 func (e *AddedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -53,6 +54,7 @@ func NewAddedEvent(
 	scopes []string,
 	audience []string,
 	needRefreshToken bool,
+	organizationID string,
 ) *AddedEvent {
 	return &AddedEvent{
 		eventstore.NewBaseEventForPush(
@@ -60,6 +62,7 @@ func NewAddedEvent(
 		),
 		clientID, deviceCode, userCode, expires, scopes, audience,
 		domain.DeviceAuthStateInitiated, needRefreshToken,
+		organizationID,
 	}
 }
 

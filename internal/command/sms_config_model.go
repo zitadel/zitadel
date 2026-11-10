@@ -27,7 +27,8 @@ type TwilioConfig struct {
 }
 
 type HTTPConfig struct {
-	Endpoint string
+	Endpoint   string
+	SigningKey *crypto.CryptoValue
 }
 
 func NewIAMSMSConfigWriteModel(instanceID, id string) *IAMSMSConfigWriteModel {
@@ -82,7 +83,8 @@ func (wm *IAMSMSConfigWriteModel) Reduce() error {
 				continue
 			}
 			wm.HTTP = &HTTPConfig{
-				Endpoint: e.Endpoint,
+				Endpoint:   e.Endpoint,
+				SigningKey: e.SigningKey,
 			}
 			wm.Description = e.Description
 			wm.State = domain.SMSConfigStateInactive
@@ -95,6 +97,9 @@ func (wm *IAMSMSConfigWriteModel) Reduce() error {
 			}
 			if e.Endpoint != nil {
 				wm.HTTP.Endpoint = *e.Endpoint
+			}
+			if e.SigningKey != nil {
+				wm.HTTP.SigningKey = e.SigningKey
 			}
 		case *instance.SMSConfigTwilioActivatedEvent:
 			if wm.ID != e.ID {
@@ -189,7 +194,13 @@ func (wm *IAMSMSConfigWriteModel) NewTwilioChangedEvent(ctx context.Context, agg
 	return changeEvent, true, nil
 }
 
-func (wm *IAMSMSConfigWriteModel) NewHTTPChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id string, description, endpoint *string) (*instance.SMSConfigHTTPChangedEvent, bool, error) {
+func (wm *IAMSMSConfigWriteModel) NewHTTPChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id string,
+	description, endpoint *string,
+	signingKey *crypto.CryptoValue,
+) (*instance.SMSConfigHTTPChangedEvent, bool, error) {
 	changes := make([]instance.SMSConfigHTTPChanges, 0)
 	var err error
 
@@ -202,6 +213,10 @@ func (wm *IAMSMSConfigWriteModel) NewHTTPChangedEvent(ctx context.Context, aggre
 	}
 	if endpoint != nil && wm.HTTP.Endpoint != *endpoint {
 		changes = append(changes, instance.ChangeSMSConfigHTTPEndpoint(*endpoint))
+	}
+	// if signingkey is set, update it as it is encrypted
+	if signingKey != nil {
+		changes = append(changes, instance.ChangeSMSConfigHTTPSigningKey(signingKey))
 	}
 
 	if len(changes) == 0 {

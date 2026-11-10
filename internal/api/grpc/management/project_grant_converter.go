@@ -6,7 +6,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	member_grpc "github.com/zitadel/zitadel/internal/api/grpc/member"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -14,8 +15,11 @@ import (
 	proj_pb "github.com/zitadel/zitadel/pkg/grpc/project"
 )
 
-func listProjectGrantsRequestToModel(req *mgmt_pb.ListProjectGrantsRequest) (*query.ProjectGrantSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func listProjectGrantsRequestToModel(defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListProjectGrantsRequest) (*query.ProjectGrantSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := ProjectGrantQueriesToModel(req)
 	if err != nil {
 		return nil, err
@@ -58,8 +62,11 @@ func ProjectGrantQueryToModel(apiQuery *proj_pb.ProjectGrantQuery) (query.Search
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-M099f", "List.Query.Invalid")
 	}
 }
-func listAllProjectGrantsRequestToModel(req *mgmt_pb.ListAllProjectGrantsRequest) (*query.ProjectGrantSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func listAllProjectGrantsRequestToModel(defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListAllProjectGrantsRequest) (*query.ProjectGrantSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := AllProjectGrantQueriesToModel(req)
 	if err != nil {
 		return nil, err
@@ -100,28 +107,34 @@ func AllProjectGrantQueryToModel(apiQuery *proj_pb.AllProjectGrantQuery) (query.
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-M099f", "List.Query.Invalid")
 	}
 }
-func AddProjectGrantRequestToDomain(req *mgmt_pb.AddProjectGrantRequest) *domain.ProjectGrant {
-	return &domain.ProjectGrant{
+func AddProjectGrantRequestToCommand(req *mgmt_pb.AddProjectGrantRequest, grantID string, resourceOwner string) *command.AddProjectGrant {
+	return &command.AddProjectGrant{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.ProjectId,
+			AggregateID:   req.ProjectId,
+			ResourceOwner: resourceOwner,
 		},
+		GrantID:      grantID,
 		GrantedOrgID: req.GrantedOrgId,
 		RoleKeys:     req.RoleKeys,
 	}
 }
 
-func UpdateProjectGrantRequestToDomain(req *mgmt_pb.UpdateProjectGrantRequest) *domain.ProjectGrant {
-	return &domain.ProjectGrant{
+func UpdateProjectGrantRequestToCommand(req *mgmt_pb.UpdateProjectGrantRequest, resourceOwner string) *command.ChangeProjectGrant {
+	return &command.ChangeProjectGrant{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.ProjectId,
+			AggregateID:   req.ProjectId,
+			ResourceOwner: resourceOwner,
 		},
 		GrantID:  req.GrantId,
 		RoleKeys: req.RoleKeys,
 	}
 }
 
-func ListProjectGrantMembersRequestToModel(ctx context.Context, req *mgmt_pb.ListProjectGrantMembersRequest) (*query.ProjectGrantMembersQuery, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func ListProjectGrantMembersRequestToModel(ctx context.Context, defaults systemdefaults.SystemDefaults, req *mgmt_pb.ListProjectGrantMembersRequest) (*query.ProjectGrantMembersQuery, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := member_grpc.MemberQueriesToQuery(req.Queries)
 	if err != nil {
 		return nil, err
@@ -142,24 +155,21 @@ func ListProjectGrantMembersRequestToModel(ctx context.Context, req *mgmt_pb.Lis
 	}, nil
 }
 
-func AddProjectGrantMemberRequestToDomain(req *mgmt_pb.AddProjectGrantMemberRequest) *domain.ProjectGrantMember {
-	return &domain.ProjectGrantMember{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.ProjectId,
-		},
-		GrantID: req.GrantId,
-		UserID:  req.UserId,
-		Roles:   req.Roles,
+func AddProjectGrantMemberRequestToCommand(req *mgmt_pb.AddProjectGrantMemberRequest, orgID string) *command.AddProjectGrantMember {
+	return &command.AddProjectGrantMember{
+		ResourceOwner:  orgID,
+		ProjectID:      req.ProjectId,
+		ProjectGrantID: req.GrantId,
+		UserID:         req.UserId,
+		Roles:          req.Roles,
 	}
 }
 
-func UpdateProjectGrantMemberRequestToDomain(req *mgmt_pb.UpdateProjectGrantMemberRequest) *domain.ProjectGrantMember {
-	return &domain.ProjectGrantMember{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.ProjectId,
-		},
-		GrantID: req.GrantId,
-		UserID:  req.UserId,
-		Roles:   req.Roles,
+func UpdateProjectGrantMemberRequestToCommand(req *mgmt_pb.UpdateProjectGrantMemberRequest) *command.ChangeProjectGrantMember {
+	return &command.ChangeProjectGrantMember{
+		ProjectID:      req.ProjectId,
+		ProjectGrantID: req.GrantId,
+		UserID:         req.UserId,
+		Roles:          req.Roles,
 	}
 }

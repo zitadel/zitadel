@@ -46,6 +46,11 @@ func NewMemberAddedEvent(
 	}
 }
 
+func (e *MemberAddedEvent) WithUserResourceOwner(userResourceOwner string) *MemberAddedEvent {
+	e.MemberAddedEvent.WithUserResourceOwner(userResourceOwner)
+	return e
+}
+
 func MemberAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := member.MemberAddedEventMapper(event)
 	if err != nil {

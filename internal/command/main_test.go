@@ -17,7 +17,9 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/repository/mock"
+	"github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -103,6 +105,15 @@ func expectFilter(events ...eventstore.Event) expect {
 		m.ExpectFilterEvents(events...)
 	}
 }
+
+func expectFilterActiveOrg(orgID string) expect {
+	return expectFilter(
+		org.NewOrgAddedEvent(context.Background(),
+			&org.NewAggregate(orgID).Aggregate,
+			"org"),
+	)
+}
+
 func expectFilterError(err error) expect {
 	return func(m *mock.MockRepository) {
 		m.ExpectFilterEventsError(err)
@@ -157,8 +168,12 @@ func eventFromEventPusherWithInstanceID(instanceID string, event eventstore.Comm
 }
 
 func eventFromEventPusherWithCreationDateNow(event eventstore.Command) *repository.Event {
+	return eventFromEventPusherWithCreationDate(event, time.Now())
+}
+
+func eventFromEventPusherWithCreationDate(event eventstore.Command, creationDate time.Time) *repository.Event {
 	e := eventFromEventPusher(event)
-	e.CreationDate = time.Now()
+	e.CreationDate = creationDate
 	return e
 }
 
@@ -192,16 +207,20 @@ func (m *mockInstance) ProjectID() string {
 	return "projectID"
 }
 
-func (m *mockInstance) ConsoleClientID() string {
-	return "consoleID"
+func (m *mockInstance) ManagementConsoleClientID() string {
+	return "managementConsoleID"
 }
 
-func (m *mockInstance) ConsoleApplicationID() string {
-	return "consoleApplicationID"
+func (m *mockInstance) ManagementConsoleApplicationID() string {
+	return "managementConsoleApplicationID"
 }
 
 func (m *mockInstance) DefaultLanguage() language.Tag {
 	return AllowedLanguage
+}
+
+func (m *mockInstance) AllowedLanguages() []language.Tag {
+	return []language.Tag{language.English}
 }
 
 func (m *mockInstance) DefaultOrganisationID() string {
@@ -216,8 +235,20 @@ func (m *mockInstance) EnableImpersonation() bool {
 	return false
 }
 
+func (m *mockInstance) EnableDynamicClientRegistration() bool {
+	return false
+}
+
+func (m *mockInstance) AllowUnauthenticatedDynamicClientRegistration() bool {
+	return false
+}
+
 func (m *mockInstance) Features() feature.Features {
 	return feature.Features{}
+}
+
+func (m *mockInstance) ExecutionRouter() target.Router {
+	return target.NewRouter(nil)
 }
 
 func newMockPermissionCheckAllowed() domain.PermissionCheck {
@@ -250,6 +281,17 @@ func newMockProjectPermissionCheckSAMLNotAllowed() domain.ProjectPermissionCheck
 	}
 }
 
+func newMockOrganizationPermissionCheckNotAllowed() OrganizationPermissionCheck {
+	return func(ctx context.Context, organizationID string) (err error) {
+		return zerrors.ThrowPermissionDenied(nil, "", "Errors.PermissionDenied")
+	}
+}
+func newMockOrganizationPermissionCheckAllowed() OrganizationPermissionCheck {
+	return func(ctx context.Context, organizationID string) (err error) {
+		return nil
+	}
+}
+
 func newMockTokenVerifierValid() func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
 	return func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
 		return nil
@@ -267,6 +309,14 @@ type plainHasher struct {
 
 func (h plainHasher) Hash(password string) (string, error) {
 	return strings.Join([]string{"", "plain", h.x, password}, "$"), nil
+}
+
+func (h plainHasher) Validate(encoded string) (verifier.Result, error) {
+	nodes := strings.Split(encoded, "$")
+	if len(nodes) != 4 || nodes[1] != "plain" {
+		return verifier.Skip, nil
+	}
+	return verifier.OK, nil
 }
 
 func (h plainHasher) Verify(encoded, password string) (verifier.Result, error) {

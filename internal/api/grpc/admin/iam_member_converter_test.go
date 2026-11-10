@@ -27,7 +27,7 @@ func TestAddIAMMemberToDomain(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := AddIAMMemberToDomain(tt.args.req)
+			got := AddIAMMemberToCommand(tt.args.req, "INSTANCE")
 			test.AssertFieldsMapped(t, got, "ObjectRoot")
 		})
 	}
@@ -53,7 +53,7 @@ func TestUpdateIAMMemberToDomain(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := UpdateIAMMemberToDomain(tt.args.req)
+			got := UpdateIAMMemberToCommand(tt.args.req, "INSTANCE")
 			test.AssertFieldsMapped(t, got, "ObjectRoot")
 		})
 	}

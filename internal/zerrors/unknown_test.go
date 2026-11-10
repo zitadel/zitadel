@@ -9,25 +9,54 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func TestUnknownError(t *testing.T) {
-	var err interface{} = new(zerrors.UnknownError)
-	_, ok := err.(zerrors.Unknown)
-	assert.True(t, ok)
-}
+func TestUnknown(t *testing.T) {
+	parentErr := errors.New("parent error")
+	id := "test_id"
+	message := "test message"
 
-func TestThrowUnknownf(t *testing.T) {
-	err := zerrors.ThrowUnknownf(nil, "id", "msg")
-	//nolint:errorlint
-	_, ok := err.(*zerrors.UnknownError)
-	assert.True(t, ok)
-}
+	t.Run("ThrowUnknown", func(t *testing.T) {
+		err := zerrors.ThrowUnknown(parentErr, id, message)
+		assert.NotNil(t, err)
 
-func TestIsUnknown(t *testing.T) {
-	err := zerrors.ThrowUnknown(nil, "id", "msg")
-	ok := zerrors.IsUnknown(err)
-	assert.True(t, ok)
+		zitadelErr, ok := zerrors.AsZitadelError(err)
+		assert.True(t, ok)
+		assert.Equal(t, zerrors.KindUnknown, zitadelErr.Kind)
 
-	err = errors.New("I am found!")
-	ok = zerrors.IsUnknown(err)
-	assert.False(t, ok)
+		zitadelError := new(zerrors.ZitadelError)
+		if errors.As(err, &zitadelError) {
+			assert.Equal(t, parentErr, zitadelError.Unwrap())
+			assert.Equal(t, id, zitadelError.ID)
+			assert.Equal(t, message, zitadelError.Message)
+		} else {
+			t.Errorf("error is not of type ZitadelError")
+		}
+	})
+
+	t.Run("ThrowUnknownf", func(t *testing.T) {
+		format := "formatted %s"
+		arg := "message"
+		expectedMessage := "formatted message"
+
+		err := zerrors.ThrowUnknownf(parentErr, id, format, arg)
+		assert.NotNil(t, err)
+
+		zitadelErr, ok := zerrors.AsZitadelError(err)
+		assert.True(t, ok)
+		assert.Equal(t, zerrors.KindUnknown, zitadelErr.Kind)
+
+		zitadelError := new(zerrors.ZitadelError)
+		if errors.As(err, &zitadelError) {
+			assert.Equal(t, parentErr, zitadelError.Unwrap())
+			assert.Equal(t, id, zitadelError.ID)
+			assert.Equal(t, expectedMessage, zitadelError.Message)
+		} else {
+			t.Errorf("error is not of type ZitadelError")
+		}
+	})
+
+	t.Run("IsUnknown", func(t *testing.T) {
+		err := zerrors.ThrowUnknown(parentErr, id, message)
+		isUnknown := zerrors.IsUnknown(err)
+		assert.True(t, isUnknown)
+	})
 }

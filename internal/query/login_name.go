@@ -15,12 +15,20 @@ var (
 		name:  projection.LoginNameCol,
 		table: loginNameTable,
 	}
+	LoginNameNameLowerCol = Column{
+		name:  projection.LoginNameLowerCol,
+		table: loginNameTable,
+	}
 	LoginNameIsPrimaryCol = Column{
 		name:  projection.LoginNameIsPrimaryCol,
 		table: loginNameTable,
 	}
 	LoginNameInstanceIDCol = Column{
 		name:  projection.LoginNameInstanceIDCol,
+		table: loginNameTable,
+	}
+	LoginNameResourceOwnerCol = Column{
+		name:  projection.LoginNameResourceOwnerCol,
 		table: loginNameTable,
 	}
 )

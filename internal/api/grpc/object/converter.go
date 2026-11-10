@@ -5,6 +5,7 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object"
@@ -120,9 +121,12 @@ func TextMethodToQuery(method object_pb.TextQueryMethod) query.TextComparison {
 	}
 }
 
-func ListQueryToModel(query *object_pb.ListQuery) (offset, limit uint64, asc bool) {
-	if query == nil {
-		return 0, 0, false
+// ListQueryToModel converts the list query into offset, limit and sorting order.
+// The limit is defaulted and checked by [systemdefaults.SystemDefaults.V1QueryLimit].
+func ListQueryToModel(defaults systemdefaults.SystemDefaults, query *object_pb.ListQuery) (offset, limit uint64, asc bool, err error) {
+	limit, err = defaults.V1QueryLimit(uint64(query.GetLimit()))
+	if err != nil {
+		return 0, 0, false, err
 	}
-	return query.Offset, uint64(query.Limit), query.Asc
+	return query.GetOffset(), limit, query.GetAsc(), nil
 }

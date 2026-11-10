@@ -16,10 +16,11 @@ type ProjectGrantMemberWriteModel struct {
 	State domain.MemberState
 }
 
-func NewProjectGrantMemberWriteModel(projectID, userID, grantID string) *ProjectGrantMemberWriteModel {
+func NewProjectGrantMemberWriteModel(projectID, userID, grantID, resourceOwner string) *ProjectGrantMemberWriteModel {
 	return &ProjectGrantMemberWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: projectID,
+			AggregateID:   projectID,
+			ResourceOwner: resourceOwner,
 		},
 		UserID:  userID,
 		GrantID: grantID,
@@ -66,6 +67,7 @@ func (wm *ProjectGrantMemberWriteModel) Reduce() error {
 		case *project.GrantMemberAddedEvent:
 			wm.Roles = e.Roles
 			wm.State = domain.MemberStateActive
+			wm.ResourceOwner = e.Aggregate().ResourceOwner
 		case *project.GrantMemberChangedEvent:
 			wm.Roles = e.Roles
 		case *project.GrantMemberRemovedEvent:
@@ -73,18 +75,24 @@ func (wm *ProjectGrantMemberWriteModel) Reduce() error {
 		case *project.GrantMemberCascadeRemovedEvent:
 			wm.State = domain.MemberStateRemoved
 		case *project.GrantRemovedEvent, *project.ProjectRemovedEvent:
+			wm.Roles = nil
 			wm.State = domain.MemberStateRemoved
+		case *project.ProjectAddedEvent:
+			wm.Roles = nil
+			wm.State = domain.MemberStateUnspecified
 		}
 	}
 	return wm.WriteModel.Reduce()
 }
 
 func (wm *ProjectGrantMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			project.ProjectAddedType,
 			project.GrantMemberAddedType,
 			project.GrantMemberChangedType,
 			project.GrantMemberRemovedType,
@@ -92,4 +100,5 @@ func (wm *ProjectGrantMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
 			project.GrantRemovedType,
 			project.ProjectRemovedType).
 		Builder()
+	return query
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/repository/target"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -20,6 +21,7 @@ func existsMock(exists bool) func(method string) bool {
 		return exists
 	}
 }
+
 func TestCommands_SetExecutionRequest(t *testing.T) {
 	type fields struct {
 		eventstore        func(t *testing.T) *eventstore.Eventstore
@@ -169,7 +171,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 							target.NewAddedEvent(context.Background(),
 								target.NewAggregate("target", "instance"),
 								"name",
-								domain.TargetTypeWebhook,
+								target_domain.TargetTypeWebhook,
 								"https://example.com",
 								time.Second,
 								true,
@@ -179,6 +181,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 									KeyID:      "id",
 									Crypted:    []byte("12345678"),
 								},
+								target_domain.PayloadTypeJSON,
 							),
 						),
 					),
@@ -224,7 +227,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 							target.NewAddedEvent(context.Background(),
 								target.NewAggregate("target", "instance"),
 								"name",
-								domain.TargetTypeWebhook,
+								target_domain.TargetTypeWebhook,
 								"https://example.com",
 								time.Second,
 								true,
@@ -234,6 +237,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 									KeyID:      "id",
 									Crypted:    []byte("12345678"),
 								},
+								target_domain.PayloadTypeJSON,
 							),
 						),
 					),
@@ -279,7 +283,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 							target.NewAddedEvent(context.Background(),
 								target.NewAggregate("target", "instance"),
 								"name",
-								domain.TargetTypeWebhook,
+								target_domain.TargetTypeWebhook,
 								"https://example.com",
 								time.Second,
 								true,
@@ -289,6 +293,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 									KeyID:      "id",
 									Crypted:    []byte("12345678"),
 								},
+								target_domain.PayloadTypeJSON,
 							),
 						),
 					),
@@ -851,7 +856,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 						target.NewAddedEvent(context.Background(),
 							target.NewAggregate("target", "instance"),
 							"name",
-							domain.TargetTypeWebhook,
+							target_domain.TargetTypeWebhook,
 							"https://example.com",
 							time.Second,
 							true,
@@ -861,6 +866,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 								KeyID:      "id",
 								Crypted:    []byte("12345678"),
 							},
+							target_domain.PayloadTypeJSON,
 						),
 					),
 					expectPushFailed(
@@ -951,7 +957,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 							target.NewAddedEvent(context.Background(),
 								target.NewAggregate("target", "instance"),
 								"name",
-								domain.TargetTypeWebhook,
+								target_domain.TargetTypeWebhook,
 								"https://example.com",
 								time.Second,
 								true,
@@ -961,6 +967,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 									KeyID:      "id",
 									Crypted:    []byte("12345678"),
 								},
+								target_domain.PayloadTypeJSON,
 							),
 						),
 					),

@@ -1,6 +1,8 @@
 package readmodel
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/v2/system"
 	"github.com/zitadel/zitadel/internal/v2/system/mirror"
@@ -8,7 +10,7 @@ import (
 
 type LastSuccessfulMirror struct {
 	ID       string
-	Position float64
+	Position decimal.Decimal
 	source   string
 }
 
@@ -34,6 +36,7 @@ func (p *LastSuccessfulMirror) Filter() *eventstore.Filter {
 		),
 		eventstore.FilterPagination(
 			eventstore.Descending(),
+			eventstore.Limit(1),
 		),
 	)
 }
@@ -53,7 +56,7 @@ func (h *LastSuccessfulMirror) Reduce(events ...*eventstore.StorageEvent) (err e
 
 func (h *LastSuccessfulMirror) reduceSucceeded(event *eventstore.StorageEvent) error {
 	// if position is set we skip all older events
-	if h.Position > 0 {
+	if h.Position.GreaterThan(decimal.NewFromInt(0)) {
 		return nil
 
 	}

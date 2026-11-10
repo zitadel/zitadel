@@ -4,25 +4,26 @@ package user_test
 
 import (
 	"context"
-	"fmt"
+	"encoding/base64"
 	"slices"
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/filter/v2"
+	v2 "github.com/zitadel/zitadel/pkg/grpc/metadata/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func TestServer_GetUserByID(t *testing.T) {
-	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
+	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	type args struct {
 		ctx context.Context
 		req *user.GetUserByIDRequest
@@ -66,7 +67,7 @@ func TestServer_GetUserByID(t *testing.T) {
 				IamCTX,
 				&user.GetUserByIDRequest{},
 				func(ctx context.Context, request *user.GetUserByIDRequest) *userAttr {
-					info := createUser(ctx, orgResp.OrganizationId, false)
+					info := createUser(ctx, Instance, orgResp.OrganizationId, false)
 					request.UserId = info.UserID
 					return &info
 				},
@@ -99,6 +100,7 @@ func TestServer_GetUserByID(t *testing.T) {
 				},
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
+					CreationDate:  timestamppb.Now(),
 					ResourceOwner: orgResp.OrganizationId,
 				},
 			},
@@ -109,7 +111,7 @@ func TestServer_GetUserByID(t *testing.T) {
 				IamCTX,
 				&user.GetUserByIDRequest{},
 				func(ctx context.Context, request *user.GetUserByIDRequest) *userAttr {
-					info := createUser(ctx, orgResp.OrganizationId, true)
+					info := createUser(ctx, Instance, orgResp.OrganizationId, true)
 					request.UserId = info.UserID
 					return &info
 				},
@@ -144,6 +146,7 @@ func TestServer_GetUserByID(t *testing.T) {
 				},
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
+					CreationDate:  timestamppb.Now(),
 					ResourceOwner: orgResp.OrganizationId,
 				},
 			},
@@ -184,8 +187,8 @@ func TestServer_GetUserByID(t *testing.T) {
 }
 
 func TestServer_GetUserByID_Permission(t *testing.T) {
-	newOrgOwnerEmail := gofakeit.Email()
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
+	newOrgOwnerEmail := integration.Email()
+	newOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), newOrgOwnerEmail)
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
 	type args struct {
 		ctx context.Context
@@ -231,6 +234,7 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 				},
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
+					CreationDate:  timestamppb.Now(),
 					ResourceOwner: newOrg.GetOrganizationId(),
 				},
 			},
@@ -269,6 +273,7 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 				},
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
+					CreationDate:  timestamppb.Now(),
 					ResourceOwner: newOrg.GetOrganizationId(),
 				},
 			},
@@ -276,7 +281,7 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 		{
 			name: "Org, error",
 			args: args{
-				CTX,
+				OrgCTX,
 				&user.GetUserByIDRequest{
 					UserId: newUserID,
 				},
@@ -349,48 +354,56 @@ type userAttr struct {
 	Details  *object.Details
 }
 
-func createUsers(ctx context.Context, orgID string, count int, passwordChangeRequired bool) userAttrs {
+func createUsers(ctx context.Context, instance *integration.Instance, orgID string, count int, passwordChangeRequired bool) userAttrs {
 	infos := make([]userAttr, count)
 	for i := 0; i < count; i++ {
-		infos[i] = createUser(ctx, orgID, passwordChangeRequired)
+		infos[i] = createUser(ctx, instance, orgID, passwordChangeRequired)
 	}
 	slices.Reverse(infos)
 	return infos
 }
 
-func createUser(ctx context.Context, orgID string, passwordChangeRequired bool) userAttr {
-	username := gofakeit.Email()
+func createUser(ctx context.Context, instance *integration.Instance, orgID string, passwordChangeRequired bool) userAttr {
+	username := integration.Email()
+	return createUserWithUserName(ctx, instance, username, orgID, passwordChangeRequired)
+}
+
+func createUserWithUserName(ctx context.Context, instance *integration.Instance, username string, orgID string, passwordChangeRequired bool) userAttr {
 	// used as default country prefix
-	phone := "+41" + gofakeit.Phone()
-	resp := Instance.CreateHumanUserVerified(ctx, orgID, username, phone)
+	phone := integration.Phone()
+	resp := instance.CreateHumanUserVerified(ctx, orgID, username, phone)
 	info := userAttr{resp.GetUserId(), username, phone, nil, resp.GetDetails()}
+	// as the change date of the creation is the creation date
+	resp.Details.CreationDate = resp.GetDetails().GetChangeDate()
 	if passwordChangeRequired {
-		details := Instance.SetUserPassword(ctx, resp.GetUserId(), integration.UserPassword, true)
+		details := instance.SetUserPassword(ctx, resp.GetUserId(), integration.UserPassword, true)
 		info.Changed = details.GetChangeDate()
 	}
 	return info
 }
 
 func TestServer_ListUsers(t *testing.T) {
-	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
+	iamOwnerCtx := InstancePermissionV2.WithAuthorizationToken(OrgCTX, integration.UserTypeIAMOwner)
+
+	orgResp := InstancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 	type args struct {
 		ctx context.Context
 		req *user.ListUsersRequest
 		dep func(ctx context.Context, request *user.ListUsersRequest) userAttrs
 	}
-	tests := []struct {
+	tt := []struct {
 		name    string
 		args    args
 		want    *user.ListUsersResponse
 		wantErr bool
 	}{
 		{
-			name: "list user by id, no permission machine user",
+			name: "list user by id, no permission service account",
 			args: args{
-				UserCTX,
+				InstancePermissionV2.WithAuthorizationToken(OrgCTX, integration.UserTypeNoPermission),
 				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-					info := createUser(ctx, orgResp.OrganizationId, false)
+					info := createUser(ctx, InstancePermissionV2, orgResp.OrganizationId, false)
 					request.Queries = append(request.Queries, InUserIDsQuery([]string{info.UserID}))
 					return []userAttr{}
 				},
@@ -407,10 +420,10 @@ func TestServer_ListUsers(t *testing.T) {
 		{
 			name: "list user by id, no permission human user",
 			args: func() args {
-				info := createUser(IamCTX, orgResp.OrganizationId, true)
+				info := createUser(iamOwnerCtx, InstancePermissionV2, orgResp.OrganizationId, true)
 				// create session to get token
 				userID := info.UserID
-				createResp, err := Instance.Client.SessionV2.CreateSession(IamCTX, &session.CreateSessionRequest{
+				createResp, err := InstancePermissionV2.Client.SessionV2.CreateSession(iamOwnerCtx, &session.CreateSessionRequest{
 					Checks: &session.Checks{
 						User: &session.CheckUser{
 							Search: &session.CheckUser_UserId{UserId: userID},
@@ -424,7 +437,7 @@ func TestServer_ListUsers(t *testing.T) {
 					require.NoError(t, err)
 				}
 				// use token to get ctx
-				HumanCTX := integration.WithAuthorizationToken(IamCTX, createResp.GetSessionToken())
+				HumanCTX := integration.WithAuthorizationToken(iamOwnerCtx, createResp.GetSessionToken())
 				return args{
 					HumanCTX,
 					&user.ListUsersRequest{},
@@ -433,7 +446,7 @@ func TestServer_ListUsers(t *testing.T) {
 					},
 				}
 			}(),
-			want: &user.ListUsersResponse{ // human user should return itself when calling ListUsers() even if it has no permissions
+			want: &user.ListUsersResponse{ // User (Human) should return itself when calling ListUsers() even if it has no permissions
 				Details: &object.ListDetails{
 					TotalResult: 1,
 					Timestamp:   timestamppb.Now(),
@@ -469,14 +482,12 @@ func TestServer_ListUsers(t *testing.T) {
 		{
 			name: "list user by id, ok",
 			args: args{
-				IamCTX,
-				&user.ListUsersRequest{
-					Queries: []*user.SearchQuery{
-						OrganizationIdQuery(orgResp.OrganizationId),
-					},
-				},
+				iamOwnerCtx,
+				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-					info := createUser(ctx, orgResp.OrganizationId, false)
+					info := createUser(ctx, InstancePermissionV2, orgResp.OrganizationId, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserIDsQuery([]string{info.UserID}))
 					return []userAttr{info}
 				},
@@ -515,14 +526,12 @@ func TestServer_ListUsers(t *testing.T) {
 		{
 			name: "list user by id, passwordChangeRequired, ok",
 			args: args{
-				IamCTX,
-				&user.ListUsersRequest{
-					Queries: []*user.SearchQuery{
-						OrganizationIdQuery(orgResp.OrganizationId),
-					},
-				},
+				iamOwnerCtx,
+				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-					info := createUser(ctx, orgResp.OrganizationId, true)
+					info := createUser(ctx, InstancePermissionV2, orgResp.OrganizationId, true)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserIDsQuery([]string{info.UserID}))
 					return []userAttr{info}
 				},
@@ -561,17 +570,22 @@ func TestServer_ListUsers(t *testing.T) {
 			},
 		},
 		{
-			name: "list user by id multiple, ok",
+			name: "list user by id and meta key multiple, ok",
 			args: args{
-				IamCTX,
-				&user.ListUsersRequest{
-					Queries: []*user.SearchQuery{
-						OrganizationIdQuery(orgResp.OrganizationId),
-					},
-				},
+				iamOwnerCtx,
+				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-					infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
+					infos := createUsers(ctx, InstancePermissionV2, orgResp.OrganizationId, 3, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserIDsQuery(infos.userIDs()))
+
+					InstancePermissionV2.SetUserMetadata(ctx, infos[0].UserID, "my meta", "my value 1")
+					InstancePermissionV2.SetUserMetadata(ctx, infos[1].UserID, "my meta 2", "my value 3")
+					InstancePermissionV2.SetUserMetadata(ctx, infos[2].UserID, "my meta", "my value 2")
+
+					request.Queries = append(request.Queries, MetadataKeyContainsQuery("my meta"))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 					return infos
 				},
 			},
@@ -580,7 +594,7 @@ func TestServer_ListUsers(t *testing.T) {
 					TotalResult: 3,
 					Timestamp:   timestamppb.Now(),
 				},
-				SortingColumn: 0,
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
 				Result: []*user.User{
 					{
 						State: user.UserState_USER_STATE_ACTIVE,
@@ -623,7 +637,8 @@ func TestServer_ListUsers(t *testing.T) {
 								},
 							},
 						},
-					}, {
+					},
+					{
 						State: user.UserState_USER_STATE_ACTIVE,
 						Type: &user.User_Human{
 							Human: &user.HumanUser{
@@ -650,15 +665,15 @@ func TestServer_ListUsers(t *testing.T) {
 		{
 			name: "list user by username, ok",
 			args: args{
-				IamCTX,
-				&user.ListUsersRequest{
-					Queries: []*user.SearchQuery{
-						OrganizationIdQuery(orgResp.OrganizationId),
-					},
-				},
+				iamOwnerCtx,
+				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-					info := createUser(ctx, orgResp.OrganizationId, false)
+					info := createUser(ctx, InstancePermissionV2, orgResp.OrganizationId, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, UsernameQuery(info.Username))
+
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 					return []userAttr{info}
 				},
 			},
@@ -667,7 +682,7 @@ func TestServer_ListUsers(t *testing.T) {
 					TotalResult: 1,
 					Timestamp:   timestamppb.Now(),
 				},
-				SortingColumn: 0,
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
 				Result: []*user.User{
 					{
 						State: user.UserState_USER_STATE_ACTIVE,
@@ -696,15 +711,14 @@ func TestServer_ListUsers(t *testing.T) {
 		{
 			name: "list user in emails, ok",
 			args: args{
-				IamCTX,
-				&user.ListUsersRequest{
-					Queries: []*user.SearchQuery{
-						OrganizationIdQuery(orgResp.OrganizationId),
-					},
-				},
+				iamOwnerCtx,
+				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-					info := createUser(ctx, orgResp.OrganizationId, false)
+					info := createUser(ctx, InstancePermissionV2, orgResp.OrganizationId, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserEmailsQuery([]string{info.Username}))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 					return []userAttr{info}
 				},
 			},
@@ -713,7 +727,7 @@ func TestServer_ListUsers(t *testing.T) {
 					TotalResult: 1,
 					Timestamp:   timestamppb.Now(),
 				},
-				SortingColumn: 0,
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
 				Result: []*user.User{
 					{
 						State: user.UserState_USER_STATE_ACTIVE,
@@ -740,17 +754,24 @@ func TestServer_ListUsers(t *testing.T) {
 			},
 		},
 		{
-			name: "list user in emails multiple, ok",
+			name: "list user by emails and meta value multiple, ok",
 			args: args{
-				IamCTX,
-				&user.ListUsersRequest{
-					Queries: []*user.SearchQuery{
-						OrganizationIdQuery(orgResp.OrganizationId),
-					},
-				},
+				iamOwnerCtx,
+				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-					infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
+					infos := createUsers(ctx, InstancePermissionV2, orgResp.OrganizationId, 3, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserEmailsQuery(infos.emails()))
+
+					InstancePermissionV2.SetUserMetadata(ctx, infos[0].UserID, "my meta 1", "my value")
+					InstancePermissionV2.SetUserMetadata(ctx, infos[0].UserID, "my meta 2", "my value")
+					InstancePermissionV2.SetUserMetadata(ctx, infos[1].UserID, "my meta 2", "my value")
+					InstancePermissionV2.SetUserMetadata(ctx, infos[2].UserID, "my meta", "my value")
+
+					request.Queries = append(request.Queries, MetadataValueQuery("my value"))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
+
 					return infos
 				},
 			},
@@ -759,7 +780,7 @@ func TestServer_ListUsers(t *testing.T) {
 					TotalResult: 3,
 					Timestamp:   timestamppb.Now(),
 				},
-				SortingColumn: 0,
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
 				Result: []*user.User{
 					{
 						State: user.UserState_USER_STATE_ACTIVE,
@@ -828,11 +849,12 @@ func TestServer_ListUsers(t *testing.T) {
 		{
 			name: "list user in emails no found, ok",
 			args: args{
-				IamCTX,
-				&user.ListUsersRequest{Queries: []*user.SearchQuery{
-					OrganizationIdQuery(orgResp.OrganizationId),
-					InUserEmailsQuery([]string{"notfound"}),
-				},
+				iamOwnerCtx,
+				&user.ListUsersRequest{
+					Queries: []*user.SearchQuery{
+						OrganizationIdQuery(orgResp.OrganizationId),
+						InUserEmailsQuery([]string{"notfound"}),
+					},
 				},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
 					return []userAttr{}
@@ -850,14 +872,12 @@ func TestServer_ListUsers(t *testing.T) {
 		{
 			name: "list user phone, ok",
 			args: args{
-				IamCTX,
-				&user.ListUsersRequest{
-					Queries: []*user.SearchQuery{
-						OrganizationIdQuery(orgResp.OrganizationId),
-					},
-				},
+				iamOwnerCtx,
+				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-					info := createUser(ctx, orgResp.OrganizationId, false)
+					info := createUser(ctx, InstancePermissionV2, orgResp.OrganizationId, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, PhoneQuery(info.Phone))
 					return []userAttr{info}
 				},
@@ -896,11 +916,12 @@ func TestServer_ListUsers(t *testing.T) {
 		{
 			name: "list user in emails no found, ok",
 			args: args{
-				IamCTX,
-				&user.ListUsersRequest{Queries: []*user.SearchQuery{
-					OrganizationIdQuery(orgResp.OrganizationId),
-					InUserEmailsQuery([]string{"notfound"}),
-				},
+				iamOwnerCtx,
+				&user.ListUsersRequest{
+					Queries: []*user.SearchQuery{
+						OrganizationIdQuery(orgResp.OrganizationId),
+						InUserEmailsQuery([]string{"notfound"}),
+					},
 				},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
 					return []userAttr{}
@@ -918,14 +939,16 @@ func TestServer_ListUsers(t *testing.T) {
 		{
 			name: "list user resourceowner multiple, ok",
 			args: args{
-				IamCTX,
+				iamOwnerCtx,
 				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-					orgResp := Instance.CreateOrganization(ctx, fmt.Sprintf("ListUsersResourceowner-%s", gofakeit.AppName()), gofakeit.Email())
+					orgResp := InstancePermissionV2.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
 
-					infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
+					infos := createUsers(ctx, InstancePermissionV2, orgResp.OrganizationId, 3, false)
+					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserEmailsQuery(infos.emails()))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 					return infos
 				},
 			},
@@ -934,7 +957,7 @@ func TestServer_ListUsers(t *testing.T) {
 					TotalResult: 3,
 					Timestamp:   timestamppb.Now(),
 				},
-				SortingColumn: 0,
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
 				Result: []*user.User{
 					{
 						State: user.UserState_USER_STATE_ACTIVE,
@@ -1000,93 +1023,390 @@ func TestServer_ListUsers(t *testing.T) {
 				},
 			},
 		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			infos := tt.args.dep(IamCTX, tt.args.req)
+		{
+			name: "list user with org query",
+			args: args{
+				iamOwnerCtx,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					orgRespForOrgTests := InstancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+					info := createUser(ctx, InstancePermissionV2, orgRespForOrgTests.OrganizationId, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgRespForOrgTests.OrganizationId))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
+					return []userAttr{info, {}}
+				},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 2,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
+								},
+							},
+						},
+					},
+					// this is the admin of the org craated in InstancePermissionV2.CreateOrganization()
+					nil,
+				},
+			},
+		},
+		{
+			name: "list user with wrong org query",
+			args: args{
+				iamOwnerCtx,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					orgRespForOrgTests := InstancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+					orgRespForOrgTests2 := InstancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+					createUser(ctx, InstancePermissionV2, orgRespForOrgTests.OrganizationId, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgRespForOrgTests2.OrganizationId))
+					return []userAttr{{}}
+				},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result: []*user.User{
+					// this is the admin of the org created in InstancePermissionV2.CreateOrganization()
+					nil,
+				},
+			},
+		},
+		{
+			name: "when no users matching meta key should return empty list",
+			args: args{
+				iamOwnerCtx,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					createUser(ctx, InstancePermissionV2, orgResp.OrganizationId, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
+					request.Queries = append(request.Queries, MetadataKeyContainsQuery("some non-existent meta"))
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
-			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, err := Client.ListUsers(tt.args.ctx, tt.args.req)
-				if tt.wantErr {
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
+					return []userAttr{}
+				},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
+				Result:        []*user.User{},
+			},
+		},
+	}
+	for _, tc := range tt {
+		t.Run(tc.name, func(t1 *testing.T) {
+			infos := tc.args.dep(iamOwnerCtx, tc.args.req)
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.args.ctx, 20*time.Second)
+			require.EventuallyWithT(t1, func(ttt *assert.CollectT) {
+				got, err := InstancePermissionV2.Client.UserV2.ListUsers(tc.args.ctx, tc.args.req)
+				if tc.wantErr {
 					require.Error(ttt, err)
 					return
 				}
 				require.NoError(ttt, err)
 
 				// always only give back dependency infos which are required for the response
-				require.Len(ttt, tt.want.Result, len(infos))
-				// always first check length, otherwise its failed anyway
-				if assert.Len(ttt, got.Result, len(tt.want.Result)) {
-					// totalResult is unrelated to the tests here so gets carried over, can vary from the count of results due to permissions
-					tt.want.Details.TotalResult = got.Details.TotalResult
-
+				require.Len(ttt, tc.want.Result, len(infos))
+				if assert.Len(ttt, got.Result, len(tc.want.Result)) {
 					// fill in userid and username as it is generated
 					for i := range infos {
-						tt.want.Result[i].UserId = infos[i].UserID
-						tt.want.Result[i].Username = infos[i].Username
-						tt.want.Result[i].PreferredLoginName = infos[i].Username
-						tt.want.Result[i].LoginNames = []string{infos[i].Username}
-						if human := tt.want.Result[i].GetHuman(); human != nil {
+						if tc.want.Result[i] == nil {
+							continue
+						}
+						tc.want.Result[i].UserId = infos[i].UserID
+						tc.want.Result[i].Username = infos[i].Username
+						tc.want.Result[i].PreferredLoginName = infos[i].Username
+						tc.want.Result[i].LoginNames = []string{infos[i].Username}
+						if human := tc.want.Result[i].GetHuman(); human != nil {
 							human.Email.Email = infos[i].Username
 							human.Phone.Phone = infos[i].Phone
-							if tt.want.Result[i].GetHuman().GetPasswordChanged() != nil {
+							if tc.want.Result[i].GetHuman().GetPasswordChanged() != nil {
 								human.PasswordChanged = infos[i].Changed
 							}
 						}
-						tt.want.Result[i].Details = infos[i].Details
+						tc.want.Result[i].Details = infos[i].Details
 					}
-					for i := range tt.want.Result {
-						assert.EqualExportedValues(ttt, got.Result[i], tt.want.Result[i])
+					for i := range tc.want.Result {
+						if tc.want.Result[i] == nil {
+							continue
+						}
+						assert.EqualExportedValues(ttt, got.Result[i], tc.want.Result[i])
 					}
 				}
-				integration.AssertListDetails(ttt, tt.want, got)
+				integration.AssertListDetails(ttt, tc.want, got)
+			}, retryDuration, tick, "timeout waiting for expected user result")
+		})
+	}
+}
+
+func TestServer_SystemUsers_ListUsers(t *testing.T) {
+	iamOwnerCtx := InstancePermissionV2.WithAuthorizationToken(OrgCTX, integration.UserTypeIAMOwner)
+
+	org1 := InstancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+	org2 := InstancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), "org2@zitadel.com")
+	org3 := InstancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+	_ = createUserWithUserName(iamOwnerCtx, InstancePermissionV2, "Test_SystemUsers_ListUser1@zitadel.com", org1.OrganizationId, false)
+	_ = createUserWithUserName(iamOwnerCtx, InstancePermissionV2, "Test_SystemUsers_ListUser2@zitadel.com", org2.OrganizationId, false)
+	_ = createUserWithUserName(iamOwnerCtx, InstancePermissionV2, "Test_SystemUsers_ListUser3@zitadel.com", org3.OrganizationId, false)
+
+	tests := []struct {
+		name                       string
+		ctx                        context.Context
+		req                        *user.ListUsersRequest
+		expectedFoundUsernames     []string
+		checkNumberOfUsersReturned bool
+	}{
+		{
+			name: "list users with neccessary permissions",
+			ctx:  SystemCTX,
+			req:  &user.ListUsersRequest{},
+			// the number of users returned will vary from test run to test run,
+			// so just check the system user gets back users from different orgs whcih it is not a memeber of
+			checkNumberOfUsersReturned: false,
+			expectedFoundUsernames:     []string{"Test_SystemUsers_ListUser1@zitadel.com", "Test_SystemUsers_ListUser2@zitadel.com", "Test_SystemUsers_ListUser3@zitadel.com"},
+		},
+		{
+			name: "list users without neccessary permissions",
+			ctx:  SystemUserWithNoPermissionsCTX,
+			req:  &user.ListUsersRequest{},
+			// check no users returned
+			checkNumberOfUsersReturned: true,
+		},
+		{
+			name: "list users with neccessary permissions specifying org",
+			req: &user.ListUsersRequest{
+				Queries: []*user.SearchQuery{OrganizationIdQuery(org2.OrganizationId)},
+			},
+			ctx:                        SystemCTX,
+			expectedFoundUsernames:     []string{"Test_SystemUsers_ListUser2@zitadel.com", "org2@zitadel.com"},
+			checkNumberOfUsersReturned: true,
+		},
+		{
+			name: "list users without neccessary permissions specifying org",
+			req: &user.ListUsersRequest{
+				Queries: []*user.SearchQuery{OrganizationIdQuery(org2.OrganizationId)},
+			},
+			ctx: SystemUserWithNoPermissionsCTX,
+			// check no users returned
+			checkNumberOfUsersReturned: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.ctx, 1*time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := InstancePermissionV2.Client.UserV2.ListUsers(tt.ctx, tt.req)
+				require.NoError(ttt, err)
+
+				if tt.checkNumberOfUsersReturned {
+					require.Equal(t, len(tt.expectedFoundUsernames), len(got.Result))
+				}
+
+				if tt.expectedFoundUsernames != nil {
+					for _, user := range got.Result {
+						for i, username := range tt.expectedFoundUsernames {
+							if username == user.Username {
+								tt.expectedFoundUsernames = tt.expectedFoundUsernames[i+1:]
+								break
+							}
+						}
+						if len(tt.expectedFoundUsernames) == 0 {
+							return
+						}
+					}
+					require.FailNow(t, "unable to find all users with specified usernames")
+				}
+			}, retryDuration, tick, "timeout waiting for expected user result")
+		})
+	}
+}
+
+func TestServer_ListUsers_UsernameAndOr(t *testing.T) {
+	iamOwnerCtx := InstancePermissionV2.WithAuthorizationToken(OrgCTX, integration.UserTypeIAMOwner)
+	orgResp := InstancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+	alice := createUser(iamOwnerCtx, InstancePermissionV2, orgResp.OrganizationId, false)
+	bob := createUser(iamOwnerCtx, InstancePermissionV2, orgResp.OrganizationId, false)
+	orgQuery := OrganizationIdQuery(orgResp.OrganizationId)
+
+	tests := []struct {
+		name          string
+		queries       []*user.SearchQuery
+		wantUsernames []string
+	}{
+		{
+			name: "org and username or username",
+			queries: []*user.SearchQuery{
+				orgQuery,
+				OrQuery([]*user.SearchQuery{UsernameQuery(alice.Username), UsernameQuery(bob.Username)}),
+			},
+			wantUsernames: []string{alice.Username, bob.Username},
+		},
+		{
+			name: "org and sibling usernames",
+			queries: []*user.SearchQuery{
+				orgQuery,
+				UsernameQuery(alice.Username),
+				UsernameQuery(bob.Username),
+			},
+		},
+		{
+			name: "nested and of or and org",
+			queries: []*user.SearchQuery{
+				AndQuery([]*user.SearchQuery{
+					OrQuery([]*user.SearchQuery{UsernameQuery(alice.Username), UsernameQuery(bob.Username)}),
+					orgQuery,
+				}),
+			},
+			wantUsernames: []string{alice.Username, bob.Username},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := &user.ListUsersRequest{Queries: tt.queries}
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamOwnerCtx, 20*time.Second)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := InstancePermissionV2.Client.UserV2.ListUsers(iamOwnerCtx, req)
+				require.NoError(ttt, err)
+
+				gotUsernames := make([]string, 0, len(got.GetResult()))
+				for _, u := range got.GetResult() {
+					gotUsernames = append(gotUsernames, u.GetUsername())
+				}
+				assert.ElementsMatch(ttt, tt.wantUsernames, gotUsernames)
 			}, retryDuration, tick, "timeout waiting for expected user result")
 		})
 	}
 }
 
 func InUserIDsQuery(ids []string) *user.SearchQuery {
-	return &user.SearchQuery{Query: &user.SearchQuery_InUserIdsQuery{
-		InUserIdsQuery: &user.InUserIDQuery{
-			UserIds: ids,
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_InUserIdsQuery{
+			InUserIdsQuery: &user.InUserIDQuery{
+				UserIds: ids,
+			},
 		},
-	},
 	}
 }
 
 func InUserEmailsQuery(emails []string) *user.SearchQuery {
-	return &user.SearchQuery{Query: &user.SearchQuery_InUserEmailsQuery{
-		InUserEmailsQuery: &user.InUserEmailsQuery{
-			UserEmails: emails,
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_InUserEmailsQuery{
+			InUserEmailsQuery: &user.InUserEmailsQuery{
+				UserEmails: emails,
+			},
 		},
-	},
 	}
 }
 
 func PhoneQuery(number string) *user.SearchQuery {
-	return &user.SearchQuery{Query: &user.SearchQuery_PhoneQuery{
-		PhoneQuery: &user.PhoneQuery{
-			Number: number,
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_PhoneQuery{
+			PhoneQuery: &user.PhoneQuery{
+				Number: number,
+			},
 		},
-	},
 	}
 }
 
 func UsernameQuery(username string) *user.SearchQuery {
-	return &user.SearchQuery{Query: &user.SearchQuery_UserNameQuery{
-		UserNameQuery: &user.UserNameQuery{
-			UserName: username,
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_UserNameQuery{
+			UserNameQuery: &user.UserNameQuery{
+				UserName: username,
+			},
 		},
-	},
 	}
 }
 
 func OrganizationIdQuery(resourceowner string) *user.SearchQuery {
-	return &user.SearchQuery{Query: &user.SearchQuery_OrganizationIdQuery{
-		OrganizationIdQuery: &user.OrganizationIdQuery{
-			OrganizationId: resourceowner,
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_OrganizationIdQuery{
+			OrganizationIdQuery: &user.OrganizationIdQuery{
+				OrganizationId: resourceowner,
+			},
 		},
-	},
+	}
+}
+
+func OrQuery(queries []*user.SearchQuery) *user.SearchQuery {
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_OrQuery{
+			OrQuery: &user.OrQuery{
+				Queries: queries,
+			},
+		},
+	}
+}
+
+func AndQuery(queries []*user.SearchQuery) *user.SearchQuery {
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_AndQuery{
+			AndQuery: &user.AndQuery{
+				Queries: queries,
+			},
+		},
+	}
+}
+
+func MetadataKeyContainsQuery(metadataKey string) *user.SearchQuery {
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_MetadataKeyFilter{
+			MetadataKeyFilter: &v2.MetadataKeyFilter{
+				Key:    metadataKey,
+				Method: filter.TextFilterMethod_TEXT_FILTER_METHOD_STARTS_WITH},
+		},
+	}
+}
+
+func MetakeyEqualsQuery(metaKey string) *user.SearchQuery {
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_MetadataKeyFilter{
+			MetadataKeyFilter: &v2.MetadataKeyFilter{
+				Key:    metaKey,
+				Method: filter.TextFilterMethod_TEXT_FILTER_METHOD_EQUALS},
+		},
+	}
+}
+
+func MetadataValueQuery(metaValue string) *user.SearchQuery {
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_MetadataValueFilter{
+			MetadataValueFilter: &v2.MetadataValueFilter{
+				Value:  []byte(base64.StdEncoding.EncodeToString([]byte(metaValue))),
+				Method: filter.ByteFilterMethod_BYTE_FILTER_METHOD_EQUALS,
+			},
+		},
 	}
 }

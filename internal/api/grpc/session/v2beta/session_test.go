@@ -14,6 +14,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -316,6 +317,10 @@ func mustNewTimestampQuery(t testing.TB, column query.Column, ts time.Time, comp
 }
 
 func Test_listSessionsRequestToQuery(t *testing.T) {
+	queryDefaults := systemdefaults.SystemDefaults{
+		DefaultQueryLimit: 100,
+		MaxQueryLimit:     1000,
+	}
 	type args struct {
 		ctx context.Context
 		req *session.ListSessionsRequest
@@ -328,24 +333,7 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "default request",
-			args: args{
-				ctx: authz.NewMockContext("123", "456", "789"),
-				req: &session.ListSessionsRequest{},
-			},
-			want: &query.SessionsSearchQueries{
-				SearchRequest: query.SearchRequest{
-					Offset: 0,
-					Limit:  0,
-					Asc:    false,
-				},
-				Queries: []query.SearchQuery{
-					mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
-				},
-			},
-		},
-		{
-			name: "default request with sorting column",
+			name: "sorting column",
 			args: args{
 				ctx: authz.NewMockContext("123", "456", "789"),
 				req: &session.ListSessionsRequest{
@@ -355,13 +343,11 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 			want: &query.SessionsSearchQueries{
 				SearchRequest: query.SearchRequest{
 					Offset:        0,
-					Limit:         0,
+					Limit:         100,
 					SortingColumn: query.SessionColumnCreationDate,
 					Asc:           false,
 				},
-				Queries: []query.SearchQuery{
-					mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
-				},
+				Queries: []query.SearchQuery{},
 			},
 		},
 		{
@@ -401,18 +387,30 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 			},
 			want: &query.SessionsSearchQueries{
 				SearchRequest: query.SearchRequest{
-					Offset: 10,
-					Limit:  20,
-					Asc:    true,
+					Offset:        10,
+					Limit:         20,
+					Asc:           true,
+					SortingColumn: query.SessionColumnID,
 				},
 				Queries: []query.SearchQuery{
 					mustNewListQuery(t, query.SessionColumnID, []interface{}{"1", "2", "3"}, query.ListIn),
 					mustNewListQuery(t, query.SessionColumnID, []interface{}{"4", "5", "6"}, query.ListIn),
 					mustNewTextQuery(t, query.SessionColumnUserID, "10", query.TextEquals),
 					mustNewTimestampQuery(t, query.SessionColumnCreationDate, creationDate, query.TimestampGreater),
-					mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
 				},
 			},
+		},
+		{
+			name: "limit exceeds max",
+			args: args{
+				ctx: authz.NewMockContext("123", "456", "789"),
+				req: &session.ListSessionsRequest{
+					Query: &object.ListQuery{
+						Limit: 1001,
+					},
+				},
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "QUERY-4M0fs", "Errors.Query.LimitExceeded"),
 		},
 		{
 			name: "invalid argument error",
@@ -439,7 +437,7 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := listSessionsRequestToQuery(tt.args.ctx, tt.args.req)
+			got, err := listSessionsRequestToQuery(tt.args.ctx, queryDefaults, tt.args.req)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
 		})
@@ -458,15 +456,6 @@ func Test_sessionQueriesToQuery(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "creator only",
-			args: args{
-				ctx: authz.NewMockContext("123", "456", "789"),
-			},
-			want: []query.SearchQuery{
-				mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
-			},
-		},
-		{
 			name: "invalid argument",
 			args: args{
 				ctx: authz.NewMockContext("123", "456", "789"),
@@ -477,7 +466,7 @@ func Test_sessionQueriesToQuery(t *testing.T) {
 			wantErr: zerrors.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid"),
 		},
 		{
-			name: "creator and sessions",
+			name: "sessions",
 			args: args{
 				ctx: authz.NewMockContext("123", "456", "789"),
 				queries: []*session.SearchQuery{
@@ -496,7 +485,6 @@ func Test_sessionQueriesToQuery(t *testing.T) {
 			want: []query.SearchQuery{
 				mustNewListQuery(t, query.SessionColumnID, []interface{}{"1", "2", "3"}, query.ListIn),
 				mustNewListQuery(t, query.SessionColumnID, []interface{}{"4", "5", "6"}, query.ListIn),
-				mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
 			},
 		},
 	}

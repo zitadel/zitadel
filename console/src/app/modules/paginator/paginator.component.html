@@ -3,31 +3,45 @@
     <p class="length">
       <span>{{ length }} </span>{{ 'PAGINATOR.COUNT' | translate }}
     </p>
-    <p class="ts cnsl-secondary-text" *ngIf="timestamp" data-e2e="timestamp">
-      {{ timestamp | timestampToDate | localizedDate: 'EEEE dd. MMM yyyy, HH:mm' }}
-    </p>
+    @if (timestamp) {
+      <p class="ts cnsl-secondary-text" data-e2e="timestamp">
+        {{ timestamp | timestampToDate | localizedDate: 'EEEE dd. MMM yyyy, HH:mm' }}
+      </p>
+    }
   </div>
   <span class="fill-space"></span>
-  <span class="pos cnsl-secondary-text" *ngIf="!hidePagination">{{ startIndex }} - {{ endIndex }} </span>
-  <div class="row" *ngIf="!hidePagination">
-    <cnsl-form-field class="size">
-      <mat-select class="paginator-select" [value]="pageSize" (selectionChange)="updatePageSize($event.value)">
-        <mat-option *ngFor="let sizeOption of pageSizeOptions" [value]="sizeOption">
-          {{ sizeOption }}
-        </mat-option>
-      </mat-select>
-    </cnsl-form-field>
-    <button *ngIf="previousPossible" (click)="previous()" [disabled]="!previousPossible" mat-stroked-button>
-      {{ 'PAGINATOR.PREVIOUS' | translate }}
-    </button>
-    <button *ngIf="nextPossible" (click)="next()" [disabled]="!nextPossible" mat-stroked-button>
-      {{ 'PAGINATOR.NEXT' | translate }}
-    </button>
-  </div>
+  @if (!hidePagination) {
+    <span class="pos cnsl-secondary-text">{{ startIndex }} - {{ endIndex }} </span>
+  }
+  @if (!hidePagination) {
+    <div class="row">
+      <cnsl-form-field class="size">
+        <mat-select class="paginator-select" [value]="pageSize" (selectionChange)="updatePageSize($event.value)">
+          @for (sizeOption of pageSizeOptions; track sizeOption) {
+            <mat-option [value]="sizeOption">
+              {{ sizeOption }}
+            </mat-option>
+          }
+        </mat-select>
+      </cnsl-form-field>
+      @if (previousPossible) {
+        <button (click)="previous()" [disabled]="!previousPossible" mat-stroked-button>
+          {{ 'PAGINATOR.PREVIOUS' | translate }}
+        </button>
+      }
+      @if (nextPossible) {
+        <button (click)="next()" [disabled]="!nextPossible" mat-stroked-button>
+          {{ 'PAGINATOR.NEXT' | translate }}
+        </button>
+      }
+    </div>
+  }
 
-  <div class="row" *ngIf="showMoreButton">
-    <button (click)="moreRequested.emit()" mat-stroked-button [disabled]="disableShowMore">
-      {{ 'PAGINATOR.MORE' | translate }}
-    </button>
-  </div>
+  @if (showMoreButton) {
+    <div class="row">
+      <button (click)="moreRequested.emit()" mat-stroked-button [disabled]="disableShowMore">
+        {{ 'PAGINATOR.MORE' | translate }}
+      </button>
+    </div>
+  }
 </div>

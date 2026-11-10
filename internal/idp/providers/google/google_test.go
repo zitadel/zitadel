@@ -2,6 +2,7 @@ package google
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -41,17 +42,17 @@ func TestProvider_BeginAuth(t *testing.T) {
 			a := assert.New(t)
 			r := require.New(t)
 
-			provider, err := New(tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes)
+			provider, err := New(tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, http.DefaultClient)
 			r.NoError(err)
 
 			ctx := context.Background()
 			session, err := provider.BeginAuth(ctx, "testState")
 			r.NoError(err)
 
-			wantHeaders, wantContent := tt.want.GetAuth(ctx)
-			gotHeaders, gotContent := session.GetAuth(ctx)
-			a.Equal(wantHeaders, gotHeaders)
-			a.Equal(wantContent, gotContent)
+			wantAuth, wantErr := tt.want.GetAuth(ctx)
+			gotAuth, gotErr := session.GetAuth(ctx)
+			a.Equal(wantAuth, gotAuth)
+			a.ErrorIs(gotErr, wantErr)
 		})
 	}
 }

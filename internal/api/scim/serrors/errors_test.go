@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -97,9 +98,10 @@ func TestErrorHandler(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			req := httptest.NewRequest("GET", "/", nil)
 			recorder := httptest.NewRecorder()
-			ErrorHandler(func(http.ResponseWriter, *http.Request) error {
-				return tt.err
-			}).ServeHTTP(recorder, req)
+			ErrorHandler(i18n.NewZitadelTranslator(language.English))(
+				func(http.ResponseWriter, *http.Request) error {
+					return tt.err
+				}).ServeHTTP(recorder, req)
 			assert.Equal(t, tt.wantStatus, recorder.Code)
 
 			if tt.wantBody != "" {

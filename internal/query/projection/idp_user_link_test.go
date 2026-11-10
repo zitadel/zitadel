@@ -304,7 +304,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam IDPConfigRemovedEvent",
+			name: "Instance IDPConfigRemovedEvent",
 			args: args{
 				event: getEvent(
 					testEvent(
