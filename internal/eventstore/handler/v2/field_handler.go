@@ -76,8 +76,8 @@ func (h *FieldHandler) Trigger(ctx context.Context, opts ...TriggerOpt) (err err
 		var wg sync.WaitGroup
 		wg.Add(1)
 		queue <- func() {
-			additionalIteration, err = h.processEvents(ctx, config)
-			wg.Done()
+			defer wg.Done()
+			additionalIteration, err = safeProcessEvents(ctx, config, h.processEvents)
 		}
 		wg.Wait()
 		logging.Debug(ctx, "trigger iteration", "iteration", i)

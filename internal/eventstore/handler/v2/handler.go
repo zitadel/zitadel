@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"log/slog"
 	"maps"
 	"math/rand"
@@ -23,6 +24,7 @@ import (
 	"github.com/zitadel/zitadel/internal/migration"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/pseudo"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type EventStore interface {
@@ -450,6 +452,28 @@ func worker() {
 	}
 }
 
+// panicToError converts the value recovered from a panic into an error.
+func panicToError(rec any) error {
+	recErr, ok := rec.(error)
+	if !ok {
+		recErr = fmt.Errorf("%v", rec)
+	}
+	return zerrors.ThrowInternal(recErr, zerrors.IDRecover, "Errors.Internal")
+}
+
+// safeProcessEvents calls processEvents and converts a panic into an error.
+// The workers are shared by all projections of the process,
+// a panic which is not recovered here would terminate the whole process.
+func safeProcessEvents(ctx context.Context, config *triggerConfig, processEvents func(context.Context, *triggerConfig) (bool, error)) (additionalIteration bool, err error) {
+	defer func() {
+		if rec := recover(); rec != nil {
+			err = panicToError(rec)
+			logging.WithError(ctx, err).Error("projection handler panicked")
+		}
+	}()
+	return processEvents(ctx, config)
+}
+
 func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Context, err error) {
 	if slices.Contains(h.skipInstanceIDs, authz.GetInstance(ctx).InstanceID()) {
 		return call.ResetTimestamp(ctx), nil
@@ -472,8 +496,8 @@ func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Co
 		)
 		wg.Add(1)
 		queue <- func() {
-			additionalIteration, err = h.processEvents(ctx, config)
-			wg.Done()
+			defer wg.Done()
+			additionalIteration, err = safeProcessEvents(ctx, config, h.processEvents)
 		}
 		wg.Wait()
 		logging.Debug(ctx, "trigger iteration", "iteration", i)
@@ -691,7 +715,7 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, statement *S
 		return err
 	}
 
-	if err = statement.Execute(ctx, tx, h.projection.Name()); err != nil {
+	if err = h.safeExecute(ctx, tx, statement); err != nil {
 		logging.WithError(ctx, err).Error("statement execution failed")
 
 		_, rollbackErr := tx.ExecContext(ctx, "ROLLBACK TO SAVEPOINT exec_stmt")
@@ -706,6 +730,18 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, statement *S
 	}
 
 	return nil
+}
+
+// safeExecute executes the statement and converts a panic into an error.
+// The failure is then handled like any other failed statement:
+// it is stored as failed event and skipped as soon as the max failure count is reached.
+func (h *Handler) safeExecute(ctx context.Context, tx *sql.Tx, statement *Statement) (err error) {
+	defer func() {
+		if rec := recover(); rec != nil {
+			err = panicToError(rec)
+		}
+	}()
+	return statement.Execute(ctx, tx, h.projection.Name())
 }
 
 func (h *Handler) eventQuery(currentState *state, minPosition decimal.Decimal) *eventstore.SearchQueryBuilder {
