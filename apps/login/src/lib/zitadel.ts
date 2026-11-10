@@ -38,6 +38,7 @@ import { getUserAgent } from "./fingerprint";
 import { applyCustomHeaders } from "@/lib/custom-headers";
 import { errorClassificationInterceptor, isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { otelGrpcInterceptor } from "@/lib/grpc/interceptors/otel";
+import { retryUnavailableInterceptor } from "@/lib/grpc/interceptors/retry";
 import { Code, Interceptor } from "@connectrpc/connect";
 import { PromiseCache } from "./cache";
 import { createServiceForHost } from "./service";
@@ -1434,6 +1435,12 @@ export function createServerTransport(token: string, serviceConfig: ServiceConfi
   return createConnectTransport({
     httpVersion: "1.1",
     baseUrl: serviceConfig.baseUrl,
-    interceptors: [otelGrpcInterceptor, errorClassificationInterceptor, authorizationInterceptor, headerInterceptor],
+    interceptors: [
+      retryUnavailableInterceptor,
+      otelGrpcInterceptor,
+      errorClassificationInterceptor,
+      authorizationInterceptor,
+      headerInterceptor,
+    ],
   });
 }
