@@ -11,7 +11,7 @@ import { createServer } from "node:net";
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { errorClassificationInterceptor, isClassifiedError } from "./error-classification";
 import { otelGrpcInterceptor } from "./otel";
-import { MAX_RETRIES, PAUSE_MS, retryUnavailableInterceptor } from "./retry";
+import { MAX_RETRIES, PAUSE_MS, RETRY_BUDGET_MS, retryUnavailableInterceptor } from "./retry";
 
 const exporter = new InMemorySpanExporter();
 const provider = new NodeTracerProvider({
@@ -29,13 +29,22 @@ function nodeError(code: string, syscall: string) {
 /**
  * Builds a client over the production chain order, with a fake network step
  * last. The step throws `failure` without calling `next` for the first
- * `failures` attempts (the request never left the Login), then calls `next`.
+ * `failures` attempts (the request never left the Login), after
+ * `failureDelayMs` if set, then calls `next`.
  */
-function setup(opts: { failures: number; failure?: () => ConnectError; handlers?: Record<string, () => unknown> }) {
+function setup(opts: {
+  failures: number;
+  failure?: () => ConnectError;
+  failureDelayMs?: number;
+  handlers?: Record<string, () => unknown>;
+}) {
   const state = { attempts: 0 };
   const network: Interceptor = (next) => async (req) => {
     state.attempts++;
     if (state.attempts <= opts.failures) {
+      if (opts.failureDelayMs) {
+        await new Promise((resolve) => setTimeout(resolve, opts.failureDelayMs));
+      }
       throw (
         opts.failure?.() ??
         new ConnectError("connect ETIMEDOUT", Code.Unavailable, undefined, undefined, nodeError("ETIMEDOUT", "connect"))
@@ -68,7 +77,7 @@ async function settle<T>(call: Promise<T>) {
     (value) => ({ value }),
     (error: unknown) => ({ error }),
   );
-  await vi.advanceTimersByTimeAsync(PAUSE_MS * (MAX_RETRIES + 1));
+  await vi.advanceTimersByTimeAsync(PAUSE_MS * 1.5 * MAX_RETRIES + 1);
   return outcome;
 }
 
@@ -76,10 +85,13 @@ describe("retryUnavailableInterceptor", () => {
   beforeEach(() => {
     exporter.reset();
     vi.useFakeTimers();
+    // A random value of 0.5 makes the jittered pause exactly PAUSE_MS.
+    vi.spyOn(Math, "random").mockReturnValue(0.5);
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   it.each([
@@ -121,6 +133,45 @@ describe("retryUnavailableInterceptor", () => {
     await vi.advanceTimersByTimeAsync(1);
     expect(state.attempts).toBe(2);
     await call;
+  });
+
+  it.each([
+    [0, PAUSE_MS / 2],
+    [0.99, PAUSE_MS * 1.49],
+  ])("with a random value of %s, pauses for %s ms", async (random, pauseMs) => {
+    vi.mocked(Math.random).mockReturnValue(random);
+    const { client, state } = setup({ failures: 1 });
+
+    const call = client.getSession({});
+    await vi.advanceTimersByTimeAsync(Math.round(pauseMs) - 1);
+    expect(state.attempts).toBe(1);
+
+    await vi.advanceTimersByTimeAsync(1);
+    expect(state.attempts).toBe(2);
+    await call;
+  });
+
+  it("does not retry once the retry budget is spent", async () => {
+    const { client, state } = setup({ failures: Infinity, failureDelayMs: RETRY_BUDGET_MS });
+
+    const call = settle(client.getSession({}));
+    await vi.advanceTimersByTimeAsync(RETRY_BUDGET_MS);
+    const result = (await call) as { error: unknown };
+
+    expect(state.attempts).toBe(1);
+    expect(result.error).toMatchObject({ code: Code.Unavailable });
+  });
+
+  it("does not retry a streaming call", async () => {
+    const next = vi.fn(() =>
+      Promise.reject(
+        new ConnectError("unavailable", Code.Unavailable, undefined, undefined, nodeError("ETIMEDOUT", "connect")),
+      ),
+    );
+    const req = { stream: true, signal: new AbortController().signal } as unknown as Parameters<ReturnType<Interceptor>>[0];
+
+    await expect(retryUnavailableInterceptor(next)(req)).rejects.toMatchObject({ code: Code.Unavailable });
+    expect(next).toHaveBeenCalledTimes(1);
   });
 
   it("does not retry once the call is aborted", async () => {
