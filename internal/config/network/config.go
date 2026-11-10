@@ -106,9 +106,6 @@ func (r *certReloader) getCertificate(hello *tls.ClientHelloInfo) (*tls.Certific
 		return r.cert, nil
 	}
 	if err := r.load(certModTime, keyModTime); err != nil {
-		// The modification times are stored anyway,
-		// so the next change of the files triggers a new attempt.
-		r.certModTime, r.keyModTime = certModTime, keyModTime
 		logging.WithError(helloContext(hello), err).Warn("unable to reload TLS certificate, keeping current certificate")
 		return r.cert, nil
 	}
@@ -123,6 +120,11 @@ func (r *certReloader) unchanged(certModTime, keyModTime time.Time) bool {
 
 // load reads and parses the key pair.
 // It must be called while holding the write lock of r.mu.
+//
+// If a file can't be read, the stored modification times are left as they are,
+// so the next handshake tries again.
+// If the files were read but don't form a valid key pair,
+// the modification times are stored anyway and the next change of the files triggers a new attempt.
 func (r *certReloader) load(certModTime, keyModTime time.Time) error {
 	certPEM, err := readOrDefault(r.certPath, r.certPEM)
 	if err != nil {
@@ -132,6 +134,7 @@ func (r *certReloader) load(certModTime, keyModTime time.Time) error {
 	if err != nil {
 		return err
 	}
+	r.certModTime, r.keyModTime = certModTime, keyModTime
 	if len(certPEM) == 0 || len(keyPEM) == 0 {
 		return ErrMissingConfig
 	}
@@ -140,7 +143,6 @@ func (r *certReloader) load(certModTime, keyModTime time.Time) error {
 		return err
 	}
 	r.cert = &cert
-	r.certModTime, r.keyModTime = certModTime, keyModTime
 	return nil
 }
 

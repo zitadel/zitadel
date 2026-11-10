@@ -123,6 +123,37 @@ func TestTLS_Config_reload(t *testing.T) {
 	assert.Equal(t, "third", commonName(t, cert))
 }
 
+func TestTLS_Config_reloadAfterReadError(t *testing.T) {
+	dir := t.TempDir()
+	certPath, keyPath := filepath.Join(dir, "tls.crt"), filepath.Join(dir, "tls.key")
+	start := time.Now().Add(-time.Hour)
+
+	certPEM, keyPEM := generateKeyPair(t, "first")
+	writeFile(t, certPath, certPEM, start)
+	writeFile(t, keyPath, keyPEM, start)
+
+	config, err := (&TLS{Enabled: true, CertPath: certPath, KeyPath: keyPath}).Config()
+	require.NoError(t, err)
+
+	// the cert path can be stat'ed but not read: keep the current certificate
+	changed := start.Add(time.Minute)
+	require.NoError(t, os.Remove(certPath))
+	require.NoError(t, os.Mkdir(certPath, 0o700))
+	require.NoError(t, os.Chtimes(certPath, changed, changed))
+	cert, err := config.GetCertificate(&tls.ClientHelloInfo{})
+	require.NoError(t, err)
+	assert.Equal(t, "first", commonName(t, cert))
+
+	// the files are restored with the same modification time: they must still be loaded
+	certPEM, keyPEM = generateKeyPair(t, "second")
+	require.NoError(t, os.Remove(certPath))
+	writeFile(t, certPath, certPEM, changed)
+	writeFile(t, keyPath, keyPEM, start)
+	cert, err = config.GetCertificate(&tls.ClientHelloInfo{})
+	require.NoError(t, err)
+	assert.Equal(t, "second", commonName(t, cert))
+}
+
 func TestTLS_Config_reloadMixed(t *testing.T) {
 	dir := t.TempDir()
 	certPath := filepath.Join(dir, "tls.crt")
