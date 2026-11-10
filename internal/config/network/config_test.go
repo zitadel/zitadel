@@ -188,21 +188,33 @@ func TestTLS_Config_reloadConcurrent(t *testing.T) {
 	config, err := (&TLS{Enabled: true, CertPath: certPath, KeyPath: keyPath}).Config()
 	require.NoError(t, err)
 
+	// The files are rotated before the workers are released,
+	// so all of them see the change at the same time and race for the reload.
+	certPEM, keyPEM = generateKeyPair(t, "second")
+	writeFile(t, keyPath, keyPEM, start.Add(time.Minute))
+	writeFile(t, certPath, certPEM, start.Add(time.Minute))
+
+	release := make(chan struct{})
 	var wg sync.WaitGroup
 	for i := 0; i < 20; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
+			<-release
 			for j := 0; j < 50; j++ {
+				// require must not be used outside of the test goroutine
 				cert, err := config.GetCertificate(&tls.ClientHelloInfo{})
-				assert.NoError(t, err)
-				assert.NotNil(t, cert)
+				if !assert.NoError(t, err) || !assert.NotNil(t, cert) {
+					return
+				}
+				parsed, err := x509.ParseCertificate(cert.Certificate[0])
+				if assert.NoError(t, err) {
+					assert.Equal(t, "second", parsed.Subject.CommonName)
+				}
 			}
 		}()
 	}
-	certPEM, keyPEM = generateKeyPair(t, "second")
-	writeFile(t, keyPath, keyPEM, start.Add(time.Minute))
-	writeFile(t, certPath, certPEM, start.Add(time.Minute))
+	close(release)
 	wg.Wait()
 
 	cert, err := config.GetCertificate(&tls.ClientHelloInfo{})
