@@ -98,16 +98,29 @@ func (t *RefreshTokenView) AppendEventIfMyRefreshToken(event eventstore.Event) (
 		if err != nil {
 			return err
 		}
-	case user_repo.HumanRefreshTokenRemovedType,
-		user_repo.UserRemovedType,
+	case user_repo.HumanRefreshTokenRemovedType:
+		return t.appendRefreshTokenRemoved(event)
+	case user_repo.UserRemovedType,
 		user_repo.UserDeactivatedType,
 		user_repo.UserLockedType:
-		view.appendRemovedEvent(event)
+		t.appendRemovedEvent(event)
+		return nil
 	default:
 		return nil
 	}
 	if view.ID == t.ID {
 		return t.AppendEvent(event)
+	}
+	return nil
+}
+
+func (t *RefreshTokenView) appendRefreshTokenRemoved(event eventstore.Event) error {
+	tokenID, err := tokenIDFromEvent(event)
+	if err != nil {
+		return err
+	}
+	if tokenID == t.ID {
+		t.appendRemovedEvent(event)
 	}
 	return nil
 }
