@@ -1,0 +1,67 @@
+InitCode:
+  Title: Naudotojo aktyvavimas
+  PreHeader: Naudotojo aktyvavimas
+  Subject: Naudotojo aktyvavimas
+  Greeting: Sveiki, {{.DisplayName}},
+  Text: Šis naudotojas buvo sukurtas. Naudokite naudotojo vardą {{.PreferredLoginName}}, kad prisijungtumėte. Spustelėkite žemiau esantį mygtuką, kad užbaigtumėte aktyvavimo procesą. (Kodas {{.Code}}) Jei neprašėte šio laiško, ignoruokite jį.
+  ButtonText: Užbaigti aktyvavimą
+PasswordReset:
+  Title: Slaptažodžio atstatymas
+  PreHeader: Slaptažodžio atstatymas
+  Subject: Slaptažodžio atstatymas
+  Greeting: Sveiki, {{.DisplayName}},
+  Text: Gavome slaptažodžio atstatymo užklausą. Naudokite žemiau esantį mygtuką, kad atstatytumėte savo slaptažodį. (Kodas {{.Code}}) Jei neprašėte šio laiško, ignoruokite jį.
+  ButtonText: Atstatyti slaptažodį
+VerifyEmail:
+  Title: El. pašto patvirtinimas
+  PreHeader: El. pašto patvirtinimas
+  Subject: El. pašto patvirtinimas
+  Greeting: Sveiki, {{.DisplayName}},
+  Text: Buvo pridėtas naujas el. pašto adresas. Naudokite žemiau esantį mygtuką, kad patvirtintumėte savo el. paštą. (Kodas {{.Code}}) Jei nepridėjote naujo el. pašto, ignoruokite šį laišką.
+  ButtonText: Patvirtinti el. paštą
+VerifyPhone:
+  Title: Telefono numerio patvirtinimas
+  PreHeader: Telefono numerio patvirtinimas
+  Subject: Telefono numerio patvirtinimas
+  Greeting: Sveiki, {{.DisplayName}},
+  Text: Buvo pridėtas naujas telefono numeris. Naudokite šį kodą, kad jį patvirtintumėte {{.Code}}
+  ButtonText: Patvirtinti telefono numerį
+VerifyEmailOTP:
+  Title: Vienkartinio kodo patvirtinimas
+  PreHeader: Vienkartinio kodo patvirtinimas
+  Subject: Vienkartinio kodo patvirtinimas
+  Greeting: Sveiki, {{.DisplayName}},
+  Text: Naudokite vienkartinį kodą {{.OTP}}, kad autentifikuotumėtės per artimiausias penkias minutes, arba spustelėkite mygtuką „Autentifikuoti“.
+  ButtonText: Autentifikuoti
+VerifySMSOTP:
+  Text: |-
+    {{.OTP}} yra jūsų vienkartinis kodas skirtas {{ .Domain }}. Naudokite jį per artimiausią {{.Expiry}}.
+    @{{.Domain}} #{{.OTP}}
+DomainClaimed:
+  Title: Domenas buvo užimtas
+  PreHeader: Pakeisti el. paštą / naudotojo vardą
+  Subject: Domenas buvo užimtas
+  Greeting: Sveiki, {{.DisplayName}},
+  Text: Domeną {{.Domain}} pasisavino organizacija. Jūsų dabartinis naudotojas {{.Username}} nėra šios organizacijos narys. Todėl prisijungdami turėsite pakeisti savo el. paštą. Šiam prisijungimui sukūrėme laikiną naudotojo vardą ({{.TempUsername}}).
+  ButtonText: Prisijungti
+PasswordlessRegistration:
+  Title: Pridėti prieigos raktą
+  PreHeader: Pridėti prieigos raktą
+  Subject: Pridėti prieigos raktą
+  Greeting: Sveiki, {{.DisplayName}},
+  Text: Gavome užklausą pridėti žetoną prisijungimui prieigos raktu. Naudokite žemiau esantį mygtuką, kad pridėtumėte savo žetoną ar įrenginį prisijungimui prieigos raktu.
+  ButtonText: Pridėti prieigos raktą
+PasswordChange:
+  Title: Naudotojo slaptažodis pakeistas
+  PreHeader: Slaptažodžio pakeitimas
+  Subject: Naudotojo slaptažodis pakeistas
+  Greeting: Sveiki, {{.DisplayName}},
+  Text: Jūsų naudotojo slaptažodis buvo pakeistas. Jei šio pakeitimo neatlikote jūs, nedelsiant atstatykite savo slaptažodį.
+  ButtonText: Prisijungti
+InviteUser:
+  Title: Kvietimas prisijungti prie {{.ApplicationName}}
+  PreHeader: Kvietimas prisijungti prie {{.ApplicationName}}
+  Subject: Kvietimas prisijungti prie {{.ApplicationName}}
+  Greeting: Sveiki, {{.DisplayName}},
+  Text: Jūsų naudotojas buvo pakviestas prisijungti prie {{.ApplicationName}}. Spustelėkite žemiau esantį mygtuką, kad užbaigtumėte kvietimo procesą. Jei neprašėte šio laiško, ignoruokite jį.
+  ButtonText: Priimti kvietimą
