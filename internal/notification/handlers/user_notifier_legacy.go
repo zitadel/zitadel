@@ -99,6 +99,14 @@ func (u *userNotifierLegacy) Reducers() []handler.AggregateReducer {
 					Reduce: u.reducePasswordChanged,
 				},
 				{
+					Event:  user.HumanEmailChangedType,
+					Reduce: u.reduceEmailChanged,
+				},
+				{
+					Event:  user.HumanPhoneChangedType,
+					Reduce: u.reducePhoneChanged,
+				},
+				{
 					Event:  user.HumanOTPSMSCodeAddedType,
 					Reduce: u.reduceOTPSMSCodeAdded,
 				},
@@ -708,6 +716,114 @@ func (u *userNotifierLegacy) reducePasswordChanged(event eventstore.Event) (*han
 			return err
 		}
 		return u.commands.PasswordChangeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
+	}), nil
+}
+
+// reduceEmailChanged notifies the user that their email address was changed, mirroring
+// reducePasswordChanged's security-notification shape. Unconditional (not gated by
+// NotificationPolicy), matching reduceDomainClaimed's precedent -- there is no existing
+// per-org opt-out for this event.
+func (u *userNotifierLegacy) reduceEmailChanged(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanEmailChangedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Ah8vX", "reduce.wrong.event.type %s", user.HumanEmailChangedType)
+	}
+
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		ctx = HandlerContext(ctx, event.Aggregate())
+		alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, nil, user.HumanEmailChangeSentType)
+		if err != nil {
+			return err
+		}
+		if alreadyHandled {
+			return nil
+		}
+
+		colors, err := u.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner, false)
+		if err != nil {
+			return err
+		}
+
+		template, err := u.queries.MailTemplateByOrg(ctx, e.Aggregate().ResourceOwner, false)
+		if err != nil {
+			return err
+		}
+
+		notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
+		if err != nil {
+			return err
+		}
+		translator, err := u.queries.GetTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.EmailChangeMessageType)
+		if err != nil {
+			return err
+		}
+		ctx, err = u.queries.Origin(ctx, e)
+		if err != nil {
+			return err
+		}
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type()).
+			SendEmailChange(ctx, notifyUser)
+		if err != nil {
+			if errors.Is(err, &channels.CancelError{}) {
+				// if the notification was canceled, we don't want to return the error, so there is no retry
+				return nil
+			}
+			return err
+		}
+		return u.commands.EmailChangeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
+	}), nil
+}
+
+// reducePhoneChanged notifies the user that their phone number was changed, mirroring
+// reduceEmailChanged/reducePasswordChanged.
+func (u *userNotifierLegacy) reducePhoneChanged(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanPhoneChangedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Bh9wY", "reduce.wrong.event.type %s", user.HumanPhoneChangedType)
+	}
+
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		ctx = HandlerContext(ctx, event.Aggregate())
+		alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, nil, user.HumanPhoneChangeSentType)
+		if err != nil {
+			return err
+		}
+		if alreadyHandled {
+			return nil
+		}
+
+		colors, err := u.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner, false)
+		if err != nil {
+			return err
+		}
+
+		template, err := u.queries.MailTemplateByOrg(ctx, e.Aggregate().ResourceOwner, false)
+		if err != nil {
+			return err
+		}
+
+		notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
+		if err != nil {
+			return err
+		}
+		translator, err := u.queries.GetTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.PhoneChangeMessageType)
+		if err != nil {
+			return err
+		}
+		ctx, err = u.queries.Origin(ctx, e)
+		if err != nil {
+			return err
+		}
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type()).
+			SendPhoneChange(ctx, notifyUser)
+		if err != nil {
+			if errors.Is(err, &channels.CancelError{}) {
+				// if the notification was canceled, we don't want to return the error, so there is no retry
+				return nil
+			}
+			return err
+		}
+		return u.commands.PhoneChangeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
 	}), nil
 }
 
