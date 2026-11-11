@@ -705,6 +705,8 @@
     "ORGID": "Organisations ID",
     "PRIMARYDOMAIN": "Organisationsdomäne",
     "PROJECTNAME": "Projektname",
+    "ROLEKEY": "Rolle",
+    "WITHGRANTED": "Projekt-Grants einbeziehen",
     "RESOURCEOWNER": "Ressourcenbesitzer",
     "METHODS": {
       "5": "beinhaltet",
@@ -833,6 +835,7 @@
         "10": "Nach Organisationsname filtern",
         "12": "Project Name"
       },
+      "SEARCHPLACEHOLDER": "Name, E-Mail oder Nutzername suchen",
       "EMPTY": "Keine Einträge"
     },
     "PASSWORDLESS": {
@@ -2820,6 +2823,7 @@
   "GRANTS": {
     "TITLE": "Rollen-Zuweisungen",
     "DESC": "Dies sind alle Rollen-Zuweisungen deiner Organisation.",
+    "SEARCHPLACEHOLDER": "Benutzer suchen",
     "DELETE": "Rollen-Zuweisung löschen",
     "EMPTY": "Keine Rollen-Zuweisung gefunden",
     "ADD": "Rollen-Zuweisung erstellen",

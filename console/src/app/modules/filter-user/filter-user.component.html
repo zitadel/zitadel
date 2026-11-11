@@ -50,9 +50,19 @@
               cnslInput
               name="value"
               [value]="dnq.getDisplayName()"
+              [matAutocomplete]="displayNameAuto"
+              (input)="onSuggestionInput(SubQuery.DISPLAYNAME, $event)"
               (change)="setValue(SubQuery.DISPLAYNAME, dnq, $event)"
             />
           </cnsl-form-field>
+          <mat-autocomplete
+            #displayNameAuto="matAutocomplete"
+            (optionSelected)="selectSuggestion(SubQuery.DISPLAYNAME, dnq, $event.option.value)"
+          >
+            @for (suggestion of suggestionsFor(SubQuery.DISPLAYNAME); track suggestion) {
+              <mat-option [value]="suggestion">{{ suggestion }}</mat-option>
+            }
+          </mat-autocomplete>
         </div>
       }
     </div>
@@ -77,8 +87,23 @@
             </mat-select>
           </cnsl-form-field>
           <cnsl-form-field class="filter-input-value">
-            <input cnslInput name="value" [value]="eq.getEmailAddress()" (change)="setValue(SubQuery.EMAIL, eq, $event)" />
+            <input
+              cnslInput
+              name="value"
+              [value]="eq.getEmailAddress()"
+              [matAutocomplete]="emailAuto"
+              (input)="onSuggestionInput(SubQuery.EMAIL, $event)"
+              (change)="setValue(SubQuery.EMAIL, eq, $event)"
+            />
           </cnsl-form-field>
+          <mat-autocomplete
+            #emailAuto="matAutocomplete"
+            (optionSelected)="selectSuggestion(SubQuery.EMAIL, eq, $event.option.value)"
+          >
+            @for (suggestion of suggestionsFor(SubQuery.EMAIL); track suggestion) {
+              <mat-option [value]="suggestion">{{ suggestion }}</mat-option>
+            }
+          </mat-autocomplete>
         </div>
       }
     </div>
@@ -103,8 +128,23 @@
             </mat-select>
           </cnsl-form-field>
           <cnsl-form-field class="filter-input-value">
-            <input cnslInput name="value" [value]="unq.getUserName()" (change)="setValue(SubQuery.USERNAME, unq, $event)" />
+            <input
+              cnslInput
+              name="value"
+              [value]="unq.getUserName()"
+              [matAutocomplete]="userNameAuto"
+              (input)="onSuggestionInput(SubQuery.USERNAME, $event)"
+              (change)="setValue(SubQuery.USERNAME, unq, $event)"
+            />
           </cnsl-form-field>
+          <mat-autocomplete
+            #userNameAuto="matAutocomplete"
+            (optionSelected)="selectSuggestion(SubQuery.USERNAME, unq, $event.option.value)"
+          >
+            @for (suggestion of suggestionsFor(SubQuery.USERNAME); track suggestion) {
+              <mat-option [value]="suggestion">{{ suggestion }}</mat-option>
+            }
+          </mat-autocomplete>
         </div>
       }
     </div>
