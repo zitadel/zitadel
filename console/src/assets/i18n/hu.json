@@ -2380,7 +2380,8 @@
       "HEADERNAME": "Fejléc neve",
       "JWTENDPOINT": "JWT végpont",
       "JWTKEYSENDPOINT": "JWT kulcsok végpont",
-      "AUDIENCE": "Audience"
+      "AUDIENCE": "Audience",
+      "AUDIENCE_EMPTY_WARNING": "Audience nélkül a ZITADEL minden érvényes tokent elfogad ettől a kibocsátótól, függetlenül attól, hogy melyik alkalmazáshoz állították ki. Erősen ajánlott Audience-t beállítani."
     },
     "APPLE": {
       "TEAMID": "Csapatazonosító",
