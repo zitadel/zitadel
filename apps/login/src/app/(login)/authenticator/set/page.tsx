@@ -6,9 +6,9 @@ import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
+import { getEnrollmentAuthorizationError } from "@/lib/server/enrollment-guard";
 import { getServiceConfig } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
-import { checkUserVerification } from "@/lib/verify-helper";
 import {
   getActiveIdentityProviders,
   getBrandingSettings,
@@ -102,10 +102,22 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     organization: sessionWithData.factors.user?.organizationId,
   });
 
-  // check if user was verified recently
-  const isUserVerified = await checkUserVerification(sessionWithData.factors.user?.id);
+  // Existing users prove ownership with their authenticated session; invitations are for onboarding.
+  const enrollmentError = await getEnrollmentAuthorizationError({
+    serviceConfig,
+    session: sessionWithData,
+    userId: sessionWithData.factors.user.id,
+  });
 
-  if (!isUserVerified) {
+  if (enrollmentError && sessionWithData.authMethods.length > 0) {
+    return (
+      <Alert>
+        <Translated i18nKey="sessionExpired" namespace="error" />
+      </Alert>
+    );
+  }
+
+  if (enrollmentError) {
     const params = new URLSearchParams({
       loginName: sessionWithData.factors.user.loginName as string,
       invite: "true",
