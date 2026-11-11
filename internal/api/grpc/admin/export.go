@@ -222,7 +222,8 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		}
 
 		/******************************************************************************************************************
-		  Grants
+		  Project grants — collected for all orgs before user grants so authorizations on
+		  granted projects are not dropped when org export order differs from project-grant ownership.
 		  ******************************************************************************************************************/
 		org.ProjectGrants, err = s.getNecessaryProjectGrantsForOrg(ctx, org.OrgId, processedOrgs, processedProjects)
 		if err != nil {
@@ -231,7 +232,12 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		for _, processedGrant := range org.ProjectGrants {
 			processedGrants = append(processedGrants, processedGrant.GrantId)
 		}
+	}
 
+	for _, org := range orgs {
+		/******************************************************************************************************************
+		  Authorizations
+		  ******************************************************************************************************************/
 		org.UserGrants, err = s.getNecessaryUserGrantsForOrg(ctx, org.OrgId, processedProjects, processedGrants, processedUsers)
 		if err != nil {
 			return nil, err
