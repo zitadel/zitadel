@@ -1,0 +1,461 @@
+{
+  "common": {
+    "back": "Quay lại",
+    "title": "Đăng nhập với Zitadel"
+  },
+  "accounts": {
+    "title": "Tài khoản",
+    "description": "Chọn tài khoản bạn muốn sử dụng.",
+    "addAnother": "Thêm tài khoản khác",
+    "noResults": "Không tìm thấy tài khoản nào",
+    "verified": "đã xác minh",
+    "expired": "đã hết hạn"
+  },
+  "logout": {
+    "title": "Đăng xuất",
+    "description": "Nhấp vào một tài khoản để kết thúc phiên",
+    "noResults": "Không tìm thấy tài khoản nào",
+    "clear": "Kết thúc phiên",
+    "verifiedAt": "Hoạt động lần cuối: {time}",
+    "success": {
+      "title": "Đăng xuất thành công",
+      "description": "Bạn đã đăng xuất thành công."
+    }
+  },
+  "loginname": {
+    "title": "Chào mừng trở lại!",
+    "description": "Nhập thông tin đăng nhập của bạn.",
+    "register": "Đăng ký người dùng mới",
+    "submit": "Tiếp tục",
+    "labels": {
+      "loginname": "Tên đăng nhập",
+      "username": "Tên người dùng",
+      "usernameOrPhoneNumber": "Tên người dùng hoặc số điện thoại",
+      "usernameOrEmail": "Tên người dùng hoặc email"
+    },
+    "required": {
+      "loginName": "Trường này là bắt buộc"
+    },
+    "errors": {
+      "internalError": "Đã xảy ra lỗi nội bộ",
+      "couldNotGetLoginSettings": "Không thể lấy cài đặt đăng nhập",
+      "couldNotSearchUsers": "Không thể tìm kiếm người dùng",
+      "couldNotGetDomain": "Không thể lấy tên miền",
+      "couldNotGetHost": "Không thể lấy máy chủ",
+      "couldNotStartIDPFlow": "Không thể bắt đầu quy trình IDP",
+      "moreThanOneUserFound": "Tìm thấy nhiều hơn một người dùng. Vui lòng cung cấp định danh duy nhất.",
+      "userNotFound": "Không tìm thấy người dùng trong hệ thống",
+      "couldNotCreateSession": "Không thể tạo phiên cho người dùng",
+      "initialUserNotSupported": "Người dùng khởi tạo không được hỗ trợ",
+      "localAuthenticationNotAllowed": "Không được phép xác thực cục bộ! Vui lòng liên hệ quản trị viên để biết thêm thông tin.",
+      "passkeysNotAllowed": "Passkey không được phép! Vui lòng liên hệ quản trị viên để biết thêm thông tin.",
+      "couldNotFindIdentityProvider": "Không thể tìm thấy nhà cung cấp danh tính.",
+      "userNotActive": "Người dùng không hoạt động. Vui lòng liên hệ quản trị viên để biết thêm thông tin."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Đã xảy ra lỗi",
+      "multipleUsersFound": "Tìm thấy nhiều người dùng",
+      "userNotFound": "Không tìm thấy người dùng trong hệ thống"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "Mật khẩu",
+      "description": "Nhập mật khẩu của bạn.",
+      "resetPassword": "Đặt lại mật khẩu",
+      "submit": "Tiếp tục",
+      "labels": {
+        "password": "Mật khẩu"
+      },
+      "required": {
+        "password": "Trường này là bắt buộc"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "Không thể xác minh mật khẩu",
+        "couldNotResetPassword": "Không thể đặt lại mật khẩu"
+      },
+      "info": {
+        "passwordResetSent": "Mật khẩu đã được đặt lại. Vui lòng kiểm tra email của bạn"
+      }
+    },
+    "set": {
+      "title": "Đặt mật khẩu",
+      "description": "Đặt mật khẩu cho tài khoản của bạn",
+      "codeSent": "Một mã mới đã được gửi đến địa chỉ email của bạn.",
+      "noCodeReceived": "Chưa nhận được mã?",
+      "resend": "Gửi lại mã",
+      "submit": "Tiếp tục",
+      "labels": {
+        "code": "Mã",
+        "newPassword": "Mật khẩu mới",
+        "confirmPassword": "Xác nhận mật khẩu"
+      },
+      "required": {
+        "code": "Trường này là bắt buộc",
+        "newPassword": "Bạn phải cung cấp mật khẩu!",
+        "confirmPassword": "Trường này là bắt buộc"
+      },
+      "errors": {
+        "couldNotSetPassword": "Không thể đặt mật khẩu",
+        "couldNotResetPassword": "Không thể đặt lại mật khẩu",
+        "couldNotVerifyPassword": "Không thể xác minh mật khẩu"
+      }
+    },
+    "change": {
+      "title": "Đổi mật khẩu",
+      "description": "Đặt mật khẩu cho tài khoản của bạn",
+      "submit": "Tiếp tục",
+      "labels": {
+        "currentPassword": "Mật khẩu hiện tại",
+        "newPassword": "Mật khẩu mới",
+        "confirmPassword": "Xác nhận mật khẩu"
+      },
+      "required": {
+        "currentPassword": "Bạn phải cung cấp mật khẩu hiện tại của mình!",
+        "newPassword": "Bạn phải cung cấp mật khẩu mới!",
+        "confirmPassword": "Trường này là bắt buộc"
+      },
+      "errors": {
+        "currentPasswordInvalid": "Mật khẩu hiện tại không chính xác.",
+        "couldNotChangePassword": "Không thể đổi mật khẩu",
+        "couldNotVerifyPassword": "Không thể xác minh mật khẩu",
+        "unknownError": "Lỗi không xác định"
+      }
+    },
+    "complexity": {
+      "length": "Phải có ít nhất {minLength} ký tự.",
+      "hasSymbol": "Phải bao gồm một ký hiệu.",
+      "hasNumber": "Phải bao gồm một chữ số.",
+      "hasUppercase": "Phải bao gồm một chữ hoa.",
+      "hasLowercase": "Phải bao gồm một chữ thường.",
+      "equals": "Xác nhận mật khẩu khớp.",
+      "matches": "Khớp",
+      "doesNotMatch": "Không khớp"
+    },
+    "errors": {
+      "noHostFound": "Không tìm thấy máy chủ",
+      "couldNotSendResetLink": "Không thể gửi liên kết đặt lại mật khẩu",
+      "couldNotCreateSessionForUser": "Không thể tạo phiên cho người dùng",
+      "couldNotVerifyPassword": "Không thể xác minh mật khẩu",
+      "failedToAuthenticate": "Xác thực thất bại. Bạn đã thử {failedAttempts} trên {maxPasswordAttempts} lần nhập mật khẩu.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Xác thực thất bại.",
+      "accountLockedContactAdmin": " Vui lòng liên hệ quản trị viên để mở khóa tài khoản của bạn",
+      "userNotFound": "Không tìm thấy người dùng trong hệ thống",
+      "initialUserNotSupported": "Người dùng khởi tạo không được hỗ trợ",
+      "userInitialStateNotSupported": "Trạng thái khởi tạo của người dùng không được hỗ trợ",
+      "codeOrVerificationRequired": "Bạn phải cung cấp mã hoặc có kiểm tra xác minh người dùng hợp lệ",
+      "verificationRequired": "Cần phải thực hiện kiểm tra xác minh người dùng",
+      "couldNotLoadSession": "Không thể tải phiên",
+      "couldNotLoadAuthMethods": "Không thể tải các phương thức xác thực",
+      "failedPrecondition": "Điều kiện tiên quyết thất bại",
+      "sessionNotValid": "Phiên không hợp lệ",
+      "passwordVerificationMissing": "Thiếu xác minh mật khẩu.",
+      "passwordVerificationTooOld": "Xác minh mật khẩu đã quá cũ. Vui lòng xác minh mật khẩu của bạn một lần nữa."
+    }
+  },
+  "idp": {
+    "title": "Đăng nhập bằng SSO",
+    "description": "Chọn một trong các nhà cung cấp sau để đăng nhập",
+    "orSignInWith": "hoặc đăng nhập bằng",
+    "signInWithApple": "Đăng nhập với Apple",
+    "signInWithGoogle": "Đăng nhập với Google",
+    "signInWithAzureAD": "Đăng nhập với AzureAD",
+    "signInWithGithub": "Đăng nhập với GitHub",
+    "signInWithGitlab": "Đăng nhập với GitLab",
+    "loginError": {
+      "title": "Đăng nhập thất bại",
+      "description": "Đã xảy ra lỗi khi cố gắng đăng nhập."
+    },
+    "linkingError": {
+      "title": "Liên kết tài khoản thất bại",
+      "description": "Đã xảy ra lỗi khi cố gắng liên kết tài khoản của bạn."
+    },
+    "completeRegister": {
+      "title": "Hoàn tất thông tin của bạn",
+      "description": "Bạn cần hoàn tất đăng ký bằng cách cung cấp địa chỉ email và tên của bạn."
+    },
+    "accountNotFound": {
+      "title": "Không tìm thấy tài khoản",
+      "description": "Chúng tôi không thể tìm thấy tài khoản liên kết với thông tin đăng nhập nhà cung cấp danh tính của bạn.",
+      "info": "Không tìm thấy tài khoản hiện có. Vui lòng đăng nhập bằng tài khoản hiện có hoặc liên hệ quản trị viên để được hỗ trợ.",
+      "backToLogin": "Quay lại đăng nhập"
+    },
+    "registrationFailed": {
+      "title": "Đăng ký không khả dụng",
+      "description": "Chúng tôi không thể hoàn tất quá trình đăng ký.",
+      "info": "Không thể xác định tổ chức để đăng ký. Vui lòng liên hệ quản trị viên để được hỗ trợ.",
+      "backToLogin": "Quay lại đăng nhập"
+    },
+    "processing": {
+      "message": "Đang xử lý xác thực...",
+      "noRedirect": "Không có chuyển hướng hoặc lỗi được trả về từ máy chủ",
+      "unexpectedError": "Đã xảy ra lỗi không mong muốn"
+    },
+    "errors": {
+      "missingParameters": "Thiếu tham số bắt buộc",
+      "missingIdpInfo": "Thiếu thông tin IDP",
+      "idpNotFound": "Không tìm thấy nhà cung cấp danh tính",
+      "linkingNotAllowed": "Không được phép liên kết cho nhà cung cấp danh tính này",
+      "linkingFailed": "Không thể liên kết nhà cung cấp danh tính với tài khoản",
+      "autoLinkingFailed": "Không thể tự động liên kết tài khoản",
+      "userCreationFailed": "Không thể tạo tài khoản người dùng",
+      "orgResolutionFailed": "Không thể xác định tổ chức để đăng ký",
+      "sessionCreationFailed": "Không thể tạo phiên hoặc xác định chuyển hướng",
+      "unknownError": "Đã xảy ra lỗi không xác định"
+    }
+  },
+  "ldap": {
+    "title": "Đăng nhập LDAP",
+    "description": "Nhập thông tin đăng nhập LDAP của bạn.",
+    "submit": "Tiếp tục",
+    "labels": {
+      "username": "Tên người dùng",
+      "password": "Mật khẩu"
+    },
+    "required": {
+      "username": "Trường này là bắt buộc",
+      "password": "Trường này là bắt buộc"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "Xác minh danh tính của bạn",
+      "description": "Chọn một trong các yếu tố sau.",
+      "noResults": "Không có yếu tố thứ hai nào khả dụng để thiết lập."
+    },
+    "set": {
+      "title": "Thiết lập xác thực 2 yếu tố",
+      "description": "Chọn một trong các yếu tố thứ hai sau.",
+      "skip": "Bỏ qua"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "Xác minh 2 yếu tố",
+      "totpDescription": "Nhập mã từ ứng dụng xác thực của bạn.",
+      "smsDescription": "Nhập mã bạn đã nhận qua SMS.",
+      "emailDescription": "Nhập mã bạn đã nhận qua email.",
+      "noCodeReceived": "Chưa nhận được mã?",
+      "resendCode": "Gửi lại mã",
+      "submit": "Tiếp tục",
+      "labels": {
+        "code": "Mã"
+      },
+      "required": {
+        "code": "Trường này là bắt buộc"
+      }
+    },
+    "set": {
+      "title": "Thiết lập xác thực 2 yếu tố",
+      "totpDescription": "Quét mã QR bằng ứng dụng xác thực của bạn.",
+      "smsDescription": "Nhập số điện thoại của bạn để nhận mã qua SMS.",
+      "emailDescription": "Nhập địa chỉ email của bạn để nhận mã qua email.",
+      "totpRegisterDescription": "Quét mã QR hoặc điều hướng đến URL theo cách thủ công.",
+      "submit": "Tiếp tục",
+      "labels": {
+        "code": "Mã"
+      },
+      "required": {
+        "code": "Trường này là bắt buộc"
+      }
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "Xác thực bằng passkey",
+      "description": "Thiết bị của bạn sẽ yêu cầu dấu vân tay, khuôn mặt hoặc khóa màn hình",
+      "usePassword": "Sử dụng mật khẩu",
+      "submit": "Tiếp tục",
+      "errors": {
+        "couldNotRequestChallenge": "Không thể yêu cầu thử thách passkey",
+        "couldNotVerifyPasskey": "Không thể xác minh passkey",
+        "noResponseReceived": "Xác minh passkey thất bại - không nhận được phản hồi",
+        "noRedirectProvided": "Xác minh passkey hoàn tất nhưng không có chuyển hướng nào được cung cấp",
+        "couldNotRetrievePasskey": "Đã xảy ra lỗi khi truy xuất passkey",
+        "verificationCancelled": "Xác minh passkey đã bị hủy",
+        "verificationFailed": "Đã xảy ra lỗi trong quá trình xác minh passkey",
+        "couldNotFindSession": "Không thể tìm thấy phiên",
+        "couldNotUpdateSession": "Không thể cập nhật phiên",
+        "userNotFound": "Không tìm thấy người dùng trong hệ thống",
+        "couldNotDetermineRedirect": "Không thể xác định URL chuyển hướng sau khi xác minh passkey"
+      }
+    },
+    "set": {
+      "title": "Thiết lập passkey",
+      "description": "Thiết bị của bạn sẽ yêu cầu dấu vân tay, khuôn mặt hoặc khóa màn hình",
+      "info": {
+        "description": "Passkey là một phương thức xác thực trên thiết bị như dấu vân tay, Apple FaceID hoặc tương tự. ",
+        "link": "Xác thực bằng Passkey"
+      },
+      "skip": "Bỏ qua",
+      "submit": "Tiếp tục"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "Xác minh 2 yếu tố",
+      "description": "Xác minh tài khoản của bạn bằng thiết bị của bạn."
+    },
+    "set": {
+      "title": "Thiết lập xác thực 2 yếu tố",
+      "description": "Thiết lập một thiết bị làm yếu tố thứ hai.",
+      "submit": "Tiếp tục"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "Passkey",
+      "password": "Mật khẩu"
+    },
+    "disabled": {
+      "title": "Đăng ký đã bị vô hiệu hóa",
+      "description": "Chức năng đăng ký đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên."
+    },
+    "missingdata": {
+      "title": "Thiếu dữ liệu",
+      "description": "Vui lòng cung cấp email, họ và tên để đăng ký."
+    },
+    "title": "Đăng ký",
+    "description": "Tạo tài khoản Zitadel của bạn.",
+    "noMethodAvailableWarning": "Không có phương thức xác thực nào khả dụng. Vui lòng liên hệ quản trị viên.",
+    "selectMethod": "Chọn phương thức bạn muốn dùng để xác thực",
+    "agreeTo": "Để đăng ký, bạn phải đồng ý với các điều khoản và điều kiện",
+    "termsOfService": "Điều khoản dịch vụ",
+    "privacyPolicy": "Chính sách bảo mật",
+    "submit": "Tiếp tục",
+    "password": {
+      "title": "Đặt mật khẩu",
+      "description": "Đặt mật khẩu cho tài khoản của bạn",
+      "submit": "Tiếp tục",
+      "labels": {
+        "password": "Mật khẩu",
+        "confirmPassword": "Xác nhận mật khẩu"
+      },
+      "required": {
+        "password": "Bạn phải cung cấp mật khẩu!",
+        "confirmPassword": "Trường này là bắt buộc"
+      }
+    },
+    "labels": {
+      "firstname": "Tên",
+      "lastname": "Họ",
+      "email": "Email"
+    },
+    "required": {
+      "firstname": "Trường này là bắt buộc",
+      "lastname": "Trường này là bắt buộc",
+      "email": "Trường này là bắt buộc"
+    },
+    "errors": {
+      "couldNotCreateUser": "Không thể tạo người dùng",
+      "couldNotCreateSession": "Không thể tạo phiên",
+      "userNotFound": "Không tìm thấy người dùng trong hệ thống",
+      "couldNotLinkIDP": "Không thể liên kết IDP với người dùng",
+      "couldNotRegisterUser": "Không thể đăng ký người dùng"
+    }
+  },
+  "invite": {
+    "title": "Mời người dùng",
+    "description": "Vui lòng cung cấp địa chỉ email và tên của người dùng mà bạn muốn mời.",
+    "info": "Người dùng sẽ nhận được email kèm hướng dẫn chi tiết.",
+    "notAllowed": "Cài đặt của bạn không cho phép mời người dùng.",
+    "submit": "Tiếp tục",
+    "success": {
+      "title": "Đã mời người dùng",
+      "description": "Email đã được gửi thành công.",
+      "verified": "Người dùng đã được mời và đã xác minh email của họ.",
+      "notVerifiedYet": "Người dùng đã được mời. Họ sẽ nhận được email kèm hướng dẫn chi tiết.",
+      "submit": "Mời người dùng khác"
+    }
+  },
+  "signedin": {
+    "title": "Chào mừng {user}!",
+    "description": "Bạn đã đăng nhập.",
+    "continue": "Tiếp tục",
+    "error": {
+      "title": "Lỗi",
+      "description": "Đã xảy ra lỗi khi cố gắng đăng nhập."
+    }
+  },
+  "verify": {
+    "userIdMissing": "Không có userId được cung cấp!",
+    "successTitle": "Người dùng đã được xác minh",
+    "successDescription": "Người dùng đã được xác minh thành công.",
+    "successContinue": "Tiếp tục",
+    "setupAuthenticator": "Thiết lập ứng dụng xác thực",
+    "verify": {
+      "title": "Xác minh người dùng",
+      "description": "Nhập mã được cung cấp trong email xác minh.",
+      "noCodeReceived": "Chưa nhận được mã?",
+      "resendCode": "Gửi lại mã",
+      "codeSent": "Một mã mới vừa được gửi đến địa chỉ email của bạn.",
+      "submit": "Tiếp tục",
+      "labels": {
+        "code": "Mã"
+      },
+      "required": {
+        "code": "Trường này là bắt buộc"
+      }
+    },
+    "errors": {
+      "couldNotResendEmail": "Không thể gửi lại email",
+      "couldNotVerifyUser": "Không thể xác minh người dùng",
+      "couldNotVerifyInvite": "Không thể xác minh lời mời",
+      "couldNotVerifyEmail": "Không thể xác minh email",
+      "couldNotVerify": "Không thể xác minh",
+      "couldNotLoadUser": "Không thể tải người dùng",
+      "couldNotLoadAuthenticators": "Không thể tải các ứng dụng xác thực khả dụng",
+      "couldNotCreateSession": "Không thể tạo phiên",
+      "noHostFound": "Không tìm thấy máy chủ",
+      "userAlreadyVerified": "Người dùng đã được xác minh!",
+      "couldNotResendInvite": "Không thể gửi lại lời mời",
+      "inviteSendFailed": "Không thể gửi email mời",
+      "emailSendFailed": "Không thể gửi email xác minh",
+      "contextMissing": "Đã xảy ra lỗi. Vui lòng thử lại."
+    }
+  },
+  "authenticator": {
+    "title": "Chọn phương thức xác thực",
+    "description": "Chọn phương thức bạn muốn dùng để xác thực",
+    "noMethodsAvailable": "Không có phương thức xác thực nào khả dụng",
+    "allSetup": "Bạn đã thiết lập một ứng dụng xác thực!",
+    "linkWithIDP": "hoặc liên kết với một Nhà cung cấp danh tính"
+  },
+  "device": {
+    "usercode": {
+      "title": "Mã thiết bị",
+      "description": "Nhập mã hiển thị trên ứng dụng hoặc thiết bị của bạn.",
+      "submit": "Tiếp tục",
+      "labels": {
+        "code": "Mã"
+      },
+      "required": {
+        "code": "Trường này là bắt buộc"
+      }
+    },
+    "request": {
+      "title": "{appName} muốn kết nối",
+      "description": "{appName} sẽ có quyền truy cập vào:",
+      "disclaimer": "Bằng cách nhấp vào Cho phép, bạn cho phép {appName} và Zitadel sử dụng thông tin của bạn theo các điều khoản dịch vụ và chính sách bảo mật tương ứng của họ. Bạn có thể thu hồi quyền truy cập này bất cứ lúc nào.",
+      "submit": "Cho phép",
+      "deny": "Từ chối"
+    },
+    "scope": {
+      "openid": "Xác minh danh tính của bạn.",
+      "email": "Xem địa chỉ email của bạn.",
+      "profile": "Xem toàn bộ thông tin hồ sơ của bạn.",
+      "offline_access": "Cho phép truy cập ngoại tuyến vào tài khoản của bạn."
+    }
+  },
+  "error": {
+    "noUserCode": "Không có mã người dùng được cung cấp!",
+    "noDeviceRequest": "Không tìm thấy yêu cầu thiết bị.",
+    "unknownContext": "Không thể lấy ngữ cảnh của người dùng. Vui lòng nhập tên người dùng trước hoặc cung cấp loginName làm searchParam.",
+    "sessionExpired": "Phiên hiện tại của bạn đã hết hạn. Vui lòng đăng nhập lại.",
+    "failedLoading": "Không thể tải dữ liệu. Vui lòng thử lại.",
+    "tryagain": "Thử lại",
+    "couldNotContinueSession": "Không thể tiếp tục với phiên - thiếu thông tin người dùng"
+  }
+}
