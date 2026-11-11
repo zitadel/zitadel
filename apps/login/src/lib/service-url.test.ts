@@ -88,6 +88,22 @@ describe("Service URL utilities", () => {
 
       expect(result.serviceConfig.publicHost).toBe("customer.zitadel.cloud:443");
     });
+
+    test("should include forwardedFor when x-forwarded-for header is present", () => {
+      process.env.ZITADEL_API_URL = "https://zitadel.mycompany.com";
+
+      const mockHeaders = {
+        get: vi.fn((key: string) => {
+          if (key === "x-forwarded-for") return "203.0.113.42";
+          if (key === "host") return "mycompany.com";
+          return null;
+        }),
+      } as any;
+
+      const result = getServiceConfig(mockHeaders);
+
+      expect(result.serviceConfig.forwardedFor).toBe("203.0.113.42");
+    });
   });
 
   describe("constructUrl", () => {
