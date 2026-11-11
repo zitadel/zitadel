@@ -10,6 +10,7 @@ import {
   humanMFAInitSkipped,
   listAuthenticationMethodTypes,
   listUsers,
+  searchUsers,
 } from "@/lib/zitadel";
 import { Code, create, Duration } from "@zitadel/client";
 import { Challenges, RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
@@ -173,9 +174,21 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       return { error: t("couldNotFindSession") };
     }
 
-    const checks = create(ChecksSchema, {
-      user: { search: { case: "loginName", value: loginName } },
-    });
+    // With ignoreUnknownUsernames, `loginName` is what the user typed (e.g. an email). The session
+    // API only resolves real login names, which are org-scoped when userLoginMustBeDomain is set,
+    // so resolve the user within the organization first, as the password step does (#13068).
+    let userCheck: any = { search: { case: "loginName", value: loginName } };
+    if (organization) {
+      const searchSettings = await getLoginSettings({ serviceConfig, organization });
+      const found = searchSettings
+        ? await searchUsers({ serviceConfig, searchValue: loginName, organizationId: organization, loginSettings: searchSettings })
+        : undefined;
+      if (found && "result" in found && found.result?.length === 1 && found.result[0].userId) {
+        userCheck = { search: { case: "userId", value: found.result[0].userId } };
+      }
+    }
+
+    const checks = create(ChecksSchema, { user: userCheck });
 
     const result = await createSessionAndUpdateCookie({
       checks,
