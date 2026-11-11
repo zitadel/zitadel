@@ -1,6 +1,6 @@
 import { Code } from "@connectrpc/connect";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { clearSession } from "./session";
+import { clearSession, updateOrCreateSession } from "./session";
 
 vi.mock("@zitadel/client", async () => {
   const { Code } = await import("@connectrpc/connect");
@@ -14,6 +14,7 @@ vi.mock("@/lib/zitadel", () => ({
   humanMFAInitSkipped: vi.fn(),
   listAuthenticationMethodTypes: vi.fn(),
   listUsers: vi.fn(),
+  searchUsers: vi.fn(),
 }));
 
 vi.mock("@/lib/server/cookie", () => ({
@@ -126,5 +127,63 @@ describe("clearSession", () => {
 
     expect(res).toBeUndefined();
     expect(deleteSession).not.toHaveBeenCalled();
+  });
+});
+
+describe("updateOrCreateSession without a session cookie", () => {
+  let getLoginSettings: any;
+  let searchUsers: any;
+  let createSessionAndUpdateCookie: any;
+  let setSessionAndUpdateCookie: any;
+
+  const webAuthN = { webAuthN: { domain: "", userVerificationRequirement: 1 } } as any;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    const zitadel = await import("@/lib/zitadel");
+    const cookieModule = await import("@/lib/server/cookie");
+    const cookies = await import("../cookies");
+    getLoginSettings = vi.mocked(zitadel.getLoginSettings);
+    searchUsers = vi.mocked(zitadel.searchUsers);
+    createSessionAndUpdateCookie = vi.mocked(cookieModule.createSessionAndUpdateCookie);
+    setSessionAndUpdateCookie = vi.mocked(cookieModule.setSessionAndUpdateCookie);
+
+    vi.mocked(cookies.getSessionCookieByLoginName).mockResolvedValue(undefined);
+    getLoginSettings.mockResolvedValue({});
+    createSessionAndUpdateCookie.mockResolvedValue({ sessionCookie: cookie });
+    setSessionAndUpdateCookie.mockResolvedValue({ id: "session-1", factors: {}, challenges: { webAuthN: { publicKeyCredentialRequestOptions: {} } } });
+  });
+
+  // With ignoreUnknownUsernames the passkey page gets the text the user typed (e.g. an email),
+  // which the session API cannot resolve when login names are org-scoped (#13068).
+  test("resolves the typed login name within the organization and creates the session by user id", async () => {
+    searchUsers.mockResolvedValue({ result: [{ userId: "user-1" }] });
+
+    const res = await updateOrCreateSession({ loginName: "user@example.com", organization: "org-1", challenges: webAuthN });
+
+    expect(searchUsers).toHaveBeenCalledWith(expect.objectContaining({ searchValue: "user@example.com", organizationId: "org-1" }));
+    expect(createSessionAndUpdateCookie).toHaveBeenCalledWith(
+      expect.objectContaining({ checks: { user: { search: { case: "userId", value: "user-1" } } } }),
+    );
+    expect(res).toEqual(expect.objectContaining({ sessionId: "session-1", challenges: expect.anything() }));
+  });
+
+  test("keeps the login name search when the organization search finds no unique user", async () => {
+    searchUsers.mockResolvedValue({ result: [] });
+
+    await updateOrCreateSession({ loginName: "user@example.com", organization: "org-1", challenges: webAuthN });
+
+    expect(createSessionAndUpdateCookie).toHaveBeenCalledWith(
+      expect.objectContaining({ checks: { user: { search: { case: "loginName", value: "user@example.com" } } } }),
+    );
+  });
+
+  test("keeps the login name search when no organization is given", async () => {
+    await updateOrCreateSession({ loginName: "user@example.com", challenges: webAuthN });
+
+    expect(searchUsers).not.toHaveBeenCalled();
+    expect(createSessionAndUpdateCookie).toHaveBeenCalledWith(
+      expect.objectContaining({ checks: { user: { search: { case: "loginName", value: "user@example.com" } } } }),
+    );
   });
 });
