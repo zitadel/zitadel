@@ -34,6 +34,10 @@ VerifyEmailOTP:
   Text: "Пожалуйста, используйте OTP {{.OTP}} для аутентификации в течение следующих пяти минут или нажмите кнопку «Войти»."
   ButtonText: "Войти"
 VerifySMSOTP:
+  Title: "Проверка OTP"
+  PreHeader: "Проверка OTP"
+  Subject: "Проверка OTP"
+  Greeting: "Привет, {{.DisplayName}}!"
   Text: |-
     {{.OTP}} — это ваш OTP для {{ .Domain }}. Используйте его в течение следующих {{.Expiry}}.
     @{{.Domain}} #{{.OTP}}
