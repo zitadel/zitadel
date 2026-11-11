@@ -1,0 +1,1425 @@
+Errors:
+  Internal: "Ndodhi një gabim i brendshëm"
+  NoChangesFound: "Nuk ka ndryshime"
+  OriginNotAllowed: "Ky \"Origin\" nuk lejohet"
+  IDMissing: "Mungon ID-ja"
+  ResourceOwnerMissing: "Mungon organizata pronare e burimit"
+  RemoveFailed: "Nuk mund të hiqej"
+  PermissionDenied: "Leja u refuzua"
+  ProjectionName:
+    Invalid: "Emër i pavlefshëm projeksioni"
+  Assets:
+    EmptyKey: "Çelësi i asetit është bosh"
+    Store:
+      NotInitialized: "Hapësira e ruajtjes së aseteve nuk është inicializuar"
+      NotConfigured: "Hapësira e ruajtjes së aseteve nuk është konfiguruar"
+    Bucket:
+      Internal: "Gabim i brendshëm gjatë krijimit të bucket-it"
+      AlreadyExists: "Bucket-i ekziston tashmë"
+      CreateFailed: "Bucket-i nuk u krijua"
+      ListFailed: "Bucket-et nuk mund të lexoheshin"
+      RemoveFailed: "Bucket-i nuk u fshi"
+      SetPublicFailed: "Bucket-i nuk mund të bëhej publik"
+    Object:
+      PutFailed: "Objekti nuk u krijua"
+      GetFailed: "Objekti nuk mund të lexohej"
+      NotFound: "Objekti nuk u gjet"
+      PresignedTokenFailed: "Token-i i nënshkruar nuk mund të krijohej"
+      ListFailed: "Lista e objekteve nuk mund të lexohej"
+      RemoveFailed: "Objekti nuk mund të hiqej"
+  Limit:
+    ExceedsDefault: "Kufiri tejkalon kufirin e parazgjedhur"
+  Limits:
+    NotFound: "Kufijtë nuk u gjetën"
+    NoneSpecified: "Nuk janë specifikuar kufij"
+    Instance:
+      Blocked: "Instanca është bllokuar"
+  Restrictions:
+    NoneSpecified: "Nuk janë specifikuar kufizime"
+    DefaultLanguageMustBeAllowed: "Gjuha e parazgjedhur duhet të jetë e lejuar"
+  Language:
+    NotParsed: "Gjuha nuk mund të analizohej"
+    NotSupported: "Gjuha nuk mbështetet"
+    NotAllowed: "Gjuha nuk lejohet"
+    Undefined: "Gjuha nuk është përcaktuar"
+    Duplicate: "Gjuhët përmbajnë dublikata"
+  OIDCSettings:
+    NotFound: "Konfigurimi OIDC nuk u gjet"
+    AlreadyExists: "Konfigurimi OIDC ekziston tashmë"
+  SecretGenerator:
+    AlreadyExists: "Gjeneruesi i sekreteve ekziston tashmë"
+    TypeMissing: "Mungon lloji i gjeneruesit të sekreteve"
+    NotFound: "Gjeneruesi i sekreteve nuk u gjet"
+  SMSConfig:
+    NotFound: "Konfigurimi SMS nuk u gjet"
+    AlreadyActive: "Konfigurimi SMS është tashmë aktiv"
+    AlreadyDeactivated: "Konfigurimi SMS është çaktivizuar tashmë"
+    NotExternalVerification: "Konfigurimi SMS nuk mbështet verifikimin e kodit"
+  SMTP:
+    NotEmailMessage: "mesazhi nuk është EmailMessage"
+    RequiredAttributes: "subjekti, marrësit dhe përmbajtja duhet të vendosen, por disa ose të gjithë janë bosh"
+    CouldNotSplit: "hosti dhe porta nuk mund të ndaheshin për lidhjen me SMTP"
+    CouldNotDial: "nuk u arrit lidhja me serverin SMTP, kontrolloni portën, problemet me firewall-in..."
+    CouldNotDialTLS: "nuk u arrit lidhja me serverin SMTP me TLS, kontrolloni portën, problemet me firewall-in..."
+    CouldNotCreateClient: "klienti SMTP nuk mund të krijohej"
+    CouldNotStartTLS: "TLS nuk mund të nisej"
+    CouldNotAuth: "vërtetimi SMTP nuk mund të shtohej; kontrolloni nëse përdoruesi dhe fjalëkalimi janë të saktë. Nëse janë të saktë, ofruesi juaj mund të kërkojë një metodë vërtetimi që Zitadel nuk e mbështet"
+    CouldNotSetSender: "dërguesi nuk mund të vendosej"
+    CouldNotSetRecipient: "marrësi nuk mund të vendosej"
+  SMTPConfig:
+    TestPassword: "Fjalëkalimi për testin nuk u gjet"
+    NotFound: "Konfigurimi SMTP nuk u gjet"
+    AlreadyExists: "Konfigurimi SMTP ekziston tashmë"
+    AlreadyDeactivated: "Konfigurimi SMTP është çaktivizuar tashmë"
+    SenderAdressNotCustomDomain: "Adresa e dërguesit duhet të konfigurohet si domen i personalizuar në instancë."
+    TestEmailNotFound: "Adresa e emailit për testin nuk u gjet"
+  Notification:
+    NoDomain: "Nuk u gjet domen për mesazhin"
+  User:
+    NotFound: "Përdoruesi nuk u gjet"
+    AlreadyExists: "Përdoruesi ekziston tashmë"
+    NotFoundOnOrg: "Përdoruesi nuk u gjet në organizatën e zgjedhur"
+    NotAllowedOrg: "Përdoruesi nuk është anëtar i organizatës së kërkuar"
+    UserIDMissing: "Mungon ID-ja e përdoruesit"
+    UserIDWrong: "Përdoruesi i kërkesës nuk përputhet me përdoruesin e vërtetuar"
+    DomainPolicyNil: "Politika e organizatës është bosh"
+    EmailAsUsernameNotAllowed: "Emaili nuk lejohet si emër përdoruesi"
+    Invalid: "Të dhënat e përdoruesit janë të pavlefshme"
+    DomainNotAllowedAsUsername: "Domeni është tashmë i rezervuar dhe nuk mund të përdoret"
+    AlreadyInactive: "Përdoruesi është tashmë joaktiv"
+    NotInactive: "Përdoruesi nuk është joaktiv"
+    CantDeactivateInitial: "Përdoruesi në gjendjen fillestare mund vetëm të fshihet, jo të çaktivizohet"
+    ShouldBeActiveOrInitial: "Përdoruesi nuk është aktiv ose në gjendjen fillestare"
+    AlreadyInitialised: "Përdoruesi është inicializuar tashmë"
+    NotInitialised: "Përdoruesi nuk është inicializuar ende"
+    NotLocked: "Përdoruesi nuk është i bllokuar"
+    NoChanges: "Nuk u gjetën ndryshime"
+    InitCodeNotFound: "Kodi i inicializimit nuk u gjet"
+    UsernameNotChanged: "Emri i përdoruesit nuk ndryshoi"
+    InvalidURLTemplate: "Shablloni i URL-së është i pavlefshëm"
+    Locked: "Përdoruesi është i bllokuar"
+    Profile:
+      NotFound: "Profili nuk u gjet"
+      NotChanged: "Profili nuk ndryshoi"
+      Empty: "Profili është bosh"
+      FirstNameEmpty: "Emri në profil është bosh"
+      LastNameEmpty: "Mbiemri në profil është bosh"
+      IDMissing: "Mungon ID-ja e profilit"
+    Email:
+      NotFound: "Emaili nuk u gjet"
+      Invalid: "Emaili është i pavlefshëm"
+      AlreadyVerified: "Emaili është verifikuar tashmë"
+      NotChanged: "Emaili nuk ndryshoi"
+      Empty: "Emaili është bosh"
+      IDMissing: "Mungon ID-ja e emailit"
+    Phone:
+      NotFound: "Telefoni nuk u gjet"
+      Invalid: "Telefoni është i pavlefshëm"
+      AlreadyVerified: "Telefoni është verifikuar tashmë"
+      Empty: "Telefoni është bosh"
+      NotChanged: "Telefoni nuk ndryshoi"
+      VerifyingRemovalIsNotSupported: "Verifikimi i heqjes së telefonit nuk mbështetet"
+    Address:
+      NotFound: "Adresa nuk u gjet"
+      NotChanged: "Adresa nuk ndryshoi"
+    Machine:
+      Key:
+        NotFound: "Çelësi i përdoruesit të shërbimit nuk u gjet"
+        AlreadyExisting: "Çelësi i përdoruesit të shërbimit ekziston tashmë"
+        Invalid: "Çelësi publik nuk është çelës publik RSA i vlefshëm në formatin PKIX me kodim PEM"
+      Secret:
+        NotExisting: "Sekreti nuk ekziston"
+        Invalid: "Sekreti është i pavlefshëm"
+        CouldNotGenerate: "Sekreti nuk mund të gjenerohej"
+    PAT:
+      NotFound: "Token-i personal i aksesit nuk u gjet"
+    Metadata:
+      Conflicting: "Metadata nuk duhet të vendosen njëkohësisht te fushat user dhe human"
+    NotHuman: "Përdoruesi duhet të jetë personal"
+    NotMachine: "Përdoruesi duhet të jetë teknik"
+    WrongType: "Nuk lejohet për këtë lloj përdoruesi"
+    NotAllowedToLink: "Përdoruesit nuk i lejohet të lidhet me ofruesin e jashtëm të hyrjes"
+    Username:
+      AlreadyExists: "Emri i përdoruesit është i zënë"
+      Reserved: "Emri i përdoruesit është tashmë i zënë"
+      Empty: "Emri i përdoruesit është bosh"
+    Code:
+      Empty: "Kodi është bosh"
+      NotFound: "Kodi nuk u gjet"
+      Expired: "Kodi ka skaduar"
+      GeneratorAlgNotSupported: "Algoritmi i gjeneruesit nuk mbështetet"
+      Invalid: "Kodi është i pavlefshëm"
+    Password:
+      NotFound: "Fjalëkalimi nuk u gjet"
+      Empty: "Fjalëkalimi është bosh"
+      Invalid: "Fjalëkalimi është i pavlefshëm"
+      NotSet: "Përdoruesi nuk ka vendosur fjalëkalim"
+      NotChanged: "Fjalëkalimi i ri nuk mund të jetë i njëjtë me fjalëkalimin tuaj aktual"
+      NotSupported: "Kodimi i hash-it të fjalëkalimit nuk mbështetet. Shihni https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets"
+    PasswordComplexityPolicy:
+      NotFound: "Politika e fjalëkalimit nuk u gjet"
+      MinLength: "Fjalëkalimi është shumë i shkurtër"
+      MinLengthNotAllowed: "Gjatësia minimale e dhënë nuk lejohet"
+      HasLower: "Fjalëkalimi duhet të përmbajë shkronja të vogla"
+      HasUpper: "Fjalëkalimi duhet të përmbajë shkronja të mëdha"
+      HasNumber: "Fjalëkalimi duhet të përmbajë një numër"
+      HasSymbol: "Fjalëkalimi duhet të përmbajë një simbol"
+    ExternalIDP:
+      Invalid: "IdP-ja e jashtme është e pavlefshme"
+      IDPConfigNotExisting: "Ofruesi IdP është i pavlefshëm për këtë organizatë"
+      NotAllowed: "IdP-ja e jashtme nuk lejohet"
+      MinimumExternalIDPNeeded: "Duhet të shtohet të paktën një IdP"
+      AlreadyExists: "IdP-ja e jashtme është tashmë e zënë"
+      NotFound: "IdP-ja e jashtme nuk u gjet"
+      LoginFailed: "Hyrja te IdP-ja e jashtme dështoi"
+    MFA:
+      OTP:
+        AlreadyReady: "OTP (fjalëkalimi njëpërdorimsh) për vërtetimin me shumë faktorë është konfiguruar tashmë"
+        NotExisting: "OTP (fjalëkalimi njëpërdorimsh) për vërtetimin me shumë faktorë nuk ekziston"
+        NotReady: "OTP (fjalëkalimi njëpërdorimsh) për vërtetimin me shumë faktorë nuk është gati"
+        InvalidCode: "Kod i pavlefshëm"
+        Reused: "Ky kod është përdorur tashmë. Ju lutemi prisni për një kod të ri"
+      U2F:
+        NotExisting: "U2F nuk ekziston"
+      Passwordless:
+        NotExisting: "Passkey-ja nuk ekziston"
+      RecoveryCodes:
+        Empty: "Kodi i rikuperimit është bosh"
+        InvalidCode: "U dha një kod rikuperimi i pavlefshëm"
+        MaxCountExceeded: "U tejkalua numri maksimal i kodeve të rikuperimit"
+        NotReady: "Kodet e rikuperimit nuk janë gati për përdorim"
+        ConfigInvalid: "Konfigurimi i kodeve të rikuperimit është i pavlefshëm"
+    WebAuthN:
+      NotFound: "Token-i WebAuthN nuk u gjet"
+      BeginRegisterFailed: "Nisja e regjistrimit WebAuthN dështoi"
+      MarshalError: "Gabim gjatë serializimit të të dhënave"
+      ErrorOnParseCredential: "Gabim gjatë analizimit të të dhënave të kredencialeve"
+      CreateCredentialFailed: "Gabim gjatë krijimit të kredencialeve"
+      BeginLoginFailed: "Nisja e hyrjes WebAuthN dështoi"
+      ValidateLoginFailed: "Gabim gjatë vlerësimit të kredencialeve të hyrjes"
+      CloneWarning: "Kredencialet mund të jenë klonuar"
+    RefreshToken:
+      Invalid: "Refresh token-i është i pavlefshëm"
+      NotFound: "Refresh token-i nuk u gjet"
+  Org:
+    AlreadyExists: "Emri ose ID-ja e organizatës është e zënë"
+    Invalid: "Organizata është e pavlefshme"
+    AlreadyDeactivated: "Organizata është çaktivizuar tashmë"
+    AlreadyActive: "Organizata është tashmë aktive"
+    Empty: "Organizata është bosh"
+    NotFound: "Organizata nuk u gjet"
+    NotActive: "Organizata nuk është aktive"
+    NotChanged: "Organizata nuk ndryshoi"
+    DefaultOrgNotDeletable: "Organizata e parazgjedhur nuk mund të fshihet"
+    ZitadelOrgNotDeletable: "Organizata me projektin Zitadel nuk mund të fshihet"
+    InvalidDomain: "Domen i pavlefshëm"
+    DomainMissing: "Mungon domeni"
+    DomainNotOnOrg: "Domeni nuk ekziston në organizatë"
+    DomainNotVerified: "Domeni nuk është verifikuar"
+    DomainAlreadyVerified: "Domeni është verifikuar tashmë"
+    DomainVerificationTypeInvalid: "Lloji i verifikimit të domenit është i pavlefshëm"
+    DomainVerificationMissing: "Verifikimi i domenit nuk ka nisur ende"
+    DomainVerificationFailed: "Verifikimi i domenit dështoi"
+    DomainVerificationTXTNotFound: "Rekordi TXT _zitadel-challenge nuk u gjet për domenin tuaj. Kontrolloni nëse e keni shtuar në serverin tuaj DNS ose prisni derisa rekordi i ri të përhapet"
+    DomainVerificationTXTNoMatch: "Rekordi TXT _zitadel-challenge u gjet për domenin tuaj, por nuk përmban tekstin e saktë të token-it. Kontrolloni nëse e keni shtuar token-in e saktë në serverin tuaj DNS ose prisni derisa rekordi i ri të përhapet"
+    DomainVerificationHTTPNotFound: "Skedari që përmban sfidën nuk u gjet në URL-në e pritur. Kontrolloni nëse e keni ngarkuar skedarin në vendin e duhur me leje leximi"
+    DomainVerificationHTTPNoMatch: "Skedari që përmban sfidën u gjet në URL-në e pritur, por nuk përmban tekstin e saktë të token-it. Kontrolloni përmbajtjen e tij"
+    DomainVerificationTimeout: "Kërkesa te serveri DNS mbaroi në kohë"
+    PrimaryDomainNotDeletable: "Domeni i organizatës nuk mund të fshihet"
+    DomainNotFound: "Domeni nuk u gjet"
+    MemberIDMissing: "Mungon ID-ja e anëtarit"
+    MemberNotFound: "Anëtari i organizatës nuk u gjet"
+    InvalidMember: "Anëtari i organizatës është i pavlefshëm"
+    UserIDMissing: "Mungon ID-ja e përdoruesit"
+    PolicyAlreadyExists: "Politika ekziston tashmë"
+    PolicyNotExisting: "Politika nuk ekziston"
+    IdpInvalid: "Konfigurimi i IdP-së është i pavlefshëm"
+    IdpNotExisting: "Konfigurimi i IdP-së nuk ekziston"
+    OIDCConfigInvalid: "Konfigurimi i IdP-së OIDC është i pavlefshëm"
+    IdpIsNotOIDC: "Konfigurimi i IdP-së nuk është i llojit OIDC"
+    Domain:
+      AlreadyExists: "Domeni ekziston tashmë"
+      InvalidCharacter: "Për një domen lejohen vetëm karaktere alfanumerike, . dhe -"
+      EmptyString: "Karakteret e pavlefshme jonumerike dhe joalfabetike u zëvendësuan me hapësira bosh dhe domeni që rezultoi është varg bosh"
+    LoginPolicy:
+      NotFound: "Politika e hyrjes nuk u gjet"
+      Invalid: "Politika e hyrjes është e pavlefshme"
+      RedirectURIInvalid: "URI-ja e parazgjedhur e ridrejtimit është e pavlefshme"
+      NotExisting: "Politika e hyrjes nuk ekziston"
+      AlreadyExists: "Politika e hyrjes ekziston tashmë"
+      IdpProviderAlreadyExisting: "Ofruesi i identitetit ekziston tashmë"
+      IdpProviderNotExisting: "Ofruesi i identitetit nuk ekziston"
+      RegistrationNotAllowed: "Regjistrimi nuk lejohet"
+      UsernamePasswordNotAllowed: "Hyrja me emër përdoruesi / fjalëkalim nuk lejohet"
+      MFA:
+        AlreadyExists: "Vërtetimi me shumë faktorë ekziston tashmë"
+        NotExisting: "Vërtetimi me shumë faktorë nuk ekziston"
+        Unspecified: "Vërtetimi me shumë faktorë është i pavlefshëm"
+    MailTemplate:
+      NotFound: "Shablloni i parazgjedhur i emailit nuk u gjet"
+      NotChanged: "Shablloni i parazgjedhur i emailit nuk ka ndryshuar"
+      AlreadyExists: "Shablloni i parazgjedhur i emailit ekziston tashmë"
+      Invalid: "Shablloni i parazgjedhur i emailit është i pavlefshëm"
+    CustomMessageText:
+      NotFound: "Teksti i parazgjedhur i mesazhit nuk u gjet"
+      NotChanged: "Teksti i parazgjedhur i mesazhit nuk ka ndryshuar"
+      AlreadyExists: "Teksti i parazgjedhur i mesazhit ekziston tashmë"
+      Invalid: "Teksti i parazgjedhur i mesazhit është i pavlefshëm"
+    PasswordComplexityPolicy:
+      NotFound: "Politika e kompleksitetit të fjalëkalimit nuk u gjet"
+      Empty: "Politika e kompleksitetit të fjalëkalimit është bosh"
+      NotExisting: "Politika e kompleksitetit të fjalëkalimit nuk ekziston"
+      AlreadyExists: "Politika e kompleksitetit të fjalëkalimit ekziston tashmë"
+    PasswordLockoutPolicy:
+      NotFound: "Politika e bllokimit për fjalëkalimin nuk u gjet"
+      Empty: "Politika e bllokimit për fjalëkalimin është bosh"
+      NotExisting: "Politika e bllokimit për fjalëkalimin nuk ekziston"
+      AlreadyExists: "Politika e bllokimit për fjalëkalimin ekziston tashmë"
+    PasswordAgePolicy:
+      NotFound: "Politika e vjetërsisë së fjalëkalimit nuk u gjet"
+      Empty: "Politika e vjetërsisë së fjalëkalimit është bosh"
+      NotExisting: "Politika e vjetërsisë së fjalëkalimit nuk ekziston"
+      AlreadyExists: "Politika e vjetërsisë së fjalëkalimit ekziston tashmë"
+    NotificationPolicy:
+      NotFound: "Politika e njoftimeve nuk u gjet"
+      NotChanged: "Politika e njoftimeve nuk ndryshoi"
+      AlreadyExists: "Politika e njoftimeve ekziston tashmë"
+    LabelPolicy:
+      NotFound: "Politika e pamjes së markës nuk u gjet"
+      NotChanged: "Politika e pamjes së markës nuk ka ndryshuar"
+    IDPConfig:
+      NotExisting: "Konfigurimi i ofruesit të identitetit nuk ekziston"
+  Project:
+    ProjectIDMissing: "Mungon ID-ja e projektit"
+    AlreadyExists: "Projekti ekziston tashmë në organizatë"
+    OrgNotExisting: "Organizata nuk ekziston"
+    UserNotExisting: "Përdoruesi nuk ekziston"
+    CouldNotGenerateClientSecret: "Client secret nuk mund të gjenerohej"
+    Invalid: "Projekti është i pavlefshëm"
+    NotActive: "Projekti nuk është aktiv"
+    NotInactive: "Projekti nuk është i çaktivizuar"
+    NotFound: "Projekti nuk u gjet"
+    UserIDMissing: "Mungon ID-ja e përdoruesit"
+    Member:
+      NotFound: "Anëtari i projektit nuk u gjet"
+      Invalid: "Anëtari i projektit është i pavlefshëm"
+      AlreadyExists: "Anëtari i projektit ekziston tashmë"
+      NotExisting: "Anëtari i projektit nuk ekziston"
+    MinimumOneRoleNeeded: "Duhet të shtohet të paktën një rol"
+    Role:
+      AlreadyExists: "Roli ekziston tashmë"
+      Invalid: "Roli është i pavlefshëm"
+      NotExisting: "Roli nuk ekziston"
+    IDMissing: "Mungon ID-ja"
+    App:
+      AlreadyExists: "Aplikacioni ekziston tashmë"
+      NotFound: "Aplikacioni nuk u gjet"
+      Invalid: "Aplikacioni është i pavlefshëm"
+      NotExisting: "Aplikacioni nuk ekziston"
+      NotActive: "Aplikacioni nuk është aktiv"
+      NotInactive: "Aplikacioni nuk është joaktiv"
+      OIDCConfigInvalid: "Konfigurimi OIDC është i pavlefshëm"
+      APIConfigInvalid: "Konfigurimi API është i pavlefshëm"
+      SAMLConfigInvalid: "Konfigurimi SAML është i pavlefshëm"
+      IsNotOIDC: "Aplikacioni nuk është i llojit OIDC"
+      IsNotAPI: "Aplikacioni nuk është i llojit API"
+      IsNotSAML: "Aplikacioni nuk është i llojit SAML"
+      SAMLMetadataMissing: "Mungojnë metadata-t SAML"
+      SAMLMetadataFormat: "Gabim në formatin e metadata-ve SAML"
+      SAMLEntityIDAlreadyExisting: "EntityID SAML ekziston tashmë"
+      OIDCAuthMethodNoSecret: "Metoda e zgjedhur e vërtetimit OIDC nuk kërkon sekret"
+      APIAuthMethodNoSecret: "Metoda e zgjedhur e vërtetimit API nuk kërkon sekret"
+      AuthMethodNoPrivateKeyJWT: "Metoda e zgjedhur e vërtetimit nuk kërkon çelës"
+      ClientSecretInvalid: "Client secret është i pavlefshëm"
+      Key:
+        AlreadyExisting: "Çelësi i aplikacionit ekziston tashmë"
+        NotFound: "Çelësi i aplikacionit nuk u gjet"
+    RequiredFieldsMissing: "Mungojnë disa fusha të detyrueshme"
+    Grant:
+      AlreadyExists: "Dhënia e aksesit në projekt ekziston tashmë"
+      NotFound: "Dhënia e aksesit në projekt nuk u gjet"
+      Invalid: "Dhënia e aksesit në projekt është e pavlefshme"
+      NotExisting: "Dhënia e aksesit në projekt nuk ekziston"
+      HasNotExistingRole: "Një rol nuk ekziston në projekt"
+      NotActive: "Dhënia e aksesit në projekt nuk është aktive"
+      NotInactive: "Dhënia e aksesit në projekt nuk është joaktive"
+  Instance:
+    AlreadyExists: "Instanca ekziston tashmë"
+    NotChanged: "Instanca nuk ndryshoi"
+    NotFound: "Instanca nuk u gjet. Sigurohuni që domeni është i saktë. Shihni https://zitadel.com/docs/apis/introduction#domains"
+    Member:
+      RolesNotChanged: "Rolet nuk kanë ndryshuar"
+    MemberInvalid: "Anëtari është i pavlefshëm"
+    MemberAlreadyExisting: "Anëtari ekziston tashmë"
+    MemberNotExisting: "Anëtari nuk ekziston"
+    IDMissing: "Mungon ID-ja"
+    IdpInvalid: "Konfigurimi i IdP-së është i pavlefshëm"
+    IdpNotExisting: "Konfigurimi i IdP-së nuk ekziston"
+    OIDCConfigInvalid: "Konfigurimi i IdP-së OIDC është i pavlefshëm"
+    IdpIsNotOIDC: "Konfigurimi i IdP-së nuk është i llojit OIDC"
+    LoginPolicyInvalid: "Politika e hyrjes është e pavlefshme"
+    LoginPolicyNotExisting: "Politika e hyrjes nuk ekziston"
+    IdpProviderInvalid: "Ofruesi i identitetit është i pavlefshëm"
+    LoginPolicy:
+      NotFound: "Politika e parazgjedhur e hyrjes nuk u gjet"
+      NotChanged: "Politika e parazgjedhur e hyrjes nuk ka ndryshuar"
+      NotExisting: "Politika e parazgjedhur e hyrjes nuk ekziston"
+      AlreadyExists: "Politika e parazgjedhur e hyrjes ekziston tashmë"
+      RedirectURIInvalid: "URI-ja e parazgjedhur e ridrejtimit është e pavlefshme"
+      MFA:
+        AlreadyExists: "Vërtetimi me shumë faktorë ekziston tashmë"
+        NotExisting: "Vërtetimi me shumë faktorë nuk ekziston"
+        Unspecified: "Vërtetimi me shumë faktorë është i pavlefshëm"
+      IDP:
+        AlreadyExists: "Ofruesi i identitetit ekziston tashmë"
+        NotExisting: "Ofruesi i identitetit nuk ekziston"
+        Invalid: "Ofruesi i identitetit është i pavlefshëm"
+      IDPConfig:
+        AlreadyExists: "Konfigurimi i ofruesit të identitetit ekziston tashmë"
+        NotInactive: "Konfigurimi i ofruesit të identitetit nuk është joaktiv"
+        NotActive: "Konfigurimi i ofruesit të identitetit nuk është aktiv"
+    LabelPolicy:
+      NotFound: "Politika e parazgjedhur e pamjes së markës nuk u gjet"
+      NotChanged: "Politika e parazgjedhur e pamjes së markës nuk ka ndryshuar"
+    MailTemplate:
+      NotFound: "Shablloni i parazgjedhur i emailit nuk u gjet"
+      NotChanged: "Shablloni i parazgjedhur i emailit nuk ka ndryshuar"
+      AlreadyExists: "Shablloni i parazgjedhur i emailit ekziston tashmë"
+      Invalid: "Shablloni i parazgjedhur i emailit është i pavlefshëm"
+    CustomMessageText:
+      NotFound: "Teksti i parazgjedhur i mesazhit nuk u gjet"
+      NotChanged: "Teksti i parazgjedhur i mesazhit nuk ka ndryshuar"
+      AlreadyExists: "Teksti i parazgjedhur i mesazhit ekziston tashmë"
+      Invalid: "Teksti i parazgjedhur i mesazhit është i pavlefshëm"
+    PasswordComplexityPolicy:
+      NotFound: "Politika e parazgjedhur e kompleksitetit të fjalëkalimit nuk u gjet"
+      NotExisting: "Politika e parazgjedhur e kompleksitetit të fjalëkalimit nuk ekziston"
+      AlreadyExists: "Politika e parazgjedhur e kompleksitetit të fjalëkalimit ekziston tashmë"
+      Empty: "Politika e parazgjedhur e kompleksitetit të fjalëkalimit është bosh"
+      NotChanged: "Politika e parazgjedhur e kompleksitetit të fjalëkalimit nuk ka ndryshuar"
+    PasswordAgePolicy:
+      NotFound: "Politika e parazgjedhur e vjetërsisë së fjalëkalimit nuk u gjet"
+      NotExisting: "Politika e parazgjedhur e vjetërsisë së fjalëkalimit nuk ekziston"
+      AlreadyExists: "Politika e parazgjedhur e vjetërsisë së fjalëkalimit ekziston tashmë"
+      Empty: "Politika e parazgjedhur e vjetërsisë së fjalëkalimit është bosh"
+      NotChanged: "Politika e parazgjedhur e vjetërsisë së fjalëkalimit nuk ka ndryshuar"
+    PasswordLockoutPolicy:
+      NotFound: "Politika e parazgjedhur e bllokimit për fjalëkalimin nuk u gjet"
+      NotExisting: "Politika e parazgjedhur e bllokimit për fjalëkalimin nuk ekziston"
+      AlreadyExists: "Politika e parazgjedhur e bllokimit për fjalëkalimin ekziston tashmë"
+      Empty: "Politika e parazgjedhur e bllokimit për fjalëkalimin është bosh"
+      NotChanged: "Politika e parazgjedhur e bllokimit për fjalëkalimin nuk ka ndryshuar"
+    DomainPolicy:
+      NotFound: "Politika e domenit të organizatës nuk u gjet"
+      Empty: "Politika e domenit të organizatës është bosh"
+      NotExisting: "Politika e domenit të organizatës nuk ekziston"
+      AlreadyExists: "Politika e domenit të organizatës ekziston tashmë"
+      NotChanged: "Politika e domenit të organizatës nuk ka ndryshuar"
+    NotificationPolicy:
+      NotFound: "Politika e parazgjedhur e njoftimeve nuk u gjet"
+      NotChanged: "Politika e parazgjedhur e njoftimeve nuk ndryshoi"
+      AlreadyExists: "Politika e parazgjedhur e njoftimeve ekziston tashmë"
+  Policy:
+    AlreadyExists: "Politika ekziston tashmë"
+    Label:
+      Invalid:
+        PrimaryColor: "Ngjyra kryesore nuk është vlerë e vlefshme ngjyre Hex"
+        BackgroundColor: "Ngjyra e sfondit nuk është vlerë e vlefshme ngjyre Hex"
+        WarnColor: "Ngjyra e paralajmërimit nuk është vlerë e vlefshme ngjyre Hex"
+        FontColor: "Ngjyra e shkronjave nuk është vlerë e vlefshme ngjyre Hex"
+        PrimaryColorDark: "Ngjyra kryesore (modaliteti i errët) nuk është vlerë e vlefshme ngjyre Hex"
+        BackgroundColorDark: "Ngjyra e sfondit (modaliteti i errët) nuk është vlerë e vlefshme ngjyre Hex"
+        WarnColorDark: "Ngjyra e paralajmërimit (modaliteti i errët) nuk është vlerë e vlefshme ngjyre Hex"
+        FontColorDark: "Ngjyra e shkronjave (modaliteti i errët) nuk është vlerë e vlefshme ngjyre Hex"
+  UserGrant:
+    AlreadyExists: "Autorizimi i përdoruesit ekziston tashmë"
+    NotFound: "Autorizimi i përdoruesit nuk u gjet"
+    Invalid: "Autorizimi i përdoruesit është i pavlefshëm"
+    NotChanged: "Autorizimi i përdoruesit nuk ka ndryshuar"
+    IDMissing: "Mungon ID-ja"
+    NoPermissionForProject: "Përdoruesi nuk ka leje në këtë projekt"
+    RoleKeyNotFound: "Roli nuk u gjet"
+  Member:
+    AlreadyExists: "Anëtari ekziston tashmë"
+  IDPConfig:
+    AlreadyExists: "Konfigurimi i IdP-së me këtë emër ekziston tashmë"
+    NotExisting: "Konfigurimi i ofruesit të identitetit nuk ekziston"
+  Changes:
+    NotFound: "Nuk u gjet historik"
+    AuditRetention: "Historiku është jashtë periudhës së ruajtjes së regjistrit të auditimit"
+  Token:
+    NotFound: "Token-i nuk u gjet"
+    Invalid: "Token-i është i pavlefshëm"
+  UserSession:
+    NotFound: "Sesioni i përdoruesit nuk u gjet"
+  Key:
+    NotFound: "Çelësi nuk u gjet"
+    ExpireBeforeNow: "Data e skadimit është në të kaluarën"
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: "Vërtetimi me shumë faktorë është konfiguruar si i detyrueshëm, por nuk është konfiguruar asnjë ofrues i mundshëm. Ju lutemi kontaktoni administratorin e sistemit."
+  Step:
+    Started:
+      AlreadyExists: "Hapi i nisur ekziston tashmë"
+    Done:
+      AlreadyExists: "Hapi i përfunduar ekziston tashmë"
+  CustomText:
+    AlreadyExists: "Teksti i personalizuar ekziston tashmë"
+    Invalid: "Teksti i personalizuar është i pavlefshëm"
+    NotFound: "Teksti i personalizuar nuk u gjet"
+  TranslationFile:
+    ReadError: "Gabim gjatë leximit të skedarit të përkthimit"
+    MergeError: "Skedari i përkthimit nuk mund të bashkohej me përkthimet e personalizuara"
+    NotFound: "Skedari i përkthimit nuk ekziston"
+  Metadata:
+    NotFound: "Metadata-t nuk u gjetën"
+    NoData: "Lista e metadata-ve është bosh"
+    Invalid: "Metadata-t janë të pavlefshme"
+    KeyNotExisting: "Një ose më shumë çelësa nuk ekzistojnë"
+  Action:
+    Invalid: "Action-i është i pavlefshëm"
+    NotFound: "Action-i nuk u gjet"
+    NotActive: "Action-i nuk është aktiv"
+    NotInactive: "Action-i nuk është joaktiv"
+    MaxAllowed: "Nuk lejohen më Action-e aktive shtesë"
+    NotEnabled: "Veçoria \"Action\" nuk është aktivizuar"
+  Flow:
+    FlowTypeMissing: "Mungon FlowType"
+    Empty: "Rrjedha është tashmë bosh"
+    WrongTriggerType: "TriggerType është i pavlefshëm"
+    NoChanges: "Nuk ka ndryshime"
+    ActionIDsNotExist: "ActionIDs nuk ekzistojnë"
+  Query:
+    CloseRows: "Deklarata SQL nuk mund të përfundohej"
+    SQLStatement: "Deklarata SQL nuk mund të krijohej"
+    InvalidRequest: "Kërkesa është e pavlefshme"
+    TooManyNestingLevels: "Shumë nivele të ndërthurura në kërkesë (maksimumi 20)"
+    LimitExceeded: "Kufiri u tejkalua"
+  Quota:
+    AlreadyExists: "Kuota ekziston tashmë për këtë njësi"
+    NotFound: "Kuota nuk u gjet për këtë njësi"
+    Invalid:
+      CallURL: "URL-ja e thirrjes së kuotës është e pavlefshme"
+      Percent: "Përqindja e kuotës është më e vogël se 1"
+      Unimplemented: "Kuotat nuk janë implementuar për këtë njësi"
+      Amount: "Sasia e kuotës është më e vogël se 1"
+      ResetInterval: "Intervali i rivendosjes së kuotës është më i shkurtër se një minutë"
+      Noop: "Një kuotë e pakufizuar pa njoftime nuk ka asnjë efekt"
+    Access:
+      Exhausted: "Kuota për kërkesat e vërtetuara është shteruar"
+    Execution:
+      Exhausted: "Kuota për sekondat e ekzekutimit është shteruar"
+  LogStore:
+    Access:
+      StorageFailed: "Ruajtja e regjistrit të aksesit në bazën e të dhënave dështoi"
+      ScanFailed: "Leximi i përdorimit për kërkesat e vërtetuara dështoi"
+    Execution:
+      StorageFailed: "Ruajtja e regjistrit të ekzekutimit të Action-eve në bazën e të dhënave dështoi"
+      ScanFailed: "Leximi i përdorimit për sekondat e ekzekutimit të Action-eve dështoi"
+  Session:
+    IDMissing: "Mungon ID-ja e sesionit"
+    NotFound: "Sesioni nuk u gjet"
+    NotExisting: "Sesioni nuk ekziston"
+    Terminated: "Sesioni është përfunduar tashmë"
+    Expired: "Sesioni ka skaduar"
+    PositiveLifetime: "Kohëzgjatja e sesionit nuk mund të jetë më e vogël se 0"
+    Token:
+      Invalid: "Token-i i sesionit është i pavlefshëm"
+    WebAuthN:
+      NoChallenge: "Sesion pa sfidë WebAuthN"
+  Intent:
+    IDPMissing: "Mungon ID-ja e IdP-së në kërkesë"
+    IDPInvalid: "IdP-ja është e pavlefshme për kërkesën"
+    ResponseInvalid: "Përgjigjja e IdP-së është e pavlefshme"
+    MissingSingleMappingAttribute: "Përgjigjja e IdP-së nuk përmban atributin e përputhjes ose ka më shumë se një vlerë"
+    SuccessURLMissing: "Mungon URL-ja e suksesit në kërkesë"
+    FailureURLMissing: "Mungon URL-ja e dështimit në kërkesë"
+    StateMissing: "Mungon parametri state në kërkesë"
+    NotStarted: "Intent-i nuk ka nisur ose është përfunduar tashmë"
+    NotSucceeded: "Intent-i nuk ka pasur sukses"
+    Expired: "Intent-i ka skaduar"
+    TokenCreationFailed: "Krijimi i token-it dështoi"
+    InvalidToken: "Token-i i intent-it është i pavlefshëm"
+    OtherUser: "Intent-i është për një përdorues tjetër"
+  AuthRequest:
+    AlreadyExists: "Kërkesa e vërtetimit ekziston tashmë"
+    NotExisting: "Kërkesa e vërtetimit nuk ekziston"
+    WrongLoginClient: "Kërkesa e vërtetimit u krijua nga një aplikacion tjetër hyrjeje"
+    AlreadyHandled: "Kërkesa e vërtetimit është trajtuar tashmë"
+  OIDCSession:
+    RefreshTokenInvalid: "Refresh token-i është i pavlefshëm"
+    Token:
+      Invalid: "Token-i është i pavlefshëm"
+      Expired: "Token-i ka skaduar"
+    InvalidClient: "Token-i nuk është lëshuar për këtë aplikacion"
+  SAMLRequest:
+    AlreadyExists: "SAMLRequest ekziston tashmë"
+    NotExisting: "SAMLRequest nuk ekziston"
+    WrongLoginClient: "SAMLRequest u krijua nga një aplikacion tjetër hyrjeje"
+    AlreadyHandled: "SAMLRequest është trajtuar tashmë"
+  SAMLSession:
+    InvalidClient: "SAMLResponse nuk është lëshuar për këtë aplikacion"
+  DeviceAuth:
+    NotFound: "Kërkesa për autorizimin e pajisjes nuk ekziston"
+    AlreadyHandled: "Kërkesa për autorizimin e pajisjes është trajtuar tashmë"
+  Feature:
+    NotExisting: "Veçoria nuk ekziston"
+    TypeNotSupported: "Lloji i veçorisë nuk mbështetet"
+    InvalidValue: "Vlerë e pavlefshme për këtë veçori"
+  Target:
+    Invalid: "Target-i është i pavlefshëm"
+    NoTimeout: "Target-i nuk ka kohë skadimi"
+    InvalidURL: "Target-i ka një URL të pavlefshme"
+    NotFound: "Target-i nuk u gjet"
+    InvalidExpirationDate: "Data e skadimit të çelësit duhet të jetë në të ardhmen"
+    PublicKeyExpired: "Çelësi publik i target-it ka skaduar"
+    PublicKeyActive: "Çelësi publik aktiv i target-it nuk mund të fshihet"
+    InvalidPublicKey: "Çelësi publik është i pavlefshëm. Duhet të jetë çelës publik RSA ose ECDSA i koduar në PEM, në formatin PKCS#8"
+  Execution:
+    ConditionInvalid: "Kushti i ekzekutimit është i pavlefshëm"
+    Invalid: "Ekzekutimi është i pavlefshëm"
+    NotFound: "Ekzekutimi nuk u gjet"
+    IncludeNotFound: "Përfshirja nuk u gjet"
+    NoTargets: "Nuk janë përcaktuar target-e"
+    Failed: "Ekzekutimi dështoi"
+    ResponseIsNotValidJSON: "Përgjigjja nuk është JSON i vlefshëm"
+    MissingEncryptionKey: "Nuk u gjet çelës enkriptimi për target-in"
+  UserSchema:
+    NotEnabled: "Veçoria \"User Schema\" nuk është aktivizuar"
+    Type:
+      Missing: "Mungon lloji i skemës së përdoruesit"
+      AlreadyExists: "Lloji i skemës së përdoruesit ekziston tashmë"
+    Authenticator:
+      Invalid: "Lloj i pavlefshëm vërtetuesi"
+    NotActive: "Skema e përdoruesit nuk është aktive"
+    NotInactive: "Skema e përdoruesit nuk është joaktive"
+    NotExists: "Skema e përdoruesit nuk ekziston"
+    ID:
+      Missing: "Mungon ID-ja e skemës së përdoruesit"
+    Invalid: "Skema e përdoruesit është e pavlefshme"
+    Data:
+      Invalid: "Të dhëna të pavlefshme për skemën e përdoruesit"
+  TokenExchange:
+    Token:
+      Missing: "Mungon token-i"
+      Invalid: "Token-i është i pavlefshëm"
+      TypeMissing: "Mungon lloji i token-it"
+      TypeNotAllowed: "Lloji i token-it nuk lejohet"
+      TypeNotSupported: "Lloji i token-it nuk mbështetet"
+      NotForAPI: "Token-et e impersonimit nuk lejohen për API"
+    Impersonation:
+      PolicyDisabled: "Impersonimi është çaktivizuar në politikën e sigurisë së instancës"
+  WebKey:
+    ActiveDelete: "Çelësi web aktiv nuk mund të fshihet"
+    Config: "Konfigurim i pavlefshëm i çelësit web"
+    Duplicate: "ID-ja e çelësit web nuk është unike"
+    NoActive: "Nuk u gjet asnjë çelës web aktiv"
+    NotFound: "Çelësi web nuk u gjet"
+  IDP:
+    InvalidSearchQuery: "Kërkim i pavlefshëm"
+    ClientIDMissing: "Mungon ClientID"
+    TeamIDMissing: "Mungon TeamID"
+    KeyIDMissing: "Mungon KeyID"
+    PrivateKeyMissing: "Mungon çelësi privat"
+    InvalidPrivateKey: "Format i pavlefshëm i çelësit privat"
+
+AggregateTypes:
+  action: "Action"
+  instance: "Instanca"
+  key_pair: "Çift çelësash"
+  org: "Organizata"
+  project: "Projekti"
+  user: "Përdoruesi"
+  usergrant: "Autorizimi i përdoruesit"
+  quota: "Kuota"
+  feature: "Veçoria"
+  target: "Target"
+  execution: "Ekzekutimi"
+  user_schema: "Skema e përdoruesit"
+  auth_request: "Kërkesa e vërtetimit"
+  device_auth: "Autorizimi i pajisjes"
+  idpintent: "Intent-i i IdP-së"
+  limits: "Kufijtë"
+  milestone: "Momenti kyç"
+  oidc_session: "Sesioni OIDC"
+  restrictions: "Kufizimet"
+  system: "Sistemi"
+  session: "Sesioni"
+  web_key: "Çelësi web"
+  saml_request: "Kërkesa SAML"
+  saml_session: "Sesioni SAML"
+EventTypes:
+  execution:
+    set: "Ekzekutimi u vendos"
+    removed: "Ekzekutimi u fshi"
+  target:
+    added: "Target-i u krijua"
+    changed: "Target-i u ndryshua"
+    removed: "Target-i u fshi"
+  user:
+    added: "Përdoruesi u shtua"
+    selfregistered: "Përdoruesi u regjistrua vetë"
+    initialization:
+      code:
+        added: "Kodi i inicializimit u gjenerua"
+        sent: "Kodi i inicializimit u dërgua"
+      check:
+        succeeded: "Kontrolli i inicializimit pati sukses"
+        failed: "Kontrolli i inicializimit dështoi"
+    token:
+      added: "Token-i i aksesit u krijua"
+      v2.added: "Token-i i aksesit u krijua"
+      removed: "Token-i i aksesit u hoq"
+    impersonated: "Përdoruesi u impersonua"
+    username:
+      reserved: "Emri i përdoruesit u rezervua"
+      released: "Emri i përdoruesit u lirua"
+      changed: "Emri i përdoruesit u ndryshua"
+    email:
+      reserved: "Adresa e emailit u rezervua"
+      released: "Adresa e emailit u lirua"
+      changed: "Adresa e emailit u ndryshua"
+      verified: "Adresa e emailit u verifikua"
+      verification:
+        failed: "Verifikimi i adresës së emailit dështoi"
+      code:
+        added: "Kodi i verifikimit të adresës së emailit u gjenerua"
+        sent: "Kodi i verifikimit të adresës së emailit u dërgua"
+    machine:
+      added: "Përdoruesi teknik u shtua"
+      changed: "Përdoruesi teknik u ndryshua"
+      key:
+        added: "Çelësi u shtua"
+        removed: "Çelësi u hoq"
+      secret:
+        set: "Sekreti u vendos"
+        updated: "Hash-i i sekretit u përditësua"
+        removed: "Sekreti u hoq"
+        check:
+          succeeded: "Kontrolli i sekretit pati sukses"
+          failed: "Kontrolli i sekretit dështoi"
+    human:
+      added: "Personi u shtua"
+      selfregistered: "Personi u regjistrua vetë"
+      avatar:
+        added: "Avatari u shtua"
+        removed: "Avatari u hoq"
+      initialization:
+        code:
+          added: "Kodi i inicializimit u gjenerua"
+          sent: "Kodi i inicializimit u dërgua"
+        check:
+          succeeded: "Kontrolli i inicializimit pati sukses"
+          failed: "Kontrolli i inicializimit dështoi"
+      invite:
+        code:
+          added: "Kodi i ftesës u gjenerua"
+          sent: "Kodi i ftesës u dërgua"
+        check:
+          succeeded: "Kontrolli i ftesës pati sukses"
+          failed: "Kontrolli i ftesës dështoi"
+      username:
+        reserved: "Emri i përdoruesit u rezervua"
+        released: "Emri i përdoruesit u lirua"
+      email:
+        changed: "Adresa e emailit u ndryshua"
+        verified: "Adresa e emailit u verifikua"
+        verification:
+          failed: "Verifikimi i adresës së emailit dështoi"
+        code:
+          added: "Kodi i verifikimit të adresës së emailit u gjenerua"
+          sent: "Kodi i verifikimit të adresës së emailit u dërgua"
+      password:
+        changed: "Fjalëkalimi u ndryshua"
+        code:
+          added: "Kodi i fjalëkalimit u gjenerua"
+          sent: "Kodi i fjalëkalimit u dërgua"
+        check:
+          succeeded: "Kontrolli i fjalëkalimit pati sukses"
+          failed: "Kontrolli i fjalëkalimit dështoi"
+        change:
+          sent: "Njoftimi për ndryshimin e fjalëkalimit u dërgua"
+        hash:
+          updated: "Hash-i i fjalëkalimit u përditësua"
+      externallogin:
+        check:
+          succeeded: "Hyrja e jashtme pati sukses"
+      externalidp:
+        added: "IdP-ja e jashtme u shtua"
+        removed: "IdP-ja e jashtme u hoq"
+        cascade:
+          removed: "IdP-ja e jashtme u hoq në kaskadë"
+        id:
+          migrated: "ID-ja e përdoruesit të jashtëm të IdP-së u migrua"
+      phone:
+        changed: "Numri i telefonit u ndryshua"
+        verified: "Numri i telefonit u verifikua"
+        verification:
+          failed: "Verifikimi i numrit të telefonit dështoi"
+        code:
+          added: "Kodi i numrit të telefonit u gjenerua"
+          sent: "Kodi i numrit të telefonit u dërgua"
+        removed: "Numri i telefonit u hoq"
+      profile:
+        changed: "Profili i përdoruesit u ndryshua"
+      address:
+        changed: "Adresa e përdoruesit u ndryshua"
+      mfa:
+        otp:
+          added: "OTP-ja si faktor shtesë u shtua"
+          verified: "OTP-ja si faktor shtesë u verifikua"
+          removed: "OTP-ja si faktor shtesë u hoq"
+          check:
+            succeeded: "Kontrolli i OTP-së si faktor shtesë pati sukses"
+            failed: "Kontrolli i OTP-së si faktor shtesë dështoi"
+            reused: "Kodi OTP si faktor shtesë u ripërdor"
+          sms:
+            added: "OTP-ja me SMS si faktor shtesë u shtua"
+            removed: "OTP-ja me SMS si faktor shtesë u hoq"
+            code:
+              added: "Kodi OTP me SMS si faktor shtesë u shtua"
+              sent: "Kodi OTP me SMS si faktor shtesë u dërgua"
+            check:
+              succeeded: "Kontrolli i OTP-së me SMS si faktor shtesë pati sukses"
+              failed: "Kontrolli i OTP-së me SMS si faktor shtesë dështoi"
+          email:
+            added: "OTP-ja me email si faktor shtesë u shtua"
+            removed: "OTP-ja me email si faktor shtesë u hoq"
+            code:
+              added: "Kodi OTP me email si faktor shtesë u shtua"
+              sent: "Kodi OTP me email si faktor shtesë u dërgua"
+            check:
+              succeeded: "Kontrolli i OTP-së me email si faktor shtesë pati sukses"
+              failed: "Kontrolli i OTP-së me email si faktor shtesë dështoi"
+        u2f:
+          token:
+            added: "Token-i U2F si faktor shtesë u shtua"
+            verified: "Token-i U2F si faktor shtesë u verifikua"
+            removed: "Token-i U2F si faktor shtesë u hoq"
+            begin:
+              login: "Kontrolli U2F si faktor shtesë nisi"
+            check:
+              succeeded: "Kontrolli U2F si faktor shtesë pati sukses"
+              failed: "Kontrolli U2F si faktor shtesë dështoi"
+            signcount:
+              changed: "Shuma e kontrollit e token-it U2F si faktor shtesë u ndryshua"
+        init:
+          skipped: "Konfigurimi i vërtetimit me shumë faktorë u kapërcye"
+      passwordless:
+        token:
+          added: "Token-i për hyrjen me passkey u shtua"
+          verified: "Token-i për hyrjen me passkey u verifikua"
+          removed: "Token-i për hyrjen me passkey u hoq"
+          begin:
+            login: "Kontrolli i hyrjes me passkey nisi"
+          check:
+            succeeded: "Kontrolli i hyrjes me passkey pati sukses"
+            failed: "Kontrolli i hyrjes me passkey dështoi"
+          signcount:
+            changed: "Shuma e kontrollit e token-it të hyrjes me passkey u ndryshua"
+        initialization:
+          code:
+            added: "Kodi i konfigurimit të passkey-t u shtua"
+            sent: "Kodi i konfigurimit të passkey-t u dërgua"
+            requested: "Kodi i konfigurimit të passkey-t u kërkua"
+            check:
+              succeeded: "Kodi i konfigurimit të passkey-t u kontrollua me sukses"
+              failed: "Kontrolli i kodit të konfigurimit të passkey-t dështoi"
+      signed:
+        out: "Përdoruesi doli"
+      refresh:
+        token:
+          added: "Refresh token-i u krijua"
+          renewed: "Refresh token-i u rinovua"
+          removed: "Refresh token-i u hoq"
+    locked: "Përdoruesi u bllokua"
+    unlocked: "Përdoruesi u zhbllokua"
+    deactivated: "Përdoruesi u çaktivizua"
+    reactivated: "Përdoruesi u riaktivizua"
+    removed: "Përdoruesi u hoq"
+    password:
+      changed: "Fjalëkalimi u ndryshua"
+      code:
+        added: "Kodi i fjalëkalimit u gjenerua"
+        sent: "Kodi i fjalëkalimit u dërgua"
+      check:
+        succeeded: "Kontrolli i fjalëkalimit pati sukses"
+        failed: "Kontrolli i fjalëkalimit dështoi"
+    phone:
+      changed: "Numri i telefonit u ndryshua"
+      verified: "Numri i telefonit u verifikua"
+      verification:
+        failed: "Verifikimi i numrit të telefonit dështoi"
+      code:
+        added: "Kodi i numrit të telefonit u gjenerua"
+        sent: "Kodi i numrit të telefonit u dërgua"
+    profile:
+      changed: "Profili i përdoruesit u ndryshua"
+    address:
+      changed: "Adresa e përdoruesit u ndryshua"
+    mfa:
+      otp:
+        added: "OTP-ja si faktor shtesë u shtua"
+        verified: "OTP-ja si faktor shtesë u verifikua"
+        removed: "OTP-ja si faktor shtesë u hoq"
+        check:
+          succeeded: "Kontrolli i OTP-së si faktor shtesë pati sukses"
+          failed: "Kontrolli i OTP-së si faktor shtesë dështoi"
+        init:
+          skipped: "Konfigurimi i OTP-së si faktor shtesë u kapërcye"
+      init:
+        skipped: "Konfigurimi i vërtetimit me shumë faktorë u kapërcye"
+    signed:
+      out: "Përdoruesi doli"
+    grant:
+      added: "Autorizimi u shtua"
+      changed: "Autorizimi u ndryshua"
+      removed: "Autorizimi u hoq"
+      deactivated: "Autorizimi u çaktivizua"
+      reactivated: "Autorizimi u riaktivizua"
+      reserved: "Autorizimi u rezervua"
+      released: "Autorizimi u lirua"
+      cascade:
+        removed: "Autorizimi u hoq"
+        changed: "Autorizimi u ndryshua"
+    metadata:
+      set: "Metadata-t e përdoruesit u vendosën"
+      removed: "Metadata-t e përdoruesit u hoqën"
+      removed.all: "Të gjitha metadata-t e përdoruesit u hoqën"
+    domain:
+      claimed: "Domeni u mor në pronësi"
+      claimed.sent: "Njoftimi për marrjen në pronësi të domenit u dërgua"
+    pat:
+      added: "Token-i personal i aksesit u shtua"
+      removed: "Token-i personal i aksesit u hoq"
+  org:
+    added: "Organizata u shtua"
+    changed: "Organizata u ndryshua"
+    deactivated: "Organizata u çaktivizua"
+    reactivated: "Organizata u riaktivizua"
+    removed: "Organizata u hoq"
+    domain:
+      added: "Domeni u shtua"
+      verification:
+        added: "Verifikimi i domenit u shtua"
+        failed: "Verifikimi i domenit dështoi"
+      verified: "Domeni u verifikua"
+      removed: "Domeni u hoq"
+      primary:
+        set: "Domeni i organizatës u vendos"
+      reserved: "Domeni u rezervua"
+      released: "Domeni u lirua"
+    name:
+      reserved: "Emri i organizatës u rezervua"
+      released: "Emri i organizatës u lirua"
+    member:
+      added: "Anëtari i organizatës u shtua"
+      changed: "Anëtari i organizatës u ndryshua"
+      removed: "Anëtari i organizatës u hoq"
+      cascade:
+        removed: "Anëtari i organizatës u hoq në kaskadë"
+    iam:
+      policy:
+        added: "Politika e sistemit u shtua"
+        changed: "Politika e sistemit u ndryshua"
+        removed: "Politika e sistemit u hoq"
+    idp:
+      config:
+        added: "Konfigurimi i IdP-së u shtua"
+        changed: "Konfigurimi i IdP-së u ndryshua"
+        removed: "Konfigurimi i IdP-së u hoq"
+        deactivated: "Konfigurimi i IdP-së u çaktivizua"
+        reactivated: "Konfigurimi i IdP-së u riaktivizua"
+      oidc:
+        config:
+          added: "Konfigurimi i IdP-së OIDC u shtua"
+          changed: "Konfigurimi i IdP-së OIDC u ndryshua"
+      saml:
+        config:
+          added: "Konfigurimi i IdP-së SAML u shtua"
+          changed: "Konfigurimi i IdP-së SAML u ndryshua"
+      jwt:
+        config:
+          added: "Konfigurimi i IdP-së JWT u shtua"
+          changed: "Konfigurimi i IdP-së JWT u ndryshua"
+    customtext:
+      set: "Teksti i personalizuar u vendos"
+      removed: "Teksti i personalizuar u hoq"
+      template:
+        removed: "Shablloni i tekstit të personalizuar u hoq"
+    policy:
+      login:
+        added: "Politika e hyrjes u shtua"
+        changed: "Politika e hyrjes u ndryshua"
+        removed: "Politika e hyrjes u hoq"
+        idpprovider:
+          added: "Ofruesi i identitetit u shtua në politikën e hyrjes"
+          removed: "Ofruesi i identitetit u hoq nga politika e hyrjes"
+          cascade:
+            removed: "Ofruesi i identitetit u hoq në kaskadë nga politika e hyrjes"
+        secondfactor:
+          added: "Faktori i dytë u shtua në politikën e hyrjes"
+          removed: "Faktori i dytë u hoq nga politika e hyrjes"
+        multifactor:
+          added: "Vërtetimi me shumë faktorë u shtua në politikën e hyrjes"
+          removed: "Vërtetimi me shumë faktorë u hoq nga politika e hyrjes"
+      password:
+        complexity:
+          added: "Politika e kompleksitetit të fjalëkalimit u shtua"
+          changed: "Politika e kompleksitetit të fjalëkalimit u ndryshua"
+          removed: "Politika e kompleksitetit të fjalëkalimit u hoq"
+        age:
+          added: "Politika e vjetërsisë së fjalëkalimit u shtua"
+          changed: "Politika e vjetërsisë së fjalëkalimit u ndryshua"
+          removed: "Politika e vjetërsisë së fjalëkalimit u hoq"
+        lockout:
+          added: "Politika e bllokimit për fjalëkalimin u shtua"
+          changed: "Politika e bllokimit për fjalëkalimin u ndryshua"
+          removed: "Politika e bllokimit për fjalëkalimin u hoq"
+      label:
+        added: "Politika e pamjes së markës u shtua"
+        changed: "Politika e pamjes së markës u ndryshua"
+        activated: "Politika e pamjes së markës u aktivizua"
+        removed: "Politika e pamjes së markës u hoq"
+        logo:
+          added: "Logoja u shtua në politikën e pamjes së markës"
+          removed: "Logoja u hoq nga politika e pamjes së markës"
+          dark:
+            added: "Logoja (modaliteti i errët) u shtua në politikën e pamjes së markës"
+            removed: "Logoja (modaliteti i errët) u hoq nga politika e pamjes së markës"
+        icon:
+          added: "Ikona u shtua në politikën e pamjes së markës"
+          removed: "Ikona u hoq nga politika e pamjes së markës"
+          dark:
+            added: "Ikona (modaliteti i errët) u shtua në politikën e pamjes së markës"
+            removed: "Ikona (modaliteti i errët) u hoq nga politika e pamjes së markës"
+        font:
+          added: "Fonti u shtua në politikën e pamjes së markës"
+          removed: "Fonti u hoq nga politika e pamjes së markës"
+        assets:
+          removed: "Asetet u hoqën nga politika e pamjes së markës"
+      privacy:
+        added: "Politika e privatësisë dhe kushtet e shërbimit u shtuan"
+        changed: "Politika e privatësisë dhe kushtet e shërbimit u ndryshuan"
+        removed: "Politika e privatësisë dhe kushtet e shërbimit u hoqën"
+      domain:
+        added: "Politika e domenit u shtua"
+        changed: "Politika e domenit u ndryshua"
+        removed: "Politika e domenit u hoq"
+      lockout:
+        added: "Politika e bllokimit u shtua"
+        changed: "Politika e bllokimit u ndryshua"
+        removed: "Politika e bllokimit u hoq"
+      notification:
+        added: "Politika e njoftimeve u shtua"
+        changed: "Politika e njoftimeve u ndryshua"
+        removed: "Politika e njoftimeve u hoq"
+    flow:
+      trigger_actions:
+        set: "Action-i u vendos"
+        cascade:
+          removed: "Action-et u hoqën në kaskadë"
+        removed: "Action-et u hoqën"
+      cleared: "Rrjedha u pastrua"
+    mail:
+      template:
+        added: "Shablloni i emailit u shtua"
+        changed: "Shablloni i emailit u ndryshua"
+        removed: "Shablloni i emailit u hoq"
+      text:
+        added: "Teksti i emailit u shtua"
+        changed: "Teksti i emailit u ndryshua"
+        removed: "Teksti i emailit u hoq"
+    metadata:
+      removed: "Metadata-t u hoqën"
+      removed.all: "Të gjitha metadata-t u hoqën"
+      set: "Metadata-t u vendosën"
+  project:
+    added: "Projekti u shtua"
+    changed: "Projekti u ndryshua"
+    deactivated: "Projekti u çaktivizua"
+    reactivated: "Projekti u riaktivizua"
+    removed: "Projekti u hoq"
+    member:
+      added: "Anëtari i projektit u shtua"
+      changed: "Anëtari i projektit u ndryshua"
+      removed: "Anëtari i projektit u hoq"
+      cascade:
+        removed: "Anëtari i projektit u hoq në kaskadë"
+    role:
+      added: "Roli i projektit u shtua"
+      changed: "Roli i projektit u ndryshua"
+      removed: "Roli i projektit u hoq"
+    grant:
+      added: "Aksesi i menaxhimit u shtua"
+      changed: "Aksesi i menaxhimit u ndryshua"
+      removed: "Aksesi i menaxhimit u hoq"
+      deactivated: "Aksesi i menaxhimit u çaktivizua"
+      reactivated: "Aksesi i menaxhimit u riaktivizua"
+      cascade:
+        changed: "Aksesi i menaxhimit u ndryshua"
+      member:
+        added: "Anëtari i aksesit të menaxhimit u shtua"
+        changed: "Anëtari i aksesit të menaxhimit u ndryshua"
+        removed: "Anëtari i aksesit të menaxhimit u hoq"
+        cascade:
+          removed: "Aksesi i menaxhimit u hoq në kaskadë"
+    application:
+      added: "Aplikacioni u shtua"
+      changed: "Aplikacioni u ndryshua"
+      removed: "Aplikacioni u hoq"
+      deactivated: "Aplikacioni u çaktivizua"
+      reactivated: "Aplikacioni u riaktivizua"
+      oidc:
+        secret:
+          check:
+            succeeded: "Kontrolli i client secret OIDC pati sukses"
+            failed: "Kontrolli i client secret OIDC dështoi"
+        key:
+          added: "Çelësi i aplikacionit OIDC u shtua"
+          removed: "Çelësi i aplikacionit OIDC u hoq"
+      api:
+        secret:
+          check:
+            succeeded: "Kontrolli i sekretit API pati sukses"
+            failed: "Kontrolli i sekretit API dështoi"
+        key:
+          added: "Çelësi i aplikacionit u shtua"
+          removed: "Çelësi i aplikacionit u hoq"
+      config:
+        saml:
+          added: "Konfigurimi SAML u shtua"
+          changed: "Konfigurimi SAML u ndryshua"
+        oidc:
+          added: "Konfigurimi OIDC u shtua"
+          changed: "Konfigurimi OIDC u ndryshua"
+          secret:
+            changed: "Sekreti OIDC u ndryshua"
+            updated: "Hash-i i sekretit OIDC u përditësua"
+        api:
+          added: "Konfigurimi API u shtua"
+          changed: "Konfigurimi API u ndryshua"
+          secret:
+            changed: "Sekreti API u ndryshua"
+            updated: "Hash-i i sekretit API u përditësua"
+  policy:
+    password:
+      complexity:
+        added: "Politika e kompleksitetit të fjalëkalimit u shtua"
+        changed: "Politika e kompleksitetit të fjalëkalimit u ndryshua"
+      age:
+        added: "Politika e vjetërsisë së fjalëkalimit u shtua"
+        changed: "Politika e vjetërsisë së fjalëkalimit u ndryshua"
+      lockout:
+        added: "Politika e bllokimit për fjalëkalimin u shtua"
+        changed: "Politika e bllokimit për fjalëkalimin u ndryshua"
+  iam:
+    setup:
+      started: "Konfigurimi i Zitadel nisi"
+      done: "Konfigurimi i Zitadel përfundoi"
+    global:
+      org:
+        set: "Organizata globale u vendos"
+    project:
+      iam:
+        set: "Projekti Zitadel u vendos"
+    member:
+      added: "Anëtari i Zitadel u shtua"
+      changed: "Anëtari i Zitadel u ndryshua"
+      removed: "Anëtari i Zitadel u hoq"
+      cascade:
+        removed: "Anëtari i Zitadel u hoq në kaskadë"
+    idp:
+      config:
+        added: "Konfigurimi i IdP-së u shtua"
+        changed: "Konfigurimi i IdP-së u ndryshua"
+        removed: "Konfigurimi i IdP-së u hoq"
+        deactivated: "Konfigurimi i IdP-së u çaktivizua"
+        reactivated: "Konfigurimi i IdP-së u riaktivizua"
+      oidc:
+        config:
+          added: "Konfigurimi i IdP-së OIDC u shtua"
+          changed: "Konfigurimi i IdP-së OIDC u ndryshua"
+      saml:
+        config:
+          added: "Konfigurimi i IdP-së SAML u shtua"
+          changed: "Konfigurimi i IdP-së SAML u ndryshua"
+      jwt:
+        config:
+          added: "Konfigurimi JWT u shtua te ofruesi i identitetit"
+          changed: "Konfigurimi JWT i ofruesit të identitetit u ndryshua"
+    customtext:
+      set: "Teksti u vendos"
+      removed: "Teksti u hoq"
+    policy:
+      login:
+        added: "Politika e parazgjedhur e hyrjes u shtua"
+        changed: "Politika e parazgjedhur e hyrjes u ndryshua"
+        idpprovider:
+          added: "Ofruesi i identitetit u shtua në politikën e parazgjedhur të hyrjes"
+          removed: "Ofruesi i identitetit u hoq nga politika e parazgjedhur e hyrjes"
+      label:
+        added: "Politika e pamjes së markës u shtua"
+        changed: "Politika e pamjes së markës u ndryshua"
+        activated: "Politika e pamjes së markës u aktivizua"
+        logo:
+          added: "Logoja u shtua në politikën e pamjes së markës"
+          removed: "Logoja u hoq nga politika e pamjes së markës"
+          dark:
+            added: "Logoja (modaliteti i errët) u shtua në politikën e pamjes së markës"
+            removed: "Logoja (modaliteti i errët) u hoq nga politika e pamjes së markës"
+        icon:
+          added: "Ikona u shtua në politikën e pamjes së markës"
+          removed: "Ikona u hoq nga politika e pamjes së markës"
+          dark:
+            added: "Ikona (modaliteti i errët) u shtua në politikën e pamjes së markës"
+            removed: "Ikona (modaliteti i errët) u hoq nga politika e pamjes së markës"
+        font:
+          added: "Fonti u shtua në politikën e pamjes së markës"
+          removed: "Fonti u hoq nga politika e pamjes së markës"
+        assets:
+          removed: "Asetet u hoqën nga politika e pamjes së markës"
+    default:
+      language:
+        set: "Gjuha e parazgjedhur u vendos"
+    oidc:
+      settings:
+        added: "Konfigurimi OIDC u shtua"
+        changed: "Konfigurimi OIDC u ndryshua"
+        removed: "Konfigurimi OIDC u hoq"
+    secret:
+      generator:
+        added: "Gjeneruesi i sekreteve u shtua"
+        changed: "Gjeneruesi i sekreteve u ndryshua"
+        removed: "Gjeneruesi i sekreteve u hoq"
+    smtp:
+      config:
+        added: "Konfigurimi SMTP u shtua"
+        changed: "Konfigurimi SMTP u ndryshua"
+        activated: "Konfigurimi SMTP u aktivizua"
+        deactivated: "Konfigurimi SMTP u çaktivizua"
+        removed: "Konfigurimi SMTP u hoq"
+        password:
+          changed: "Sekreti i konfigurimit SMTP u ndryshua"
+    sms:
+      config:
+        twilio:
+          added: "Ofruesi SMS Twilio u shtua"
+          changed: "Ofruesi SMS Twilio u ndryshua"
+          token:
+            changed: "Token-i i ofruesit SMS Twilio u ndryshua"
+          removed: "Ofruesi SMS Twilio u hoq"
+          activated: "Ofruesi SMS Twilio u aktivizua"
+          deactivated: "Ofruesi SMS Twilio u çaktivizua"
+  key_pair:
+    added: "Çifti i çelësave u shtua"
+    certificate:
+      added: "Certifikata u shtua"
+  action:
+    added: "Action-i u shtua"
+    changed: "Action-i u ndryshua"
+    deactivated: "Action-i u çaktivizua"
+    reactivated: "Action-i u riaktivizua"
+    removed: "Action-i u hoq"
+  instance:
+    added: "Instanca u shtua"
+    changed: "Instanca u ndryshua"
+    customtext:
+      removed: "Teksti i personalizuar u hoq"
+      set: "Teksti i personalizuar u vendos"
+      template:
+        removed: "Shablloni i tekstit të personalizuar u hoq"
+    default:
+      language:
+        set: "Gjuha e parazgjedhur u vendos"
+      org:
+        set: "Organizata e parazgjedhur u vendos"
+    domain:
+      added: "Domeni u shtua"
+      primary:
+        set: "Domeni kryesor u vendos"
+      removed: "Domeni u hoq"
+    iam:
+      console:
+        set: "Aplikacioni Zitadel Management Console u vendos"
+      project:
+        set: "Projekti Zitadel u vendos"
+    mail:
+      template:
+        added: "Shablloni i emailit u shtua"
+        changed: "Shablloni i emailit u ndryshua"
+      text:
+        added: "Teksti i emailit u shtua"
+        changed: "Teksti i emailit u ndryshua"
+    member:
+      added: "Anëtari i instancës u shtua"
+      changed: "Anëtari i instancës u ndryshua"
+      removed: "Anëtari i instancës u hoq"
+      cascade:
+        removed: "Anëtari i instancës u hoq në kaskadë"
+    notification:
+      provider:
+        debug:
+          fileadded: "Ofruesi i njoftimeve për debug në skedar u shtua"
+          filechanged: "Ofruesi i njoftimeve për debug në skedar u ndryshua"
+          fileremoved: "Ofruesi i njoftimeve për debug në skedar u hoq"
+          logadded: "Ofruesi i njoftimeve për debug në log u shtua"
+          logchanged: "Ofruesi i njoftimeve për debug në log u ndryshua"
+          logremoved: "Ofruesi i njoftimeve për debug në log u hoq"
+    oidc:
+      settings:
+        added: "Cilësimet OIDC u shtuan"
+        changed: "Cilësimet OIDC u ndryshuan"
+    policy:
+      domain:
+        added: "Politika e domenit u shtua"
+        changed: "Politika e domenit u ndryshua"
+      label:
+        activated: "Politika e pamjes së markës u aktivizua"
+        added: "Politika e pamjes së markës u shtua"
+        assets:
+          removed: "Aseti u hoq nga politika e pamjes së markës"
+        changed: "Politika e pamjes së markës u ndryshua"
+        font:
+          added: "Fonti u shtua në politikën e pamjes së markës"
+          removed: "Fonti u hoq nga politika e pamjes së markës"
+        icon:
+          added: "Ikona u shtua në politikën e pamjes së markës"
+          removed: "Ikona u hoq nga politika e pamjes së markës"
+          dark:
+            added: "Ikona u shtua në politikën e pamjes së markës për modalitetin e errët"
+            removed: "Ikona u hoq nga politika e pamjes së markës për modalitetin e errët"
+        logo:
+          added: "Logoja u shtua në politikën e pamjes së markës"
+          removed: "Logoja u hoq nga politika e pamjes së markës"
+          dark:
+            added: "Logoja u shtua në politikën e pamjes së markës për modalitetin e errët"
+            removed: "Logoja u hoq nga politika e pamjes së markës për modalitetin e errët"
+      lockout:
+        added: "Politika e bllokimit u shtua"
+        changed: "Politika e bllokimit u ndryshua"
+      login:
+        added: "Politika e hyrjes u shtua"
+        changed: "Politika e hyrjes u ndryshua"
+        idpprovider:
+          added: "Ofruesi i identitetit u shtua në politikën e hyrjes"
+          cascade:
+            removed: "Ofruesi i identitetit u hoq në kaskadë nga politika e hyrjes"
+          removed: "Ofruesi i identitetit u hoq nga politika e hyrjes"
+        multifactor:
+          added: "Vërtetimi me shumë faktorë u shtua në politikën e hyrjes"
+          removed: "Vërtetimi me shumë faktorë u hoq nga politika e hyrjes"
+        secondfactor:
+          added: "Faktori i dytë u shtua në politikën e hyrjes"
+          removed: "Faktori i dytë u hoq nga politika e hyrjes"
+      password:
+        age:
+          added: "Politika e vjetërsisë së fjalëkalimit u shtua"
+          changed: "Politika e vjetërsisë së fjalëkalimit u ndryshua"
+        complexity:
+          added: "Politika e kompleksitetit të fjalëkalimit u shtua"
+          changed: "Politika e kompleksitetit të fjalëkalimit u ndryshua"
+      privacy:
+        added: "Politika e privatësisë u shtua"
+        changed: "Politika e privatësisë u ndryshua"
+      security:
+        set: "Politika e sigurisë u vendos"
+    removed: "Instanca u hoq"
+    secret:
+      generator:
+        added: "Gjeneruesi i sekreteve u shtua"
+        changed: "Gjeneruesi i sekreteve u ndryshua"
+        removed: "Gjeneruesi i sekreteve u hoq"
+    sms:
+      configtwilio:
+        activated: "Konfigurimi SMS Twilio u aktivizua"
+        added: "Konfigurimi SMS Twilio u shtua"
+        changed: "Konfigurimi SMS Twilio u ndryshua"
+        deactivated: "Konfigurimi SMS Twilio u çaktivizua"
+        removed: "Konfigurimi SMS Twilio u hoq"
+        token:
+          changed: "Token-i i konfigurimit SMS Twilio u ndryshua"
+    smtp:
+      config:
+        added: "Konfigurimi SMTP u shtua"
+        changed: "Konfigurimi SMTP u ndryshua"
+        activated: "Konfigurimi SMTP u aktivizua"
+        deactivated: "Konfigurimi SMTP u çaktivizua"
+        password:
+          changed: "Fjalëkalimi i konfigurimit SMTP u ndryshua"
+        removed: "Konfigurimi SMTP u hoq"
+  user_schema:
+    created: "Skema e përdoruesit u krijua"
+    updated: "Skema e përdoruesit u përditësua"
+    deactivated: "Skema e përdoruesit u çaktivizua"
+    reactivated: "Skema e përdoruesit u riaktivizua"
+    deleted: "Skema e përdoruesit u fshi"
+    user:
+      created: "Përdoruesi u krijua"
+      updated: "Përdoruesi u përditësua"
+      deleted: "Përdoruesi u fshi"
+      email:
+        updated: "Adresa e emailit u ndryshua"
+        verified: "Adresa e emailit u verifikua"
+        verification:
+          failed: "Verifikimi i adresës së emailit dështoi"
+        code:
+          added: "Kodi i verifikimit të adresës së emailit u gjenerua"
+          sent: "Kodi i verifikimit të adresës së emailit u dërgua"
+      phone:
+        updated: "Numri i telefonit u ndryshua"
+        verified: "Numri i telefonit u verifikua"
+        verification:
+          failed: "Verifikimi i numrit të telefonit dështoi"
+        code:
+          added: "Kodi i verifikimit të numrit të telefonit u gjenerua"
+          sent: "Kodi i verifikimit të numrit të telefonit u dërgua"
+  web_key:
+    added: "Çelësi web u shtua"
+    activated: "Çelësi web u aktivizua"
+    deactivated: "Çelësi web u çaktivizua"
+    removed: "Çelësi web u hoq"
+Application:
+  OIDC:
+    UnsupportedVersion: "Versioni juaj OIDC nuk mbështetet"
+    V1:
+      NotCompliant: "Konfigurimi juaj nuk është në përputhje dhe ndryshon nga standardi OIDC 1.0."
+      NoRedirectUris: "Duhet të regjistrohet të paktën një URI ridrejtimi."
+      NotAllCombinationsAreAllowed: "Konfigurimi është në përputhje, por jo të gjitha kombinimet e mundshme lejohen."
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: "Grant type \"code\" lejon URI ridrejtimi http vetëm për llojin e aplikacionit \"web\"."
+          CustomOnlyForNative: "Grant type \"code\" lejon URI ridrejtimi të personalizuara vetëm për llojin e aplikacionit \"native\"  (p.sh. appname:// )"
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: "Grant type implicit nuk lejon URI ridrejtimi të personalizuara"
+          HttpNotAllowed: "Grant type implicit nuk lejon URI ridrejtimi http"
+          HttpLocalhostOnlyForNative: "Http://localhost si URI ridrejtimi lejohet vetëm për aplikacionet native."
+      Native:
+        AuthMethodType:
+          NotNone: "Aplikacionet native duhet të kenë authmethodtype none."
+        RedirectUris:
+          MustBeHttpLocalhost: "URI-të e ridrejtimit duhet të fillojnë me protokollin tuaj, http://127.0.0.1, http://[::1] ose http://localhost."
+      UserAgent:
+        AuthMethodType:
+          NotNone: "Aplikacioni user agent duhet të ketë authmethodtype none."
+      GrantType:
+        Refresh:
+          NoAuthCode: "Refresh token-i lejohet vetëm në kombinim me Authorization Code."
+Action:
+  Flow:
+    Type:
+      Unspecified: "I papërcaktuar"
+      ExternalAuthentication: "Vërtetimi i jashtëm"
+      CustomiseToken: "Plotësimi i token-it"
+      InternalAuthentication: "Vërtetimi i brendshëm"
+      CustomizeSAMLResponse: "Plotësimi i SAMLResponse"
+  TriggerType:
+    Unspecified: "I papërcaktuar"
+    PostAuthentication: "Pas vërtetimit"
+    PreCreation: "Para krijimit"
+    PostCreation: "Pas krijimit"
+    PreUserinfoCreation: "Para krijimit të userinfo"
+    PreAccessTokenCreation: "Para krijimit të access token-it"
+    PreSAMLResponseCreation: "Para krijimit të SAMLResponse"
