@@ -145,6 +145,12 @@
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "assets": ["src/favicon.ico", "src/assets"],
+            "stylePreprocessorOptions": {
+              "sass": {
+                "silenceDeprecations": ["import", "mixed-decls"]
+              },
+              "includePaths": ["node_modules", "."]
+            },
             "styles": ["src/styles.scss"],
             "scripts": []
           }
