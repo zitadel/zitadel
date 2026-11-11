@@ -1371,6 +1371,51 @@ EventTypes:
     activated: "Clé Web activée"
     deactivated: "Clé Web désactivée"
     removed: "Clé Web supprimée"
+  session:
+    added: "Session créée"
+    user:
+      checked: "Utilisateur de la session vérifié"
+    password:
+      checked: "Mot de passe de la session vérifié"
+    intent:
+      checked: "Intent du fournisseur d'identité de la session vérifié"
+    webAuthN:
+      challenged: "Défi WebAuthN de la session créé"
+      checked: "WebAuthN de la session vérifié"
+    totp:
+      checked: "TOTP de la session vérifié"
+    otp:
+      sms:
+        challenged: "Défi OTP SMS de la session créé"
+        sent: "Code OTP SMS de la session envoyé"
+        checked: "OTP SMS de la session vérifié"
+      email:
+        challenged: "Défi OTP Email de la session créé"
+        sent: "Code OTP Email de la session envoyé"
+        checked: "OTP Email de la session vérifié"
+    recoveryCode:
+      checked: "Code de récupération de la session vérifié"
+    token:
+      set: "Jeton de la session défini"
+    metadata:
+      set: "Métadonnées de la session définies"
+    lifetime:
+      set: "Durée de vie de la session définie"
+    terminated: "Session terminée"
+  oidc_session:
+    added: "Session OIDC créée"
+    access_token:
+      added: "Jeton d'accès de la session OIDC créé"
+      revoked: "Jeton d'accès de la session OIDC révoqué"
+    refresh_token:
+      added: "Jeton de rafraîchissement de la session OIDC créé"
+      renewed: "Jeton de rafraîchissement de la session OIDC renouvelé"
+      revoked: "Jeton de rafraîchissement de la session OIDC révoqué"
+  saml_session:
+    added: "Session SAML créée"
+    saml_response:
+      added: "Réponse SAML de la session créée"
+      revoked: "Réponse SAML de la session révoquée"
 Application:
   OIDC:
     UnsupportedVersion: "Votre version de l'OIDC n'est pas prise en charge"

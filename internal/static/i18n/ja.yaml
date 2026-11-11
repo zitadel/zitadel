@@ -1376,6 +1376,51 @@ EventTypes:
     activated: "Web キーが有効化されました"
     deactivated: "Web キーが無効化されました"
     removed: "Web キーが削除されました"
+  session:
+    added: "セッションの作成"
+    user:
+      checked: "セッションのユーザーチェック"
+    password:
+      checked: "セッションのパスワードチェック"
+    intent:
+      checked: "セッションのIDPインテントチェック"
+    webAuthN:
+      challenged: "セッションのWebAuthNチャレンジの作成"
+      checked: "セッションのWebAuthNチェック"
+    totp:
+      checked: "セッションのTOTPチェック"
+    otp:
+      sms:
+        challenged: "セッションのOTP SMSチャレンジの作成"
+        sent: "セッションのOTP SMSコードの送信"
+        checked: "セッションのOTP SMSチェック"
+      email:
+        challenged: "セッションのOTP Emailチャレンジの作成"
+        sent: "セッションのOTP Emailコードの送信"
+        checked: "セッションのOTP Emailチェック"
+    recoveryCode:
+      checked: "セッションのリカバリーコードチェック"
+    token:
+      set: "セッションのトークンの設定"
+    metadata:
+      set: "セッションのメタデータの設定"
+    lifetime:
+      set: "セッションの有効期間の設定"
+    terminated: "セッションの終了"
+  oidc_session:
+    added: "OIDCセッションの作成"
+    access_token:
+      added: "OIDCセッションのアクセストークンの作成"
+      revoked: "OIDCセッションのアクセストークンの取り消し"
+    refresh_token:
+      added: "OIDCセッションのリフレッシュトークンの作成"
+      renewed: "OIDCセッションのリフレッシュトークンの更新"
+      revoked: "OIDCセッションのリフレッシュトークンの取り消し"
+  saml_session:
+    added: "SAMLセッションの作成"
+    saml_response:
+      added: "SAMLセッションのレスポンスの作成"
+      revoked: "SAMLセッションのレスポンスの取り消し"
 Application:
   OIDC:
     UnsupportedVersion: "OIDCバージョンはサポートされていません"

@@ -1377,6 +1377,51 @@ EventTypes:
     activated: "已激活 Web Key"
     deactivated: "已停用 Web Key"
     removed: "已删除 Web Key"
+  session:
+    added: "已创建会话"
+    user:
+      checked: "已检查会话用户"
+    password:
+      checked: "已检查会话密码"
+    intent:
+      checked: "已检查会话身份提供者意图"
+    webAuthN:
+      challenged: "已创建会话 WebAuthN 质询"
+      checked: "已检查会话 WebAuthN"
+    totp:
+      checked: "已检查会话 TOTP"
+    otp:
+      sms:
+        challenged: "已创建会话 OTP 短信质询"
+        sent: "已发送会话 OTP 短信代码"
+        checked: "已检查会话 OTP 短信"
+      email:
+        challenged: "已创建会话 OTP 电子邮件质询"
+        sent: "已发送会话 OTP 电子邮件代码"
+        checked: "已检查会话 OTP 电子邮件"
+    recoveryCode:
+      checked: "已检查会话恢复代码"
+    token:
+      set: "已设置会话令牌"
+    metadata:
+      set: "已设置会话元数据"
+    lifetime:
+      set: "已设置会话有效期"
+    terminated: "已终止会话"
+  oidc_session:
+    added: "已创建 OIDC 会话"
+    access_token:
+      added: "已创建 OIDC 会话访问令牌"
+      revoked: "已撤销 OIDC 会话访问令牌"
+    refresh_token:
+      added: "已创建 OIDC 会话刷新令牌"
+      renewed: "已续订 OIDC 会话刷新令牌"
+      revoked: "已撤销 OIDC 会话刷新令牌"
+  saml_session:
+    added: "已创建 SAML 会话"
+    saml_response:
+      added: "已创建 SAML 会话响应"
+      revoked: "已撤销 SAML 会话响应"
 Application:
   OIDC:
     UnsupportedVersion: "不支持您的 OIDC 版本"

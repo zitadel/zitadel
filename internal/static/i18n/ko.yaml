@@ -1376,6 +1376,51 @@ EventTypes:
     activated: "웹 키 활성화됨"
     deactivated: "웹 키 비활성화됨"
     removed: "웹 키 삭제됨"
+  session:
+    added: "세션 생성됨"
+    user:
+      checked: "세션 사용자 확인됨"
+    password:
+      checked: "세션 비밀번호 확인됨"
+    intent:
+      checked: "세션 IDP 인텐트 확인됨"
+    webAuthN:
+      challenged: "세션 WebAuthN 챌린지 생성됨"
+      checked: "세션 WebAuthN 확인됨"
+    totp:
+      checked: "세션 TOTP 확인됨"
+    otp:
+      sms:
+        challenged: "세션 OTP SMS 챌린지 생성됨"
+        sent: "세션 OTP SMS 코드 전송됨"
+        checked: "세션 OTP SMS 확인됨"
+      email:
+        challenged: "세션 OTP 이메일 챌린지 생성됨"
+        sent: "세션 OTP 이메일 코드 전송됨"
+        checked: "세션 OTP 이메일 확인됨"
+    recoveryCode:
+      checked: "세션 복구 코드 확인됨"
+    token:
+      set: "세션 토큰 설정됨"
+    metadata:
+      set: "세션 메타데이터 설정됨"
+    lifetime:
+      set: "세션 수명 설정됨"
+    terminated: "세션 종료됨"
+  oidc_session:
+    added: "OIDC 세션 생성됨"
+    access_token:
+      added: "OIDC 세션 액세스 토큰 생성됨"
+      revoked: "OIDC 세션 액세스 토큰 취소됨"
+    refresh_token:
+      added: "OIDC 세션 리프레시 토큰 생성됨"
+      renewed: "OIDC 세션 리프레시 토큰 갱신됨"
+      revoked: "OIDC 세션 리프레시 토큰 취소됨"
+  saml_session:
+    added: "SAML 세션 생성됨"
+    saml_response:
+      added: "SAML 세션 응답 생성됨"
+      revoked: "SAML 세션 응답 취소됨"
 Application:
   OIDC:
     UnsupportedVersion: "지원되지 않는 OIDC 버전입니다"
