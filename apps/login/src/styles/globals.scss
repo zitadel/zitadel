@@ -16,6 +16,12 @@
 html {
   --background-color: #ffffff;
   --dark-background-color: #000000;
+
+  background-color: var(--theme-light-background-600, var(--background-color));
+}
+
+html.dark {
+  background-color: var(--theme-dark-background-600, var(--dark-background-color));
 }
 
 .form-checkbox {
