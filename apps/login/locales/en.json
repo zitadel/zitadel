@@ -255,6 +255,7 @@
       "smsDescription": "Enter your phone number to receive a code via SMS.",
       "emailDescription": "Enter your email address to receive a code via email.",
       "totpRegisterDescription": "Scan the QR Code or navigate to the URL manually.",
+      "manualSetupDescription": "Can't scan the QR code? Enter this key in your authenticator app instead.",
       "submit": "Continue",
       "labels": {
         "code": "Code"
