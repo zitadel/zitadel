@@ -353,7 +353,7 @@ func (c *Commands) HumanSendOTPSMS(ctx context.Context, userID, resourceOwner st
 		domain.SecretGeneratorTypeOTPSMS,
 		c.defaultSecretGenerators.OTPSMS,
 		codeAddedEvent,
-		c.newPhoneCode,
+		c.newPhoneCodeWithHook(userID, resourceOwner),
 	)
 }
 
@@ -472,12 +472,8 @@ func (c *Commands) HumanSendOTPEmail(ctx context.Context, userID, resourceOwner 
 	smsWriteModel := func(ctx context.Context, userID string, resourceOwner string) (OTPWriteModel, error) {
 		return c.otpEmailWriteModelByID(ctx, userID, resourceOwner)
 	}
-	codeAddedEvent := func(ctx context.Context, aggregate *eventstore.Aggregate, code *crypto.CryptoValue, expiry time.Duration, info *user.AuthRequestInfo, _ string) eventstore.Command {
-		return user.NewHumanOTPEmailCodeAddedEvent(ctx, aggregate, code, expiry, info)
-	}
-	generateCode := func(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, defaultConfig *crypto.GeneratorConfig) (*EncryptedCode, string, error) {
-		code, err := c.newEncryptedCodeWithDefault(ctx, filter, typ, alg, defaultConfig)
-		return code, "", err
+	codeAddedEvent := func(ctx context.Context, aggregate *eventstore.Aggregate, code *crypto.CryptoValue, expiry time.Duration, info *user.AuthRequestInfo, generatorID string) eventstore.Command {
+		return user.NewHumanOTPEmailCodeAddedEvent(ctx, aggregate, code, expiry, info, generatorID)
 	}
 	return c.sendHumanOTP(
 		ctx,
@@ -488,7 +484,7 @@ func (c *Commands) HumanSendOTPEmail(ctx context.Context, userID, resourceOwner 
 		domain.SecretGeneratorTypeOTPEmail,
 		c.defaultSecretGenerators.OTPEmail,
 		codeAddedEvent,
-		generateCode,
+		c.newEmailCodeWithHook(userID, resourceOwner),
 	)
 }
 
@@ -521,7 +517,7 @@ func (c *Commands) HumanCheckOTPEmail(ctx context.Context, userID, code, resourc
 		writeModel,
 		c.eventstore.FilterToQueryReducer,
 		c.userEncryption,
-		nil, // email currently always uses local code checks
+		c.emailCodeVerifier,
 		succeededEvent,
 		failedEvent,
 		c.tarpit,
