@@ -1,12 +1,14 @@
 package command
 
 import (
+	"context"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/repository/session"
 )
 
 func TestSessionWriteModel_AuthMethodTypes(t *testing.T) {
@@ -116,4 +118,38 @@ func TestSessionWriteModel_AuthMethodTypes(t *testing.T) {
 			assert.Equal(t, got, tt.want)
 		})
 	}
+}
+
+func TestSessionWriteModel_ReduceMetadata(t *testing.T) {
+	agg := &session.NewAggregate("sessionID", "instance1").Aggregate
+	wm := NewSessionWriteModel("sessionID", "instance1")
+	wm.AppendEvents(
+		session.NewMetadataSetEvent(context.Background(), agg, map[string][]byte{"a": []byte("1"), "b": []byte("2")}),
+		session.NewMetadataSetEvent(context.Background(), agg, map[string][]byte{"a": []byte("1")}),
+	)
+	assert.NoError(t, wm.Reduce())
+	assert.Equal(t, map[string][]byte{"a": []byte("1")}, wm.Metadata)
+}
+
+func TestSessionCommands_ChangeMetadata_deleteExistingKey(t *testing.T) {
+	agg := &session.NewAggregate("sessionID", "instance1").Aggregate
+	wm := NewSessionWriteModel("sessionID", "instance1")
+	wm.AppendEvents(
+		session.NewMetadataSetEvent(context.Background(), agg, map[string][]byte{"a": []byte("1"), "b": []byte("2")}),
+	)
+	assert.NoError(t, wm.Reduce())
+	wm.aggregate = agg
+
+	cmds := &SessionCommands{sessionWriteModel: wm}
+	cmds.ChangeMetadata(context.Background(), map[string][]byte{"a": nil})
+
+	assert.Len(t, cmds.eventCommands, 1)
+	ev, ok := cmds.eventCommands[0].(*session.MetadataSetEvent)
+	assert.True(t, ok)
+	assert.Equal(t, map[string][]byte{"b": []byte("2")}, ev.Metadata)
+
+	// removing a key that does not exist stays a no-op
+	cmds = &SessionCommands{sessionWriteModel: wm}
+	cmds.ChangeMetadata(context.Background(), map[string][]byte{"missing": nil})
+	assert.Empty(t, cmds.eventCommands)
 }

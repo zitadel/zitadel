@@ -104,6 +104,8 @@ func (wm *SessionWriteModel) Reduce() error {
 			wm.reduceOTPEmailChecked(e)
 		case *session.TokenSetEvent:
 			wm.reduceTokenSet(e)
+		case *session.MetadataSetEvent:
+			wm.reduceMetadataSet(e)
 		case *session.LifetimeSetEvent:
 			wm.reduceLifetimeSet(e)
 		case *session.TerminateEvent:
@@ -220,6 +222,14 @@ func (wm *SessionWriteModel) reduceOTPEmailChecked(e *session.OTPEmailCheckedEve
 
 func (wm *SessionWriteModel) reduceTokenSet(e *session.TokenSetEvent) {
 	wm.TokenID = e.TokenID
+}
+
+func (wm *SessionWriteModel) reduceMetadataSet(e *session.MetadataSetEvent) {
+	// the event contains the complete metadata after the change, so it replaces the current state
+	wm.Metadata = make(map[string][]byte, len(e.Metadata))
+	for key, value := range e.Metadata {
+		wm.Metadata[key] = value
+	}
 }
 
 func (wm *SessionWriteModel) reduceLifetimeSet(e *session.LifetimeSetEvent) {
