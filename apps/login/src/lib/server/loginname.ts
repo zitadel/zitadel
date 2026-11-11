@@ -3,6 +3,7 @@
 import { equalsIgnoreCase } from "@/lib/auth-utils";
 import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
 import { createLogger } from "@/lib/logger";
+import { getLoginMethods } from "@/lib/login-methods";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
@@ -59,6 +60,22 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   // loginName exposed in redirect URLs, keeping known and unknown users
   // indistinguishable while protection applies.
   const ignoreUnknownUsernames = !!loginSettingsByContext.ignoreUnknownUsernames;
+
+  // Under enumeration protection, offer the same policy-level choices for every identifier.
+  if (loginSettingsByContext.ignoreUnknownUsernames) {
+    const options = await getLoginMethods({
+      serviceConfig,
+      organization: command.organization,
+      loginSettings: loginSettingsByContext,
+    });
+    if (options.count > 1) {
+      const loginName = command.suffix ? `${command.loginName}@${command.suffix}` : command.loginName;
+      const params = new URLSearchParams({ loginName });
+      if (command.organization) params.set("organization", command.organization);
+      if (command.requestId) params.set("requestId", command.requestId);
+      return { redirect: "/login-method?" + params };
+    }
+  }
 
   let searchUsersRequest: SearchUsersCommand = {
     serviceConfig,
@@ -400,6 +417,23 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       }
 
       return { redirect: `/verify?` + params };
+    }
+
+    // Keep method discovery out of the enumeration-protected flow.
+    if (!ignoreUnknownUsernames && session && userLoginSettings && !userLoginSettings.ignoreUnknownUsernames) {
+      const options = await getLoginMethods({
+        serviceConfig,
+        userId,
+        organization: session.factors!.user!.organizationId,
+        authMethods: methods.authMethodTypes,
+        loginSettings: userLoginSettings,
+      });
+      if (options.count > 1) {
+        const params = new URLSearchParams({ loginName: redirectLoginName as string });
+        if (organization) params.set("organization", organization);
+        if (command.requestId) params.set("requestId", command.requestId);
+        return { redirect: "/login-method?" + params };
+      }
     }
 
     if (methods.authMethodTypes.length == 1) {
