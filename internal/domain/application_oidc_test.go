@@ -179,6 +179,34 @@ func TestApplicationValid(t *testing.T) {
 			},
 			result: false,
 		},
+		{
+			name: "invalid oidc application: invalid redirect uri",
+			args: args{
+				app: &OIDCApp{
+					ObjectRoot:    models.ObjectRoot{AggregateID: "AggregateID"},
+					AppID:         "AppID",
+					AppName:       "Name",
+					ResponseTypes: []OIDCResponseType{OIDCResponseTypeCode},
+					GrantTypes:    []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
+					RedirectUris:  []string{"http://localhost:5173.evil.example.com/callback"},
+				},
+			},
+			result: false,
+		},
+		{
+			name: "invalid oidc application: invalid post logout redirect uri",
+			args: args{
+				app: &OIDCApp{
+					ObjectRoot:             models.ObjectRoot{AggregateID: "AggregateID"},
+					AppID:                  "AppID",
+					AppName:                "Name",
+					ResponseTypes:          []OIDCResponseType{OIDCResponseTypeCode},
+					GrantTypes:             []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
+					PostLogoutRedirectUris: []string{"http://localhost:5173.evil.example.com/logout"},
+				},
+			},
+			result: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
