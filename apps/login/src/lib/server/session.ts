@@ -11,7 +11,7 @@ import {
   listAuthenticationMethodTypes,
   listUsers,
 } from "@/lib/zitadel";
-import { Code, create, Duration } from "@zitadel/client";
+import { Code, create, Duration, timestampDate } from "@zitadel/client";
 import { Challenges, RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -25,7 +25,13 @@ import {
   removeSessionFromCookie,
 } from "../cookies";
 import { getServiceConfig } from "../service-url";
-import { isSessionValid } from "../session";
+import {
+  hasVerifiedPrimaryFactor,
+  isSessionValid,
+  reportMissingSessionCookie,
+  resolveSession,
+  SESSION_RESOLUTION_MESSAGE_KEYS,
+} from "../session";
 import { getPublicHost } from "./host";
 import { sendLoginname } from "./loginname";
 
@@ -143,6 +149,11 @@ export type UpdateSessionCommand = {
   lifetime?: Duration;
 };
 
+// A second factor can only complete a session that already holds a verified first factor.
+function isSecondFactorStep(checks?: Checks, challenges?: RequestChallenges): boolean {
+  return !!(checks?.totp || checks?.otpSms || checks?.otpEmail || challenges?.otpSms || challenges?.otpEmail);
+}
+
 export async function updateOrCreateSession(options: UpdateSessionCommand) {
   let { loginName, sessionId, organization, checks, requestId, challenges, lifetime } = options;
 
@@ -151,6 +162,7 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
   const host = getPublicHost(_headers);
 
   const t = await getTranslations("verify.errors");
+  const tError = await getTranslations("error");
 
   if (!host) {
     return { error: "Could not get host" }; // Technical error, maybe leave or translate if key exists
@@ -168,9 +180,15 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       ? await getSessionCookieByLoginName({ loginName, organization })
       : await getMostRecentSessionCookie();
 
+  const secondFactorStep = isSecondFactorStep(checks, challenges);
+
   if (!recentSession) {
-    if (!loginName) {
-      return { error: t("couldNotFindSession") };
+    // A new session only holds the user check. That starts a passkey flow, but it can never complete
+    // a second factor step: the verified first factor of the session that got lost would be missing.
+    if (!loginName || secondFactorStep) {
+      const reason = await reportMissingSessionCookie("update_session", { loginName, organization, sessionId });
+      // the reason stays in the logs, the caller only learns that retrying cannot succeed
+      return { error: tError(SESSION_RESOLUTION_MESSAGE_KEYS[reason]), sessionLost: true };
     }
 
     const checks = create(ChecksSchema, {
@@ -229,6 +247,31 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       lifetime,
     });
   } catch (error) {
+    // Creating a new session below replaces the cookie entry and drops the factors of the existing session.
+    const existing = await resolveSession(serviceConfig, recentSession, "update_session");
+    const expired = existing.session?.expirationDate ? timestampDate(existing.session.expirationDate) < new Date() : false;
+
+    // The session is still usable, so the update itself was rejected (e.g. a wrong code). The caller
+    // reports that, and a session with a verified first factor is never replaced by one without.
+    if (existing.session && !expired && (secondFactorStep || hasVerifiedPrimaryFactor(existing.session).verifiedAt)) {
+      throw error;
+    }
+
+    // The session is gone or expired. A second factor needs its verified first factor, which a new
+    // session cannot have, so only the steps that start a login continue with a new session.
+    if (secondFactorStep) {
+      const reason = existing.reason ?? "server_session_not_found";
+      logger.warn("LOGIN_SESSION_UPDATE_FAILED: could not update the session and did not replace it with a new one", {
+        code: "LOGIN_SESSION_UPDATE_FAILED",
+        reason,
+        sessionId: recentSession.id,
+        expired,
+        secondFactorStep,
+        grpcCode: isClassifiedError(error) ? error.code : undefined,
+      });
+      return { error: tError(SESSION_RESOLUTION_MESSAGE_KEYS[reason]), sessionLost: true };
+    }
+
     const loginNameForCreation = options.loginName || recentSession?.loginName;
     const orgForCreation = options.organization || recentSession?.organization;
 

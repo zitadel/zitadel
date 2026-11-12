@@ -66,4 +66,32 @@ describe("LoginOTP", () => {
       expect(screen.getByText("errors.couldNotRequestChallenge")).toBeInTheDocument();
     });
   });
+
+  test("should offer to restart the sign-in when the session of the step is lost", async () => {
+    mockUpdateOrCreateSession.mockResolvedValueOnce({
+      error: "sessionResolution.cookieMissing",
+      sessionLost: true,
+    });
+
+    render(<LoginOTP host={null} method="sms" loginName="user@example.com" organization="org-1" requestId="oidc_123" />);
+
+    await waitFor(() => {
+      expect(screen.getByText("sessionResolution.cookieMissing")).toBeInTheDocument();
+    });
+    expect(screen.getByTestId("restart-sign-in")).toHaveAttribute(
+      "href",
+      "/loginname?loginName=user%40example.com&organization=org-1&requestId=oidc_123",
+    );
+  });
+
+  test("should not offer to restart the sign-in for an error the user can retry", async () => {
+    mockUpdateOrCreateSession.mockResolvedValueOnce({ error: "couldNotUpdateSession" });
+
+    render(<LoginOTP host={null} method="sms" loginName="user@example.com" />);
+
+    await waitFor(() => {
+      expect(screen.getByText("couldNotUpdateSession")).toBeInTheDocument();
+    });
+    expect(screen.queryByTestId("restart-sign-in")).toBeNull();
+  });
 });

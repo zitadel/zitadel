@@ -468,6 +468,14 @@
     "noDeviceRequest": "Nenhuma solicitação de dispositivo encontrada.",
     "unknownContext": "Não foi possível obter o contexto do usuário. Certifique-se de inserir o nome de usuário primeiro ou forneça um loginName como parâmetro de busca.",
     "sessionExpired": "Sua sessão expirou ou requer uma nova autenticação. Por favor, faça login novamente.",
+    "sessionResolution": {
+      "cookieMissing": "A sessão do navegador necessária para continuar não foi encontrada. Por favor, reinicie o processo de login.",
+      "cookieInvalid": "Sua sessão do navegador não é mais válida. Por favor, reinicie o processo de login.",
+      "entryNotFound": "A sessão de login desta conta não está mais disponível. Por favor, faça login novamente.",
+      "sessionNotFound": "Esta sessão de login foi encerrada ou expirou. Por favor, faça login novamente.",
+      "lookupFailed": "Não foi possível verificar sua sessão de login. Por favor, tente novamente.",
+      "restart": "Reiniciar login"
+    },
     "failedLoading": "Falha ao carregar dados. Por favor, tente novamente.",
     "tryagain": "Tentar Novamente",
     "couldNotContinueSession": "Não foi possível continuar a sessão — informações do usuário ausentes",

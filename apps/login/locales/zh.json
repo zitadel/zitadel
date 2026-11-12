@@ -468,6 +468,14 @@
     "noDeviceRequest": "没有找到设备请求。",
     "unknownContext": "无法获取用户的上下文。请先输入用户名或提供 loginName 作为搜索参数。",
     "sessionExpired": "会话已过期或需要重新验证身份，请重新登录。",
+    "sessionResolution": {
+      "cookieMissing": "未找到继续操作所需的浏览器会话，请重新开始登录。",
+      "cookieInvalid": "您的浏览器会话已失效，请重新开始登录。",
+      "entryNotFound": "此账户的登录会话已不可用，请重新登录。",
+      "sessionNotFound": "此登录会话已结束或已过期，请重新登录。",
+      "lookupFailed": "无法验证您的登录会话，请重试。",
+      "restart": "重新开始登录"
+    },
     "failedLoading": "加载数据失败，请再试一次。",
     "tryagain": "重试",
     "couldNotContinueSession": "无法继续会话 - 缺少用户信息",

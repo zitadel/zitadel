@@ -2,6 +2,7 @@ import { Alert } from "@/components/alert";
 import { BackButton } from "@/components/back-button";
 import { Button, ButtonVariants } from "@/components/button";
 import { DynamicTheme } from "@/components/dynamic-theme";
+import { RestartSignIn } from "@/components/restart-sign-in";
 import { TotpRegister } from "@/components/totp-register";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
@@ -142,6 +143,7 @@ export default async function Page(props: {
               {/* context was provided but the session could not be resolved (cookie missing, invalid or expired) */}
               <Translated i18nKey={loginName || sessionId ? "sessionExpired" : "unknownContext"} namespace="error" />
             </Alert>
+            <RestartSignIn loginName={loginName} organization={organization} requestId={requestId} />
           </div>
         )}
 

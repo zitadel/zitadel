@@ -469,6 +469,14 @@
     "noDeviceRequest": "No device request found.",
     "unknownContext": "Could not get the context of the user. Make sure to enter the username first or provide a loginName as searchParam.",
     "sessionExpired": "Your session has expired or requires re-authentication. Please sign in again.",
+    "sessionResolution": {
+      "cookieMissing": "The browser session required to continue could not be found. Please restart the sign-in process.",
+      "cookieInvalid": "Your browser session is no longer valid. Please restart the sign-in process.",
+      "entryNotFound": "The login session for this account is no longer available. Please sign in again.",
+      "sessionNotFound": "This login session has ended or expired. Please sign in again.",
+      "lookupFailed": "We could not verify your login session. Please try again.",
+      "restart": "Restart sign-in"
+    },
     "failedLoading": "Failed to load data. Please try again.",
     "tryagain": "Try Again",
     "couldNotContinueSession": "Could not continue with session - missing user information",

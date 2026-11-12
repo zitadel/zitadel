@@ -16,11 +16,36 @@
 import { Code, ConnectError } from "@connectrpc/connect";
 import { timestampDate } from "@zitadel/client";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { cookies, headers } from "next/headers";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import * as cookiesModule from "./cookies";
-import { isSessionValid, loadMostRecentSession, loadSessionById } from "./session";
+import {
+  isSessionValid,
+  loadMostRecentSession,
+  loadSessionById,
+  resolveMostRecentSession,
+  resolveSessionById,
+  SESSION_RESOLUTION_MESSAGE_KEYS,
+} from "./session";
+import { signSession } from "./session-cookie-signature";
 import * as verifyHelperModule from "./verify-helper";
 import * as zitadelModule from "./zitadel";
+
+const mockLogger = vi.hoisted(() => ({
+  debug: vi.fn(),
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+}));
+
+vi.mock("./logger", () => ({
+  createLogger: () => mockLogger,
+}));
+
+vi.mock("next/headers", () => ({
+  cookies: vi.fn(),
+  headers: vi.fn(),
+}));
 
 vi.mock("@zitadel/client", () => ({
   timestampDate: vi.fn(),
@@ -1625,6 +1650,8 @@ describe("loadMostRecentSession", () => {
 
     expect(result).toBeUndefined();
     expect(zitadelModule.getSession).not.toHaveBeenCalled();
+    // pages that work without a session use this loader, a missing cookie entry is not worth a warning there
+    expect(mockLogger.warn).not.toHaveBeenCalled();
   });
 
   test("returns the session when getSession succeeds", async () => {
@@ -1643,50 +1670,45 @@ describe("loadMostRecentSession", () => {
   });
 
   test.each([
-    ["NotFound", Code.NotFound, "Session does not exist (QUERY-SFeaa)"],
-    ["PermissionDenied", Code.PermissionDenied, "Permission denied (QUERY-dsfr3)"],
+    ["NotFound", Code.NotFound, "Session does not exist (QUERY-SFeaa)", "LOGIN_SESSION_NOT_FOUND"],
+    ["PermissionDenied", Code.PermissionDenied, "Permission denied (QUERY-dsfr3)", "LOGIN_SESSION_TOKEN_REJECTED"],
   ])(
     "returns undefined instead of throwing when getSession rejects with %s (stale cookie)",
-    async (_name, code, message) => {
+    async (name, code, message, logCode) => {
       // The `sessions` cookie can outlive the server-side session (NotFound), or hold a token that
       // no longer matches a session that still exists (PermissionDenied). loadMostRecentSession
       // must treat both the same as no session.
-      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-      const error = new ConnectError(message, code);
       vi.mocked(cookiesModule.getMostRecentCookieWithLoginname).mockResolvedValue(cookie as any);
-      vi.mocked(zitadelModule.getSession).mockRejectedValue(error);
+      vi.mocked(zitadelModule.getSession).mockRejectedValue(new ConnectError(message, code));
 
       const result = await loadMostRecentSession({ serviceConfig, sessionParams });
 
       expect(result).toBeUndefined();
-      expect(consoleSpy).toHaveBeenCalledWith("[Session] Could not load session", error);
-      consoleSpy.mockRestore();
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        expect.stringContaining(logCode),
+        expect.objectContaining({ code: logCode, source: "load_session", sessionId: "session-id", grpcCode: name }),
+      );
     },
   );
 
   test("re-throws other ConnectErrors (real failures must propagate)", async () => {
-    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
     const unavailable = new ConnectError("backend unavailable", Code.Unavailable);
     vi.mocked(cookiesModule.getMostRecentCookieWithLoginname).mockResolvedValue(cookie as any);
     vi.mocked(zitadelModule.getSession).mockRejectedValue(unavailable);
 
     await expect(loadMostRecentSession({ serviceConfig, sessionParams })).rejects.toBe(unavailable);
-    expect(consoleSpy).not.toHaveBeenCalled();
-    consoleSpy.mockRestore();
+    expect(mockLogger.warn).not.toHaveBeenCalled();
   });
 
   test("re-throws non-ConnectError rejections (only coded NotFound or PermissionDenied is treated as no session)", async () => {
-    // The guard is `instanceof ConnectError && (code === NotFound || code === PermissionDenied)`; anything that is not a
-    // ConnectError (e.g. an unexpected runtime error) must not be mistaken for a stale
-    // cookie and must propagate.
-    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    // Anything that is not a ConnectError (e.g. an unexpected runtime error) must not be
+    // mistaken for a stale cookie and must propagate.
     const unexpected = new Error("boom");
     vi.mocked(cookiesModule.getMostRecentCookieWithLoginname).mockResolvedValue(cookie as any);
     vi.mocked(zitadelModule.getSession).mockRejectedValue(unexpected);
 
     await expect(loadMostRecentSession({ serviceConfig, sessionParams })).rejects.toBe(unexpected);
-    expect(consoleSpy).not.toHaveBeenCalled();
-    consoleSpy.mockRestore();
+    expect(mockLogger.warn).not.toHaveBeenCalled();
   });
 });
 
@@ -1700,25 +1722,237 @@ describe("loadSessionById", () => {
   });
 
   test.each([
-    ["NotFound", Code.NotFound, "Session does not exist"],
-    ["PermissionDenied", Code.PermissionDenied, "Permission denied (QUERY-dsfr3)"],
-  ])("returns undefined when getSession rejects with %s (stale cookie)", async (_name, code, message) => {
-    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const error = new ConnectError(message, code);
-    vi.mocked(zitadelModule.getSession).mockRejectedValue(error);
+    ["NotFound", Code.NotFound, "Session does not exist", "LOGIN_SESSION_NOT_FOUND"],
+    ["PermissionDenied", Code.PermissionDenied, "Permission denied (QUERY-dsfr3)", "LOGIN_SESSION_TOKEN_REJECTED"],
+  ])("returns undefined when getSession rejects with %s (stale cookie)", async (_name, code, message, logCode) => {
+    vi.mocked(zitadelModule.getSession).mockRejectedValue(new ConnectError(message, code));
 
     await expect(loadSessionById(serviceConfig, "session-id", "test-org-id")).resolves.toBeUndefined();
-    expect(consoleSpy).toHaveBeenCalledWith("[Session] Could not load session", error);
-    consoleSpy.mockRestore();
+    expect(mockLogger.warn).toHaveBeenCalledWith(
+      expect.stringContaining(logCode),
+      expect.objectContaining({ code: logCode, sessionId: "session-id" }),
+    );
   });
 
   test("re-throws other errors", async () => {
-    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
     const unavailable = new ConnectError("backend unavailable", Code.Unavailable);
     vi.mocked(zitadelModule.getSession).mockRejectedValue(unavailable);
 
     await expect(loadSessionById(serviceConfig, "session-id")).rejects.toBe(unavailable);
-    expect(consoleSpy).not.toHaveBeenCalled();
-    consoleSpy.mockRestore();
+    expect(mockLogger.warn).not.toHaveBeenCalled();
+  });
+});
+
+describe("session resolution with reasons", () => {
+  const serviceConfig = { baseUrl: "https://zitadel-abc123.zitadel.cloud" };
+  const sessionParams = { loginName: "Test@Example.com", organization: "test-org-id" };
+  const entry = {
+    id: "session-id",
+    token: "session-token",
+    loginName: "Test@Example.com",
+    organization: "test-org-id",
+    creationTs: "1700000000000",
+    expirationTs: "1900000000000",
+    changeTs: "1700000000000",
+  };
+  const otherEntry = { ...entry, id: "other-session-id", token: "other-token", loginName: "other@example.com" };
+
+  // what the browser sent: the raw `sessions` cookie value and the Cookie header around it
+  function browserSends(value: string | undefined, cookieHeader?: string) {
+    vi.mocked(cookies).mockResolvedValue({ get: () => (value === undefined ? undefined : { value }) } as any);
+    const header = cookieHeader ?? (value === undefined ? "" : `sessions=${encodeURIComponent(value)}`);
+    vi.mocked(headers).mockResolvedValue(new Headers(header ? { cookie: header } : {}) as any);
+  }
+
+  function signed(...entries: (typeof entry)[]) {
+    return JSON.stringify(entries.map((e) => signSession(e)));
+  }
+
+  function loggedMeta(level: "warn" | "error" = "warn") {
+    return mockLogger[level].mock.calls[0][1];
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    process.env.ZITADEL_SESSION_COOKIE_SECRET = "test-session-cookie-secret-at-least-32-chars";
+    vi.mocked(cookiesModule.getMostRecentCookieWithLoginname).mockResolvedValue(undefined as any);
+    vi.mocked(cookiesModule.getSessionCookieById).mockResolvedValue(undefined as any);
+  });
+
+  afterEach(() => {
+    delete process.env.ZITADEL_SESSION_COOKIE_SECRET;
+  });
+
+  test("returns the session without logging when it resolves", async () => {
+    const session = { id: "session-id", factors: { user: { id: "user-id" } } };
+    vi.mocked(cookiesModule.getMostRecentCookieWithLoginname).mockResolvedValue(entry as any);
+    vi.mocked(zitadelModule.getSession).mockResolvedValue({ session } as any);
+
+    await expect(resolveMostRecentSession({ serviceConfig, sessionParams }, "otp_page")).resolves.toEqual({ session });
+    expect(mockLogger.warn).not.toHaveBeenCalled();
+    expect(mockLogger.error).not.toHaveBeenCalled();
+  });
+
+  test("cookie_missing: the browser sent no sessions cookie", async () => {
+    browserSends(undefined, "fingerprintId=abc; NEXT_LOCALE=en");
+
+    await expect(resolveMostRecentSession({ serviceConfig, sessionParams }, "otp_page")).resolves.toEqual({
+      reason: "cookie_missing",
+    });
+    expect(zitadelModule.getSession).not.toHaveBeenCalled();
+    expect(mockLogger.warn).toHaveBeenCalledWith(
+      expect.stringContaining("LOGIN_SESSION_COOKIE_MISSING"),
+      expect.objectContaining({
+        code: "LOGIN_SESSION_COOKIE_MISSING",
+        reason: "cookie_missing",
+        source: "otp_page",
+        hasLoginName: true,
+        hasOrganization: true,
+        hasSessionId: false,
+        cookieEntries: 0,
+        cookieSize: 0,
+        sessionsCookieCount: 0,
+        cookieHeaderSize: "fingerprintId=abc; NEXT_LOCALE=en".length,
+      }),
+    );
+  });
+
+  test("cookie_invalid: the cookie is not readable", async () => {
+    browserSends("not-json");
+
+    await expect(resolveMostRecentSession({ serviceConfig, sessionParams }, "otp_page")).resolves.toEqual({
+      reason: "cookie_invalid",
+    });
+    expect(loggedMeta()).toMatchObject({ code: "LOGIN_SESSION_COOKIE_INVALID", cookieEntries: 0 });
+  });
+
+  test("cookie_invalid: the wanted entry has no valid signature", async () => {
+    const [validOther] = JSON.parse(signed(otherEntry));
+    browserSends(JSON.stringify([{ ...entry, sig: "forged" }, validOther]));
+
+    await expect(resolveMostRecentSession({ serviceConfig, sessionParams }, "otp_page")).resolves.toEqual({
+      reason: "cookie_invalid",
+    });
+    expect(loggedMeta()).toMatchObject({ code: "LOGIN_SESSION_COOKIE_INVALID", cookieEntries: 2, cookieEntriesDropped: 1 });
+  });
+
+  test("session_entry_not_found: the cookie only holds entries of other accounts", async () => {
+    const value = signed(otherEntry);
+    browserSends(value);
+
+    await expect(resolveMostRecentSession({ serviceConfig, sessionParams }, "otp_page")).resolves.toEqual({
+      reason: "session_entry_not_found",
+    });
+    expect(loggedMeta()).toMatchObject({
+      code: "LOGIN_SESSION_ENTRY_NOT_FOUND",
+      cookieEntries: 1,
+      cookieEntriesDropped: 0,
+      cookieSize: `sessions=${encodeURIComponent(value)}`.length,
+      sessionsCookieCount: 1,
+      entriesMatchingLoginName: 0,
+      entriesMatchingLoginNameIgnoringCase: 0,
+    });
+  });
+
+  test("session_entry_not_found: reports an entry that only differs by organization or casing", async () => {
+    browserSends(signed({ ...entry, organization: "another-org-id" }, { ...otherEntry, loginName: "test@example.com" }));
+
+    await expect(resolveMostRecentSession({ serviceConfig, sessionParams }, "otp_page")).resolves.toEqual({
+      reason: "session_entry_not_found",
+    });
+    expect(loggedMeta()).toMatchObject({ entriesMatchingLoginName: 1, entriesMatchingLoginNameIgnoringCase: 2 });
+  });
+
+  test("reports more than one sessions cookie in the Cookie header", async () => {
+    const value = signed(otherEntry);
+    browserSends(value, `sessions=${encodeURIComponent(value)}; other=1; sessions=%5B%5D`);
+
+    await resolveMostRecentSession({ serviceConfig, sessionParams }, "otp_page");
+
+    expect(loggedMeta()).toMatchObject({ sessionsCookieCount: 2 });
+  });
+
+  test("never logs tokens, signatures or login names", async () => {
+    const value = signed(entry, otherEntry);
+    browserSends(value);
+
+    await resolveMostRecentSession({ serviceConfig, sessionParams: { loginName: "missing@example.com" } }, "otp_page");
+
+    const logged = JSON.stringify(mockLogger.warn.mock.calls);
+    for (const secret of [entry.token, otherEntry.token, entry.loginName, otherEntry.loginName, "missing@example.com"]) {
+      expect(logged).not.toContain(secret);
+    }
+    for (const signedEntry of JSON.parse(value)) {
+      expect(logged).not.toContain(signedEntry.sig);
+    }
+  });
+
+  test.each([
+    ["server_session_not_found", Code.NotFound, "LOGIN_SESSION_NOT_FOUND"],
+    ["session_token_rejected", Code.PermissionDenied, "LOGIN_SESSION_TOKEN_REJECTED"],
+  ] as const)("%s: the API rejects the cookie entry", async (reason, code, logCode) => {
+    vi.mocked(cookiesModule.getMostRecentCookieWithLoginname).mockResolvedValue(entry as any);
+    vi.mocked(zitadelModule.getSession).mockRejectedValue(new ConnectError("rejected", code));
+
+    await expect(resolveMostRecentSession({ serviceConfig, sessionParams }, "otp_page")).resolves.toEqual({ reason });
+    expect(mockLogger.warn).toHaveBeenCalledWith(
+      expect.stringContaining(logCode),
+      expect.objectContaining({ code: logCode, reason, source: "otp_page", sessionId: "session-id" }),
+    );
+  });
+
+  test("server_session_not_found: the API answers without a session", async () => {
+    vi.mocked(cookiesModule.getMostRecentCookieWithLoginname).mockResolvedValue(entry as any);
+    vi.mocked(zitadelModule.getSession).mockResolvedValue({} as any);
+
+    await expect(resolveMostRecentSession({ serviceConfig, sessionParams }, "otp_page")).resolves.toEqual({
+      reason: "server_session_not_found",
+    });
+  });
+
+  test("session_lookup_failed: any other API failure is returned and logged as an error, not thrown", async () => {
+    const unavailable = new ConnectError("backend unavailable", Code.Unavailable);
+    vi.mocked(cookiesModule.getMostRecentCookieWithLoginname).mockResolvedValue(entry as any);
+    vi.mocked(zitadelModule.getSession).mockRejectedValue(unavailable);
+
+    await expect(resolveMostRecentSession({ serviceConfig, sessionParams }, "otp_page")).resolves.toEqual({
+      reason: "session_lookup_failed",
+    });
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      expect.stringContaining("LOGIN_SESSION_LOOKUP_FAILED"),
+      expect.objectContaining({ code: "LOGIN_SESSION_LOOKUP_FAILED", grpcCode: "Unavailable", error: unavailable }),
+    );
+  });
+
+  test("resolveSessionById: reports the session id when the cookie holds no entry for it", async () => {
+    browserSends(signed(otherEntry));
+
+    await expect(resolveSessionById(serviceConfig, "session-id", "test-org-id", "otp_page")).resolves.toEqual({
+      reason: "session_entry_not_found",
+    });
+    expect(cookiesModule.getSessionCookieById).toHaveBeenCalledWith({
+      sessionId: "session-id",
+      organization: "test-org-id",
+    });
+    expect(loggedMeta()).toMatchObject({ hasSessionId: true, hasLoginName: false, sessionId: "session-id" });
+  });
+
+  test("resolveSessionById: returns the session of the cookie entry", async () => {
+    const session = { id: "session-id" };
+    vi.mocked(cookiesModule.getSessionCookieById).mockResolvedValue(entry as any);
+    vi.mocked(zitadelModule.getSession).mockResolvedValue({ session } as any);
+
+    await expect(resolveSessionById(serviceConfig, "session-id", undefined, "otp_page")).resolves.toEqual({ session });
+  });
+
+  test("every reason has a message", () => {
+    expect(Object.keys(SESSION_RESOLUTION_MESSAGE_KEYS).sort()).toEqual([
+      "cookie_invalid",
+      "cookie_missing",
+      "server_session_not_found",
+      "session_entry_not_found",
+      "session_lookup_failed",
+      "session_token_rejected",
+    ]);
   });
 });
