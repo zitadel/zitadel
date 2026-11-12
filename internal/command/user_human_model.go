@@ -1,6 +1,8 @@
 package command
 
 import (
+	"time"
+
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -34,6 +36,7 @@ type HumanWriteModel struct {
 	StreetAddress string
 
 	UserState domain.UserState
+	LockedAt  time.Time
 }
 
 func NewHumanWriteModel(userID, resourceOwner string) *HumanWriteModel {
@@ -77,11 +80,13 @@ func (wm *HumanWriteModel) Reduce() error {
 		case *user.UserLockedEvent:
 			if wm.UserState != domain.UserStateDeleted {
 				wm.UserState = domain.UserStateLocked
+				wm.LockedAt = e.CreationDate()
 			}
 		case *user.UserUnlockedEvent:
 			if wm.UserState != domain.UserStateDeleted {
 				wm.UserState = domain.UserStateActive
 			}
+			wm.LockedAt = time.Time{}
 		case *user.UserDeactivatedEvent:
 			if wm.UserState != domain.UserStateDeleted {
 				wm.UserState = domain.UserStateInactive

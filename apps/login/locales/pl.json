@@ -142,6 +142,8 @@
       "failedToAuthenticate": "Uwierzytelnianie nie powiodło się. Wykorzystałeś {failedAttempts} z {maxPasswordAttempts} prób wprowadzenia hasła.{lockoutMessage}",
       "failedToAuthenticateNoLimit": "Uwierzytelnianie nie powiodło się.",
       "accountLockedContactAdmin": " Skontaktuj się z administratorem, aby odblokować konto",
+      "accountLocked": "Konto jest zablokowane. Pozostały czas blokady: {remainingLockDuration} minut",
+      "accountLockedAbsolute": "Konto jest zablokowane. Czas blokady: {lockDuration} minut.",
       "userNotFound": "Użytkownik nie został znaleziony w systemie",
       "initialUserNotSupported": "Użytkownik początkowy nie jest obsługiwany",
       "userInitialStateNotSupported": "Początkowy stan użytkownika nie jest obsługiwany",

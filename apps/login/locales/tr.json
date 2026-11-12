@@ -142,6 +142,8 @@
       "failedToAuthenticate": "Kimlik doğrulama başarısız. {maxPasswordAttempts} denemeden {failedAttempts} tanesini kullandınız.{lockoutMessage}",
       "failedToAuthenticateNoLimit": "Kimlik doğrulama başarısız.",
       "accountLockedContactAdmin": " Hesabınızın kilidini açmak için yöneticinizle iletişime geçin",
+      "accountLocked": "Hesap kilitlendi. Kalan kilit süresi: {remainingLockDuration} dakika",
+      "accountLockedAbsolute": "Hesap kilitlendi. Kilit süresi: {lockDuration} dakika.",
       "userNotFound": "Kullanıcı sistemde bulunamadı",
       "initialUserNotSupported": "İlk kullanıcı desteklenmiyor",
       "userInitialStateNotSupported": "Kullanıcı İlk Durumu desteklenmiyor",

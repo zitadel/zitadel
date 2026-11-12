@@ -1081,6 +1081,36 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
+	t.Run("test lockout policy changed with auto-unlock fields", func(t *testing.T) {
+		before := time.Now()
+		_, err := newInstance.Client.Mgmt.UpdateCustomLockoutPolicy(IAMCTX, &management.UpdateCustomLockoutPolicyRequest{
+			MaxPasswordAttempts:      5,
+			MaxOtpAttempts:           5,
+			AutoUnlockAfterMin:       10,
+			ShowRemainingLockoutTime: true,
+			ShowAbsoluteLockoutTime:  false,
+		})
+		require.NoError(t, err)
+		after := time.Now()
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			setting, err := settingsRepo.Get(
+				IAMCTX, pool,
+				database.WithCondition(
+					settingsRepo.UniqueCondition(newInstance.ID(), &orgId, domain.SettingTypeLockout, domain.SettingStateActive),
+				),
+			)
+			require.NoError(t, err)
+
+			// event org.policy.lockout.changed with new auto-unlock fields
+			assert.Equal(t, uint64(10), *setting.AutoUnlockAfterMin)
+			assert.Equal(t, true, *setting.ShowRemainingLockoutTime)
+			assert.Equal(t, false, *setting.ShowAbsoluteLockoutTime)
+			assert.WithinRange(t, setting.UpdatedAt, before, after)
+		}, retryDuration, tick)
+	})
+
 	t.Run("test remove lockout policy reduces", func(t *testing.T) {
 		// remove lockout policy org
 		_, err := newInstance.Client.Mgmt.ResetLockoutPolicyToDefault(IAMCTX, &management.ResetLockoutPolicyToDefaultRequest{})
