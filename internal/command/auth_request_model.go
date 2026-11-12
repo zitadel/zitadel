@@ -28,6 +28,7 @@ type AuthRequestWriteModel struct {
 	Prompt           []domain.Prompt
 	UILocales        []string
 	MaxAge           *time.Duration
+	CreationDate     time.Time
 	LoginHint        *string
 	HintUserID       *string
 	SessionID        string
@@ -53,6 +54,7 @@ func (m *AuthRequestWriteModel) Reduce() error {
 	for _, event := range m.Events {
 		switch e := event.(type) {
 		case *authrequest.AddedEvent:
+			m.CreationDate = e.CreationDate()
 			m.LoginClient = e.LoginClient
 			m.ClientID = e.ClientID
 			m.RedirectURI = e.RedirectURI
