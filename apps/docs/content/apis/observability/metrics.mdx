@@ -12,5 +12,5 @@ The metrics endpoint can be scrubbed by any tool of choice that supports the `ot
 
 For our [Kubernetes/Helm](/self-hosting/deploy/kubernetes) users, we provide an out-of-the-box support for the [ServiceMonitor](https://github.com/zitadel/zitadel-charts/blob/main/charts/zitadel/templates/servicemonitor.yaml) custom resource.
 
-By default, metrics are enabled but can be turned off through ZITADEL's [settings](/self-hosting/manage/configure).
+Metrics exposure is controlled by `Instrumentation.Metric.Exporter.Type` (`ZITADEL_INSTRUMENTATION_METRIC_EXPORTER_TYPE`), which must be set to `prometheus` to expose this endpoint. Metrics are one of four observability pillars — tracing, metrics, logging, and profiling — that all share the same `Instrumentation` configuration and `Exporter` concept; see [Instrumentation](/self-hosting/manage/instrumentation/overview) for the full picture.
 The (default) settings are located in the [defaults.yaml](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml).
