@@ -683,7 +683,13 @@ func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.S
 		}
 
 		notificationPolicy, err := u.queries.NotificationPolicyByOrg(ctx, true, e.Aggregate().ResourceOwner, false)
-		if err != nil && !zerrors.IsNotFound(err) {
+		// Match legacy behavior: missing policy means no password-change mail, not a hard failure.
+		// Returning NotFound previously left notificationPolicy nil and panicked on .PasswordChange,
+		// which wedged the projection worker (Trigger never unlocks that instance).
+		if zerrors.IsNotFound(err) {
+			return nil
+		}
+		if err != nil {
 			return err
 		}
 
