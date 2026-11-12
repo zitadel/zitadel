@@ -27,6 +27,7 @@ import { addSessionToCookie, updateSessionCookie } from "@/lib/cookies";
 import { createSessionFromChecksAndChallenges, getSecuritySettings, getSession, setSession } from "@/lib/zitadel";
 import { headers } from "next/headers";
 import { getServiceConfig } from "../service-url";
+import { SessionUpdatedError } from "./challenges";
 import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "./cookie";
 
 // A challenge request as an attacker-controlled browser could construct it: both OTP methods
@@ -157,6 +158,18 @@ describe("OTP SMS resend cooldown timestamp", () => {
     await setSessionAndUpdateCookie({ recentCookie, lifetime: {} as any });
 
     expect(writtenSessionCookie()).not.toHaveProperty("otpSmsSentTs");
+  });
+
+  test("setSessionAndUpdateCookie reports a failure after the session was updated as SessionUpdatedError", async () => {
+    vi.mocked(getSession).mockRejectedValue(new Error("not found"));
+
+    await expect(
+      setSessionAndUpdateCookie({
+        recentCookie,
+        challenges: create(RequestChallengesSchema, { otpSms: {} }),
+        lifetime: {} as any,
+      }),
+    ).rejects.toThrow(SessionUpdatedError);
   });
 
   test("createSessionAndUpdateCookie records when an OTP SMS was requested", async () => {

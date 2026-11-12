@@ -78,3 +78,14 @@ export function getOTPSMSRetryAfterSeconds(otpSmsSentTs: string | undefined, now
   // a timestamp in the future can only come from clock skew between replicas, cap it at the full cooldown
   return Math.min(Math.max(remainingSeconds, 0), cooldownSeconds);
 }
+
+/**
+ * Thrown when a session was updated, so the requested challenges were already sent, but a step after
+ * the update failed. Callers must not request the same challenges again, the user already has the code.
+ */
+export class SessionUpdatedError extends Error {
+  constructor(cause: unknown) {
+    super("session was updated, but the steps after the update failed", { cause });
+    this.name = "SessionUpdatedError";
+  }
+}

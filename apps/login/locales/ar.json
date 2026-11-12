@@ -266,8 +266,7 @@
     },
     "errors": {
       "couldNotRequestChallenge": "تعذر طلب تحدي OTP",
-      "couldNotVerifyCode": "تعذر التحقق من رمز OTP",
-      "resendCooldown": "يرجى الانتظار {seconds} ثانية قبل طلب رمز جديد."
+      "couldNotVerifyCode": "تعذر التحقق من رمز OTP"
     }
   },
   "passkey": {

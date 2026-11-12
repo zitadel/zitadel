@@ -266,8 +266,7 @@
       },
       "errors": {
         "couldNotRequestChallenge": "OTP-Challenge konnte nicht angefordert werden",
-        "couldNotVerifyCode": "OTP-Code konnte nicht verifiziert werden",
-        "resendCooldown": "Bitte warten Sie {seconds} Sekunden, bevor Sie einen neuen Code anfordern."
+        "couldNotVerifyCode": "OTP-Code konnte nicht verifiziert werden"
       }
     },
     "passkey": {
@@ -742,8 +741,7 @@
       },
       "errors": {
         "couldNotRequestChallenge": "Could not request OTP challenge",
-        "couldNotVerifyCode": "Could not verify OTP code",
-        "resendCooldown": "Please wait {seconds} seconds before requesting a new code."
+        "couldNotVerifyCode": "Could not verify OTP code"
       }
     },
     "passkey": {
@@ -1218,8 +1216,7 @@
       },
       "errors": {
         "couldNotRequestChallenge": "No se pudo solicitar el desafío OTP",
-        "couldNotVerifyCode": "No se pudo verificar el código OTP",
-        "resendCooldown": "Espera {seconds} segundos antes de solicitar un nuevo código."
+        "couldNotVerifyCode": "No se pudo verificar el código OTP"
       }
     },
     "passkey": {
@@ -1694,8 +1691,7 @@
       },
       "errors": {
         "couldNotRequestChallenge": "Impossibile richiedere la challenge OTP",
-        "couldNotVerifyCode": "Impossibile verificare il codice OTP",
-        "resendCooldown": "Attendi {seconds} secondi prima di richiedere un nuovo codice."
+        "couldNotVerifyCode": "Impossibile verificare il codice OTP"
       }
     },
     "passkey": {
@@ -2170,8 +2166,7 @@
       },
       "errors": {
         "couldNotRequestChallenge": "Kon OTP-uitdaging niet aanvragen",
-        "couldNotVerifyCode": "Kon OTP-code niet verifiëren",
-        "resendCooldown": "Wacht {seconds} seconden voordat je een nieuwe code aanvraagt."
+        "couldNotVerifyCode": "Kon OTP-code niet verifiëren"
       }
     },
     "passkey": {
@@ -2646,8 +2641,7 @@
       },
       "errors": {
         "couldNotRequestChallenge": "Nie można zażądać wyzwania OTP",
-        "couldNotVerifyCode": "Nie można zweryfikować kodu OTP",
-        "resendCooldown": "Odczekaj {seconds} s przed wysłaniem prośby o nowy kod."
+        "couldNotVerifyCode": "Nie można zweryfikować kodu OTP"
       }
     },
     "passkey": {
@@ -3122,8 +3116,7 @@
       },
       "errors": {
         "couldNotRequestChallenge": "Не удалось запросить OTP-челлендж",
-        "couldNotVerifyCode": "Не удалось проверить OTP-код",
-        "resendCooldown": "Подождите {seconds} с, прежде чем запрашивать новый код."
+        "couldNotVerifyCode": "Не удалось проверить OTP-код"
       }
     },
     "passkey": {
@@ -3598,8 +3591,7 @@
       },
       "errors": {
         "couldNotRequestChallenge": "无法请求 OTP 质询",
-        "couldNotVerifyCode": "无法验证 OTP 验证码",
-        "resendCooldown": "请等待 {seconds} 秒后再请求新的验证码。"
+        "couldNotVerifyCode": "无法验证 OTP 验证码"
       }
     },
     "passkey": {
@@ -4074,8 +4066,7 @@
       },
       "errors": {
         "couldNotRequestChallenge": "OTP meydan okuması istenemedi",
-        "couldNotVerifyCode": "OTP kodu doğrulanamadı",
-        "resendCooldown": "Yeni bir kod istemeden önce lütfen {seconds} saniye bekleyin."
+        "couldNotVerifyCode": "OTP kodu doğrulanamadı"
       }
     },
     "passkey": {
@@ -4550,8 +4541,7 @@
       },
       "errors": {
         "couldNotRequestChallenge": "Не вдалося запросити OTP-виклик",
-        "couldNotVerifyCode": "Не вдалося перевірити OTP-код",
-        "resendCooldown": "Зачекайте {seconds} с, перш ніж запитувати новий код."
+        "couldNotVerifyCode": "Не вдалося перевірити OTP-код"
       }
     },
     "passkey": {
@@ -5026,8 +5016,7 @@
       },
       "errors": {
         "couldNotRequestChallenge": "تعذر طلب تحدي OTP",
-        "couldNotVerifyCode": "تعذر التحقق من رمز OTP",
-        "resendCooldown": "يرجى الانتظار {seconds} ثانية قبل طلب رمز جديد."
+        "couldNotVerifyCode": "تعذر التحقق من رمز OTP"
       }
     },
     "passkey": {
@@ -5502,8 +5491,7 @@
       },
       "errors": {
         "couldNotRequestChallenge": "Nem sikerült OTP-kihívást kérni",
-        "couldNotVerifyCode": "Nem sikerült ellenőrizni az OTP-kódot",
-        "resendCooldown": "Várj {seconds} másodpercet, mielőtt új kódot kérsz."
+        "couldNotVerifyCode": "Nem sikerült ellenőrizni az OTP-kódot"
       }
     },
     "passkey": {
@@ -5978,8 +5966,7 @@
       },
       "errors": {
         "couldNotRequestChallenge": "Impossible de demander le challenge OTP",
-        "couldNotVerifyCode": "Impossible de vérifier le code OTP",
-        "resendCooldown": "Veuillez patienter {seconds} secondes avant de demander un nouveau code."
+        "couldNotVerifyCode": "Impossible de vérifier le code OTP"
       }
     },
     "passkey": {
@@ -6454,8 +6441,7 @@
       },
       "errors": {
         "couldNotRequestChallenge": "OTPチャレンジをリクエストできませんでした",
-        "couldNotVerifyCode": "OTPコードを確認できませんでした",
-        "resendCooldown": "新しいコードをリクエストするまで {seconds} 秒お待ちください。"
+        "couldNotVerifyCode": "OTPコードを確認できませんでした"
       }
     },
     "passkey": {
@@ -6930,8 +6916,7 @@
       },
       "errors": {
         "couldNotRequestChallenge": "Não foi possível solicitar o desafio OTP",
-        "couldNotVerifyCode": "Não foi possível verificar o código OTP",
-        "resendCooldown": "Aguarde {seconds} segundos antes de solicitar um novo código."
+        "couldNotVerifyCode": "Não foi possível verificar o código OTP"
       }
     },
     "passkey": {

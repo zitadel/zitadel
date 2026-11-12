@@ -122,7 +122,7 @@ describe("LoginOTP", () => {
     });
 
     test("shows the countdown instead of an error when the server refuses within the cooldown", async () => {
-      mockUpdateOrCreateSession.mockResolvedValue({ error: "errors.resendCooldown", retryAfterSeconds: 25 });
+      mockUpdateOrCreateSession.mockResolvedValue({ retryAfterSeconds: 25 });
 
       render(<LoginOTP host={null} method="sms" />);
 

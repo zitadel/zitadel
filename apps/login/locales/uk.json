@@ -266,8 +266,7 @@
     },
     "errors": {
       "couldNotRequestChallenge": "Не вдалося запросити OTP-виклик",
-      "couldNotVerifyCode": "Не вдалося перевірити OTP-код",
-      "resendCooldown": "Зачекайте {seconds} с, перш ніж запитувати новий код."
+      "couldNotVerifyCode": "Не вдалося перевірити OTP-код"
     }
   },
   "passkey": {

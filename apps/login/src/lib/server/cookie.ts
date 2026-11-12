@@ -2,7 +2,7 @@
 
 import { addSessionToCookie, updateSessionCookie } from "@/lib/cookies";
 import { createLogger } from "@/lib/logger";
-import { sanitizeChallenges } from "@/lib/server/challenges";
+import { sanitizeChallenges, SessionUpdatedError } from "@/lib/server/challenges";
 import {
   createSessionForUserIdAndIdpIntent,
   createSessionFromChecksAndChallenges,
@@ -32,7 +32,11 @@ type CustomCookieData = {
   otpSmsSentTs?: string; // when the last OTP SMS was requested for this session, enforces the resend cooldown
 };
 
-const passwordAttemptsHandler = (error: ConnectError) => {
+const passwordAttemptsHandler = (error: ConnectError | SessionUpdatedError) => {
+  if (error instanceof SessionUpdatedError) {
+    throw error;
+  }
+
   const details = error.findDetails(CredentialsCheckErrorSchema);
 
   if (details[0] && "failedAttempts" in details[0]) {
@@ -238,8 +242,8 @@ export async function setSessionAndUpdateCookie(command: {
           sessionCookie.requestId = command.requestId;
         }
 
-        return getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token }).then(
-          async (response) => {
+        return getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token })
+          .then(async (response) => {
             if (!response?.session || !response.session.factors?.user?.loginName) {
               throw new Error("could not get session or session does not have loginName");
             }
@@ -276,8 +280,11 @@ export async function setSessionAndUpdateCookie(command: {
             }).then(() => {
               return { challenges: updatedSession.challenges, ...session };
             });
-          },
-        );
+          })
+          .catch((error) => {
+            // the session is already updated at this point, which the caller has to know before it retries
+            throw new SessionUpdatedError(error);
+          });
       } else {
         throw new Error("Session could not be set");
       }

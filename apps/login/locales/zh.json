@@ -266,8 +266,7 @@
     },
     "errors": {
       "couldNotRequestChallenge": "无法请求 OTP 质询",
-      "couldNotVerifyCode": "无法验证 OTP 验证码",
-      "resendCooldown": "请等待 {seconds} 秒后再请求新的验证码。"
+      "couldNotVerifyCode": "无法验证 OTP 验证码"
     }
   },
   "passkey": {

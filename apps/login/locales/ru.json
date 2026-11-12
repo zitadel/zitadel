@@ -266,8 +266,7 @@
     },
     "errors": {
       "couldNotRequestChallenge": "Не удалось запросить OTP-челлендж",
-      "couldNotVerifyCode": "Не удалось проверить OTP-код",
-      "resendCooldown": "Подождите {seconds} с, прежде чем запрашивать новый код."
+      "couldNotVerifyCode": "Не удалось проверить OTP-код"
     }
   },
   "passkey": {

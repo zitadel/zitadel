@@ -266,8 +266,7 @@
     },
     "errors": {
       "couldNotRequestChallenge": "OTP meydan okuması istenemedi",
-      "couldNotVerifyCode": "OTP kodu doğrulanamadı",
-      "resendCooldown": "Yeni bir kod istemeden önce lütfen {seconds} saniye bekleyin."
+      "couldNotVerifyCode": "OTP kodu doğrulanamadı"
     }
   },
   "passkey": {

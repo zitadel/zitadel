@@ -259,8 +259,7 @@
     },
     "errors": {
       "couldNotRequestChallenge": "OTPチャレンジをリクエストできませんでした",
-      "couldNotVerifyCode": "OTPコードを確認できませんでした",
-      "resendCooldown": "新しいコードをリクエストするまで {seconds} 秒お待ちください。"
+      "couldNotVerifyCode": "OTPコードを確認できませんでした"
     }
   },
   "passkey": {

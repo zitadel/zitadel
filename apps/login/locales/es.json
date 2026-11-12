@@ -266,8 +266,7 @@
     },
     "errors": {
       "couldNotRequestChallenge": "No se pudo solicitar el desafío OTP",
-      "couldNotVerifyCode": "No se pudo verificar el código OTP",
-      "resendCooldown": "Espera {seconds} segundos antes de solicitar un nuevo código."
+      "couldNotVerifyCode": "No se pudo verificar el código OTP"
     }
   },
   "passkey": {

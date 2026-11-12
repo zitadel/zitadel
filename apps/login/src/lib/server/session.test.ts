@@ -1,5 +1,6 @@
 import { Code } from "@connectrpc/connect";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { SessionUpdatedError } from "./challenges";
 import { clearSession, updateOrCreateSession } from "./session";
 
 vi.mock("@zitadel/client", async () => {
@@ -157,7 +158,7 @@ describe("updateOrCreateSession OTP SMS resend cooldown", () => {
 
     const res = await updateOrCreateSession({ sessionId: "session-1", challenges: { otpSms: {} } as any });
 
-    expect(res).toEqual({ error: "errors.resendCooldown", retryAfterSeconds: 20 });
+    expect(res).toEqual({ retryAfterSeconds: 20 });
     expect(setSessionAndUpdateCookie).not.toHaveBeenCalled();
   });
 
@@ -180,6 +181,18 @@ describe("updateOrCreateSession OTP SMS resend cooldown", () => {
 
     expect(vi.mocked(serverCookie.createSessionAndUpdateCookie).mock.calls[0][0]).not.toHaveProperty("challenges");
     expect(setSessionAndUpdateCookie).toHaveBeenCalledWith(expect.objectContaining({ challenges: { otpSms: {} } }));
+  });
+
+  test("does not send a second OTP SMS on a new session when the update failed after the code was sent", async () => {
+    const serverCookie = await import("@/lib/server/cookie");
+    getSessionCookieById.mockResolvedValue(cookie);
+    setSessionAndUpdateCookie.mockRejectedValue(new SessionUpdatedError(new Error("could not get session")));
+
+    await expect(updateOrCreateSession({ sessionId: "session-1", challenges: { otpSms: {} } as any })).rejects.toThrow(
+      SessionUpdatedError,
+    );
+
+    expect(serverCookie.createSessionAndUpdateCookie).not.toHaveBeenCalled();
   });
 
   test("does not apply the cooldown to code checks", async () => {

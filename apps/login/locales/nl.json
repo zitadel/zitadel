@@ -266,8 +266,7 @@
     },
     "errors": {
       "couldNotRequestChallenge": "Kon OTP-uitdaging niet aanvragen",
-      "couldNotVerifyCode": "Kon OTP-code niet verifiëren",
-      "resendCooldown": "Wacht {seconds} seconden voordat je een nieuwe code aanvraagt."
+      "couldNotVerifyCode": "Kon OTP-code niet verifiëren"
     }
   },
   "passkey": {

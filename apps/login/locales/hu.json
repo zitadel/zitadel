@@ -266,8 +266,7 @@
     },
     "errors": {
       "couldNotRequestChallenge": "Nem sikerült OTP-kihívást kérni",
-      "couldNotVerifyCode": "Nem sikerült ellenőrizni az OTP-kódot",
-      "resendCooldown": "Várj {seconds} másodpercet, mielőtt új kódot kérsz."
+      "couldNotVerifyCode": "Nem sikerült ellenőrizni az OTP-kódot"
     }
   },
   "passkey": {

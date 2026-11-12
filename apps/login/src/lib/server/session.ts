@@ -26,7 +26,7 @@ import {
 } from "../cookies";
 import { getServiceConfig } from "../service-url";
 import { isSessionValid } from "../session";
-import { getOTPSMSResendCooldownSeconds, getOTPSMSRetryAfterSeconds } from "./challenges";
+import { getOTPSMSResendCooldownSeconds, getOTPSMSRetryAfterSeconds, SessionUpdatedError } from "./challenges";
 import { getPublicHost } from "./host";
 import { sendLoginname } from "./loginname";
 
@@ -205,8 +205,8 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
   if (challenges?.otpSms) {
     const retryAfterSeconds = getOTPSMSRetryAfterSeconds(recentSession.otpSmsSentTs);
     if (retryAfterSeconds > 0) {
-      const tOtp = await getTranslations("otp");
-      return { error: tOtp("errors.resendCooldown", { seconds: retryAfterSeconds }), retryAfterSeconds };
+      // no error message: the UI shows the countdown on the resend button instead
+      return { retryAfterSeconds };
     }
   }
 
@@ -238,6 +238,12 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       lifetime,
     });
   } catch (error) {
+    // the code was already sent for this session: creating a new session with the same challenge would send
+    // a second code, and the first one could not be verified against the new session
+    if (error instanceof SessionUpdatedError && (challenges?.otpSms || challenges?.otpEmail)) {
+      throw error;
+    }
+
     const loginNameForCreation = options.loginName || recentSession?.loginName;
     const orgForCreation = options.organization || recentSession?.organization;
 
