@@ -89,12 +89,15 @@ func (e *RemovedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 }
 
 func (e *RemovedEvent) Fields() []*eventstore.FieldOperation {
-	return []*eventstore.FieldOperation{
-		eventstore.RemoveSearchFieldsByAggregateAndObject(
-			e.Aggregate(),
-			roleSearchObject(e.Role),
-		),
-	}
+	// only remove the field of the removed permission,
+	// the other permissions of the role must be kept
+	op := eventstore.RemoveSearchFieldsByAggregateAndObjectAndField(
+		e.Aggregate(),
+		roleSearchObject(e.Role),
+		PermissionSearchField,
+	)
+	op.Remove[eventstore.FieldTypeValue] = e.Permission
+	return []*eventstore.FieldOperation{op}
 }
 
 func NewRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, role, permission string) *RemovedEvent {
