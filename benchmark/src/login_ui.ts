@@ -1,5 +1,5 @@
 import { JSONObject, check, fail } from 'k6';
-import http, { Response } from 'k6/http';
+import http, { Params, Response } from 'k6/http';
 // @ts-ignore Import module
 import { URL } from 'https://jslib.k6.io/url/1.0.0/index.js';
 import { Trend } from 'k6/metrics';
@@ -21,11 +21,18 @@ export function loginByUsernamePassword(user: User, client = Client()) {
 }
 
 const initLoginTrend = new Trend('login_ui_init_login_duration', true);
+// Every step of this flow follows redirects through URLs carrying a fresh authRequestID or
+// code. Without a name tag k6 names each request by its URL, so each login adds new time
+// series: human_password_login drove k6 past 3 GB within 13 minutes on 2026-09-28. A tag set
+// in the params applies to every hop of the redirect chain, so one name covers each step.
+const tagged = (name: string) => ({ tags: { name } });
+
 export function initLogin(loginClientId?: string, client = Client()): Response {
-  let params = {};
+  let params: Params = tagged('/oauth/v2/authorize');
   let expectedStatus = 200;
   if (loginClientId) {
     params = {
+      ...params,
       headers: {
         'x-zitadel-login-client': loginClientId,
       },
@@ -54,6 +61,7 @@ function enterLoginName(page: Response, user: User): Response {
     fields: {
       loginName: user.loginName,
     },
+    params: tagged('/ui/login/loginname'),
   });
 
   check(response, {
@@ -74,6 +82,7 @@ function enterPassword(page: Response, user: User): Response {
     fields: {
       password: user.password,
     },
+    params: tagged('/ui/login/password'),
   });
   enterPasswordTrend.add(response.timings.duration);
 
@@ -82,6 +91,7 @@ function enterPassword(page: Response, user: User): Response {
     response = response.submitForm({
       formSelector: 'form',
       submitSelector: '[name="skip"]',
+      params: tagged('/ui/login/password (skip 2fa)'),
     });
   }
 
