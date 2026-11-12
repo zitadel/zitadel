@@ -28,10 +28,11 @@ func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGr
 	}
 
 	client := &clientCredentialsClient{
-		clientID:      user.Username,
-		userID:        user.UserID,
-		resourceOwner: user.ResourceOwner,
-		tokenType:     user.TokenType,
+		clientID:        user.Username,
+		userID:          user.UserID,
+		resourceOwner:   user.ResourceOwner,
+		tokenType:       user.TokenType,
+		idTokenLifeTime: s.defaultIdTokenLifetime,
 	}
 	scope, err := op.ValidateAuthReqScopes(client, r.Data.Scope)
 	if err != nil {
