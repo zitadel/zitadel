@@ -316,7 +316,7 @@ func (repo *TokenVerifierRepo) getTokenIDAndSubject(ctx context.Context, accessT
 		}
 		return accessTokenClaims.JWTID, accessTokenClaims.Subject, true
 	}
-	splitToken := strings.Split(tokenIDSubject, ":")
+	splitToken := strings.SplitN(tokenIDSubject, ":", 2)
 	if len(splitToken) != 2 {
 		return "", "", false
 	}
