@@ -310,6 +310,28 @@
       "submit": "Continua"
     }
   },
+  "recoveryCode": {
+    "verify": {
+      "title": "Verifica l'autenticazione a 2 fattori",
+      "description": "Inserisci uno dei tuoi codici di ripristino. Ogni codice può essere usato una sola volta.",
+      "useRecoveryCode": "Usa un codice di ripristino",
+      "submit": "Continua",
+      "labels": {
+        "code": "Codice di ripristino"
+      },
+      "required": {
+        "code": "Questo campo è obbligatorio"
+      },
+      "errors": {
+        "invalidCode": "Il codice di ripristino non è valido o è già stato utilizzato.",
+        "userLocked": "Il tuo account è stato bloccato. Contatta il tuo amministratore.",
+        "notReady": "Non ci sono codici di ripristino configurati per questo account.",
+        "couldNotFindSession": "Impossibile trovare la sessione",
+        "couldNotVerifyCode": "Impossibile verificare il codice di ripristino",
+        "couldNotDetermineRedirect": "Impossibile determinare l'URL di reindirizzamento dopo la verifica"
+      }
+    }
+  },
   "register": {
     "methods": {
       "passkey": "Passkey",
@@ -434,7 +456,8 @@
       "otpEmail": "Codice via email",
       "otpSms": "Codice via SMS",
       "passkey": "Passkey",
-      "password": "Password"
+      "password": "Password",
+      "recoveryCode": "Codice di ripristino"
     }
   },
   "device": {

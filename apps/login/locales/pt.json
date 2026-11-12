@@ -310,6 +310,28 @@
       "submit": "Continuar"
     }
   },
+  "recoveryCode": {
+    "verify": {
+      "title": "Verificar 2º Fator",
+      "description": "Digite um dos seus códigos de recuperação. Cada código só pode ser usado uma vez.",
+      "useRecoveryCode": "Usar código de recuperação",
+      "submit": "Continuar",
+      "labels": {
+        "code": "Código de recuperação"
+      },
+      "required": {
+        "code": "Este campo é obrigatório"
+      },
+      "errors": {
+        "invalidCode": "O código de recuperação é inválido ou já foi usado.",
+        "userLocked": "Sua conta foi bloqueada. Entre em contato com seu administrador.",
+        "notReady": "Não há códigos de recuperação configurados para esta conta.",
+        "couldNotFindSession": "Não foi possível encontrar a sessão",
+        "couldNotVerifyCode": "Não foi possível verificar o código de recuperação",
+        "couldNotDetermineRedirect": "Não foi possível determinar a URL de redirecionamento após a verificação"
+      }
+    }
+  },
   "register": {
     "methods": {
       "passkey": "Chave de Acesso",
@@ -434,7 +456,8 @@
       "otpEmail": "Código via e-mail",
       "otpSms": "Código via SMS",
       "passkey": "Chave de Acesso",
-      "password": "Senha"
+      "password": "Senha",
+      "recoveryCode": "Código de recuperação"
     }
   },
   "device": {
