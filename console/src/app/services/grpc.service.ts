@@ -112,7 +112,8 @@ export class GrpcService {
         this.mgmtNew = createManagementServiceClient(transportOldAPIs);
         this.authNew = createAuthServiceClient(transportOldAPIs);
         this.featureNew = createFeatureServiceClient(transport);
-        this.settingsNew = createSettingsServiceClient(transport);
+        // the permission to read the settings is checked in the selected organization
+        this.settingsNew = createSettingsServiceClient(transportOldAPIs);
         this.actionNew = createActionServiceClient(transport);
         this.webKey = createWebKeyServiceClient(transport);
         this.organizationNew = createOrganizationServiceClient(transport);
