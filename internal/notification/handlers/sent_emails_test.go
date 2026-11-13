@@ -3,10 +3,10 @@ package handlers
 import (
 	"encoding/json"
 	"io"
+	"strconv"
 	"testing"
 	"time"
 
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -133,14 +133,15 @@ func TestNotificationQueries_SentEmails(t *testing.T) {
 // Test_sentEmails_Query_bounds ensures that only the events of the instance within the window are read,
 // and not more of them than the limit.
 func Test_sentEmails_Query_bounds(t *testing.T) {
-	since := time.Date(2026, time.October, 5, 12, 0, 0, 0, time.UTC)
+	// the fraction of the second is kept, as a window can be shorter than a second
+	since := time.Date(2026, time.October, 5, 12, 0, 0, 123456000, time.UTC)
 	query := (&sentEmails{instanceID: instanceID, providerID: "provider1", since: since, limit: 10}).Query()
 
 	require.NotNil(t, query.GetInstanceID())
 	assert.Equal(t, instanceID, *query.GetInstanceID())
 	assert.Equal(t, uint64(10), query.GetLimit())
-	// the position of an event is the time it was created at in seconds
-	assert.True(t, query.GetPositionAtLeast().Equal(decimal.NewFromInt(since.Unix())), query.GetPositionAtLeast().String())
+	// the position of an event is the time it was created at in seconds, with microseconds as fraction
+	assert.Equal(t, strconv.FormatInt(since.Unix(), 10)+".123456", query.GetPositionAtLeast().String())
 	require.Len(t, query.GetQueries(), 1)
 	assert.Equal(t, senders.DeliveredBy("provider1"), query.GetQueries()[0].GetEventData())
 }

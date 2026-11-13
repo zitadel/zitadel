@@ -65,8 +65,8 @@ func (s *sentEmails) AppendEvents(events ...eventstore.Event) {
 func (s *sentEmails) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		InstanceID(s.instanceID).
-		// the position of an event is the time it was created at
-		PositionAtLeast(decimal.NewFromInt(s.since.Unix())).
+		// the position of an event is the time it was created at in seconds, with microseconds as fraction
+		PositionAtLeast(decimal.New(s.since.UnixMicro(), -6)).
 		Limit(s.limit).
 		AddQuery().
 		AggregateTypes(user.AggregateType, session.AggregateType).
