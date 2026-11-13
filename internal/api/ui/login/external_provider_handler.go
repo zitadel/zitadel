@@ -344,7 +344,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = azuread.NewSession(provider, data.Code)
+		session = azuread.NewSession(provider, data.Code, authReq.SelectedIDPConfigArgs)
 	case domain.IDPTypeGitHub:
 		provider, err := l.githubProvider(r.Context(), identityProvider)
 		if err != nil {

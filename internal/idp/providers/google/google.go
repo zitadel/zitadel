@@ -3,6 +3,7 @@ package google
 import (
 	"net/http"
 
+	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	openid "github.com/zitadel/oidc/v3/pkg/oidc"
 
 	"github.com/zitadel/zitadel/internal/idp"
@@ -23,12 +24,14 @@ type Provider struct {
 
 // New creates a Google provider using the [oidc.Provider] (OIDC generic provider)
 func New(clientID, clientSecret, redirectURI string, scopes []string, httpClient *http.Client, opts ...oidc.ProviderOpts) (*Provider, error) {
-	rp, err := oidc.New(name, issuer, clientID, clientSecret, redirectURI, scopes, userMapper, httpClient, append(opts, oidc.WithSelectAccount())...)
+	// PKCE is used by default
+	opts = append(opts, oidc.WithSelectAccount(), oidc.WithRelyingPartyOption(rp.WithPKCE(nil)))
+	provider, err := oidc.New(name, issuer, clientID, clientSecret, redirectURI, scopes, userMapper, httpClient, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return &Provider{
-		Provider: rp,
+		Provider: provider,
 	}, nil
 }
 

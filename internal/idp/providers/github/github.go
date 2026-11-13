@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
@@ -24,7 +25,9 @@ const (
 var _ idp.Provider = (*Provider)(nil)
 
 // New creates a GitHub.com provider using the [oauth.Provider] (OAuth 2.0 generic provider)
+// PKCE is used by default. It is not enabled for GitHub Enterprise Server (see [NewCustomURL]), since it does not support it.
 func New(clientID, secret, callbackURL string, scopes []string, httpClient *http.Client, options ...oauth.ProviderOpts) (*Provider, error) {
+	options = append(options, oauth.WithRelyingPartyOption(rp.WithPKCE(nil)))
 	return NewCustomURL(name, clientID, secret, callbackURL, authURL, tokenURL, profileURL, scopes, httpClient, options...)
 }
 
