@@ -1,11 +1,11 @@
 import { isSafeRedirectUri } from "@/lib/client-utils";
 import { Cookie } from "@/lib/cookies";
 import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
-import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import { createResponse, getLoginSettings, ServiceConfig } from "@/lib/zitadel";
 import { Code, create } from "@zitadel/client";
 import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { reauthenticate } from "./reauthenticate";
 import { isSessionValid } from "./session";
 
 type LoginWithSAMLAndSession = {
@@ -32,24 +32,10 @@ export async function loginWithSAMLAndSession({
   if (selectedSession && selectedSession.id) {
     const isValid = await isSessionValid({ serviceConfig, session: selectedSession });
 
-    if (!isValid && selectedSession.factors?.user) {
-      // if the session is not valid anymore, we need to redirect the user to re-authenticate /
-      // TODO: handle IDP intent direcly if available
-      const command: SendLoginnameCommand = {
-        loginName: selectedSession.factors.user?.loginName,
-        organization: selectedSession.factors?.user?.organizationId,
-        requestId: `saml_${samlRequest}`,
-      };
-
-      const res = await sendLoginname(command);
-
-      if (res && "redirect" in res && res?.redirect) {
-        return { redirect: res.redirect };
-      }
-
-      if (res && "samlData" in res && res?.samlData) {
-        return { samlData: res.samlData };
-      }
+    if (!isValid) {
+      // An invalid session (e.g. no verified factor, MFA missing or expired) must never be
+      // linked to the SAML request. Send the user to re-authenticate, or fail closed.
+      return (await reauthenticate(selectedSession, `saml_${samlRequest}`)) ?? { error: "Session not found or invalid" };
     }
 
     const cookie = sessionCookies.find((cookie) => cookie.id === selectedSession?.id);

@@ -104,6 +104,58 @@ describe("loginWithOIDCAndSession", () => {
     });
   });
 
+  it.each([
+    ["undefined", undefined],
+    ["an error", { error: "errors.localAuthenticationNotAllowed" }],
+  ])("should not create a callback for an invalid session when re-authentication returns %s", async (_, response) => {
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(false);
+    vi.mocked(loginnameModule.sendLoginname).mockResolvedValue(response as any);
+
+    const result = await loginWithOIDCAndSession({
+      serviceUrl: mockServiceUrl,
+      authRequest: mockAuthRequest,
+      sessionId: mockSessionId,
+      sessions: mockSessions,
+      sessionCookies: mockCookies,
+    });
+
+    expect(result).toEqual({ error: "Session not found or invalid" });
+    expect(zitadelModule.createCallback).not.toHaveBeenCalled();
+  });
+
+  it("should pass SAML data of an upstream IDP through for an invalid session", async () => {
+    const samlData = { url: "https://idp.example.com/saml", fields: { SAMLRequest: "abc" } };
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(false);
+    vi.mocked(loginnameModule.sendLoginname).mockResolvedValue({ samlData });
+
+    const result = await loginWithOIDCAndSession({
+      serviceUrl: mockServiceUrl,
+      authRequest: mockAuthRequest,
+      sessionId: mockSessionId,
+      sessions: mockSessions,
+      sessionCookies: mockCookies,
+    });
+
+    expect(result).toEqual({ samlData });
+    expect(zitadelModule.createCallback).not.toHaveBeenCalled();
+  });
+
+  it("should not create a callback for an invalid session without a user factor", async () => {
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(false);
+
+    const result = await loginWithOIDCAndSession({
+      serviceUrl: mockServiceUrl,
+      authRequest: mockAuthRequest,
+      sessionId: mockSessionId,
+      sessions: [{ id: mockSessionId, factors: {} }],
+      sessionCookies: mockCookies,
+    });
+
+    expect(result).toEqual({ error: "Session not found or invalid" });
+    expect(loginnameModule.sendLoginname).not.toHaveBeenCalled();
+    expect(zitadelModule.createCallback).not.toHaveBeenCalled();
+  });
+
   it("should return error when session not found", async () => {
     const result = await loginWithOIDCAndSession({
       serviceUrl: mockServiceUrl,
