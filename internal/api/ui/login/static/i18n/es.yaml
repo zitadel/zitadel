@@ -400,6 +400,24 @@ ExternalNotFound:
   Ukrainian: Українська
   Arabic: العربية
 
+DeviceAuth:
+  Title: Autorización de dispositivo
+  UserCode:
+    Label: Código de usuario
+    Description: Introduce el código de usuario que aparece en el dispositivo.
+    ButtonNext: Siguiente
+  Action:
+    Description: Conceder acceso al dispositivo.
+    GrantDevice: estás a punto de conceder acceso al dispositivo
+    AccessToScopes: a los siguientes permisos
+    Button:
+      Allow: Permitir
+      Deny: Denegar
+  Done:
+    Description: Listo.
+    Approved: Autorización de dispositivo aprobada. Ya puedes volver al dispositivo.
+    Denied: Autorización de dispositivo denegada. Ya puedes volver al dispositivo.
+
 Footer:
   PoweredBy: Powered By
   Tos: TDS
@@ -517,5 +535,8 @@ Errors:
   Org:
     LoginPolicy:
       RegistrationNotAllowed: El registro no está permitido
+  DeviceAuth:
+    NotExisting: El código de usuario no existe
+    NotFound: La solicitud de autorización del dispositivo no existe
 
 optional: (opcional)

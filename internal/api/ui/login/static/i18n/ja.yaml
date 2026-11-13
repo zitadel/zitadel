@@ -537,5 +537,6 @@ Errors:
       RegistrationNotAllowed: 新規登録は許可されていません
   DeviceAuth:
     NotExisting: ユーザーコードが存在しません
+    NotFound: デバイス認証リクエストが存在しません
 
 optional: "（オプション）"

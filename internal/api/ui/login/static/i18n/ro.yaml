@@ -536,5 +536,6 @@ Errors:
       RegistrationNotAllowed: Înregistrarea nu este permisă
   DeviceAuth:
     NotExisting: Codul de utilizator nu există
+    NotFound: Cererea de autorizare a dispozitivului nu există
 
 optional: (opțional)
