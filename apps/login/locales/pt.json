@@ -255,6 +255,11 @@
       "smsDescription": "Insira seu número de telefone para receber um código via SMS.",
       "emailDescription": "Insira seu endereço de e-mail para receber um código por e-mail.",
       "totpRegisterDescription": "Escaneie o QR Code ou acesse a URL manualmente.",
+      "emailAddDescription": "Use um código de uso único enviado para o seu endereço de e-mail verificado como segundo fator.",
+      "smsAddDescription": "Use um código de uso único enviado para o seu número de telefone verificado como segundo fator.",
+      "add": "Adicionar",
+      "emailAdded": "Código por e-mail adicionado.",
+      "smsAdded": "Código por SMS adicionado.",
       "submit": "Continuar",
       "labels": {
         "code": "Código"
@@ -265,7 +270,13 @@
     },
     "errors": {
       "couldNotRequestChallenge": "Não foi possível solicitar o desafio OTP",
-      "couldNotVerifyCode": "Não foi possível verificar o código OTP"
+      "couldNotVerifyCode": "Não foi possível verificar o código OTP",
+      "couldNotGetSession": "Não foi possível carregar sua sessão. Entre novamente.",
+      "invalidMethod": "Este segundo fator não é suportado.",
+      "couldNotAddEmail": "Não foi possível adicionar o código por e-mail.",
+      "couldNotAddSms": "Não foi possível adicionar o código por SMS.",
+      "emailNotVerified": "Verifique seu endereço de e-mail antes de adicionar códigos por e-mail.",
+      "phoneNotVerified": "Verifique seu número de telefone antes de adicionar códigos por SMS."
     }
   },
   "passkey": {
