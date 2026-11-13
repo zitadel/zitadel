@@ -2,6 +2,7 @@ package templates
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/i18n"
@@ -30,8 +31,10 @@ type TemplateData struct {
 	FontFaceFamily  string `json:"fontFaceFamily,omitempty"`
 	FontFamily      string `json:"fontFamily,omitempty"`
 
-	IncludeFooter bool   `json:"includeFooter,omitempty"`
-	FooterText    string `json:"footerText,omitempty"`
+	IncludeGreeting bool   `json:"includeGreeting,omitempty"`
+	IncludeButton   bool   `json:"includeButton,omitempty"`
+	IncludeFooter   bool   `json:"includeFooter,omitempty"`
+	FooterText      string `json:"footerText,omitempty"`
 }
 
 func (data *TemplateData) Translate(translator *i18n.Translator, msgType string, args map[string]interface{}, langs ...string) {
@@ -39,8 +42,12 @@ func (data *TemplateData) Translate(translator *i18n.Translator, msgType string,
 	data.PreHeader = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessagePreHeader), args, langs...)
 	data.Subject = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageSubject), args, langs...)
 	data.Greeting = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageGreeting), args, langs...)
+	// a blank (whitespace only) greeting hides the greeting section of the email
+	data.IncludeGreeting = strings.TrimSpace(data.Greeting) != ""
 	data.Text = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageText), args, langs...)
 	data.ButtonText = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageButtonText), args, langs...)
+	// a blank (whitespace only) button text hides the button of the email
+	data.IncludeButton = strings.TrimSpace(data.ButtonText) != ""
 	// Footer text is neither included in i18n files nor defaults.yaml
 	footerText := fmt.Sprintf("%s.%s", msgType, domain.MessageFooterText)
 	data.FooterText = translator.Localize(footerText, args, langs...)
