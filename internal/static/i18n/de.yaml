@@ -654,6 +654,8 @@ EventTypes:
     removed: "Ziel gelöscht"
   user:
     added: "Benutzer hinzugefügt"
+    notification:
+      rejected: "Benachrichtigung abgelehnt"
     selfregistered: "Benutzer hat sich selbst registriert"
     initialization:
       code:

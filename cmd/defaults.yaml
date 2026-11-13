@@ -625,6 +625,13 @@ Notifications:
   #     # Removes HTML from custom message texts. Simple formatting (br, strong, b, em, i, u, p) is kept,
   #     # all other elements like links, images or styles are removed, their text is kept.
   #     RestrictCustomHTML: true
+  #     # Limits the emails an instance can send through the provider within a rolling time window.
+  #     # Notifications exceeding the limit are rejected, which is stated as event on the user or session.
+  #     # The emails are counted per provider by their sent events, up to Count events are read for every email.
+  #     # The limit is therefore meant for small numbers and for credentials the instance cannot use for a provider of its own.
+  #     Limit:
+  #       Count: 100
+  #       Window: 24h
   #     # Headers are added to every email. The names are canonicalized (X-Instance-Id),
   #     # the values can contain text and the placeholders {{.InstanceID}} and {{.OrgID}}.
   #     Headers:

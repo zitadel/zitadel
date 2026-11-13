@@ -649,6 +649,8 @@ EventTypes:
     removed: "Ціль видалена"
   user:
     added: "Користувач доданий"
+    notification:
+      rejected: "Сповіщення відхилено"
     selfregistered: "Користувач зареєстрував себе"
     initialization:
       code:

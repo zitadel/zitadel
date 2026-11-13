@@ -655,6 +655,8 @@ EventTypes:
     removed: "ターゲットが削除されました"
   user:
     added: "ユーザーの追加"
+    notification:
+      rejected: "通知が拒否されました"
     selfregistered: "ユーザー自身の登録"
     initialization:
       code:

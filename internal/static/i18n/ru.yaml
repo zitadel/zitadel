@@ -643,6 +643,8 @@ EventTypes:
     removed: "Цель удалена."
   user:
     added: "Пользователь добавлен"
+    notification:
+      rejected: "Уведомление отклонено"
     selfregistered: "Пользователь зарегистрирован самостоятельно"
     initialization:
       code:

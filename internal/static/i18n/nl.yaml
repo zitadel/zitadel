@@ -654,6 +654,8 @@ EventTypes:
     removed: "Doel verwijderd"
   user:
     added: "Gebruiker toegevoegd"
+    notification:
+      rejected: "Melding geweigerd"
     selfregistered: "Gebruiker heeft zichzelf geregistreerd"
     initialization:
       code:

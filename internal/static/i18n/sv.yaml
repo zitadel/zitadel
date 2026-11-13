@@ -654,6 +654,8 @@ EventTypes:
     removed: "Mål borttaget"
   user:
     added: "Användare tillagd"
+    notification:
+      rejected: "Avisering avvisad"
     selfregistered: "Användare registrerade sig själv"
     initialization:
       code:

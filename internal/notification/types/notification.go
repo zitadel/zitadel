@@ -4,6 +4,7 @@ import (
 	"context"
 	"html"
 	"strings"
+	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
@@ -41,7 +42,14 @@ type ChannelChains interface {
 	// SMTPRule returns the rule defined by the operator for the SMTP provider.
 	// If no rule matches the provider, the zero value is returned.
 	SMTPRule(ctx context.Context, config *smtp.Config, orgID string) smtp.Rule
+	// SentEmails returns the amount of emails the instance sent through the provider since the given time.
+	// At most limit emails are counted.
+	SentEmails(ctx context.Context, providerID string, since time.Time, limit uint64) (uint64, error)
 }
+
+// RejectedNotificationsCounter counts the notifications, which were intentionally not sent,
+// e.g. because a limit of the provider was exceeded.
+const RejectedNotificationsCounter = "rejected_notifications"
 
 // SendEmail returns a [Notify] function, which sends the notification as email.
 // deliveryInfo is optional and states the provider the email was sent through.

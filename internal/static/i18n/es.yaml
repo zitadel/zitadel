@@ -654,6 +654,8 @@ EventTypes:
     removed: "Objetivo eliminado"
   user:
     added: "Usuario añadido"
+    notification:
+      rejected: "Notificación rechazada"
     selfregistered: "El usuario se registró por sí mismo"
     initialization:
       code:

@@ -655,6 +655,8 @@ EventTypes:
     removed: "目标已删除"
   user:
     added: "已添加用户"
+    notification:
+      rejected: "通知已拒绝"
     selfregistered: "自注册用户"
     initialization:
       code:
