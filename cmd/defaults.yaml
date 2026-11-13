@@ -215,14 +215,16 @@ TLS:
   # either directly or by a path to the corresponding file
   Enabled: true # ZITADEL_TLS_ENABLED
   # Path to the private key of the TLS certificate, will be loaded into the key
-  # and overwrite any existing value
+  # and overwrite any existing value.
+  # The file is reloaded automatically when it changes, no restart needed.
   # E.g. /path/to/key/file.pem
   KeyPath: # ZITADEL_TLS_KEYPATH
   # Private key of the TLS certificate (KeyPath has a higher priority than Key)
   # base64 encoded content of a pem file
   Key: # ZITADEL_TLS_KEY
   # Path to the certificate for the TLS connection, will be loaded into the Cert
-  # and overwrite any existing value
+  # and overwrite any existing value.
+  # The file is reloaded automatically when it changes, no restart needed.
   # E.g. /path/to/cert/file.pem
   CertPath: # ZITADEL_TLS_CERTPATH
   # Certificate for the TLS connection (CertPath will this overwrite if specified)
