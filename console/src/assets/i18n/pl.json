@@ -653,6 +653,7 @@
     "IAM_OWNER_VIEWER": "Ma uprawnienie do przeglądania całej instancji, włącznie z wszystkimi organizacjami",
     "IAM_ORG_MANAGER": "Ma uprawnienie do tworzenia i zarządzania organizacjami",
     "IAM_USER_MANAGER": "Ma uprawnienie do tworzenia i zarządzania użytkownikami",
+    "IAM_USER_VIEWER": "Ma uprawnienie do przeglądania użytkowników",
     "IAM_ADMIN_IMPERSONATOR": "Ma uprawnienia do podszywania się pod administratora i użytkowników końcowych ze wszystkich organizacji",
     "IAM_END_USER_IMPERSONATOR": "Ma uprawnienia do podszywania się pod użytkowników końcowych ze wszystkich organizacji",
     "IAM_LOGIN_CLIENT": "Ma uprawnienia do zarządzania aplikacjami logowania",

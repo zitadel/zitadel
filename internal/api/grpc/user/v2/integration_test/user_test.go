@@ -2294,6 +2294,12 @@ func TestServer_ListAuthenticationMethodTypes_CrossOrg(t *testing.T) {
 		require.NoError(t, err)
 		requireReadsPassword(t, integration.WithAuthorizationToken(CTX, pat), victimID)
 	})
+
+	t.Run("instance wide user viewer is allowed", func(t *testing.T) {
+		_, pat, err := Instance.CreateMachineUserPATWithMembership(IamCTX, "IAM_USER_VIEWER")
+		require.NoError(t, err)
+		requireReadsPassword(t, integration.WithAuthorizationToken(CTX, pat), victimID)
+	})
 }
 
 func TestServer_ListAuthenticationFactors(t *testing.T) {
