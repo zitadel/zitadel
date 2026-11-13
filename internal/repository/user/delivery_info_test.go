@@ -102,12 +102,19 @@ func TestDeliveryInfo(t *testing.T) {
 			for _, info := range []senders.DeliveryInfo{
 				{},
 				{ProviderID: "provider1"},
+				{DeliverySuppressed: true},
 			} {
 				payload, err := json.Marshal(tt.event(info).Payload())
 				require.NoError(t, err)
-				if info.ProviderID != "" {
+				switch {
+				case info.DeliverySuppressed:
+					assert.Contains(t, string(payload), `"deliverySuppressed":true`)
+					assert.NotContains(t, string(payload), "providerId")
+				case info.ProviderID != "":
 					assert.Contains(t, string(payload), `"providerId":"provider1"`)
-				} else {
+					assert.NotContains(t, string(payload), "deliverySuppressed")
+				default:
+					assert.NotContains(t, string(payload), "deliverySuppressed")
 					assert.NotContains(t, string(payload), "providerId")
 					if tt.payloadLessBefore {
 						// the stored payload must not change for events which had none before

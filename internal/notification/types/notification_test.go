@@ -145,10 +145,13 @@ func TestSendEmail(t *testing.T) {
 		text              string
 		displayName       string
 		urlTemplate       string
+		recipient         string
+		nilSuppressed     bool
 		wantRuleRequested bool
 		wantErr           func(t *testing.T, err error)
 		wantChainsCreated int
 		wantMessage       zchannels.Message
+		wantSuppressed    bool
 		// wantSentEmailsCounted states whether the emails sent through the provider are counted for the limit
 		wantSentEmailsCounted bool
 	}{
@@ -399,6 +402,91 @@ func TestSendEmail(t *testing.T) {
 			},
 		},
 		{
+			name: "limit reached, reserved recipient domain is suppressed and not counted",
+			channels: &testChannels{
+				emailConfig: smtpConfig,
+				rule: smtp.Rule{RuleOptions: smtp.RuleOptions{
+					SuppressReservedRecipientDomains: true,
+					Limit:                            limit,
+				}},
+				sentEmails: 3,
+			},
+			text:              linkText,
+			displayName:       "Bob",
+			recipient:         "user@example.com",
+			wantRuleRequested: true,
+			wantSuppressed:    true,
+		},
+		{
+			name: "reserved recipient domain is suppressed",
+			channels: &testChannels{
+				emailConfig: smtpConfig,
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{SuppressReservedRecipientDomains: true}},
+			},
+			text:              linkText,
+			displayName:       "Bob",
+			recipient:         "user@example.com",
+			wantRuleRequested: true,
+			wantSuppressed:    true,
+		},
+		{
+			name: "reserved recipient domain is suppressed before connecting to the provider",
+			channels: &testChannels{
+				emailConfig: smtpConfig,
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{SuppressReservedRecipientDomains: true}},
+				noChain:     true,
+			},
+			text:              linkText,
+			displayName:       "Bob",
+			recipient:         "user@example.com",
+			wantRuleRequested: true,
+			wantSuppressed:    true,
+		},
+		{
+			name: "reserved recipient domain is suppressed without out parameter",
+			channels: &testChannels{
+				emailConfig: smtpConfig,
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{SuppressReservedRecipientDomains: true}},
+			},
+			text:              linkText,
+			displayName:       "Bob",
+			recipient:         "user@user.test",
+			nilSuppressed:     true,
+			wantRuleRequested: true,
+		},
+		{
+			name: "suppression rule, other recipient domain is sent",
+			channels: &testChannels{
+				emailConfig: smtpConfig,
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{SuppressReservedRecipientDomains: true}},
+			},
+			text:              linkText,
+			displayName:       "Bob",
+			wantRuleRequested: true,
+			wantMessage: expectMessage(
+				"user@example.ch",
+				`<html><h1>Hello Bob,</h1>`+
+					`<p>Click <a href="https://other.example">here</a> to join App</p>`+
+					`<a href="https://login.example.com/invite?userID=user1&code=code1">Accept</a></html>`,
+				nil,
+			),
+		},
+		{
+			name:              "no rule, reserved recipient domain is sent",
+			channels:          &testChannels{emailConfig: smtpConfig},
+			text:              linkText,
+			displayName:       "Bob",
+			recipient:         "user@example.com",
+			wantRuleRequested: true,
+			wantMessage: expectMessage(
+				"user@example.com",
+				`<html><h1>Hello Bob,</h1>`+
+					`<p>Click <a href="https://other.example">here</a> to join App</p>`+
+					`<a href="https://login.example.com/invite?userID=user1&code=code1">Accept</a></html>`,
+				nil,
+			),
+		},
+		{
 			name: "webhook provider, no rule requested",
 			channels: &testChannels{
 				emailConfig: webhookConfig,
@@ -424,11 +512,14 @@ func TestSendEmail(t *testing.T) {
 				ResourceOwner:      "org1",
 				DisplayName:        tt.displayName,
 				PreferredLoginName: "bob@example.com",
-				LastEmail:          "user@example.ch",
+				LastEmail:          cmp.Or(tt.recipient, "user@example.ch"),
 				PreferredLanguage:  language.English,
 			}
 
-			deliveryInfo := new(senders.DeliveryInfo)
+			var deliveryInfo *senders.DeliveryInfo
+			if !tt.nilSuppressed {
+				deliveryInfo = new(senders.DeliveryInfo)
+			}
 			notify := SendEmail(t.Context(), tt.channels, mailTemplate, translator, user, &query.LabelPolicy{}, eventType, deliveryInfo)
 			err = notify(
 				cmp.Or(tt.urlTemplate, urlTemplate),
@@ -455,8 +546,23 @@ func TestSendEmail(t *testing.T) {
 				return
 			}
 			require.NoError(t, err)
-			// the provider is stated, as the email was sent to it
-			assert.Equal(t, senders.DeliveryInfo{ProviderID: tt.channels.emailConfig.ProviderConfig.ID}, *deliveryInfo)
+			if deliveryInfo != nil {
+				// the provider is only stated if the email was sent to it
+				wantProviderID := tt.channels.emailConfig.ProviderConfig.ID
+				if tt.wantSuppressed {
+					wantProviderID = ""
+				}
+				assert.Equal(t, senders.DeliveryInfo{
+					ProviderID:         wantProviderID,
+					DeliverySuppressed: tt.wantSuppressed,
+				}, *deliveryInfo)
+			}
+			if tt.wantMessage == nil && (tt.wantSuppressed || tt.nilSuppressed) {
+				assert.Empty(t, tt.channels.messages)
+				// a suppressed email must not connect to the provider
+				assert.Zero(t, tt.channels.chainsCreated)
+				return
+			}
 			require.Len(t, tt.channels.messages, 1)
 			assert.Equal(t, 1, tt.channels.chainsCreated)
 			if tt.wantMessage != nil {
