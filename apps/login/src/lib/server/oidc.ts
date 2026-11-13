@@ -3,12 +3,15 @@ import "server-only";
 import { isSafeRedirectUri } from "@/lib/client-utils";
 import { Cookie } from "@/lib/server/cookies";
 import { isClassifiedError } from "@/lib/server/grpc/interceptors/error-classification";
+import { createLogger } from "@/lib/server/logger";
 import { reauthenticate } from "@/lib/server/reauthenticate";
 import { isSessionValid } from "@/lib/server/session";
 import { createCallback, getLoginSettings, ServiceConfig } from "@/lib/server/zitadel";
 import { Code, create } from "@zitadel/client";
 import { CreateCallbackRequestSchema, SessionSchema } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+
+const logger = createLogger("oidc");
 
 type LoginWithOIDCAndSession = {
   serviceConfig: ServiceConfig;
@@ -31,7 +34,7 @@ export async function loginWithOIDCAndSession({
   if (selectedSession && selectedSession.id) {
     const isValid = await isSessionValid({ serviceConfig, session: selectedSession });
 
-    console.log("Session is valid:", isValid);
+    logger.debug("Session is valid", { isValid });
 
     if (!isValid) {
       // An invalid session (e.g. no verified factor, MFA missing or expired) must never be
