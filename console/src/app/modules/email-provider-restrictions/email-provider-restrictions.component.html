@@ -14,9 +14,11 @@
       <p>{{ 'SMTP.RESTRICTIONS.OWN_PROVIDER' | translate }}</p>
     } @else {
       <p>{{ 'SMTP.RESTRICTIONS.HTML_HINT' | translate }}</p>
-      <a class="own-provider" mat-stroked-button [routerLink]="['/instance']" [queryParams]="{ id: 'smtpprovider' }">
-        {{ 'SMTP.RESTRICTIONS.HTML_HINT_LINK' | translate }}
-      </a>
+      @if (canConfigureProvider()) {
+        <a class="own-provider" mat-stroked-button [routerLink]="['/instance']" [queryParams]="{ id: 'smtpprovider' }">
+          {{ 'SMTP.RESTRICTIONS.HTML_HINT_LINK' | translate }}
+        </a>
+      }
     }
   </cnsl-info-section>
 }

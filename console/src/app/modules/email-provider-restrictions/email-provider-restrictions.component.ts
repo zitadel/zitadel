@@ -2,10 +2,12 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { TranslatePipe } from '@ngx-translate/core';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { RouterLink } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 
 import { InfoSectionModule } from '../info-section/info-section.module';
 import { NewSettingsService } from 'src/app/services/new-settings.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 // States the restrictions the ZITADEL operator defined for the active email provider,
 // e.g. a default provider shared by multiple instances.
@@ -30,12 +32,18 @@ export class EmailProviderRestrictionsComponent {
     this.settingsQuery.isError() ? undefined : this.settingsQuery.data()?.emailProviderRestrictions,
   );
 
+  // the email providers are part of the instance settings, which organization admins cannot open
+  protected readonly canConfigureProvider = toSignal(inject(GrpcAuthService).isAllowed(['iam.read']), {
+    initialValue: false,
+  });
+
   protected readonly limit = computed(() => {
     const limit = this.restrictions()?.sendingLimit;
     if (!limit) {
       return undefined;
     }
-    return { count: limit.count, duration: formatWindow(Number(limit.window?.seconds ?? 0)) };
+    const seconds = Number(limit.window?.seconds ?? 0) + (limit.window?.nanos ?? 0) / 1e9;
+    return { count: limit.count, duration: formatWindow(seconds) };
   });
 
   protected readonly show = computed(() => {
@@ -47,8 +55,11 @@ export class EmailProviderRestrictionsComponent {
   });
 }
 
-// formatWindow states the window in the largest unit representing it exactly, e.g. 24 h, 5 min or 90 s.
+// formatWindow states the window in the largest unit representing it exactly, e.g. 24 h, 5 min, 90 s or 0.5 s.
 function formatWindow(seconds: number): string {
+  if (!Number.isInteger(seconds) || seconds === 0) {
+    return `${seconds} s`;
+  }
   if (seconds % 3600 === 0) {
     return `${seconds / 3600} h`;
   }
