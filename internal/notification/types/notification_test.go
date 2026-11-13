@@ -118,6 +118,7 @@ func TestSendEmail(t *testing.T) {
 	tests := []struct {
 		name              string
 		channels          *testChannels
+		subject           string
 		text              string
 		displayName       string
 		urlTemplate       string
@@ -182,6 +183,45 @@ func TestSendEmail(t *testing.T) {
 					`<a href="https://login.example.com/invite?userID=user1&code=code1">Accept</a></html>`,
 				nil,
 			),
+		},
+		{
+			name: "HTML disabled, template action in an argument is not executed",
+			channels: &testChannels{
+				emailConfig: smtpConfig,
+				rule:        smtp.Rule{RestrictCustomHTML: true},
+			},
+			subject:           linkText,
+			text:              formattedText,
+			displayName:       "{{.Subject}}",
+			wantRuleRequested: true,
+			wantMessage: &messages.Email{
+				Recipients: []string{"user@example.com"},
+				// the subject is no HTML and therefore not restricted, so it must not be rendered into the content
+				Subject: `Click <a href="https://other.example">here</a> to join App`,
+				Content: `<html><h1>Hello {{.Subject}},</h1>` +
+					`<p>Use <strong>code1</strong><br>to join App</p>` +
+					`<a href="https://login.example.com/invite?userID=user1&code=code1">Accept</a></html>`,
+				TriggeringEventType: eventType,
+			},
+		},
+		{
+			name: "HTML disabled, template action in a text is not executed",
+			channels: &testChannels{
+				emailConfig: smtpConfig,
+				rule:        smtp.Rule{RestrictCustomHTML: true},
+			},
+			subject:           linkText,
+			text:              `Join {{"{{.Subject}}"}} and {{"{{.URL}}"}}`,
+			displayName:       "Bob",
+			wantRuleRequested: true,
+			wantMessage: &messages.Email{
+				Recipients: []string{"user@example.com"},
+				Subject:    `Click <a href="https://other.example">here</a> to join App`,
+				Content: `<html><h1>Hello Bob,</h1>` +
+					`<p>Join {{.Subject}} and {{.URL}}</p>` +
+					`<a href="https://login.example.com/invite?userID=user1&code=code1">Accept</a></html>`,
+				TriggeringEventType: eventType,
+			},
 		},
 		{
 			name: "HTML disabled, simple formatting is kept",
@@ -277,7 +317,7 @@ func TestSendEmail(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			translator := i18n.NewNotificationTranslator(language.English, nil)
 			err := translator.AddMessages(language.English,
-				i18n.Message{ID: "InviteUser.Subject", Text: "Invitation to {{.ApplicationName}}"},
+				i18n.Message{ID: "InviteUser.Subject", Text: cmp.Or(tt.subject, "Invitation to {{.ApplicationName}}")},
 				i18n.Message{ID: "InviteUser.Greeting", Text: "Hello {{.DisplayName}},"},
 				i18n.Message{ID: "InviteUser.Text", Text: tt.text},
 				i18n.Message{ID: "InviteUser.ButtonText", Text: "Accept"},
