@@ -329,7 +329,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	actionsLogstoreSvc := logstore.New(queries, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
-	notification.Register(
+	err = notification.Register(
 		ctx,
 		config.Projections.Customizations["notifications"],
 		config.Projections.Customizations["notificationsquotas"],
@@ -352,6 +352,9 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		q,
 		httpClient,
 	)
+	if err != nil {
+		return err
+	}
 	notification.Start(ctx)
 
 	execution.Register(

@@ -5,17 +5,21 @@ import (
 	"html"
 	"strings"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/i18n"
+	zchannels "github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/channels/email"
 	"github.com/zitadel/zitadel/internal/notification/channels/set"
 	"github.com/zitadel/zitadel/internal/notification/channels/sms"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/templates"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Notify func(
@@ -26,10 +30,17 @@ type Notify func(
 ) error
 
 type ChannelChains interface {
-	Email(context.Context) (*senders.Chain, *email.Config, error)
+	// EmailConfig returns the active email provider of the instance.
+	EmailConfig(context.Context) (*email.Config, error)
+	// Email returns the channels of the email provider.
+	// The channels connect to the provider, so they are only created right before an email is sent.
+	Email(context.Context, *email.Config) (*senders.Chain, error)
 	SMS(context.Context) (*senders.Chain, *sms.Config, error)
 	Webhook(context.Context, webhook.Config) (*senders.Chain, error)
 	SecurityTokenEvent(context.Context, set.Config) (*senders.Chain, error)
+	// SMTPRule returns the rule defined by the operator for the SMTP provider.
+	// If no rule matches the provider, the zero value is returned.
+	SMTPRule(ctx context.Context, config *smtp.Config, orgID string) smtp.Rule
 }
 
 func SendEmail(
@@ -47,6 +58,17 @@ func SendEmail(
 		messageType string,
 		allowUnverifiedNotificationChannel bool,
 	) error {
+		// The provider is resolved before the content is rendered,
+		// because the rule of the provider defines how it is rendered.
+		// The channels are only created in [generateEmail], as they connect to the provider.
+		config, err := channels.EmailConfig(ctx)
+		if err != nil {
+			logging.OnError(ctx, err).Error("could not get email provider")
+			return zchannels.NewCancelError(
+				zerrors.ThrowPreconditionFailed(err, "MAIL-w8nfow", "Errors.Notification.Channels.NotPresent"),
+			)
+		}
+		rule := smtpRule(ctx, channels, config, user)
 		args = mapNotifyUserToArgs(user, args)
 		sanitizeArgsForHTML(args)
 		url, err := urlFromTemplate(urlTmpl, args)
@@ -54,13 +76,20 @@ func SendEmail(
 			return err
 		}
 		data := GetTemplateData(ctx, translator, args, url, messageType, user.PreferredLanguage.String(), colors)
-		template, err := templates.GetParsedTemplate(mailhtml, data)
+		if rule.RestrictCustomHTML {
+			// The texts contain the custom message texts of the instance / org with the already escaped arguments.
+			// Only the texts are restricted, the arguments remain escaped and are never rendered.
+			data.RestrictHTML()
+		}
+		template, err := parseTemplate(mailhtml, data, rule)
 		if err != nil {
 			return err
 		}
 		return generateEmail(
 			ctx,
 			channels,
+			config,
+			rule,
 			user,
 			template,
 			data,
@@ -69,6 +98,26 @@ func SendEmail(
 			triggeringEventType,
 		)
 	}
+}
+
+// parseTemplate renders the email.
+// If custom HTML is restricted, the template is rendered once only.
+// A second pass would execute template actions contained in the texts or their arguments,
+// which could insert values that are not restricted, like the subject.
+func parseTemplate(mailhtml string, data templates.TemplateData, rule smtp.Rule) (string, error) {
+	if rule.RestrictCustomHTML {
+		return templates.ParseTemplateFile(mailhtml, data)
+	}
+	return templates.GetParsedTemplate(mailhtml, data)
+}
+
+// smtpRule returns the rule of the operator for the provider.
+// Rules are only applied to SMTP providers.
+func smtpRule(ctx context.Context, channels ChannelChains, config *email.Config, user *query.NotifyUser) smtp.Rule {
+	if config == nil || config.SMTPConfig == nil {
+		return smtp.Rule{}
+	}
+	return channels.SMTPRule(ctx, config.SMTPConfig, user.ResourceOwner)
 }
 
 func sanitizeArgsForHTML(args map[string]any) {
