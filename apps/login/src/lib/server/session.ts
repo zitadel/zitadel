@@ -24,10 +24,10 @@ import {
   getSessionCookieByLoginName,
   removeSessionFromCookie,
 } from "../cookies";
+import { reauthenticate } from "../reauthenticate";
 import { getServiceConfig } from "../service-url";
 import { isSessionValid } from "../session";
 import { getPublicHost } from "./host";
-import { sendLoginname } from "./loginname";
 
 const logger = createLogger("session");
 
@@ -96,21 +96,7 @@ export async function continueWithSession({ requestId, ...session }: ContinueWit
     });
 
     // Redirect user to re-authenticate (will route to MFA page if password is still valid)
-    const res = await sendLoginname({
-      loginName: session.factors.user.loginName,
-      organization: session.factors.user.organizationId,
-      requestId: requestId,
-    });
-
-    if (res && "redirect" in res && res.redirect) {
-      return { redirect: res.redirect };
-    }
-
-    if (res && "samlData" in res && res.samlData) {
-      return { samlData: res.samlData };
-    }
-
-    return { error: t("couldNotContinueSession") };
+    return (await reauthenticate(session as Session, requestId)) ?? { error: t("couldNotContinueSession") };
   }
 
   if (requestId && session.id) {

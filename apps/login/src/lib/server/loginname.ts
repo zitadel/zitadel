@@ -248,6 +248,21 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
   };
 
+  // Used when the user has more than one identity provider and none can be picked automatically.
+  const redirectToIDPSelection = (organization?: string) => {
+    const params = new URLSearchParams();
+
+    if (command.requestId) {
+      params.set("requestId", command.requestId);
+    }
+
+    if (organization) {
+      params.set("organization", organization);
+    }
+
+    return { redirect: "/idp?" + params };
+  };
+
   if (users.length > 1) {
     logger.debug("multiple users found, returning error");
     if (ignoreUnknownUsernames) {
@@ -472,7 +487,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             return { error: resp.error };
           }
 
-          return resp;
+          // no single identity provider could be resolved, let the user choose one
+          return resp ?? redirectToIDPSelection(organization);
         }
       }
     } else {
@@ -496,19 +512,20 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         }
 
         return { redirect: "/passkey?" + passkeyParams };
-      } else if (methods.authMethodTypes.includes(AuthenticationMethodType.IDP)) {
-        return redirectUserToIDP(userId, organization);
-      } else if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)) {
-        // Check if password authentication is allowed
-        if (!userLoginSettings?.allowLocalAuthentication) {
-          if (ignoreUnknownUsernames) {
-            return preventUserEnumeration(command.organization);
-          }
-          return {
-            error: t("errors.localAuthenticationNotAllowed"),
-          };
-        }
+      }
 
+      if (methods.authMethodTypes.includes(AuthenticationMethodType.IDP)) {
+        const resp = await redirectUserToIDP(userId, organization);
+        if (resp) {
+          return resp;
+        }
+        // no single identity provider could be resolved, continue with the remaining methods
+      }
+
+      if (
+        methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD) &&
+        userLoginSettings?.allowLocalAuthentication
+      ) {
         // user has no passkey setup and login settings allow passwords
         const paramsPasswordDefault = new URLSearchParams({
           loginName: redirectLoginName,
@@ -524,6 +541,20 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
         return {
           redirect: "/password?" + paramsPasswordDefault,
+        };
+      }
+
+      if (methods.authMethodTypes.includes(AuthenticationMethodType.IDP)) {
+        return redirectToIDPSelection(organization);
+      }
+
+      if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)) {
+        // password authentication is not allowed
+        if (ignoreUnknownUsernames) {
+          return preventUserEnumeration(command.organization);
+        }
+        return {
+          error: t("errors.localAuthenticationNotAllowed"),
         };
       }
     }
