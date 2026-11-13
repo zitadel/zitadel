@@ -172,6 +172,7 @@ export async function sendPassword(
     }
 
     if (loginSettingsByContext && !loginSettingsByContext.allowLocalAuthentication) {
+      recordAuthFailure("password", "local_auth_not_allowed", command.organization);
       return { error: t("errors.localAuthenticationNotAllowed") };
     }
   }
@@ -181,6 +182,11 @@ export async function sendPassword(
       loginSettingsByUser = await getLoginSettings({ serviceConfig, organization: sessionCookie.organization });
 
       if (loginSettingsByUser) {
+        if (!loginSettingsByUser.allowLocalAuthentication) {
+          recordAuthFailure("password", "local_auth_not_allowed", command.organization);
+          return { error: t("errors.localAuthenticationNotAllowed") };
+        }
+
         let lifetime = loginSettingsByUser.passwordCheckLifetime;
 
         if (!lifetime || !lifetime.seconds) {
@@ -244,8 +250,27 @@ export async function sendPassword(
 
       const userLoginSettings = await getLoginSettings({ serviceConfig, organization: user.details?.resourceOwner });
 
+      if (!userLoginSettings) {
+        recordAuthFailure("password", "settings_unavailable", command.organization);
+        return {
+          error: t(
+            loginSettingsByContext.ignoreUnknownUsernames
+              ? "errors.failedToAuthenticateNoLimit"
+              : "errors.couldNotVerifyPassword",
+          ),
+        };
+      }
+      if (!userLoginSettings.allowLocalAuthentication) {
+        recordAuthFailure("password", "local_auth_not_allowed", command.organization);
+        if (loginSettingsByContext?.ignoreUnknownUsernames) {
+          return { error: t("errors.failedToAuthenticateNoLimit") };
+        }
+        return { error: t("errors.localAuthenticationNotAllowed") };
+      }
+      loginSettingsByUser = userLoginSettings;
+
       // recheck login settings after user discovery, as the search might have been done without org scope
-      if (userLoginSettings?.disableLoginWithEmail && userLoginSettings?.disableLoginWithPhone) {
+      if (userLoginSettings.disableLoginWithEmail && userLoginSettings.disableLoginWithPhone) {
         if (!equalsIgnoreCase(user.preferredLoginName, command.loginName)) {
           // emulate user not found to prevent enumeration (use context settings not user settings)
           recordAuthFailure("password", "login_name_mismatch", command.organization);
@@ -254,7 +279,7 @@ export async function sendPassword(
           }
           return { error: t("errors.couldNotVerifyPassword") };
         }
-      } else if (userLoginSettings?.disableLoginWithEmail) {
+      } else if (userLoginSettings.disableLoginWithEmail) {
         if (
           !equalsIgnoreCase(user.preferredLoginName, command.loginName) &&
           !equalsIgnoreCase(humanUser?.phone?.phone, command.loginName)
@@ -265,7 +290,7 @@ export async function sendPassword(
           }
           return { error: t("errors.couldNotVerifyPassword") };
         }
-      } else if (userLoginSettings?.disableLoginWithPhone) {
+      } else if (userLoginSettings.disableLoginWithPhone) {
         if (
           !equalsIgnoreCase(user.preferredLoginName, command.loginName) &&
           !equalsIgnoreCase(humanUser?.email?.email, command.loginName)
@@ -544,6 +569,11 @@ export async function checkSessionAndSetPassword({
     serviceConfig,
     organization: sessionCookie.organization,
   });
+
+  // the session cookie carries the user's organization, so these are the user's org settings
+  if (loginSettings && !loginSettings.allowLocalAuthentication) {
+    return { error: t("errors.localAuthenticationNotAllowed") };
+  }
 
   let lifetime = loginSettings?.passwordCheckLifetime;
   if (!lifetime || !lifetime.seconds) {

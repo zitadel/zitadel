@@ -153,7 +153,8 @@
       "sessionNotValid": "A munkamenet nem érvényes",
       "passwordVerificationMissing": "A jelszó hitelesítés hiányzik.",
       "passwordVerificationTooOld": "A jelszó hitelesítés túl régi. Kérjük, erősítsd meg újra a jelszavadat.",
-      "passwordResetNotAllowed": "A jelszó-visszaállítás nem engedélyezett. További információért fordulj a rendszergazdához."
+      "passwordResetNotAllowed": "A jelszó-visszaállítás nem engedélyezett. További információért fordulj a rendszergazdához.",
+      "localAuthenticationNotAllowed": "A helyi hitelesítés nem engedélyezett! További információért fordulj a rendszergazdához."
     }
   },
   "idp": {

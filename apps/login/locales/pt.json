@@ -153,7 +153,8 @@
       "sessionNotValid": "A sessão não é válida",
       "passwordVerificationMissing": "A verificação de senha está ausente.",
       "passwordVerificationTooOld": "A verificação de senha expirou. Por favor, verifique sua senha novamente.",
-      "passwordResetNotAllowed": "A redefinição de senha não é permitida. Entre em contato com o administrador para mais informações."
+      "passwordResetNotAllowed": "A redefinição de senha não é permitida. Entre em contato com o administrador para mais informações.",
+      "localAuthenticationNotAllowed": "A autenticação local não é permitida! Entre em contato com o administrador para mais informações."
     }
   },
   "idp": {

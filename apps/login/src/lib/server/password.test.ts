@@ -118,6 +118,7 @@ describe("checkSessionAndSetPassword", () => {
     // Default: login settings with password check lifetime
     mockGetLoginSettings.mockResolvedValue({
       forceMfa: false,
+      allowLocalAuthentication: true,
       passwordCheckLifetime: { seconds: BigInt(60 * 60 * 24), nanos: 0 },
     });
 
@@ -158,6 +159,7 @@ describe("checkSessionAndSetPassword", () => {
   test("should return generic error when current password is incorrect and ignoreUnknownUsernames is true", async () => {
     mockGetLoginSettings.mockResolvedValue({
       forceMfa: false,
+      allowLocalAuthentication: true,
       passwordCheckLifetime: { seconds: BigInt(60 * 60 * 24), nanos: 0 },
       ignoreUnknownUsernames: true,
     });
@@ -170,6 +172,24 @@ describe("checkSessionAndSetPassword", () => {
     });
 
     expect(result).toEqual({ error: "change.errors.couldNotVerifyPassword" });
+    expect(mockSetPassword).not.toHaveBeenCalled();
+  });
+
+  test("should refuse when the user's org does not allow local authentication", async () => {
+    mockGetLoginSettings.mockResolvedValue({
+      passwordCheckLifetime: { seconds: BigInt(60 * 60 * 24), nanos: 0 },
+      allowLocalAuthentication: false,
+    });
+
+    const result = await checkSessionAndSetPassword({
+      sessionId: "session123",
+      currentPassword: "oldpassword",
+      password: "newpassword",
+    });
+
+    expect(result).toEqual({ error: "errors.localAuthenticationNotAllowed" });
+    expect(mockGetLoginSettings).toHaveBeenCalledWith(expect.objectContaining({ organization: "org123" }));
+    expect(mockSetSessionAndUpdateCookie).not.toHaveBeenCalled();
     expect(mockSetPassword).not.toHaveBeenCalled();
   });
 
@@ -212,6 +232,7 @@ describe("checkSessionAndSetPassword", () => {
   test("should return generic error for failedAttempts when ignoreUnknownUsernames is true", async () => {
     mockGetLoginSettings.mockResolvedValue({
       forceMfa: false,
+      allowLocalAuthentication: true,
       passwordCheckLifetime: { seconds: BigInt(60 * 60 * 24), nanos: 0 },
       ignoreUnknownUsernames: true,
     });
@@ -258,7 +279,7 @@ describe("checkSessionAndSetPassword", () => {
   });
 
   test("should use default lifetime when login settings have no passwordCheckLifetime", async () => {
-    mockGetLoginSettings.mockResolvedValue({ forceMfa: false });
+    mockGetLoginSettings.mockResolvedValue({ forceMfa: false, allowLocalAuthentication: true });
 
     await checkSessionAndSetPassword({
       sessionId: "session123",

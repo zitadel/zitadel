@@ -153,7 +153,8 @@
       "sessionNotValid": "Sesja jest nieważna",
       "passwordVerificationMissing": "Brak weryfikacji hasła.",
       "passwordVerificationTooOld": "Weryfikacja hasła jest przestarzała. Proszę zweryfikować hasło ponownie.",
-      "passwordResetNotAllowed": "Resetowanie hasła jest niedozwolone. Skontaktuj się z administratorem, aby uzyskać więcej informacji."
+      "passwordResetNotAllowed": "Resetowanie hasła jest niedozwolone. Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+      "localAuthenticationNotAllowed": "Uwierzytelnianie lokalne nie jest dozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji."
     }
   },
   "idp": {
