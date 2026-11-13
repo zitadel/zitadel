@@ -25,7 +25,7 @@ func generateEmail(
 	lastEmail bool,
 	triggeringEventType eventstore.EventType,
 ) error {
-	emailChannels, config, err := channels.Email(ctx)
+	emailChannels, config, err := channels.Email(ctx, user.ResourceOwner)
 	logging.OnError(err).Error("could not create email channel")
 	if emailChannels == nil || emailChannels.Len() == 0 {
 		return zchannels.NewCancelError(

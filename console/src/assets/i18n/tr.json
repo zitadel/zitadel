@@ -1667,7 +1667,9 @@
       "LOGINV2_DESCRIPTION": "Bunu etkinleştirmek, gelişmiş güvenlik, performans ve özelleştirme ile yeni TypeScript tabanlı giriş UI'ını etkinleştirir.",
       "LOGINV2_BASEURI": "Temel URI",
       "ENABLERELATIONALTABLES": "İlişkisel Tablolar",
-      "ENABLERELATIONALTABLES_DESCRIPTION": "Veri depolamak için projeksiyonlar yerine ilişkisel tabloları kullanmak için bunu etkinleştirin. Şu anda bu anahtar hiçbir şey yapmıyor."
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Veri depolamak için projeksiyonlar yerine ilişkisel tabloları kullanmak için bunu etkinleştirin. Şu anda bu anahtar hiçbir şey yapmıyor.",
+      "ORGEMAILPROVIDERS": "Kuruluş E-posta Sağlayıcıları",
+      "ORGEMAILPROVIDERS_DESCRIPTION": "Kuruluşların kendi e-posta sağlayıcılarını yapılandırmasına izin vermek için bunu etkinleştirin. Devre dışı bırakılırsa tüm e-postalar örneğin e-posta sağlayıcısı üzerinden gönderilir."
     },
     "DIALOG": {
       "RESET": {

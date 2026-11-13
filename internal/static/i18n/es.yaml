@@ -69,8 +69,13 @@ Errors:
     NotFound: "configuración SMTP no encontrada"
     AlreadyExists: "la configuración SMTP ya existe"
     AlreadyDeactivated: "la configuración SMTP ya está desactivada"
+    OrgProvidersDisabled: "Los proveedores de correo de las organizaciones están desactivados en esta instancia"
+    OrgHTTPSRequired: "Los proveedores de correo electrónico de las organizaciones deben usar https"
     SenderAdressNotCustomDomain: "La dirección del remitente debe configurarse como un dominio personalizado en la instancia."
     TestEmailNotFound: "Dirección de correo electrónico para la prueba no encontrada"
+  NotificationProvider:
+    Blocked:
+      Endpoint: "La dirección de este proveedor de notificaciones no está permitida"
   Notification:
     NoDomain: "No se encontró el dominio para el mensaje"
   User:

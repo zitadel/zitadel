@@ -69,8 +69,13 @@ Errors:
     NotFound: "SMTP конфигурацијата не е пронајдена"
     AlreadyExists: "SMTP конфигурацијата веќе постои"
     AlreadyDeactivated: "SMTP конфигурацијата е веќе деактивирана"
+    OrgProvidersDisabled: "Давателите на е-пошта на организациите се оневозможени на оваа инстанца"
+    OrgHTTPSRequired: "Давателите на е-пошта на организациите мора да користат https"
     SenderAdressNotCustomDomain: "Адресата на испраќачот мора да биде конфигурирана како прилагоден домен на инстанцата."
     TestEmailNotFound: "Адресата на е-пошта за тест не е пронајдена"
+  NotificationProvider:
+    Blocked:
+      Endpoint: "Адресата на овој давател на известувања не е дозволена"
   Notification:
     NoDomain: "Не е пронајден домен за пораката"
   User:

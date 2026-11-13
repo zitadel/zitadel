@@ -1665,7 +1665,9 @@
       "LOGINV2_DESCRIPTION": "Al habilitar esto, se activa la nueva interfaz de inicio de sesión basada en TypeScript con mejoras en seguridad, rendimiento y personalización.",
       "LOGINV2_BASEURI": "URI base",
       "ENABLERELATIONALTABLES": "Tablas relacionales",
-      "ENABLERELATIONALTABLES_DESCRIPTION": "Habilitar esto para usar tablas relacionales en lugar de proyecciones para almacenar datos. Actualmente este interruptor no hace nada."
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Habilitar esto para usar tablas relacionales en lugar de proyecciones para almacenar datos. Actualmente este interruptor no hace nada.",
+      "ORGEMAILPROVIDERS": "Proveedores de correo de la organización",
+      "ORGEMAILPROVIDERS_DESCRIPTION": "Active esta opción para permitir que las organizaciones configuren sus propios proveedores de correo. Si está desactivada, todos los correos se envían a través del proveedor de correo de la instancia."
     },
     "DIALOG": {
       "RESET": {

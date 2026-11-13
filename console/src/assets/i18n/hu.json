@@ -1667,7 +1667,9 @@
       "LOGINV2_DESCRIPTION": "Ennek engedélyezésével aktiválódik az új, TypeScript-alapú bejelentkezési felület, amely jobb biztonságot, teljesítményt és testreszabhatóságot nyújt.",
       "LOGINV2_BASEURI": "Alap URI",
       "ENABLERELATIONALTABLES": "Kapcsolati táblák",
-      "ENABLERELATIONALTABLES_DESCRIPTION": "Engedélyez ezt a relációs táblák használatához a projekciók helyett az adatok tárolásához. Jelenleg ez a kapcsoló semmit sem csinál."
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Engedélyez ezt a relációs táblák használatához a projekciók helyett az adatok tárolásához. Jelenleg ez a kapcsoló semmit sem csinál.",
+      "ORGEMAILPROVIDERS": "Szervezeti e-mail szolgáltatók",
+      "ORGEMAILPROVIDERS_DESCRIPTION": "Engedélyezze, hogy a szervezetek saját e-mail szolgáltatókat állíthassanak be. Ha le van tiltva, minden e-mail a példány e-mail szolgáltatóján keresztül kerül elküldésre."
     },
     "DIALOG": {
       "RESET": {

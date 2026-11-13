@@ -163,6 +163,7 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		ConsoleUseV2UserApi:    gu.Ptr(true),
 		PermissionCheckV2:      gu.Ptr(false),
 		EnableRelationalTables: gu.Ptr(true),
+		OrgEmailProviders:      gu.Ptr(true),
 	}
 	want := &command.InstanceFeatures{
 		LoginDefaultOrg:                gu.Ptr(true),
@@ -177,6 +178,7 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		ManagementConsoleUseV2UserApi: gu.Ptr(true),
 		PermissionCheckV2:             gu.Ptr(false),
 		EnableRelationalTables:        gu.Ptr(true),
+		OrgEmailProviders:             gu.Ptr(true),
 	}
 
 	// Test
@@ -231,6 +233,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Level: feature.LevelInstance,
 			Value: true,
 		},
+		OrgEmailProviders: query.FeatureSource[bool]{
+			Level: feature.LevelInstance,
+			Value: true,
+		},
 	}
 	want := &feature_pb.GetInstanceFeaturesResponse{
 		Details: &object.Details{
@@ -280,6 +286,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},
 		EnableRelationalTables: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_INSTANCE,
+		},
+		OrgEmailProviders: &feature_pb.FeatureFlag{
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},

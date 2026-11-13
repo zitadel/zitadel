@@ -1664,7 +1664,9 @@
       "LOGINV2_DESCRIPTION": "Durch das Aktivieren wird das neue TypeScript-basierte Login-UI mit verbesserter Sicherheit, Leistung und Anpassbarkeit aktiviert.",
       "LOGINV2_BASEURI": "Basis-URI",
       "ENABLERELATIONALTABLES": "Relationale Tabellen",
-      "ENABLERELATIONALTABLES_DESCRIPTION": "Aktivieren Sie diese Option, um relationale Tabellen anstelle von Projektionen zur Datenspeicherung zu verwenden. Diese Option hat derzeit keine Auswirkung."
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Aktivieren Sie diese Option, um relationale Tabellen anstelle von Projektionen zur Datenspeicherung zu verwenden. Diese Option hat derzeit keine Auswirkung.",
+      "ORGEMAILPROVIDERS": "E-Mail-Provider der Organisation",
+      "ORGEMAILPROVIDERS_DESCRIPTION": "Aktivieren Sie diese Option, damit Organisationen eigene E-Mail-Provider konfigurieren können. Wenn deaktiviert, werden alle E-Mails über den E-Mail-Provider der Instanz versendet."
     },
     "DIALOG": {
       "RESET": {

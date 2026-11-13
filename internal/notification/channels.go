@@ -63,8 +63,8 @@ func registerCounter(counter, desc string) {
 	logging.WithFields("metric", counter).OnError(err).Panic("unable to register counter")
 }
 
-func (c *channels) Email(ctx context.Context) (*senders.Chain, *email.Config, error) {
-	emailCfg, err := c.q.GetActiveEmailConfig(ctx)
+func (c *channels) Email(ctx context.Context, orgID string) (*senders.Chain, *email.Config, error) {
+	emailCfg, err := c.q.GetActiveEmailConfig(ctx, orgID)
 	if err != nil {
 		return nil, nil, err
 	}

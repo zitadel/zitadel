@@ -69,8 +69,13 @@ Errors:
     NotFound: "Konfigurace SMTP nebyla nalezena"
     AlreadyExists: "Konfigurace SMTP již existuje"
     AlreadyDeactivated: "Konfigurace SMTP je již deaktivována"
+    OrgProvidersDisabled: "Poskytovatelé e-mailu organizací jsou v této instanci zakázáni"
+    OrgHTTPSRequired: "Poskytovatelé e-mailů organizací musí používat https"
     SenderAdressNotCustomDomain: "Adresa odesílatele musí být nakonfigurována jako vlastní doména na instanci."
     TestEmailNotFound: "E-mailová adresa pro test nebyla nalezena"
+  NotificationProvider:
+    Blocked:
+      Endpoint: "Adresa tohoto poskytovatele oznámení není povolena"
   Notification:
     NoDomain: "Pro zprávu nebyla nalezena žádná doména"
   User:

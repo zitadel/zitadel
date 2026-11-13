@@ -1664,7 +1664,9 @@
       "LOGINV2_DESCRIPTION": "L’activation de cette option lance la nouvelle interface de connexion basée sur TypeScript, avec une sécurité, des performances et une personnalisation améliorées.",
       "LOGINV2_BASEURI": "URI de base",
       "ENABLERELATIONALTABLES": "Tables relationnelles",
-      "ENABLERELATIONALTABLES_DESCRIPTION": "Activez ceci pour utiliser des tables relationnelles au lieu de projections pour stocker des données. Actuellement, ce commutateur ne fait rien."
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Activez ceci pour utiliser des tables relationnelles au lieu de projections pour stocker des données. Actuellement, ce commutateur ne fait rien.",
+      "ORGEMAILPROVIDERS": "Fournisseurs d'e-mail des organisations",
+      "ORGEMAILPROVIDERS_DESCRIPTION": "Activez ceci pour permettre aux organisations de configurer leurs propres fournisseurs d'e-mail. Si désactivé, tous les e-mails sont envoyés via le fournisseur d'e-mail de l'instance."
     },
     "DIALOG": {
       "RESET": {

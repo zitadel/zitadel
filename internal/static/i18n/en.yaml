@@ -71,8 +71,13 @@ Errors:
     NotFound: "SMTP configuration not found"
     AlreadyExists: "SMTP configuration already exists"
     AlreadyDeactivated: "SMTP configuration already deactivated"
+    OrgProvidersDisabled: "Email providers of organizations are disabled on this instance"
+    OrgHTTPSRequired: "Email providers of organizations must use https"
     SenderAdressNotCustomDomain: "The sender address must be configured as Custom Domain on the instance."
     TestEmailNotFound: "Email address for test not found"
+  NotificationProvider:
+    Blocked:
+      Endpoint: "The address of this notification provider is not allowed"
   Notification:
     NoDomain: "No Domain found for message"
   User:

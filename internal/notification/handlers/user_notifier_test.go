@@ -1963,6 +1963,8 @@ func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQu
 			smtpAlg,
 			f.SMSTokenCrypto,
 			nil,
+			nil,
+			true,
 		),
 		otpEmailTmpl: func(origin *url.URL) string {
 			return origin.String() + defaultOTPEmailTemplate
@@ -1978,7 +1980,7 @@ type notificationChannels struct {
 	SMSConfig   *sms.Config
 }
 
-func (c *notificationChannels) Email(context.Context) (*senders.Chain, *email.Config, error) {
+func (c *notificationChannels) Email(_ context.Context, _ string) (*senders.Chain, *email.Config, error) {
 	return &c.Chain, c.EmailConfig, nil
 }
 

@@ -70,8 +70,13 @@ Errors:
     NotFound: "SMTP構成が見つかりません"
     AlreadyExists: "すでに存在するSMTP構成です"
     AlreadyDeactivated: "SMTP設定はすでに無効化されています"
+    OrgProvidersDisabled: "組織のメールプロバイダーは、このインスタンスで無効になっています"
+    OrgHTTPSRequired: "組織のメールプロバイダーは https を使用する必要があります"
     SenderAdressNotCustomDomain: "送信者アドレスは、インスタンスのカスタムドメインとして構成する必要があります。"
     TestEmailNotFound: "テスト用のメールアドレスが見つかりません"
+  NotificationProvider:
+    Blocked:
+      Endpoint: "この通知プロバイダーのアドレスは許可されていません"
   Notification:
     NoDomain: "メッセージのドメインが見つかりません"
   User:

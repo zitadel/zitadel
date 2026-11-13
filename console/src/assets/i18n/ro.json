@@ -1661,7 +1661,9 @@
       "LOGINV2_DESCRIPTION": "Activarea acestei opțiuni pornește noua interfață de autentificare bazată pe TypeScript, cu securitate, performanță și personalizare îmbunătățite.",
       "LOGINV2_BASEURI": "URI de bază",
       "ENABLERELATIONALTABLES": "Tabele relaționale",
-      "ENABLERELATIONALTABLES_DESCRIPTION": "Activați acest lucru pentru a utiliza tabele relaționale în loc de proiecții pentru stocarea datelor. În prezent, acest comutator nu face nimic."
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Activați acest lucru pentru a utiliza tabele relaționale în loc de proiecții pentru stocarea datelor. În prezent, acest comutator nu face nimic.",
+      "ORGEMAILPROVIDERS": "Furnizori de e-mail ai organizației",
+      "ORGEMAILPROVIDERS_DESCRIPTION": "Activați pentru a permite organizațiilor să-și configureze propriii furnizori de e-mail. Dacă este dezactivat, toate e-mailurile sunt trimise prin furnizorul de e-mail al instanței."
     },
     "DIALOG": {
       "RESET": {

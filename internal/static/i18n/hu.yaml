@@ -69,8 +69,13 @@ Errors:
     NotFound: "SMTP konfiguráció nem található"
     AlreadyExists: "SMTP konfiguráció már létezik"
     AlreadyDeactivated: "SMTP konfiguráció már inaktiválva lett"
+    OrgProvidersDisabled: "A szervezeti e-mail szolgáltatók le vannak tiltva ezen a példányon"
+    OrgHTTPSRequired: "A szervezetek e-mail-szolgáltatóinak https-t kell használniuk"
     SenderAdressNotCustomDomain: "A küldő címét egyéni domain névként kell beállítani az instanciánál."
     TestEmailNotFound: "Teszt email cím nem található"
+  NotificationProvider:
+    Blocked:
+      Endpoint: "Az értesítésszolgáltató címe nem engedélyezett"
   Notification:
     NoDomain: "Nem található domain az üzenethez"
   User:

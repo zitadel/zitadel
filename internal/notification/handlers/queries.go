@@ -9,6 +9,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
@@ -27,6 +28,7 @@ type Queries interface {
 	NotificationProviderByIDAndType(ctx context.Context, aggID string, providerType domain.NotificationProviderType) (*query.DebugNotificationProvider, error)
 	SMSProviderConfigActive(ctx context.Context, resourceOwner string) (config *query.SMSConfig, err error)
 	SMTPConfigActive(ctx context.Context, resourceOwner string) (*query.SMTPConfig, error)
+	OrgSMTPConfigActive(ctx context.Context, orgID string) (*query.SMTPConfig, error)
 	GetDefaultLanguage(ctx context.Context) language.Tag
 	GetInstanceRestrictions(ctx context.Context) (restrictions query.Restrictions, err error)
 	InstanceByID(ctx context.Context, id string) (instance authz.Instance, err error)
@@ -37,15 +39,17 @@ type Queries interface {
 
 type NotificationQueries struct {
 	Queries
-	es                 *eventstore.Eventstore
-	externalDomain     string
-	externalPort       uint16
-	externalSecure     bool
-	fileSystemPath     string
-	UserDataCrypto     crypto.EncryptionAlgorithm
-	SMTPPasswordCrypto crypto.EncryptionAlgorithm
-	SMSTokenCrypto     crypto.EncryptionAlgorithm
-	httpClient         *http.Client
+	es                        *eventstore.Eventstore
+	externalDomain            string
+	externalPort              uint16
+	externalSecure            bool
+	fileSystemPath            string
+	UserDataCrypto            crypto.EncryptionAlgorithm
+	SMTPPasswordCrypto        crypto.EncryptionAlgorithm
+	SMSTokenCrypto            crypto.EncryptionAlgorithm
+	httpClient                *http.Client
+	denyList                  []denylist.AddressChecker
+	OrgSMTPFallbackToInstance bool
 }
 
 func NewNotificationQueries(
@@ -59,17 +63,21 @@ func NewNotificationQueries(
 	smtpPasswordCrypto crypto.EncryptionAlgorithm,
 	smsTokenCrypto crypto.EncryptionAlgorithm,
 	httpClient *http.Client,
+	denyList []denylist.AddressChecker,
+	orgSMTPFallbackToInstance bool,
 ) *NotificationQueries {
 	return &NotificationQueries{
-		Queries:            baseQueries,
-		es:                 es,
-		externalDomain:     externalDomain,
-		externalPort:       externalPort,
-		externalSecure:     externalSecure,
-		fileSystemPath:     fileSystemPath,
-		UserDataCrypto:     userDataCrypto,
-		SMTPPasswordCrypto: smtpPasswordCrypto,
-		SMSTokenCrypto:     smsTokenCrypto,
-		httpClient:         httpClient,
+		Queries:                   baseQueries,
+		es:                        es,
+		externalDomain:            externalDomain,
+		externalPort:              externalPort,
+		externalSecure:            externalSecure,
+		fileSystemPath:            fileSystemPath,
+		UserDataCrypto:            userDataCrypto,
+		SMTPPasswordCrypto:        smtpPasswordCrypto,
+		SMSTokenCrypto:            smsTokenCrypto,
+		httpClient:                httpClient,
+		denyList:                  denyList,
+		OrgSMTPFallbackToInstance: orgSMTPFallbackToInstance,
 	}
 }
