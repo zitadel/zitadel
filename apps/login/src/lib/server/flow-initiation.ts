@@ -1,5 +1,7 @@
 import "server-only";
 
+import { addIdpFlowProof } from "@/lib/server/fingerprint";
+
 import { isExternalUrl, isSafeRedirectUri } from "@/lib/client-utils";
 import { getValidLocaleFromUILocales } from "@/lib/server/auth-utils";
 import { getLanguageCookie, setLanguageCookie, type Cookie } from "@/lib/server/cookies";
@@ -324,6 +326,9 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         if (organization) {
           params.set("organization", organization);
         }
+
+        // binds the flow to this browser; Next.js adds the cookie set via cookies() to the returned response
+        await addIdpFlowProof(params);
 
         const response = await startIdentityProviderFlow({
           serviceConfig,

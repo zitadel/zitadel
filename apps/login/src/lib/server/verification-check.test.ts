@@ -8,11 +8,12 @@ vi.mock("next/headers", () => ({
 }));
 
 vi.mock("@/lib/server/fingerprint", () => ({
-  getFingerprintIdCookie: vi.fn(),
-  getOrSetFingerprintId: vi.fn(),
+  getBindingIdCookie: vi.fn(),
+  getOrSetBindingId: vi.fn(),
+  setBrowserCookie: vi.fn(),
 }));
 
-import { getFingerprintIdCookie, getOrSetFingerprintId } from "@/lib/server/fingerprint";
+import { getBindingIdCookie, getOrSetBindingId, setBrowserCookie } from "@/lib/server/fingerprint";
 import { MIN_SESSION_COOKIE_SECRET_LENGTH, signSession } from "@/lib/server/session-cookie-signature";
 import {
   createVerificationCheck,
@@ -124,16 +125,19 @@ describe("verification-check", () => {
   });
 
   it("round trips through the cookie helpers", async () => {
-    vi.mocked(getOrSetFingerprintId).mockResolvedValue("fp-1");
+    vi.mocked(getOrSetBindingId).mockResolvedValue("fp-1");
     await setUserVerificationCheckCookie("user-1");
 
-    expect(mockCookies.set).toHaveBeenCalledWith(
-      expect.objectContaining({ name: "verificationCheck", httpOnly: true, maxAge: VERIFICATION_CHECK_MAX_AGE_SECONDS }),
+    // setBrowserCookie adds SameSite and Secure, so the cookie also works in an iframe
+    expect(setBrowserCookie).toHaveBeenCalledWith(
+      "verificationCheck",
+      expect.any(String),
+      VERIFICATION_CHECK_MAX_AGE_SECONDS,
     );
 
-    const { value } = mockCookies.set.mock.calls[0][0];
+    const value = vi.mocked(setBrowserCookie).mock.calls[0][1];
     mockCookies.get.mockReturnValue({ value });
-    vi.mocked(getFingerprintIdCookie).mockResolvedValue({ name: "fingerprintId", value: "fp-1" } as any);
+    vi.mocked(getBindingIdCookie).mockResolvedValue({ name: "bindingId", value: "fp-1" } as any);
 
     expect(await hasValidUserVerificationCheckCookie("user-1")).toBe(true);
     expect(await hasValidUserVerificationCheckCookie("user-2")).toBe(false);

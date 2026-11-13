@@ -1,5 +1,5 @@
 import { processIDPCallback } from "@/lib/actions/idp-intent";
-import { createIdpLinkProof } from "@/lib/server/idp-link-proof";
+import { createIdpFlowProof } from "@/lib/server/idp-flow-proof";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import crypto from "crypto";
@@ -66,7 +66,7 @@ vi.mock("next-intl/server", () => ({
 }));
 
 vi.mock("@/lib/server/fingerprint", () => ({
-  getFingerprintIdCookie: vi.fn(),
+  getBindingIdCookie: vi.fn(),
 }));
 
 describe("processIDPCallback", () => {
@@ -87,16 +87,19 @@ describe("processIDPCallback", () => {
   let mockGetSession: any;
   let mockCreateNewSessionFromIdpIntent: any;
   let mockGetSessionCookieById: any;
-  let mockGetFingerprintIdCookie: any;
+  let mockGetBindingIdCookie: any;
   let mockListAuthenticationMethodTypes: any;
   let mockCheckUserVerification: any;
 
-  const defaultParams = {
-    provider: "google",
-    id: "intent123",
-    token: "token123",
-    requestId: "req123",
-    organization: "org123",
+  const browserBindingId = "fp123";
+  // assigned in beforeEach: the flowFingerprint proof needs the signing secret
+  let defaultParams: {
+    provider: string;
+    id: string;
+    token: string;
+    requestId: string;
+    organization: string;
+    flowFingerprint: string;
   };
 
   const defaultIntent = {
@@ -174,7 +177,7 @@ describe("processIDPCallback", () => {
     } = await import("@/lib/server/zitadel");
     const { createNewSessionFromIdpIntent } = await import("@/lib/server/idp-session");
     const { getSessionCookieById } = await import("@/lib/server/cookies");
-    const { getFingerprintIdCookie } = await import("@/lib/server/fingerprint");
+    const { getBindingIdCookie } = await import("@/lib/server/fingerprint");
     const { checkUserVerification } = await import("@/lib/server/verify-helper");
 
     // Setup mocks
@@ -195,9 +198,21 @@ describe("processIDPCallback", () => {
 
     mockCreateNewSessionFromIdpIntent = vi.mocked(createNewSessionFromIdpIntent);
     mockGetSessionCookieById = vi.mocked(getSessionCookieById);
-    mockGetFingerprintIdCookie = vi.mocked(getFingerprintIdCookie);
+    mockGetBindingIdCookie = vi.mocked(getBindingIdCookie);
     mockListAuthenticationMethodTypes = vi.mocked(listAuthenticationMethodTypes);
     mockCheckUserVerification = vi.mocked(checkUserVerification);
+
+    // Default: the callback is opened in the browser that started the flow
+    vi.stubEnv("ZITADEL_SESSION_COOKIE_SECRET", "test-session-cookie-secret-at-least-32-chars");
+    defaultParams = {
+      provider: "google",
+      id: "intent123",
+      token: "token123",
+      requestId: "req123",
+      organization: "org123",
+      flowFingerprint: createIdpFlowProof(browserBindingId),
+    };
+    mockGetBindingIdCookie.mockResolvedValue({ name: "bindingId", value: browserBindingId });
 
     // Default mock implementations
     mockHeaders.mockResolvedValue({} as any);
@@ -232,6 +247,7 @@ describe("processIDPCallback", () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllEnvs();
   });
 
   describe("Parameter validation", () => {
@@ -282,6 +298,59 @@ describe("processIDPCallback", () => {
     });
   });
 
+  describe("Browser binding (flowFingerprint)", () => {
+    test.each([
+      ["a missing proof", () => undefined],
+      ["a proof for another browser", () => createIdpFlowProof("attacker-fp")],
+      ["a linking flow proof for a sign-in", () => createIdpFlowProof(browserBindingId, "session123")],
+      ["a garbage value", () => "not-a-proof"],
+    ])("should reject %s without touching the intent", async (_name, makeFlowFingerprint) => {
+      const result = await processIDPCallback({
+        ...defaultParams,
+        postErrorRedirectUrl: "https://app.example.com/error",
+        flowFingerprint: makeFlowFingerprint(),
+      });
+
+      expect(result.redirect).toContain("/idp/google/failure");
+      expect(result.redirect).toContain("error=flow_mismatch");
+      expect(result.redirect).toContain("requestId=req123");
+      expect(result.redirect).toContain("organization=org123");
+      expect(result.redirect).toContain("postErrorRedirectUrl=https%3A%2F%2Fapp.example.com%2Ferror");
+      expect(mockRetrieveIDPIntent).not.toHaveBeenCalled();
+      expect(mockCreateNewSessionFromIdpIntent).not.toHaveBeenCalled();
+    });
+
+    test("should reject a proof signed for the API-visible fingerprintId instead of the binding id", async () => {
+      // an attacker can read a victim's fingerprintId through the Session API and get a proof signed for it,
+      // but the proof is checked against the binding id cookie, which never leaves the browser
+      mockGetBindingIdCookie.mockResolvedValue({ name: "bindingId", value: "secret-binding-id" });
+
+      const result = await processIDPCallback({ ...defaultParams, flowFingerprint: createIdpFlowProof("api-visible-fp") });
+
+      expect(result.redirect).toContain("/idp/google/failure");
+      expect(mockRetrieveIDPIntent).not.toHaveBeenCalled();
+      expect(mockCreateNewSessionFromIdpIntent).not.toHaveBeenCalled();
+    });
+
+    test("should reject a valid proof when the browser has no binding id cookie", async () => {
+      mockGetBindingIdCookie.mockResolvedValue(undefined);
+
+      const result = await processIDPCallback(defaultParams);
+
+      expect(result.redirect).toContain("/idp/google/failure");
+      expect(mockRetrieveIDPIntent).not.toHaveBeenCalled();
+      expect(mockCreateNewSessionFromIdpIntent).not.toHaveBeenCalled();
+    });
+
+    test("should sign in when the proof matches the binding id cookie of this browser", async () => {
+      const result = await processIDPCallback(defaultParams);
+
+      expect(mockRetrieveIDPIntent).toHaveBeenCalled();
+      expect(mockCreateNewSessionFromIdpIntent).toHaveBeenCalled();
+      expect(result.redirect).toBe("https://app.example.com/success");
+    });
+  });
+
   describe("Intent retrieval errors", () => {
     test("should return error redirect when IDP information is missing", async () => {
       mockRetrieveIDPIntent.mockResolvedValue({
@@ -310,6 +379,7 @@ describe("processIDPCallback", () => {
 
       expect(result.redirect).toContain("/idp/google/failure");
       expect(result.redirect).toContain("error=Network+error");
+      expect(result.redirect).toContain("requestId=req123");
     });
   });
 
@@ -524,17 +594,17 @@ describe("processIDPCallback", () => {
   describe("CASE 2: Link IDP to existing user", () => {
     const sessionId = "session123";
     const fingerprintValue = "fp123";
-    let linkParams: typeof defaultParams & { sessionId: string; linkFingerprint: string };
+    let linkParams: typeof defaultParams & { sessionId: string };
 
     beforeEach(() => {
       vi.stubEnv("ZITADEL_SESSION_COOKIE_SECRET", "test-session-cookie-secret-at-least-32-chars");
       linkParams = {
         ...defaultParams,
         sessionId,
-        linkFingerprint: createIdpLinkProof(sessionId, fingerprintValue),
+        flowFingerprint: createIdpFlowProof(fingerprintValue, sessionId),
       };
 
-      mockGetFingerprintIdCookie.mockResolvedValue({ name: "fingerprintId", value: fingerprintValue });
+      mockGetBindingIdCookie.mockResolvedValue({ name: "bindingId", value: fingerprintValue });
       mockRetrieveIDPIntent.mockResolvedValue({
         ...defaultIntent,
         userId: undefined,
@@ -564,15 +634,16 @@ describe("processIDPCallback", () => {
             .update(sessionId + fingerprintValue)
             .digest("hex"),
       ],
-      ["a proof for another session", () => createIdpLinkProof("other-session", fingerprintValue)],
-      ["a proof for another browser", () => createIdpLinkProof(sessionId, "other-fp")],
-    ])("should reject %s as linkFingerprint", async (_name, makeLinkFingerprint) => {
+      ["a proof for another session", () => createIdpFlowProof(fingerprintValue, "other-session")],
+      ["a proof for another browser", () => createIdpFlowProof("other-fp", sessionId)],
+      ["a plain sign-in proof without the session", () => createIdpFlowProof(fingerprintValue)],
+    ])("should reject %s as flowFingerprint without touching the intent", async (_name, makeFlowFingerprint) => {
       mockGetIDPByID.mockResolvedValue(defaultIdp);
 
-      const result = await processIDPCallback({ ...linkParams, linkFingerprint: makeLinkFingerprint() });
+      const result = await processIDPCallback({ ...linkParams, flowFingerprint: makeFlowFingerprint() });
 
-      expect(result.redirect).toContain("/idp/google/linking-failed");
-      expect(result.redirect).toContain("error=session_mismatch");
+      expect(result.redirect).toBe("/idp/google/linking-failed?error=session_mismatch");
+      expect(mockRetrieveIDPIntent).not.toHaveBeenCalled();
       expect(mockAddIDPLink).not.toHaveBeenCalled();
     });
 
@@ -1090,6 +1161,8 @@ describe("processIDPCallback", () => {
       expect(result.redirect).toContain("token=token123");
       expect(result.redirect).toContain("organization=org123");
       expect(result.redirect).toContain("familyName=User");
+      const params = new URLSearchParams(result.redirect!.split("?")[1]);
+      expect(params.get("flowFingerprint")).toBe(defaultParams.flowFingerprint);
     });
 
     test("should redirect to complete registration when familyName is missing", async () => {
@@ -1215,6 +1288,9 @@ describe("processIDPCallback", () => {
       expect(result.redirect).toContain("givenName=Test");
       expect(result.redirect).toContain("familyName=User");
       expect(result.redirect).toContain("email=test%40example.com");
+      // the complete-registration form must stay bound to this browser
+      const params = new URLSearchParams(result.redirect!.split("?")[1]);
+      expect(params.get("flowFingerprint")).toBe(defaultParams.flowFingerprint);
     });
 
     test("should fallback to default organization for registration", async () => {

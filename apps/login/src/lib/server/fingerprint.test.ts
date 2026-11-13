@@ -1,16 +1,18 @@
 import {
-  getFingerprintId,
-  getFingerprintIdCookie,
+  addIdpFlowProof,
+  getBindingIdCookie,
+  getOrSetBindingId,
   getOrSetFingerprintId,
   getUserAgent,
-  setFingerprintIdCookie,
 } from "@/lib/server/fingerprint";
+import { isIdpFlowProofValid } from "@/lib/server/idp-flow-proof";
 import { v4 as uuidv4 } from "uuid";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { create } from "@zitadel/client";
 import { cookies, headers } from "next/headers";
 import { userAgent } from "next/server";
+import { getSecuritySettings } from "./zitadel";
 
 // Mock dependencies
 vi.mock("uuid");
@@ -24,172 +26,23 @@ vi.mock("next/server", () => ({
 vi.mock("@zitadel/client", () => ({
   create: vi.fn(),
 }));
+vi.mock("./service-url", () => ({
+  getServiceConfig: vi.fn(() => ({ serviceConfig: { baseUrl: "https://api.example.com" } })),
+}));
+vi.mock("./zitadel", () => ({
+  getSecuritySettings: vi.fn(),
+}));
 
 describe("fingerprint", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // default: login is not embedded in an iframe
+    vi.mocked(getSecuritySettings).mockResolvedValue(undefined);
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
-  });
-
-  describe("getFingerprintId", () => {
-    it("should generate a UUID v4", async () => {
-      const mockUuid = "550e8400-e29b-41d4-a716-446655440000";
-      vi.mocked(uuidv4).mockReturnValue(mockUuid as any);
-
-      const result = await getFingerprintId();
-
-      expect(result).toBe(mockUuid);
-      expect(uuidv4).toHaveBeenCalledOnce();
-    });
-
-    it("should generate unique IDs on multiple calls", async () => {
-      const uuid1 = "550e8400-e29b-41d4-a716-446655440000";
-      const uuid2 = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
-
-      vi.mocked(uuidv4)
-        .mockReturnValueOnce(uuid1 as any)
-        .mockReturnValueOnce(uuid2 as any);
-
-      const result1 = await getFingerprintId();
-      const result2 = await getFingerprintId();
-
-      expect(result1).toBe(uuid1);
-      expect(result2).toBe(uuid2);
-      expect(result1).not.toBe(result2);
-    });
-  });
-
-  describe("setFingerprintIdCookie", () => {
-    it("should set cookie with correct name and value", async () => {
-      const mockSet = vi.fn();
-      const mockCookies = { set: mockSet };
-      vi.mocked(cookies).mockResolvedValue(mockCookies as any);
-
-      const fingerprintId = "test-fingerprint-id";
-      await setFingerprintIdCookie(fingerprintId);
-
-      expect(mockSet).toHaveBeenCalledWith({
-        name: "fingerprintId",
-        value: fingerprintId,
-        httpOnly: true,
-        path: "/",
-        maxAge: 31536000,
-      });
-    });
-
-    it("should set httpOnly flag to true", async () => {
-      const mockSet = vi.fn();
-      const mockCookies = { set: mockSet };
-      vi.mocked(cookies).mockResolvedValue(mockCookies as any);
-
-      await setFingerprintIdCookie("test-id");
-
-      const callArgs = mockSet.mock.calls[0][0];
-      expect(callArgs.httpOnly).toBe(true);
-    });
-
-    it("should set cookie path to root", async () => {
-      const mockSet = vi.fn();
-      const mockCookies = { set: mockSet };
-      vi.mocked(cookies).mockResolvedValue(mockCookies as any);
-
-      await setFingerprintIdCookie("test-id");
-
-      const callArgs = mockSet.mock.calls[0][0];
-      expect(callArgs.path).toBe("/");
-    });
-
-    it("should set maxAge to 1 year (31536000 seconds)", async () => {
-      const mockSet = vi.fn();
-      const mockCookies = { set: mockSet };
-      vi.mocked(cookies).mockResolvedValue(mockCookies as any);
-
-      await setFingerprintIdCookie("test-id");
-
-      const callArgs = mockSet.mock.calls[0][0];
-      expect(callArgs.maxAge).toBe(31536000);
-      expect(callArgs.maxAge).toBe(365 * 24 * 60 * 60);
-    });
-
-    it("should handle special characters in fingerprint ID", async () => {
-      const mockSet = vi.fn();
-      const mockCookies = { set: mockSet };
-      vi.mocked(cookies).mockResolvedValue(mockCookies as any);
-
-      const specialId = "test-id-with-!@#$%^&*()";
-      await setFingerprintIdCookie(specialId);
-
-      const callArgs = mockSet.mock.calls[0][0];
-      expect(callArgs.value).toBe(specialId);
-    });
-
-    it("should handle empty fingerprint ID", async () => {
-      const mockSet = vi.fn();
-      const mockCookies = { set: mockSet };
-      vi.mocked(cookies).mockResolvedValue(mockCookies as any);
-
-      await setFingerprintIdCookie("");
-
-      expect(mockSet).toHaveBeenCalledWith(
-        expect.objectContaining({
-          value: "",
-        }),
-      );
-    });
-
-    it("should handle very long fingerprint IDs", async () => {
-      const mockSet = vi.fn();
-      const mockCookies = { set: mockSet };
-      vi.mocked(cookies).mockResolvedValue(mockCookies as any);
-
-      const longId = "a".repeat(1000);
-      await setFingerprintIdCookie(longId);
-
-      const callArgs = mockSet.mock.calls[0][0];
-      expect(callArgs.value).toBe(longId);
-    });
-  });
-
-  describe("getFingerprintIdCookie", () => {
-    it("should retrieve fingerprint cookie", async () => {
-      const mockGet = vi.fn().mockReturnValue({
-        name: "fingerprintId",
-        value: "test-fingerprint",
-      });
-      const mockCookies = { get: mockGet };
-      vi.mocked(cookies).mockResolvedValue(mockCookies as any);
-
-      const result = await getFingerprintIdCookie();
-
-      expect(mockGet).toHaveBeenCalledWith("fingerprintId");
-      expect(result).toEqual({
-        name: "fingerprintId",
-        value: "test-fingerprint",
-      });
-    });
-
-    it("should return undefined if cookie doesn't exist", async () => {
-      const mockGet = vi.fn().mockReturnValue(undefined);
-      const mockCookies = { get: mockGet };
-      vi.mocked(cookies).mockResolvedValue(mockCookies as any);
-
-      const result = await getFingerprintIdCookie();
-
-      expect(result).toBeUndefined();
-    });
-
-    it("should handle null cookie value", async () => {
-      const mockGet = vi.fn().mockReturnValue(null);
-      const mockCookies = { get: mockGet };
-      vi.mocked(cookies).mockResolvedValue(mockCookies as any);
-
-      const result = await getFingerprintIdCookie();
-
-      expect(result).toBeNull();
-    });
+    vi.unstubAllEnvs();
   });
 
   describe("getOrSetFingerprintId", () => {
@@ -225,7 +78,42 @@ describe("fingerprint", () => {
         httpOnly: true,
         path: "/",
         maxAge: 31536000,
+        sameSite: "lax",
+        secure: false,
       });
+    });
+
+    it("should use sameSite none with secure when iframe embedding is enabled", async () => {
+      const mockSet = vi.fn();
+      vi.mocked(cookies).mockResolvedValue({ get: vi.fn().mockReturnValue(undefined), set: mockSet } as any);
+      vi.mocked(getSecuritySettings).mockResolvedValue({ embeddedIframe: { enabled: true } } as any);
+
+      await getOrSetFingerprintId();
+
+      const callArgs = mockSet.mock.calls[0][0];
+      expect(callArgs.sameSite).toBe("none");
+      expect(callArgs.secure).toBe(true);
+    });
+
+    it("should use sameSite lax when iframe embedding is disabled", async () => {
+      const mockSet = vi.fn();
+      vi.mocked(cookies).mockResolvedValue({ get: vi.fn().mockReturnValue(undefined), set: mockSet } as any);
+      vi.mocked(getSecuritySettings).mockResolvedValue({ embeddedIframe: { enabled: false } } as any);
+
+      await getOrSetFingerprintId();
+
+      expect(mockSet.mock.calls[0][0].sameSite).toBe("lax");
+    });
+
+    it("should fall back to sameSite lax when the security settings can't be loaded", async () => {
+      const mockSet = vi.fn();
+      vi.mocked(cookies).mockResolvedValue({ get: vi.fn().mockReturnValue(undefined), set: mockSet } as any);
+      vi.mocked(getSecuritySettings).mockRejectedValue(new Error("unavailable"));
+
+      // must not throw, the fingerprint is still needed by every flow
+      await getOrSetFingerprintId();
+
+      expect(mockSet.mock.calls[0][0].sameSite).toBe("lax");
     });
 
     it("should not regenerate ID on subsequent calls with existing cookie", async () => {
@@ -246,7 +134,69 @@ describe("fingerprint", () => {
     });
   });
 
+  describe("getOrSetBindingId", () => {
+    it("should return the existing binding id cookie", async () => {
+      const mockGet = vi.fn((name: string) => (name === "bindingId" ? { name, value: "binding-1" } : undefined));
+      const mockSet = vi.fn();
+      vi.mocked(cookies).mockResolvedValue({ get: mockGet, set: mockSet } as any);
+
+      expect(await getOrSetBindingId()).toBe("binding-1");
+      expect(await getBindingIdCookie()).toEqual({ name: "bindingId", value: "binding-1" });
+      expect(mockSet).not.toHaveBeenCalled();
+    });
+
+    it("should set a new random binding id with the iframe-aware attributes", async () => {
+      const mockSet = vi.fn();
+      vi.mocked(cookies).mockResolvedValue({ get: vi.fn().mockReturnValue(undefined), set: mockSet } as any);
+      vi.mocked(uuidv4).mockReturnValue("new-binding-id" as any);
+      vi.mocked(getSecuritySettings).mockResolvedValue({ embeddedIframe: { enabled: true } } as any);
+
+      const result = await getOrSetBindingId();
+
+      expect(result).toBe("new-binding-id");
+      expect(mockSet).toHaveBeenCalledWith({
+        name: "bindingId",
+        value: "new-binding-id",
+        httpOnly: true,
+        path: "/",
+        maxAge: 31536000,
+        sameSite: "none",
+        secure: true,
+      });
+    });
+  });
+
+  describe("addIdpFlowProof", () => {
+    it("should set a flow proof bound to this browser and the session to link", async () => {
+      vi.stubEnv("ZITADEL_SESSION_COOKIE_SECRET", "test-session-cookie-secret-at-least-32-chars");
+      const mockGet = vi.fn((name: string) => (name === "bindingId" ? { name, value: "binding-1" } : undefined));
+      vi.mocked(cookies).mockResolvedValue({ get: mockGet, set: vi.fn() } as any);
+
+      const params = new URLSearchParams();
+      await addIdpFlowProof(params, "session-1");
+      const signInParams = new URLSearchParams();
+      await addIdpFlowProof(signInParams);
+
+      expect(isIdpFlowProofValid(params.get("flowFingerprint") ?? undefined, "binding-1", "session-1")).toBe(true);
+      expect(isIdpFlowProofValid(signInParams.get("flowFingerprint") ?? undefined, "binding-1")).toBe(true);
+    });
+  });
+
   describe("getUserAgent", () => {
+    it("should send the fingerprintId but never the binding id to the API", async () => {
+      const mockGet = vi.fn((name: string) => ({ name, value: name === "bindingId" ? "secret-binding" : "public-fp" }));
+      vi.mocked(cookies).mockResolvedValue({ get: mockGet, set: vi.fn() } as any);
+      vi.mocked(headers).mockResolvedValue({ get: () => null } as any);
+      vi.mocked(userAgent).mockReturnValue({ device: {}, engine: {}, os: {}, browser: {} } as any);
+
+      await getUserAgent();
+
+      const sent = vi.mocked(create).mock.calls[0][1];
+      expect(sent).toEqual(expect.objectContaining({ fingerprintId: "public-fp" }));
+      expect(JSON.stringify(sent)).not.toContain("secret-binding");
+      expect(mockGet).not.toHaveBeenCalledWith("bindingId");
+    });
+
     it("should create user agent with all components", async () => {
       const mockFingerprintId = "test-fingerprint";
       const mockGet = vi.fn().mockReturnValue({

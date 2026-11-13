@@ -1,4 +1,5 @@
 import { sendLoginname } from "@/lib/actions/loginname";
+import { createIdpFlowProof, isIdpFlowProofValid } from "@/lib/server/idp-flow-proof";
 import { getIDPByID } from "@/lib/server/zitadel";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
@@ -38,6 +39,10 @@ vi.mock("@/lib/server/session-cookie", () => ({
   createSessionAndUpdateCookie: vi.fn(),
 }));
 
+vi.mock("@/lib/server/fingerprint", () => ({
+  addIdpFlowProof: vi.fn(),
+}));
+
 vi.mock("@/lib/server/host", () => ({
   getInstanceHost: vi.fn(),
   getPublicHost: vi.fn(),
@@ -72,6 +77,7 @@ describe("sendLoginname", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    vi.stubEnv("ZITADEL_SESSION_COOKIE_SECRET", "test-session-cookie-secret-at-least-32-chars");
 
     // Import mocked modules
     const { headers } = await import("next/headers");
@@ -89,6 +95,7 @@ describe("sendLoginname", () => {
     const { createSessionAndUpdateCookie } = await import("@/lib/server/session-cookie");
     const { getInstanceHost, getPublicHost } = await import("@/lib/server/host");
     const { idpTypeToSlug } = await import("@/lib/idp");
+    const { addIdpFlowProof } = await import("@/lib/server/fingerprint");
 
     // Setup mocks
     mockHeaders = vi.mocked(headers);
@@ -110,6 +117,10 @@ describe("sendLoginname", () => {
     // Default mock implementations
     mockHeaders.mockResolvedValue({} as any);
     mockGetServiceUrlFromHeaders.mockReturnValue({ serviceConfig: { baseUrl: "https://api.example.com" } });
+    // the real helper reads the binding id cookie, here the browser binding id is "fp123"
+    vi.mocked(addIdpFlowProof).mockImplementation(async (params, linkToSessionId) => {
+      params.set("flowFingerprint", createIdpFlowProof("fp123", linkToSessionId));
+    });
     mockGetInstanceHost.mockReturnValue("example.com");
     mockGetPublicHost.mockReturnValue("example.com");
     mockIdpTypeToSlug.mockReturnValue("google");
@@ -126,6 +137,7 @@ describe("sendLoginname", () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllEnvs();
   });
 
   describe("Error cases", () => {
@@ -404,6 +416,28 @@ describe("sendLoginname", () => {
             urls: expect.objectContaining({ loginHint: "user@example.com" }),
           }),
         );
+      });
+
+      test.each([
+        ["the user's linked IDP", [{ idpId: "idp123" }], []],
+        ["the organization's single active IDP", [], [{ id: "org-idp-123", type: 0, options: { isAutoCreation: true } }]],
+      ])("should bind the flow to this browser when redirecting to %s", async (_name, idpLinks, activeIdps) => {
+        mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD],
+        });
+        mockListIDPLinks.mockResolvedValue({ result: idpLinks });
+        mockGetActiveIdentityProviders.mockResolvedValue({ identityProviders: activeIdps });
+        mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
+
+        await sendLoginname({
+          loginName: "user@example.com",
+        });
+
+        const successUrl = new URL(mockStartIdentityProviderFlow.mock.calls[0][0].urls.successUrl);
+        expect(successUrl.pathname).toMatch(/\/idp\/google\/process$/);
+        expect(isIdpFlowProofValid(successUrl.searchParams.get("flowFingerprint") ?? undefined, "fp123")).toBe(true);
+        expect(isIdpFlowProofValid(successUrl.searchParams.get("flowFingerprint") ?? undefined, "other-fp")).toBe(false);
       });
 
       test("should redirect to passkey when user has only passkey method and it's allowed", async () => {

@@ -36,9 +36,17 @@ type Props = {
     email?: string;
   };
   idpUserName?: string;
+  flowFingerprint?: string;
 };
 
-export function RegisterFormIDPIncomplete({ organization, requestId, idpIntent, defaultValues, idpUserName }: Props) {
+export function RegisterFormIDPIncomplete({
+  organization,
+  requestId,
+  idpIntent,
+  defaultValues,
+  idpUserName,
+  flowFingerprint,
+}: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onChange",
     defaultValues: {
@@ -66,6 +74,7 @@ export function RegisterFormIDPIncomplete({ organization, requestId, idpIntent, 
         organization: organization,
         requestId: requestId,
         idpIntent: idpIntent,
+        flowFingerprint: flowFingerprint,
       });
 
       handleServerActionResponse(response, router, setSamlData, setError);
