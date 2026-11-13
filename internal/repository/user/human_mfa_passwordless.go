@@ -375,7 +375,7 @@ func HumanPasswordlessInitCodeRequestedEventMapper(event eventstore.Event) (even
 type HumanPasswordlessInitCodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	// DeliveryInfo states the provider the email was sent through.
+	// DeliveryInfo states the provider the email was sent through or that the delivery was suppressed.
 	senders.DeliveryInfo
 
 	ID string `json:"id"`

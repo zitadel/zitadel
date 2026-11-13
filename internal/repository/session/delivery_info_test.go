@@ -16,6 +16,7 @@ func TestOTPEmailSentEvent_DeliveryInfo(t *testing.T) {
 	for _, info := range []senders.DeliveryInfo{
 		{},
 		{ProviderID: "provider1"},
+		{DeliverySuppressed: true},
 	} {
 		event := NewOTPEmailSentEvent(t.Context(), agg, info)
 		payload, err := json.Marshal(event.Payload())

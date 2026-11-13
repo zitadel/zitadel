@@ -309,7 +309,7 @@ func HumanInitialCodeAddedEventMapper(event eventstore.Event) (eventstore.Event,
 type HumanInitialCodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	// DeliveryInfo states the provider the email was sent through.
+	// DeliveryInfo states the provider the email was sent through or that the delivery was suppressed.
 	senders.DeliveryInfo
 }
 
@@ -452,7 +452,7 @@ func NewHumanInviteCodeAddedEvent(
 type HumanInviteCodeSentEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	// DeliveryInfo states the provider the email was sent through.
+	// DeliveryInfo states the provider the email was sent through or that the delivery was suppressed.
 	senders.DeliveryInfo
 }
 

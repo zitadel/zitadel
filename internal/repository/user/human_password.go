@@ -170,7 +170,7 @@ func HumanPasswordCodeAddedEventMapper(event eventstore.Event) (eventstore.Event
 type HumanPasswordCodeSentEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	// DeliveryInfo states the provider the email was sent through.
+	// DeliveryInfo states the provider the email was sent through or that the delivery was suppressed.
 	senders.DeliveryInfo
 
 	GeneratorInfo *senders.CodeGeneratorInfo `json:"generatorInfo,omitempty"`
@@ -203,7 +203,7 @@ func NewHumanPasswordCodeSentEvent(ctx context.Context, aggregate *eventstore.Ag
 type HumanPasswordChangeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	// DeliveryInfo states the provider the email was sent through.
+	// DeliveryInfo states the provider the email was sent through or that the delivery was suppressed.
 	senders.DeliveryInfo
 }
 

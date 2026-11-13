@@ -31,7 +31,7 @@ var emailSentTypes = []eventstore.EventType{
 }
 
 // SentEmails returns the amount of emails the instance sent through the provider since the given time.
-// At most limit emails are counted.
+// At most limit emails are counted. Suppressed emails do not state a provider and are therefore not counted.
 func (n *NotificationQueries) SentEmails(ctx context.Context, providerID string, since time.Time, limit uint64) (uint64, error) {
 	sent := &sentEmails{
 		instanceID: authz.GetInstance(ctx).InstanceID(),
