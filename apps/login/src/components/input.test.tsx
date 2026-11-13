@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { TextInput } from "./input";
 
@@ -10,6 +10,7 @@ describe("TextInput Component", () => {
   });
 
   afterEach(() => {
+    cleanup();
     process.env = originalEnv;
   });
 
@@ -48,7 +49,11 @@ describe("TextInput Component", () => {
 
     it("should render error state with message", () => {
       render(<TextInput label="Email" error="Invalid email" />);
-      expect(screen.getByText("Invalid email")).toBeTruthy();
+      const input = screen.getByRole("textbox");
+      expect(input).toHaveAccessibleName("Email");
+      expect(input).toHaveAttribute("aria-invalid", "true");
+      expect(input).toHaveAccessibleDescription("Invalid email");
+      expect(screen.getByRole("alert")).toHaveTextContent("Invalid email");
     });
 
     it("should apply error styling when error is present", () => {
@@ -120,10 +125,15 @@ describe("TextInput Component", () => {
     });
 
     it("should pass through native input props", () => {
-      const { container } = render(<TextInput label="Test" maxLength={10} type="email" />);
+      const { container } = render(
+        <TextInput id="contact-email" label="Test" maxLength={10} type="email" aria-invalid="grammar" />,
+      );
       const input = container.querySelector("input");
       expect(input?.maxLength).toBe(10);
       expect(input?.type).toBe("email");
+      expect(input?.id).toBe("contact-email");
+      expect(screen.getByLabelText("Test")).toBe(input);
+      expect(input).toHaveAttribute("aria-invalid", "grammar");
     });
 
     it("should support autoFocus", () => {
@@ -177,6 +187,41 @@ describe("TextInput Component", () => {
   });
 
   describe("Accessibility", () => {
+    it("should preserve help descriptions when an error appears and is cleared", () => {
+      const field = (error?: string) => (
+        <>
+          <p id="email-help">Use your work address.</p>
+          <TextInput label="Email" aria-describedby="email-help" error={error} />
+        </>
+      );
+      const { getByRole, queryByRole, rerender } = render(field());
+      const input = getByRole("textbox");
+      expect(input).toHaveAccessibleDescription("Use your work address.");
+      expect(input).not.toHaveAttribute("aria-invalid");
+
+      rerender(field("Invalid email"));
+      expect(input).toHaveAttribute("aria-invalid", "true");
+      expect(input).toHaveAccessibleDescription("Use your work address. Invalid email");
+
+      rerender(field());
+      expect(input).not.toHaveAttribute("aria-invalid");
+      expect(input).toHaveAttribute("aria-describedby", "email-help");
+      expect(input).toHaveAccessibleDescription("Use your work address.");
+      expect(queryByRole("alert")).not.toBeInTheDocument();
+    });
+
+    it("should associate repeated fields with their own error messages", () => {
+      const { getByRole } = render(
+        <>
+          <TextInput label="First email" error="Check the first address." />
+          <TextInput label="Second email" error="Check the second address." />
+        </>,
+      );
+
+      expect(getByRole("textbox", { name: /^First email/ })).toHaveAccessibleDescription("Check the first address.");
+      expect(getByRole("textbox", { name: /^Second email/ })).toHaveAccessibleDescription("Check the second address.");
+    });
+
     it("should connect label to input", () => {
       const { container } = render(<TextInput label="Accessible Input" />);
       const label = container.querySelector("label");
