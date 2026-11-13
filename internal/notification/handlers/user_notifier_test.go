@@ -2049,11 +2049,32 @@ func expectTemplateWithNotifyUserQueries(queries *mock.MockQueries, template str
 	expectTemplateQueries(queries, template)
 }
 
+// expectTemplateWithReservedNotifyUserQueries returns a user with email addresses of a reserved domain.
+func expectTemplateWithReservedNotifyUserQueries(queries *mock.MockQueries, template string) {
+	queries.EXPECT().GetNotifyUserByID(gomock.Any(), gomock.Any(), gomock.Any()).Return(&query.NotifyUser{
+		ID:                 userID,
+		ResourceOwner:      orgID,
+		LastEmail:          "last@example.com",
+		VerifiedEmail:      "verified@example.com",
+		PreferredLoginName: preferredLoginName,
+		LastPhone:          lastPhone,
+		VerifiedPhone:      verifiedPhone,
+	}, nil)
+	expectTemplateQueries(queries, template)
+}
+
 // limitRules limits the emails sent through the provider to 10 per day.
 func limitRules(t *testing.T) smtp.Rules {
 	rules, err := smtp.CompileRules([]smtp.RuleConfig{{RuleOptions: smtp.RuleOptions{
 		Limit: &smtp.RuleLimit{Count: 10, Window: smtp.RuleDuration(24 * time.Hour)},
 	}}})
+	require.NoError(t, err)
+	return rules
+}
+
+// suppressReservedRecipientDomainsRules returns a rule matching every SMTP provider.
+func suppressReservedRecipientDomainsRules(t *testing.T) smtp.Rules {
+	rules, err := smtp.CompileRules([]smtp.RuleConfig{{RuleOptions: smtp.RuleOptions{SuppressReservedRecipientDomains: true}}})
 	require.NoError(t, err)
 	return rules
 }

@@ -6,7 +6,11 @@ import (
 	"strings"
 	"time"
 
+	"go.opentelemetry.io/otel/attribute"
+
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	zchannels "github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/channels/email"
@@ -35,8 +39,18 @@ func generateEmail(
 	if lastEmail {
 		recipient = user.LastEmail
 	}
+	if config.SMTPConfig != nil && rule.SuppressReservedRecipientDomains && domain.EmailAddress(recipient).IsReservedDomain() {
+		// The notification is handled as sent, but the email is not sent to the provider,
+		// as the recipient domain can never receive it and the email would only bounce.
+		// This is checked before the channels are created, so no connection to the provider is made.
+		if deliveryInfo != nil {
+			deliveryInfo.DeliverySuppressed = true
+		}
+		countSuppressedEmail(ctx, recipient, triggeringEventType)
+		return nil
+	}
 	if config.SMTPConfig != nil && rule.Limit != nil {
-		// The limit is checked before the channels are created, so no connection to the provider is made.
+		// Like the suppression, the limit is checked before the channels are created.
 		if err := checkEmailLimit(ctx, channels, rule.Limit, config.ProviderConfig); err != nil {
 			return err
 		}
@@ -112,6 +126,14 @@ func checkEmailLimit(ctx context.Context, channels ChannelChains, limit *smtp.Ru
 		return zchannels.NewRejectedError(zchannels.RejectionReasonLimitExceeded, provider.ID)
 	}
 	return nil
+}
+
+func countSuppressedEmail(ctx context.Context, recipient string, triggeringEventType eventstore.EventType) {
+	logging.Debug(ctx, "email to reserved recipient domain not sent", "domain", domain.EmailAddress(recipient).Domain(), "eventType", triggeringEventType)
+	err := metrics.AddCount(ctx, SuppressedEmailsCounter, 1, map[string]attribute.Value{
+		"triggering_event_type": attribute.StringValue(string(triggeringEventType)),
+	})
+	logging.OnError(ctx, err).Warn("incrementing counter metric failed", "name", SuppressedEmailsCounter)
 }
 
 func mapNotifyUserToArgs(user *query.NotifyUser, args map[string]interface{}) map[string]interface{} {

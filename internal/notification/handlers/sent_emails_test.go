@@ -55,7 +55,8 @@ func Test_sentEmails_Query(t *testing.T) {
 	}
 	assert.Empty(t, query.Matches(notCounted...))
 
-	// the filter on the payload must match what the sent events of delivered emails store
+	// the filter on the payload must match what the sent events of delivered emails store,
+	// and must not match suppressed emails, which do not state a provider
 	for _, tt := range []struct {
 		name string
 		info senders.DeliveryInfo
@@ -63,6 +64,7 @@ func Test_sentEmails_Query(t *testing.T) {
 	}{
 		{name: "delivered through the provider", info: delivered, want: true},
 		{name: "delivered through another provider", info: senders.DeliveryInfo{ProviderID: "provider2"}, want: false},
+		{name: "suppressed", info: senders.DeliveryInfo{DeliverySuppressed: true}, want: false},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			payload, err := json.Marshal(user.NewHumanInviteCodeSentEvent(ctx, userAgg, tt.info).Payload())
