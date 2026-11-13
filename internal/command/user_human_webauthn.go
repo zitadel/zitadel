@@ -82,7 +82,7 @@ func (c *Commands) HumanAddU2FSetup(ctx context.Context, userID, resourceowner s
 	if err != nil {
 		return nil, err
 	}
-	addWebAuthN, userAgg, webAuthN, err := c.addHumanWebAuthN(ctx, userID, resourceowner, "", u2fTokens, domain.AuthenticatorAttachmentUnspecified, domain.UserVerificationRequirementDiscouraged)
+	addWebAuthN, userAgg, webAuthN, err := c.addHumanWebAuthN(ctx, userID, resourceowner, "", u2fTokens, domain.AuthenticatorAttachmentUnspecified, domain.UserVerificationRequirementDiscouraged, domain.ResidentKeyRequirementUnspecified)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func (c *Commands) HumanAddPasswordlessSetup(ctx context.Context, userID, resour
 	if err != nil {
 		return nil, err
 	}
-	addWebAuthN, userAgg, webAuthN, err := c.addHumanWebAuthN(ctx, userID, resourceowner, "", passwordlessTokens, authenticatorPlatform, domain.UserVerificationRequirementRequired)
+	addWebAuthN, userAgg, webAuthN, err := c.addHumanWebAuthN(ctx, userID, resourceowner, "", passwordlessTokens, authenticatorPlatform, domain.UserVerificationRequirementRequired, domain.ResidentKeyRequirementRequired)
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +137,7 @@ func (c *Commands) HumanAddPasswordlessSetupInitCode(ctx context.Context, userID
 	return c.HumanAddPasswordlessSetup(ctx, userID, resourceowner, preferredPlatformType)
 }
 
-func (c *Commands) addHumanWebAuthN(ctx context.Context, userID, resourceowner, rpID string, tokens []*domain.WebAuthNToken, authenticatorPlatform domain.AuthenticatorAttachment, userVerification domain.UserVerificationRequirement) (*HumanWebAuthNWriteModel, *eventstore.Aggregate, *domain.WebAuthNToken, error) {
+func (c *Commands) addHumanWebAuthN(ctx context.Context, userID, resourceowner, rpID string, tokens []*domain.WebAuthNToken, authenticatorPlatform domain.AuthenticatorAttachment, userVerification domain.UserVerificationRequirement, residentKey domain.ResidentKeyRequirement) (*HumanWebAuthNWriteModel, *eventstore.Aggregate, *domain.WebAuthNToken, error) {
 	if userID == "" {
 		return nil, nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-3M0od", "Errors.IDMissing")
 	}
@@ -160,7 +160,7 @@ func (c *Commands) addHumanWebAuthN(ctx context.Context, userID, resourceowner, 
 	if accountName == "" {
 		accountName = string(user.EmailAddress)
 	}
-	webAuthN, err := c.webauthnConfig.BeginRegistration(ctx, user, accountName, authenticatorPlatform, userVerification, rpID, tokens...)
+	webAuthN, err := c.webauthnConfig.BeginRegistration(ctx, user, accountName, authenticatorPlatform, userVerification, residentKey, rpID, tokens...)
 	if err != nil {
 		return nil, nil, nil, err
 	}
