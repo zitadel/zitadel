@@ -542,6 +542,7 @@ Errors:
     NotExisting: "Autentiseringsbegäran existerar inte"
     WrongLoginClient: "Autentiseringsbegäran skapad av annan inloggningsklient"
     AlreadyHandled: "Autentiseringsbegäran har redan hanterats"
+    NotAuthenticated: "Användaren är inte autentiserad"
   OIDCSession:
     RefreshTokenInvalid: "Uppdateringstoken är ogiltig"
     Token:

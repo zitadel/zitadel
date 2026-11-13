@@ -542,6 +542,7 @@ Errors:
         AlreadyExists: "Cererea de autentificare există deja"
         NotExisting: "Cererea de autentificare nu există"
         WrongLoginClient: "Cererea de autentificare a fost creată de alt client de autentificare"
+        NotAuthenticated: "Utilizatorul nu este autentificat"
       OIDCSession:
         RefreshTokenInvalid: "Token-ul de reîmprospătare este invalid"
         Token:
