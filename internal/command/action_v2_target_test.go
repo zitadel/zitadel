@@ -584,6 +584,76 @@ func TestCommands_ChangeTarget(t *testing.T) {
 			res{},
 		},
 		{
+			"interrupt on error unchanged since add, no changes",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							func() eventstore.Command {
+								event := targetAddEvent("id1", "instance")
+								event.InterruptOnError = true
+								return event
+							}(),
+						),
+					),
+				),
+				denyList: []denylist.AddressChecker{localhostAddrChecker},
+				lookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{[]byte("192.168.1.1")}, nil
+				},
+			},
+			args{
+				ctx: context.Background(),
+				change: &ChangeTarget{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "id1",
+					},
+					InterruptOnError: gu.Ptr(true),
+				},
+				resourceOwner: "instance",
+			},
+			res{},
+		},
+		{
+			"interrupt on error set on add, disabled, push ok",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							func() eventstore.Command {
+								event := targetAddEvent("id1", "instance")
+								event.InterruptOnError = true
+								return event
+							}(),
+						),
+					),
+					expectPush(
+						target.NewChangedEvent(context.Background(),
+							target.NewAggregate("id1", "instance"),
+							[]target.Changes{
+								target.ChangeInterruptOnError(false),
+							},
+						),
+					),
+				),
+				denyList: []denylist.AddressChecker{localhostAddrChecker},
+				lookupFunc: func(_ string) ([]net.IP, error) {
+					return []net.IP{[]byte("192.168.1.1")}, nil
+				},
+			},
+			args{
+				ctx: context.Background(),
+				change: &ChangeTarget{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "id1",
+					},
+					InterruptOnError: gu.Ptr(false),
+				},
+				resourceOwner: "instance",
+			},
+			res{},
+		},
+		{
 			"push full ok",
 			fields{
 				eventstore: expectEventstore(
