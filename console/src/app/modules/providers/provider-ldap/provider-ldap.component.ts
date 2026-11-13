@@ -4,6 +4,7 @@ import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { BehaviorSubject, take } from 'rxjs';
+import { providerOptionsFromStored } from 'src/app/modules/provider-options/provider-options';
 import {
   AddLDAPProviderRequest as AdminAddLDAPProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -154,6 +155,7 @@ export class ProviderLDAPComponent {
       .then((resp) => {
         if (resp.idp) {
           this.provider = resp.idp;
+          this.options = providerOptionsFromStored(this.provider?.config?.options);
           this.loading = false;
 
           this.name?.setValue(this.provider.name);

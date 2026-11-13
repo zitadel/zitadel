@@ -1,5 +1,6 @@
 import { Component, Injector, Type } from '@angular/core';
 import { Location } from '@angular/common';
+import { providerOptionsFromStored } from 'src/app/modules/provider-options/provider-options';
 import {
   AutoLinkingOption,
   Options,
@@ -310,6 +311,7 @@ export class ProviderSamlSpComponent {
       .getProviderByID(req)
       .then((resp) => {
         this.provider = resp.idp;
+        this.options = providerOptionsFromStored(this.provider?.config?.options);
         this.loading = false;
         this.name.setValue(this.provider?.name || '');
         if (this.provider?.config?.saml) {
