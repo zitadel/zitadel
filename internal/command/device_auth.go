@@ -142,7 +142,21 @@ func (c *Commands) ApproveDeviceAuthWithSession(
 	return writeModelToObjectDetails(&model.WriteModel), nil
 }
 
+// CancelDeviceAuth cancels the device authorization on behalf of a caller
+// that holds the session.link permission, such as a custom login UI.
 func (c *Commands) CancelDeviceAuth(ctx context.Context, id string, reason domain.DeviceAuthCanceled) (*domain.ObjectDetails, error) {
+	return c.cancelDeviceAuth(ctx, id, reason, true)
+}
+
+// DenyDeviceAuth cancels the device authorization when the end user denies it
+// in the hosted login (v1). The login has already verified that the auth request
+// is done and belongs to the user agent, which is the same guarantee
+// [Commands.ApproveDeviceAuth] relies on, so no session.link permission is required.
+func (c *Commands) DenyDeviceAuth(ctx context.Context, deviceCode string) (*domain.ObjectDetails, error) {
+	return c.cancelDeviceAuth(ctx, deviceCode, domain.DeviceAuthCanceledDenied, false)
+}
+
+func (c *Commands) cancelDeviceAuth(ctx context.Context, id string, reason domain.DeviceAuthCanceled, checkPermission bool) (*domain.ObjectDetails, error) {
 	model, err := c.getDeviceAuthWriteModelByDeviceCode(ctx, id)
 	if err != nil {
 		return nil, err
@@ -150,8 +164,10 @@ func (c *Commands) CancelDeviceAuth(ctx context.Context, id string, reason domai
 	if !model.State.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-gee5A", "Errors.DeviceAuth.NotFound")
 	}
-	if err := c.checkPermission(ctx, domain.PermissionSessionLink, model.ResourceOwner, ""); err != nil {
-		return nil, err
+	if checkPermission {
+		if err := c.checkPermission(ctx, domain.PermissionSessionLink, model.ResourceOwner, ""); err != nil {
+			return nil, err
+		}
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewCanceledEvent(ctx, model.aggregate, reason))
 	if err != nil {
