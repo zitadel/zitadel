@@ -97,17 +97,19 @@ func TestSendEmail(t *testing.T) {
 		germanText = `Dieser Benutzer wurde soeben im Zitadel erstellt. Mit dem Benutzernamen <br><strong>{{.PreferredLoginName}}</strong><br> kannst du dich anmelden. (Code <strong>{{.Code}}</strong>)`
 	)
 	smtpConfig := &email.Config{
+		ProviderConfig: &email.Provider{ID: "smtpProvider"},
 		SMTPConfig: &smtp.Config{
 			SMTP: smtp.SMTP{Host: "smtp.example.com:587"},
 			From: "noreply@example.com",
 		},
 	}
 	webhookConfig := &email.Config{
-		WebhookConfig: &webhook.Config{CallURL: "https://relay.example.com"},
+		ProviderConfig: &email.Provider{ID: "webhookProvider"},
+		WebhookConfig:  &webhook.Config{CallURL: "https://relay.example.com"},
 	}
-	expectMessage := func(content string, headers map[string]string) *messages.Email {
+	expectMessage := func(recipient, content string, headers map[string]string) *messages.Email {
 		return &messages.Email{
-			Recipients:          []string{"user@example.com"},
+			Recipients:          []string{recipient},
 			Subject:             "Invitation to App",
 			Content:             content,
 			Headers:             headers,
@@ -162,6 +164,7 @@ func TestSendEmail(t *testing.T) {
 			displayName:       "O'Brien <b>",
 			wantRuleRequested: true,
 			wantMessage: expectMessage(
+				"user@example.ch",
 				`<html><h1>Hello O&#39;Brien &lt;b&gt;,</h1>`+
 					`<p>Click <a href="https://other.example">here</a> to join App</p>`+
 					`<a href="https://login.example.com/invite?userID=user1&code=code1">Accept</a></html>`,
@@ -178,6 +181,7 @@ func TestSendEmail(t *testing.T) {
 			displayName:       "O'Brien <b>",
 			wantRuleRequested: true,
 			wantMessage: expectMessage(
+				"user@example.ch",
 				`<html><h1>Hello O&#39;Brien &lt;b&gt;,</h1>`+
 					`<p>Click here to join App</p>`+
 					`<a href="https://login.example.com/invite?userID=user1&code=code1">Accept</a></html>`,
@@ -195,7 +199,7 @@ func TestSendEmail(t *testing.T) {
 			displayName:       "{{.Subject}}",
 			wantRuleRequested: true,
 			wantMessage: &messages.Email{
-				Recipients: []string{"user@example.com"},
+				Recipients: []string{"user@example.ch"},
 				// the subject is no HTML and therefore not restricted, so it must not be rendered into the content
 				Subject: `Click <a href="https://other.example">here</a> to join App`,
 				Content: `<html><h1>Hello {{.Subject}},</h1>` +
@@ -215,7 +219,7 @@ func TestSendEmail(t *testing.T) {
 			displayName:       "Bob",
 			wantRuleRequested: true,
 			wantMessage: &messages.Email{
-				Recipients: []string{"user@example.com"},
+				Recipients: []string{"user@example.ch"},
 				Subject:    `Click <a href="https://other.example">here</a> to join App`,
 				Content: `<html><h1>Hello Bob,</h1>` +
 					`<p>Join {{.Subject}} and {{.URL}}</p>` +
@@ -233,6 +237,7 @@ func TestSendEmail(t *testing.T) {
 			displayName:       "Bob",
 			wantRuleRequested: true,
 			wantMessage: expectMessage(
+				"user@example.ch",
 				`<html><h1>Hello Bob,</h1>`+
 					`<p>Use <strong>code1</strong><br>to join App</p>`+
 					`<a href="https://login.example.com/invite?userID=user1&code=code1">Accept</a></html>`,
@@ -249,6 +254,7 @@ func TestSendEmail(t *testing.T) {
 			displayName:       "<b>Bob</b><br>",
 			wantRuleRequested: true,
 			wantMessage: expectMessage(
+				"user@example.ch",
 				`<html><h1>Hello &lt;b&gt;Bob&lt;/b&gt;&lt;br&gt;,</h1>`+
 					`<p>Use <strong>code1</strong><br>to join App</p>`+
 					`<a href="https://login.example.com/invite?userID=user1&code=code1">Accept</a></html>`,
@@ -262,6 +268,7 @@ func TestSendEmail(t *testing.T) {
 			displayName:       "Bob",
 			wantRuleRequested: true,
 			wantMessage: expectMessage(
+				"user@example.ch",
 				`<html><h1>Hello Bob,</h1>`+
 					`<p>Dieser Benutzer wurde soeben im Zitadel erstellt. Mit dem Benutzernamen <br><strong>bob@example.com</strong><br> kannst du dich anmelden. (Code <strong>code1</strong>)</p>`+
 					`<a href="https://login.example.com/invite?userID=user1&code=code1">Accept</a></html>`,
@@ -278,6 +285,7 @@ func TestSendEmail(t *testing.T) {
 			displayName:       "Bob",
 			wantRuleRequested: true,
 			wantMessage: expectMessage(
+				"user@example.ch",
 				`<html><h1>Hello Bob,</h1>`+
 					`<p>Dieser Benutzer wurde soeben im Zitadel erstellt. Mit dem Benutzernamen <br><strong>bob@example.com</strong><br> kannst du dich anmelden. (Code <strong>code1</strong>)</p>`+
 					`<a href="https://login.example.com/invite?userID=user1&code=code1">Accept</a></html>`,
@@ -296,6 +304,7 @@ func TestSendEmail(t *testing.T) {
 			displayName:       "Bob",
 			wantRuleRequested: true,
 			wantMessage: expectMessage(
+				"user@example.ch",
 				`<html><h1>Hello Bob,</h1>`+
 					`<p>Click <a href="https://other.example">here</a> to join App</p>`+
 					`<a href="https://login.example.com/invite?userID=user1&code=code1">Accept</a></html>`,
@@ -328,11 +337,12 @@ func TestSendEmail(t *testing.T) {
 				ResourceOwner:      "org1",
 				DisplayName:        tt.displayName,
 				PreferredLoginName: "bob@example.com",
-				LastEmail:          "user@example.com",
+				LastEmail:          "user@example.ch",
 				PreferredLanguage:  language.English,
 			}
 
-			notify := SendEmail(t.Context(), tt.channels, mailTemplate, translator, user, &query.LabelPolicy{}, eventType)
+			deliveryInfo := new(senders.DeliveryInfo)
+			notify := SendEmail(t.Context(), tt.channels, mailTemplate, translator, user, &query.LabelPolicy{}, eventType, deliveryInfo)
 			err = notify(
 				cmp.Or(tt.urlTemplate, urlTemplate),
 				map[string]any{"Code": "code1", "ApplicationName": "App"},
@@ -349,6 +359,8 @@ func TestSendEmail(t *testing.T) {
 				return
 			}
 			require.NoError(t, err)
+			// the provider is stated, as the email was sent to it
+			assert.Equal(t, senders.DeliveryInfo{ProviderID: tt.channels.emailConfig.ProviderConfig.ID}, *deliveryInfo)
 			require.Len(t, tt.channels.messages, 1)
 			assert.Equal(t, 1, tt.channels.chainsCreated)
 			if tt.wantMessage != nil {
