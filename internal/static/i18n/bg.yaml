@@ -543,6 +543,7 @@ Errors:
     NotExisting: "Auth Request не съществува"
     WrongLoginClient: "Auth Request, създаден от друг клиент за влизане"
     AlreadyHandled: "Заявката за удостоверяване вече е обработена"
+    NotAuthenticated: "Потребителят не е удостоверен"
   OIDCSession:
     RefreshTokenInvalid: "Токенът за опресняване е невалиден"
     Token:

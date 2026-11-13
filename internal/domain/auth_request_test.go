@@ -106,3 +106,23 @@ func TestAuthRequest_UserAuthMethodTypes(t *testing.T) {
 		})
 	}
 }
+
+func TestAuthRequest_CodeIssuedToCurrentUser(t *testing.T) {
+	tests := []struct {
+		name       string
+		userID     string
+		codeUserID string
+		want       bool
+	}{
+		{"same user", "alice", "alice", true},
+		{"user switched after issuance", "bob", "alice", false},
+		{"no user bound at issuance", "bob", "", false},
+		{"both empty", "", "", false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			a := &AuthRequest{UserID: tt.userID, CodeUserID: tt.codeUserID}
+			assert.Equal(t, tt.want, a.CodeIssuedToCurrentUser())
+		})
+	}
+}

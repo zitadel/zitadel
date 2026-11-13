@@ -541,6 +541,7 @@ Errors:
     NotExisting: "Požadavek na autentizaci neexistuje"
     WrongLoginClient: "Požadavek na autentizaci vytvořen jiným klientem přihlášení"
     AlreadyHandled: "Žádost o ověření již byla zpracována"
+    NotAuthenticated: "Uživatel není ověřen"
   OIDCSession:
     RefreshTokenInvalid: "Obnovovací token je neplatný"
     Token:

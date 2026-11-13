@@ -543,6 +543,7 @@ Errors:
     NotExisting: "Auth Verzoek bestaat niet"
     WrongLoginClient: "Auth Verzoek aangemaakt door andere login client"
     AlreadyHandled: "Authenticatieverzoek is al verwerkt"
+    NotAuthenticated: "Gebruiker is niet geauthenticeerd"
   OIDCSession:
     RefreshTokenInvalid: "Refresh Token is ongeldig"
     Token:

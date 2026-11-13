@@ -544,6 +544,7 @@ Errors:
     NotExisting: "AuthRequest不存在"
     WrongLoginClient: "其他登录客户端创建的AuthRequest"
     AlreadyHandled: "身份验证请求已被处理"
+    NotAuthenticated: "用户未认证"
   OIDCSession:
     RefreshTokenInvalid: "Refresh Token 无效"
     Token:

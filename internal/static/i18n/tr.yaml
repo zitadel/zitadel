@@ -543,6 +543,7 @@ Errors:
     NotExisting: "Kimlik Doğrulama İsteği mevcut değil"
     WrongLoginClient: "Kimlik Doğrulama İsteği başka giriş istemcisi tarafından oluşturulmuş"
     AlreadyHandled: "Kimlik Doğrulama İsteği zaten işlenmiş"
+    NotAuthenticated: "Kullanıcı kimliği doğrulanmadı"
   OIDCSession:
     RefreshTokenInvalid: "Yenileme Token'ı geçersiz"
     Token:
