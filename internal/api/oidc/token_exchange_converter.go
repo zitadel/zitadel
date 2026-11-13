@@ -37,6 +37,7 @@ func accessToExchangeToken(token *accessToken, issuer string) *exchangeToken {
 		userID:            token.userID,
 		issuer:            issuer,
 		resourceOwner:     token.resourceOwner,
+		authTime:          token.authTime,
 		authMethods:       token.authMethods,
 		actor:             token.actor,
 		audience:          token.audience,
