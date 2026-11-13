@@ -691,9 +691,16 @@ func NewTerminateEvent(
 }
 
 func TerminateEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	return &TerminateEvent{
+	terminated := &TerminateEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
+	}
+
+	err := event.Unmarshal(terminated)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "SESSION-dA2g9", "unable to unmarshal session terminated")
+	}
+
+	return terminated, nil
 }
 
 type RecoveryCodeCheckedEvent struct {
