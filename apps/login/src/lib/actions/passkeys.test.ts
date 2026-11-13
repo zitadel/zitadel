@@ -38,6 +38,12 @@ vi.mock("@/lib/server/cookies", () => ({
   getMostRecentSessionCookie: vi.fn(),
 }));
 
+// the browser's cookie is not part of these tests, only what sendPasskey does without an entry
+vi.mock("@/lib/server/session", async () => ({
+  ...(await vi.importActual<typeof import("@/lib/server/session")>("@/lib/server/session")),
+  reportMissingSessionCookie: vi.fn(async () => "cookie_missing"),
+}));
+
 vi.mock("@/lib/server/verify-helper", () => ({
   checkEmailVerification: vi.fn(),
   checkUserVerification: vi.fn(),
@@ -129,7 +135,7 @@ describe("sendPasskey", () => {
       });
 
       expect(result).toEqual({
-        error: "couldNotFindSession",
+        error: "sessionResolution.cookieMissing",
       });
       expect(mockGetSessionCookieById).toHaveBeenCalledWith({
         sessionId: "test-session-id",
@@ -163,7 +169,7 @@ describe("sendPasskey", () => {
       });
 
       expect(result).toEqual({
-        error: "couldNotFindSession",
+        error: "sessionResolution.cookieMissing",
       });
       expect(mockGetMostRecentSessionCookie).toHaveBeenCalled();
     });

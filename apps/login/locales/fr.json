@@ -481,6 +481,14 @@
     "noDeviceRequest": "Aucune demande d'appareil trouvée.",
     "unknownContext": "Impossible d'obtenir le contexte de l'utilisateur. Assurez-vous d'abord de saisir le nom d'utilisateur ou de fournir un loginName comme paramètre de recherche.",
     "sessionExpired": "Votre session a expiré ou nécessite une nouvelle authentification. Veuillez vous reconnecter.",
+    "sessionResolution": {
+      "cookieMissing": "La session de navigateur nécessaire pour continuer est introuvable. Veuillez recommencer la connexion.",
+      "cookieInvalid": "Votre session de navigateur n'est plus valide. Veuillez recommencer la connexion.",
+      "entryNotFound": "La session de connexion de ce compte n'est plus disponible. Veuillez vous reconnecter.",
+      "sessionNotFound": "Cette session de connexion est terminée ou a expiré. Veuillez vous reconnecter.",
+      "lookupFailed": "Nous n'avons pas pu vérifier votre session de connexion. Veuillez réessayer.",
+      "restart": "Recommencer la connexion"
+    },
     "failedLoading": "Échec du chargement des données. Veuillez réessayer.",
     "tryagain": "Réessayer",
     "couldNotContinueSession": "Impossible de continuer la session - informations utilisateur manquantes",

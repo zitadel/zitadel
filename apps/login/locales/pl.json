@@ -481,6 +481,14 @@
     "noDeviceRequest": "Nie znaleziono żądania urządzenia.",
     "unknownContext": "Nie udało się pobrać kontekstu użytkownika. Upewnij się, że najpierw wprowadziłeś nazwę użytkownika lub podałeś login jako parametr wyszukiwania.",
     "sessionExpired": "Twoja sesja wygasła lub wymaga ponownego uwierzytelnienia. Zaloguj się ponownie.",
+    "sessionResolution": {
+      "cookieMissing": "Nie znaleziono sesji przeglądarki wymaganej do kontynuacji. Rozpocznij logowanie od nowa.",
+      "cookieInvalid": "Twoja sesja przeglądarki nie jest już ważna. Rozpocznij logowanie od nowa.",
+      "entryNotFound": "Sesja logowania dla tego konta nie jest już dostępna. Zaloguj się ponownie.",
+      "sessionNotFound": "Ta sesja logowania została zakończona lub wygasła. Zaloguj się ponownie.",
+      "lookupFailed": "Nie udało się zweryfikować Twojej sesji logowania. Spróbuj ponownie.",
+      "restart": "Rozpocznij logowanie od nowa"
+    },
     "failedLoading": "Nie udało się załadować danych. Spróbuj ponownie.",
     "tryagain": "Spróbuj ponownie",
     "couldNotContinueSession": "Nie udało się kontynuować sesji - brak informacji o użytkowniku",

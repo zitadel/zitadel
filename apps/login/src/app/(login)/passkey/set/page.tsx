@@ -1,6 +1,7 @@
 import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterPasskey } from "@/components/register-passkey";
+import { RestartSignIn } from "@/components/restart-sign-in";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceConfig } from "@/lib/server/service-url";
@@ -98,6 +99,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
               {/* context was provided but the session could not be resolved (cookie missing, invalid or expired) */}
               <Translated i18nKey={loginName || userId ? "sessionExpired" : "unknownContext"} namespace="error" />
             </Alert>
+            <RestartSignIn loginName={loginName} organization={organization} requestId={requestId} />
           </div>
         )}
 

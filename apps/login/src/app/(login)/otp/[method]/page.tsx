@@ -1,10 +1,11 @@
 import { Alert } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { LoginOTP } from "@/components/login-otp";
+import { RestartSignIn } from "@/components/restart-sign-in";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceConfig } from "@/lib/server/service-url";
-import { loadMostRecentSession, loadSessionById } from "@/lib/server/session";
+import { resolveMostRecentSession, resolveSessionById, SESSION_RESOLUTION_MESSAGE_KEYS } from "@/lib/server/session";
 import { getBrandingSettings, getLoginSettings } from "@/lib/server/zitadel";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -35,9 +36,9 @@ export default async function Page(props: {
 
   const { method } = params;
 
-  const session = sessionId
-    ? await loadSessionById(serviceConfig, sessionId, organization)
-    : await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } });
+  const { session, reason } = sessionId
+    ? await resolveSessionById(serviceConfig, sessionId, organization, "otp_page")
+    : await resolveMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } }, "otp_page");
 
   // email links do not come with organization, thus we need to use the session's organization
   const branding = await getBrandingSettings({
@@ -75,9 +76,13 @@ export default async function Page(props: {
         {!session && (
           <div className="py-4">
             <Alert>
-              {/* context was provided but the session could not be resolved (cookie missing, invalid or expired) */}
-              <Translated i18nKey={loginName || sessionId ? "sessionExpired" : "unknownContext"} namespace="error" />
+              {/* context was provided but the session could not be resolved, the reason picks the message */}
+              <Translated
+                i18nKey={loginName || sessionId ? SESSION_RESOLUTION_MESSAGE_KEYS[reason] : "unknownContext"}
+                namespace="error"
+              />
             </Alert>
+            <RestartSignIn loginName={loginName} organization={organization} requestId={requestId} />
           </div>
         )}
 

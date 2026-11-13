@@ -481,6 +481,14 @@
     "noDeviceRequest": "Cihaz isteği bulunamadı.",
     "unknownContext": "Kullanıcının bağlamı alınamadı. Önce kullanıcı adını girdiğinizden emin olun veya searchParam olarak bir loginName sağlayın.",
     "sessionExpired": "Oturumunuzun süresi doldu veya yeniden kimlik doğrulaması gerekiyor. Lütfen tekrar giriş yapın.",
+    "sessionResolution": {
+      "cookieMissing": "Devam etmek için gereken tarayıcı oturumu bulunamadı. Lütfen giriş işlemini yeniden başlatın.",
+      "cookieInvalid": "Tarayıcı oturumunuz artık geçerli değil. Lütfen giriş işlemini yeniden başlatın.",
+      "entryNotFound": "Bu hesabın giriş oturumu artık kullanılamıyor. Lütfen tekrar giriş yapın.",
+      "sessionNotFound": "Bu giriş oturumu sona erdi veya süresi doldu. Lütfen tekrar giriş yapın.",
+      "lookupFailed": "Giriş oturumunuz doğrulanamadı. Lütfen tekrar deneyin.",
+      "restart": "Girişi yeniden başlat"
+    },
     "failedLoading": "Veri yüklenemedi. Lütfen tekrar deneyin.",
     "tryagain": "Tekrar Dene",
     "couldNotContinueSession": "Oturuma devam edilemedi - kullanıcı bilgileri eksik",

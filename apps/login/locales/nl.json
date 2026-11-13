@@ -481,6 +481,14 @@
     "noDeviceRequest": "Geen apparaatverzoek gevonden.",
     "unknownContext": "Kon de context van de gebruiker niet ophalen. Zorg ervoor dat u eerst de gebruikersnaam invoert of een loginName als zoekparameter opgeeft.",
     "sessionExpired": "Uw sessie is verlopen of vereist opnieuw authenticatie. Log opnieuw in.",
+    "sessionResolution": {
+      "cookieMissing": "De browsersessie die nodig is om door te gaan, is niet gevonden. Start het inloggen opnieuw.",
+      "cookieInvalid": "Uw browsersessie is niet meer geldig. Start het inloggen opnieuw.",
+      "entryNotFound": "De inlogsessie voor dit account is niet meer beschikbaar. Log opnieuw in.",
+      "sessionNotFound": "Deze inlogsessie is beëindigd of verlopen. Log opnieuw in.",
+      "lookupFailed": "We konden uw inlogsessie niet verifiëren. Probeer het opnieuw.",
+      "restart": "Inloggen opnieuw starten"
+    },
     "failedLoading": "Gegevens laden mislukt. Probeer het opnieuw.",
     "tryagain": "Opnieuw proberen",
     "couldNotContinueSession": "Kon de sessie niet voortzetten - ontbrekende gebruikersinformatie",

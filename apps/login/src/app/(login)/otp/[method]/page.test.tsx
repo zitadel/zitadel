@@ -7,10 +7,14 @@ vi.mock("@/lib/server/zitadel", () => ({
   getLoginSettings: vi.fn(),
 }));
 
-vi.mock("@/lib/server/session", () => ({
-  loadMostRecentSession: vi.fn(),
-  loadSessionById: vi.fn(),
-}));
+vi.mock("@/lib/server/session", async () => {
+  const actual = await vi.importActual<typeof import("@/lib/server/session")>("@/lib/server/session");
+  return {
+    resolveMostRecentSession: vi.fn(),
+    resolveSessionById: vi.fn(),
+    SESSION_RESOLUTION_MESSAGE_KEYS: actual.SESSION_RESOLUTION_MESSAGE_KEYS,
+  };
+});
 
 vi.mock("@/lib/server/service-url", () => ({
   getServiceConfig: vi.fn(() => ({ serviceConfig: { baseUrl: "https://example.com" } })),
@@ -45,34 +49,42 @@ vi.mock("next/headers", () => ({
 }));
 
 describe("otp page", () => {
-  let loadSessionById: any;
-  let loadMostRecentSession: any;
+  let resolveSessionById: any;
+  let resolveMostRecentSession: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
     const zitadel = await import("@/lib/server/zitadel");
     const sessionLib = await import("@/lib/server/session");
 
-    loadSessionById = vi.mocked(sessionLib.loadSessionById);
-    loadMostRecentSession = vi.mocked(sessionLib.loadMostRecentSession);
+    resolveSessionById = vi.mocked(sessionLib.resolveSessionById);
+    resolveMostRecentSession = vi.mocked(sessionLib.resolveMostRecentSession);
     vi.mocked(zitadel.getBrandingSettings).mockResolvedValue({} as any);
     vi.mocked(zitadel.getLoginSettings).mockResolvedValue({} as any);
   });
 
   afterEach(cleanup);
 
-  // A rejected session cookie must not crash the render: the shared loaders resolve undefined and
-  // the page falls back to its no-session alert on every branch.
+  async function renderPage(searchParams: Record<string, string>) {
+    const result = await Page({
+      searchParams: Promise.resolve(searchParams),
+      params: Promise.resolve({ method: "time-based" }),
+    });
+    render(result);
+  }
+
+  // A session that cannot be resolved must not crash the render: the page shows the alert for the
+  // reason on every branch.
   test.each([
     {
       name: "sessionId and loginName",
       searchParams: { sessionId: "session-1", loginName: "user@example.com", organization: "org-1" },
-      expectedAlert: "sessionExpired",
+      expectedAlert: "sessionResolution.sessionNotFound",
     },
     {
       name: "loginName only",
       searchParams: { loginName: "user@example.com", organization: "org-1" },
-      expectedAlert: "sessionExpired",
+      expectedAlert: "sessionResolution.sessionNotFound",
     },
     {
       name: "neither sessionId nor loginName",
@@ -82,27 +94,65 @@ describe("otp page", () => {
   ])(
     "renders the $expectedAlert alert and no OTP form when the session cannot be loaded ($name)",
     async ({ searchParams, expectedAlert }) => {
-      loadSessionById.mockResolvedValue(undefined);
-      loadMostRecentSession.mockResolvedValue(undefined);
+      resolveSessionById.mockResolvedValue({ reason: "server_session_not_found" });
+      resolveMostRecentSession.mockResolvedValue({ reason: "server_session_not_found" });
 
-      const result = await Page({
-        searchParams: Promise.resolve(searchParams),
-        params: Promise.resolve({ method: "time-based" }),
-      });
-      render(result);
+      await renderPage(searchParams as Record<string, string>);
 
       if (searchParams.sessionId) {
-        expect(loadSessionById).toHaveBeenCalledWith({ baseUrl: "https://example.com" }, "session-1", "org-1");
-        expect(loadMostRecentSession).not.toHaveBeenCalled();
+        expect(resolveSessionById).toHaveBeenCalledWith(
+          { baseUrl: "https://example.com" },
+          "session-1",
+          "org-1",
+          "otp_page",
+        );
+        expect(resolveMostRecentSession).not.toHaveBeenCalled();
       } else {
-        expect(loadMostRecentSession).toHaveBeenCalledWith({
-          serviceConfig: { baseUrl: "https://example.com" },
-          sessionParams: { loginName: searchParams.loginName, organization: searchParams.organization },
-        });
-        expect(loadSessionById).not.toHaveBeenCalled();
+        expect(resolveMostRecentSession).toHaveBeenCalledWith(
+          {
+            serviceConfig: { baseUrl: "https://example.com" },
+            sessionParams: { loginName: searchParams.loginName, organization: searchParams.organization },
+          },
+          "otp_page",
+        );
+        expect(resolveSessionById).not.toHaveBeenCalled();
       }
       expect(screen.getByRole("alert").textContent).toBe(expectedAlert);
       expect(screen.queryByTestId("login-otp")).toBeNull();
     },
   );
+
+  test.each([
+    ["cookie_missing", "sessionResolution.cookieMissing"],
+    ["cookie_invalid", "sessionResolution.cookieInvalid"],
+    ["session_entry_not_found", "sessionResolution.entryNotFound"],
+    ["server_session_not_found", "sessionResolution.sessionNotFound"],
+    ["session_token_rejected", "sessionResolution.cookieInvalid"],
+    ["session_lookup_failed", "sessionResolution.lookupFailed"],
+  ])("shows the message for %s", async (reason, expectedAlert) => {
+    resolveMostRecentSession.mockResolvedValue({ reason });
+
+    await renderPage({ loginName: "user@example.com" });
+
+    expect(screen.getByRole("alert").textContent).toBe(expectedAlert);
+  });
+
+  test("offers to restart the sign-in with the auth request when the session cannot be resolved", async () => {
+    resolveMostRecentSession.mockResolvedValue({ reason: "cookie_missing" });
+
+    await renderPage({ loginName: "user@example.com", organization: "org-1", requestId: "oidc_123" });
+
+    const href = screen.getByTestId("restart-sign-in").getAttribute("href");
+    expect(href).toBe("/loginname?loginName=user%40example.com&organization=org-1&requestId=oidc_123");
+  });
+
+  test("renders the OTP form and no alert when the session resolves", async () => {
+    resolveMostRecentSession.mockResolvedValue({ session: { id: "session-1", factors: { user: { loginName: "user" } } } });
+
+    await renderPage({ loginName: "user@example.com" });
+
+    expect(screen.getByTestId("login-otp")).toBeTruthy();
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.queryByTestId("restart-sign-in")).toBeNull();
+  });
 });

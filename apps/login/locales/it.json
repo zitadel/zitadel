@@ -481,6 +481,14 @@
     "noDeviceRequest": "Nessuna richiesta di dispositivo trovata.",
     "unknownContext": "Impossibile ottenere il contesto dell'utente. Assicurati di inserire prima il nome utente o di fornire un loginName come parametro di ricerca.",
     "sessionExpired": "La tua sessione è scaduta o richiede una nuova autenticazione. Effettua nuovamente l'accesso.",
+    "sessionResolution": {
+      "cookieMissing": "La sessione del browser necessaria per continuare non è stata trovata. Riavvia la procedura di accesso.",
+      "cookieInvalid": "La tua sessione del browser non è più valida. Riavvia la procedura di accesso.",
+      "entryNotFound": "La sessione di accesso per questo account non è più disponibile. Effettua nuovamente l'accesso.",
+      "sessionNotFound": "Questa sessione di accesso è terminata o scaduta. Effettua nuovamente l'accesso.",
+      "lookupFailed": "Non è stato possibile verificare la tua sessione di accesso. Riprova.",
+      "restart": "Riavvia l'accesso"
+    },
     "failedLoading": "Impossibile caricare i dati. Riprova.",
     "tryagain": "Riprova",
     "couldNotContinueSession": "Impossibile continuare con la sessione - informazioni utente mancanti",

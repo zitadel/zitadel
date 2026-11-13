@@ -1,6 +1,7 @@
 import { Alert } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterU2f } from "@/components/register-u2f";
+import { RestartSignIn } from "@/components/restart-sign-in";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getEnrollmentAuthorizationError } from "@/lib/server/enrollment-guard";
@@ -75,6 +76,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
               {/* a loginName was provided but the session could not be resolved (cookie missing, invalid or expired) */}
               <Translated i18nKey={!sessionFactors && loginName ? "sessionExpired" : "unknownContext"} namespace="error" />
             </Alert>
+            <RestartSignIn loginName={loginName} organization={organization} requestId={requestId} />
           </div>
         )}
 

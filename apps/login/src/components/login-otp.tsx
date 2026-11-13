@@ -16,6 +16,7 @@ import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
+import { RestartSignIn } from "./restart-sign-in";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 
@@ -38,6 +39,8 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
   const t = useTranslations("otp");
 
   const [error, setError] = useState<string>("");
+  // the session of this step is gone, retrying cannot succeed
+  const [sessionLost, setSessionLost] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
@@ -85,6 +88,7 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
     }
 
     if (response && "error" in response && response.error) {
+      setSessionLost("sessionLost" in response);
       return { error: response.error };
     }
 
@@ -157,6 +161,7 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
       });
 
     if (response && "error" in response && response.error) {
+      setSessionLost("sessionLost" in response);
       setError(response.error);
       return;
     }
@@ -240,6 +245,7 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
         {error && (
           <div className="py-4" data-testid="error">
             <Alert>{error}</Alert>
+            {sessionLost && <RestartSignIn loginName={loginName} organization={organization} requestId={requestId} />}
           </div>
         )}
 

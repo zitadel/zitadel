@@ -481,6 +481,14 @@
     "noDeviceRequest": " Es wurde keine Geräteanforderung gefunden. Bitte überprüfen Sie die URL.",
     "unknownContext": "Der Kontext des Benutzers konnte nicht ermittelt werden. Stellen Sie sicher, dass Sie zuerst den Benutzernamen eingeben oder einen loginName als Suchparameter angeben.",
     "sessionExpired": "Ihre Sitzung ist abgelaufen oder erfordert eine erneute Authentifizierung. Bitte melden Sie sich erneut an.",
+    "sessionResolution": {
+      "cookieMissing": "Die zum Fortfahren benötigte Browsersitzung wurde nicht gefunden. Bitte starten Sie die Anmeldung erneut.",
+      "cookieInvalid": "Ihre Browsersitzung ist nicht mehr gültig. Bitte starten Sie die Anmeldung erneut.",
+      "entryNotFound": "Die Anmeldesitzung für dieses Konto ist nicht mehr verfügbar. Bitte melden Sie sich erneut an.",
+      "sessionNotFound": "Diese Anmeldesitzung wurde beendet oder ist abgelaufen. Bitte melden Sie sich erneut an.",
+      "lookupFailed": "Ihre Anmeldesitzung konnte nicht überprüft werden. Bitte versuchen Sie es erneut.",
+      "restart": "Anmeldung neu starten"
+    },
     "failedLoading": "Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
     "tryagain": "Erneut versuchen",
     "couldNotContinueSession": "Sitzung konnte nicht fortgesetzt werden - fehlende Benutzerinformationen",
