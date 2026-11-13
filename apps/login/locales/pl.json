@@ -255,6 +255,11 @@
       "smsDescription": "Wprowadź swój numer telefonu, aby otrzymać kod SMS-em.",
       "emailDescription": "Wprowadź swój adres e-mail, aby otrzymać kod e-mailem.",
       "totpRegisterDescription": "Zeskanuj kod QR lub otwórz adres URL ręcznie.",
+      "emailAddDescription": "Używaj jednorazowego kodu wysyłanego na zweryfikowany adres e-mail jako drugiego składnika.",
+      "smsAddDescription": "Używaj jednorazowego kodu wysyłanego na zweryfikowany numer telefonu jako drugiego składnika.",
+      "add": "Dodaj",
+      "emailAdded": "Dodano kod przez e-mail.",
+      "smsAdded": "Dodano kod przez SMS.",
       "submit": "Kontynuuj",
       "labels": {
         "code": "Kod"
@@ -265,7 +270,13 @@
     },
     "errors": {
       "couldNotRequestChallenge": "Nie można zażądać wyzwania OTP",
-      "couldNotVerifyCode": "Nie można zweryfikować kodu OTP"
+      "couldNotVerifyCode": "Nie można zweryfikować kodu OTP",
+      "couldNotGetSession": "Nie udało się wczytać sesji. Zaloguj się ponownie.",
+      "invalidMethod": "Ten drugi składnik nie jest obsługiwany.",
+      "couldNotAddEmail": "Nie udało się dodać kodu przez e-mail.",
+      "couldNotAddSms": "Nie udało się dodać kodu przez SMS.",
+      "emailNotVerified": "Zweryfikuj adres e-mail przed dodaniem kodów przez e-mail.",
+      "phoneNotVerified": "Zweryfikuj numer telefonu przed dodaniem kodów przez SMS."
     }
   },
   "passkey": {
