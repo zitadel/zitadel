@@ -43,6 +43,8 @@ type ChannelChains interface {
 	SMTPRule(ctx context.Context, config *smtp.Config, orgID string) smtp.Rule
 }
 
+// SendEmail returns a [Notify] function, which sends the notification as email.
+// deliveryInfo is optional and states the provider the email was sent through.
 func SendEmail(
 	ctx context.Context,
 	channels ChannelChains,
@@ -51,6 +53,7 @@ func SendEmail(
 	user *query.NotifyUser,
 	colors *query.LabelPolicy,
 	triggeringEventType eventstore.EventType,
+	deliveryInfo *senders.DeliveryInfo,
 ) Notify {
 	return func(
 		urlTmpl string,
@@ -96,6 +99,7 @@ func SendEmail(
 			args,
 			allowUnverifiedNotificationChannel,
 			triggeringEventType,
+			deliveryInfo,
 		)
 	}
 }
