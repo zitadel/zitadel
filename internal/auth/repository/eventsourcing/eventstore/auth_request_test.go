@@ -3306,3 +3306,62 @@ func TestAuthRequestRepo_VerifyPassword_IgnoreUnknownUsernames(t *testing.T) {
 		})
 	}
 }
+
+func TestAuthRequestRepo_SaveAuthCode(t *testing.T) {
+	newRepo := func(authRequests cache.AuthRequestCache, sessionView userSessionViewProvider) *AuthRequestRepo {
+		return &AuthRequestRepo{
+			AuthRequests:            authRequests,
+			UserSessionViewProvider: sessionView,
+			UserViewProvider: &mockViewUser{
+				PasswordSet:     true,
+				IsEmailVerified: true,
+				OTPState:        int32(user_model.MFAStateReady),
+				MFAMaxSetUp:     int32(domain.MFALevelSecondFactor),
+			},
+			UserEventProvider:         &mockEventUser{},
+			OrgViewProvider:           &mockViewOrg{State: domain.OrgStateActive},
+			UserGrantProvider:         &mockUserGrants{},
+			ProjectProvider:           &mockProject{},
+			ApplicationProvider:       &mockApp{app: &query.App{OIDCConfig: &query.OIDCApp{AppType: domain.OIDCApplicationTypeWeb}}},
+			LoginPolicyViewProvider:   &mockLoginPolicy{policy: &query.LoginPolicy{AllowUsernamePassword: true, SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeTOTP}, PasswordCheckLifetime: database.Duration(10 * 24 * time.Hour), SecondFactorCheckLifetime: database.Duration(18 * time.Hour)}},
+			LockoutPolicyViewProvider: &mockLockoutPolicy{policy: &query.LockoutPolicy{}},
+			IDPUserLinksProvider:      &mockIDPUserLinks{},
+			PrivacyPolicyProvider:     &mockPrivacyPolicy{policy: &query.PrivacyPolicy{}},
+			LabelPolicyProvider:       &mockLabelPolicy{policy: &query.LabelPolicy{}},
+			PasswordAgePolicyProvider: &mockPasswordAgePolicy{policy: &query.PasswordAgePolicy{}},
+			CustomTextProvider:        &mockCustomText{texts: &query.CustomTexts{}},
+		}
+	}
+	newRequest := func() *domain.AuthRequest {
+		return &domain.AuthRequest{ID: "id", AgentID: "agentID", UserID: "userA", Request: &domain.AuthRequestOIDC{}}
+	}
+
+	t.Run("logged in, code bound to the checked user", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		authRequests := mock.NewMockAuthRequestCache(ctrl)
+		authRequests.EXPECT().GetAuthRequestByID(gomock.Any(), "id").Return(newRequest(), nil)
+		authRequests.EXPECT().CacheAuthRequest(gomock.Any(), gomock.Any()).AnyTimes()
+		authRequests.EXPECT().UpdateAuthRequest(gomock.Any(), gomock.Any()).DoAndReturn(func(_ context.Context, r *domain.AuthRequest) error {
+			assert.Equal(t, "code", r.Code)
+			assert.Equal(t, "userA", r.CodeUserID)
+			assert.Empty(t, r.MFAsVerified, "login check side effects must not be persisted")
+			return nil
+		})
+		repo := newRepo(authRequests, &mockViewUserSession{
+			PasswordVerification:     testNow.Add(-5 * time.Minute),
+			SecondFactorVerification: testNow.Add(-5 * time.Minute),
+		})
+		assert.NoError(t, repo.SaveAuthCode(context.Background(), "id", "code", "agentID"))
+	})
+
+	t.Run("current user not logged in (e.g. switched), no code saved", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		authRequests := mock.NewMockAuthRequestCache(ctrl)
+		authRequests.EXPECT().GetAuthRequestByID(gomock.Any(), "id").Return(newRequest(), nil)
+		authRequests.EXPECT().CacheAuthRequest(gomock.Any(), gomock.Any()).AnyTimes()
+		// no UpdateAuthRequest expected: gomock fails the test if it is called
+		repo := newRepo(authRequests, &mockViewUserSession{})
+		err := repo.SaveAuthCode(context.Background(), "id", "code", "agentID")
+		assert.True(t, zerrors.IsPreconditionFailed(err), "got %v", err)
+	})
+}

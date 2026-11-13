@@ -541,6 +541,7 @@ Errors:
     NotExisting: "Барањето за автентикација не постои"
     WrongLoginClient: "Барањето за автификација беше креирано од друг клиент за најавување"
     AlreadyHandled: "Барањето за автентикација е веќе обработено"
+    NotAuthenticated: "Корисникот не е автентициран"
   OIDCSession:
     RefreshTokenInvalid: "Токенот за освежување е неважечки"
     Token:
