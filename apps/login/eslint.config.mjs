@@ -6,6 +6,7 @@ import prettierConfig from "eslint-config-prettier/flat";
 import importPlugin from "eslint-plugin-import";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
 import globals from "globals";
+import moduleBoundaries from "./checks/eslint-module-boundaries.mjs";
 
 export default [
   {
@@ -90,13 +91,23 @@ export default [
       ],
     },
   },
+  // Server Actions live in src/lib/actions, server-only code in src/lib/server
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    plugins: {
+      login: moduleBoundaries,
+    },
+    rules: {
+      "login/module-boundaries": "error",
+    },
+  },
   // Server components and server actions: must use logger, not console.*
   {
     files: [
       "src/lib/server/**/*.ts",
+      "src/lib/actions/**/*.ts",
       "src/app/**/route.ts",
-      "src/middleware.ts",
-      "src/lib/cookies.ts",
+      "src/proxy.ts",
     ],
     rules: {
       "no-console": "warn",
@@ -123,7 +134,7 @@ export default [
                 "Use of next/image is forbidden. Use regular <img> elements instead.",
             },
             {
-              name: "@/lib/logger",
+              name: "@/lib/server/logger",
               message:
                 "Cannot import logger in client components. Use console.* instead. The logger uses 'server-only' and will fail at build time.",
             },

@@ -65,7 +65,11 @@ func (c *Commands) AddSAMLRequest(ctx context.Context, samlRequest *SAMLRequest)
 	return samlRequestWriteModelToCurrentSAMLRequest(writeModel), nil
 }
 
-func (c *Commands) LinkSessionToSAMLRequest(ctx context.Context, id, sessionID, sessionToken string, checkLoginClient bool, projectPermissionCheck domain.ProjectPermissionCheck) (*domain.ObjectDetails, *CurrentSAMLRequest, error) {
+// LinkSessionToSAMLRequest links the session to the SAML request.
+// If checkLinkPermission is set, the caller must be granted the session.link permission.
+// The login client recorded on the SAML request (x-zitadel-login-client header) is chosen
+// by whoever starts the (unauthenticated) SAML request and must not grant any permission.
+func (c *Commands) LinkSessionToSAMLRequest(ctx context.Context, id, sessionID, sessionToken string, checkLinkPermission bool, projectPermissionCheck domain.ProjectPermissionCheck) (*domain.ObjectDetails, *CurrentSAMLRequest, error) {
 	writeModel, err := c.getSAMLRequestWriteModel(ctx, id)
 	if err != nil {
 		return nil, nil, err
@@ -76,7 +80,7 @@ func (c *Commands) LinkSessionToSAMLRequest(ctx context.Context, id, sessionID, 
 	if writeModel.SAMLRequestState != domain.SAMLRequestStateAdded {
 		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-ttPKNdAIFT", "Errors.SAMLRequest.AlreadyHandled")
 	}
-	if checkLoginClient && authz.GetCtxData(ctx).UserID != writeModel.LoginClient {
+	if checkLinkPermission {
 		if err := c.checkPermission(ctx, domain.PermissionSessionLink, writeModel.ResourceOwner, ""); err != nil {
 			return nil, nil, err
 		}

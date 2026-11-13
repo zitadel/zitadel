@@ -1,13 +1,18 @@
-import { getValidLocaleFromUILocales } from "@/lib/auth-utils";
-import { isExternalUrl, isSafeRedirectUri } from "@/lib/client-utils";
-import { getLanguageCookie, setLanguageCookie, type Cookie } from "@/lib/cookies";
+import "server-only";
 
+import { addIdpFlowProof } from "@/lib/server/fingerprint";
+
+import { isExternalUrl, isSafeRedirectUri } from "@/lib/client-utils";
+import { getValidLocaleFromUILocales } from "@/lib/server/auth-utils";
+import { getLanguageCookie, setLanguageCookie, type Cookie } from "@/lib/server/cookies";
+
+import { sendLoginname } from "@/lib/actions/loginname";
 import { shouldUILocalesOverrideCookie } from "@/lib/i18n";
 import { idpTypeToSlug } from "@/lib/idp";
-import { createLogger } from "@/lib/logger";
-import { sendLoginname } from "@/lib/server/loginname";
-import { constructUrl } from "@/lib/service-url";
-import { findValidSession } from "@/lib/session";
+import { buildCSP } from "@/lib/server/csp";
+import { createLogger } from "@/lib/server/logger";
+import { constructUrl } from "@/lib/server/service-url";
+import { findValidSession } from "@/lib/server/session";
 import {
   createCallback,
   createResponse,
@@ -18,7 +23,7 @@ import {
   getSecuritySettings,
   ServiceConfig,
   startIdentityProviderFlow,
-} from "@/lib/zitadel";
+} from "@/lib/server/zitadel";
 import { create } from "@zitadel/client";
 import { Prompt } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import { CreateCallbackRequestSchema, SessionSchema } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
@@ -28,7 +33,6 @@ import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_s
 import { SecuritySettings } from "@zitadel/proto/zitadel/settings/v2/security_settings_pb";
 import escapeHtml from "escape-html";
 import { NextRequest, NextResponse } from "next/server";
-import { buildCSP } from "../csp";
 
 const logger = createLogger("flow-initiation");
 
@@ -322,6 +326,9 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         if (organization) {
           params.set("organization", organization);
         }
+
+        // binds the flow to this browser; Next.js adds the cookie set via cookies() to the returned response
+        await addIdpFlowProof(params);
 
         const response = await startIdentityProviderFlow({
           serviceConfig,

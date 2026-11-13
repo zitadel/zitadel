@@ -43,6 +43,7 @@ type SessionCommands struct {
 	now                  func() time.Time
 	maxIdPIntentLifetime time.Duration
 	tarpit               func(failedAttempts uint64)
+	getLoginPolicy       func(ctx context.Context, orgID string) (*domain.LoginPolicy, error)
 }
 
 func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWriteModel) *SessionCommands {
@@ -61,6 +62,7 @@ func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWri
 		now:                  time.Now,
 		maxIdPIntentLifetime: c.maxIdPIntentLifetime,
 		tarpit:               c.tarpit,
+		getLoginPolicy:       c.getOrgLoginPolicy,
 	}
 }
 
@@ -77,7 +79,18 @@ func CheckUser(id string, resourceOwner string, preferredLanguage *language.Tag)
 // CheckPassword defines a password check to be executed for a session update
 func CheckPassword(password string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) ([]eventstore.Command, error) {
-		commands, err := checkPassword(ctx, cmd.sessionWriteModel.UserID, password, cmd.eventstore, cmd.hasher, nil, cmd.tarpit)
+		if cmd.sessionWriteModel.UserResourceOwner == "" {
+			return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Vz4tb", "Errors.User.UserIDMissing")
+		}
+		loginPolicy, err := passwordAllowedLoginPolicy(ctx, cmd.getLoginPolicy, cmd.sessionWriteModel.UserResourceOwner)
+		if err != nil {
+			return nil, err
+		}
+		var tarpit func(failedAttempts uint64)
+		if !loginPolicy.IgnoreUnknownUsernames {
+			tarpit = cmd.tarpit
+		}
+		commands, err := checkPassword(ctx, cmd.sessionWriteModel.UserID, password, cmd.eventstore, cmd.hasher, nil, tarpit)
 		if err != nil {
 			return commands, err
 		}

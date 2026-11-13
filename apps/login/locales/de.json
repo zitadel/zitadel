@@ -153,7 +153,8 @@
       "sessionNotValid": "Sitzung ist nicht gültig",
       "passwordVerificationMissing": "Passwort-Verifizierung fehlt.",
       "passwordVerificationTooOld": "Passwort-Verifizierung ist zu alt. Bitte verifizieren Sie Ihr Passwort erneut.",
-      "passwordResetNotAllowed": "Das Zurücksetzen des Passworts ist nicht zulässig. Wenden Sie sich für weitere Informationen an Ihren Administrator."
+      "passwordResetNotAllowed": "Das Zurücksetzen des Passworts ist nicht zulässig. Wenden Sie sich für weitere Informationen an Ihren Administrator.",
+      "localAuthenticationNotAllowed": "Lokale Authentifizierung nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator."
     }
   },
   "idp": {
@@ -256,6 +257,11 @@
       "smsDescription": "Geben Sie Ihre Telefonnummer ein, um einen Code per SMS zu erhalten.",
       "emailDescription": "Geben Sie Ihre E-Mail-Adresse ein, um einen Code per E-Mail zu erhalten.",
       "totpRegisterDescription": "Scannen Sie den QR-Code oder navigieren Sie manuell zur URL.",
+      "emailAddDescription": "Verwenden Sie einen Einmalcode, der an Ihre verifizierte E-Mail-Adresse gesendet wird, als zweiten Faktor.",
+      "smsAddDescription": "Verwenden Sie einen Einmalcode, der an Ihre verifizierte Telefonnummer gesendet wird, als zweiten Faktor.",
+      "add": "Hinzufügen",
+      "emailAdded": "Code per E-Mail hinzugefügt.",
+      "smsAdded": "Code per SMS hinzugefügt.",
       "submit": "Weiter",
       "labels": {
         "code": "Code"
@@ -266,7 +272,13 @@
     },
     "errors": {
       "couldNotRequestChallenge": "OTP-Challenge konnte nicht angefordert werden",
-      "couldNotVerifyCode": "OTP-Code konnte nicht verifiziert werden"
+      "couldNotVerifyCode": "OTP-Code konnte nicht verifiziert werden",
+      "couldNotGetSession": "Ihre Sitzung konnte nicht geladen werden. Bitte melden Sie sich erneut an.",
+      "invalidMethod": "Dieser zweite Faktor wird nicht unterstützt.",
+      "couldNotAddEmail": "Code per E-Mail konnte nicht hinzugefügt werden.",
+      "couldNotAddSms": "Code per SMS konnte nicht hinzugefügt werden.",
+      "emailNotVerified": "Verifizieren Sie Ihre E-Mail-Adresse, bevor Sie Codes per E-Mail hinzufügen.",
+      "phoneNotVerified": "Verifizieren Sie Ihre Telefonnummer, bevor Sie Codes per SMS hinzufügen."
     }
   },
   "passkey": {
@@ -360,7 +372,8 @@
       "couldNotCreateSession": "Sitzung konnte nicht erstellt werden",
       "userNotFound": "Benutzer nicht im System gefunden",
       "couldNotLinkIDP": "IDP konnte nicht mit dem Benutzer verknüpft werden",
-      "couldNotRegisterUser": "Benutzer konnte nicht registriert werden"
+      "couldNotRegisterUser": "Benutzer konnte nicht registriert werden",
+      "sessionMismatch": "Die Registrierung wurde in einem anderen Browser gestartet. Bitte melden Sie sich erneut bei Ihrem Identitätsanbieter an."
     }
   },
   "invite": {

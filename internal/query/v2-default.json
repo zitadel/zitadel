@@ -256,6 +256,11 @@
         "smsDescription": "Geben Sie Ihre Telefonnummer ein, um einen Code per SMS zu erhalten.",
         "emailDescription": "Geben Sie Ihre E-Mail-Adresse ein, um einen Code per E-Mail zu erhalten.",
         "totpRegisterDescription": "Scannen Sie den QR-Code oder navigieren Sie manuell zur URL.",
+        "emailAddDescription": "Verwenden Sie einen Einmalcode, der an Ihre verifizierte E-Mail-Adresse gesendet wird, als zweiten Faktor.",
+        "smsAddDescription": "Verwenden Sie einen Einmalcode, der an Ihre verifizierte Telefonnummer gesendet wird, als zweiten Faktor.",
+        "add": "Hinzufügen",
+        "emailAdded": "Code per E-Mail hinzugefügt.",
+        "smsAdded": "Code per SMS hinzugefügt.",
         "submit": "Weiter",
         "labels": {
           "code": "Code"
@@ -266,7 +271,13 @@
       },
       "errors": {
         "couldNotRequestChallenge": "OTP-Challenge konnte nicht angefordert werden",
-        "couldNotVerifyCode": "OTP-Code konnte nicht verifiziert werden"
+        "couldNotVerifyCode": "OTP-Code konnte nicht verifiziert werden",
+        "couldNotGetSession": "Ihre Sitzung konnte nicht geladen werden. Bitte melden Sie sich erneut an.",
+        "invalidMethod": "Dieser zweite Faktor wird nicht unterstützt.",
+        "couldNotAddEmail": "Code per E-Mail konnte nicht hinzugefügt werden.",
+        "couldNotAddSms": "Code per SMS konnte nicht hinzugefügt werden.",
+        "emailNotVerified": "Verifizieren Sie Ihre E-Mail-Adresse, bevor Sie Codes per E-Mail hinzufügen.",
+        "phoneNotVerified": "Verifizieren Sie Ihre Telefonnummer, bevor Sie Codes per SMS hinzufügen."
       }
     },
     "passkey": {
@@ -731,6 +742,11 @@
         "smsDescription": "Enter your phone number to receive a code via SMS.",
         "emailDescription": "Enter your email address to receive a code via email.",
         "totpRegisterDescription": "Scan the QR Code or navigate to the URL manually.",
+        "emailAddDescription": "Use a one-time code sent to your verified email address as a second factor.",
+        "smsAddDescription": "Use a one-time code sent to your verified phone number as a second factor.",
+        "add": "Add",
+        "emailAdded": "Code via email added.",
+        "smsAdded": "Code via SMS added.",
         "submit": "Continue",
         "labels": {
           "code": "Code"
@@ -741,7 +757,13 @@
       },
       "errors": {
         "couldNotRequestChallenge": "Could not request OTP challenge",
-        "couldNotVerifyCode": "Could not verify OTP code"
+        "couldNotVerifyCode": "Could not verify OTP code",
+        "couldNotGetSession": "Your session could not be loaded. Please sign in again.",
+        "invalidMethod": "This second factor is not supported.",
+        "couldNotAddEmail": "Code via email could not be added.",
+        "couldNotAddSms": "Code via SMS could not be added.",
+        "emailNotVerified": "Verify your email address before adding codes via email.",
+        "phoneNotVerified": "Verify your phone number before adding codes via SMS."
       }
     },
     "passkey": {
@@ -1206,6 +1228,11 @@
         "smsDescription": "Introduce tu número de teléfono para recibir un código por SMS.",
         "emailDescription": "Introduce tu dirección de correo electrónico para recibir un código por correo electrónico.",
         "totpRegisterDescription": "Escanea el código QR o navega manualmente a la URL.",
+        "emailAddDescription": "Usa un código de un solo uso enviado a tu dirección de correo electrónico verificada como segundo factor.",
+        "smsAddDescription": "Usa un código de un solo uso enviado a tu número de teléfono verificado como segundo factor.",
+        "add": "Añadir",
+        "emailAdded": "Código por correo electrónico añadido.",
+        "smsAdded": "Código por SMS añadido.",
         "submit": "Continuar",
         "labels": {
           "code": "Código"
@@ -1216,7 +1243,13 @@
       },
       "errors": {
         "couldNotRequestChallenge": "No se pudo solicitar el desafío OTP",
-        "couldNotVerifyCode": "No se pudo verificar el código OTP"
+        "couldNotVerifyCode": "No se pudo verificar el código OTP",
+        "couldNotGetSession": "No se pudo cargar tu sesión. Vuelve a iniciar sesión.",
+        "invalidMethod": "Este segundo factor no es compatible.",
+        "couldNotAddEmail": "No se pudo añadir el código por correo electrónico.",
+        "couldNotAddSms": "No se pudo añadir el código por SMS.",
+        "emailNotVerified": "Verifica tu dirección de correo electrónico antes de añadir códigos por correo electrónico.",
+        "phoneNotVerified": "Verifica tu número de teléfono antes de añadir códigos por SMS."
       }
     },
     "passkey": {
@@ -1681,6 +1714,11 @@
         "smsDescription": "Inserisci il tuo numero di telefono per ricevere un codice via SMS.",
         "emailDescription": "Inserisci il tuo indirizzo email per ricevere un codice via email.",
         "totpRegisterDescription": "Scansiona il codice QR o naviga manualmente all'URL.",
+        "emailAddDescription": "Usa un codice monouso inviato al tuo indirizzo email verificato come secondo fattore.",
+        "smsAddDescription": "Usa un codice monouso inviato al tuo numero di telefono verificato come secondo fattore.",
+        "add": "Aggiungi",
+        "emailAdded": "Codice via email aggiunto.",
+        "smsAdded": "Codice via SMS aggiunto.",
         "submit": "Continua",
         "labels": {
           "code": "Codice"
@@ -1691,7 +1729,13 @@
       },
       "errors": {
         "couldNotRequestChallenge": "Impossibile richiedere la challenge OTP",
-        "couldNotVerifyCode": "Impossibile verificare il codice OTP"
+        "couldNotVerifyCode": "Impossibile verificare il codice OTP",
+        "couldNotGetSession": "Impossibile caricare la sessione. Accedi di nuovo.",
+        "invalidMethod": "Questo secondo fattore non è supportato.",
+        "couldNotAddEmail": "Impossibile aggiungere il codice via email.",
+        "couldNotAddSms": "Impossibile aggiungere il codice via SMS.",
+        "emailNotVerified": "Verifica il tuo indirizzo email prima di aggiungere codici via email.",
+        "phoneNotVerified": "Verifica il tuo numero di telefono prima di aggiungere codici via SMS."
       }
     },
     "passkey": {
@@ -2156,6 +2200,11 @@
         "smsDescription": "Voer jouw telefoonnummer in om een code via sms te ontvangen.",
         "emailDescription": "Voer jouw e-mailadres in om een code via e-mail te ontvangen.",
         "totpRegisterDescription": "Scan de QR-code of navigeer handmatig naar de URL.",
+        "emailAddDescription": "Gebruik een eenmalige code die naar je geverifieerde e-mailadres wordt gestuurd als tweede factor.",
+        "smsAddDescription": "Gebruik een eenmalige code die naar je geverifieerde telefoonnummer wordt gestuurd als tweede factor.",
+        "add": "Toevoegen",
+        "emailAdded": "Code via e-mail toegevoegd.",
+        "smsAdded": "Code via sms toegevoegd.",
         "submit": "Verder",
         "labels": {
           "code": "Code"
@@ -2166,7 +2215,13 @@
       },
       "errors": {
         "couldNotRequestChallenge": "Kon OTP-uitdaging niet aanvragen",
-        "couldNotVerifyCode": "Kon OTP-code niet verifiëren"
+        "couldNotVerifyCode": "Kon OTP-code niet verifiëren",
+        "couldNotGetSession": "Je sessie kon niet worden geladen. Meld je opnieuw aan.",
+        "invalidMethod": "Deze tweede factor wordt niet ondersteund.",
+        "couldNotAddEmail": "Code via e-mail kon niet worden toegevoegd.",
+        "couldNotAddSms": "Code via sms kon niet worden toegevoegd.",
+        "emailNotVerified": "Verifieer je e-mailadres voordat je codes via e-mail toevoegt.",
+        "phoneNotVerified": "Verifieer je telefoonnummer voordat je codes via sms toevoegt."
       }
     },
     "passkey": {
@@ -2631,6 +2686,11 @@
         "smsDescription": "Wprowadź swój numer telefonu, aby otrzymać kod SMS-em.",
         "emailDescription": "Wprowadź swój adres e-mail, aby otrzymać kod e-mailem.",
         "totpRegisterDescription": "Zeskanuj kod QR lub otwórz adres URL ręcznie.",
+        "emailAddDescription": "Używaj jednorazowego kodu wysyłanego na zweryfikowany adres e-mail jako drugiego składnika.",
+        "smsAddDescription": "Używaj jednorazowego kodu wysyłanego na zweryfikowany numer telefonu jako drugiego składnika.",
+        "add": "Dodaj",
+        "emailAdded": "Dodano kod przez e-mail.",
+        "smsAdded": "Dodano kod przez SMS.",
         "submit": "Kontynuuj",
         "labels": {
           "code": "Kod"
@@ -2641,7 +2701,13 @@
       },
       "errors": {
         "couldNotRequestChallenge": "Nie można zażądać wyzwania OTP",
-        "couldNotVerifyCode": "Nie można zweryfikować kodu OTP"
+        "couldNotVerifyCode": "Nie można zweryfikować kodu OTP",
+        "couldNotGetSession": "Nie udało się wczytać sesji. Zaloguj się ponownie.",
+        "invalidMethod": "Ten drugi składnik nie jest obsługiwany.",
+        "couldNotAddEmail": "Nie udało się dodać kodu przez e-mail.",
+        "couldNotAddSms": "Nie udało się dodać kodu przez SMS.",
+        "emailNotVerified": "Zweryfikuj adres e-mail przed dodaniem kodów przez e-mail.",
+        "phoneNotVerified": "Zweryfikuj numer telefonu przed dodaniem kodów przez SMS."
       }
     },
     "passkey": {
@@ -3106,6 +3172,11 @@
         "smsDescription": "Введите номер телефона для получения кода по SMS.",
         "emailDescription": "Введите email для получения кода.",
         "totpRegisterDescription": "Отсканируйте QR-код или перейдите по ссылке вручную.",
+        "emailAddDescription": "Используйте одноразовый код, отправляемый на ваш подтверждённый адрес электронной почты, в качестве второго фактора.",
+        "smsAddDescription": "Используйте одноразовый код, отправляемый на ваш подтверждённый номер телефона, в качестве второго фактора.",
+        "add": "Добавить",
+        "emailAdded": "Код по электронной почте добавлен.",
+        "smsAdded": "Код по SMS добавлен.",
         "submit": "Продолжить",
         "labels": {
           "code": "Код"
@@ -3116,7 +3187,13 @@
       },
       "errors": {
         "couldNotRequestChallenge": "Не удалось запросить OTP-челлендж",
-        "couldNotVerifyCode": "Не удалось проверить OTP-код"
+        "couldNotVerifyCode": "Не удалось проверить OTP-код",
+        "couldNotGetSession": "Не удалось загрузить сессию. Войдите снова.",
+        "invalidMethod": "Этот второй фактор не поддерживается.",
+        "couldNotAddEmail": "Не удалось добавить код по электронной почте.",
+        "couldNotAddSms": "Не удалось добавить код по SMS.",
+        "emailNotVerified": "Подтвердите адрес электронной почты, прежде чем добавлять коды по электронной почте.",
+        "phoneNotVerified": "Подтвердите номер телефона, прежде чем добавлять коды по SMS."
       }
     },
     "passkey": {
@@ -3581,6 +3658,11 @@
         "smsDescription": "输入您的电话号码以接收短信验证码。",
         "emailDescription": "输入您的电子邮箱地址以接收电子邮件验证码。",
         "totpRegisterDescription": "扫描二维码或手动导航到URL。",
+        "emailAddDescription": "使用发送到您已验证电子邮件地址的一次性验证码作为第二因素。",
+        "smsAddDescription": "使用发送到您已验证手机号码的一次性验证码作为第二因素。",
+        "add": "添加",
+        "emailAdded": "已添加电子邮件验证码。",
+        "smsAdded": "已添加短信验证码。",
         "submit": "继续",
         "labels": {
           "code": "验证码"
@@ -3591,7 +3673,13 @@
       },
       "errors": {
         "couldNotRequestChallenge": "无法请求 OTP 质询",
-        "couldNotVerifyCode": "无法验证 OTP 验证码"
+        "couldNotVerifyCode": "无法验证 OTP 验证码",
+        "couldNotGetSession": "无法加载您的会话。请重新登录。",
+        "invalidMethod": "不支持此第二因素。",
+        "couldNotAddEmail": "无法添加电子邮件验证码。",
+        "couldNotAddSms": "无法添加短信验证码。",
+        "emailNotVerified": "添加电子邮件验证码前，请先验证您的电子邮件地址。",
+        "phoneNotVerified": "添加短信验证码前，请先验证您的手机号码。"
       }
     },
     "passkey": {
@@ -4056,6 +4144,11 @@
         "smsDescription": "SMS ile kod almak için telefon numaranızı girin.",
         "emailDescription": "E-posta ile kod almak için e-posta adresinizi girin.",
         "totpRegisterDescription": "QR Kodunu tarayın veya URL'ye manuel olarak gidin.",
+        "emailAddDescription": "Doğrulanmış e-posta adresinize gönderilen tek kullanımlık kodu ikinci faktör olarak kullanın.",
+        "smsAddDescription": "Doğrulanmış telefon numaranıza gönderilen tek kullanımlık kodu ikinci faktör olarak kullanın.",
+        "add": "Ekle",
+        "emailAdded": "E-posta ile kod eklendi.",
+        "smsAdded": "SMS ile kod eklendi.",
         "submit": "Devam",
         "labels": {
           "code": "Kod"
@@ -4066,7 +4159,13 @@
       },
       "errors": {
         "couldNotRequestChallenge": "OTP meydan okuması istenemedi",
-        "couldNotVerifyCode": "OTP kodu doğrulanamadı"
+        "couldNotVerifyCode": "OTP kodu doğrulanamadı",
+        "couldNotGetSession": "Oturumunuz yüklenemedi. Lütfen yeniden oturum açın.",
+        "invalidMethod": "Bu ikinci faktör desteklenmiyor.",
+        "couldNotAddEmail": "E-posta ile kod eklenemedi.",
+        "couldNotAddSms": "SMS ile kod eklenemedi.",
+        "emailNotVerified": "E-posta ile kod eklemeden önce e-posta adresinizi doğrulayın.",
+        "phoneNotVerified": "SMS ile kod eklemeden önce telefon numaranızı doğrulayın."
       }
     },
     "passkey": {
@@ -4531,6 +4630,11 @@
         "smsDescription": "Введіть номер телефону для отримання коду через SMS.",
         "emailDescription": "Введіть електронну адресу для отримання коду на пошту.",
         "totpRegisterDescription": "Відскануйте QR-код або перейдіть за URL вручну.",
+        "emailAddDescription": "Використовуйте одноразовий код, що надсилається на вашу підтверджену електронну адресу, як другий фактор.",
+        "smsAddDescription": "Використовуйте одноразовий код, що надсилається на ваш підтверджений номер телефону, як другий фактор.",
+        "add": "Додати",
+        "emailAdded": "Код електронною поштою додано.",
+        "smsAdded": "Код через SMS додано.",
         "submit": "Продовжити",
         "labels": {
           "code": "Код"
@@ -4541,7 +4645,13 @@
       },
       "errors": {
         "couldNotRequestChallenge": "Не вдалося запросити OTP-виклик",
-        "couldNotVerifyCode": "Не вдалося перевірити OTP-код"
+        "couldNotVerifyCode": "Не вдалося перевірити OTP-код",
+        "couldNotGetSession": "Не вдалося завантажити сеанс. Увійдіть знову.",
+        "invalidMethod": "Цей другий фактор не підтримується.",
+        "couldNotAddEmail": "Не вдалося додати код електронною поштою.",
+        "couldNotAddSms": "Не вдалося додати код через SMS.",
+        "emailNotVerified": "Підтвердьте електронну адресу, перш ніж додавати коди електронною поштою.",
+        "phoneNotVerified": "Підтвердьте номер телефону, перш ніж додавати коди через SMS."
       }
     },
     "passkey": {
@@ -5006,6 +5116,11 @@
         "smsDescription": "أدخل رقم هاتفك لتلقي رمز عبر الرسائل القصيرة.",
         "emailDescription": "أدخل عنوان بريدك الإلكتروني لتلقي رمز عبر البريد الإلكتروني.",
         "totpRegisterDescription": "امسح رمز الاستجابة السريعة أو انتقل إلى عنوان URL يدوياً.",
+        "emailAddDescription": "استخدم رمزًا لمرة واحدة يُرسل إلى عنوان بريدك الإلكتروني الموثق كعامل ثانٍ.",
+        "smsAddDescription": "استخدم رمزًا لمرة واحدة يُرسل إلى رقم هاتفك الموثق كعامل ثانٍ.",
+        "add": "إضافة",
+        "emailAdded": "تمت إضافة الرمز عبر البريد الإلكتروني.",
+        "smsAdded": "تمت إضافة الرمز عبر الرسائل القصيرة.",
         "submit": "متابعة",
         "labels": {
           "code": "الرمز"
@@ -5016,7 +5131,13 @@
       },
       "errors": {
         "couldNotRequestChallenge": "تعذر طلب تحدي OTP",
-        "couldNotVerifyCode": "تعذر التحقق من رمز OTP"
+        "couldNotVerifyCode": "تعذر التحقق من رمز OTP",
+        "couldNotGetSession": "تعذر تحميل جلستك. يرجى تسجيل الدخول مرة أخرى.",
+        "invalidMethod": "هذا العامل الثاني غير مدعوم.",
+        "couldNotAddEmail": "تعذرت إضافة الرمز عبر البريد الإلكتروني.",
+        "couldNotAddSms": "تعذرت إضافة الرمز عبر الرسائل القصيرة.",
+        "emailNotVerified": "وثّق عنوان بريدك الإلكتروني قبل إضافة الرموز عبر البريد الإلكتروني.",
+        "phoneNotVerified": "وثّق رقم هاتفك قبل إضافة الرموز عبر الرسائل القصيرة."
       }
     },
     "passkey": {
@@ -5481,6 +5602,11 @@
         "smsDescription": "Add meg a telefonszámodat, hogy SMS-ben elküldhessük az ellenőrző kódot.",
         "emailDescription": "Add meg az e-mail címedet, hogy e-mailben elküldhessük az ellenőrző kódot.",
         "totpRegisterDescription": "Olvasd be a QR-kódot, vagy navigálj az URL-re manuálisan.",
+        "emailAddDescription": "Használj az ellenőrzött e-mail-címedre küldött egyszer használatos kódot második faktorként.",
+        "smsAddDescription": "Használj az ellenőrzött telefonszámodra küldött egyszer használatos kódot második faktorként.",
+        "add": "Hozzáadás",
+        "emailAdded": "E-mailes kód hozzáadva.",
+        "smsAdded": "SMS-es kód hozzáadva.",
         "submit": "Tovább",
         "labels": {
           "code": "Kód"
@@ -5491,7 +5617,13 @@
       },
       "errors": {
         "couldNotRequestChallenge": "Nem sikerült OTP-kihívást kérni",
-        "couldNotVerifyCode": "Nem sikerült ellenőrizni az OTP-kódot"
+        "couldNotVerifyCode": "Nem sikerült ellenőrizni az OTP-kódot",
+        "couldNotGetSession": "A munkamenet nem tölthető be. Jelentkezz be újra.",
+        "invalidMethod": "Ez a második faktor nem támogatott.",
+        "couldNotAddEmail": "Az e-mailes kódot nem sikerült hozzáadni.",
+        "couldNotAddSms": "Az SMS-es kódot nem sikerült hozzáadni.",
+        "emailNotVerified": "Ellenőrizd az e-mail-címedet, mielőtt e-mailes kódokat adsz hozzá.",
+        "phoneNotVerified": "Ellenőrizd a telefonszámodat, mielőtt SMS-es kódokat adsz hozzá."
       }
     },
     "passkey": {
@@ -5956,6 +6088,11 @@
         "smsDescription": "Entrez votre numéro de téléphone pour recevoir un code par SMS.",
         "emailDescription": "Entrez votre adresse e-mail pour recevoir un code par e-mail.",
         "totpRegisterDescription": "Scannez le QR code ou saisissez l'URL manuellement.",
+        "emailAddDescription": "Utilisez un code à usage unique envoyé à votre adresse e-mail vérifiée comme second facteur.",
+        "smsAddDescription": "Utilisez un code à usage unique envoyé à votre numéro de téléphone vérifié comme second facteur.",
+        "add": "Ajouter",
+        "emailAdded": "Code par e-mail ajouté.",
+        "smsAdded": "Code par SMS ajouté.",
         "submit": "Continuer",
         "labels": {
           "code": "Code"
@@ -5966,7 +6103,13 @@
       },
       "errors": {
         "couldNotRequestChallenge": "Impossible de demander le challenge OTP",
-        "couldNotVerifyCode": "Impossible de vérifier le code OTP"
+        "couldNotVerifyCode": "Impossible de vérifier le code OTP",
+        "couldNotGetSession": "Votre session n'a pas pu être chargée. Veuillez vous reconnecter.",
+        "invalidMethod": "Ce second facteur n'est pas pris en charge.",
+        "couldNotAddEmail": "Le code par e-mail n'a pas pu être ajouté.",
+        "couldNotAddSms": "Le code par SMS n'a pas pu être ajouté.",
+        "emailNotVerified": "Vérifiez votre adresse e-mail avant d'ajouter des codes par e-mail.",
+        "phoneNotVerified": "Vérifiez votre numéro de téléphone avant d'ajouter des codes par SMS."
       }
     },
     "passkey": {
@@ -6431,6 +6574,11 @@
         "smsDescription": "SMSでコードを受信する電話番号を入力してください。",
         "emailDescription": "メールでコードを受信するメールアドレスを入力してください。",
         "totpRegisterDescription": "QRコードをスキャンするか、URLに手動でアクセスしてください。",
+        "emailAddDescription": "確認済みのメールアドレスに送信されるワンタイムコードを第2要素として使用します。",
+        "smsAddDescription": "確認済みの電話番号に送信されるワンタイムコードを第2要素として使用します。",
+        "add": "追加",
+        "emailAdded": "メールによるコードを追加しました。",
+        "smsAdded": "SMSによるコードを追加しました。",
         "submit": "続行",
         "labels": {
           "code": "コード"
@@ -6441,7 +6589,13 @@
       },
       "errors": {
         "couldNotRequestChallenge": "OTPチャレンジをリクエストできませんでした",
-        "couldNotVerifyCode": "OTPコードを確認できませんでした"
+        "couldNotVerifyCode": "OTPコードを確認できませんでした",
+        "couldNotGetSession": "セッションを読み込めませんでした。もう一度サインインしてください。",
+        "invalidMethod": "この第2要素はサポートされていません。",
+        "couldNotAddEmail": "メールによるコードを追加できませんでした。",
+        "couldNotAddSms": "SMSによるコードを追加できませんでした。",
+        "emailNotVerified": "メールによるコードを追加する前に、メールアドレスを確認してください。",
+        "phoneNotVerified": "SMSによるコードを追加する前に、電話番号を確認してください。"
       }
     },
     "passkey": {
@@ -6906,6 +7060,11 @@
         "smsDescription": "Insira seu número de telefone para receber um código via SMS.",
         "emailDescription": "Insira seu endereço de e-mail para receber um código por e-mail.",
         "totpRegisterDescription": "Escaneie o QR Code ou acesse a URL manualmente.",
+        "emailAddDescription": "Use um código de uso único enviado para o seu endereço de e-mail verificado como segundo fator.",
+        "smsAddDescription": "Use um código de uso único enviado para o seu número de telefone verificado como segundo fator.",
+        "add": "Adicionar",
+        "emailAdded": "Código por e-mail adicionado.",
+        "smsAdded": "Código por SMS adicionado.",
         "submit": "Continuar",
         "labels": {
           "code": "Código"
@@ -6916,7 +7075,13 @@
       },
       "errors": {
         "couldNotRequestChallenge": "Não foi possível solicitar o desafio OTP",
-        "couldNotVerifyCode": "Não foi possível verificar o código OTP"
+        "couldNotVerifyCode": "Não foi possível verificar o código OTP",
+        "couldNotGetSession": "Não foi possível carregar sua sessão. Entre novamente.",
+        "invalidMethod": "Este segundo fator não é suportado.",
+        "couldNotAddEmail": "Não foi possível adicionar o código por e-mail.",
+        "couldNotAddSms": "Não foi possível adicionar o código por SMS.",
+        "emailNotVerified": "Verifique seu endereço de e-mail antes de adicionar códigos por e-mail.",
+        "phoneNotVerified": "Verifique seu número de telefone antes de adicionar códigos por SMS."
       }
     },
     "passkey": {

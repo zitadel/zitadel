@@ -1,3 +1,5 @@
+import "server-only";
+
 import { create } from "@zitadel/client";
 import {
   RequestChallenges,

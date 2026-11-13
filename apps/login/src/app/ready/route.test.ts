@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { GET } from "./route";
 
-vi.mock("@/lib/logger", () => ({
+vi.mock("@/lib/server/logger", () => ({
   createLogger: () => ({ error: vi.fn(), warn: vi.fn() }),
 }));
 

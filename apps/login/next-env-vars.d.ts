@@ -26,7 +26,7 @@ declare namespace NodeJS {
 
     /**
      * Secret used to sign LoginV2 `sessions` cookie entries, the `verificationCheck` cookie and the
-     * `linkFingerprint` of IdP linking flows (purpose-bound signing keys are derived via HKDF).
+     * `flowFingerprint` of external IdP flows (purpose-bound signing keys are derived via HKDF).
      * Recommended configuration; will become required in a future major release.
      * Every value must be at least 32 characters long (e.g. `openssl rand -base64 32`); a shorter value
      * disables signing and makes /ready fail instead of falling back to the API credential.

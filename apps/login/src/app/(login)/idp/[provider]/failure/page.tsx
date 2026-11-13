@@ -3,8 +3,9 @@ import { ChooseAuthenticatorToLogin } from "@/components/choose-authenticator-to
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getServiceConfig } from "@/lib/service-url";
-import { getBrandingSettings, getLoginSettings, getUserByID, listAuthenticationMethodTypes } from "@/lib/zitadel";
+import { isKnownIdpError } from "@/lib/idp-errors";
+import { getServiceConfig } from "@/lib/server/service-url";
+import { getBrandingSettings, getLoginSettings, getUserByID, listAuthenticationMethodTypes } from "@/lib/server/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
@@ -15,7 +16,7 @@ export default async function Page(props: {
 }) {
   const searchParams = await props.searchParams;
 
-  const { organization, userId } = searchParams;
+  const { organization, userId, error } = searchParams;
 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
@@ -67,6 +68,7 @@ export default async function Page(props: {
         <Alert type={AlertType.ALERT}>
           <Translated i18nKey="loginError.description" namespace="idp" />
         </Alert>
+        {isKnownIdpError(error) && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
         {userId && authMethods.length && (
           <>

@@ -10,11 +10,11 @@ vi.mock("next-intl", () => ({
   useTranslations: () => (key: string, data?: Record<string, unknown>) => (data ? `${key} ${JSON.stringify(data)}` : key),
 }));
 
-vi.mock("@/lib/server/session", () => ({
+vi.mock("@/lib/actions/session", () => ({
   updateOrCreateSession: vi.fn(),
 }));
 
-vi.mock("@/lib/client", () => ({
+vi.mock("@/lib/actions/flow", () => ({
   handleServerActionResponse: vi.fn(),
   completeFlowOrGetUrl: vi.fn(),
 }));
@@ -24,21 +24,21 @@ describe("LoginOTP", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    const { updateOrCreateSession } = await import("@/lib/server/session");
+    const { updateOrCreateSession } = await import("@/lib/actions/session");
     mockUpdateOrCreateSession = vi.mocked(updateOrCreateSession);
   });
 
   afterEach(cleanup);
 
   test("should autofocus the code input on mount", () => {
-    const { getByTestId } = render(<LoginOTP host={null} method="time-based" />);
+    const { getByTestId } = render(<LoginOTP method="time-based" />);
     expect(getByTestId("code-text-input")).toHaveFocus();
   });
 
   test("should display translated fallback error when OTP verification request rejects", async () => {
     mockUpdateOrCreateSession.mockRejectedValueOnce(new Error("network down"));
 
-    render(<LoginOTP host={null} method="time-based" />);
+    render(<LoginOTP method="time-based" />);
 
     const input = screen.getByTestId("code-text-input");
     fireEvent.change(input, { target: { value: "123456" } });
@@ -58,7 +58,7 @@ describe("LoginOTP", () => {
   test("should display translated fallback error when OTP challenge request rejects", async () => {
     mockUpdateOrCreateSession.mockRejectedValueOnce(new Error("challenge request failed"));
 
-    render(<LoginOTP host={null} method="sms" />);
+    render(<LoginOTP method="sms" />);
 
     expect(screen.getByRole("button", { name: "verify.resendCode" })).toBeInTheDocument();
 
@@ -76,7 +76,7 @@ describe("LoginOTP", () => {
       vi.useFakeTimers({ shouldAdvanceTime: true });
       mockUpdateOrCreateSession.mockResolvedValue({ sessionId: "session-1", retryAfterSeconds: 2 });
 
-      render(<LoginOTP host={null} method="sms" />);
+      render(<LoginOTP method="sms" />);
 
       const resendButton = screen.getByTestId("resend-button");
       await waitFor(() => expect(resendButton).toHaveTextContent('verify.resendCodeIn {"seconds":2}'));
@@ -98,7 +98,7 @@ describe("LoginOTP", () => {
       vi.useFakeTimers({ shouldAdvanceTime: true });
       mockUpdateOrCreateSession.mockResolvedValue({ sessionId: "session-1", retryAfterSeconds: 30 });
 
-      render(<LoginOTP host={null} method="sms" />);
+      render(<LoginOTP method="sms" />);
 
       const resendButton = screen.getByTestId("resend-button");
       await waitFor(() => expect(resendButton).toHaveTextContent('verify.resendCodeIn {"seconds":30}'));
@@ -116,7 +116,7 @@ describe("LoginOTP", () => {
     test("exposes the countdown in the button's accessible name", async () => {
       mockUpdateOrCreateSession.mockResolvedValue({ sessionId: "session-1", retryAfterSeconds: 25 });
 
-      render(<LoginOTP host={null} method="sms" />);
+      render(<LoginOTP method="sms" />);
 
       expect(await screen.findByRole("button", { name: 'verify.resendCodeIn {"seconds":25}' })).toBeDisabled();
     });
@@ -124,7 +124,7 @@ describe("LoginOTP", () => {
     test("shows the countdown instead of an error when the server refuses within the cooldown", async () => {
       mockUpdateOrCreateSession.mockResolvedValue({ retryAfterSeconds: 25 });
 
-      render(<LoginOTP host={null} method="sms" />);
+      render(<LoginOTP method="sms" />);
 
       const resendButton = screen.getByTestId("resend-button");
       await waitFor(() => expect(resendButton).toHaveTextContent('verify.resendCodeIn {"seconds":25}'));
@@ -135,7 +135,7 @@ describe("LoginOTP", () => {
     test("does not start a countdown for email codes", async () => {
       mockUpdateOrCreateSession.mockResolvedValue({ sessionId: "session-1" });
 
-      render(<LoginOTP host="example.com" method="email" />);
+      render(<LoginOTP method="email" />);
 
       await waitFor(() => expect(mockUpdateOrCreateSession).toHaveBeenCalledTimes(1));
       const resendButton = screen.getByTestId("resend-button");

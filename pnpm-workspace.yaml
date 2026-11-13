@@ -18,9 +18,6 @@ overrides:
   "follow-redirects@<1.16.1": "^1.16.1"
   "brace-expansion@>=4.0.0 <5.0.12": "^5.0.12"
   "smol-toml@<1.9.0": "^1.9.0"
-  # @angular/cli and @angular/build 21.2.27 (console, latest 21.x) pin @modelcontextprotocol/sdk 1.31.0 and vite 7.3.6
-  "@modelcontextprotocol/sdk@<1.32.0": "^1.32.0"
-  "vite@>=7.0.0 <7.3.7": "^7.3.7"
   # tsup 8.x (via @zitadel/client) allows esbuild ^0.27 only
   "esbuild@>=0.27.3 <0.28.1": "^0.28.1"
   # @opentelemetry/sdk-node 0.218 and auto-instrumentations-node 0.76 (login) pin older versions

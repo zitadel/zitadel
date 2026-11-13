@@ -10,22 +10,22 @@ const { redirect } = vi.hoisted(() => ({
 
 vi.mock("next/navigation", () => ({ redirect }));
 
-vi.mock("@/lib/zitadel", () => ({
+vi.mock("@/lib/server/zitadel", () => ({
   getBrandingSettings: vi.fn(),
   getDefaultOrg: vi.fn(),
   getDeviceAuthorizationRequest: vi.fn(),
 }));
 
-vi.mock("@/lib/session", () => ({
+vi.mock("@/lib/server/session", () => ({
   loadMostRecentSession: vi.fn(),
   loadSessionById: vi.fn(),
 }));
 
-vi.mock("@/lib/device-code-check", () => ({
+vi.mock("@/lib/server/device-code-check", () => ({
   checkDeviceCodeCheckCookie: vi.fn(),
 }));
 
-vi.mock("@/lib/service-url", () => ({
+vi.mock("@/lib/server/service-url", () => ({
   getServiceConfig: vi.fn(() => ({ serviceConfig: { baseUrl: "https://example.com" } })),
 }));
 
@@ -49,9 +49,9 @@ describe("device consent page", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    const zitadel = await import("@/lib/zitadel");
-    const sessionLib = await import("@/lib/session");
-    const deviceCodeCheck = await import("@/lib/device-code-check");
+    const zitadel = await import("@/lib/server/zitadel");
+    const sessionLib = await import("@/lib/server/session");
+    const deviceCodeCheck = await import("@/lib/server/device-code-check");
 
     checkDeviceCodeCheckCookie = vi.mocked(deviceCodeCheck.checkDeviceCodeCheckCookie);
     loadSessionById = vi.mocked(sessionLib.loadSessionById);
