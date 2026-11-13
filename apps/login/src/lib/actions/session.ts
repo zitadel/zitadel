@@ -1,6 +1,7 @@
 "use server";
 
 import { completeFlowOrGetUrl } from "@/lib/actions/flow";
+import { equalsIgnoreCase } from "@/lib/server/auth-utils";
 import {
   getMostRecentSessionCookie,
   getSessionCookieById,
@@ -21,6 +22,7 @@ import {
   getSecuritySettings,
   humanMFAInitSkipped,
   listUsers,
+  searchUsers,
   ServiceConfig,
 } from "@/lib/server/zitadel";
 import { Code, create, Duration } from "@zitadel/client";
@@ -167,6 +169,53 @@ export async function continueWithSession({ sessionId, requestId }: ContinueWith
   );
 }
 
+/**
+ * Resolves what the user typed on the loginname page (login name, email or phone) to a single user id,
+ * scoped to the organization and honouring the user's login settings like the password page does.
+ * Returns undefined when nothing or more than one user matches, so callers keep their generic error.
+ */
+async function findUserIdForInput({
+  serviceConfig,
+  input,
+  organization,
+}: {
+  serviceConfig: ServiceConfig;
+  input: string;
+  organization?: string;
+}): Promise<string | undefined> {
+  const loginSettings = await getLoginSettings({ serviceConfig, organization });
+  if (!loginSettings) {
+    return undefined;
+  }
+
+  const searchResult = await searchUsers({
+    serviceConfig,
+    searchValue: input,
+    organizationId: organization,
+    loginSettings,
+  });
+  if (!searchResult || !("result" in searchResult) || searchResult.result?.length !== 1) {
+    return undefined;
+  }
+
+  const user = searchResult.result[0];
+  if (!user.userId) {
+    return undefined;
+  }
+
+  // the search may have run without org scope: recheck against the user's own login settings
+  const userLoginSettings = await getLoginSettings({ serviceConfig, organization: user.details?.resourceOwner });
+  const humanUser = user.type.case === "human" ? user.type.value : undefined;
+  const matchesLoginName = equalsIgnoreCase(user.preferredLoginName, input);
+  const matchesEmail = !userLoginSettings?.disableLoginWithEmail && equalsIgnoreCase(humanUser?.email?.email, input);
+  const matchesPhone = !userLoginSettings?.disableLoginWithPhone && equalsIgnoreCase(humanUser?.phone?.phone, input);
+  if (!matchesLoginName && !matchesEmail && !matchesPhone) {
+    return undefined;
+  }
+
+  return user.userId;
+}
+
 export type UpdateSessionCommand = {
   loginName?: string;
   sessionId?: string;
@@ -259,8 +308,13 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       return { error: t("couldNotFindSession") };
     }
 
+    // The loginname page skips creating a session while ignoreUnknownUsernames applies and passes on
+    // the raw input, which may be an email or phone rather than a login name. Resolve it the way the
+    // loginname and password pages do, else a user without a password cannot start a passkey login.
+    const userId = await findUserIdForInput({ serviceConfig, input: loginName, organization });
+
     const checks = create(ChecksSchema, {
-      user: { search: { case: "loginName", value: loginName } },
+      user: userId ? { search: { case: "userId", value: userId } } : { search: { case: "loginName", value: loginName } },
     });
 
     const result = await createSessionAndUpdateCookie({
