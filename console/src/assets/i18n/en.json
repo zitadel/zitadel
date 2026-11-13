@@ -2473,6 +2473,7 @@
     "RESTRICTIONS": {
       "MANAGED": "The active email provider is managed by the ZITADEL operator and is meant for getting started.",
       "LIMIT": "Email limit: {{count}} within {{duration}}. Further emails are not sent.",
+      "RESERVED_DOMAINS": "Emails to test domains like example.com or .test are not delivered.",
       "HTML": "HTML in custom message texts is reduced to simple formatting. Links, images and styles are removed.",
       "OWN_PROVIDER": "Configure your own provider for production use.",
       "HTML_HINT": "The active email provider only allows simple formatting in message texts. Links, images and styles are removed.",
