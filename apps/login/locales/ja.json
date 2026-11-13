@@ -235,6 +235,7 @@
       "emailDescription": "メールで受信したコードを入力してください。",
       "noCodeReceived": "コードが届きませんか？",
       "resendCode": "コードを再送信",
+      "resendCodeIn": "コードを再送信 ({seconds}秒)",
       "submit": "続行",
       "labels": {
         "code": "コード"

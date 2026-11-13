@@ -242,6 +242,7 @@
       "emailDescription": "Inserisci il codice ricevuto via email.",
       "noCodeReceived": "Non hai ricevuto un codice?",
       "resendCode": "Invia di nuovo il codice",
+      "resendCodeIn": "Invia di nuovo il codice ({seconds}s)",
       "submit": "Continua",
       "labels": {
         "code": "Codice"

@@ -242,6 +242,7 @@
       "emailDescription": "Add meg az e-mailben kapott kódot.",
       "noCodeReceived": "Nem kaptál kódot?",
       "resendCode": "Kód újraküldése",
+      "resendCodeIn": "Kód újraküldése ({seconds} mp)",
       "submit": "Tovább",
       "labels": {
         "code": "Kód"

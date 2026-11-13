@@ -242,6 +242,7 @@
       "emailDescription": "Введіть код, отриманий на електронну пошту.",
       "noCodeReceived": "Не отримали код?",
       "resendCode": "Надіслати код повторно",
+      "resendCodeIn": "Надіслати код повторно ({seconds} с)",
       "submit": "Продовжити",
       "labels": {
         "code": "Код"

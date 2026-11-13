@@ -242,6 +242,7 @@
       "emailDescription": "输入通过电子邮件收到的验证码。",
       "noCodeReceived": "没有收到验证码？",
       "resendCode": "重发验证码",
+      "resendCodeIn": "重发验证码 ({seconds}秒)",
       "submit": "继续",
       "labels": {
         "code": "验证码"

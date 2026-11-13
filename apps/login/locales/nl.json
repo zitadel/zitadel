@@ -242,6 +242,7 @@
       "emailDescription": "Voer de code in die u via e-mail heeft ontvangen.",
       "noCodeReceived": "Geen code ontvangen?",
       "resendCode": "Code opnieuw versturen",
+      "resendCodeIn": "Code opnieuw versturen ({seconds}s)",
       "submit": "Verder",
       "labels": {
         "code": "Code"

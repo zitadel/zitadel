@@ -242,6 +242,7 @@
       "emailDescription": "أدخل الرمز الذي تلقيته عبر البريد الإلكتروني.",
       "noCodeReceived": "لم تستلم رمزاً؟",
       "resendCode": "إعادة إرسال الرمز",
+      "resendCodeIn": "إعادة إرسال الرمز ({seconds} ث)",
       "submit": "متابعة",
       "labels": {
         "code": "الرمز"
