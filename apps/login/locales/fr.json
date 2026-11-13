@@ -263,7 +263,8 @@
       "smsAdded": "Code par SMS ajouté.",
       "submit": "Continuer",
       "labels": {
-        "code": "Code"
+        "code": "Code",
+        "secret": "Clé secrète"
       },
       "required": {
         "code": "Ce champ est requis"

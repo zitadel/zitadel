@@ -263,7 +263,8 @@
       "smsAdded": "SMS ile kod eklendi.",
       "submit": "Devam",
       "labels": {
-        "code": "Kod"
+        "code": "Kod",
+        "secret": "Gizli anahtar"
       },
       "required": {
         "code": "Bu alan zorunludur"

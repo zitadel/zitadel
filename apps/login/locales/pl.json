@@ -263,7 +263,8 @@
       "smsAdded": "Dodano kod przez SMS.",
       "submit": "Kontynuuj",
       "labels": {
-        "code": "Kod"
+        "code": "Kod",
+        "secret": "Tajny klucz"
       },
       "required": {
         "code": "To pole jest wymagane"

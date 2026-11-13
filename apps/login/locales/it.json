@@ -263,7 +263,8 @@
       "smsAdded": "Codice via SMS aggiunto.",
       "submit": "Continua",
       "labels": {
-        "code": "Codice"
+        "code": "Codice",
+        "secret": "Chiave segreta"
       },
       "required": {
         "code": "Questo campo è obbligatorio"

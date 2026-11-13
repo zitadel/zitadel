@@ -263,7 +263,8 @@
       "smsAdded": "Code via sms toegevoegd.",
       "submit": "Verder",
       "labels": {
-        "code": "Code"
+        "code": "Code",
+        "secret": "Geheime sleutel"
       },
       "required": {
         "code": "Dit veld is verplicht"
