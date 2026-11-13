@@ -1,7 +1,7 @@
 "use client";
 
+import { redirectToIdp } from "@/lib/actions/idp";
 import { idpTypeToSlug } from "@/lib/idp";
-import { redirectToIdp } from "@/lib/server/idp";
 import { IdentityProvider, IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { ReactNode, useActionState } from "react";
 import { Alert } from "./alert";

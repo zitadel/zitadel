@@ -4,7 +4,7 @@ import { isValidElement, ReactElement, ReactNode } from "react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import Page from "./page";
 
-vi.mock("@/lib/zitadel", () => ({
+vi.mock("@/lib/server/zitadel", () => ({
   getBrandingSettings: vi.fn(),
   getLoginSettings: vi.fn(),
   registerTOTP: vi.fn(),
@@ -16,16 +16,16 @@ vi.mock("@/lib/server/enrollment-guard", () => ({
   getEnrollmentAuthorizationError: vi.fn(),
 }));
 
-vi.mock("@/lib/server/otp", () => ({
+vi.mock("@/lib/actions/otp", () => ({
   addOTP: vi.fn(),
 }));
 
-vi.mock("@/lib/session", () => ({
+vi.mock("@/lib/server/session", () => ({
   loadMostRecentSession: vi.fn(),
   loadSessionById: vi.fn(),
 }));
 
-vi.mock("@/lib/service-url", () => ({
+vi.mock("@/lib/server/service-url", () => ({
   getServiceConfig: vi.fn(() => ({ serviceConfig: { baseUrl: "https://example.com" } })),
 }));
 
@@ -62,10 +62,10 @@ describe("otp set page", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    zitadel = await import("@/lib/zitadel");
-    sessionLib = await import("@/lib/session");
+    zitadel = await import("@/lib/server/zitadel");
+    sessionLib = await import("@/lib/server/session");
     guard = await import("@/lib/server/enrollment-guard");
-    addOTP = vi.mocked((await import("@/lib/server/otp")).addOTP);
+    addOTP = vi.mocked((await import("@/lib/actions/otp")).addOTP);
 
     vi.mocked(zitadel.getBrandingSettings).mockResolvedValue({} as any);
     vi.mocked(zitadel.getLoginSettings).mockResolvedValue({} as any);

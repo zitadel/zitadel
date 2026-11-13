@@ -12,7 +12,7 @@ vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
 }));
 
-vi.mock("@/lib/server/otp", () => ({
+vi.mock("@/lib/actions/otp", () => ({
   addOTP: vi.fn(),
 }));
 
@@ -21,7 +21,7 @@ describe("OTPAddForm", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    addOTP = vi.mocked((await import("@/lib/server/otp")).addOTP);
+    addOTP = vi.mocked((await import("@/lib/actions/otp")).addOTP);
   });
 
   afterEach(cleanup);

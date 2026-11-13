@@ -1,7 +1,9 @@
-import { createLogger } from "@/lib/logger";
-import { hasVerifiedPrimaryFactor } from "@/lib/session";
-import { checkUserVerification } from "@/lib/verify-helper";
-import { listAuthenticationMethodTypes, ServiceConfig } from "@/lib/zitadel";
+import "server-only";
+
+import { createLogger } from "@/lib/server/logger";
+import { hasVerifiedPrimaryFactor } from "@/lib/server/session";
+import { checkUserVerification } from "@/lib/server/verify-helper";
+import { listAuthenticationMethodTypes, ServiceConfig } from "@/lib/server/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 
 const logger = createLogger("enrollment-guard");

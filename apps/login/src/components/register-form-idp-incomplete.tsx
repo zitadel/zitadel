@@ -1,7 +1,7 @@
 "use client";
 
+import { registerUserAndLinkToIDP } from "@/lib/actions/register";
 import { handleServerActionResponse } from "@/lib/client-utils";
-import { registerUserAndLinkToIDP } from "@/lib/server/register";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -35,20 +35,10 @@ type Props = {
     lastname?: string;
     email?: string;
   };
-  idpUserId: string;
-  idpId: string;
   idpUserName?: string;
 };
 
-export function RegisterFormIDPIncomplete({
-  organization,
-  requestId,
-  idpIntent,
-  defaultValues,
-  idpUserId,
-  idpId,
-  idpUserName,
-}: Props) {
+export function RegisterFormIDPIncomplete({ organization, requestId, idpIntent, defaultValues, idpUserName }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onChange",
     defaultValues: {
@@ -69,9 +59,7 @@ export function RegisterFormIDPIncomplete({
     setLoading(true);
     try {
       const response = await registerUserAndLinkToIDP({
-        idpId: idpId,
         idpUserName: idpUserName ? idpUserName : values.username,
-        idpUserId: idpUserId,
         email: values.email,
         firstName: values.firstname,
         lastName: values.lastname,

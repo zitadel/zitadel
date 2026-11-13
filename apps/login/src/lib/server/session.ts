@@ -1,331 +1,276 @@
-"use server";
+import "server-only";
 
-import { isClassifiedError } from "@/lib/grpc/interceptors/error-classification";
-import { createLogger } from "@/lib/logger";
-import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "@/lib/server/cookie";
+import { getMostRecentCookieWithLoginname, getSessionCookieById } from "@/lib/server/cookies";
+import { shouldEnforceMFA } from "@/lib/server/verify-helper";
 import {
-  deleteSession,
   getLoginSettings,
-  getSecuritySettings,
-  humanMFAInitSkipped,
+  getSession,
+  getUserByID,
   listAuthenticationMethodTypes,
-  listUsers,
-} from "@/lib/zitadel";
-import { Code, create, Duration } from "@zitadel/client";
-import { Challenges, RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+  ServiceConfig,
+} from "@/lib/server/zitadel";
+import { Timestamp, timestampDate } from "@zitadel/client";
+import { AuthRequest } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
+import { SAMLRequest } from "@zitadel/proto/zitadel/saml/v2/authorization_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { getTranslations } from "next-intl/server";
-import { headers } from "next/headers";
-import { completeFlowOrGetUrl } from "../client";
-import {
-  getMostRecentSessionCookie,
-  getSessionCookieById,
-  getSessionCookieByLoginName,
-  removeSessionFromCookie,
-} from "../cookies";
-import { reauthenticate } from "../reauthenticate";
-import { getServiceConfig } from "../service-url";
-import { isSessionValid } from "../session";
-import { getPublicHost } from "./host";
+import { GetSessionResponse } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
-const logger = createLogger("session");
+type LoadMostRecentSessionParams = {
+  serviceConfig: ServiceConfig;
+  sessionParams: {
+    loginName?: string;
+    organization?: string;
+  };
+};
 
-export async function skipMFAAndContinueWithNextUrl({
-  userId,
-  requestId,
-  loginName,
-  sessionId,
+export async function loadMostRecentSession({
+  serviceConfig,
+  sessionParams,
+}: LoadMostRecentSessionParams): Promise<Session | undefined> {
+  const recent = await getMostRecentCookieWithLoginname({
+    loginName: sessionParams.loginName,
+    organization: sessionParams.organization,
+  });
+
+  if (!recent) {
+    return undefined;
+  }
+
+  return loadSession(serviceConfig, recent);
+}
+
+export async function loadSessionById(
+  serviceConfig: ServiceConfig,
+  sessionId: string,
+  organization?: string,
+): Promise<Session | undefined> {
+  const recent = await getSessionCookieById({ sessionId, organization });
+
+  if (!recent) {
+    return undefined;
+  }
+
+  return loadSession(serviceConfig, recent);
+}
+
+export async function loadSession(
+  serviceConfig: ServiceConfig,
+  cookie: { id: string; token: string },
+): Promise<Session | undefined> {
+  return getSession({ serviceConfig, sessionId: cookie.id, sessionToken: cookie.token })
+    .then((resp: GetSessionResponse) => resp.session)
+    .catch(async (error) => {
+      const { Code, ConnectError } = await import("@connectrpc/connect");
+      const isSessionRejected =
+        error instanceof ConnectError && (error.code === Code.NotFound || error.code === Code.PermissionDenied);
+
+      // The `sessions` cookie has no maxAge, so it can outlive the server-side session
+      // and reference one the session projection no longer holds, e.g. the user logged out, an
+      // admin/API terminated the session, or the user/org/instance was removed. In that
+      // case getSession throws `not_found`. If the session still exists but the cookie's token
+      // no longer matches it (e.g. the token was rotated by a later session update), getSession
+      // throws `permission_denied` (QUERY-dsfr3). Treat both like the no-cookie case and
+      // return undefined instead of letting the error crash the caller's render.
+      // Every call site already handles an undefined session, either with a graceful fallback
+      // or by throwing its own explicit "no session" error.
+      if (isSessionRejected) {
+        console.warn("[Session] Could not load session", error);
+        return undefined;
+      }
+
+      throw error;
+    });
+}
+
+/**
+ * A session proves genuine (primary) authentication when a primary factor — password,
+ * passkey/WebAuthn or IDP intent — has been verified and the session has not expired.
+ *
+ * A WebAuthn factor only counts as a *primary* factor when it was user-verified
+ * (`userVerified` true, i.e. passwordless login). A presence-only WebAuthn assertion is a
+ * second-factor (U2F) check and must NOT be treated as primary authentication — mirroring
+ * how `mfa-helper` distinguishes "authenticated with passkey" from a 2FA WebAuthn check.
+ *
+ * This is the shared gate behind both the credential-enrollment guard
+ * (`getEnrollmentAuthorizationError`) and the MFA-setup page, so an "identify-only"
+ * session (only `factors.user` set, produced by submitting a login name) is never enough
+ * to attach a new authenticator (GHSA-45f2-5q3r-xgg6).
+ */
+export function hasVerifiedPrimaryFactor(session: Partial<Session>): {
+  valid: boolean;
+  verifiedAt?: Timestamp;
+} {
+  const validPassword = session?.factors?.password?.verifiedAt;
+  const validPasskey =
+    session?.factors?.webAuthN?.verifiedAt && !!session?.factors?.webAuthN?.userVerified
+      ? session?.factors?.webAuthN?.verifiedAt
+      : undefined;
+  const validIDP = session?.factors?.intent?.verifiedAt;
+
+  const stillValid = session.expirationDate ? timestampDate(session.expirationDate) > new Date() : true;
+
+  const verifiedAt = validPassword || validPasskey || validIDP;
+  const valid = !!(verifiedAt && stillValid);
+
+  return { valid, verifiedAt };
+}
+
+/**
+ * mfa is required, session is not valid anymore (e.g. session expired, user logged out, etc.)
+ * to check for mfa for automatically selected session -> const response = await listAuthenticationMethodTypes(userId);
+ **/
+export async function isSessionValid({
+  serviceConfig,
+  session,
+}: {
+  serviceConfig: ServiceConfig;
+  session: Session;
+}): Promise<boolean> {
+  // session can't be checked without user
+  if (!session.factors?.user) {
+    return false;
+  }
+
+  let mfaValid = true;
+
+  // Check if user authenticated via different methods
+  const validIDP = session?.factors?.intent?.verifiedAt;
+  const validPassword = session?.factors?.password?.verifiedAt;
+  const validPasskey = session?.factors?.webAuthN?.verifiedAt;
+
+  // Get login settings to determine if MFA is actually required by policy
+  const loginSettings = await getLoginSettings({ serviceConfig, organization: session.factors?.user?.organizationId });
+
+  // Use the existing shouldEnforceMFA function to determine if MFA is required
+  const isMfaRequired = shouldEnforceMFA(session, loginSettings);
+
+  // Always check auth methods to see if the user has MFA factors configured
+  const authMethodTypes = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id });
+
+  const authMethods = authMethodTypes.authMethodTypes;
+  // Filter to only MFA methods (exclude PASSWORD and PASSKEY)
+  const mfaMethods = authMethods?.filter(
+    (method) =>
+      method === AuthenticationMethodType.TOTP ||
+      method === AuthenticationMethodType.OTP_EMAIL ||
+      method === AuthenticationMethodType.OTP_SMS ||
+      method === AuthenticationMethodType.U2F,
+  );
+
+  // A user-verified passkey (possession + user verification) is inherently multi-factor.
+  // Mirrors the passkey escape in checkMFAFactors, which never prompts for an additional
+  // second factor after a passkey login. Without this, users with a passkey plus a
+  // configured TOTP/OTP factor get stuck in a redirect loop on /passkey, because the
+  // flow never asks for the second factor but this check would deem the session invalid.
+  const hasAuthenticatedWithPasskey = !!session.factors.webAuthN?.verifiedAt && !!session.factors.webAuthN?.userVerified;
+
+  if (mfaMethods && mfaMethods.length > 0) {
+    // User has MFA methods configured — they must be verified regardless of policy,
+    // unless the session was already authenticated with a user-verified passkey
+    const totpValid = mfaMethods.includes(AuthenticationMethodType.TOTP) && !!session.factors.totp?.verifiedAt;
+    const otpEmailValid = mfaMethods.includes(AuthenticationMethodType.OTP_EMAIL) && !!session.factors.otpEmail?.verifiedAt;
+    const otpSmsValid = mfaMethods.includes(AuthenticationMethodType.OTP_SMS) && !!session.factors.otpSms?.verifiedAt;
+    const u2fValid = mfaMethods.includes(AuthenticationMethodType.U2F) && !!session.factors.webAuthN?.verifiedAt;
+
+    mfaValid = hasAuthenticatedWithPasskey || totpValid || otpEmailValid || otpSmsValid || u2fValid;
+  } else if (isMfaRequired) {
+    // No MFA methods configured, but MFA is forced by policy — check for any verified MFA factors
+    const otpEmail = session.factors.otpEmail?.verifiedAt;
+    const otpSms = session.factors.otpSms?.verifiedAt;
+    const totp = session.factors.totp?.verifiedAt;
+    const webAuthN = session.factors.webAuthN?.verifiedAt;
+
+    mfaValid = !!(otpEmail || otpSms || totp || webAuthN);
+  }
+
+  // If user has no MFA methods and MFA is not required by policy, mfaValid remains true
+
+  const stillValid = session.expirationDate ? timestampDate(session.expirationDate).getTime() > new Date().getTime() : true;
+
+  if (!stillValid) {
+    console.warn(
+      "[Session] Session is expired",
+      session.expirationDate ? timestampDate(session.expirationDate).toDateString() : "no expiration date",
+    );
+    return false;
+  }
+
+  const validChecks = !!(validPassword || validPasskey || validIDP);
+
+  if (!validChecks) {
+    return false;
+  }
+
+  if (!mfaValid) {
+    console.warn("[Session] MFA is required but not valid");
+    return false;
+  }
+
+  // Check email verification if EMAIL_VERIFICATION environment variable is enabled
+  if (process.env.EMAIL_VERIFICATION === "true") {
+    const userResponse = await getUserByID({ serviceConfig, userId: session.factors.user.id });
+
+    const humanUser = userResponse?.user?.type.case === "human" ? userResponse?.user.type.value : undefined;
+
+    if (humanUser && !humanUser.email?.isVerified) {
+      console.warn("[Session] Email is not verified");
+      return false;
+    }
+  }
+
+  return true;
+}
+
+export async function findValidSession({
+  serviceConfig,
+  sessions,
+  authRequest,
+  samlRequest,
   organization,
 }: {
-  userId: string;
-  loginName?: string;
-  sessionId?: string;
-  requestId?: string;
+  serviceConfig: ServiceConfig;
+  sessions: Session[];
+  authRequest?: AuthRequest;
+  samlRequest?: SAMLRequest;
   organization?: string;
-}): Promise<{ redirect: string } | { error: string } | { samlData: { url: string; fields: Record<string, string> } }> {
-  const _headers = await headers();
-  const { serviceConfig } = getServiceConfig(_headers);
-
-  const loginSettings = await getLoginSettings({ serviceConfig, organization: organization });
-
-  await humanMFAInitSkipped({ serviceConfig, userId });
-
-  if (requestId && sessionId) {
-    return completeFlowOrGetUrl(
-      {
-        sessionId: sessionId,
-        requestId: requestId,
-        organization: organization,
-      },
-      loginSettings?.defaultRedirectUri,
-    );
-  } else if (loginName) {
-    return completeFlowOrGetUrl(
-      {
-        loginName: loginName,
-        organization: organization,
-      },
-      loginSettings?.defaultRedirectUri,
-    );
-  }
-
-  return { error: "Could not skip MFA and continue" };
-}
-
-export type ContinueWithSessionCommand = Session & { requestId?: string };
-
-export async function continueWithSession({ requestId, ...session }: ContinueWithSessionCommand) {
-  const _headers = await headers();
-  const { serviceConfig } = getServiceConfig(_headers);
-
-  const t = await getTranslations("error");
-
-  if (!session.factors?.user) {
-    return { error: t("couldNotContinueSession") };
-  }
-
-  const loginSettings = await getLoginSettings({ serviceConfig, organization: session.factors.user.organizationId });
-
-  // Validate session (including MFA) before completing the flow
-  const valid = await isSessionValid({ serviceConfig, session: session as Session });
-
-  if (!valid) {
-    logger.warn("continueWithSession: session is not valid (e.g. MFA not completed), redirecting to re-authenticate", {
-      sessionId: session.id,
-    });
-
-    // Redirect user to re-authenticate (will route to MFA page if password is still valid)
-    return (await reauthenticate(session as Session, requestId)) ?? { error: t("couldNotContinueSession") };
-  }
-
-  if (requestId && session.id) {
-    return completeFlowOrGetUrl(
-      {
-        sessionId: session.id,
-        requestId: requestId,
-        organization: session.factors.user.organizationId,
-      },
-      loginSettings?.defaultRedirectUri,
-    );
-  }
-
-  return completeFlowOrGetUrl(
-    {
-      loginName: session.factors.user.loginName,
-      organization: session.factors.user.organizationId,
-    },
-    loginSettings?.defaultRedirectUri,
-  );
-}
-
-export type UpdateSessionCommand = {
-  loginName?: string;
-  sessionId?: string;
-  organization?: string;
-  checks?: Checks;
-  requestId?: string;
-  challenges?: RequestChallenges;
-  lifetime?: Duration;
-};
-
-export async function updateOrCreateSession(options: UpdateSessionCommand) {
-  let { loginName, sessionId, organization, checks, requestId, challenges, lifetime } = options;
-
-  const _headers = await headers();
-  const { serviceConfig } = getServiceConfig(_headers);
-  const host = getPublicHost(_headers);
-
-  const t = await getTranslations("verify.errors");
-
-  if (!host) {
-    return { error: "Could not get host" }; // Technical error, maybe leave or translate if key exists
-  }
-
-  if (challenges && challenges.webAuthN && !challenges.webAuthN.domain) {
-    const [hostname] = host.split(":");
-
-    challenges.webAuthN.domain = hostname;
-  }
-
-  let recentSession = sessionId
-    ? await getSessionCookieById({ sessionId })
-    : loginName
-      ? await getSessionCookieByLoginName({ loginName, organization })
-      : await getMostRecentSessionCookie();
-
-  if (!recentSession) {
-    if (!loginName) {
-      return { error: t("couldNotFindSession") };
+}): Promise<Session | undefined> {
+  let sessionsWithHint = sessions.filter((s) => {
+    if (authRequest && authRequest.hintUserId) {
+      return s.factors?.user?.id === authRequest.hintUserId;
     }
-
-    const checks = create(ChecksSchema, {
-      user: { search: { case: "loginName", value: loginName } },
-    });
-
-    const result = await createSessionAndUpdateCookie({
-      checks,
-      challenges,
-      requestId,
-    }).catch((error) => {
-      if (isClassifiedError(error) && error.isUserError) {
-        logger.warn("Could not create session (client error)", { grpcCode: error.code, httpStatus: error.httpStatus });
-      } else {
-        logger.error("Could not create session (server error)", { error });
-      }
-      return undefined;
-    });
-
-    if (result && "sessionCookie" in result) {
-      recentSession = result.sessionCookie;
+    if (authRequest && authRequest.loginHint) {
+      return s.factors?.user?.loginName === authRequest.loginHint;
     }
+    if (samlRequest) {
+      // SAML requests don't contain user hints like OIDC (hintUserId/loginHint)
+      // so we return all sessions for further processing
+      return true;
+    }
+    return true;
+  });
 
-    if (!recentSession) {
-      return {
-        error: t("couldNotFindSession"),
-      };
+  if (organization) {
+    sessionsWithHint = sessionsWithHint.filter((s) => s.factors?.user?.organizationId === organization);
+  }
+
+  if (sessionsWithHint.length === 0) {
+    return undefined;
+  }
+
+  // sort by change date descending
+  sessionsWithHint.sort((a, b) => {
+    const dateA = a.changeDate ? timestampDate(a.changeDate).getTime() : 0;
+    const dateB = b.changeDate ? timestampDate(b.changeDate).getTime() : 0;
+    return dateB - dateA;
+  });
+
+  // return the first valid session according to settings
+  for (const session of sessionsWithHint) {
+    if (await isSessionValid({ serviceConfig, session })) {
+      return session;
     }
   }
 
-  const loginSettings = await getLoginSettings({ serviceConfig, organization });
-
-  if (!lifetime) {
-    lifetime = checks?.webAuthN
-      ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
-      : checks?.otpEmail || checks?.otpSms
-        ? loginSettings?.secondFactorCheckLifetime
-        : undefined;
-  }
-
-  if (!lifetime || !lifetime.seconds) {
-    logger.warn("No lifetime provided for session, defaulting to 24 hours");
-    lifetime = {
-      seconds: BigInt(60 * 60 * 24), // default to 24 hours
-      nanos: 0,
-    } as Duration;
-  }
-
-  let session;
-  try {
-    session = await setSessionAndUpdateCookie({
-      recentCookie: recentSession,
-      checks,
-      challenges,
-      requestId,
-      lifetime,
-    });
-  } catch (error) {
-    const loginNameForCreation = options.loginName || recentSession?.loginName;
-    const orgForCreation = options.organization || recentSession?.organization;
-
-    if (!loginNameForCreation) {
-      throw error;
-    }
-
-    const users = await listUsers({
-      serviceConfig,
-      loginName: loginNameForCreation,
-      organizationId: orgForCreation,
-    });
-
-    if (users.details?.totalResult === BigInt(1) && users.result[0].userId) {
-      const user = users.result[0];
-      const newChecks = create(ChecksSchema, {
-        ...(checks || {}),
-        user: { search: { case: "userId", value: user.userId } } as any,
-      });
-
-      const result = await createSessionAndUpdateCookie({
-        checks: newChecks,
-        requestId,
-        lifetime,
-        challenges,
-      });
-      // @ts-ignore
-      session = { ...result.session, challenges: result.challenges };
-    } else {
-      throw error;
-    }
-  }
-
-  if (!session || ("error" in session && session.error)) {
-    return { error: t("couldNotUpdateSession") };
-  }
-
-  // if password, check if user has MFA methods
-  let authMethods;
-  if (checks && checks.password && session.factors?.user?.id) {
-    const response = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id });
-    if (response.authMethodTypes && response.authMethodTypes.length) {
-      authMethods = response.authMethodTypes;
-    }
-  }
-
-  // @ts-ignore
-  const challengeResponse: Challenges | undefined = session.challenges;
-
-  return {
-    sessionId: session.id,
-    factors: session.factors,
-    // Only the WebAuthN challenge may reach the browser. `sanitizeChallenges` already stops
-    // `returnCode` from being requested, so `otpSms`/`otpEmail` should always be unset here —
-    // keeping the projection explicit means no OTP code can leak through this boundary even
-    // if that ever regresses (GHSA-3gwm-5wx8-4gm6).
-    challenges: challengeResponse?.webAuthN ? { webAuthN: challengeResponse.webAuthN } : undefined,
-    authMethods,
-  };
-}
-
-type ClearSessionOptions = {
-  sessionId: string;
-};
-
-export async function clearSession(options: ClearSessionOptions): Promise<{ error?: string } | void> {
-  const _headers = await headers();
-  const { serviceConfig } = getServiceConfig(_headers);
-
-  const { sessionId } = options;
-
-  const sessionCookie = await getSessionCookieById({ sessionId });
-
-  if (!sessionCookie) {
-    return;
-  }
-
-  try {
-    const deleteResponse = await deleteSession({
-      serviceConfig,
-      sessionId: sessionCookie.id,
-      sessionToken: sessionCookie.token,
-    });
-    if (!deleteResponse) {
-      throw new Error("Could not delete session");
-    }
-  } catch (error) {
-    // The backend verifies the cookie's token before it looks at the session
-    // state, so PermissionDenied is what a session that no longer exists answers
-    // (nothing to verify against). It is also what a live session with a stale
-    // cookie token would answer; we deliberately prune the cookie entry in that
-    // case too: the user explicitly asked to remove the account from this
-    // browser, and without its token the server-side session cannot be used by
-    // anyone and simply expires. Every other failure keeps the entry and is
-    // reported so the caller can show it.
-    // (A session terminated by an RP-initiated logout keeps its token id, so
-    // deleting it again succeeds and never reaches this branch.)
-    if (!isClassifiedError(error) || error.code !== Code.PermissionDenied) {
-      logger.error("clearSession: could not delete session", { sessionId: sessionCookie.id, error });
-      const t = await getTranslations("error");
-      return { error: t("couldNotClearSession") };
-    }
-
-    logger.warn("clearSession: session rejected the cookie token (gone or stale), pruning cookie entry", {
-      sessionId: sessionCookie.id,
-    });
-  }
-
-  // Only needed for the cookie rewrite, so it must not gate the delete above.
-  const securitySettings = await getSecuritySettings({ serviceConfig });
-  const iFrameEnabled = !!securitySettings?.embeddedIframe?.enabled;
-
-  await removeSessionFromCookie({ session: sessionCookie, iFrameEnabled });
+  return undefined;
 }
