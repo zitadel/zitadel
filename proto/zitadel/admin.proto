@@ -7279,6 +7279,9 @@ message AddSAMLProviderRequest {
     // Specify a Signature Algorithm that should be used to sign SAML requests and responses.
     // Can be used only if the `with_signed_request` option is set to true.
     zitadel.idp.v1.SAMLSignatureAlgorithm signature_algorithm = 10;
+    // Optionally provide the certificate and private key used to sign requests and decrypt assertions.
+    // If not provided, a self-signed certificate is generated.
+    zitadel.idp.v1.SAMLCertificate certificate = 11;
 }
 
 message AddSAMLProviderResponse {
@@ -7319,6 +7322,9 @@ message UpdateSAMLProviderRequest {
     // Specify a Signature Algorithm that should be used to sign SAML requests and responses.
     // Can be used only if the `with_signed_request` option is set to true.
     zitadel.idp.v1.SAMLSignatureAlgorithm signature_algorithm = 11;
+    // Optionally replace the certificate and private key used to sign requests and decrypt assertions.
+    // If not provided, the current certificate is kept.
+    zitadel.idp.v1.SAMLCertificate certificate = 12;
 }
 
 message UpdateSAMLProviderResponse {

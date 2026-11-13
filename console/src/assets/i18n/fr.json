@@ -2390,7 +2390,16 @@
     "ISIDTOKENMAPPING": "Mappage depuis le jeton ID",
     "ISIDTOKENMAPPING_DESC": "Si sélectionné, les informations du fournisseur sont mappées à partir du jeton ID, et non à partir du point d'extrémité userinfo.",
     "USEPKCE": "Utiliser PKCE",
-    "USEPKCE_DESC": "Détermine si les paramètres code_challenge et code_challenge_method sont inclus dans la demande d'authentification"
+    "USEPKCE_DESC": "Détermine si les paramètres code_challenge et code_challenge_method sont inclus dans la demande d'authentification",
+    "SAML": {
+      "CERTIFICATE": "Certificat",
+      "PRIVATEKEY": "Clé privée",
+      "UPLOADCERTIFICATE": "Téléverser le certificat",
+      "UPLOADPRIVATEKEY": "Téléverser la clé privée",
+      "UPDATECERTIFICATE": "Remplacer le certificat",
+      "FILEMAXSIZEEXCEEDED": "Taille maximale du fichier dépassée.",
+      "CERTIFICATE_DESC": "Vous pouvez téléverser un certificat et sa clé privée (PEM), par exemple émis par une autorité de certification exigée par le fournisseur d'identité. Ils sont utilisés pour signer les requêtes et déchiffrer les assertions. Sinon, un certificat auto-signé est généré."
+    }
   },
   "MFA": {
     "LIST": {

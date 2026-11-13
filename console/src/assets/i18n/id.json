@@ -2392,7 +2392,14 @@
       "SIGNATUREALGORITHM": "Algoritma tanda tangan",
       "NAMEIDFORMAT": "Format ID Nama",
       "TRANSIENTMAPPINGATTRIBUTENAME": "Nama Atribut Pemetaan Khusus",
-      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Nama atribut alternatif untuk memetakan pengguna jika `format nameid` yang dikembalikan adalah `sementara`, mis. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Nama atribut alternatif untuk memetakan pengguna jika `format nameid` yang dikembalikan adalah `sementara`, mis. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`",
+      "CERTIFICATE": "Sertifikat",
+      "PRIVATEKEY": "Kunci pribadi",
+      "UPLOADCERTIFICATE": "Unggah sertifikat",
+      "UPLOADPRIVATEKEY": "Unggah kunci pribadi",
+      "UPDATECERTIFICATE": "Ganti sertifikat",
+      "FILEMAXSIZEEXCEEDED": "Ukuran file maksimum terlampaui.",
+      "CERTIFICATE_DESC": "Secara opsional, unggah sertifikat beserta kunci pribadinya (PEM), misalnya yang diterbitkan oleh otoritas sertifikat yang diwajibkan oleh penyedia identitas. Keduanya digunakan untuk menandatangani permintaan dan mendekripsi assertion. Jika tidak diberikan, sertifikat yang ditandatangani sendiri akan dibuat."
     },
     "TOAST": {
       "SAVED": "Berhasil disimpan.",

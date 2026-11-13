@@ -2385,7 +2385,16 @@
     "ISIDTOKENMAPPING": "Mapeamento do token ID",
     "ISIDTOKENMAPPING_DESC": "Se selecionado, as informações do provedor são mapeadas a partir do token ID, e não do ponto final userinfo.",
     "USEPKCE": "Usar PKCE",
-    "USEPKCE_DESC": "Determina se os parâmetros code_challenge e code_challenge_method estão incluídos na solicitação de autenticação"
+    "USEPKCE_DESC": "Determina se os parâmetros code_challenge e code_challenge_method estão incluídos na solicitação de autenticação",
+    "SAML": {
+      "CERTIFICATE": "Certificado",
+      "PRIVATEKEY": "Chave privada",
+      "UPLOADCERTIFICATE": "Carregar certificado",
+      "UPLOADPRIVATEKEY": "Carregar chave privada",
+      "UPDATECERTIFICATE": "Substituir certificado",
+      "FILEMAXSIZEEXCEEDED": "Tamanho máximo do arquivo excedido.",
+      "CERTIFICATE_DESC": "Opcionalmente, carregue um certificado e sua chave privada (PEM), por exemplo emitido por uma autoridade certificadora exigida pelo provedor de identidade. Eles são usados para assinar as solicitações e descriptografar as asserções. Se nenhum for fornecido, um certificado autoassinado é gerado."
+    }
   },
   "MFA": {
     "LIST": {

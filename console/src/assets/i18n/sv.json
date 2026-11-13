@@ -2397,7 +2397,14 @@
       "SIGNEDREQUEST": "Signerad begäran",
       "NAMEIDFORMAT": "NameID-format",
       "TRANSIENTMAPPINGATTRIBUTENAME": "Anpassat mappningsattributnamn",
-      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternativt attributnamn för att mappa användaren om `nameid-format` som returneras är `transient`, t.ex. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternativt attributnamn för att mappa användaren om `nameid-format` som returneras är `transient`, t.ex. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`",
+      "CERTIFICATE": "Certifikat",
+      "PRIVATEKEY": "Privat nyckel",
+      "UPLOADCERTIFICATE": "Ladda upp certifikat",
+      "UPLOADPRIVATEKEY": "Ladda upp privat nyckel",
+      "UPDATECERTIFICATE": "Ersätt certifikat",
+      "FILEMAXSIZEEXCEEDED": "Maximal filstorlek överskriden.",
+      "CERTIFICATE_DESC": "Du kan ladda upp ett certifikat och dess privata nyckel (PEM), t.ex. utfärdat av en certifikatutfärdare som identitetsleverantören kräver. De används för att signera förfrågningar och dekryptera assertions. Om inget anges genereras ett självsignerat certifikat."
     },
     "TOAST": {
       "SAVED": "Sparat framgångsrikt.",
