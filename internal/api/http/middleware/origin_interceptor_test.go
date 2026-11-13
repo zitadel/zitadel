@@ -2,22 +2,27 @@ package middleware
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func Test_composeOrigin(t *testing.T) {
 	type args struct {
 		h            http.Header
 		enforceHttps bool
+		// defaults to x-zitadel-public-host
+		publicHeaders []string
 	}
 	tests := []struct {
-		name string
-		args args
-		want *http_util.DomainCtx
+		name    string
+		args    args
+		want    *http_util.DomainCtx
+		wantErr bool
 	}{{
 		name: "no proxy headers",
 		want: &http_util.DomainCtx{
@@ -214,27 +219,47 @@ func Test_composeOrigin(t *testing.T) {
 			Protocol:     "http",
 		},
 	}, {
-		name: "invalid public host (non-numeric port) is kept to be rejected by the trusted domain check",
+		name: "invalid public host (non-numeric port) is rejected",
 		args: args{
 			h: http.Header{
 				"X-Zitadel-Public-Host": []string{"evil.com:443/"},
 			},
 		},
-		want: &http_util.DomainCtx{
-			InstanceHost: "host.header",
-			PublicHost:   "evil.com:443/",
-			Protocol:     "http",
-		},
+		wantErr: true,
 	}, {
-		name: "invalid public host (userinfo) is kept to be rejected by the trusted domain check",
+		name: "invalid public host (userinfo) is rejected",
 		args: args{
 			h: http.Header{
 				"X-Zitadel-Public-Host": []string{"a:b@evil.com"},
 			},
 		},
+		wantErr: true,
+	}, {
+		// the trusted domain check must not see "trusted.example.com", while links would point to "evil.example"
+		name: "invalid public host (userinfo with trusted host and port) is rejected",
+		args: args{
+			h: http.Header{
+				"X-Zitadel-Public-Host": []string{"trusted.example.com:443@evil.example"},
+			},
+		},
+		wantErr: true,
+	}, {
+		name: "invalid public host (userinfo without port) is rejected",
+		args: args{
+			h: http.Header{
+				"X-Zitadel-Public-Host": []string{"trusted.example.com@evil.example"},
+			},
+		},
+		wantErr: true,
+	}, {
+		name: "invalid instance host (userinfo with trusted host and port) is ignored",
+		args: args{
+			h: http.Header{
+				"X-Forwarded-Host": []string{"trusted.example.com:443@evil.example"},
+			},
+		},
 		want: &http_util.DomainCtx{
 			InstanceHost: "host.header",
-			PublicHost:   "a:b@evil.com",
 			Protocol:     "http",
 		},
 	}, {
@@ -248,91 +273,201 @@ func Test_composeOrigin(t *testing.T) {
 			InstanceHost: "host.header",
 			Protocol:     "http",
 		},
+	}, {
+		name: "x-forwarded-for does not contain a host",
+		args: args{
+			h: http.Header{
+				"X-Forwarded-For": []string{"host=evil.example"},
+			},
+		},
+		want: &http_util.DomainCtx{
+			InstanceHost: "host.header",
+			Protocol:     "http",
+		},
+	}, {
+		name: "multiple instance host values use the first value",
+		args: args{
+			h: http.Header{
+				"X-Forwarded-Host": []string{"first.host", "second.host"},
+			},
+		},
+		want: &http_util.DomainCtx{
+			InstanceHost: "first.host",
+			Protocol:     "http",
+		},
+	}, {
+		name: "public host with empty port is normalized",
+		args: args{
+			h: http.Header{
+				"X-Zitadel-Public-Host": []string{"public.host:"},
+			},
+		},
+		want: &http_util.DomainCtx{
+			InstanceHost: "host.header",
+			PublicHost:   "public.host",
+			Protocol:     "http",
+		},
+	}, {
+		name: "multiple public host values are rejected",
+		args: args{
+			h: http.Header{
+				"X-Zitadel-Public-Host": []string{"trusted.example.com", "evil.example"},
+			},
+		},
+		wantErr: true,
+	}, {
+		// first match wins: the invalid higher-ranked header is skipped and the valid lower-ranked
+		// header is used. The chosen host is still validated and checked against the trusted domains,
+		// so no poisoned host can reach the links.
+		name: "invalid public host header is skipped when a lower-ranked one is valid",
+		args: args{
+			h: http.Header{
+				"X-Public-A": []string{"trusted.example.com:443@evil.example"},
+				"X-Public-B": []string{"trusted.example.com"},
+			},
+			publicHeaders: []string{"x-public-a", "x-public-b"},
+		},
+		want: &http_util.DomainCtx{
+			InstanceHost: "host.header",
+			PublicHost:   "trusted.example.com",
+			Protocol:     "http",
+		},
+	}, {
+		name: "unparsable forwarded public host is rejected",
+		args: args{
+			h: http.Header{
+				"Forwarded": []string{`host="a:b@evil.com`},
+			},
+			publicHeaders: []string{http_util.Forwarded},
+		},
+		wantErr: true,
+	}, {
+		name: "forwarded public host with invalid host is rejected",
+		args: args{
+			h: http.Header{
+				"Forwarded": []string{`host="trusted.example.com:443@evil.example"`},
+			},
+			publicHeaders: []string{http_util.Forwarded},
+		},
+		wantErr: true,
+	}, {
+		name: "forwarded public host without host is ignored",
+		args: args{
+			h: http.Header{
+				"Forwarded": []string{"for=192.0.2.60;proto=https"},
+			},
+			publicHeaders: []string{http_util.Forwarded},
+		},
+		want: &http_util.DomainCtx{
+			InstanceHost: "host.header",
+			Protocol:     "https",
+		},
+	}, {
+		name: "unparsable forwarded instance host is ignored",
+		args: args{
+			h: http.Header{
+				"Forwarded": []string{`host="a:b@evil.com`},
+			},
+		},
+		want: &http_util.DomainCtx{
+			InstanceHost: "host.header",
+			Protocol:     "http",
+		},
 	},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equalf(t, tt.want, composeDomainContext(
+			publicHeaders := tt.args.publicHeaders
+			if publicHeaders == nil {
+				publicHeaders = []string{"x-zitadel-public-host"}
+			}
+			got, err := composeDomainContext(
 				&http.Request{
 					Host:   "host.header",
 					Header: tt.args.h,
 				},
 				tt.args.enforceHttps,
 				[]string{http_util.Forwarded, http_util.ForwardedFor, http_util.ForwardedHost, http_util.ForwardedProto},
-				[]string{"x-zitadel-public-host"},
-			), "headers: %+v, enforceHttps: %t", tt.args.h, tt.args.enforceHttps)
+				publicHeaders,
+			)
+			if tt.wantErr {
+				assert.True(t, zerrors.IsErrorInvalidArgument(err), "expected invalid argument error, got: %v", err)
+			} else {
+				assert.NoError(t, err)
+			}
+			assert.Equalf(t, tt.want, got, "headers: %+v, enforceHttps: %t", tt.args.h, tt.args.enforceHttps)
 		})
 	}
 }
 
-func Test_sanitizeHost(t *testing.T) {
-	type args struct {
-		rawHost string
-	}
+func TestWithOrigin_keepsHeaderConfig(t *testing.T) {
+	// a config slice with spare capacity must not be written to (shared between concurrent requests)
+	instanceHostHeaders := make([]string, 1, 10)
+	instanceHostHeaders[0] = "x-zitadel-instance-host"
+
+	WithOrigin(false, "host", ":authority", instanceHostHeaders, []string{"x-zitadel-public-host"})
+
+	assert.Equal(t, []string{"x-zitadel-instance-host"}, instanceHostHeaders)
+	assert.Empty(t, instanceHostHeaders[:2][1], "backing array of the config slice was modified")
+}
+
+func TestWithOrigin(t *testing.T) {
 	tests := []struct {
-		name string
-		args args
-		want string
+		name           string
+		publicHost     string
+		wantStatus     int
+		wantNextCalled bool
+		wantPublicHost string
 	}{
 		{
-			name: "normal host",
-			args: args{rawHost: "example.com"},
-			want: "example.com",
+			name:           "no public host",
+			wantStatus:     http.StatusOK,
+			wantNextCalled: true,
 		},
 		{
-			name: "host with port",
-			args: args{rawHost: "example.com:8080"},
-			want: "example.com:8080",
+			name:           "valid public host",
+			publicHost:     "trusted.example.com",
+			wantStatus:     http.StatusOK,
+			wantNextCalled: true,
+			wantPublicHost: "trusted.example.com",
 		},
 		{
-			name: "ipv4",
-			args: args{rawHost: "192.168.1.1"},
-			want: "192.168.1.1",
+			name:       "invalid public host (userinfo with trusted host and port)",
+			publicHost: "trusted.example.com:443@evil.example",
+			wantStatus: http.StatusBadRequest,
 		},
 		{
-			name: "ipv4 with port",
-			args: args{rawHost: "192.168.1.1:8080"},
-			want: "192.168.1.1:8080",
-		},
-		{
-			name: "ipv6",
-			args: args{rawHost: "[2001:0db8:85a3:0000:0000:8a2e:0370:7334]"},
-			want: "[2001:0db8:85a3:0000:0000:8a2e:0370:7334]",
-		},
-		{
-			name: "ipv6 with port",
-			args: args{rawHost: "[2001:0db8:85a3:0000:0000:8a2e:0370:7334]:8080"},
-			want: "[2001:0db8:85a3:0000:0000:8a2e:0370:7334]:8080",
-		},
-		{
-			name: "host with trailing colon",
-			args: args{rawHost: "example.com:"},
-			want: "",
-		},
-		{
-			name: "host with invalid port",
-			args: args{rawHost: "example.com:port"},
-			want: "",
-		},
-		{
-			name: "invalid host",
-			args: args{rawHost: "localhost:@attacker.com"},
-			want: "",
-		},
-		{
-			name: "invalid host",
-			args: args{rawHost: "localhost:@attacker.com:8080"},
-			want: "",
-		},
-		{
-			name: "empty host",
-			args: args{rawHost: ""},
-			want: "",
+			name:       "invalid public host (userinfo)",
+			publicHost: "a:b@evil.com",
+			wantStatus: http.StatusBadRequest,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equalf(t, tt.want, sanitizeHost(tt.args.rawHost), "sanitizeHost(%v)", tt.args.rawHost)
+			var (
+				nextCalled bool
+				domainCtx  *http_util.DomainCtx
+			)
+			handler := WithOrigin(false, "", "", nil, []string{"x-zitadel-public-host"})(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				nextCalled = true
+				domainCtx = http_util.DomainContext(r.Context())
+			}))
+			req := httptest.NewRequest(http.MethodGet, "http://host.header/", nil)
+			if tt.publicHost != "" {
+				req.Header.Set("x-zitadel-public-host", tt.publicHost)
+			}
+			rec := httptest.NewRecorder()
+
+			handler.ServeHTTP(rec, req)
+
+			assert.Equal(t, tt.wantStatus, rec.Code)
+			if tt.wantStatus == http.StatusBadRequest {
+				assert.Contains(t, rec.Body.String(), "HTTP-Rk7pX")
+			}
+			assert.Equal(t, tt.wantNextCalled, nextCalled)
+			if tt.wantNextCalled {
+				assert.Equal(t, tt.wantPublicHost, domainCtx.PublicHost)
+			}
 		})
 	}
 }
