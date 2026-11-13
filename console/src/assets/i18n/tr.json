@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "SMS Ayarları",
-        "DESCRIPTION": "Tüm Zitadel özelliklerinin kilidini açmak için kullanıcılarınıza SMS mesajları göndermek üzere Twilio'yu yapılandırın."
+        "DESCRIPTION": "Zitadel'in tüm özelliklerinin kilidini açmak için kullanıcılarınıza SMS göndermek üzere Twilio'yu veya kendi HTTP uç noktanızı yapılandırın."
       },
       "IAM_EVENTS": {
         "TITLE": "Olaylar",
@@ -1606,6 +1606,25 @@
         "SETTOKEN": "Token'ı Ayarla",
         "TOKENSET": "Token başarıyla ayarlandı."
       }
+    },
+    "HTTPPROVIDER": {
+      "ADD_TITLE": "HTTP sağlayıcı ekle",
+      "EDIT_TITLE": "HTTP sağlayıcıyı düzenle",
+      "EMAIL_DESCRIPTION": "Zitadel, SMTP kullanmak yerine her e-postayı imzalı bir JSON isteği olarak uç noktanıza gönderir. Mesajı hizmetiniz oluşturur ve iletir.",
+      "SMS_DESCRIPTION": "Zitadel her SMS'i imzalı bir JSON isteği olarak uç noktanıza gönderir. Mesajı hizmetiniz iletir.",
+      "ENDPOINT": "Uç nokta",
+      "ENDPOINT_INVALID": "http:// veya https:// ile başlayan bir URL girin.",
+      "DESCRIPTION": "Açıklama",
+      "SIGNINGKEY": "İmzalama anahtarı",
+      "SIGNINGKEY_DESCRIPTION": "Her istek, bu sağlayıcının anahtarıyla imzalanmış bir ZITADEL-Signature başlığı içerir. Bunu hizmetinizde doğrulayın.",
+      "SIGNINGKEY_STORE": "İmzalama anahtarını kopyalayın ve güvenli bir yerde saklayın. Hizmetiniz ZITADEL-Signature başlığını doğrulamak için buna ihtiyaç duyar.",
+      "REGENERATE_SIGNINGKEY": "Yeni bir imzalama anahtarı oluştur. Mevcut anahtar hemen geçersiz olur.",
+      "ADDED": "HTTP sağlayıcı eklendi.",
+      "UPDATED": "HTTP sağlayıcı güncellendi.",
+      "REMOVED": "HTTP sağlayıcı kaldırıldı.",
+      "DELETE_TITLE": "HTTP sağlayıcıyı sil",
+      "DELETE_DESCRIPTION": "Bir HTTP sağlayıcıyı silmek üzeresiniz. Uç noktasını yazarak onaylayın.",
+      "DELETE_CONFIRM": "Bu HTTP sağlayıcıyı silmek için {{value}} yazın."
     },
     "SECRETS": {
       "TYPES": "Gizli Anahtar Türleri",

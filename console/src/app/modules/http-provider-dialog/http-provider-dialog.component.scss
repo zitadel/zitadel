@@ -1,0 +1,46 @@
+.title {
+  font-size: 1.2rem;
+  margin-top: 0;
+}
+
+.http-provider-field {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.http-provider-error {
+  color: var(--warn);
+  font-size: 12px;
+}
+
+.http-provider-key-label {
+  margin: 0.5rem 0 0;
+  font-size: 14px;
+}
+
+.http-provider-key {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .http-provider-key-value {
+    overflow-wrap: anywhere;
+    font-size: 13px;
+  }
+}
+
+.http-provider-hint {
+  font-size: 13px;
+}
+
+.action {
+  display: flex;
+
+  .fill-space {
+    flex: 1;
+  }
+
+  .ok-button {
+    margin-left: 0.5rem;
+  }
+}
