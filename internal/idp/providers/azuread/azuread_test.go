@@ -8,7 +8,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	openid "github.com/zitadel/oidc/v3/pkg/oidc"
 
 	"github.com/zitadel/zitadel/internal/idp"
@@ -153,7 +152,6 @@ func TestProvider_Options(t *testing.T) {
 						oauth.WithCreationAllowed(),
 						oauth.WithAutoCreation(),
 						oauth.WithAutoUpdate(),
-						oauth.WithRelyingPartyOption(rp.WithPKCE(nil)),
 					),
 				},
 			},
