@@ -477,7 +477,8 @@
     "failedLoading": "データの読み込みに失敗しました。再試行してください。",
     "tryagain": "再試行",
     "couldNotContinueSession": "セッションを継続できませんでした - ユーザー情報が不足しています",
-    "couldNotClearSession": "セッションを終了できませんでした。もう一度お試しください。"
+    "couldNotClearSession": "セッションを終了できませんでした。もう一度お試しください。",
+    "internalError": "内部エラーが発生しました"
   },
   "zitadel": {
     "errors": {
