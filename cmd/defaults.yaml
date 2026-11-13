@@ -611,6 +611,8 @@ Notifications:
   #   - Match:
   #       # Every defined criterion must match. Without any criterion the rule matches all SMTP providers.
   #       # Hosts of the SMTP provider. An entry without port matches any port.
+  #       # The host of a provider can be changed without entering its credentials again, and a server can be
+  #       # reachable by several names. To bind a rule to an account of the provider, match the Users.
   #       Hosts:
   #         - smtp.example.com
   #       # Usernames of the SMTP authentication, e.g. the token of the provider. They identify the account
