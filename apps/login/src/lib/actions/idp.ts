@@ -1,9 +1,8 @@
 "use server";
 
 import { getSessionCookieById } from "@/lib/server/cookies";
-import { getOrSetFingerprintId } from "@/lib/server/fingerprint";
+import { addIdpFlowProof } from "@/lib/server/fingerprint";
 import { getPublicHost } from "@/lib/server/host";
-import { createIdpLinkProof } from "@/lib/server/idp-link-proof";
 import { getServiceConfig } from "@/lib/server/service-url";
 import { ServiceConfig, startIdentityProviderFlow, startLDAPIdentityProviderFlow } from "@/lib/server/zitadel";
 import { headers } from "next/headers";
@@ -28,21 +27,11 @@ export async function redirectToIdp(prevState: RedirectToIdpState, formData: For
   const loginHint = formData.get("loginHint") as string;
 
   if (sessionId) {
-    try {
-      // Validate that the requestor owns the session they are trying to link
-      await getSessionCookieById({ sessionId });
-
-      // Get fingerprint (ensure it exists)
-      const fingerprintId = await getOrSetFingerprintId();
-
-      // Signed proof (server-only secret) to verify the intent upon return
-      const linkFingerprint = createIdpLinkProof(sessionId, fingerprintId);
-
-      params.set("linkToSessionId", sessionId);
-      params.set("linkFingerprint", linkFingerprint);
-    } catch {
+    // the session to link must be one of this browser's sessions
+    if (!(await getSessionCookieById({ sessionId }).catch(() => undefined))) {
       return { error: "Invalid session for linking" };
     }
+    params.set("linkToSessionId", sessionId);
   }
   if (requestId) params.set("requestId", requestId);
   if (organization) params.set("organization", organization);
@@ -53,6 +42,9 @@ export async function redirectToIdp(prevState: RedirectToIdpState, formData: For
     params.set("idpId", idpId);
     redirect(`/idp/ldap?` + params.toString());
   }
+
+  // binds the flow to this browser (and the session to link), checked when the callback is processed
+  await addIdpFlowProof(params, sessionId);
 
   const response = await startIDPFlow({
     serviceConfig,
@@ -124,7 +116,6 @@ type createNewSessionForLDAPCommand = {
   organization?: string;
   postErrorRedirectUrl?: string;
   linkToSessionId?: string;
-  linkFingerprint?: string;
 };
 
 export async function createNewSessionForLDAP(command: createNewSessionForLDAPCommand) {
@@ -134,6 +125,14 @@ export async function createNewSessionForLDAP(command: createNewSessionForLDAPCo
 
   if (!command.username || !command.password) {
     return { error: "No username or password provided" };
+  }
+
+  // the session to link must be one of this browser's sessions, same as redirectToIdp
+  if (command.linkToSessionId) {
+    const sessionCookie = await getSessionCookieById({ sessionId: command.linkToSessionId }).catch(() => undefined);
+    if (!sessionCookie) {
+      return { error: "Invalid session for linking" };
+    }
   }
 
   const response = await startLDAPIdentityProviderFlow({
@@ -154,6 +153,7 @@ export async function createNewSessionForLDAP(command: createNewSessionForLDAPCo
     id: idpIntentId,
     token: idpIntentToken,
   });
+  await addIdpFlowProof(params, command.linkToSessionId);
 
   if (command.link) {
     params.set("link", "true");
@@ -162,7 +162,6 @@ export async function createNewSessionForLDAP(command: createNewSessionForLDAPCo
   if (command.organization) params.set("organization", command.organization);
   if (command.postErrorRedirectUrl) params.set("postErrorRedirectUrl", command.postErrorRedirectUrl);
   if (command.linkToSessionId) params.set("linkToSessionId", command.linkToSessionId);
-  if (command.linkFingerprint) params.set("linkFingerprint", command.linkFingerprint);
 
   return {
     redirect: `/idp/ldap/process?` + params.toString(),

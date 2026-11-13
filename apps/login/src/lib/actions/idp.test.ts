@@ -1,5 +1,5 @@
-import { redirectToIdp } from "@/lib/actions/idp";
-import { isIdpLinkProofValid } from "@/lib/server/idp-link-proof";
+import { createNewSessionForLDAP, redirectToIdp } from "@/lib/actions/idp";
+import { createIdpFlowProof, isIdpFlowProofValid } from "@/lib/server/idp-flow-proof";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 // Mock all the dependencies
@@ -28,12 +28,21 @@ vi.mock("@/lib/server/host", () => ({
 
 vi.mock("@/lib/server/zitadel", () => ({
   startIdentityProviderFlow: vi.fn(),
+  startLDAPIdentityProviderFlow: vi.fn(),
 }));
 
 vi.mock("@/lib/server/fingerprint", () => ({
-  getFingerprintIdCookie: vi.fn(),
-  getOrSetFingerprintId: vi.fn(),
+  getBindingIdCookie: vi.fn(),
+  addIdpFlowProof: vi.fn(),
 }));
+
+// the real helper reads the binding id cookie, here the browser binding id is "fp123"
+async function mockAddIdpFlowProof() {
+  const { addIdpFlowProof } = await import("@/lib/server/fingerprint");
+  vi.mocked(addIdpFlowProof).mockImplementation(async (params, linkToSessionId) => {
+    params.set("flowFingerprint", createIdpFlowProof("fp123", linkToSessionId));
+  });
+}
 
 describe("redirectToIdp", () => {
   let mockHeaders: any;
@@ -51,7 +60,7 @@ describe("redirectToIdp", () => {
     const { getServiceConfig } = await import("@/lib/server/service-url");
     const { getInstanceHost, getPublicHost } = await import("@/lib/server/host");
     const { startIdentityProviderFlow } = await import("@/lib/server/zitadel");
-    const { getFingerprintIdCookie, getOrSetFingerprintId } = await import("@/lib/server/fingerprint");
+    const { getBindingIdCookie } = await import("@/lib/server/fingerprint");
     const { getSessionCookieById } = await import("@/lib/server/cookies");
 
     // Setup mocks
@@ -60,13 +69,12 @@ describe("redirectToIdp", () => {
     mockGetInstanceHost = vi.mocked(getInstanceHost);
     mockGetPublicHost = vi.mocked(getPublicHost);
     mockStartIdentityProviderFlow = vi.mocked(startIdentityProviderFlow);
-    const mockGetFingerprintIdCookie = vi.mocked(getFingerprintIdCookie);
-    const mockGetOrSetFingerprintId = vi.mocked(getOrSetFingerprintId);
+    const mockGetBindingIdCookie = vi.mocked(getBindingIdCookie);
     const mockGetSessionCookieById = vi.mocked(getSessionCookieById);
 
     // Default mock implementations
-    mockGetFingerprintIdCookie.mockResolvedValue({ name: "fingerprintId", value: "fp123" });
-    mockGetOrSetFingerprintId.mockResolvedValue("fp123");
+    mockGetBindingIdCookie.mockResolvedValue({ name: "bindingId", value: "fp123" });
+    await mockAddIdpFlowProof();
     mockGetSessionCookieById.mockResolvedValue({} as any);
     mockHeaders.mockResolvedValue({} as any);
     mockGetServiceUrlFromHeaders.mockReturnValue({
@@ -240,15 +248,9 @@ describe("redirectToIdp", () => {
       const failureUrl = callArgs.urls.failureUrl;
 
       // Both parameters should be present
-      // Both parameters should be present
       expect(successUrl).toContain("linkToSessionId=session123");
-      // The linkFingerprint is a signed proof bound to the session and this browser's fingerprint
-      const linkFingerprint = new URL(successUrl).searchParams.get("linkFingerprint") ?? undefined;
-      expect(isIdpLinkProofValid(linkFingerprint, "session123", "fp123")).toBe(true);
-      expect(isIdpLinkProofValid(linkFingerprint, "other-session", "fp123")).toBe(false);
       expect(successUrl).toContain("postErrorRedirectUrl=%2Fcustom-error");
       expect(failureUrl).toContain("linkToSessionId=session123");
-      expect(failureUrl).toContain("linkFingerprint=");
       expect(failureUrl).toContain("postErrorRedirectUrl=%2Fcustom-error");
     });
 
@@ -351,5 +353,138 @@ describe("redirectToIdp", () => {
         expect(error.message).toBe("REDIRECT: https://idp.example.com/auth");
       }
     });
+  });
+
+  describe("flowFingerprint (browser binding)", () => {
+    test("should add a flow proof bound to this browser's binding id to the success URL", async () => {
+      const formData = new FormData();
+      formData.append("id", "idp123");
+      formData.append("provider", "google");
+
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
+
+      await expect(redirectToIdp(undefined, formData)).rejects.toThrow("REDIRECT:");
+
+      const successUrl = mockStartIdentityProviderFlow.mock.calls[0][0].urls.successUrl;
+      const flowFingerprint = new URL(successUrl).searchParams.get("flowFingerprint") ?? undefined;
+      expect(isIdpFlowProofValid(flowFingerprint, "fp123")).toBe(true);
+      expect(isIdpFlowProofValid(flowFingerprint, "other-fp")).toBe(false);
+    });
+
+    test("should bind the flow proof to the session when linking", async () => {
+      const formData = new FormData();
+      formData.append("id", "idp123");
+      formData.append("provider", "google");
+      formData.append("sessionId", "session123");
+
+      mockStartIdentityProviderFlow.mockResolvedValue({ url: "https://idp.example.com/auth" });
+
+      await expect(redirectToIdp(undefined, formData)).rejects.toThrow("REDIRECT:");
+
+      const successUrl = new URL(mockStartIdentityProviderFlow.mock.calls[0][0].urls.successUrl);
+      const flowFingerprint = successUrl.searchParams.get("flowFingerprint") ?? undefined;
+      expect(isIdpFlowProofValid(flowFingerprint, "fp123", "session123")).toBe(true);
+      expect(isIdpFlowProofValid(flowFingerprint, "fp123", "other-session")).toBe(false);
+      expect(isIdpFlowProofValid(flowFingerprint, "fp123")).toBe(false);
+    });
+
+    test("should reject linking to a session this browser does not own", async () => {
+      const { getSessionCookieById } = await import("@/lib/server/cookies");
+      vi.mocked(getSessionCookieById).mockResolvedValue(undefined);
+      const formData = new FormData();
+      formData.append("id", "idp123");
+      formData.append("provider", "google");
+      formData.append("sessionId", "victim-session");
+
+      const result = await redirectToIdp(undefined, formData);
+
+      expect(result).toEqual({ error: "Invalid session for linking" });
+      expect(mockStartIdentityProviderFlow).not.toHaveBeenCalled();
+    });
+
+    test("should not add a flow proof to the LDAP credentials page redirect", async () => {
+      const formData = new FormData();
+      formData.append("id", "idp123");
+      formData.append("provider", "ldap");
+
+      const error = await redirectToIdp(undefined, formData).catch((e: Error) => e);
+
+      expect((error as Error).message).toContain("REDIRECT: /idp/ldap?");
+      expect((error as Error).message).not.toContain("flowFingerprint");
+    });
+  });
+});
+
+describe("createNewSessionForLDAP", () => {
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.stubEnv("ZITADEL_SESSION_COOKIE_SECRET", "test-session-cookie-secret-at-least-32-chars");
+
+    const { headers } = await import("next/headers");
+    const { getServiceConfig } = await import("@/lib/server/service-url");
+    const { startLDAPIdentityProviderFlow } = await import("@/lib/server/zitadel");
+    const { getSessionCookieById } = await import("@/lib/server/cookies");
+
+    vi.mocked(headers).mockResolvedValue({} as any);
+    vi.mocked(getServiceConfig).mockReturnValue({ serviceConfig: { baseUrl: "https://api.example.com" } } as any);
+    await mockAddIdpFlowProof();
+    vi.mocked(getSessionCookieById).mockResolvedValue({} as any);
+    vi.mocked(startLDAPIdentityProviderFlow).mockResolvedValue({
+      nextStep: { case: "idpIntent", value: { userId: "user123", idpIntentId: "intent123", idpIntentToken: "token123" } },
+    } as any);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllEnvs();
+  });
+
+  test("should add a flow proof bound to this browser's binding id to the process URL", async () => {
+    const result = await createNewSessionForLDAP({
+      username: "user",
+      password: "secret",
+      idpId: "idp123",
+      link: false,
+      requestId: "req123",
+    });
+
+    expect("redirect" in result && result.redirect).toContain("/idp/ldap/process?");
+    const params = new URLSearchParams((result as { redirect: string }).redirect.split("?")[1]);
+    expect(params.get("id")).toBe("intent123");
+    expect(params.get("requestId")).toBe("req123");
+    expect(isIdpFlowProofValid(params.get("flowFingerprint") ?? undefined, "fp123")).toBe(true);
+    expect(isIdpFlowProofValid(params.get("flowFingerprint") ?? undefined, "other-fp")).toBe(false);
+  });
+
+  test("should bind the flow proof to the session to link", async () => {
+    const result = await createNewSessionForLDAP({
+      username: "user",
+      password: "secret",
+      idpId: "idp123",
+      link: true,
+      linkToSessionId: "session123",
+    });
+
+    const params = new URLSearchParams((result as { redirect: string }).redirect.split("?")[1]);
+    expect(params.get("linkToSessionId")).toBe("session123");
+    expect(isIdpFlowProofValid(params.get("flowFingerprint") ?? undefined, "fp123", "session123")).toBe(true);
+    expect(isIdpFlowProofValid(params.get("flowFingerprint") ?? undefined, "fp123")).toBe(false);
+  });
+
+  test("should reject linking to a session this browser does not own", async () => {
+    const { getSessionCookieById } = await import("@/lib/server/cookies");
+    const { startLDAPIdentityProviderFlow } = await import("@/lib/server/zitadel");
+    vi.mocked(getSessionCookieById).mockResolvedValue(undefined);
+
+    const result = await createNewSessionForLDAP({
+      username: "user",
+      password: "secret",
+      idpId: "idp123",
+      link: true,
+      linkToSessionId: "victim-session",
+    });
+
+    expect(result).toEqual({ error: "Invalid session for linking" });
+    expect(startLDAPIdentityProviderFlow).not.toHaveBeenCalled();
   });
 });

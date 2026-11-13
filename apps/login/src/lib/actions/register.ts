@@ -1,6 +1,8 @@
 "use server";
 
 import { completeFlowOrGetUrl } from "@/lib/actions/flow";
+import { getBindingIdCookie } from "@/lib/server/fingerprint";
+import { isIdpFlowProofValid } from "@/lib/server/idp-flow-proof";
 import { createLogger } from "@/lib/server/logger";
 import { getServiceConfig } from "@/lib/server/service-url";
 import { createSessionAndUpdateCookie, createSessionForIdpAndUpdateCookie } from "@/lib/server/session-cookie";
@@ -196,6 +198,7 @@ type RegisterUserAndLinkToIDPommand = {
   };
   /** only used when the IDP did not provide a user name */
   idpUserName: string;
+  flowFingerprint?: string;
 };
 
 export type registerUserAndLinkToIDPResponse = {
@@ -219,6 +222,13 @@ export async function registerUserAndLinkToIDP(
 
   if (!loginSettings.allowRegister) {
     return { error: t("errors.registerNotAllowed") };
+  }
+
+  // the intent must belong to an IdP flow started in this browser (login CSRF)
+  const bindingIdCookie = await getBindingIdCookie();
+  if (!isIdpFlowProofValid(command.flowFingerprint, bindingIdCookie?.value)) {
+    logger.warn("IDP flow fingerprint missing or mismatch on registration");
+    return { error: t("errors.sessionMismatch") };
   }
 
   // The external identity to link is read from the intent, which proves the user authenticated at

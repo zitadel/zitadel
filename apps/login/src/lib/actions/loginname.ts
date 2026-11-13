@@ -2,6 +2,7 @@
 
 import { idpTypeToIdentityProviderType, idpTypeToSlug } from "@/lib/idp";
 import { equalsIgnoreCase } from "@/lib/server/auth-utils";
+import { addIdpFlowProof } from "@/lib/server/fingerprint";
 import { isClassifiedError } from "@/lib/server/grpc/interceptors/error-classification";
 import { createLogger } from "@/lib/server/logger";
 import { create } from "@zitadel/client";
@@ -158,6 +159,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           params.set("organization", organization);
         }
 
+        await addIdpFlowProof(params);
+
         const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
         const response = await startIdentityProviderFlow({
@@ -217,6 +220,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       if (organization) {
         params.set("organization", organization);
       }
+
+      await addIdpFlowProof(params);
 
       const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 

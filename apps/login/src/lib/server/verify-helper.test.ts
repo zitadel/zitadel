@@ -1,4 +1,4 @@
-import { getFingerprintIdCookie } from "@/lib/server/fingerprint";
+import { getBindingIdCookie } from "@/lib/server/fingerprint";
 import { createVerificationCheck } from "@/lib/server/verification-check";
 import crypto from "crypto";
 import { cookies } from "next/headers";
@@ -349,8 +349,8 @@ vi.mock("next/headers", () => ({
 }));
 
 vi.mock("@/lib/server/fingerprint", () => ({
-  getFingerprintIdCookie: vi.fn(),
-  getOrSetFingerprintId: vi.fn(),
+  getBindingIdCookie: vi.fn(),
+  getOrSetBindingId: vi.fn(),
 }));
 
 vi.mock("@/lib/server/zitadel", () => ({
@@ -650,8 +650,8 @@ describe("checkUserVerification", () => {
   });
 
   it("should return true for a server issued verification check", async () => {
-    vi.mocked(getFingerprintIdCookie).mockResolvedValue({
-      name: "fingerprintId",
+    vi.mocked(getBindingIdCookie).mockResolvedValue({
+      name: "bindingId",
       value: "fingerprint-123",
     } as any);
 
@@ -665,8 +665,8 @@ describe("checkUserVerification", () => {
   });
 
   it("should return false for a verification check issued for another user", async () => {
-    vi.mocked(getFingerprintIdCookie).mockResolvedValue({
-      name: "fingerprintId",
+    vi.mocked(getBindingIdCookie).mockResolvedValue({
+      name: "bindingId",
       value: "fingerprint-123",
     } as any);
 
@@ -680,8 +680,8 @@ describe("checkUserVerification", () => {
   });
 
   it("should return false for a client computed sha256(userId:fingerprintId) hash", async () => {
-    vi.mocked(getFingerprintIdCookie).mockResolvedValue({
-      name: "fingerprintId",
+    vi.mocked(getBindingIdCookie).mockResolvedValue({
+      name: "bindingId",
       value: "attacker-chosen",
     } as any);
 
@@ -695,7 +695,7 @@ describe("checkUserVerification", () => {
   });
 
   it("should return false if fingerprint cookie not found", async () => {
-    vi.mocked(getFingerprintIdCookie).mockResolvedValue(undefined);
+    vi.mocked(getBindingIdCookie).mockResolvedValue(undefined);
 
     mockCookies.get.mockReturnValue({
       value: createVerificationCheck("user-123", "fingerprint-123"),
@@ -707,8 +707,8 @@ describe("checkUserVerification", () => {
   });
 
   it("should return false if fingerprint cookie has no value", async () => {
-    vi.mocked(getFingerprintIdCookie).mockResolvedValue({
-      name: "fingerprintId",
+    vi.mocked(getBindingIdCookie).mockResolvedValue({
+      name: "bindingId",
       value: "",
     } as any);
 
@@ -718,8 +718,8 @@ describe("checkUserVerification", () => {
   });
 
   it("should return false if verification cookie not found", async () => {
-    vi.mocked(getFingerprintIdCookie).mockResolvedValue({
-      name: "fingerprintId",
+    vi.mocked(getBindingIdCookie).mockResolvedValue({
+      name: "bindingId",
       value: "fingerprint-123",
     } as any);
 
@@ -732,8 +732,8 @@ describe("checkUserVerification", () => {
 
   it("should not log the expected value on mismatch", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    vi.mocked(getFingerprintIdCookie).mockResolvedValue({
-      name: "fingerprintId",
+    vi.mocked(getBindingIdCookie).mockResolvedValue({
+      name: "bindingId",
       value: "fingerprint-123",
     } as any);
 

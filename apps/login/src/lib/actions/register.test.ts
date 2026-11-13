@@ -36,6 +36,15 @@ vi.mock("next-intl/server", () => ({
   getTranslations: vi.fn(async () => (key: string) => key),
 }));
 
+// fphg: the registration must come from the browser that started the IdP flow
+vi.mock("@/lib/server/fingerprint", () => ({
+  getBindingIdCookie: vi.fn(async () => ({ value: "binding-id" })),
+}));
+
+vi.mock("@/lib/server/idp-flow-proof", () => ({
+  isIdpFlowProofValid: vi.fn(() => true),
+}));
+
 vi.mock("next/headers", () => ({
   headers: vi.fn(() => new Headers()),
 }));
