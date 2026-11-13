@@ -314,6 +314,58 @@ func TestServer_CreateSession_lock_user(t *testing.T) {
 	}
 }
 
+func TestServer_CreateSession_password_not_allowed(t *testing.T) {
+	// create a separate org so we don't interfere with any other test
+	org := Instance.CreateOrganization(IAMOwnerCTX, integration.OrganizationName(), integration.Email())
+	userID := org.CreatedAdmins[0].GetUserId()
+	Instance.SetUserPassword(IAMOwnerCTX, userID, integration.UserPassword, false)
+
+	// disable local authentication for the org
+	ctxOrg := metadata.AppendToOutgoingContext(IAMOwnerCTX, "x-zitadel-orgid", org.GetOrganizationId())
+	_, err := Instance.Client.Mgmt.AddCustomLoginPolicy(ctxOrg, &mgmt.AddCustomLoginPolicyRequest{
+		AllowUsernamePassword: false,
+		AllowExternalIdp:      true,
+	})
+	require.NoError(t, err)
+
+	_, err = Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{
+					UserId: userID,
+				},
+			},
+			Password: &session.CheckPassword{
+				Password: integration.UserPassword,
+			},
+		},
+	})
+	require.Error(t, err)
+	assert.Equal(t, codes.FailedPrecondition, status.Code(err))
+
+	// the password check must also be refused when set on an existing session
+	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{
+					UserId: userID,
+				},
+			},
+		},
+	})
+	require.NoError(t, err)
+	_, err = Client.SetSession(LoginCTX, &session.SetSessionRequest{
+		SessionId: createResp.GetSessionId(),
+		Checks: &session.Checks{
+			Password: &session.CheckPassword{
+				Password: integration.UserPassword,
+			},
+		},
+	})
+	require.Error(t, err)
+	assert.Equal(t, codes.FailedPrecondition, status.Code(err))
+}
+
 func TestServer_CreateSession_webauthn(t *testing.T) {
 	// create new session with user and request the webauthn challenge
 	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{

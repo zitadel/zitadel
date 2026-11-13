@@ -1,9 +1,9 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SessionsClearList } from "@/components/sessions-clear-list";
 import { Translated } from "@/components/translated";
-import { getAllSessionCookieIds } from "@/lib/cookies";
-import { getServiceConfig } from "@/lib/service-url";
-import { getBrandingSettings, getDefaultOrg, listSessions, ServiceConfig } from "@/lib/zitadel";
+import { getAllSessionCookieIds } from "@/lib/server/cookies";
+import { getServiceConfig } from "@/lib/server/service-url";
+import { getBrandingSettings, getDefaultOrg, listSessions, ServiceConfig } from "@/lib/server/zitadel";
 import { verifyJwt } from "@zitadel/client/node";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";

@@ -5,14 +5,14 @@ const registerNode = vi.fn();
 
 // Keep the real FATAL_CREDENTIAL_CHECK_RESULTS, but replace the check itself
 // and cut the import chain into the API client.
-vi.mock("./lib/verify-credentials", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("./lib/verify-credentials")>()),
+vi.mock("@/lib/server/verify-credentials", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/server/verify-credentials")>()),
   verifyApiCredentials,
 }));
-vi.mock("@/lib/service", () => ({ createServiceForHost: vi.fn() }));
+vi.mock("@/lib/server/service", () => ({ createServiceForHost: vi.fn() }));
 vi.mock("./instrumentation.node", () => ({ registerNode }));
 const startupLogger = { warn: vi.fn(), error: vi.fn() };
-vi.mock("./lib/logger", () => ({ createLogger: () => startupLogger }));
+vi.mock("@/lib/server/logger", () => ({ createLogger: () => startupLogger }));
 
 async function loadRegister() {
   vi.resetModules();

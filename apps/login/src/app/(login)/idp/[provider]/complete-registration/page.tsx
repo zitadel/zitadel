@@ -1,8 +1,8 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterFormIDPIncomplete } from "@/components/register-form-idp-incomplete";
 import { Translated } from "@/components/translated";
-import { getServiceConfig } from "@/lib/service-url";
-import { getBrandingSettings } from "@/lib/zitadel";
+import { getServiceConfig } from "@/lib/server/service-url";
+import { getBrandingSettings } from "@/lib/server/zitadel";
 import { headers } from "next/headers";
 
 /**
@@ -13,14 +13,14 @@ export default async function CompleteRegistrationPage(props: {
   params: Promise<{ provider: string }>;
 }) {
   const searchParams = await props.searchParams;
-  const { id, token, requestId, organization, idpId, idpUserId, idpUserName, givenName, familyName, email } = searchParams;
+  const { id, token, requestId, organization, idpUserName, givenName, familyName, email, flowFingerprint } = searchParams;
 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
   const branding = await getBrandingSettings({ serviceConfig, organization });
 
-  if (!id || !token || !idpId || !organization || !idpUserId) {
+  if (!id || !token || !organization) {
     throw new Error("Missing required parameters");
   }
 
@@ -37,8 +37,6 @@ export default async function CompleteRegistrationPage(props: {
 
       <div className="w-full">
         <RegisterFormIDPIncomplete
-          idpUserId={idpUserId}
-          idpId={idpId}
           idpUserName={idpUserName}
           defaultValues={{
             email: email || "",
@@ -51,6 +49,7 @@ export default async function CompleteRegistrationPage(props: {
             idpIntentId: id,
             idpIntentToken: token,
           }}
+          flowFingerprint={flowFingerprint}
         />
       </div>
     </DynamicTheme>

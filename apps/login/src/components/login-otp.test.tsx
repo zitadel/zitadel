@@ -10,11 +10,11 @@ vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
 }));
 
-vi.mock("@/lib/server/session", () => ({
+vi.mock("@/lib/actions/session", () => ({
   updateOrCreateSession: vi.fn(),
 }));
 
-vi.mock("@/lib/client", () => ({
+vi.mock("@/lib/actions/flow", () => ({
   handleServerActionResponse: vi.fn(),
   completeFlowOrGetUrl: vi.fn(),
 }));
@@ -24,21 +24,21 @@ describe("LoginOTP", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    const { updateOrCreateSession } = await import("@/lib/server/session");
+    const { updateOrCreateSession } = await import("@/lib/actions/session");
     mockUpdateOrCreateSession = vi.mocked(updateOrCreateSession);
   });
 
   afterEach(cleanup);
 
   test("should autofocus the code input on mount", () => {
-    const { getByTestId } = render(<LoginOTP host={null} method="time-based" />);
+    const { getByTestId } = render(<LoginOTP method="time-based" />);
     expect(getByTestId("code-text-input")).toHaveFocus();
   });
 
   test("should display translated fallback error when OTP verification request rejects", async () => {
     mockUpdateOrCreateSession.mockRejectedValueOnce(new Error("network down"));
 
-    render(<LoginOTP host={null} method="time-based" />);
+    render(<LoginOTP method="time-based" />);
 
     const input = screen.getByTestId("code-text-input");
     fireEvent.change(input, { target: { value: "123456" } });
@@ -58,7 +58,7 @@ describe("LoginOTP", () => {
   test("should display translated fallback error when OTP challenge request rejects", async () => {
     mockUpdateOrCreateSession.mockRejectedValueOnce(new Error("challenge request failed"));
 
-    render(<LoginOTP host={null} method="sms" />);
+    render(<LoginOTP method="sms" />);
 
     expect(screen.getByRole("button", { name: "verify.resendCode" })).toBeInTheDocument();
 

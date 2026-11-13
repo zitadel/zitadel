@@ -1,6 +1,6 @@
 "use client";
 
-import { processIDPCallback } from "@/lib/server/idp-intent";
+import { processIDPCallback } from "@/lib/actions/idp-intent";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -16,7 +16,7 @@ type Props = {
   organization?: string;
   link?: string;
   sessionId?: string;
-  linkFingerprint?: string;
+  flowFingerprint?: string;
   postErrorRedirectUrl?: string;
 };
 
@@ -32,7 +32,7 @@ export function IdpProcessHandler({
   organization,
   link,
   sessionId,
-  linkFingerprint,
+  flowFingerprint,
   postErrorRedirectUrl,
 }: Props) {
   const t = useTranslations("idp");
@@ -59,7 +59,7 @@ export function IdpProcessHandler({
       requestId,
       organization,
       sessionId,
-      linkFingerprint,
+      flowFingerprint,
       postErrorRedirectUrl,
     })
       .then((result) => {
@@ -91,7 +91,7 @@ export function IdpProcessHandler({
         setError(err instanceof Error ? err.message : t("processing.unexpectedError"));
         setLoading(false);
       });
-  }, [provider, id, token, requestId, organization, link, sessionId, linkFingerprint, postErrorRedirectUrl, router, t]);
+  }, [provider, id, token, requestId, organization, link, sessionId, flowFingerprint, postErrorRedirectUrl, router, t]);
 
   return (
     <div className="flex items-center justify-center">

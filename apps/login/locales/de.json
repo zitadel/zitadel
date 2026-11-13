@@ -153,7 +153,8 @@
       "sessionNotValid": "Sitzung ist nicht gültig",
       "passwordVerificationMissing": "Passwort-Verifizierung fehlt.",
       "passwordVerificationTooOld": "Passwort-Verifizierung ist zu alt. Bitte verifizieren Sie Ihr Passwort erneut.",
-      "passwordResetNotAllowed": "Das Zurücksetzen des Passworts ist nicht zulässig. Wenden Sie sich für weitere Informationen an Ihren Administrator."
+      "passwordResetNotAllowed": "Das Zurücksetzen des Passworts ist nicht zulässig. Wenden Sie sich für weitere Informationen an Ihren Administrator.",
+      "localAuthenticationNotAllowed": "Lokale Authentifizierung nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator."
     }
   },
   "idp": {
@@ -370,7 +371,8 @@
       "couldNotCreateSession": "Sitzung konnte nicht erstellt werden",
       "userNotFound": "Benutzer nicht im System gefunden",
       "couldNotLinkIDP": "IDP konnte nicht mit dem Benutzer verknüpft werden",
-      "couldNotRegisterUser": "Benutzer konnte nicht registriert werden"
+      "couldNotRegisterUser": "Benutzer konnte nicht registriert werden",
+      "sessionMismatch": "Die Registrierung wurde in einem anderen Browser gestartet. Bitte melden Sie sich erneut bei Ihrem Identitätsanbieter an."
     }
   },
   "invite": {

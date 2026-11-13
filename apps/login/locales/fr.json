@@ -153,7 +153,8 @@
       "sessionNotValid": "La session n'est pas valide",
       "passwordVerificationMissing": "La vérification du mot de passe est manquante.",
       "passwordVerificationTooOld": "La vérification du mot de passe est trop ancienne. Veuillez vérifier à nouveau votre mot de passe.",
-      "passwordResetNotAllowed": "La réinitialisation du mot de passe n'est pas autorisée. Contactez votre administrateur pour plus d'informations."
+      "passwordResetNotAllowed": "La réinitialisation du mot de passe n'est pas autorisée. Contactez votre administrateur pour plus d'informations.",
+      "localAuthenticationNotAllowed": "L'authentification locale n'est pas autorisée ! Contactez votre administrateur pour plus d'informations."
     }
   },
   "idp": {
@@ -370,7 +371,8 @@
       "couldNotCreateSession": "Impossible de créer la session",
       "userNotFound": "Utilisateur non trouvé dans le système",
       "couldNotLinkIDP": "Impossible de lier le fournisseur d'identité à l'utilisateur",
-      "couldNotRegisterUser": "Impossible d'inscrire l'utilisateur"
+      "couldNotRegisterUser": "Impossible d'inscrire l'utilisateur",
+      "sessionMismatch": "L'inscription a été commencée dans un autre navigateur. Veuillez vous reconnecter avec votre fournisseur d'identité."
     }
   },
   "invite": {

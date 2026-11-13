@@ -2,8 +2,9 @@ import { Alert, AlertType } from "@/components/alert";
 import { Button } from "@/components/button";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
-import { getServiceConfig } from "@/lib/service-url";
-import { getBrandingSettings, getDefaultOrg } from "@/lib/zitadel";
+import { isAllowedPostErrorRedirectUrl } from "@/lib/client-utils";
+import { getServiceConfig } from "@/lib/server/service-url";
+import { getBrandingSettings, getDefaultOrg } from "@/lib/server/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -48,7 +49,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           </Alert>
         </div>
 
-        {postErrorRedirectUrl && (
+        {isAllowedPostErrorRedirectUrl(postErrorRedirectUrl) && (
           <Link href={postErrorRedirectUrl}>
             <Button className="bg-primary-light-500 hover:bg-primary-light-400 dark:bg-primary-dark-500 dark:hover:bg-primary-dark-400 w-full rounded-md px-4 py-3 text-center transition-all">
               <Translated i18nKey="registrationFailed.backToLogin" namespace="idp" />

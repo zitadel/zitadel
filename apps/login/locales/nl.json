@@ -153,7 +153,8 @@
       "sessionNotValid": "Sessie is niet geldig",
       "passwordVerificationMissing": "Wachtwoordverificatie ontbreekt.",
       "passwordVerificationTooOld": "Wachtwoordverificatie is te oud. Verifieer je wachtwoord opnieuw.",
-      "passwordResetNotAllowed": "Wachtwoord resetten is niet toegestaan. Neem contact op met uw beheerder voor meer informatie."
+      "passwordResetNotAllowed": "Wachtwoord resetten is niet toegestaan. Neem contact op met uw beheerder voor meer informatie.",
+      "localAuthenticationNotAllowed": "Lokale authenticatie is niet toegestaan! Neem contact op met uw beheerder voor meer informatie."
     }
   },
   "idp": {
@@ -370,7 +371,8 @@
       "couldNotCreateSession": "Kon sessie niet aanmaken",
       "userNotFound": "Gebruiker niet in het systeem gevonden",
       "couldNotLinkIDP": "Kon IDP niet aan gebruiker koppelen",
-      "couldNotRegisterUser": "Kon gebruiker niet registreren"
+      "couldNotRegisterUser": "Kon gebruiker niet registreren",
+      "sessionMismatch": "De registratie is in een andere browser gestart. Meld je opnieuw aan bij je identiteitsprovider."
     }
   },
   "invite": {

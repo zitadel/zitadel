@@ -368,12 +368,9 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-3n8fs", "Errors.User.Password.Empty")
 	}
 
-	loginPolicy, err := c.getOrgLoginPolicy(ctx, orgID)
+	loginPolicy, err := passwordAllowedLoginPolicy(ctx, c.getOrgLoginPolicy, orgID)
 	if err != nil {
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-Edf3g", "Errors.Org.LoginPolicy.NotFound")
-	}
-	if !loginPolicy.AllowUsernamePassword {
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-Dft32", "Errors.Org.LoginPolicy.UsernamePasswordNotAllowed")
+		return err
 	}
 	var tarpit func(failedAttempts uint64)
 	if !loginPolicy.IgnoreUnknownUsernames {
@@ -386,6 +383,19 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 	_, pushErr := c.eventstore.Push(ctx, commands...)
 	logging.OnError(pushErr).Error("error create password check failed event")
 	return err
+}
+
+// passwordAllowedLoginPolicy returns the login policy of the org,
+// or an error if it cannot be loaded or does not allow username / password login.
+func passwordAllowedLoginPolicy(ctx context.Context, getPolicy func(context.Context, string) (*domain.LoginPolicy, error), orgID string) (*domain.LoginPolicy, error) {
+	loginPolicy, err := getPolicy(ctx, orgID)
+	if err != nil {
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-Edf3g", "Errors.Org.LoginPolicy.NotFound")
+	}
+	if !loginPolicy.AllowUsernamePassword {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Dft32", "Errors.Org.LoginPolicy.UsernamePasswordNotAllowed")
+	}
+	return loginPolicy, nil
 }
 
 func checkPassword(ctx context.Context, userID, password string, es *eventstore.Eventstore, hasher *crypto.Hasher, optionalAuthRequestInfo *user.AuthRequestInfo, tarpit func(failedAttempts uint64)) ([]eventstore.Command, error) {

@@ -7,9 +7,9 @@ import { TotpRegister } from "@/components/totp-register";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getEnrollmentAuthorizationError } from "@/lib/server/enrollment-guard";
-import { getServiceConfig } from "@/lib/service-url";
-import { loadMostRecentSession, loadSessionById } from "@/lib/session";
-import { getBrandingSettings, getLoginSettings, registerTOTP } from "@/lib/zitadel";
+import { getServiceConfig } from "@/lib/server/service-url";
+import { loadMostRecentSession, loadSessionById } from "@/lib/server/session";
+import { getBrandingSettings, getLoginSettings, registerTOTP } from "@/lib/server/zitadel";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 

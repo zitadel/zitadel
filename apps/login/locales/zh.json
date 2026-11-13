@@ -153,7 +153,8 @@
       "sessionNotValid": "会话无效",
       "passwordVerificationMissing": "缺少密码验证。",
       "passwordVerificationTooOld": "密码验证已过期。请重新通过验证。",
-      "passwordResetNotAllowed": "不允许重置密码。请联系您的管理员以获取更多信息。"
+      "passwordResetNotAllowed": "不允许重置密码。请联系您的管理员以获取更多信息。",
+      "localAuthenticationNotAllowed": "不允许本地身份验证！请联系您的管理员以获取更多信息。"
     }
   },
   "idp": {
@@ -370,7 +371,8 @@
       "couldNotCreateSession": "无法创建会话",
       "userNotFound": "系统中未找到用户",
       "couldNotLinkIDP": "无法将 IDP 关联到用户",
-      "couldNotRegisterUser": "无法注册用户"
+      "couldNotRegisterUser": "无法注册用户",
+      "sessionMismatch": "注册是在另一个浏览器中开始的。请使用您的身份提供商重新登录。"
     }
   },
   "invite": {

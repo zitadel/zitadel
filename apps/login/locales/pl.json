@@ -153,7 +153,8 @@
       "sessionNotValid": "Sesja jest nieważna",
       "passwordVerificationMissing": "Brak weryfikacji hasła.",
       "passwordVerificationTooOld": "Weryfikacja hasła jest przestarzała. Proszę zweryfikować hasło ponownie.",
-      "passwordResetNotAllowed": "Resetowanie hasła jest niedozwolone. Skontaktuj się z administratorem, aby uzyskać więcej informacji."
+      "passwordResetNotAllowed": "Resetowanie hasła jest niedozwolone. Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+      "localAuthenticationNotAllowed": "Uwierzytelnianie lokalne nie jest dozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji."
     }
   },
   "idp": {
@@ -370,7 +371,8 @@
       "couldNotCreateSession": "Nie udało się utworzyć sesji",
       "userNotFound": "Nie znaleziono użytkownika w systemie",
       "couldNotLinkIDP": "Nie udało się powiązać IDP z użytkownikiem",
-      "couldNotRegisterUser": "Nie udało się zarejestrować użytkownika"
+      "couldNotRegisterUser": "Nie udało się zarejestrować użytkownika",
+      "sessionMismatch": "Rejestracja została rozpoczęta w innej przeglądarce. Zaloguj się ponownie u swojego dostawcy tożsamości."
     }
   },
   "invite": {

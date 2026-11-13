@@ -1,6 +1,6 @@
 "use client";
 
-import { addOTP } from "@/lib/server/otp";
+import { addOTP } from "@/lib/actions/otp";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

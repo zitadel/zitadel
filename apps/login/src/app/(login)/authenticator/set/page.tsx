@@ -6,10 +6,10 @@ import { RestartSignIn } from "@/components/restart-sign-in";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getSessionCookieById } from "@/lib/cookies";
-import { getServiceConfig } from "@/lib/service-url";
-import { loadMostRecentSession } from "@/lib/session";
-import { checkUserVerification } from "@/lib/verify-helper";
+import { getSessionCookieById } from "@/lib/server/cookies";
+import { getServiceConfig } from "@/lib/server/service-url";
+import { loadMostRecentSession } from "@/lib/server/session";
+import { checkUserVerification } from "@/lib/server/verify-helper";
 import {
   getActiveIdentityProviders,
   getBrandingSettings,
@@ -17,7 +17,7 @@ import {
   getSession,
   getUserByID,
   listAuthenticationMethodTypes,
-} from "@/lib/zitadel";
+} from "@/lib/server/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 // import { getLocale } from "next-intl/server";
 import { Metadata } from "next";

@@ -153,7 +153,8 @@
       "sessionNotValid": "Session is not valid",
       "passwordVerificationMissing": "Password verification is missing.",
       "passwordVerificationTooOld": "Password verification is too old. Please verify your password again.",
-      "passwordResetNotAllowed": "Password reset is not allowed. Contact your administrator for more information."
+      "passwordResetNotAllowed": "Password reset is not allowed. Contact your administrator for more information.",
+      "localAuthenticationNotAllowed": "Local authentication is not allowed! Contact your administrator for more information."
     }
   },
   "idp": {
@@ -370,7 +371,8 @@
       "couldNotCreateSession": "Could not create session",
       "userNotFound": "User not found in the system",
       "couldNotLinkIDP": "Could not link IDP to user",
-      "couldNotRegisterUser": "Could not register user"
+      "couldNotRegisterUser": "Could not register user",
+      "sessionMismatch": "The registration was started in another browser. Please sign in with your identity provider again."
     }
   },
   "invite": {
