@@ -112,11 +112,17 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 		return CtxData{}, err
 	}
 	if err != nil {
-		logging.WithFields("org_id", orgID, "org_domain", orgDomain).WithError(err).Warn("authz: verify access token")
+		// Not a regular access token. It may still be a system token, so this is an
+		// expected fall-through rather than a failure: warning here would emit a log
+		// line on every successful system API call.
+		logging.WithFields("org_id", orgID, "org_domain", orgDomain).WithError(err).Debug("authz: verify access token")
 		var sysTokenErr error
 		sysMemberships, userID, sysTokenErr = t.VerifySystemToken(ctx, tokenWOBearer, orgID)
 		if sysTokenErr != nil || sysMemberships == nil {
-			return CtxData{}, zerrors.ThrowUnauthenticated(errors.Join(err, sysTokenErr), "AUTH-7fs1e", "Errors.Token.Invalid")
+			// Both verifications failed, so the token really is invalid.
+			tokenErr := errors.Join(err, sysTokenErr)
+			logging.WithFields("org_id", orgID, "org_domain", orgDomain).WithError(tokenErr).Warn("authz: token is neither a valid access token nor a valid system token")
+			return CtxData{}, zerrors.ThrowUnauthenticated(tokenErr, "AUTH-7fs1e", "Errors.Token.Invalid")
 		}
 	}
 	projectID, err := projectIDAndCheckOriginForClientID(ctx, clientID, t)
