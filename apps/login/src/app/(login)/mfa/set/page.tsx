@@ -4,16 +4,16 @@ import { ChooseSecondFactorToSetup } from "@/components/choose-second-factor-to-
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getSessionCookieById } from "@/lib/cookies";
-import { getServiceConfig } from "@/lib/service-url";
-import { hasVerifiedPrimaryFactor, loadMostRecentSession } from "@/lib/session";
+import { getSessionCookieById } from "@/lib/server/cookies";
+import { getServiceConfig } from "@/lib/server/service-url";
+import { hasVerifiedPrimaryFactor, loadMostRecentSession } from "@/lib/server/session";
 import {
   getBrandingSettings,
   getLoginSettings,
   getSession,
   getUserByID,
   listAuthenticationMethodTypes,
-} from "@/lib/zitadel";
+} from "@/lib/server/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { SecondFactorType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { Metadata } from "next";
@@ -165,7 +165,6 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
           {valid && loginSettings && sessionWithData && sessionWithData.factors?.user?.id && (
             <ChooseSecondFactorToSetup
-              userId={sessionWithData.factors?.user?.id}
               loginName={loginName}
               sessionId={sessionWithData.id}
               requestId={requestId}

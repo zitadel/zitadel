@@ -1,6 +1,6 @@
 "use client";
 
-import { processIDPCallback } from "@/lib/server/idp-intent";
+import { processIDPCallback } from "@/lib/actions/idp-intent";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";

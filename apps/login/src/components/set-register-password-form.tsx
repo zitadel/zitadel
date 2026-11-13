@@ -1,8 +1,8 @@
 "use client";
 
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from "@/helpers/validators";
+import { registerUser } from "@/lib/actions/register";
 import { handleServerActionResponse } from "@/lib/client-utils";
-import { registerUser } from "@/lib/server/register";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
