@@ -27,7 +27,7 @@ Read more about the [different authentication methods for service accounts](./au
 
 ## Prerequisites
 
-A code library or framework that supports JWT generation and verification (such as `pyjwt` for Python or `jsonwebtoken` for Node.js).
+A code library or framework that supports JWT generation and verification (such as `pyjwt` for Python or `jsonwebtoken` for Node.js). Signing with RS256 in `pyjwt` requires the `cryptography` package, so install it with `pip install "pyjwt[crypto]"`.
 
 ## Steps to authenticate a Service Account with private JWT
 
@@ -115,7 +115,7 @@ Payload:
 ```
 
 * `iss`: The entity making the request, i.e., the owner of the private key. Use the `userId` from your downloaded JSON.
-* `sub`: The application. Set this to the same value as `userId`.
+* `sub`: The service account the token is requested for. Set this to the same value as `userId`.
 * `aud`: Your [Custom Domain](../../../concepts/features/custom-domain).
 * `iat`: The Unix timestamp when the JWT is created/signed (must be no older than 1 hour).
 * `exp`: The Unix timestamp when this assertion expires. The value of `exp` is strictly enforced. However, if `exp` is set to more than 1 hour in the future, `iat` will take precedence (the JWT will stop working once the `iat` timestamp is older than 1 hour).
@@ -127,34 +127,38 @@ There are also [many libraries](https://jwt.io/#libraries-io) available for gene
 
 **Code Example (Python using `pyjwt`):**
 
+The example reads `userId`, `keyId` and `key` from the JSON key file you downloaded, so the private key never has to be copied into the code.
+
 ```python
-import jwt
 import datetime
+import json
 
-# Replace with your service account ID and private key
-service_user_id = "your_service_user_id"
-private_key = "-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY\n-----END PRIVATE KEY-----"
-key_id = "your_key_id"
+import jwt
 
-# ZITADEL API URL (replace if needed)
-api_url = "your_custom_domain"
+# Path to the JSON key file downloaded for your service account
+KEY_FILE_PATH = "path/to/service-account-key.json"
+# Your ZITADEL issuer URL (Custom Domain), including the scheme
+ISSUER_URL = "https://your-custom-domain.zitadel.cloud"
 
-# Generate JWT claims
+with open(KEY_FILE_PATH) as key_file:
+    key_data = json.load(key_file)
+
+now = datetime.datetime.now(datetime.timezone.utc)
 payload = {
-    "iss": service_user_id,
-    "sub": service_user_id,
-    "aud": api_url,
-    "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=5),
-    "iat": datetime.datetime.now(datetime.timezone.utc)
+    "iss": key_data["userId"],
+    "sub": key_data["userId"],
+    "aud": ISSUER_URL,
+    "iat": now,
+    "exp": now + datetime.timedelta(minutes=5),
 }
 
-header = {
-    "alg": "RS256",
-    "kid": key_id
-}
-
-# Sign the JWT using the RS256 algorithm
-encoded_jwt = jwt.encode(payload, private_key, algorithm="RS256", headers=header)
+# pyjwt sets "alg" from the algorithm argument; "kid" identifies the key in ZITADEL
+encoded_jwt = jwt.encode(
+    payload,
+    key_data["key"],
+    algorithm="RS256",
+    headers={"kid": key_data["keyId"]},
+)
 
 print(f"Generated JWT: {encoded_jwt}")
 ```
