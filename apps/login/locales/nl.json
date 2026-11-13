@@ -153,7 +153,8 @@
       "sessionNotValid": "Sessie is niet geldig",
       "passwordVerificationMissing": "Wachtwoordverificatie ontbreekt.",
       "passwordVerificationTooOld": "Wachtwoordverificatie is te oud. Verifieer je wachtwoord opnieuw.",
-      "passwordResetNotAllowed": "Wachtwoord resetten is niet toegestaan. Neem contact op met uw beheerder voor meer informatie."
+      "passwordResetNotAllowed": "Wachtwoord resetten is niet toegestaan. Neem contact op met uw beheerder voor meer informatie.",
+      "localAuthenticationNotAllowed": "Lokale authenticatie is niet toegestaan! Neem contact op met uw beheerder voor meer informatie."
     }
   },
   "idp": {
@@ -255,6 +256,11 @@
       "smsDescription": "Voer jouw telefoonnummer in om een code via sms te ontvangen.",
       "emailDescription": "Voer jouw e-mailadres in om een code via e-mail te ontvangen.",
       "totpRegisterDescription": "Scan de QR-code of navigeer handmatig naar de URL.",
+      "emailAddDescription": "Gebruik een eenmalige code die naar je geverifieerde e-mailadres wordt gestuurd als tweede factor.",
+      "smsAddDescription": "Gebruik een eenmalige code die naar je geverifieerde telefoonnummer wordt gestuurd als tweede factor.",
+      "add": "Toevoegen",
+      "emailAdded": "Code via e-mail toegevoegd.",
+      "smsAdded": "Code via sms toegevoegd.",
       "submit": "Verder",
       "labels": {
         "code": "Code"
@@ -265,7 +271,13 @@
     },
     "errors": {
       "couldNotRequestChallenge": "Kon OTP-uitdaging niet aanvragen",
-      "couldNotVerifyCode": "Kon OTP-code niet verifiëren"
+      "couldNotVerifyCode": "Kon OTP-code niet verifiëren",
+      "couldNotGetSession": "Je sessie kon niet worden geladen. Meld je opnieuw aan.",
+      "invalidMethod": "Deze tweede factor wordt niet ondersteund.",
+      "couldNotAddEmail": "Code via e-mail kon niet worden toegevoegd.",
+      "couldNotAddSms": "Code via sms kon niet worden toegevoegd.",
+      "emailNotVerified": "Verifieer je e-mailadres voordat je codes via e-mail toevoegt.",
+      "phoneNotVerified": "Verifieer je telefoonnummer voordat je codes via sms toevoegt."
     }
   },
   "passkey": {
@@ -359,7 +371,8 @@
       "couldNotCreateSession": "Kon sessie niet aanmaken",
       "userNotFound": "Gebruiker niet in het systeem gevonden",
       "couldNotLinkIDP": "Kon IDP niet aan gebruiker koppelen",
-      "couldNotRegisterUser": "Kon gebruiker niet registreren"
+      "couldNotRegisterUser": "Kon gebruiker niet registreren",
+      "sessionMismatch": "De registratie is in een andere browser gestart. Meld je opnieuw aan bij je identiteitsprovider."
     }
   },
   "invite": {

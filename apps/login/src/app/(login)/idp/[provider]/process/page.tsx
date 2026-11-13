@@ -1,7 +1,7 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { IdpProcessHandler } from "@/components/idp-process-handler";
-import { getServiceConfig } from "@/lib/service-url";
-import { getBrandingSettings, getDefaultOrg } from "@/lib/zitadel";
+import { getServiceConfig } from "@/lib/server/service-url";
+import { getBrandingSettings, getDefaultOrg } from "@/lib/server/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { headers } from "next/headers";
 
@@ -18,7 +18,7 @@ export default async function ProcessPage(props: {
   const searchParams = await props.searchParams;
 
   const { provider } = params;
-  const { id, token, requestId, organization, link, postErrorRedirectUrl, linkToSessionId, linkFingerprint } = searchParams;
+  const { id, token, requestId, organization, link, postErrorRedirectUrl, linkToSessionId, flowFingerprint } = searchParams;
 
   // Validate required parameters before passing to client component
   if (!id || !token) {
@@ -48,7 +48,7 @@ export default async function ProcessPage(props: {
         organization={organization}
         link={link}
         sessionId={linkToSessionId}
-        linkFingerprint={linkFingerprint}
+        flowFingerprint={flowFingerprint}
         postErrorRedirectUrl={postErrorRedirectUrl}
       />
     </DynamicTheme>

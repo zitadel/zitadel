@@ -1,9 +1,9 @@
+import { buildCSP } from "@/lib/server/csp";
+import { applyCustomHeaders } from "@/lib/server/custom-headers";
+import { createLogger } from "@/lib/server/logger";
+import { getServiceConfig } from "@/lib/server/service-url";
 import { NextRequest, NextResponse } from "next/server";
-import { buildCSP } from "./lib/csp";
-import { applyCustomHeaders } from "./lib/custom-headers";
-import { createLogger } from "./lib/logger";
 import { getIframeOrigins } from "./lib/server/security-settings";
-import { getServiceConfig } from "./lib/service-url";
 
 const logger = createLogger("middleware");
 

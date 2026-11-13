@@ -10,11 +10,11 @@ vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
 }));
 
-vi.mock("@/lib/server/verify", () => ({
+vi.mock("@/lib/actions/verify", () => ({
   verifyTOTP: vi.fn(),
 }));
 
-vi.mock("@/lib/client", () => ({
+vi.mock("@/lib/actions/flow", () => ({
   handleServerActionResponse: vi.fn(),
   completeFlowOrGetUrl: vi.fn(),
 }));

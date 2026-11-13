@@ -1,6 +1,6 @@
-import { applyCustomHeaders } from "@/lib/custom-headers";
-import { createLogger } from "@/lib/logger";
-import { getSessionCookieSecretConfigError, hasSessionCookieSecret } from "@/lib/session-cookie-signature";
+import { applyCustomHeaders } from "@/lib/server/custom-headers";
+import { createLogger } from "@/lib/server/logger";
+import { getSessionCookieSecretConfigError, hasSessionCookieSecret } from "@/lib/server/session-cookie-signature";
 import { NextResponse } from "next/server";
 
 const logger = createLogger("readiness");

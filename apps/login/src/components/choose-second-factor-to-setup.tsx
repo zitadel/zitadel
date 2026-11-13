@@ -1,7 +1,7 @@
 "use client";
 
+import { skipMFAAndContinueWithNextUrl } from "@/lib/actions/session";
 import { handleServerActionResponse } from "@/lib/client-utils";
-import { skipMFAAndContinueWithNextUrl } from "@/lib/server/session";
 import { LoginSettings, SecondFactorType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useRouter } from "next/navigation";
@@ -12,7 +12,6 @@ import { AutoSubmitForm } from "./auto-submit-form";
 import { Translated } from "./translated";
 
 type Props = {
-  userId: string;
   loginName?: string;
   sessionId?: string;
   requestId?: string;
@@ -26,7 +25,6 @@ type Props = {
 };
 
 export function ChooseSecondFactorToSetup({
-  userId,
   loginName,
   sessionId,
   requestId,
@@ -86,7 +84,6 @@ export function ChooseSecondFactorToSetup({
           className="hover:text-primary-light-500 dark:hover:text-primary-dark-500 text-sm transition-all"
           onClick={async () => {
             const skipResponse = await skipMFAAndContinueWithNextUrl({
-              userId,
               loginName,
               sessionId,
               organization,

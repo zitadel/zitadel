@@ -1,7 +1,7 @@
 import { LANGS, LANGUAGE_COOKIE_NAME, LANGUAGE_HEADER_NAME } from "@/lib/i18n";
-import { mergeMessages } from "@/lib/merge-messages";
-import { getServiceConfig } from "@/lib/service-url";
-import { getAllowedLanguages, getHostedLoginTranslation } from "@/lib/zitadel";
+import { mergeMessages } from "@/lib/server/merge-messages";
+import { getServiceConfig } from "@/lib/server/service-url";
+import { getAllowedLanguages, getHostedLoginTranslation } from "@/lib/server/zitadel";
 import { JsonObject } from "@zitadel/client";
 import { getRequestConfig } from "next-intl/server";
 import { cookies, headers } from "next/headers";
