@@ -60,7 +60,13 @@ var reservedDomains = []string{
 // IsReservedDomain reports whether the domain of the address is reserved (RFC 2606, RFC 6761)
 // and can therefore never receive an email, e.g. example.com or user.test.
 func (e EmailAddress) IsReservedDomain() bool {
-	domain := strings.ToLower(strings.TrimSuffix(e.Domain(), "."))
+	address := e
+	// a valid address can be written in other forms, like <user@example.com> or with a comment,
+	// which must not hide its domain
+	if parsed, err := mail.ParseAddress(string(e)); err == nil {
+		address = EmailAddress(parsed.Address)
+	}
+	domain := strings.ToLower(strings.TrimSuffix(address.Domain(), "."))
 	for _, reserved := range reservedDomains {
 		if domain == reserved || strings.HasSuffix(domain, "."+reserved) {
 			return true

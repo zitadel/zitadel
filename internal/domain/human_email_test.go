@@ -195,6 +195,12 @@ func TestEmailAddress_IsReservedDomain(t *testing.T) {
 		{address: "user", want: false},
 		{address: "", want: false},
 		{address: " user@example.com ", want: true},
+		// other forms accepted by Validate
+		{address: "<user@example.com>", want: true},
+		{address: "user@example.com()", want: true},
+		{address: "user@example.com (comment)", want: true},
+		{address: "<user@user.test>", want: true},
+		{address: "<user@example.ch>", want: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.address, func(t *testing.T) {
