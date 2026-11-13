@@ -255,6 +255,11 @@
       "smsDescription": "Inserisci il tuo numero di telefono per ricevere un codice via SMS.",
       "emailDescription": "Inserisci il tuo indirizzo email per ricevere un codice via email.",
       "totpRegisterDescription": "Scansiona il codice QR o naviga manualmente all'URL.",
+      "emailAddDescription": "Usa un codice monouso inviato al tuo indirizzo email verificato come secondo fattore.",
+      "smsAddDescription": "Usa un codice monouso inviato al tuo numero di telefono verificato come secondo fattore.",
+      "add": "Aggiungi",
+      "emailAdded": "Codice via email aggiunto.",
+      "smsAdded": "Codice via SMS aggiunto.",
       "submit": "Continua",
       "labels": {
         "code": "Codice"
@@ -265,7 +270,13 @@
     },
     "errors": {
       "couldNotRequestChallenge": "Impossibile richiedere la challenge OTP",
-      "couldNotVerifyCode": "Impossibile verificare il codice OTP"
+      "couldNotVerifyCode": "Impossibile verificare il codice OTP",
+      "couldNotGetSession": "Impossibile caricare la sessione. Accedi di nuovo.",
+      "invalidMethod": "Questo secondo fattore non è supportato.",
+      "couldNotAddEmail": "Impossibile aggiungere il codice via email.",
+      "couldNotAddSms": "Impossibile aggiungere il codice via SMS.",
+      "emailNotVerified": "Verifica il tuo indirizzo email prima di aggiungere codici via email.",
+      "phoneNotVerified": "Verifica il tuo numero di telefono prima di aggiungere codici via SMS."
     }
   },
   "passkey": {

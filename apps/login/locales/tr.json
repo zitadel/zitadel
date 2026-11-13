@@ -255,6 +255,11 @@
       "smsDescription": "SMS ile kod almak için telefon numaranızı girin.",
       "emailDescription": "E-posta ile kod almak için e-posta adresinizi girin.",
       "totpRegisterDescription": "QR Kodunu tarayın veya URL'ye manuel olarak gidin.",
+      "emailAddDescription": "Doğrulanmış e-posta adresinize gönderilen tek kullanımlık kodu ikinci faktör olarak kullanın.",
+      "smsAddDescription": "Doğrulanmış telefon numaranıza gönderilen tek kullanımlık kodu ikinci faktör olarak kullanın.",
+      "add": "Ekle",
+      "emailAdded": "E-posta ile kod eklendi.",
+      "smsAdded": "SMS ile kod eklendi.",
       "submit": "Devam",
       "labels": {
         "code": "Kod"
@@ -265,7 +270,13 @@
     },
     "errors": {
       "couldNotRequestChallenge": "OTP meydan okuması istenemedi",
-      "couldNotVerifyCode": "OTP kodu doğrulanamadı"
+      "couldNotVerifyCode": "OTP kodu doğrulanamadı",
+      "couldNotGetSession": "Oturumunuz yüklenemedi. Lütfen yeniden oturum açın.",
+      "invalidMethod": "Bu ikinci faktör desteklenmiyor.",
+      "couldNotAddEmail": "E-posta ile kod eklenemedi.",
+      "couldNotAddSms": "SMS ile kod eklenemedi.",
+      "emailNotVerified": "E-posta ile kod eklemeden önce e-posta adresinizi doğrulayın.",
+      "phoneNotVerified": "SMS ile kod eklemeden önce telefon numaranızı doğrulayın."
     }
   },
   "passkey": {
