@@ -3,12 +3,12 @@ import { isValidElement, ReactNode } from "react";
 import { describe, expect, test, vi } from "vitest";
 import Page from "./page";
 
-vi.mock("@/lib/zitadel", () => ({
+vi.mock("@/lib/server/zitadel", () => ({
   getBrandingSettings: vi.fn(async () => ({})),
   getDefaultOrg: vi.fn(async () => null),
 }));
 
-vi.mock("@/lib/service-url", () => ({
+vi.mock("@/lib/server/service-url", () => ({
   getServiceConfig: vi.fn(() => ({ serviceConfig: { baseUrl: "https://example.com" } })),
 }));
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { createNewSessionForLDAP } from "@/lib/server/idp";
+import { createNewSessionForLDAP } from "@/lib/actions/idp";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
