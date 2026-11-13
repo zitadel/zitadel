@@ -13,7 +13,7 @@ export default async function CompleteRegistrationPage(props: {
   params: Promise<{ provider: string }>;
 }) {
   const searchParams = await props.searchParams;
-  const { id, token, requestId, organization, idpUserName, givenName, familyName, email } = searchParams;
+  const { id, token, requestId, organization, idpUserName, givenName, familyName, email, flowFingerprint } = searchParams;
 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
@@ -49,6 +49,7 @@ export default async function CompleteRegistrationPage(props: {
             idpIntentId: id,
             idpIntentToken: token,
           }}
+          flowFingerprint={flowFingerprint}
         />
       </div>
     </DynamicTheme>

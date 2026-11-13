@@ -1,4 +1,5 @@
 import type { Cookie } from "@/lib/server/cookies";
+import { createIdpFlowProof, isIdpFlowProofValid } from "@/lib/server/idp-flow-proof";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { FlowInitiationParams, handleOIDCFlowInitiation } from "./flow-initiation";
@@ -14,6 +15,10 @@ vi.mock("@/lib/server/auth-utils", () => ({
 
 vi.mock("@/lib/idp", () => ({
   idpTypeToSlug: vi.fn(),
+}));
+
+vi.mock("@/lib/server/fingerprint", () => ({
+  addIdpFlowProof: vi.fn(),
 }));
 
 vi.mock("@/lib/actions/loginname", () => ({
@@ -963,6 +968,13 @@ describe("handleOIDCFlowInitiation — idp scope (urn:zitadel:iam:org:idp:id)", 
       return new URL(`https://example.com${path}`);
     });
     mockIdpTypeToSlug.mockReturnValue("azure");
+
+    vi.stubEnv("ZITADEL_SESSION_COOKIE_SECRET", "test-session-cookie-secret-at-least-32-chars");
+    const fingerprint = await import("@/lib/server/fingerprint");
+    // the real helper reads the binding id cookie, here the browser binding id is "fp123"
+    vi.mocked(fingerprint.addIdpFlowProof).mockImplementation(async (params, linkToSessionId) => {
+      params.set("flowFingerprint", createIdpFlowProof("fp123", linkToSessionId));
+    });
   });
 
   afterEach(() => {
@@ -1090,5 +1102,35 @@ describe("handleOIDCFlowInitiation — idp scope (urn:zitadel:iam:org:idp:id)", 
         urls: expect.objectContaining({ loginHint: "user@example.com" }),
       }),
     );
+  });
+
+  test("should bind the scoped IdP flow to this browser with a flowFingerprint in the success URL", async () => {
+    const { IdentityProviderType } = await import("@zitadel/proto/zitadel/settings/v2/login_settings_pb");
+
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: ["urn:zitadel:iam:org:idp:id:idp-1"],
+        prompt: [],
+        loginHint: undefined,
+      },
+    });
+
+    mockGetActiveIdentityProviders.mockResolvedValue({
+      identityProviders: [{ id: "idp-1", type: IdentityProviderType.AZURE_AD }],
+    });
+
+    mockStartIdentityProviderFlow.mockResolvedValue({
+      url: "https://login.microsoftonline.com/tenant/oauth2/v2.0/authorize?client_id=xyz",
+    });
+
+    await handleOIDCFlowInitiation(makeBaseParams({ sessions: [] }));
+
+    const successUrl = new URL(mockStartIdentityProviderFlow.mock.calls[0][0].urls.successUrl);
+    expect(successUrl.pathname).toBe("/idp/azure/process");
+    expect(successUrl.searchParams.get("requestId")).toBe("oidc_abc123");
+    expect(isIdpFlowProofValid(successUrl.searchParams.get("flowFingerprint") ?? undefined, "fp123")).toBe(true);
+    expect(isIdpFlowProofValid(successUrl.searchParams.get("flowFingerprint") ?? undefined, "other-fp")).toBe(false);
   });
 });

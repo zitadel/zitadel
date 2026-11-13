@@ -2,9 +2,9 @@
 
 import { getSessionCookieById } from "@/lib/server/cookies";
 import { getEnrollmentAuthorizationError } from "@/lib/server/enrollment-guard";
-import { getFingerprintIdCookie } from "@/lib/server/fingerprint";
+import { getBindingIdCookie } from "@/lib/server/fingerprint";
 import { isClassifiedError } from "@/lib/server/grpc/interceptors/error-classification";
-import { isIdpLinkProofValid } from "@/lib/server/idp-link-proof";
+import { isIdpFlowProofValid } from "@/lib/server/idp-flow-proof";
 import { validateIDPLinkingPermissions } from "@/lib/server/idp-linking";
 import { createNewSessionFromIdpIntent } from "@/lib/server/idp-session";
 import { syncInstanceRolesFromIdpIntent } from "@/lib/server/instance-roles";
@@ -235,7 +235,6 @@ interface IDPHandlerContext {
     organization?: string;
     postErrorRedirectUrl?: string;
     sessionId?: string;
-    linkFingerprint?: string;
   };
   buildRedirectParams: (additionalParams?: Record<string, string>, includeToken?: boolean) => string;
 }
@@ -282,14 +281,14 @@ async function resolveUserIdFromSession({
     // "identify-only" session — produced by only submitting a login name, with no verified
     // primary factor (password / passkey / IDP intent) — must NOT be trusted on its own:
     // otherwise an unauthenticated attacker who merely knows a victim's login name could bind
-    // their own external identity to the victim's account (account takeover). The fingerprint
-    // check above only proves the link request originated from the same browser that started
-    // the flow, not that the session was ever authenticated.
+    // their own external identity to the victim's account (account takeover). The flowFingerprint
+    // checked at the entry of processIDPCallback only proves the link request originated from
+    // the same browser that started the flow, not that the session was ever authenticated.
     //
     // getEnrollmentAuthorizationError authorizes when the session has a verified, non-expired
     // primary factor, OR the user has no authentication methods yet AND passed a
     // user-verification check (the email/invite-code proof bound to this browser's
-    // fingerprint). The latter preserves the legitimate "link an IDP as the first
+    // binding id). The latter preserves the legitimate "link an IDP as the first
     // authenticator" onboarding flow, which isSessionValid would have rejected.
     const enrollmentError = await getEnrollmentAuthorizationError({
       serviceConfig,
@@ -309,25 +308,13 @@ async function resolveUserIdFromSession({
 }
 
 async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResult> {
-  const { sessionId, linkFingerprint, provider } = ctx.params;
+  const { sessionId, provider } = ctx.params;
   const { userId } = ctx.intent;
   const { options, serviceConfig, intent, t, buildRedirectParams } = ctx;
 
   if (sessionId && !userId) {
     // Intent should not have a userId if it is a linking intent
-    // 1. Security Check: Verify Fingerprint
-    const fingerprintCookie = await getFingerprintIdCookie();
-
-    if (!linkFingerprint || !fingerprintCookie?.value) {
-      logger.warn("Missing fingerprint information for linking verification");
-      return { redirect: `/idp/${provider}/linking-failed?error=session_mismatch` };
-    }
-
-    if (!isIdpLinkProofValid(linkFingerprint, sessionId, fingerprintCookie.value)) {
-      logger.warn("Session linking fingerprint mismatch");
-      return { redirect: `/idp/${provider}/linking-failed?error=session_mismatch` };
-    }
-
+    // 1. The flowFingerprint checked at the entry of processIDPCallback is bound to this sessionId and browser
     // 2. Retrieve Session & Resolve User
     const { userId: resolvedUserId, redirect: sessionRedirect } = await resolveUserIdFromSession({
       sessionId,
@@ -774,7 +761,7 @@ export async function processIDPCallback({
   organization,
   postErrorRedirectUrl,
   sessionId,
-  linkFingerprint,
+  flowFingerprint,
 }: {
   provider: string;
   id: string;
@@ -783,7 +770,7 @@ export async function processIDPCallback({
   organization?: string;
   postErrorRedirectUrl?: string;
   sessionId?: string;
-  linkFingerprint?: string;
+  flowFingerprint?: string;
 }): Promise<{ redirect?: string; error?: string; samlData?: { url: string; fields: Record<string, string> } }> {
   // ... (headers and config retrieval) ...
   const _headers = await headers();
@@ -791,14 +778,25 @@ export async function processIDPCallback({
 
   const t = await getTranslations("idp");
 
+  const errorParams = new URLSearchParams();
+  if (requestId) errorParams.set("requestId", requestId);
+  if (organization) errorParams.set("organization", organization);
+  if (postErrorRedirectUrl) errorParams.set("postErrorRedirectUrl", postErrorRedirectUrl);
+
   // Validate required parameters
   if (!provider || !id || !token) {
     logger.error("Missing required parameters", { provider, id, hasToken: !!token });
-    const errorParams = new URLSearchParams();
-    if (requestId) errorParams.set("requestId", requestId);
-    if (organization) errorParams.set("organization", organization);
-    if (postErrorRedirectUrl) errorParams.set("postErrorRedirectUrl", postErrorRedirectUrl);
+    return { redirect: `/idp/${provider}/failure?${errorParams.toString()}` };
+  }
 
+  // Security Check: the flow must have been started in this browser (login CSRF) and, when linking, for this session
+  const bindingIdCookie = await getBindingIdCookie();
+  if (!isIdpFlowProofValid(flowFingerprint, bindingIdCookie?.value, sessionId)) {
+    logger.warn("IDP flow fingerprint missing or mismatch");
+    if (sessionId) {
+      return { redirect: `/idp/${provider}/linking-failed?error=session_mismatch` };
+    }
+    errorParams.set("error", "flow_mismatch");
     return { redirect: `/idp/${provider}/failure?${errorParams.toString()}` };
   }
 
@@ -813,7 +811,8 @@ export async function processIDPCallback({
     // Verify we have IDP info early on
     if (!idpInformation) {
       logger.error("IDP information missing");
-      return { redirect: `/idp/${provider}/failure?error=missing_idp_info` };
+      errorParams.set("error", "missing_idp_info");
+      return { redirect: `/idp/${provider}/failure?${errorParams.toString()}` };
     }
 
     // Get IDP configuration
@@ -830,6 +829,8 @@ export async function processIDPCallback({
       const params = new URLSearchParams();
       params.set("id", id);
       if (includeToken) params.set("token", token);
+      // the token lets the complete-registration form consume the intent, so keep it bound to this browser
+      if (includeToken && flowFingerprint) params.set("flowFingerprint", flowFingerprint);
       if (requestId) params.set("requestId", requestId);
       if (organization) params.set("organization", organization);
       if (postErrorRedirectUrl) params.set("postErrorRedirectUrl", postErrorRedirectUrl);
@@ -858,7 +859,6 @@ export async function processIDPCallback({
         organization,
         postErrorRedirectUrl,
         sessionId,
-        linkFingerprint,
       },
       buildRedirectParams,
     };
@@ -884,10 +884,6 @@ export async function processIDPCallback({
   } catch (error: unknown) {
     logger.error("Error processing intent", { error });
 
-    const errorParams = new URLSearchParams();
-    if (requestId) errorParams.set("requestId", requestId);
-    if (organization) errorParams.set("organization", organization);
-    if (postErrorRedirectUrl) errorParams.set("postErrorRedirectUrl", postErrorRedirectUrl);
     errorParams.set("error", error instanceof Error ? error.message : t("errors.unknownError"));
 
     return { redirect: `/idp/${provider}/failure?${errorParams.toString()}` };

@@ -371,7 +371,8 @@
       "couldNotCreateSession": "تعذر إنشاء الجلسة",
       "userNotFound": "المستخدم غير موجود في النظام",
       "couldNotLinkIDP": "تعذر ربط IDP بالمستخدم",
-      "couldNotRegisterUser": "تعذر تسجيل المستخدم"
+      "couldNotRegisterUser": "تعذر تسجيل المستخدم",
+      "sessionMismatch": "بدأ التسجيل في متصفح آخر. يرجى تسجيل الدخول مرة أخرى باستخدام موفر الهوية الخاص بك."
     }
   },
   "invite": {

@@ -1,5 +1,6 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
+import { isKnownIdpError } from "@/lib/idp-errors";
 import { getServiceConfig } from "@/lib/server/service-url";
 import { getBrandingSettings } from "@/lib/server/zitadel";
 import { headers } from "next/headers";
@@ -28,7 +29,7 @@ export default async function LinkingFailedPage(props: {
         <p className="ztdl-p text-center">
           <Translated i18nKey="errors.linkingFailed" namespace="idp" />
         </p>
-        {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+        {isKnownIdpError(error) && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
       </div>
     </DynamicTheme>
   );

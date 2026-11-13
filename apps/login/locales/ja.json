@@ -364,7 +364,8 @@
       "couldNotCreateSession": "セッションを作成できませんでした",
       "userNotFound": "ユーザーがシステムに見つかりません",
       "couldNotLinkIDP": "IDPをユーザーにリンクできませんでした",
-      "couldNotRegisterUser": "ユーザーを登録できませんでした"
+      "couldNotRegisterUser": "ユーザーを登録できませんでした",
+      "sessionMismatch": "登録は別のブラウザで開始されました。IDプロバイダーでもう一度サインインしてください。"
     }
   },
   "invite": {
