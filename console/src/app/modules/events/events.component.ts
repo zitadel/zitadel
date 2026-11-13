@@ -3,6 +3,7 @@ import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { DisplayJsonDialogComponent } from 'src/app/modules/display-json-dialog/display-json-dialog.component';
 import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
@@ -47,6 +48,9 @@ export class EventsComponent implements OnDestroy {
     EventFieldName.CREATIONDATE,
     EventFieldName.PAYLOAD,
   ];
+
+  // the last request received from the filter component, without paging cursor
+  private filterRequest: ListEventsRequest = new ListEventsRequest();
 
   public currentRequest$: BehaviorSubject<LoadRequest> = new BehaviorSubject<LoadRequest>({
     req: new ListEventsRequest().setLimit(this.INITPAGESIZE),
@@ -139,12 +143,8 @@ export class EventsComponent implements OnDestroy {
       this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
       this.sortAsc = sortState.direction === 'asc';
 
-      const { req } = this.currentRequest$.value;
-
-      req.setLimit(this.INITPAGESIZE);
-      req.setAsc(this.sortAsc ? true : false);
-
-      this.loadEvents(req, true);
+      // start from the filter request again, so the paging cursor of the previous direction is dropped
+      this.loadEvents(this.buildRequest(this.filterRequest, this.sortAsc), true);
     } else {
       this._liveAnnouncer.announce('Sorting cleared');
     }
@@ -160,16 +160,27 @@ export class EventsComponent implements OnDestroy {
   }
 
   public more(): void {
-    const sequence = this.getCursor();
     const { req } = this.currentRequest$.value;
-    req.setSequence(sequence);
+    const cursor = this.getCursor();
+    if (cursor) {
+      this.applyCursor(req, cursor);
+    }
     this.loadEvents(req);
   }
 
   public filterChanged(filterRequest: ListEventsRequest) {
+    this.filterRequest = filterRequest;
+    const isAsc: boolean = filterRequest.getAsc();
+    if (this.sortAsc !== isAsc) {
+      this.sort.sort({ id: 'creationDate', start: isAsc ? 'asc' : 'desc', disableClear: true });
+    }
+    this.loadEvents(this.buildRequest(filterRequest, isAsc), true);
+  }
+
+  private buildRequest(filterRequest: ListEventsRequest, asc: boolean): ListEventsRequest {
     const req = new ListEventsRequest();
     req.setLimit(this.INITPAGESIZE);
-    req.setAsc(this.sortAsc ? true : false);
+    req.setAsc(asc);
 
     req.setAggregateTypesList(filterRequest.getAggregateTypesList());
     req.setAggregateId(filterRequest.getAggregateId());
@@ -177,23 +188,38 @@ export class EventsComponent implements OnDestroy {
     req.setEditorUserId(filterRequest.getEditorUserId());
     req.setResourceOwner(filterRequest.getResourceOwner());
     req.setSequence(filterRequest.getSequence());
-    req.setRange(filterRequest.getRange());
+    // the range is tightened in place by the paging cursor, so the filter request must keep its own copy
+    req.setRange(filterRequest.getRange()?.clone());
     req.setFrom(filterRequest.getFrom());
-    const isAsc: boolean = filterRequest.getAsc();
-    req.setAsc(isAsc);
-    if (this.sortAsc !== isAsc) {
-      this.sort.sort({ id: 'creationDate', start: isAsc ? 'asc' : 'desc', disableClear: true });
-    }
-    this.loadEvents(req, true);
+    return req;
   }
 
-  private getCursor(): number {
-    const current = this._data.value;
-
-    if (current.length) {
-      const sequence = current[current.length - 1].toObject().sequence;
-      return sequence;
+  /**
+   * The events API pages by creation date: with asc = false the returned events are older than `from`,
+   * with asc = true they are younger. `from` and `range` share a oneof, so an active range filter is
+   * tightened on the cursor side instead of being replaced.
+   *
+   * The sequence of an event must not be used as cursor, it is only counting per aggregate.
+   */
+  private applyCursor(req: ListEventsRequest, cursor: Timestamp): void {
+    const range = req.getRange();
+    if (range) {
+      if (req.getAsc()) {
+        range.setSince(cursor);
+      } else {
+        range.setUntil(cursor);
+      }
+      req.setRange(range);
+      return;
     }
-    return 0;
+    req.setFrom(cursor);
+  }
+
+  private getCursor(): Timestamp | undefined {
+    const current = this._data.value;
+    if (!current.length) {
+      return undefined;
+    }
+    return current[current.length - 1].getCreationDate();
   }
 }
