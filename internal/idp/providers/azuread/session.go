@@ -50,7 +50,7 @@ func (s *Session) RetrievePreviousID() (string, error) {
 
 // PersistentParameters implements the [idp.Session] interface.
 func (s *Session) PersistentParameters() map[string]any {
-	return nil
+	return s.oauth().PersistentParameters()
 }
 
 // FetchUser implements the [idp.Session] interface.
