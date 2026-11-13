@@ -153,7 +153,8 @@
       "sessionNotValid": "Sitzung ist nicht gültig",
       "passwordVerificationMissing": "Passwort-Verifizierung fehlt.",
       "passwordVerificationTooOld": "Passwort-Verifizierung ist zu alt. Bitte verifizieren Sie Ihr Passwort erneut.",
-      "passwordResetNotAllowed": "Das Zurücksetzen des Passworts ist nicht zulässig. Wenden Sie sich für weitere Informationen an Ihren Administrator."
+      "passwordResetNotAllowed": "Das Zurücksetzen des Passworts ist nicht zulässig. Wenden Sie sich für weitere Informationen an Ihren Administrator.",
+      "localAuthenticationNotAllowed": "Lokale Authentifizierung nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator."
     }
   },
   "idp": {
