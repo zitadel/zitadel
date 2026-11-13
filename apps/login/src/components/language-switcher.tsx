@@ -1,6 +1,6 @@
 "use client";
 
-import { setLanguageCookie } from "@/lib/cookies";
+import { setLanguageCookie } from "@/lib/actions/language";
 import { Lang } from "@/lib/i18n";
 import { APPEARANCE_STYLES, getComponentRoundness, getThemeConfig } from "@/lib/theme";
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react";

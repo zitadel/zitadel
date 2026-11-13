@@ -1,0 +1,58 @@
+{
+  "src/lib/actions/device.ts": [
+    "approveDeviceAuthorization",
+    "denyDeviceAuthorization"
+  ],
+  "src/lib/actions/flow.ts": [
+    "completeFlowOrGetUrl"
+  ],
+  "src/lib/actions/idp-intent.ts": [
+    "processIDPCallback"
+  ],
+  "src/lib/actions/idp.ts": [
+    "createNewSessionForLDAP",
+    "redirectToIdp"
+  ],
+  "src/lib/actions/language.ts": [
+    "setLanguageCookie"
+  ],
+  "src/lib/actions/loginname.ts": [
+    "sendLoginname"
+  ],
+  "src/lib/actions/oidc.ts": [
+    "getDeviceAuthorizationRequest"
+  ],
+  "src/lib/actions/otp.ts": [
+    "addOTP"
+  ],
+  "src/lib/actions/passkeys.ts": [
+    "registerPasskeyLink",
+    "sendPasskey",
+    "verifyPasskeyRegistration"
+  ],
+  "src/lib/actions/password.ts": [
+    "changePassword",
+    "checkSessionAndSetPassword",
+    "resetPassword",
+    "sendPassword"
+  ],
+  "src/lib/actions/register.ts": [
+    "registerUser",
+    "registerUserAndLinkToIDP"
+  ],
+  "src/lib/actions/session.ts": [
+    "clearSession",
+    "continueWithSession",
+    "skipMFAAndContinueWithNextUrl",
+    "updateOrCreateSession"
+  ],
+  "src/lib/actions/u2f.ts": [
+    "addU2F",
+    "verifyU2F"
+  ],
+  "src/lib/actions/verify.ts": [
+    "resendVerification",
+    "sendVerification",
+    "verifyTOTP"
+  ]
+}

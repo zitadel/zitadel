@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { isExternalUrl, isSafeRedirectUri } from "./client-utils";
+import { isAllowedPostErrorRedirectUrl, isExternalUrl, isSafeRedirectUri } from "./client-utils";
 
 describe("isSafeRedirectUri", () => {
   beforeEach(() => {
@@ -72,5 +72,28 @@ describe("isExternalUrl", () => {
   test("should return true for protocol-relative URLs", () => {
     expect(isExternalUrl("//evil.com")).toBe(true);
     expect(isExternalUrl("//example.com/path")).toBe(true);
+  });
+});
+
+describe("isAllowedPostErrorRedirectUrl", () => {
+  test("accepts the known back link targets", () => {
+    expect(isAllowedPostErrorRedirectUrl("/loginname")).toBe(true);
+    expect(isAllowedPostErrorRedirectUrl("/idp")).toBe(true);
+  });
+
+  test.each([
+    "https://evil.example",
+    "//evil.example",
+    "/\\evil.example",
+    "javascript:alert(1)",
+    "data:text/html,x",
+    "",
+    undefined,
+    "/loginname/x",
+    "/loginname?x=1",
+    " /loginname",
+    "/LOGINNAME",
+  ])("rejects %s", (url) => {
+    expect(isAllowedPostErrorRedirectUrl(url)).toBe(false);
   });
 });

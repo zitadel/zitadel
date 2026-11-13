@@ -543,6 +543,7 @@ Errors:
     NotExisting: "AuthRequest が存在しません"
     WrongLoginClient: "他のログインクライアントによって作成された AuthRequest"
     AlreadyHandled: "認証リクエストは既に処理済みです"
+    NotAuthenticated: "ユーザーは認証されていません"
   OIDCSession:
     RefreshTokenInvalid: "無効なリフレッシュトークンです"
     Token:

@@ -542,6 +542,7 @@ Errors:
     NotExisting: "Auth Request nie istnieje"
     WrongLoginClient: "Auth Request utworzony przez innego klienta logowania"
     AlreadyHandled: "Żądanie uwierzytelnienia zostało już obsłużone"
+    NotAuthenticated: "Użytkownik nie jest uwierzytelniony"
   OIDCSession:
     RefreshTokenInvalid: "Refresh Token jest nieprawidłowy"
     Token:
