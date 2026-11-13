@@ -158,6 +158,14 @@ func expectLoginPathsDefaultEmailCodeURLTemplate(tmpl string) func(t *testing.T)
 	}
 }
 
+func expectLoginPathsDefaultInviteCodeURLTemplate(tmpl string) func(t *testing.T) LoginPaths {
+	return func(t *testing.T) LoginPaths {
+		m := NewMockLoginPaths(gomock.NewController(t))
+		m.EXPECT().DefaultInviteCodeURLTemplate(gomock.Any()).Return(tmpl)
+		return m
+	}
+}
+
 func expectLoginPathsDefaultDomainClaimedURLTemplate(tmpl string) func(t *testing.T) LoginPaths {
 	return func(t *testing.T) LoginPaths {
 		m := NewMockLoginPaths(gomock.NewController(t))
