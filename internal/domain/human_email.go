@@ -27,6 +27,12 @@ func (e EmailAddress) Validate() error {
 	if p.Name != "" {
 		return zerrors.ThrowInvalidArgument(errEmailNameProvided, "EMAIL-599GV", "Errors.User.Email.Invalid")
 	}
+	// #3919: the domain part must contain a dot (rejects single-label
+	// domains like test@test which net/mail.ParseAddress accepts)
+	if at := strings.LastIndex(p.Address, "@"); at < 0 ||
+		!strings.Contains(p.Address[at+1:], ".") {
+		return zerrors.ThrowInvalidArgument(nil, "EMAIL-bb39i", "Errors.User.Email.Invalid")
+	}
 	return nil
 }
 
