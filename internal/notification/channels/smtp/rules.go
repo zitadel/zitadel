@@ -152,10 +152,18 @@ func compileHeaders(configs map[string]string) (map[string]string, error) {
 
 // isValidHeaderValue reports whether the value consists of text and the supported placeholders only.
 func isValidHeaderValue(value string) bool {
-	for placeholder := range headerPlaceholders {
-		value = strings.ReplaceAll(value, placeholder, "")
-	}
+	value = replaceHeaderPlaceholders(value, func(func(RuleData) string) string { return "" })
 	return !strings.Contains(value, "{{") && !strings.Contains(value, "}}")
+}
+
+// replaceHeaderPlaceholders replaces the placeholders of the value in a single pass,
+// so only placeholders of the configured value are recognized and not the ones resulting from a replacement.
+func replaceHeaderPlaceholders(value string, replacement func(render func(RuleData) string) string) string {
+	oldnew := make([]string, 0, len(headerPlaceholders)*2)
+	for placeholder, render := range headerPlaceholders {
+		oldnew = append(oldnew, placeholder, replacement(render))
+	}
+	return strings.NewReplacer(oldnew...).Replace(value)
 }
 
 // Match returns the [Rule] of the first rule matching the SMTP provider.
@@ -188,10 +196,7 @@ func (r *compiledRule) renderHeaders(data RuleData) map[string]string {
 	}
 	headers := make(map[string]string, len(r.headers))
 	for name, value := range r.headers {
-		for placeholder, render := range headerPlaceholders {
-			value = strings.ReplaceAll(value, placeholder, render(data))
-		}
-		headers[name] = value
+		headers[name] = replaceHeaderPlaceholders(value, func(render func(RuleData) string) string { return render(data) })
 	}
 	return headers
 }
@@ -231,10 +236,12 @@ func matchesSenderDomain(domains []string, sender string) bool {
 // parseHostPort splits a host with an optional port. Brackets of IPv6 addresses are removed.
 func parseHostPort(value string) hostPort {
 	value = strings.ToLower(strings.TrimSpace(value))
-	if host, port, err := net.SplitHostPort(value); err == nil {
-		return hostPort{host: host, port: port}
+	host, port, err := net.SplitHostPort(value)
+	if err != nil {
+		host, port = strings.TrimSuffix(strings.TrimPrefix(value, "["), "]"), ""
 	}
-	return hostPort{host: strings.TrimSuffix(strings.TrimPrefix(value, "["), "]")}
+	// a fully qualified name with the trailing dot of the DNS root is the same host
+	return hostPort{host: strings.TrimSuffix(host, "."), port: port}
 }
 
 var errEmptyMatchEntry = errors.New("must not be empty")

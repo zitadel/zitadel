@@ -103,6 +103,8 @@ func TestCompileRules(t *testing.T) {
 		value string
 	}{
 		{"unknown placeholder", "{{.UserID}}"},
+		{"placeholder resulting from a replacement", "{{.Inst{{.OrgID}}anceID}}"},
+		{"placeholder resulting from a replacement, other order", "{{.Org{{.InstanceID}}ID}}"},
 		{"placeholder with spaces", "{{ .InstanceID }}"},
 		{"trim markers", "{{- .InstanceID -}}"},
 		{"condition", "{{if .InstanceID}}{{.OrgID}}{{end}}"},
@@ -200,6 +202,24 @@ func TestRules_Match(t *testing.T) {
 			}},
 			config: defaultProvider,
 			want:   Rule{},
+		},
+		{
+			name: "host with the trailing dot of the DNS root matches",
+			configs: []RuleConfig{{
+				Match:              RuleMatch{Hosts: []string{"smtp.example.com"}},
+				RestrictCustomHTML: true,
+			}},
+			config: provider("smtp.example.com.:587", "token", "noreply@example.com"),
+			want:   Rule{RestrictCustomHTML: true},
+		},
+		{
+			name: "rule host with the trailing dot of the DNS root matches",
+			configs: []RuleConfig{{
+				Match:              RuleMatch{Hosts: []string{"smtp.example.com.:587"}},
+				RestrictCustomHTML: true,
+			}},
+			config: defaultProvider,
+			want:   Rule{RestrictCustomHTML: true},
 		},
 		{
 			name: "host is case insensitive",
