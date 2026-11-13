@@ -114,6 +114,11 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 				}
 			}
 		}
+		// the same applies if all subqueries filter the same single aggregate,
+		// where the sequence is the authoritative order of its events
+		if q.EventSortKeyAfter == nil && len(q.SubQueries) > 1 {
+			shouldOrderBySequence = subQueriesOfSingleAggregate(q.SubQueries)
+		}
 
 		switch q.Columns {
 		case eventstore.ColumnsEvent,
@@ -427,4 +432,34 @@ func getCondition(cond querier, filter *repository.Filter, useV1 bool) (conditio
 	format := cond.conditionFormat(filter.Operation)
 
 	return fmt.Sprintf(format, field, operation)
+}
+
+// subQueriesOfSingleAggregate reports if all subqueries filter the same aggregate type and id with an equals filter.
+func subQueriesOfSingleAggregate(subQueries [][]*repository.Filter) bool {
+	var aggregateType, aggregateID any
+	for i, filters := range subQueries {
+		var typ, id any
+		for _, filter := range filters {
+			if filter.Operation != repository.OperationEquals {
+				continue
+			}
+			if filter.Field == repository.FieldAggregateType {
+				typ = filter.Value
+			}
+			if filter.Field == repository.FieldAggregateID {
+				id = filter.Value
+			}
+		}
+		if typ == nil || id == nil {
+			return false
+		}
+		if i == 0 {
+			aggregateType, aggregateID = typ, id
+			continue
+		}
+		if typ != aggregateType || id != aggregateID {
+			return false
+		}
+	}
+	return true
 }
