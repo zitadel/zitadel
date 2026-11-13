@@ -153,7 +153,8 @@
       "sessionNotValid": "Session is not valid",
       "passwordVerificationMissing": "Password verification is missing.",
       "passwordVerificationTooOld": "Password verification is too old. Please verify your password again.",
-      "passwordResetNotAllowed": "Password reset is not allowed. Contact your administrator for more information."
+      "passwordResetNotAllowed": "Password reset is not allowed. Contact your administrator for more information.",
+      "localAuthenticationNotAllowed": "Local authentication is not allowed! Contact your administrator for more information."
     }
   },
   "idp": {

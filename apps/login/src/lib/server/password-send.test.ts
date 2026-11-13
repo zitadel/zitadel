@@ -67,6 +67,12 @@ vi.mock("next-intl/server", () => ({
   getTranslations: vi.fn(() => (key: string) => key),
 }));
 
+vi.mock("@/lib/metrics", () => ({
+  recordAuthAttempt: vi.fn(),
+  recordAuthFailure: vi.fn(),
+  recordAuthSuccess: vi.fn(),
+}));
+
 describe("sendPassword", () => {
   let mockHeaders: any;
   let mockGetServiceConfig: any;
@@ -77,6 +83,9 @@ describe("sendPassword", () => {
   let mockCompleteFlowOrGetUrl: any;
   let mockListAuthenticationMethodTypes: any;
   let mockCheckMFAFactors: any;
+  let mockSetSessionAndUpdateCookie: any;
+  let mockGetUserByID: any;
+  let mockRecordAuthFailure: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -84,8 +93,8 @@ describe("sendPassword", () => {
     const { headers } = await import("next/headers");
     const { getServiceConfig } = await import("../service-url");
     const { getSessionCookieByLoginName } = await import("../cookies");
-    const { getLoginSettings, listAuthenticationMethodTypes, searchUsers } = await import("../zitadel");
-    const { createSessionAndUpdateCookie } = await import("@/lib/server/cookie");
+    const { getLoginSettings, listAuthenticationMethodTypes, searchUsers, getUserByID } = await import("../zitadel");
+    const { createSessionAndUpdateCookie, setSessionAndUpdateCookie } = await import("@/lib/server/cookie");
     const { completeFlowOrGetUrl } = await import("../client");
     const { checkMFAFactors } = await import("../verify-helper");
 
@@ -98,6 +107,9 @@ describe("sendPassword", () => {
     mockCompleteFlowOrGetUrl = vi.mocked(completeFlowOrGetUrl);
     mockListAuthenticationMethodTypes = vi.mocked(listAuthenticationMethodTypes);
     mockCheckMFAFactors = vi.mocked(checkMFAFactors);
+    mockSetSessionAndUpdateCookie = vi.mocked(setSessionAndUpdateCookie);
+    mockGetUserByID = vi.mocked(getUserByID);
+    mockRecordAuthFailure = vi.mocked((await import("@/lib/metrics")).recordAuthFailure);
 
     mockHeaders.mockResolvedValue({});
     mockGetServiceConfig.mockReturnValue({ serviceConfig: { baseUrl: "https://api.example.com" } });
@@ -155,5 +167,178 @@ describe("sendPassword", () => {
     expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
     expect(mockCompleteFlowOrGetUrl).toHaveBeenCalled();
     expect(result).toEqual({ redirect: "/next-page" });
+  });
+
+  const existingCookie = { id: "session-id", token: "token123", loginName: "testuser", organization: "orgB" };
+
+  test("refuses password when existing session cookie belongs to an org with local auth disabled", async () => {
+    mockGetSessionCookieByLoginName.mockResolvedValue(existingCookie);
+    mockGetLoginSettings.mockResolvedValue({
+      passwordCheckLifetime: { seconds: BigInt(86400) },
+      allowLocalAuthentication: false,
+    });
+
+    const result = await sendPassword({
+      loginName: "testuser",
+      checks: create(ChecksSchema, { password: { password: "password123" } }),
+    });
+
+    expect(result).toEqual({ error: "errors.localAuthenticationNotAllowed" });
+    expect(mockSetSessionAndUpdateCookie).not.toHaveBeenCalled();
+    expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+  });
+
+  test("updates existing session when the cookie org allows local auth", async () => {
+    mockGetSessionCookieByLoginName.mockResolvedValue(existingCookie);
+    mockGetLoginSettings.mockResolvedValue({
+      passwordCheckLifetime: { seconds: BigInt(86400) },
+      allowLocalAuthentication: true,
+    });
+    mockSetSessionAndUpdateCookie.mockResolvedValue({
+      id: "session-id",
+      factors: {
+        user: { id: "user123", loginName: "testuser", organizationId: "orgB" },
+        password: { verifiedAt: { seconds: 100 } },
+      },
+    });
+    mockGetUserByID.mockResolvedValue({
+      user: { userId: "user123", type: { case: "human", value: {} }, state: UserState.ACTIVE },
+    });
+    mockListAuthenticationMethodTypes.mockResolvedValue({
+      authMethodTypes: [AuthenticationMethodType.PASSWORD],
+    });
+    mockCheckMFAFactors.mockResolvedValue(null);
+    mockCompleteFlowOrGetUrl.mockResolvedValue({ redirect: "/next-page" });
+
+    const result = await sendPassword({
+      loginName: "testuser",
+      checks: create(ChecksSchema, { password: { password: "password123" } }),
+    });
+
+    expect(mockSetSessionAndUpdateCookie).toHaveBeenCalled();
+    expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+    expect(result).toEqual({ redirect: "/next-page" });
+  });
+
+  function mockNoSessionUserInOrgB(contextSettings: Record<string, unknown>, userOrgSettings: unknown) {
+    mockGetSessionCookieByLoginName.mockResolvedValue(null);
+    mockSearchUsers.mockResolvedValue({
+      result: [
+        {
+          userId: "user123",
+          preferredLoginName: "testuser",
+          type: { case: "human", value: {} },
+          state: UserState.ACTIVE,
+          details: { resourceOwner: "orgB" },
+        },
+      ],
+    });
+    mockGetLoginSettings.mockImplementation(async ({ organization }: { organization?: string }) =>
+      organization === "orgB" ? userOrgSettings : contextSettings,
+    );
+  }
+
+  test("refuses password when no session and the user's org has local auth disabled (context org allows)", async () => {
+    mockNoSessionUserInOrgB({ allowLocalAuthentication: true }, { allowLocalAuthentication: false });
+
+    const result = await sendPassword({
+      loginName: "testuser",
+      checks: create(ChecksSchema, { password: { password: "password123" } }),
+    });
+
+    expect(result).toEqual({ error: "errors.localAuthenticationNotAllowed" });
+    expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+  });
+
+  test("masks the refusal when context org ignores unknown usernames", async () => {
+    mockNoSessionUserInOrgB(
+      { allowLocalAuthentication: true, ignoreUnknownUsernames: true },
+      { allowLocalAuthentication: false },
+    );
+
+    const result = await sendPassword({
+      loginName: "testuser",
+      checks: create(ChecksSchema, { password: { password: "password123" } }),
+    });
+
+    expect(result).toEqual({ error: "errors.failedToAuthenticateNoLimit" });
+    expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+  });
+
+  test("fails closed when the user's org login settings cannot be loaded", async () => {
+    mockNoSessionUserInOrgB({ allowLocalAuthentication: true }, undefined);
+
+    const result = await sendPassword({
+      loginName: "testuser",
+      checks: create(ChecksSchema, { password: { password: "password123" } }),
+    });
+
+    expect(result).toEqual({ error: "errors.couldNotVerifyPassword" });
+    expect(mockRecordAuthFailure).toHaveBeenCalledWith("password", "settings_unavailable", undefined);
+    expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+  });
+
+  test("masks the failure to load the user's org settings when context org ignores unknown usernames", async () => {
+    mockNoSessionUserInOrgB({ allowLocalAuthentication: true, ignoreUnknownUsernames: true }, undefined);
+
+    const result = await sendPassword({
+      loginName: "testuser",
+      checks: create(ChecksSchema, { password: { password: "password123" } }),
+    });
+
+    expect(result).toEqual({ error: "errors.failedToAuthenticateNoLimit" });
+    expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+  });
+
+  test("records the failure when the context org has local auth disabled", async () => {
+    mockGetSessionCookieByLoginName.mockResolvedValue(null);
+    mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
+
+    const result = await sendPassword({
+      loginName: "testuser",
+      organization: "orgA",
+      checks: create(ChecksSchema, { password: { password: "password123" } }),
+    });
+
+    expect(result).toEqual({ error: "errors.localAuthenticationNotAllowed" });
+    expect(mockRecordAuthFailure).toHaveBeenCalledWith("password", "local_auth_not_allowed", "orgA");
+    expect(mockSearchUsers).not.toHaveBeenCalled();
+  });
+
+  test("uses the user's org login settings for the later checks", async () => {
+    const userOrgSettings = { allowLocalAuthentication: true };
+    mockNoSessionUserInOrgB({ allowLocalAuthentication: true }, userOrgSettings);
+    mockCreateSessionAndUpdateCookie.mockResolvedValue({
+      session: {
+        id: "new-session-id",
+        factors: {
+          user: { id: "user123", loginName: "testuser", organizationId: "orgB" },
+          password: { verifiedAt: { seconds: 100 } },
+        },
+      },
+      sessionCookie: { id: "new-session-id", token: "token123", organization: "orgB" },
+    });
+    mockListAuthenticationMethodTypes.mockResolvedValue({
+      authMethodTypes: [AuthenticationMethodType.PASSWORD],
+    });
+    mockCheckMFAFactors.mockResolvedValue(null);
+    mockCompleteFlowOrGetUrl.mockResolvedValue({ redirect: "/next-page" });
+
+    const result = await sendPassword({
+      loginName: "testuser",
+      organization: "orgA",
+      checks: create(ChecksSchema, { password: { password: "password123" } }),
+    });
+
+    expect(result).toEqual({ redirect: "/next-page" });
+    expect(mockGetLoginSettings).toHaveBeenCalledTimes(2);
+    expect(mockCheckMFAFactors).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      userOrgSettings,
+      expect.anything(),
+      "orgA",
+      undefined,
+    );
   });
 });
