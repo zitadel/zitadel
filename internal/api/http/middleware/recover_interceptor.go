@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/zitadel/sloggcp"
@@ -24,11 +23,7 @@ func RecoverHandler(writeResponse func(w http.ResponseWriter, r *http.Request, e
 			defer func() {
 				var err error
 				if rec := recover(); rec != nil {
-					recErr, ok := rec.(error)
-					if !ok {
-						recErr = fmt.Errorf("%v", rec)
-					}
-					err = zerrors.ThrowInternal(recErr, zerrors.IDRecover, "Errors.Internal")
+					err = zerrors.ThrowRecovered(rec)
 					logRecovered(ctx, err)
 					writeResponse(w, r, err)
 				}
@@ -63,11 +58,7 @@ func RecoverHandlerWithError(next HandlerFuncWithError) HandlerFuncWithError {
 		r = r.WithContext(ctx)
 		defer func() {
 			if rec := recover(); rec != nil {
-				recErr, ok := rec.(error)
-				if !ok {
-					recErr = fmt.Errorf("%v", rec)
-				}
-				err = zerrors.ThrowInternal(recErr, zerrors.IDRecover, "Errors.Internal")
+				err = zerrors.ThrowRecovered(rec)
 				logRecovered(ctx, err)
 			}
 			cancel(err)

@@ -56,7 +56,15 @@ func (h *Handler) eventsToStatements(ctx context.Context, tx *sql.Tx, events []e
 	return statements, nil
 }
 
-func (h *Handler) reduce(event eventstore.Event) (*Statement, error) {
+// reduce calls the reducer registered for the event.
+// A panic of the reducer is converted into an error,
+// so the event is handled like any other event which failed to reduce.
+func (h *Handler) reduce(event eventstore.Event) (_ *Statement, err error) {
+	defer func() {
+		if rec := recover(); rec != nil {
+			err = zerrors.ThrowRecovered(rec)
+		}
+	}()
 	for _, reducer := range h.projection.Reducers() {
 		if reducer.Aggregate != event.Aggregate().Type {
 			continue
