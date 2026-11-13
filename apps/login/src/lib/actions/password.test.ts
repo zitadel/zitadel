@@ -11,7 +11,7 @@ vi.mock("next/headers", () => ({
 
 vi.mock("@zitadel/client", () => ({
   create: vi.fn(),
-  Code: { FailedPrecondition: 9 },
+  Code: { InvalidArgument: 3, FailedPrecondition: 9 },
   ConnectError: class extends Error {
     code: number;
     constructor(msg: string, code: number) {
@@ -604,6 +604,232 @@ describe("sendPassword", () => {
 
     expect(mockSetSessionAndUpdateCookie).toHaveBeenCalled();
     expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
+  });
+
+  // Regression tests for: https://github.com/zitadel/zitadel/issues/12615
+  // Every password check counts towards the lockout policy. A password that was rejected on the
+  // existing session must not be checked a second time on a new session.
+  describe("with an existing session in the cookie", () => {
+    const existingCookie = { id: "session123", token: "token123", loginName: "user@example.com", organization: "org123" };
+    const activeUser = {
+      userId: "user123",
+      type: { case: "human", value: {} },
+      state: 1,
+      preferredLoginName: "user@example.com",
+    };
+
+    function classified(message: string, code: Code) {
+      return new ClassifiedConnectError(new ConnectError(message, code));
+    }
+
+    // renders the translation parameters, so the tests can compare the whole message
+    async function translateWithParams() {
+      const { getTranslations } = await import("next-intl/server");
+      vi.mocked(getTranslations).mockResolvedValueOnce(((key: string, params?: Record<string, unknown>) =>
+        params ? `${key} ${JSON.stringify(params)}` : key) as any);
+    }
+
+    beforeEach(() => {
+      mockGetSessionCookieByLoginName.mockResolvedValue(existingCookie);
+      mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: false, allowLocalAuthentication: true });
+      mockGetLockoutSettings.mockResolvedValue({ maxPasswordAttempts: BigInt(5) });
+      mockSearchUsers.mockResolvedValue({ result: [activeUser] });
+    });
+
+    test("should check a wrong password once and return the lockout info", async () => {
+      await translateWithParams();
+      mockSetSessionAndUpdateCookie.mockRejectedValue({ error: "Failed to authenticate", failedAttempts: 1 });
+
+      const result = await sendPassword({
+        loginName: "user@example.com",
+        organization: "org123",
+        checks: { password: { password: "wrong" } } as any,
+      });
+
+      expect(result).toEqual({
+        error: `errors.failedToAuthenticate ${JSON.stringify({ failedAttempts: 1, maxPasswordAttempts: "5", lockoutMessage: "" })}`,
+      });
+      expect(mockSetSessionAndUpdateCookie).toHaveBeenCalledTimes(1);
+      expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+      expect(mockSearchUsers).not.toHaveBeenCalled();
+      expect(mockGetLockoutSettings).toHaveBeenCalledWith(expect.objectContaining({ orgId: "org123" }));
+    });
+
+    test("should return the same error as a wrong password on a new session", async () => {
+      const wrongPassword = { error: "Failed to authenticate", failedAttempts: 2 };
+      const command = { loginName: "user@example.com", checks: { password: { password: "wrong" } } as any };
+
+      await translateWithParams();
+      mockSetSessionAndUpdateCookie.mockRejectedValue(wrongPassword);
+      const onExistingSession = await sendPassword(command);
+
+      await translateWithParams();
+      mockGetSessionCookieByLoginName.mockResolvedValue(null);
+      mockCreateSessionAndUpdateCookie.mockRejectedValue(wrongPassword);
+      const onNewSession = await sendPassword(command);
+
+      expect(onExistingSession).toEqual(onNewSession);
+      expect(mockSetSessionAndUpdateCookie).toHaveBeenCalledTimes(1);
+      expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalledTimes(1);
+    });
+
+    test("should not show a limit when the lockout policy has none", async () => {
+      await translateWithParams();
+      mockSetSessionAndUpdateCookie.mockRejectedValue({ failedAttempts: 3 });
+      mockGetLockoutSettings.mockResolvedValue({ maxPasswordAttempts: BigInt(0) });
+
+      const result = await sendPassword({
+        loginName: "user@example.com",
+        checks: { password: { password: "wrong" } } as any,
+      });
+
+      expect(result).toEqual({
+        error: `errors.failedToAuthenticateNoLimit ${JSON.stringify({ failedAttempts: 3, maxPasswordAttempts: "?", lockoutMessage: "" })}`,
+      });
+      expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    test("should not check the password of a locked user a second time", async () => {
+      await translateWithParams();
+      // the API rejects a locked user with the number of failed attempts
+      mockSetSessionAndUpdateCookie.mockRejectedValue({ error: "Failed to authenticate", failedAttempts: 5 });
+
+      const result = await sendPassword({
+        loginName: "user@example.com",
+        checks: { password: { password: "any" } } as any,
+      });
+
+      expect(result).toEqual({
+        error: `errors.failedToAuthenticate ${JSON.stringify({
+          failedAttempts: 5,
+          maxPasswordAttempts: "5",
+          lockoutMessage: "errors.accountLockedContactAdmin",
+        })}`,
+      });
+      expect(mockSetSessionAndUpdateCookie).toHaveBeenCalledTimes(1);
+      expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    test("should not check the password again for a user that was locked without failed attempts", async () => {
+      mockSetSessionAndUpdateCookie.mockRejectedValue({ error: "Failed to authenticate", failedAttempts: 0 });
+
+      const result = await sendPassword({
+        loginName: "user@example.com",
+        checks: { password: { password: "any" } } as any,
+      });
+
+      // same message a new session returns for this rejection
+      expect(result).toEqual({ error: "errors.couldNotCreateSessionForUser" });
+      expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    test("should not check the password again when the API rejects it without attempt details", async () => {
+      mockSetSessionAndUpdateCookie.mockRejectedValue(classified("Password is invalid", Code.InvalidArgument));
+
+      const result = await sendPassword({
+        loginName: "user@example.com",
+        checks: { password: { password: "wrong" } } as any,
+      });
+
+      expect(result).toEqual({ error: "errors.couldNotCreateSessionForUser" });
+      expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    test("should keep a wrong password indistinguishable when ignoreUnknownUsernames is true", async () => {
+      mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true, allowLocalAuthentication: true });
+      mockSetSessionAndUpdateCookie.mockRejectedValue({ failedAttempts: 1 });
+
+      const result = await sendPassword({
+        loginName: "user@example.com",
+        checks: { password: { password: "wrong" } } as any,
+      });
+
+      expect(result).toEqual({ error: "errors.failedToAuthenticateNoLimit" });
+      expect(mockGetLockoutSettings).not.toHaveBeenCalled();
+      expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    test("should apply the enumeration protection of the request context, not of the user's organization", async () => {
+      // an unknown user never has a session, so the settings of the user's organization must not change the message
+      mockGetLoginSettings.mockImplementation(async ({ organization }: { organization?: string }) =>
+        organization === "org123"
+          ? { ignoreUnknownUsernames: false, allowLocalAuthentication: true }
+          : { ignoreUnknownUsernames: true, allowLocalAuthentication: true },
+      );
+      mockSetSessionAndUpdateCookie.mockRejectedValue({ failedAttempts: 1 });
+
+      const result = await sendPassword({
+        loginName: "user@example.com",
+        defaultOrganization: "org-default",
+        checks: { password: { password: "wrong" } } as any,
+      });
+
+      expect(result).toEqual({ error: "errors.failedToAuthenticateNoLimit" });
+      expect(mockGetLoginSettings).toHaveBeenCalledWith(expect.objectContaining({ organization: "org-default" }));
+      expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    test("should not check the password again when the context settings cannot be loaded", async () => {
+      mockGetLoginSettings.mockImplementation(async ({ organization }: { organization?: string }) =>
+        organization === "org123" ? { ignoreUnknownUsernames: false, allowLocalAuthentication: true } : undefined,
+      );
+      mockSetSessionAndUpdateCookie.mockRejectedValue({ failedAttempts: 1 });
+
+      const result = await sendPassword({
+        loginName: "user@example.com",
+        checks: { password: { password: "wrong" } } as any,
+      });
+
+      expect(result).toEqual({ error: "errors.couldNotVerifyPassword" });
+      expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    test.each([
+      ["was terminated", classified("Session is terminated (COMMAND-Hewfq)", Code.FailedPrecondition)],
+      ["expired", classified("Session is expired (COMMAND-Hkl3d)", Code.FailedPrecondition)],
+      ["does not exist anymore", classified("User ID missing (COMMAND-Sfw3f)", Code.FailedPrecondition)],
+      ["is unknown to the API", classified("Session not found", Code.NotFound)],
+      ["rejects the token of the cookie", classified("Permission denied (QUERY-dsfr3)", Code.PermissionDenied)],
+      ["has no entry to update in the cookie", "updateSessionCookie<T>: session id not found"],
+      ["could not be updated for an unknown reason", new Error("Some internal error")],
+    ])("should sign in with a new session when the existing session %s", async (_name, sessionError) => {
+      mockSetSessionAndUpdateCookie.mockRejectedValue(sessionError);
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({
+        session: { id: "newSession", factors: { user: { id: "user123", loginName: "user@example.com" } } },
+        sessionCookie: { id: "newSession", token: "newToken" },
+      });
+      const { getUserByID, listAuthenticationMethodTypes } = await import("@/lib/server/zitadel");
+      vi.mocked(getUserByID).mockResolvedValue({ user: activeUser } as any);
+      vi.mocked(listAuthenticationMethodTypes).mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD],
+      } as any);
+
+      const result = await sendPassword({
+        loginName: "user@example.com",
+        checks: { password: { password: "correct" } } as any,
+      });
+
+      expect(result).toEqual({ redirect: "https://example.com" });
+      expect(mockSetSessionAndUpdateCookie).toHaveBeenCalledTimes(1);
+      expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalledTimes(1);
+    });
+
+    test("should not check the password of an inactive user", async () => {
+      // the sessions of a deactivated user are removed, the API rejects the user check of a new session
+      mockSetSessionAndUpdateCookie.mockRejectedValue(classified("Session not found", Code.NotFound));
+      mockCreateSessionAndUpdateCookie.mockRejectedValue(
+        classified("Errors.User.NotActive (SESSION-Gj4ko)", Code.FailedPrecondition),
+      );
+
+      const result = await sendPassword({
+        loginName: "user@example.com",
+        checks: { password: { password: "any" } } as any,
+      });
+
+      expect(result).toEqual({ error: "errors.couldNotCreateSessionForUser" });
+      expect(mockSetSessionAndUpdateCookie).toHaveBeenCalledTimes(1);
+      expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalledTimes(1);
+    });
   });
 });
 describe("resetPassword", () => {

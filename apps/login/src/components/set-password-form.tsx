@@ -8,7 +8,7 @@ import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
 import { AutoSubmitForm } from "./auto-submit-form";
@@ -60,6 +60,9 @@ export function SetPasswordForm({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
+  // Pending until the page the password check redirects to is shown. The form stays disabled
+  // meanwhile, a second submit would check the password again and rotate the session token.
+  const [navigating, startNavigation] = useTransition();
 
   const router = useRouter();
 
@@ -144,7 +147,12 @@ export function SetPasswordForm({
     });
 
     setLoading(false);
-    handleServerActionResponse(passwordResponse as any, router, setSamlData, setError);
+    handleServerActionResponse(
+      passwordResponse as any,
+      { push: (url) => startNavigation(() => router.push(url)) },
+      setSamlData,
+      setError,
+    );
 
     return;
   }
@@ -191,7 +199,7 @@ export function SetPasswordForm({
                 </span>
                 <button
                   aria-label={t("set.resend")}
-                  disabled={loading}
+                  disabled={loading || navigating}
                   type="button"
                   className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
                   onClick={() => {
@@ -264,11 +272,14 @@ export function SetPasswordForm({
           <Button
             type="submit"
             variant={ButtonVariants.Primary}
-            disabled={loading || !policyIsValid || !formState.isValid || watchPassword !== watchConfirmPassword}
+            disabled={
+              loading || navigating || !policyIsValid || !formState.isValid || watchPassword !== watchConfirmPassword
+            }
             onClick={handleSubmit(submitPassword)}
             data-testid="submit-button"
           >
-            {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="set.submit" namespace="password" />
+            {(loading || navigating) && <Spinner className="mr-2 h-5 w-5" />}{" "}
+            <Translated i18nKey="set.submit" namespace="password" />
           </Button>
         </div>
       </form>
