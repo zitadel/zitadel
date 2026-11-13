@@ -81,7 +81,7 @@ func SendEmail(
 			// Only the texts are restricted, the arguments remain escaped and are never rendered.
 			data.RestrictHTML()
 		}
-		template, err := templates.GetParsedTemplate(mailhtml, data)
+		template, err := parseTemplate(mailhtml, data, rule)
 		if err != nil {
 			return err
 		}
@@ -98,6 +98,17 @@ func SendEmail(
 			triggeringEventType,
 		)
 	}
+}
+
+// parseTemplate renders the email.
+// If custom HTML is restricted, the template is rendered once only.
+// A second pass would execute template actions contained in the texts or their arguments,
+// which could insert values that are not restricted, like the subject.
+func parseTemplate(mailhtml string, data templates.TemplateData, rule smtp.Rule) (string, error) {
+	if rule.RestrictCustomHTML {
+		return templates.ParseTemplateFile(mailhtml, data)
+	}
+	return templates.GetParsedTemplate(mailhtml, data)
 }
 
 // smtpRule returns the rule of the operator for the provider.
