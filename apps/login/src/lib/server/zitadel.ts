@@ -912,6 +912,43 @@ export async function getDefaultOrg({ serviceConfig }: WithServiceConfig): Promi
     : fetcher();
 }
 
+/**
+ * The primary domain of an organization: the suffix of its users' login names
+ * when "user login must be domain" is set. Cached per instance and organization.
+ */
+export async function getOrganizationPrimaryDomain({
+  serviceConfig,
+  organizationId,
+}: WithServiceConfig<{ organizationId: string }>): Promise<string | undefined> {
+  const fetcher = async () => {
+    const orgService: Client<typeof OrganizationService> = await createServiceForHost(OrganizationService, serviceConfig);
+
+    return orgService
+      .listOrganizations(
+        {
+          queries: [
+            {
+              query: {
+                case: "idQuery",
+                value: { id: organizationId },
+              },
+            },
+          ],
+        },
+        {},
+      )
+      .then((resp) => resp?.result?.[0]?.primaryDomain || undefined);
+  };
+
+  return useCache
+    ? freshCache(
+        instanceCacheKey(serviceConfig, `getOrganizationPrimaryDomain-${organizationId}`),
+        fetcher,
+        getTTLForKey("getOrganizationPrimaryDomain", defaultCacheTTL),
+      )
+    : fetcher();
+}
+
 export async function getOrgsByDomain({ serviceConfig, domain }: WithServiceConfig<{ domain: string }>) {
   const orgService: Client<typeof OrganizationService> = await createServiceForHost(OrganizationService, serviceConfig);
 

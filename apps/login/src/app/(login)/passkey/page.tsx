@@ -76,12 +76,21 @@ export default async function Page(props: { searchParams: Promise<Record<string 
         {sessionFactors ? (
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
+            organizationId={sessionFactors.factors?.user?.organizationId}
+            hideLoginNameSuffix={branding?.hideLoginNameSuffix}
             displayName={sessionFactors.factors?.user?.displayName}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
         ) : loginName ? (
-          <UserAvatar loginName={loginName} displayName={loginName} showDropdown searchParams={searchParams}></UserAvatar>
+          <UserAvatar
+            loginName={loginName}
+            displayName={loginName}
+            showDropdown
+            searchParams={searchParams}
+            organizationId={organization}
+            hideLoginNameSuffix={branding?.hideLoginNameSuffix}
+          ></UserAvatar>
         ) : null}
       </div>
 
