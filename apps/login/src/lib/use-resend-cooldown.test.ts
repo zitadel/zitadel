@@ -10,6 +10,7 @@ describe("useResendCooldown", () => {
     const { result } = renderHook(() => useResendCooldown(30));
     expect(result.current.remaining).toBe(0);
     expect(result.current.isCoolingDown).toBe(false);
+    expect(result.current.suffix).toBe("");
   });
 
   test("counts down and re-enables after the cooldown", () => {
@@ -21,6 +22,7 @@ describe("useResendCooldown", () => {
 
     act(() => vi.advanceTimersByTime(10_000));
     expect(result.current.remaining).toBe(20);
+    expect(result.current.suffix).toBe(" (20s)");
 
     act(() => vi.advanceTimersByTime(20_000));
     expect(result.current.remaining).toBe(0);

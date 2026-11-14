@@ -34,5 +34,9 @@ export function useResendCooldown(seconds: number = RESEND_COOLDOWN_SECONDS) {
     setRemaining(seconds);
   }, [seconds]);
 
-  return { remaining, isCoolingDown: remaining > 0, start };
+  const isCoolingDown = remaining > 0;
+  // e.g. " (24s)" while cooling down, so labels can append it
+  const suffix = isCoolingDown ? ` (${remaining}s)` : "";
+
+  return { remaining, isCoolingDown, suffix, start };
 }

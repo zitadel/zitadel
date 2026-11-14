@@ -45,6 +45,34 @@ describe("SetPasswordForm", () => {
     expect(getByTestId("code-text-input")).toHaveFocus();
   });
 
+  test("should start the resend cooldown on arrival when a code was just sent", () => {
+    render(
+      <SetPasswordForm
+        passwordComplexitySettings={defaultComplexitySettings}
+        loginName="test@example.com"
+        userId="user-1"
+        codeRequired={true}
+        codeSent={true}
+      />,
+    );
+
+    const button = screen.getByRole("button", { name: "set.resend (30s)" });
+    expect(button).toBeDisabled();
+  });
+
+  test("should not start the resend cooldown on arrival without codeSent", () => {
+    render(
+      <SetPasswordForm
+        passwordComplexitySettings={defaultComplexitySettings}
+        loginName="test@example.com"
+        userId="user-1"
+        codeRequired={true}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "set.resend" })).not.toBeDisabled();
+  });
+
   test("should use translated resend accessible name when codeRequired is true", () => {
     render(
       <SetPasswordForm
