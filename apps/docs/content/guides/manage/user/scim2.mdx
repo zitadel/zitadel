@@ -102,8 +102,30 @@ Other extended schemas are not supported.
 
 ### Groups
 
-The `/Groups` endpoint supports create, get, list, replace (`PUT`), and delete.
-`PATCH` is not supported for groups, use `PUT` instead. Filtering groups is not supported.
+The `/Groups` endpoint supports create, get, list, replace (`PUT`), update (`PATCH`), and delete.
+Group lookup supports filters on `displayName` (case-insensitive) and `id`, with `startIndex` and `count` pagination.
+GET and list responses include members by default; `excludedAttributes=members` omits them.
+
+#### Okta and Microsoft Entra ID
+
+Use `displayName` as the group matching attribute. Group `externalId` is not persisted or searchable.
+The following provisioning payloads are supported:
+
+* Rename using `path: "displayName"`, or a pathless `value: {"displayName": "Engineering"}`.
+* Add members using `path: "members"` and an array of user references.
+* Okta removal using `path: "members[value eq \"user-id\"]"`.
+* Entra removal using `path: "members"` and an array containing only the users to remove. Other memberships are preserved.
+* Replace all members using `op: "replace"`, or remove all members using `op: "remove"` without a value.
+
+Operation names are case-insensitive, including Entra's `Add`, `Replace`, and `Remove`.
+Successful PATCH requests return HTTP 204. Repeated additions and removals are idempotent.
+Members must already exist in the same organization as the group.
+
+Create with members, PUT, and a batch of PATCH operations validate before committing their changes in one transaction.
+A failed mutation does not leave a partial rename or membership change. Reads use eventually consistent projections.
+Atomic writes do not provide serialization between concurrent provisioning clients; coordinate writers for each group.
+Native group and membership events remain available to Actions v2 event targets for application integration.
+This does not add ordered webhook delivery or change the existing target retry behavior.
 
 Zitadel groups are **flat**:
 

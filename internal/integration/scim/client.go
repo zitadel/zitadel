@@ -47,7 +47,8 @@ type ZitadelErrorDetail struct {
 }
 
 type ListRequest struct {
-	Schemas []schemas.ScimSchemaType `json:"schemas"`
+	ExcludedAttributes string                   `json:"excludedAttributes,omitempty"`
+	Schemas            []schemas.ScimSchemaType `json:"schemas"`
 
 	Count *int `json:"count,omitempty"`
 
@@ -213,6 +214,9 @@ func (c *ResourceClient[T]) List(ctx context.Context, orgID string, req *ListReq
 		query.Set(listQueryParamStartIndex, strconv.Itoa(*req.StartIndex))
 	}
 
+	if req.ExcludedAttributes != "" {
+		query.Set("excludedAttributes", req.ExcludedAttributes)
+	}
 	if req.Filter != nil {
 		query.Set(listQueryParamFilter, *req.Filter)
 	}

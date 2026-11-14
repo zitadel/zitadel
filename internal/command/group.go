@@ -17,6 +17,7 @@ type CreateGroup struct {
 
 	Name        string
 	Description string
+	UserIDs     []string
 }
 
 func (g *CreateGroup) IsValid() error {
@@ -65,13 +66,24 @@ func (c *Commands) CreateGroup(ctx context.Context, group *CreateGroup) (details
 		return nil, zerrors.ThrowAlreadyExists(nil, "CMDGRP-shRut3", "Errors.Group.AlreadyExists")
 	}
 
-	err = c.pushAppendAndReduce(ctx,
-		groupWriteModel,
-		repo.NewGroupAddedEvent(ctx,
-			GroupAggregateFromWriteModel(ctx, &groupWriteModel.WriteModel),
-			group.Name,
-			group.Description,
-		))
+	if len(group.UserIDs) > 0 {
+		if err := c.checkPermissionAddUserToGroup(ctx, group.ResourceOwner, group.AggregateID); err != nil {
+			return nil, err
+		}
+		if err := c.checkUsersExist(ctx, group.UserIDs, group.ResourceOwner); err != nil {
+			return nil, err
+		}
+	}
+	aggregate := GroupAggregateFromWriteModel(ctx, &groupWriteModel.WriteModel)
+	events := []eventstore.Command{repo.NewGroupAddedEvent(ctx, aggregate, group.Name, group.Description)}
+	seen := make(map[string]bool, len(group.UserIDs))
+	for _, id := range group.UserIDs {
+		if !seen[id] {
+			events = append(events, repo.NewGroupUserAddedEvent(ctx, aggregate, id))
+			seen[id] = true
+		}
+	}
+	err = c.pushAppendAndReduce(ctx, groupWriteModel, events...)
 	if err != nil {
 		return nil, err
 	}

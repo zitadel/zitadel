@@ -12,7 +12,8 @@ import (
 )
 
 type ListRequest struct {
-	Schemas []schemas.ScimSchemaType `json:"schemas"`
+	ExcludedAttributes string                   `json:"excludedAttributes,omitempty" schema:"excludedAttributes"`
+	Schemas            []schemas.ScimSchemaType `json:"schemas"`
 
 	// Count An integer indicating the desired maximum number of query results per page.
 	Count int64 `json:"count" schema:"count"`

@@ -107,7 +107,11 @@ func (adapter *ResourceHandlerAdapter[T]) ListFromHttp(r *http.Request) (*ListRe
 
 func (adapter *ResourceHandlerAdapter[T]) GetFromHttp(r *http.Request) (T, error) {
 	id := mux.Vars(r)["id"]
-	return adapter.handler.Get(r.Context(), id)
+	resource, err := adapter.handler.Get(r.Context(), id)
+	if group, ok := any(resource).(*ScimGroup); ok && group != nil && excludeGroupMembers(r.URL.Query().Get("excludedAttributes")) {
+		group.Members = nil
+	}
+	return resource, err
 }
 
 func (adapter *ResourceHandlerAdapter[T]) readEntity(data io.ReadCloser) (T, error) {
