@@ -75,6 +75,8 @@ export default async function Page(props: {
             {user && human && (
               <UserAvatar
                 loginName={user.preferredLoginName}
+                organizationId={user.details?.resourceOwner}
+                hideLoginNameSuffix={branding?.hideLoginNameSuffix}
                 displayName={human?.profile?.displayName}
                 showDropdown={false}
               />

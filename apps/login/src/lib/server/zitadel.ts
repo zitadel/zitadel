@@ -912,6 +912,58 @@ export async function getDefaultOrg({ serviceConfig }: WithServiceConfig): Promi
     : fetcher();
 }
 
+/**
+ * The domain settings of an organization (or the instance), among them whether
+ * login names are suffixed with the organization's domain. Cached per instance
+ * and organization like the other settings.
+ */
+export async function getDomainSettings({
+  serviceConfig,
+  organization,
+}: WithServiceConfig<{
+  organization?: string;
+}>) {
+  const fetcher = async () => {
+    const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
+
+    return settingsService
+      .getDomainSettings({ ctx: makeReqCtx(organization) }, {})
+      .then((resp) => (resp.settings ? resp.settings : undefined));
+  };
+
+  return freshCache(
+    instanceCacheKey(serviceConfig, `getDomainSettings-${organization || "instance"}`),
+    fetcher,
+    getTTLForKey("getDomainSettings", defaultCacheTTL),
+  );
+}
+
+/**
+ * The verified domains of an organization. With "user login must be domain" a
+ * user has a login name per verified domain, and a session can carry any of
+ * them, not only the one of the primary domain. Cached per instance and organization.
+ */
+export async function getOrganizationDomains({
+  serviceConfig,
+  organizationId,
+}: WithServiceConfig<{ organizationId: string }>): Promise<string[]> {
+  const fetcher = async () => {
+    const orgService: Client<typeof OrganizationService> = await createServiceForHost(OrganizationService, serviceConfig);
+
+    return orgService
+      .listOrganizationDomains({ organizationId }, {})
+      .then((resp) => resp.domains.filter((domain) => domain.isVerified).map((domain) => domain.domain));
+  };
+
+  return useCache
+    ? freshCache(
+        instanceCacheKey(serviceConfig, `getOrganizationDomains-${organizationId}`),
+        fetcher,
+        getTTLForKey("getOrganizationDomains", defaultCacheTTL),
+      )
+    : fetcher();
+}
+
 export async function getOrgsByDomain({ serviceConfig, domain }: WithServiceConfig<{ domain: string }>) {
   const orgService: Client<typeof OrganizationService> = await createServiceForHost(OrganizationService, serviceConfig);
 

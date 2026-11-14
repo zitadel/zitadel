@@ -116,6 +116,8 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         {sessionFactors ? (
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
+            organizationId={sessionFactors.factors?.user?.organizationId}
+            hideLoginNameSuffix={branding?.hideLoginNameSuffix}
             displayName={sessionFactors.factors?.user?.displayName}
             showDropdown
             searchParams={searchParams}
@@ -124,6 +126,12 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           (user || loginName) && (
             <UserAvatar
               loginName={loginName ?? user?.preferredLoginName}
+              // With enumeration protection the shown name must not depend on whether the user
+              // was found, so it is formatted with the requested organization, not the user's.
+              organizationId={
+                loginSettings?.ignoreUnknownUsernames ? organization : (user?.details?.resourceOwner ?? organization)
+              }
+              hideLoginNameSuffix={branding?.hideLoginNameSuffix}
               displayName={
                 !loginSettings?.ignoreUnknownUsernames
                   ? human?.profile?.displayName
