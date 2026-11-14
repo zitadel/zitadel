@@ -6,10 +6,12 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/riverqueue/river"
 
+	"github.com/zitadel/zitadel/internal/api/oidc/sign"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/denylist"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
@@ -49,12 +51,26 @@ func (w *Worker) Work(ctx context.Context, job *river.Job[*exec_repo.Request]) e
 		return river.JobCancel(fmt.Errorf("unable to unmarshal targets because %w", err))
 	}
 
-	_, err = CallTargets(ctx, targets, exec_repo.ContextInfoFromRequest(job.Args), w.targetEncAlg, w.activeSigningKey, w.httpClient)
-	if err != nil {
-		// If there is an error returned from the targets, it means that the execution was interrupted
-		return river.JobCancel(fmt.Errorf("interruption during call of targets because %w", err))
+	info := exec_repo.ContextInfoFromRequest(job.Args)
+	signerOnce := sign.GetSignerOnce(w.activeSigningKey)
+	encrypters := &sync.Map{}
+	var deliveryErrors error
+	for _, target := range targets {
+		// The queue already provides asynchronous execution; acknowledge only after delivery finishes.
+		if target.TargetType == target_domain.TargetTypeAsync {
+			target.TargetType = target_domain.TargetTypeWebhook
+		}
+		_, err := CallTarget(ctx, target, info, w.targetEncAlg, signerOnce, encrypters, w.httpClient)
+		if err == nil {
+			continue
+		}
+		deliveryErrors = errors.Join(deliveryErrors, fmt.Errorf("target %s: %w", target.GetTargetID(), err))
+		if target.IsInterruptOnError() {
+			break
+		}
 	}
-	return nil
+	// River retries the whole target list; successful receivers may see the event again.
+	return deliveryErrors
 }
 
 // NowFunc makes [time.Now] mockable
