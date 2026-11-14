@@ -3,6 +3,7 @@ package oidc
 import (
 	"context"
 	"slices"
+	"sync"
 	"time"
 
 	"github.com/zitadel/oidc/v3/pkg/crypto"
@@ -29,8 +30,13 @@ for example the v2 code exchange and refresh token.
 
 func (s *Server) accessTokenResponseFromSession(ctx context.Context, client op.Client, session *command.OIDCSession, state, projectID string, projectRoleAssertion, accessTokenRoleAssertion, idTokenRoleAssertion, userInfoAssertion bool) (_ *oidc.AccessTokenResponse, err error) {
 	getUserInfo := s.getUserInfo(session.UserID, projectID, client.GetID(), projectRoleAssertion, userInfoAssertion, session.Scope)
-	getSigner := s.getSignerOnce()
+	return s.accessTokenResponse(ctx, client, session, state, getUserInfo, s.getSignerOnce(), accessTokenRoleAssertion, idTokenRoleAssertion)
+}
 
+// accessTokenResponse creates the token response for the session.
+// The user info (including the action flows) and the signing key are taken from getUserInfo and getSigner,
+// so callers can resolve them before the session is stored, see [Server.prepareRefreshTokenResponse].
+func (s *Server) accessTokenResponse(ctx context.Context, client op.Client, session *command.OIDCSession, state string, getUserInfo userInfoFunc, getSigner sign.SignerFunc, accessTokenRoleAssertion, idTokenRoleAssertion bool) (_ *oidc.AccessTokenResponse, err error) {
 	resp := &oidc.AccessTokenResponse{
 		TokenType:    oidc.BearerToken,
 		RefreshToken: session.RefreshToken,
@@ -69,6 +75,34 @@ func (s *Server) getUserInfo(userID, projectID, clientID string, projectRoleAsse
 	userInfo := s.userInfo(userID, scope, projectID, clientID, projectRoleAssertion, userInfoAssertion, false)
 	return func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType, actor *domain.TokenActor) (*oidc.UserInfo, error) {
 		return userInfo(ctx, roleAssertion, triggerType, actor)
+	}
+}
+
+// cacheUserInfo returns a userInfoFunc which calls getUserInfo once per role assertion and trigger type,
+// and returns the stored result, including an error, on later calls.
+// This allows running the action flows ahead of building a token response without running them twice.
+// The actor is not part of the key, because all calls for one token response pass the actor of the same session.
+func cacheUserInfo(getUserInfo userInfoFunc) userInfoFunc {
+	type key struct {
+		roleAssertion bool
+		triggerType   domain.TriggerType
+	}
+	type result struct {
+		userInfo *oidc.UserInfo
+		err      error
+	}
+	var mu sync.Mutex
+	results := make(map[key]result)
+	return func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType, actor *domain.TokenActor) (*oidc.UserInfo, error) {
+		mu.Lock()
+		defer mu.Unlock()
+		k := key{roleAssertion: roleAssertion, triggerType: triggerType}
+		if r, ok := results[k]; ok {
+			return r.userInfo, r.err
+		}
+		userInfo, err := getUserInfo(ctx, roleAssertion, triggerType, actor)
+		results[k] = result{userInfo: userInfo, err: err}
+		return userInfo, err
 	}
 }
 
