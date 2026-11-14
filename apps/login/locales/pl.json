@@ -484,6 +484,8 @@
     "failedLoading": "Nie udało się załadować danych. Spróbuj ponownie.",
     "tryagain": "Spróbuj ponownie",
     "couldNotContinueSession": "Nie udało się kontynuować sesji - brak informacji o użytkowniku",
-    "couldNotClearSession": "Nie udało się zakończyć sesji. Spróbuj ponownie."
+    "couldNotClearSession": "Nie udało się zakończyć sesji. Spróbuj ponownie.",
+    "grantRequired": "Logowanie nie jest możliwe. Użytkownik musi posiadać przynajmniej jedno uprawnienie w aplikacji. Skontaktuj się z administratorem.",
+    "projectRequired": "Logowanie nie jest możliwe. Organizacja użytkownika musi zostać udzielona projektowi. Skontaktuj się z administratorem."
   }
 }

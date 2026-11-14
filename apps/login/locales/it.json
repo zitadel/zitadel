@@ -484,6 +484,8 @@
     "failedLoading": "Impossibile caricare i dati. Riprova.",
     "tryagain": "Riprova",
     "couldNotContinueSession": "Impossibile continuare con la sessione - informazioni utente mancanti",
-    "couldNotClearSession": "Impossibile terminare la sessione. Riprova."
+    "couldNotClearSession": "Impossibile terminare la sessione. Riprova.",
+    "grantRequired": "Accesso non possibile. L'utente deve avere almeno un'autorizzazione sull'applicazione. Contatta il tuo amministratore.",
+    "projectRequired": "Accesso non possibile. All'organizzazione dell'utente deve essere concesso l'accesso al progetto. Contatta il tuo amministratore."
   }
 }

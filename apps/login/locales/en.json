@@ -485,6 +485,8 @@
     "failedLoading": "Failed to load data. Please try again.",
     "tryagain": "Try Again",
     "couldNotContinueSession": "Could not continue with session - missing user information",
-    "couldNotClearSession": "Could not end the session. Please try again."
+    "couldNotClearSession": "Could not end the session. Please try again.",
+    "grantRequired": "Login not possible. The user is required to have at least one grant on the application. Please contact your administrator.",
+    "projectRequired": "Login not possible. The organization of the user must be granted to the project. Please contact your administrator."
   }
 }

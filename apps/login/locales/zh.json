@@ -484,6 +484,8 @@
     "failedLoading": "加载数据失败，请再试一次。",
     "tryagain": "重试",
     "couldNotContinueSession": "无法继续会话 - 缺少用户信息",
-    "couldNotClearSession": "无法结束会话。请重试。"
+    "couldNotClearSession": "无法结束会话。请重试。",
+    "grantRequired": "无法登录，用户需要在应用程序上拥有至少一项授权，请联系您的管理员。",
+    "projectRequired": "无法登录，用户的组织必须授予项目，请联系您的管理员。"
   }
 }

@@ -12,8 +12,12 @@ vi.mock("@/lib/server/grpc/interceptors/error-classification", () => ({
     typeof error === "object" && error !== null && "code" in error && typeof (error as any).code === "number",
 }));
 
+vi.mock("next-intl/server", () => ({
+  getTranslations: vi.fn(() => (key: string) => key),
+}));
+
 vi.mock("@zitadel/client", () => ({
-  Code: { FailedPrecondition: 9 },
+  Code: { FailedPrecondition: 9, PermissionDenied: 7 },
   create: vi.fn(),
 }));
 
@@ -112,5 +116,26 @@ describe("loginWithSAMLAndSession", () => {
     expect(result).toEqual({ error: "Session not found or invalid" });
     expect(loginnameModule.sendLoginname).not.toHaveBeenCalled();
     expect(zitadelModule.createResponse).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["Errors.User.GrantRequired (SAML-foSyH49RvL)", "grantRequired"],
+    ["Errors.User.ProjectRequired (SAML-foSyH49RvL)", "projectRequired"],
+  ])("should return the translated authorization error for %s", async (rawMessage, expected) => {
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(true);
+    vi.mocked(zitadelModule.createResponse).mockRejectedValue({ code: 7, rawMessage });
+
+    const result = await login();
+
+    expect(result).toEqual({ error: expected });
+  });
+
+  it("should return unknown error for other permission denied errors", async () => {
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(true);
+    vi.mocked(zitadelModule.createResponse).mockRejectedValue({ code: 7, rawMessage: "Errors.AuthRequest.NoPermission" });
+
+    const result = await login();
+
+    expect(result).toEqual({ error: "Unknown error occurred" });
   });
 });

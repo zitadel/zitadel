@@ -484,6 +484,8 @@
     "failedLoading": "Échec du chargement des données. Veuillez réessayer.",
     "tryagain": "Réessayer",
     "couldNotContinueSession": "Impossible de continuer la session - informations utilisateur manquantes",
-    "couldNotClearSession": "La session n'a pas pu être terminée. Veuillez réessayer."
+    "couldNotClearSession": "La session n'a pas pu être terminée. Veuillez réessayer.",
+    "grantRequired": "Connexion impossible. L'utilisateur doit disposer d'au moins une autorisation sur l'application. Contactez votre administrateur.",
+    "projectRequired": "Connexion impossible. L'accès au projet doit être accordé à l'organisation de l'utilisateur. Contactez votre administrateur."
   }
 }

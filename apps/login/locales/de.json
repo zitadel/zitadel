@@ -484,6 +484,8 @@
     "failedLoading": "Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
     "tryagain": "Erneut versuchen",
     "couldNotContinueSession": "Sitzung konnte nicht fortgesetzt werden - fehlende Benutzerinformationen",
-    "couldNotClearSession": "Die Sitzung konnte nicht beendet werden. Bitte versuchen Sie es erneut."
+    "couldNotClearSession": "Die Sitzung konnte nicht beendet werden. Bitte versuchen Sie es erneut.",
+    "grantRequired": "Die Anmeldung an dieser Anwendung ist nicht möglich. Der Benutzer benötigt mindestens eine Berechtigung für die Anwendung. Wenden Sie sich bitte an Ihren Administrator.",
+    "projectRequired": "Die Anmeldung an dieser Anwendung ist nicht möglich. Die Organisation des Benutzers benötigt eine Berechtigung für das Projekt. Wenden Sie sich bitte an Ihren Administrator."
   }
 }

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { isSafeRedirectUri } from "@/lib/client-utils";
+import { getAuthorizationErrorMessage } from "@/lib/server/authorization-error";
 import { Cookie } from "@/lib/server/cookies";
 import { isClassifiedError } from "@/lib/server/grpc/interceptors/error-classification";
 import { reauthenticate } from "@/lib/server/reauthenticate";
@@ -93,7 +94,8 @@ export async function loginWithOIDCAndSession({
           }
           return { redirect: signedinUrl + "?" + params.toString() };
         } else {
-          return { error: "Unknown error occurred" };
+          const authorizationError = await getAuthorizationErrorMessage(error);
+          return { error: authorizationError ?? "Unknown error occurred" };
         }
       }
     }
