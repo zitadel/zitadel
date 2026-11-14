@@ -215,7 +215,7 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
                 aria-label={`${t("verify.resendCode")}${resendCooldown.suffix}`}
                 disabled={loading || resendCooldown.isCoolingDown}
                 type="button"
-                className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
+                className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-500 dark:disabled:text-gray-400"
                 onClick={async () => {
                   setLoading(true);
                   const response = await updateSessionForOTPChallenge();
