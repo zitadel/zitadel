@@ -939,38 +939,27 @@ export async function getDomainSettings({
 }
 
 /**
- * The primary domain of an organization: the suffix of its users' login names
- * when "user login must be domain" is set. Cached per instance and organization.
+ * The verified domains of an organization. With "user login must be domain" a
+ * user has a login name per verified domain, and a session can carry any of
+ * them, not only the one of the primary domain. Cached per instance and organization.
  */
-export async function getOrganizationPrimaryDomain({
+export async function getOrganizationDomains({
   serviceConfig,
   organizationId,
-}: WithServiceConfig<{ organizationId: string }>): Promise<string | undefined> {
+}: WithServiceConfig<{ organizationId: string }>): Promise<string[]> {
   const fetcher = async () => {
     const orgService: Client<typeof OrganizationService> = await createServiceForHost(OrganizationService, serviceConfig);
 
     return orgService
-      .listOrganizations(
-        {
-          queries: [
-            {
-              query: {
-                case: "idQuery",
-                value: { id: organizationId },
-              },
-            },
-          ],
-        },
-        {},
-      )
-      .then((resp) => resp?.result?.[0]?.primaryDomain || undefined);
+      .listOrganizationDomains({ organizationId }, {})
+      .then((resp) => resp.domains.filter((domain) => domain.isVerified).map((domain) => domain.domain));
   };
 
   return useCache
     ? freshCache(
-        instanceCacheKey(serviceConfig, `getOrganizationPrimaryDomain-${organizationId}`),
+        instanceCacheKey(serviceConfig, `getOrganizationDomains-${organizationId}`),
         fetcher,
-        getTTLForKey("getOrganizationPrimaryDomain", defaultCacheTTL),
+        getTTLForKey("getOrganizationDomains", defaultCacheTTL),
       )
     : fetcher();
 }

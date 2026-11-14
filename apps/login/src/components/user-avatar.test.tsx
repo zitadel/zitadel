@@ -4,7 +4,7 @@ import { UserAvatar } from "./user-avatar";
 
 vi.mock("@/lib/server/zitadel", () => ({
   getDomainSettings: vi.fn(),
-  getOrganizationPrimaryDomain: vi.fn(),
+  getOrganizationDomains: vi.fn(),
 }));
 
 vi.mock("@/lib/server/service-url", () => ({
@@ -20,13 +20,13 @@ vi.mock("@/components/avatar", () => ({ Avatar: vi.fn(() => null) }));
 const loginName = "anna@example.com@studio.example.com";
 
 describe("UserAvatar", () => {
-  let getOrganizationPrimaryDomain: any;
+  let getOrganizationDomains: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
     const zitadel = await import("@/lib/server/zitadel");
-    getOrganizationPrimaryDomain = vi.mocked(zitadel.getOrganizationPrimaryDomain);
-    getOrganizationPrimaryDomain.mockResolvedValue("studio.example.com");
+    getOrganizationDomains = vi.mocked(zitadel.getOrganizationDomains);
+    getOrganizationDomains.mockResolvedValue(["studio.example.com"]);
     vi.mocked(zitadel.getDomainSettings).mockResolvedValue({ loginNameIncludesDomain: true } as never);
   });
 
@@ -38,7 +38,7 @@ describe("UserAvatar", () => {
     render(await UserAvatar({ loginName, showDropdown: false, organizationId: "org-1", hideLoginNameSuffix: false }));
 
     expect(screen.getByText(loginName)).toBeDefined();
-    expect(getOrganizationPrimaryDomain).not.toHaveBeenCalled();
+    expect(getOrganizationDomains).not.toHaveBeenCalled();
   });
 
   test("shows the login name without the organization domain when the branding hides the suffix", async () => {
@@ -52,11 +52,11 @@ describe("UserAvatar", () => {
     render(await UserAvatar({ loginName, showDropdown: false, hideLoginNameSuffix: true }));
 
     expect(screen.getByText(loginName)).toBeDefined();
-    expect(getOrganizationPrimaryDomain).not.toHaveBeenCalled();
+    expect(getOrganizationDomains).not.toHaveBeenCalled();
   });
 
   test("shows the login name when the organization cannot be read", async () => {
-    getOrganizationPrimaryDomain.mockRejectedValue(new Error("permission denied"));
+    getOrganizationDomains.mockRejectedValue(new Error("permission denied"));
 
     render(await UserAvatar({ loginName, showDropdown: false, organizationId: "org-1", hideLoginNameSuffix: true }));
 
