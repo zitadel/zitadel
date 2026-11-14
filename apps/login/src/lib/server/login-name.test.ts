@@ -2,52 +2,58 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { getShownLoginName, stripLoginNameSuffix } from "./login-name";
 
 vi.mock("@/lib/server/zitadel", () => ({
+  getDomainSettings: vi.fn(),
   getOrganizationPrimaryDomain: vi.fn(),
 }));
 
 const serviceConfig = { baseUrl: "https://example.com" };
 
 describe("stripLoginNameSuffix", () => {
-  test("removes the domain suffix", () => {
-    expect(stripLoginNameSuffix("anna@studio.example.com", "studio.example.com")).toBe("anna");
-  });
-
-  test("keeps an e-mail username when the domain suffix is removed", () => {
+  test("removes the domain suffix appended to an e-mail-style username", () => {
     expect(stripLoginNameSuffix("anna@example.com@studio.example.com", "studio.example.com")).toBe("anna@example.com");
   });
 
   test("ignores case", () => {
-    expect(stripLoginNameSuffix("Anna@Studio.Example.com", "studio.example.COM")).toBe("Anna");
+    expect(stripLoginNameSuffix("Anna@Example.com@Studio.Example.com", "studio.example.COM")).toBe("Anna@Example.com");
+  });
+
+  test("keeps a login name with a single @, which may be a complete username", () => {
+    expect(stripLoginNameSuffix("theodora@studio.example.com", "studio.example.com")).toBe("theodora@studio.example.com");
   });
 
   test("keeps a login name of another domain", () => {
-    expect(stripLoginNameSuffix("anna@example.com", "studio.example.com")).toBe("anna@example.com");
+    expect(stripLoginNameSuffix("anna@example.com@other.example.com", "studio.example.com")).toBe(
+      "anna@example.com@other.example.com",
+    );
   });
 
   test("keeps a login name that only ends like the domain", () => {
-    expect(stripLoginNameSuffix("anna@otherstudio.example.com", "studio.example.com")).toBe("anna@otherstudio.example.com");
-  });
-
-  test("keeps a login name that is nothing but the suffix", () => {
-    expect(stripLoginNameSuffix("@studio.example.com", "studio.example.com")).toBe("@studio.example.com");
+    expect(stripLoginNameSuffix("anna@example.com@otherstudio.example.com", "studio.example.com")).toBe(
+      "anna@example.com@otherstudio.example.com",
+    );
   });
 
   test("keeps the login name without a domain", () => {
-    expect(stripLoginNameSuffix("anna@studio.example.com", undefined)).toBe("anna@studio.example.com");
+    expect(stripLoginNameSuffix("anna@example.com@studio.example.com", undefined)).toBe(
+      "anna@example.com@studio.example.com",
+    );
   });
 });
 
 describe("getShownLoginName", () => {
+  let getDomainSettings: any;
   let getOrganizationPrimaryDomain: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
     const zitadel = await import("@/lib/server/zitadel");
+    getDomainSettings = vi.mocked(zitadel.getDomainSettings);
     getOrganizationPrimaryDomain = vi.mocked(zitadel.getOrganizationPrimaryDomain);
+    getDomainSettings.mockResolvedValue({ loginNameIncludesDomain: true });
     getOrganizationPrimaryDomain.mockResolvedValue("studio.example.com");
   });
 
-  test("strips the organization's domain when the suffix is hidden", async () => {
+  test("strips the organization's domain when the suffix is hidden and appended", async () => {
     const shown = await getShownLoginName({
       serviceConfig,
       loginName: "anna@example.com@studio.example.com",
@@ -56,7 +62,32 @@ describe("getShownLoginName", () => {
     });
 
     expect(shown).toBe("anna@example.com");
+    expect(getDomainSettings).toHaveBeenCalledWith({ serviceConfig, organization: "org-1" });
     expect(getOrganizationPrimaryDomain).toHaveBeenCalledWith({ serviceConfig, organizationId: "org-1" });
+  });
+
+  test("keeps a typed e-mail username that ends with the organization's domain", async () => {
+    const shown = await getShownLoginName({
+      serviceConfig,
+      loginName: "theodora@studio.example.com",
+      organizationId: "org-1",
+      hideLoginNameSuffix: true,
+    });
+
+    expect(shown).toBe("theodora@studio.example.com");
+  });
+
+  test("keeps the login name when the organization does not append its domain", async () => {
+    getDomainSettings.mockResolvedValue({ loginNameIncludesDomain: false });
+
+    const shown = await getShownLoginName({
+      serviceConfig,
+      loginName: "anna@example.com@studio.example.com",
+      organizationId: "org-1",
+      hideLoginNameSuffix: true,
+    });
+
+    expect(shown).toBe("anna@example.com@studio.example.com");
   });
 
   test("keeps the login name and reads nothing when the suffix is not hidden", async () => {
@@ -68,6 +99,7 @@ describe("getShownLoginName", () => {
     });
 
     expect(shown).toBe("anna@example.com@studio.example.com");
+    expect(getDomainSettings).not.toHaveBeenCalled();
     expect(getOrganizationPrimaryDomain).not.toHaveBeenCalled();
   });
 
@@ -82,7 +114,20 @@ describe("getShownLoginName", () => {
     expect(getOrganizationPrimaryDomain).not.toHaveBeenCalled();
   });
 
-  test("keeps the login name when the organization cannot be read", async () => {
+  test("keeps the login name when the organization's settings cannot be read", async () => {
+    getDomainSettings.mockRejectedValue(new Error("permission denied"));
+
+    const shown = await getShownLoginName({
+      serviceConfig,
+      loginName: "anna@example.com@studio.example.com",
+      organizationId: "org-1",
+      hideLoginNameSuffix: true,
+    });
+
+    expect(shown).toBe("anna@example.com@studio.example.com");
+  });
+
+  test("keeps the login name when the organization's domain cannot be read", async () => {
     getOrganizationPrimaryDomain.mockRejectedValue(new Error("permission denied"));
 
     const shown = await getShownLoginName({
