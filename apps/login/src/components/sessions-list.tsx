@@ -10,9 +10,11 @@ import { Translated } from "./translated";
 type Props = {
   sessions: Session[];
   requestId?: string;
+  // The login name to show per session id, when it differs from the session's own.
+  shownLoginNames?: Record<string, string>;
 };
 
-export function SessionsList({ sessions, requestId }: Props) {
+export function SessionsList({ sessions, requestId, shownLoginNames }: Props) {
   const [list, setList] = useState<Session[]>(sessions);
   return sessions ? (
     <div className="flex flex-col space-y-2">
@@ -30,6 +32,7 @@ export function SessionsList({ sessions, requestId }: Props) {
             <SessionItem
               session={session}
               requestId={requestId}
+              shownLoginName={shownLoginNames?.[session.id]}
               reload={() => {
                 setList(list.filter((s) => s.id !== session.id));
               }}

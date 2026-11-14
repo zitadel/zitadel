@@ -142,6 +142,8 @@ export default async function Page(props: { searchParams: Promise<Record<string 
         {sessionWithData && (
           <UserAvatar
             loginName={loginName ?? sessionWithData.factors?.user?.loginName}
+            organizationId={sessionWithData.factors?.user?.organizationId}
+            hideLoginNameSuffix={branding?.hideLoginNameSuffix}
             displayName={sessionWithData.factors?.user?.displayName}
             showDropdown
             searchParams={searchParams}
