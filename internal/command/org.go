@@ -610,7 +610,7 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate, permissionCheck Organizati
 			if err != nil {
 				return nil, err
 			}
-			groupRemovals, err := orgGroupRemovals(ctx, filter, a.ID)
+			groupRemovals, err := orgGroupRemovals(ctx, c.eventstore.Search, a.ID)
 			if err != nil {
 				return nil, err
 			}

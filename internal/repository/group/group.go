@@ -129,9 +129,10 @@ type GroupRemovedEvent struct {
 
 	ID string `json:"id,omitempty"`
 
-	name        string
-	externalIDs map[string]string
-	memberIDs   []string
+	name           string
+	externalIDs    map[string]string
+	memberIDs      []string
+	externalIDKeys []string
 }
 
 func NewGroupRemovedEvent(
@@ -165,6 +166,9 @@ func (g *GroupRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	for scope, value := range g.externalIDs {
 		constraints = append(constraints, NewRemoveGroupExternalIDUniqueConstraint(g.Aggregate().ID, g.Aggregate().ResourceOwner, scope, value))
 	}
+	for _, key := range g.externalIDKeys {
+		constraints = append(constraints, eventstore.NewRemoveUniqueConstraint("group_external_id", key).WithClaimant(AggregateType, g.Aggregate().ID))
+	}
 	for _, id := range g.memberIDs {
 		constraints = append(constraints, NewRemoveGroupUserUniqueConstraint(g.Aggregate().ID, id))
 	}
@@ -173,5 +177,10 @@ func (g *GroupRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 
 func (g *GroupRemovedEvent) WithMembers(ids []string) *GroupRemovedEvent {
 	g.memberIDs = ids
+	return g
+}
+
+func (g *GroupRemovedEvent) WithExternalIDKeys(keys []string) *GroupRemovedEvent {
+	g.externalIDKeys = keys
 	return g
 }

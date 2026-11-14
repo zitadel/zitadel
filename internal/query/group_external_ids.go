@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+	"crypto/sha256"
 	"database/sql"
 
 	sq "github.com/Masterminds/squirrel"
@@ -65,7 +66,13 @@ func NewGroupExternalIDSearchQuery(scope, value string) (SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	sub, err := NewSubSelect(groupExternalIDColumn(projection.GroupExternalIDsColumnGroupID), []SearchQuery{instanceQuery, orgQuery, scopeQuery, valueQuery})
+	digest := sha256.Sum256([]byte(value))
+	// Squirrel treats []byte as scalar bytea equality rather than expanding an IN list.
+	digestQuery, err := NewListQuery(groupExternalIDColumn(projection.GroupExternalIDsColumnDigest), digest[:], ListIn)
+	if err != nil {
+		return nil, err
+	}
+	sub, err := NewSubSelect(groupExternalIDColumn(projection.GroupExternalIDsColumnGroupID), []SearchQuery{instanceQuery, orgQuery, scopeQuery, digestQuery, valueQuery})
 	if err != nil {
 		return nil, err
 	}

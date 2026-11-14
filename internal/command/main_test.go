@@ -33,8 +33,9 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	}
 	es := eventstore.NewEventstore(
 		&eventstore.Config{
-			Querier: m.MockQuerier,
-			Pusher:  m.MockPusher,
+			Querier:  m.MockQuerier,
+			Pusher:   m.MockPusher,
+			Searcher: m.MockSearcher,
 		},
 	)
 	return es

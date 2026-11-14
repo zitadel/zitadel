@@ -8,10 +8,14 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
+	"time"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	sq "github.com/Masterminds/squirrel"
+	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/database"
+	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 )
 
 var (
@@ -558,4 +562,25 @@ func prepareMembershipWrapper() func() (sq.SelectBuilder, func(*sql.Rows) (*Memb
 		builder, _, fun := prepareMembershipsQuery(context.Background(), &MembershipSearchQuery{}, false)
 		return builder, fun
 	}
+}
+
+func TestMemberships_LifecycleTransactionDoesNotRefreshProjections(t *testing.T) {
+	db, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
+	require.NoError(t, err)
+	defer db.Close()
+	db.SetMaxOpenConns(1)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	mock.ExpectBegin()
+	tx, err := db.BeginTx(ctx, nil)
+	require.NoError(t, err)
+	mock.ExpectQuery("SELECT").WillReturnRows(sqlmock.NewRows([]string{"event_date", "position", "last_updated"}))
+	mock.ExpectQuery("SELECT").WillReturnRows(sqlmock.NewRows(nil))
+	mock.ExpectRollback()
+	queries := &Queries{client: &database.DB{DB: db}}
+	memberships, err := queries.Memberships(database.ContextWithTransaction(ctx, tx), &MembershipSearchQuery{}, true)
+	require.NoError(t, err)
+	require.Empty(t, memberships.Memberships)
+	require.NoError(t, tx.Rollback())
+	require.NoError(t, mock.ExpectationsWereMet())
 }

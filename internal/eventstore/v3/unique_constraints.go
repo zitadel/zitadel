@@ -19,8 +19,6 @@ import (
 var (
 	//go:embed unique_constraints_delete.sql
 	deleteConstraintStmt string
-	//go:embed unique_constraints_delete_placeholders.sql
-	deleteConstraintPlaceholdersStmt string
 	//go:embed unique_constraints_add.sql
 	addConstraintStmt string
 )
@@ -29,11 +27,8 @@ func handleUniqueConstraints(ctx context.Context, tx database.Transaction, comma
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	deletePlaceholders := make([]string, 0)
-	deleteArgs := make([]any, 0)
-
-	addPlaceholders := make([]string, 0)
-	addArgs := make([]any, 0)
+	var deleteInstances, deleteTypes, deleteFields, removeInstances []string
+	var addInstances, addTypes, addFields, claimantTypes, claimantIDs []string
 	addConstraints := map[string]*eventstore.UniqueConstraint{}
 	deleteConstraints := map[string]*eventstore.UniqueConstraint{}
 
@@ -49,8 +44,11 @@ func handleUniqueConstraints(ctx context.Context, tx database.Transaction, comma
 			switch constraint.Action {
 			case eventstore.UniqueConstraintAdd:
 				constraint.UniqueField = strings.ToLower(constraint.UniqueField)
-				addPlaceholders = append(addPlaceholders, fmt.Sprintf("($%d, $%d, $%d, NULLIF($%d, ''), NULLIF($%d, ''))", len(addArgs)+1, len(addArgs)+2, len(addArgs)+3, len(addArgs)+4, len(addArgs)+5))
-				addArgs = append(addArgs, instanceID, constraint.UniqueType, constraint.UniqueField, string(constraint.ClaimantType), constraint.ClaimantID)
+				addInstances = append(addInstances, instanceID)
+				addTypes = append(addTypes, constraint.UniqueType)
+				addFields = append(addFields, constraint.UniqueField)
+				claimantTypes = append(claimantTypes, string(constraint.ClaimantType))
+				claimantIDs = append(claimantIDs, constraint.ClaimantID)
 				addConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, instanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			case eventstore.UniqueConstraintRemove:
 				if constraint.ClaimantID != "" {
@@ -59,19 +57,19 @@ func handleUniqueConstraints(ctx context.Context, tx database.Transaction, comma
 					}
 					continue
 				}
-				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf(deleteConstraintPlaceholdersStmt, len(deleteArgs)+1, len(deleteArgs)+2, len(deleteArgs)+3))
-				deleteArgs = append(deleteArgs, instanceID, constraint.UniqueType, constraint.UniqueField)
+				deleteInstances = append(deleteInstances, instanceID)
+				deleteTypes = append(deleteTypes, constraint.UniqueType)
+				deleteFields = append(deleteFields, constraint.UniqueField)
 				deleteConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, instanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			case eventstore.UniqueConstraintInstanceRemove:
-				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf("(instance_id = $%d)", len(deleteArgs)+1))
-				deleteArgs = append(deleteArgs, instanceID)
+				removeInstances = append(removeInstances, instanceID)
 				deleteConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, instanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			}
 		}
 	}
 
-	if len(deletePlaceholders) > 0 {
-		_, err := tx.Exec(ctx, fmt.Sprintf(deleteConstraintStmt, strings.Join(deletePlaceholders, " OR ")), deleteArgs...)
+	if len(deleteFields) > 0 {
+		_, err := tx.Exec(ctx, deleteConstraintStmt, deleteInstances, deleteTypes, deleteFields)
 		if err != nil {
 			logging.WithError(err).Warn("delete unique constraint failed")
 			errMessage := "Errors.Internal"
@@ -81,8 +79,19 @@ func handleUniqueConstraints(ctx context.Context, tx database.Transaction, comma
 			return zerrors.ThrowInternal(err, "V3-C8l3V", errMessage)
 		}
 	}
-	if len(addPlaceholders) > 0 {
-		_, err := tx.Exec(ctx, fmt.Sprintf(addConstraintStmt, strings.Join(addPlaceholders, ", ")), addArgs...)
+	if len(removeInstances) > 0 {
+		_, err := tx.Exec(ctx, "DELETE FROM eventstore.unique_constraints WHERE instance_id = ANY($1::text[])", removeInstances)
+		if err != nil {
+			logging.WithError(err).Warn("delete instance unique constraints failed")
+			errMessage := "Errors.Internal"
+			if constraint := constraintFromErr(err, deleteConstraints); constraint != nil {
+				errMessage = constraint.ErrorMessage
+			}
+			return zerrors.ThrowInternal(err, "V3-C8l3V", errMessage)
+		}
+	}
+	if len(addFields) > 0 {
+		_, err := tx.Exec(ctx, addConstraintStmt, addInstances, addTypes, addFields, claimantTypes, claimantIDs)
 		if err != nil {
 			logging.WithError(err).Warn("add unique constraint failed")
 			errMessage := "Errors.Internal"

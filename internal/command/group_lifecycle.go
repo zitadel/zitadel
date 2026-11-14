@@ -4,66 +4,80 @@ import (
 	"context"
 	"maps"
 	"slices"
+	"strings"
 
-	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	repo "github.com/zitadel/zitadel/internal/repository/group"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
-
-// Called under the instance lifecycle lock. Projections cannot be used here:
-// they may omit a membership whose add transaction has already committed.
-func orgGroupWriteModels(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) (map[string]*GroupWriteModel, error) {
-	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).ResourceOwner(orgID).OrderAsc().AddQuery().AggregateTypes(repo.AggregateType).Builder())
-	if err != nil {
-		return nil, err
-	}
-	groups := make(map[string]*GroupWriteModel)
-	for _, event := range events {
-		id := event.Aggregate().ID
-		if groups[id] == nil {
-			groups[id] = NewGroupWriteModel(id, orgID, []string{})
-		}
-		groups[id].AppendEvents(event)
-	}
-	for _, group := range groups {
-		if err := group.Reduce(); err != nil {
-			return nil, err
-		}
-	}
-	return groups, nil
-}
 
 func groupRemoval(ctx context.Context, group *GroupWriteModel) *repo.GroupRemovedEvent {
 	return repo.NewGroupRemovedEvent(ctx, GroupAggregateFromWriteModel(ctx, &group.WriteModel), group.Name, group.ExternalIDs).
 		WithMembers(slices.Sorted(maps.Keys(group.existingUserIDs)))
 }
 
-func orgGroupRemovals(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) ([]eventstore.Command, error) {
-	groups, err := orgGroupWriteModels(ctx, filter, orgID)
+// Lifecycle fields commit with events; cascades under the instance lock need no history replay.
+func orgGroupRemovals(ctx context.Context, search func(context.Context, ...map[eventstore.FieldType]any) ([]*eventstore.SearchResult, error), orgID string) ([]eventstore.Command, error) {
+	fields, err := search(ctx, map[eventstore.FieldType]any{
+		eventstore.FieldTypeResourceOwner: orgID,
+		eventstore.FieldTypeAggregateType: repo.AggregateType,
+		eventstore.FieldTypeObjectType:    repo.FieldObjectType,
+	})
 	if err != nil {
 		return nil, err
 	}
+	type groupState struct {
+		name          string
+		members, keys []string
+	}
+	groups := make(map[string]*groupState)
+	for _, field := range fields {
+		id := field.Aggregate.ID
+		if groups[id] == nil {
+			groups[id] = new(groupState)
+		}
+		state := groups[id]
+		switch field.FieldName {
+		case repo.FieldName:
+			if err := field.Value.Unmarshal(&state.name); err != nil {
+				return nil, err
+			}
+		case repo.FieldMember:
+			state.members = append(state.members, field.Object.ID)
+		case repo.FieldExternalIDKey:
+			state.keys = append(state.keys, field.Object.ID)
+		}
+	}
 	var events []eventstore.Command
 	for _, id := range slices.Sorted(maps.Keys(groups)) {
-		if groups[id].State.Exists() {
-			events = append(events, groupRemoval(ctx, groups[id]))
+		state := groups[id]
+		if state.name == "" {
+			return nil, zerrors.ThrowInternal(nil, "GROUP-lifecycle-fields", "Missing group lifecycle state")
 		}
+		slices.Sort(state.members)
+		slices.Sort(state.keys)
+		aggregate := eventstore.NewAggregate(ctx, id, repo.AggregateType, repo.AggregateVersion, eventstore.WithResourceOwner(orgID))
+		events = append(events, repo.NewGroupRemovedEvent(ctx, aggregate, state.name).WithMembers(state.members).WithExternalIDKeys(state.keys))
 	}
 	return events, nil
 }
 
 func (c *Commands) removeUserGroupMemberships(ctx context.Context, userID, orgID string) ([]eventstore.Command, error) {
-	//nolint:staticcheck // cascade discovery must replay authoritative state in this transaction.
-	groups, err := orgGroupWriteModels(ctx, c.eventstore.Filter, orgID)
+	fields, err := c.eventstore.Search(ctx, map[eventstore.FieldType]any{
+		eventstore.FieldTypeResourceOwner: orgID,
+		eventstore.FieldTypeAggregateType: repo.AggregateType,
+		eventstore.FieldTypeObjectType:    repo.FieldObjectType,
+		eventstore.FieldTypeFieldName:     repo.FieldMember,
+		eventstore.FieldTypeValue:         userID,
+	})
 	if err != nil {
 		return nil, err
 	}
-	var events []eventstore.Command
-	for _, id := range slices.Sorted(maps.Keys(groups)) {
-		group := groups[id]
-		if _, member := group.existingUserIDs[userID]; group.State.Exists() && member {
-			events = append(events, repo.NewGroupUserRemovedEvent(ctx, GroupAggregateFromWriteModel(ctx, &group.WriteModel), userID))
-		}
+	slices.SortFunc(fields, func(a, b *eventstore.SearchResult) int { return strings.Compare(a.Aggregate.ID, b.Aggregate.ID) })
+	events := make([]eventstore.Command, 0, len(fields))
+	for _, field := range fields {
+		aggregate := eventstore.NewAggregate(ctx, field.Aggregate.ID, repo.AggregateType, repo.AggregateVersion, eventstore.WithResourceOwner(orgID))
+		events = append(events, repo.NewGroupUserRemovedEvent(ctx, aggregate, userID))
 	}
 	return events, nil
 }

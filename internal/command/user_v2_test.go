@@ -1216,8 +1216,8 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 						),
 					),
 					expectFilterOrganizationSettings("org1", false, false),
-					expectFilter(),
-					expectGroupPush(
+					expectGroupFields(),
+					expectPush(
 						user.NewUserRemovedEvent(ctx,
 							userAgg,
 							"username",
@@ -1334,8 +1334,8 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 						),
 					),
 					expectFilterOrganizationSettings("org1", false, false),
-					expectFilter(),
-					expectGroupPush(
+					expectGroupFields(),
+					expectPush(
 						user.NewUserRemovedEvent(ctx,
 							userAgg,
 							"username",
@@ -1399,7 +1399,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 					),
 					expectFilterOrganizationSettings("org1", false, false),
 					expectGroupMembershipsFixture("user1", "org1", "group1", "group2"),
-					expectGroupPush(
+					expectPush(
 						user.NewUserRemovedEvent(ctx,
 							userAgg,
 							"username",

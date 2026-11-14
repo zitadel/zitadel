@@ -196,6 +196,8 @@ type Steps struct {
 	s74Apps7OIDCConfigsAddRegistrationToken *Apps7OIDCConfigsAddRegistrationToken
 	s75Apps7OIDCConfigsAddAppLinkConfig     *Apps7OIDCConfigsAddAppLinkConfig
 	s76UniqueConstraintClaimants            *UniqueConstraintClaimants
+	s77EventStatementPosition               *EventStatementPosition
+	s78GroupLifecycleFields                 *GroupLifecycleFields
 	RelationalTables                        *TransactionalTables
 }
 

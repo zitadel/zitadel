@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -16,7 +17,7 @@ type transactionState struct {
 
 // ContextWithTransaction binds command reads and writes to the same transaction.
 func ContextWithTransaction(ctx context.Context, tx *sql.Tx) context.Context {
-	return context.WithValue(ctx, transactionKey{}, &transactionState{tx: tx})
+	return context.WithValue(database.ContextWithTransaction(ctx, tx), transactionKey{}, &transactionState{tx: tx})
 }
 
 func transactionFromContext(ctx context.Context) *transactionState {

@@ -2,6 +2,7 @@ package projection
 
 import (
 	"context"
+	"crypto/sha256"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -12,13 +13,14 @@ import (
 )
 
 const (
-	GroupExternalIDsProjectionTable = "projections.group_external_ids1"
+	GroupExternalIDsProjectionTable = "projections.group_external_ids2"
 
 	GroupExternalIDsColumnGroupID       = "group_id"
 	GroupExternalIDsColumnScope         = "scope"
 	GroupExternalIDsColumnResourceOwner = "resource_owner"
 	GroupExternalIDsColumnInstanceID    = "instance_id"
 	GroupExternalIDsColumnValue         = "external_id"
+	GroupExternalIDsColumnDigest        = "external_id_sha256"
 )
 
 type groupExternalIDsProjection struct{}
@@ -39,9 +41,10 @@ func (*groupExternalIDsProjection) Init() *old_handler.Check {
 			handler.NewColumn(GroupExternalIDsColumnResourceOwner, handler.ColumnTypeText),
 			handler.NewColumn(GroupExternalIDsColumnInstanceID, handler.ColumnTypeText),
 			handler.NewColumn(GroupExternalIDsColumnValue, handler.ColumnTypeText),
+			handler.NewColumn(GroupExternalIDsColumnDigest, handler.ColumnTypeBytes),
 		},
 			handler.NewPrimaryKey(GroupExternalIDsColumnInstanceID, GroupExternalIDsColumnGroupID, GroupExternalIDsColumnScope),
-			handler.WithIndex(handler.NewIndex("lookup", []string{GroupExternalIDsColumnInstanceID, GroupExternalIDsColumnResourceOwner, GroupExternalIDsColumnScope})),
+			handler.WithIndex(handler.NewIndex("lookup", []string{GroupExternalIDsColumnInstanceID, GroupExternalIDsColumnResourceOwner, GroupExternalIDsColumnScope, GroupExternalIDsColumnDigest})),
 			handler.WithIndex(handler.NewIndex("group_id", []string{GroupExternalIDsColumnGroupID})),
 		),
 	)
@@ -95,6 +98,7 @@ func (g *groupExternalIDsProjection) reduceExternalIDSet(event eventstore.Event)
 			handler.NewCond(GroupExternalIDsColumnScope, e.Scope),
 		}), nil
 	}
+	digest := sha256.Sum256([]byte(e.ExternalID))
 	return handler.NewUpsertStatement(e, []handler.Column{
 		handler.NewCol(GroupExternalIDsColumnInstanceID, nil), handler.NewCol(GroupExternalIDsColumnGroupID, nil), handler.NewCol(GroupExternalIDsColumnScope, nil),
 	}, []handler.Column{
@@ -103,6 +107,7 @@ func (g *groupExternalIDsProjection) reduceExternalIDSet(event eventstore.Event)
 		handler.NewCol(GroupExternalIDsColumnResourceOwner, e.Aggregate().ResourceOwner),
 		handler.NewCol(GroupExternalIDsColumnScope, e.Scope),
 		handler.NewCol(GroupExternalIDsColumnValue, e.ExternalID),
+		handler.NewCol(GroupExternalIDsColumnDigest, digest[:]),
 	}), nil
 }
 

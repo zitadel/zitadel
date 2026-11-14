@@ -19,13 +19,15 @@ import (
 type MockRepository struct {
 	*MockPusher
 	*MockQuerier
+	*MockSearcher
 }
 
 func NewRepo(t *testing.T) *MockRepository {
 	controller := gomock.NewController(t)
 	return &MockRepository{
-		MockPusher:  NewMockPusher(controller),
-		MockQuerier: NewMockQuerier(controller),
+		MockPusher:   NewMockPusher(controller),
+		MockQuerier:  NewMockQuerier(controller),
+		MockSearcher: NewMockSearcher(controller),
 	}
 }
 
@@ -231,5 +233,10 @@ func (m *MockRepository) ExpectRandomPushFailed(err error, expectedEvents []even
 			return nil, err
 		},
 	)
+	return m
+}
+
+func (m *MockRepository) ExpectSearch(results ...*eventstore.SearchResult) *MockRepository {
+	m.MockSearcher.EXPECT().Search(gomock.Any(), gomock.Any()).Return(results, nil)
 	return m
 }
