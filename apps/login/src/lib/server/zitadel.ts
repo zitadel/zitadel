@@ -913,6 +913,32 @@ export async function getDefaultOrg({ serviceConfig }: WithServiceConfig): Promi
 }
 
 /**
+ * The domain settings of an organization (or the instance), among them whether
+ * login names are suffixed with the organization's domain. Cached per instance
+ * and organization like the other settings.
+ */
+export async function getDomainSettings({
+  serviceConfig,
+  organization,
+}: WithServiceConfig<{
+  organization?: string;
+}>) {
+  const fetcher = async () => {
+    const settingsService: Client<typeof SettingsService> = await createServiceForHost(SettingsService, serviceConfig);
+
+    return settingsService
+      .getDomainSettings({ ctx: makeReqCtx(organization) }, {})
+      .then((resp) => (resp.settings ? resp.settings : undefined));
+  };
+
+  return freshCache(
+    instanceCacheKey(serviceConfig, `getDomainSettings-${organization || "instance"}`),
+    fetcher,
+    getTTLForKey("getDomainSettings", defaultCacheTTL),
+  );
+}
+
+/**
  * The primary domain of an organization: the suffix of its users' login names
  * when "user login must be domain" is set. Cached per instance and organization.
  */

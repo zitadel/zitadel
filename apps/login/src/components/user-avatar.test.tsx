@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { UserAvatar } from "./user-avatar";
 
 vi.mock("@/lib/server/zitadel", () => ({
+  getDomainSettings: vi.fn(),
   getOrganizationPrimaryDomain: vi.fn(),
 }));
 
@@ -26,6 +27,7 @@ describe("UserAvatar", () => {
     const zitadel = await import("@/lib/server/zitadel");
     getOrganizationPrimaryDomain = vi.mocked(zitadel.getOrganizationPrimaryDomain);
     getOrganizationPrimaryDomain.mockResolvedValue("studio.example.com");
+    vi.mocked(zitadel.getDomainSettings).mockResolvedValue({ loginNameIncludesDomain: true } as never);
   });
 
   afterEach(() => {
