@@ -92,3 +92,33 @@ func TestCommands_MutateGroup_externalID(t *testing.T) {
 		require.Error(t, err)
 	})
 }
+
+func TestCommands_MutateGroup_validatesOncePerCall(t *testing.T) {
+	ctx := context.Background()
+	mutations := make([]GroupMutation, maxGroupMutations)
+	for i := range mutations {
+		mutations[i] = GroupMutation{Name: gu.Ptr("Engineering"), AddMembers: []string{"bob"}, RemoveMembers: []string{"alice"}}
+	}
+	checks := make(map[string]int)
+	c := &Commands{eventstore: expectEventstore(
+		expectFilterScoped(t, "org1", eventFromEventPusher(addNewGroupEvent("group1", "org1")), eventFromEventPusher(newGroupUserAddedEvent("group1", "org1", "alice"))),
+		// One existence query for all mutations; a second query fails as an unexpected call.
+		expectFilterScoped(t, "org1", eventFromEventPusher(addNewUserEvent("bob", "org1"))),
+		expectGroupPush(
+			repo.NewGroupChangedEvent(ctx, &repo.NewAggregate("group1", "org1").Aggregate, "group1", []repo.GroupChanges{repo.ChangeName(gu.Ptr("Engineering"))}),
+			newGroupUserAddedEvent("group1", "org1", "bob"), newGroupUserRemovedEvent("group1", "org1", "alice")),
+	)(t), checkPermission: func(_ context.Context, permission, _, _ string) error {
+		checks[permission]++
+		return nil
+	}}
+	_, err := c.MutateGroup(ctx, "group1", "org1", mutations)
+	require.NoError(t, err)
+	require.Len(t, checks, 3)
+	for permission, count := range checks {
+		require.Equal(t, 1, count, permission)
+	}
+
+	c = &Commands{eventstore: expectEventstore()(t), checkPermission: newMockPermissionCheckAllowed()}
+	_, err = c.MutateGroup(ctx, "group1", "org1", make([]GroupMutation, maxGroupMutations+1))
+	require.True(t, zerrors.IsErrorInvalidArgument(err), err)
+}

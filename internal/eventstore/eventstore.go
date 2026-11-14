@@ -130,29 +130,21 @@ func (es *Eventstore) PushWithNewClient(ctx context.Context, client new_db.Query
 		logPushedEvents(ctx, events)
 	}()
 
-	// Retry when there is a collision of the sequence as part of the primary key.
-	// "duplicate key value violates unique constraint \"events2_pkey\" (SQLSTATE 23505)"
-	// https://github.com/zitadel/zitadel/issues/7202
 retry:
 	for ; retries <= es.maxRetries; retries++ {
 		events, err = es.pusher.Push(ctx, client, cmds...)
+		if !isRetryablePushErr(err) {
+			break retry
+		}
 		// if there is a transaction passed the calling function needs to retry
 		if _, ok := client.(new_db.Transaction); ok {
+			if transactionFromContext(ctx) != nil {
+				// The lifecycle transaction is aborted, so the whole change must be retried.
+				err = zerrors.CreateZitadelError(ErrConcurrentModification.Kind, err, ErrConcurrentModification.ID, ErrConcurrentModification.Message, 0)
+			}
 			break retry
 		}
-		var pgErr *pgconn.PgError
-		if !errors.As(err, &pgErr) {
-			break retry
-		}
-		if pgErr.ConstraintName == "events2_pkey" && pgErr.SQLState() == "23505" {
-			logging.WithError(ctx, err).Info("eventstore push retry")
-			continue
-		}
-		if pgErr.SQLState() == "CR000" || pgErr.SQLState() == "40001" {
-			logging.WithError(ctx, err).Info("eventstore push retry")
-			continue
-		}
-		break retry
+		logging.WithError(ctx, err).Info("eventstore push retry")
 	}
 	if err != nil {
 		return nil, err
@@ -168,6 +160,19 @@ retry:
 		es.notify(mappedEvents)
 	}
 	return mappedEvents, nil
+}
+
+// isRetryablePushErr reports a sequence collision on events2_pkey
+// (https://github.com/zitadel/zitadel/issues/7202) or a serialization failure.
+func isRetryablePushErr(err error) bool {
+	var pgErr *pgconn.PgError
+	if !errors.As(err, &pgErr) {
+		return false
+	}
+	if pgErr.ConstraintName == "events2_pkey" && pgErr.SQLState() == "23505" {
+		return true
+	}
+	return pgErr.SQLState() == "CR000" || pgErr.SQLState() == "40001"
 }
 
 func AggregateTypeFromEventType(typ EventType) AggregateType {
@@ -201,7 +206,7 @@ func (es *Eventstore) Search(ctx context.Context, conditions ...map[FieldType]an
 //
 // Deprecated: Use [FilterToQueryReducer] instead to avoid allocations.
 func (es *Eventstore) Filter(ctx context.Context, searchQuery *SearchQueryBuilder) ([]Event, error) {
-	if state := transactionFromContext(ctx); state != nil {
+	if state := transactionFromContext(ctx); state != nil && searchQuery.GetTx() == nil {
 		searchQuery.SetTx(state.tx)
 	}
 	events := make([]Event, 0, searchQuery.GetLimit())
@@ -261,7 +266,7 @@ type reducer interface {
 
 // FilterToReducer filters the events based on the search query, appends all events to the reducer and calls it's reduce function
 func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQueryBuilder, r reducer) error {
-	if state := transactionFromContext(ctx); state != nil {
+	if state := transactionFromContext(ctx); state != nil && searchQuery.GetTx() == nil {
 		searchQuery.SetTx(state.tx)
 	}
 	searchQuery.ensureInstanceID(ctx)

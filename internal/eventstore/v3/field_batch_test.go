@@ -115,6 +115,19 @@ func TestFieldBatch(t *testing.T) {
 	count(3)
 	value("a", "after broad delete")
 
+	// Removes by aggregate batch together, but not with removes by field.
+	otherGroup := *aggregate
+	otherGroup.ID = "other-group"
+	run([]*eventstore.FieldOperation{field("a", "a"), field("b", "b")}, 1, false)
+	otherField := field("x", "x")
+	otherField.Set.Aggregate = &otherGroup
+	run([]*eventstore.FieldOperation{otherField}, 1, false)
+	count(4)
+	run([]*eventstore.FieldOperation{eventstore.RemoveSearchFieldsByAggregate(aggregate), eventstore.RemoveSearchFieldsByAggregate(&otherGroup),
+		remove("never")}, 2, false)
+	count(1)
+	run([]*eventstore.FieldOperation{field("a", "after broad delete"), field("b", "b")}, 1, false)
+
 	// A failed later statement must roll back the preceding batch as well.
 	run([]*eventstore.FieldOperation{remove("a"), remove("b"), field("bad", []string{"not primitive"}), field("c", "c")}, 2, true)
 	count(3)
@@ -132,9 +145,12 @@ func TestBatchFieldKeyFallback(t *testing.T) {
 		{Set: &eventstore.Field{Value: eventstore.Value{MustBeUnique: true}}},
 		{Set: &eventstore.Field{UpsertConflictFields: []eventstore.FieldType{eventstore.FieldTypeObjectID}}},
 		{Set: &eventstore.Field{UpsertConflictFields: make([]eventstore.FieldType, 8)}},
-		eventstore.RemoveSearchFieldsByAggregate(&eventstore.Aggregate{}),
+		{Remove: map[eventstore.FieldType]any{eventstore.FieldTypeInstanceID: "i", eventstore.FieldTypeObjectType: "o",
+			eventstore.FieldTypeObjectID: "id", eventstore.FieldTypeFieldName: "f"}},
 	} {
-		_, eligible := batchFieldKey(operation)
-		require.False(t, eligible)
+		_, kind := batchFieldKey(operation)
+		require.Equal(t, fieldBatchKindNone, kind)
 	}
+	_, kind := batchFieldKey(eventstore.RemoveSearchFieldsByAggregate(&eventstore.Aggregate{}))
+	require.Equal(t, fieldBatchKindRemoveByAggregate, kind)
 }

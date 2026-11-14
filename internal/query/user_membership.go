@@ -132,8 +132,7 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	// Refreshing projections needs separate connections and cannot run while a lifecycle transaction holds one.
-	if shouldTrigger && database.TransactionFromContext(ctx) == nil {
+	if shouldTrigger {
 		wg := sync.WaitGroup{}
 		wg.Add(4)
 		go func() {

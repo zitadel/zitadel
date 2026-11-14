@@ -197,8 +197,8 @@ type Steps struct {
 	s75Apps7OIDCConfigsAddAppLinkConfig     *Apps7OIDCConfigsAddAppLinkConfig
 	s76UniqueConstraintClaimants            *UniqueConstraintClaimants
 	s77EventStatementPosition               *EventStatementPosition
-	s78GroupLifecycleFields                 *GroupLifecycleFields
 	RelationalTables                        *TransactionalTables
+	GroupLifecycleFields                    *GroupLifecycleFields
 }
 
 func NewSteps(ctx context.Context, v *viper.Viper) (*Steps, error) {

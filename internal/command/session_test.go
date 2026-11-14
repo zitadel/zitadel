@@ -1087,7 +1087,7 @@ func TestCheckTOTP(t *testing.T) {
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	orgAgg := &org.NewAggregate("org1").Aggregate
 
-	code, err := totp.GenerateCode(key.Secret(), testNow)
+	code, err := totp.GenerateCode(key.Secret(), time.Now()) // domain.CheckTOTP validates against the real clock, not testNow.
 	require.NoError(t, err)
 
 	type fields struct {

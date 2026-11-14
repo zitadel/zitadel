@@ -108,7 +108,9 @@ func (adapter *ResourceHandlerAdapter[T]) ListFromHttp(r *http.Request) (*ListRe
 func (adapter *ResourceHandlerAdapter[T]) GetFromHttp(r *http.Request) (T, error) {
 	id := mux.Vars(r)["id"]
 	resource, err := adapter.handler.Get(r.Context(), id)
-	if group, ok := any(resource).(*ScimGroup); ok && group != nil && excludeGroupMembers(r.URL.Query().Get("excludedAttributes")) {
+	var excluded Attributes
+	_ = excluded.UnmarshalText([]byte(r.URL.Query().Get("excludedAttributes")))
+	if group, ok := any(resource).(*ScimGroup); ok && group != nil && excludeGroupMembers(excluded) {
 		group.Members = nil
 	}
 	return resource, err

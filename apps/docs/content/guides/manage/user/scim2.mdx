@@ -12,7 +12,7 @@ For full reference details of Zitadel’s SCIM API, consult the API documentatio
 
 ## Provisioning domain
 
-A **provisioning domain** represents an external administrative domain—separate from the service provider—typically introduced for legal, organizational, or technical reasons.
+A **provisioning domain** represents an external administrative domain - separate from the service provider - typically introduced for legal, organizational, or technical reasons.
 Refer to the SCIM specification definitions in **RFC7643**:
 https://datatracker.ietf.org/doc/html/rfc7643#section-1.2
 
@@ -104,7 +104,9 @@ Other extended schemas are not supported.
 
 The `/Groups` endpoint supports create, get, list, replace (`PUT`), update (`PATCH`), and delete.
 Group lookup supports filters on `displayName` (case-insensitive), `id`, and `externalId` (case-exact equality), with `startIndex` and `count` pagination.
-GET and list responses include members by default; `excludedAttributes=members` omits them.
+GET `/Groups/{id}` includes members by default; `excludedAttributes=members` omits them.
+List and `.search` responses never include members; get a single group to read its members.
+`excludedAttributes` accepts a comma-separated string or, in a `POST /.search` body, a JSON array of strings.
 
 #### Okta and Microsoft Entra ID
 
@@ -128,6 +130,7 @@ The following provisioning payloads are supported:
 
 Operation names are case-insensitive, including Entra's `Add`, `Replace`, and `Remove`.
 Successful PATCH requests return HTTP 204. Repeated additions and removals are idempotent.
+A PATCH request accepts at most 1000 operations.
 Members must already exist in the same organization as the group.
 
 Create with members, PUT, and a batch of PATCH operations validate before committing their changes in one transaction.
@@ -135,8 +138,9 @@ A failed mutation does not leave a partial rename or membership change. Reads us
 Group writes check the group revision at commit and retry conflicting operations from fresh state, with at most three attempts.
 Continued contention returns HTTP 409; retry the request. External ID reservations belong to the claiming group,
 so stale releases cannot remove another group’s binding. Group changes, group grants, user deletion, and organization
-deletion share a database transaction lock per instance. Deletion discovers memberships from authoritative events,
-including changes that have not reached the read projections, and commits the cascade in that same transaction.
+deletion share a database transaction lock per instance.
+Deletion reads memberships from group lifecycle state that each write maintains in the same transaction as its events.
+This includes changes that have not reached the read projections, and the cascade commits in that same transaction.
 
 ### Group notifications for headless applications
 
@@ -150,8 +154,41 @@ not the organization or target. Subscriptions can omit events, so sequences need
 Discarding older membership deltas can lose independent changes. Reconcile current group state instead,
 accounting for eventually consistent reads with retries or periodic reconciliation.
 
-Webhook retry reliability is unchanged by SCIM group support: target errors may cancel a job or be ignored,
-and queued jobs can expire. Reliable retry and failed-message recovery require separate Actions changes.
+If a target fails to receive a queued event, the job fails and the queue retries it with backoff.
+Retries continue until `Executions.MaxTtl` passes, counted from job creation (default 5 minutes).
+Each retry sends the event to the full target list again, so targets that already received it can get duplicates.
+Errors that cannot succeed on retry, such as missing keys or an invalid target configuration, cancel the job without retries.
+The async targets of one queued event run at the same time.
+All targets of one queued event, including async targets, must finish within `Executions.TransactionDuration` (default 10 seconds).
+When that time runs out or the worker stops, delivery stops and the job is retried.
+To give slow targets more time, increase `Executions.TransactionDuration`.
+A failed async target does not stop the other targets.
+
+### Upgrade
+
+The group lifecycle state that SCIM deletion reads must be in place before new binaries serve requests.
+Older API instances do not maintain this state, so do not do a normal rolling update where setup runs while old instances still serve.
+Use these steps:
+
+1. Stop all older API instances that write events.
+2. Run `zitadel setup` until it completes. This runs migrations 76 to 78, including the group lifecycle backfill.
+3. Start the new binaries.
+
+After you run `zitadel mirror`, increase `GroupLifecycleFields.Rerun` by one and run `zitadel setup` before you start the new binaries.
+
+If you roll back and run older binaries again, they do not keep the group lifecycle state current.
+Before you start the new binaries again, rebuild that state:
+
+1. Stop all older API instances that write events.
+2. Increase the setup step value `GroupLifecycleFields.Rerun` by one, for example with `ZITADEL_GROUPLIFECYCLEFIELDS_RERUN=2`.
+3. Run `zitadel setup` until it completes. Setup runs the backfill again because the value changed, and it records the new run in the migration history.
+4. Start the new binaries.
+
+The rerun also releases the external ID bindings of groups that the older binaries deleted, so those external IDs can be used again.
+
+Setup runs the backfill only when the value differs from the value of the last run.
+Keep the new value for later setup runs.
+If you change the value back, setup runs the backfill again; this is safe, but it takes time on large installations.
 
 Zitadel groups are **flat**:
 

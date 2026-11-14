@@ -81,7 +81,7 @@ func TestEventstore_UniqueConstraintArrays_legacyMatching(t *testing.T) {
 					}
 					_, err := pusher.Push(ctx, nil, claimedCommand(typ, "group", nil, eventstore.NewRemoveUniqueConstraint(string(typ), "MiXeD")))
 					require.NoError(t, err)
-					rows, err := clients[name].DB.QueryContext(ctx, "SELECT unique_field FROM eventstore.unique_constraints WHERE unique_type = $1 ORDER BY unique_field", typ)
+					rows, err := clients[name].DB.QueryContext(ctx, "SELECT unique_field FROM eventstore.unique_constraints WHERE unique_type = $1 ORDER BY unique_field COLLATE \"C\"", typ)
 					require.NoError(t, err)
 					defer rows.Close()
 					got := []string{}

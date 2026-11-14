@@ -260,7 +260,11 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s75Apps7OIDCConfigsAddAppLinkConfig = &Apps7OIDCConfigsAddAppLinkConfig{dbClient: dbClient}
 	steps.s76UniqueConstraintClaimants = &UniqueConstraintClaimants{dbClient: dbClient}
 	steps.s77EventStatementPosition = &EventStatementPosition{dbClient: dbClient}
-	steps.s78GroupLifecycleFields = &GroupLifecycleFields{dbClient: dbClient}
+
+	// Every pushed unique constraint writes the columns of step 76, also the one of each migration started event.
+	if setupErr = steps.s76UniqueConstraintClaimants.Execute(ctx, nil); setupErr != nil {
+		return fmt.Errorf("unable to add unique constraint claimant columns: %w", setupErr)
+	}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	if err != nil {
@@ -321,7 +325,6 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s69CacheTablesLogged,
 		steps.s70AddEventStoreCommandEnforceOwner,
 		steps.s77EventStatementPosition,
-		steps.s78GroupLifecycleFields,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
@@ -333,6 +336,10 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s59SetupWebkeys = &SetupWebkeys{eventstore: eventstoreClient, commands: commands}
 
 	repeatableSteps := []migration.RepeatableMigration{
+		&GroupLifecycleFields{
+			dbClient: dbClient,
+			Rerun:    steps.GroupLifecycleFields.Rerun,
+		},
 		&externalConfigChange{
 			es:             eventstoreClient,
 			ExternalDomain: config.ExternalDomain,

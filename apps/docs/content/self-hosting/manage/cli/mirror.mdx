@@ -60,8 +60,11 @@ zitadel mirror --system --config /path/to/your/mirror/config.yaml # make sure to
 
 The last step is to setup the permissions and verify the data, there might be differences between source and destination, refer to [`zitadel mirror verify`](#zitadel-mirror-verify) to get an overview of possible diffs.
 
+The mirror does not copy the group lifecycle state, which includes the group names, members and external IDs.
+Set `ZITADEL_GROUPLIFECYCLEFIELDS_RERUN` to a value which differs from the previous setup run, so that setup rebuilds this state from the mirrored events.
+
 ```bash
-zitadel setup --for-mirror --config /path/to/your/new/config.yaml # make sure to set --tlsMode and masterkey analog to your current deployment
+ZITADEL_GROUPLIFECYCLEFIELDS_RERUN=$(date +%s) zitadel setup --for-mirror --config /path/to/your/new/config.yaml # make sure to set --tlsMode and masterkey analog to your current deployment
 zitadel mirror verify --system --config /path/to/your/mirror/config.yaml # make sure to set --tlsMode and masterkey analog to your current deployment
 ```
 

@@ -79,8 +79,7 @@ func TestGroups_providerProvisioning(t *testing.T) {
 			groups, err := Instance.Client.SCIM.Groups.List(CTX, orgID, &scim.ListRequest{Filter: gu.Ptr(fmt.Sprintf(`id eq %q`, groupID))})
 			require.NoError(t, err)
 			require.Len(t, groups.Resources, 1)
-			require.Len(t, groups.Resources[0].Members, 1)
-			assert.Equal(t, bob, groups.Resources[0].Members[0].Value)
+			assert.Empty(t, groups.Resources[0].Members, "list responses never include members")
 			// A later invalid member must roll back an earlier rename and removal.
 			require.Error(t, update(fmt.Sprintf(`[{"op":"replace","path":"displayName","value":%q},{"op":"remove","path":"members"},{"op":"add","path":"members","value":[{"value":"missing-user"}]}]`, integration.GroupName())))
 			check(renamed, bob)

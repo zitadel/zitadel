@@ -17,27 +17,46 @@ var fieldBatchSet string
 //go:embed field_batch_remove.sql
 var fieldBatchRemove string
 
-// Only full-identity operations without value uniqueness can be reordered within a statement.
-func batchFieldKey(operation *eventstore.FieldOperation) (key [8]string, eligible bool) {
+//go:embed field_batch_remove_aggregate.sql
+var fieldBatchRemoveAggregate string
+
+type fieldBatchKind int
+
+const (
+	fieldBatchKindNone fieldBatchKind = iota
+	fieldBatchKindSet
+	fieldBatchKindRemoveField
+	// Removes by the four aggregate columns, like [eventstore.RemoveSearchFieldsByAggregate].
+	fieldBatchKindRemoveByAggregate
+)
+
+const aggregateKeyLen = 4
+
+// Only full-identity operations without value uniqueness, and removes by full
+// identity or by aggregate, can be reordered within a statement.
+func batchFieldKey(operation *eventstore.FieldOperation) (key [8]string, kind fieldBatchKind) {
 	if field := operation.Set; field != nil {
 		if field.Value.MustBeUnique || len(field.UpsertConflictFields) != len(key) {
-			return key, false
+			return key, fieldBatchKindNone
 		}
 		var seen [8]bool
 		for _, typ := range field.UpsertConflictFields {
 			if typ < 0 || int(typ) >= len(seen) || seen[typ] {
-				return key, false
+				return key, fieldBatchKindNone
 			}
 			seen[typ] = true
 		}
 		return [8]string{string(field.Aggregate.Type), field.Aggregate.ID, field.Aggregate.InstanceID,
 			field.Aggregate.ResourceOwner, field.Object.Type, field.Object.ID,
-			strconv.Itoa(int(field.Object.Revision)), field.FieldName}, true
+			strconv.Itoa(int(field.Object.Revision)), field.FieldName}, fieldBatchKindSet
 	}
-	if len(operation.Remove) != len(key) {
-		return key, false
+	kind = fieldBatchKindRemoveField
+	if len(operation.Remove) == aggregateKeyLen {
+		kind = fieldBatchKindRemoveByAggregate
+	} else if len(operation.Remove) != len(key) {
+		return key, fieldBatchKindNone
 	}
-	for i := range key {
+	for i := range len(operation.Remove) {
 		switch value := operation.Remove[eventstore.FieldType(i)].(type) {
 		case string:
 			key[i] = value
@@ -46,13 +65,13 @@ func batchFieldKey(operation *eventstore.FieldOperation) (key [8]string, eligibl
 		case uint8:
 			key[i] = strconv.Itoa(int(value))
 		default:
-			return key, false
+			return key, fieldBatchKindNone
 		}
 	}
-	return key, true
+	return key, kind
 }
 
-func handleFieldBatch(ctx context.Context, tx database.Transaction, operations []*eventstore.FieldOperation) error {
+func handleFieldBatch(ctx context.Context, tx database.Transaction, kind fieldBatchKind, operations []*eventstore.FieldOperation) error {
 	var columns [8][]string
 	for i := range columns {
 		columns[i] = make([]string, len(operations))
@@ -78,9 +97,13 @@ func handleFieldBatch(ctx context.Context, tx database.Transaction, operations [
 		args = append(args, column)
 	}
 	stmt := fieldBatchRemove
-	if operations[0].Set != nil {
+	switch kind {
+	case fieldBatchKindSet:
 		stmt = fieldBatchSet
 		args = append(args, values, indexed)
+	case fieldBatchKindRemoveByAggregate:
+		stmt = fieldBatchRemoveAggregate
+		args = args[:aggregateKeyLen]
 	}
 	_, err := tx.Exec(ctx, stmt, args...)
 	return err

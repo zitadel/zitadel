@@ -162,22 +162,22 @@ func handleFieldFillEvents(ctx context.Context, tx database.Transaction, events 
 func handleFieldOperations(ctx context.Context, tx database.Transaction, operations []*eventstore.FieldOperation) error {
 	for i := 0; i < len(operations); {
 		operation := operations[i]
-		key, eligible := batchFieldKey(operation)
-		if eligible {
+		key, kind := batchFieldKey(operation)
+		if kind != fieldBatchKindNone {
 			keys := map[[8]string]struct{}{key: {}}
 			end := i + 1
 			for end < len(operations) {
-				next, ok := batchFieldKey(operations[end])
+				next, nextKind := batchFieldKey(operations[end])
 				_, repeated := keys[next]
 				// A repeated key or a change of operation must observe preceding writes.
-				if !ok || repeated || (operation.Set == nil) != (operations[end].Set == nil) {
+				if nextKind != kind || repeated {
 					break
 				}
 				keys[next] = struct{}{}
 				end++
 			}
 			if end-i > 1 {
-				if err := handleFieldBatch(ctx, tx, operations[i:end]); err != nil {
+				if err := handleFieldBatch(ctx, tx, kind, operations[i:end]); err != nil {
 					return err
 				}
 				i = end

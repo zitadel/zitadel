@@ -21,8 +21,14 @@ type GroupMutation struct {
 	RemoveMembers []string
 }
 
+// maxGroupMutations bounds the work done while the instance lock is held.
+const maxGroupMutations = 1000
+
 // MutateGroup validates all mutations before persisting their events in one transaction.
 func (c *Commands) MutateGroup(ctx context.Context, groupID, orgID string, mutations []GroupMutation) (*domain.ObjectDetails, error) {
+	if len(mutations) > maxGroupMutations {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "CMDGRP-mut3", "at most %d group mutations are allowed", maxGroupMutations)
+	}
 	return c.retryGroupChange(ctx, func(ctx context.Context) (*domain.ObjectDetails, error) {
 		return c.mutateGroupOnce(ctx, groupID, orgID, mutations)
 	})
@@ -42,10 +48,10 @@ func (c *Commands) mutateGroupOnce(ctx context.Context, groupID, orgID string, m
 	name := group.Name
 	externalIDs := maps.Clone(group.ExternalIDs)
 	members := maps.Clone(group.existingUserIDs)
+	if err := c.validateGroupMutations(ctx, groupID, orgID, mutations); err != nil {
+		return nil, err
+	}
 	for _, mutation := range mutations {
-		if err := c.validateGroupMutation(ctx, groupID, orgID, mutation); err != nil {
-			return nil, err
-		}
 		if mutation.ExternalID != nil {
 			externalIDs[mutation.ExternalID.Scope] = mutation.ExternalID.Value
 		}
@@ -87,33 +93,43 @@ func (c *Commands) mutateGroupOnce(ctx context.Context, groupID, orgID string, m
 	return c.pushAppendAndReduceDetails(ctx, group, events...)
 }
 
-func (c *Commands) validateGroupMutation(ctx context.Context, groupID, orgID string, mutation GroupMutation) error {
-	if err := (&UpdateGroup{Name: mutation.Name}).IsValid(); err != nil {
-		return err
+// validateGroupMutations runs each permission check and the user existence query
+// at most once, because they run while the instance lock is held.
+func (c *Commands) validateGroupMutations(ctx context.Context, groupID, orgID string, mutations []GroupMutation) error {
+	var update, add, remove bool
+	var added []string
+	for _, mutation := range mutations {
+		if err := (&UpdateGroup{Name: mutation.Name}).IsValid(); err != nil {
+			return err
+		}
+		if err := mutation.ExternalID.IsValid(); err != nil {
+			return err
+		}
+		update = update || mutation.Name != nil || mutation.ExternalID != nil
+		add = add || mutation.Members != nil || len(mutation.AddMembers) > 0
+		remove = remove || mutation.Members != nil || len(mutation.RemoveMembers) > 0
+		added = append(added, mutation.AddMembers...)
+		if mutation.Members != nil {
+			added = append(added, (*mutation.Members)...)
+		}
 	}
-	if err := mutation.ExternalID.IsValid(); err != nil {
-		return err
-	}
-	if mutation.Name != nil || mutation.ExternalID != nil {
+	if update {
 		if err := c.checkPermissionUpdateGroup(ctx, orgID, groupID); err != nil {
 			return err
 		}
 	}
-	if mutation.Members != nil || len(mutation.AddMembers) > 0 {
+	if add {
 		if err := c.checkPermissionAddUserToGroup(ctx, orgID, groupID); err != nil {
 			return err
 		}
-		added := mutation.AddMembers
-		if mutation.Members != nil {
-			added = append(slices.Clone(added), (*mutation.Members)...)
-		}
-		if len(added) > 0 {
-			if err := c.checkUsersExist(ctx, added, orgID); err != nil {
-				return err
-			}
+	}
+	if len(added) > 0 {
+		slices.Sort(added)
+		if err := c.checkUsersExist(ctx, slices.Compact(added), orgID); err != nil {
+			return err
 		}
 	}
-	if mutation.Members != nil || len(mutation.RemoveMembers) > 0 {
+	if remove {
 		return c.checkPermissionRemoveUserFromGroup(ctx, orgID, groupID)
 	}
 	return nil

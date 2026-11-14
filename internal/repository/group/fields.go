@@ -46,8 +46,8 @@ func (e *GroupUserRemovedEvent) Fields() []*eventstore.FieldOperation {
 
 func (e *GroupExternalIDSetEvent) Fields() []*eventstore.FieldOperation {
 	var fields []*eventstore.FieldOperation
-	if e.oldExternalID != "" {
-		key := externalIDConstraintKey(e.Aggregate().ResourceOwner, e.Scope, e.oldExternalID)
+	if e.OldExternalID != "" {
+		key := externalIDConstraintKey(e.Aggregate().ResourceOwner, e.Scope, e.OldExternalID)
 		fields = append(fields, removeGroupField(e.Aggregate(), key, FieldExternalIDKey))
 	}
 	if e.ExternalID != "" {

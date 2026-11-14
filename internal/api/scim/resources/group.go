@@ -222,14 +222,8 @@ func (h *GroupsHandler) List(ctx context.Context, request *ListRequest) (*ListRe
 	}
 	scimGroups := make([]*ScimGroup, len(groups.Groups))
 	for i, group := range groups.Groups {
-		var members []*query.GroupUser
-		if !excludeGroupMembers(request.ExcludedAttributes) {
-			members, err = h.groupMembers(ctx, group.ID)
-			if err != nil {
-				return nil, err
-			}
-		}
-		scimGroups[i] = h.mapToScimGroup(ctx, group, members)
+		// members are omitted in listings, use a get on the single group to resolve them
+		scimGroups[i] = h.mapToScimGroup(ctx, group, nil)
 		scimGroups[i].ExternalID = bindings[group.ID]
 	}
 	return NewListResponse(groups.Count, sr, scimGroups), nil
@@ -305,8 +299,8 @@ func (h *GroupsHandler) mapToScimGroup(ctx context.Context, group *query.Group, 
 	return scimGroup
 }
 
-func excludeGroupMembers(attributes string) bool {
-	for _, attribute := range strings.Split(attributes, ",") {
+func excludeGroupMembers(attributes Attributes) bool {
+	for _, attribute := range attributes {
 		if strings.EqualFold(strings.TrimSpace(attribute), "members") || strings.EqualFold(strings.TrimSpace(attribute), string(scim_schemas.IdGroup)+":members") {
 			return true
 		}

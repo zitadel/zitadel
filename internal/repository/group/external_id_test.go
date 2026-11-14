@@ -2,6 +2,7 @@ package group
 
 import (
 	"context"
+	"encoding/json"
 	"strings"
 	"testing"
 
@@ -39,4 +40,23 @@ func TestGroupExternalIDConstraints(t *testing.T) {
 	removed := NewGroupRemovedEvent(context.Background(), aggregate, "name", map[string]string{"entra": "ABC"}).UniqueConstraints()
 	require.Len(t, removed, 2)
 	require.Equal(t, NewRemoveGroupExternalIDUniqueConstraint("group", "org", "entra", "ABC"), removed[1])
+}
+
+func TestGroupExternalIDSetEventPersistsOldExternalID(t *testing.T) {
+	aggregate := &NewAggregate("group", "org").Aggregate
+	event := NewGroupExternalIDSetEvent(context.Background(), aggregate, "entra", "old", "new")
+	payload, err := json.Marshal(event.Payload())
+	require.NoError(t, err)
+
+	stored := new(GroupExternalIDSetEvent)
+	require.NoError(t, json.Unmarshal(payload, stored))
+	stored.SetBaseEvent(&event.BaseEvent)
+
+	require.Equal(t, "old", stored.OldExternalID)
+	require.Equal(t, event.UniqueConstraints(), stored.UniqueConstraints())
+	require.Equal(t, NewRemoveGroupExternalIDUniqueConstraint("group", "org", "entra", "old"), stored.UniqueConstraints()[0])
+	fields := stored.Fields()
+	require.Equal(t, event.Fields(), fields)
+	require.Len(t, fields, 2)
+	require.Equal(t, removeGroupField(aggregate, externalIDConstraintKey("org", "entra", "old"), FieldExternalIDKey), fields[0])
 }

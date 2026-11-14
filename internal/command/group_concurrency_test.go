@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/muhlemmer/gu"
@@ -10,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	repo "github.com/zitadel/zitadel/internal/repository/group"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // The existing fixtures replay events at sequence zero. Explicitly expect that
@@ -90,4 +92,32 @@ func TestGroupWriteModel_revisionIncludesManagerRoles(t *testing.T) {
 	wm.AppendEvents(added, roles)
 	require.NoError(t, wm.Reduce())
 	require.Equal(t, uint64(4), *GroupAggregateFromWriteModel(context.Background(), &wm.WriteModel).ExpectedSequence)
+}
+
+func TestRetryGroupChange_refreshesMembershipsOutsideLock(t *testing.T) {
+	var calls []string
+	inLock := false
+	c := &Commands{eventstore: expectEventstore()(t), refreshMemberProjections: func(context.Context) {
+		require.False(t, inLock, "projections cannot be triggered inside the lock transaction")
+		calls = append(calls, "refresh")
+	}}
+	change := func(err error) func(context.Context) (*domain.ObjectDetails, error) {
+		return func(context.Context) (*domain.ObjectDetails, error) {
+			inLock = true
+			defer func() { inLock = false }()
+			calls = append(calls, "change")
+			if len(calls) == 1 || err != nil {
+				return nil, zerrors.ThrowNotFound(err, "AUTHZ-cdgFk", "membership not found")
+			}
+			return &domain.ObjectDetails{}, nil
+		}
+	}
+	_, err := c.retryGroupChange(context.Background(), change(nil))
+	require.NoError(t, err)
+	require.Equal(t, []string{"change", "refresh", "change"}, calls)
+
+	calls = nil
+	_, err = c.retryGroupChange(context.Background(), change(errors.New("still missing")))
+	require.True(t, zerrors.IsNotFound(err))
+	require.Equal(t, []string{"change", "refresh", "change"}, calls, "refresh and retry only once")
 }

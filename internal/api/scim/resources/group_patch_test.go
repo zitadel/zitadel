@@ -63,11 +63,16 @@ func TestGroupMutations(t *testing.T) {
 }
 
 func TestExcludeGroupMembers(t *testing.T) {
+	parse := func(value string) Attributes {
+		var attributes Attributes
+		require.NoError(t, attributes.UnmarshalText([]byte(value)))
+		return attributes
+	}
 	for _, value := range []string{"members", " Members ,displayName", "urn:ietf:params:scim:schemas:core:2.0:Group:members"} {
-		require.True(t, excludeGroupMembers(value))
+		require.True(t, excludeGroupMembers(parse(value)))
 	}
 	for _, value := range []string{"", "members.value", "displayName"} {
-		require.False(t, excludeGroupMembers(value))
+		require.False(t, excludeGroupMembers(parse(value)))
 	}
 }
 
