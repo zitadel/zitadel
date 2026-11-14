@@ -3,6 +3,7 @@
 import { completeFlowOrGetUrl } from "@/lib/actions/flow";
 import { updateOrCreateSession } from "@/lib/actions/session";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useResendCooldown } from "@/lib/use-resend-cooldown";
 import { create } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -39,6 +40,8 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
 
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const resendCooldown = useResendCooldown();
+  const { start: startResendCooldown } = resendCooldown;
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const router = useRouter();
@@ -99,13 +102,15 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
         .then((response) => {
           if (response?.error) {
             setError(response.error);
+          } else {
+            startResendCooldown();
           }
         })
         .finally(() => {
           setLoading(false);
         });
     }
-  }, [updateSessionForOTPChallenge, method, code]);
+  }, [updateSessionForOTPChallenge, method, code, startResendCooldown]);
 
   async function submitCode(values: Inputs, organization?: string) {
     setLoading(true);
@@ -207,21 +212,24 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
                 <Translated i18nKey="verify.noCodeReceived" namespace="otp" />
               </span>
               <button
-                aria-label={t("verify.resendCode")}
-                disabled={loading}
+                aria-label={`${t("verify.resendCode")}${resendCooldown.suffix}`}
+                disabled={loading || resendCooldown.isCoolingDown}
                 type="button"
-                className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
+                className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-500 dark:disabled:text-gray-400"
                 onClick={async () => {
                   setLoading(true);
                   const response = await updateSessionForOTPChallenge();
                   if (response?.error) {
                     setError(response.error);
+                  } else {
+                    resendCooldown.start();
                   }
                   setLoading(false);
                 }}
                 data-testid="resend-button"
               >
                 <Translated i18nKey="verify.resendCode" namespace="otp" />
+                {resendCooldown.suffix}
               </button>
             </div>
           </Alert>
