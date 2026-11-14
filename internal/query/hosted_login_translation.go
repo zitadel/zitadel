@@ -128,13 +128,29 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 		sq.Eq{hostedLoginTranslationColLocale.identifier(): lang.String()},
 		sq.Eq{hostedLoginTranslationColLocale.identifier(): parentLang.String()},
 	}
-	eq := sq.Eq{
+	var levels sq.Sqlizer = sq.Eq{
 		hostedLoginTranslationColInstanceID.identifier():        inst.InstanceID(),
 		hostedLoginTranslationColResourceOwner.identifier():     levelID,
 		hostedLoginTranslationColResourceOwnerType.identifier(): resourceOwner,
 	}
+	// An organization inherits its instance's translations, so they are read together
+	if resourceOwner == org.AggregateType && !req.GetIgnoreInheritance() {
+		levels = sq.And{
+			sq.Eq{hostedLoginTranslationColInstanceID.identifier(): inst.InstanceID()},
+			sq.Or{
+				sq.Eq{
+					hostedLoginTranslationColResourceOwner.identifier():     levelID,
+					hostedLoginTranslationColResourceOwnerType.identifier(): org.AggregateType,
+				},
+				sq.Eq{
+					hostedLoginTranslationColResourceOwner.identifier():     inst.InstanceID(),
+					hostedLoginTranslationColResourceOwnerType.identifier(): instance.AggregateType,
+				},
+			},
+		}
+	}
 
-	query, args, err := stmt.Where(eq).Where(langORBaseLang).ToSql()
+	query, args, err := stmt.Where(levels).Where(langORBaseLang).ToSql()
 	if err != nil {
 		logging.WithError(err).Error("unable to generate sql statement")
 		return nil, zerrors.ThrowInternal(err, "QUERY-ZgCMux", "Errors.Query.SQLStatement")
@@ -150,20 +166,20 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 		return nil, zerrors.ThrowInternal(err, "QUERY-6k1zjx", "Errors.Internal")
 	}
 
-	requestedTranslation, parentTranslation := &HostedLoginTranslation{}, &HostedLoginTranslation{}
-	for _, tr := range trs {
-		if tr == nil {
-			continue
-		}
-
-		if tr.LevelType == resourceOwner {
-			requestedTranslation = tr
-		} else {
-			parentTranslation = tr
+	inherit := !req.GetIgnoreInheritance()
+	requestedTranslation, err := levelTranslation(trs, resourceOwner, lang.String(), parentLang.String(), inherit)
+	if err != nil {
+		return nil, err
+	}
+	parentTranslation := &HostedLoginTranslation{}
+	if resourceOwner == org.AggregateType && inherit {
+		parentTranslation, err = levelTranslation(trs, instance.AggregateType, lang.String(), parentLang.String(), inherit)
+		if err != nil {
+			return nil, err
 		}
 	}
 
-	if !req.GetIgnoreInheritance() {
+	if inherit {
 
 		// There is no record for the requested level, set the upper level etag
 		if requestedTranslation.Etag == "" {
@@ -192,6 +208,37 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 	return getTranslationOutputMessage(requestedTranslation.File, requestedTranslation.Etag)
 }
 
+// levelTranslation picks a level's translation out of the rows, which can hold one for the
+// requested locale and one for its base language. The locale wins; with inheritance, the base
+// language fills in the keys it lacks, and without it the base language is only a fallback.
+func levelTranslation(trs []*HostedLoginTranslation, levelType, locale, baseLocale string, inherit bool) (*HostedLoginTranslation, error) {
+	var exact, base *HostedLoginTranslation
+	for _, tr := range trs {
+		if tr == nil || tr.LevelType != levelType {
+			continue
+		}
+		switch tr.Locale {
+		case locale:
+			exact = tr
+		case baseLocale:
+			base = tr
+		}
+	}
+
+	switch {
+	case exact == nil && base == nil:
+		return &HostedLoginTranslation{}, nil
+	case exact == nil:
+		return base, nil
+	case base == nil || !inherit:
+		return exact, nil
+	}
+	if err := mergo.Merge(&exact.File, base.File); err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-Lc7xQe", "Errors.Query.MergeTranslations")
+	}
+	return exact, nil
+}
+
 func getSystemTranslation(lang, instanceDefaultLang language.Tag) (map[string]any, string, error) {
 	translation, ok := defaultSystemTranslations[lang]
 	if !ok {
@@ -211,11 +258,13 @@ func prepareHostedLoginTranslationQuery() (sq.SelectBuilder, func(*sql.Rows) ([]
 			hostedLoginTranslationColFile.identifier(),
 			hostedLoginTranslationColResourceOwnerType.identifier(),
 			hostedLoginTranslationColEtag.identifier(),
+			hostedLoginTranslationColLocale.identifier(),
 		).From(hostedLoginTranslationTable.identifier()).
-			Limit(2).
+			// a translation for the locale and one for its base language, for up to two levels
+			Limit(4).
 			PlaceholderFormat(sq.Dollar),
 		func(r *sql.Rows) ([]*HostedLoginTranslation, error) {
-			translations := make([]*HostedLoginTranslation, 0, 2)
+			translations := make([]*HostedLoginTranslation, 0, 4)
 			for r.Next() {
 				var rawTranslation json.RawMessage
 				translation := &HostedLoginTranslation{}
@@ -223,6 +272,7 @@ func prepareHostedLoginTranslationQuery() (sq.SelectBuilder, func(*sql.Rows) ([]
 					&rawTranslation,
 					&translation.LevelType,
 					&translation.Etag,
+					&translation.Locale,
 				)
 				if err != nil {
 					return nil, err

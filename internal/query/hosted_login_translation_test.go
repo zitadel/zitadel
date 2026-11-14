@@ -132,13 +132,21 @@ func TestGetTranslationOutput(t *testing.T) {
 }
 
 func TestGetHostedLoginTranslation(t *testing.T) {
-	query := `SELECT projections.hosted_login_translations.file, projections.hosted_login_translations.aggregate_type, projections.hosted_login_translations.etag
+	query := `SELECT projections.hosted_login_translations.file, projections.hosted_login_translations.aggregate_type, projections.hosted_login_translations.etag, projections.hosted_login_translations.locale
 	FROM projections.hosted_login_translations
 	WHERE projections.hosted_login_translations.aggregate_id = $1
 	AND projections.hosted_login_translations.aggregate_type = $2
 	AND projections.hosted_login_translations.instance_id = $3
 	AND (projections.hosted_login_translations.locale = $4 OR projections.hosted_login_translations.locale = $5)
-	LIMIT 2`
+	LIMIT 4`
+	inheritingQuery := `SELECT projections.hosted_login_translations.file, projections.hosted_login_translations.aggregate_type, projections.hosted_login_translations.etag, projections.hosted_login_translations.locale
+	FROM projections.hosted_login_translations
+	WHERE (projections.hosted_login_translations.instance_id = $1
+	AND (projections.hosted_login_translations.aggregate_id = $2 AND projections.hosted_login_translations.aggregate_type = $3
+	OR projections.hosted_login_translations.aggregate_id = $4 AND projections.hosted_login_translations.aggregate_type = $5))
+	AND (projections.hosted_login_translations.locale = $6 OR projections.hosted_login_translations.locale = $7)
+	LIMIT 4`
+	inheritingArgs := mock.WithQueryArgs("instance-id", "123", "org", "instance-id", "instance", "en-US", "en")
 	okTranslation := defaultLoginTranslations
 
 	parsedOKTranslation := map[string]map[string]any{}
@@ -151,6 +159,9 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 	defaultWithDBTranslations["test"] = "translation"
 	defaultWithDBTranslations["test2"] = "translation2"
 	protoDefaultWithDBTranslation, err := structpb.NewStruct(defaultWithDBTranslations)
+	require.NoError(t, err)
+
+	protoOnlyLocaleTranslation, err := structpb.NewStruct(map[string]any{"test": "translation"})
 	require.NoError(t, err)
 
 	nilProtoDefaultMap, err := structpb.NewStruct(nil)
@@ -216,8 +227,8 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 			defaultInstanceLanguage: language.English,
 			sqlExpectations: []mock.Expectation{
 				mock.ExpectQuery(
-					query,
-					mock.WithQueryArgs("123", "org", "instance-id", "en-US", "en"),
+					inheritingQuery,
+					inheritingArgs,
 					mock.WithQueryErr(sql.ErrConnDone),
 				),
 			},
@@ -236,10 +247,10 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 			defaultInstanceLanguage: language.English,
 			sqlExpectations: []mock.Expectation{
 				mock.ExpectQuery(
-					query,
-					mock.WithQueryArgs("123", "org", "instance-id", "en-US", "en"),
+					inheritingQuery,
+					inheritingArgs,
 					mock.WithQueryResult(
-						[]string{"file", "aggregate_type", "etag"},
+						[]string{"file", "aggregate_type", "etag", "locale"},
 						[][]driver.Value{},
 					),
 				),
@@ -265,7 +276,7 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 					query,
 					mock.WithQueryArgs("123", "org", "instance-id", "en-US", "en"),
 					mock.WithQueryResult(
-						[]string{"file", "aggregate_type", "etag"},
+						[]string{"file", "aggregate_type", "etag", "locale"},
 						[][]driver.Value{},
 					),
 				),
@@ -289,13 +300,13 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 			defaultInstanceLanguage: language.English,
 			sqlExpectations: []mock.Expectation{
 				mock.ExpectQuery(
-					query,
-					mock.WithQueryArgs("123", "org", "instance-id", "en-US", "en"),
+					inheritingQuery,
+					inheritingArgs,
 					mock.WithQueryResult(
-						[]string{"file", "aggregate_type", "etag"},
+						[]string{"file", "aggregate_type", "etag", "locale"},
 						[][]driver.Value{
-							{[]byte(`{"test": "translation"}`), "org", "etag-org"},
-							{[]byte(`{"test2": "translation2"}`), "instance", "etag-instance"},
+							{[]byte(`{"test": "translation"}`), "org", "etag-org", "en-US"},
+							{[]byte(`{"test2": "translation2"}`), "instance", "etag-instance", "en-US"},
 						},
 					),
 				),
@@ -309,6 +320,177 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 
 			expectedResult: &settings.GetHostedLoginTranslationResponse{
 				Etag:         "etag-org",
+				Translations: protoDefaultWithDBTranslation,
+			},
+		},
+		{
+			testName: "when organization has no translations should inherit the instance's",
+
+			defaultInstanceLanguage: language.English,
+			sqlExpectations: []mock.Expectation{
+				mock.ExpectQuery(
+					inheritingQuery,
+					inheritingArgs,
+					mock.WithQueryResult(
+						[]string{"file", "aggregate_type", "etag", "locale"},
+						[][]driver.Value{
+							{[]byte(`{"test": "translation", "test2": "translation2"}`), "instance", "etag-instance", "en-US"},
+						},
+					),
+				),
+			},
+			inputRequest: &settings.GetHostedLoginTranslationRequest{
+				Locale: "en-US",
+				Level: &settings.GetHostedLoginTranslationRequest_OrganizationId{
+					OrganizationId: "123",
+				},
+			},
+
+			expectedResult: &settings.GetHostedLoginTranslationResponse{
+				Etag:         "etag-instance",
+				Translations: protoDefaultWithDBTranslation,
+			},
+		},
+		{
+			testName: "when instance has the locale and its base language should prefer the locale in any row order",
+
+			defaultInstanceLanguage: language.English,
+			sqlExpectations: []mock.Expectation{
+				mock.ExpectQuery(
+					inheritingQuery,
+					inheritingArgs,
+					mock.WithQueryResult(
+						[]string{"file", "aggregate_type", "etag", "locale"},
+						[][]driver.Value{
+							{[]byte(`{"test": "translation"}`), "instance", "etag-instance-us", "en-US"},
+							{[]byte(`{"test": "base", "test2": "translation2"}`), "instance", "etag-instance-en", "en"},
+						},
+					),
+				),
+			},
+			inputRequest: &settings.GetHostedLoginTranslationRequest{
+				Locale: "en-US",
+				Level: &settings.GetHostedLoginTranslationRequest_OrganizationId{
+					OrganizationId: "123",
+				},
+			},
+
+			expectedResult: &settings.GetHostedLoginTranslationResponse{
+				Etag:         "etag-instance-us",
+				Translations: protoDefaultWithDBTranslation,
+			},
+		},
+		{
+			testName: "when base language row comes first should still prefer the locale",
+
+			defaultInstanceLanguage: language.English,
+			sqlExpectations: []mock.Expectation{
+				mock.ExpectQuery(
+					inheritingQuery,
+					inheritingArgs,
+					mock.WithQueryResult(
+						[]string{"file", "aggregate_type", "etag", "locale"},
+						[][]driver.Value{
+							{[]byte(`{"test": "base", "test2": "translation2"}`), "instance", "etag-instance-en", "en"},
+							{[]byte(`{"test": "translation"}`), "instance", "etag-instance-us", "en-US"},
+						},
+					),
+				),
+			},
+			inputRequest: &settings.GetHostedLoginTranslationRequest{
+				Locale: "en-US",
+				Level: &settings.GetHostedLoginTranslationRequest_OrganizationId{
+					OrganizationId: "123",
+				},
+			},
+
+			expectedResult: &settings.GetHostedLoginTranslationResponse{
+				Etag:         "etag-instance-us",
+				Translations: protoDefaultWithDBTranslation,
+			},
+		},
+		{
+			testName: "when organization has the base language and instance the locale should prefer the organization",
+
+			defaultInstanceLanguage: language.English,
+			sqlExpectations: []mock.Expectation{
+				mock.ExpectQuery(
+					inheritingQuery,
+					inheritingArgs,
+					mock.WithQueryResult(
+						[]string{"file", "aggregate_type", "etag", "locale"},
+						[][]driver.Value{
+							{[]byte(`{"test": "instance", "test2": "translation2"}`), "instance", "etag-instance-us", "en-US"},
+							{[]byte(`{"test": "translation"}`), "org", "etag-org-en", "en"},
+						},
+					),
+				),
+			},
+			inputRequest: &settings.GetHostedLoginTranslationRequest{
+				Locale: "en-US",
+				Level: &settings.GetHostedLoginTranslationRequest_OrganizationId{
+					OrganizationId: "123",
+				},
+			},
+
+			expectedResult: &settings.GetHostedLoginTranslationResponse{
+				Etag:         "etag-org-en",
+				Translations: protoDefaultWithDBTranslation,
+			},
+		},
+		{
+			testName: "when inheritance disabled should return only the locale's row, without its base language",
+
+			defaultInstanceLanguage: language.English,
+			sqlExpectations: []mock.Expectation{
+				mock.ExpectQuery(
+					query,
+					mock.WithQueryArgs("123", "org", "instance-id", "en-US", "en"),
+					mock.WithQueryResult(
+						[]string{"file", "aggregate_type", "etag", "locale"},
+						[][]driver.Value{
+							{[]byte(`{"test": "translation"}`), "org", "etag-org-us", "en-US"},
+							{[]byte(`{"test": "base", "test2": "translation2"}`), "org", "etag-org-en", "en"},
+						},
+					),
+				),
+			},
+			inputRequest: &settings.GetHostedLoginTranslationRequest{
+				Locale: "en-US",
+				Level: &settings.GetHostedLoginTranslationRequest_OrganizationId{
+					OrganizationId: "123",
+				},
+				IgnoreInheritance: true,
+			},
+
+			expectedResult: &settings.GetHostedLoginTranslationResponse{
+				Etag:         "etag-org-us",
+				Translations: protoOnlyLocaleTranslation,
+			},
+		},
+		{
+			testName: "when requesting instance level should read only the instance",
+
+			defaultInstanceLanguage: language.English,
+			sqlExpectations: []mock.Expectation{
+				mock.ExpectQuery(
+					query,
+					mock.WithQueryArgs("instance-id", "instance", "instance-id", "en-US", "en"),
+					mock.WithQueryResult(
+						[]string{"file", "aggregate_type", "etag", "locale"},
+						[][]driver.Value{
+							{[]byte(`{"test": "translation", "test2": "translation2"}`), "instance", "etag-instance", "en-US"},
+						},
+					),
+				),
+			},
+			inputRequest: &settings.GetHostedLoginTranslationRequest{
+				Locale: "en-US",
+				Level:  &settings.GetHostedLoginTranslationRequest_Instance{Instance: true},
+			},
+
+			expectedResult: &settings.GetHostedLoginTranslationResponse{
+				Etag:         "etag-instance",
 				Translations: protoDefaultWithDBTranslation,
 			},
 		},
