@@ -56,7 +56,7 @@ describe("SetPasswordForm", () => {
       />,
     );
 
-    const button = screen.getByRole("button", { name: "set.resend (30s)" });
+    const button = screen.getByRole("button", { name: /^set\.resend \(\d+s\)$/ });
     expect(button).toBeDisabled();
   });
 

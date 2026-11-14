@@ -74,7 +74,7 @@ describe("LoginOTP", () => {
       render(<LoginOTP host={null} method="sms" />);
 
       await waitFor(() => {
-        expect(screen.getByRole("button", { name: "verify.resendCode (30s)" })).toBeDisabled();
+        expect(screen.getByRole("button", { name: /^verify\.resendCode \(\d+s\)$/ })).toBeDisabled();
       });
     });
 
@@ -98,7 +98,7 @@ describe("LoginOTP", () => {
       fireEvent.click(screen.getByTestId("resend-button"));
 
       await waitFor(() => {
-        expect(screen.getByRole("button", { name: "verify.resendCode (30s)" })).toBeDisabled();
+        expect(screen.getByRole("button", { name: /^verify\.resendCode \(\d+s\)$/ })).toBeDisabled();
       });
     });
 

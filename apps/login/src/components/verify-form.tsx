@@ -59,6 +59,8 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
     if (userId === UNKNOWN_USER_ID) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setLoading(false);
+      // behave like a real send, so the cooldown does not reveal that the user is unknown
+      resendCooldown.start();
       return;
     }
 
@@ -99,9 +101,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
     if (codeSent) {
       startResendCooldown();
     }
-    // only on arrival; later resends start the cooldown themselves
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [codeSent, startResendCooldown]);
 
   const processedCode = useRef<string | undefined>(undefined);
 

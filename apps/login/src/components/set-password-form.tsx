@@ -73,9 +73,7 @@ export function SetPasswordForm({
     if (codeSent && codeRequired) {
       startResendCooldown();
     }
-    // only on arrival; later resends start the cooldown themselves
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [codeSent, codeRequired, startResendCooldown]);
 
   async function resendCode() {
     setError("");
