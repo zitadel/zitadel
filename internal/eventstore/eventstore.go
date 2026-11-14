@@ -92,6 +92,9 @@ func (es *Eventstore) Health(ctx context.Context) error {
 // Push pushes the events in a single transaction
 // an event needs at least an aggregate
 func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error) {
+	if state := transactionFromContext(ctx); state != nil {
+		return es.PushWithClient(ctx, state.tx, cmds...)
+	}
 	return es.PushWithClient(ctx, nil, cmds...)
 }
 
@@ -159,7 +162,11 @@ retry:
 	if err != nil {
 		return mappedEvents, err
 	}
-	es.notify(mappedEvents)
+	if state := transactionFromContext(ctx); state != nil {
+		state.events = append(state.events, mappedEvents...)
+	} else {
+		es.notify(mappedEvents)
+	}
 	return mappedEvents, nil
 }
 
@@ -194,6 +201,9 @@ func (es *Eventstore) Search(ctx context.Context, conditions ...map[FieldType]an
 //
 // Deprecated: Use [FilterToQueryReducer] instead to avoid allocations.
 func (es *Eventstore) Filter(ctx context.Context, searchQuery *SearchQueryBuilder) ([]Event, error) {
+	if state := transactionFromContext(ctx); state != nil {
+		searchQuery.SetTx(state.tx)
+	}
 	events := make([]Event, 0, searchQuery.GetLimit())
 	searchQuery.ensureInstanceID(ctx)
 	err := es.querier.FilterToReducer(ctx, searchQuery, func(event Event) error {
@@ -251,6 +261,9 @@ type reducer interface {
 
 // FilterToReducer filters the events based on the search query, appends all events to the reducer and calls it's reduce function
 func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQueryBuilder, r reducer) error {
+	if state := transactionFromContext(ctx); state != nil {
+		searchQuery.SetTx(state.tx)
+	}
 	searchQuery.ensureInstanceID(ctx)
 	return es.querier.FilterToReducer(ctx, searchQuery, func(event Event) error {
 		event, err := es.mapEvent(event)

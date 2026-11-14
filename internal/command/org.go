@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/group"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -522,6 +521,12 @@ func (c *Commands) ReactivateOrg(ctx context.Context, organizationID string, per
 }
 
 func (c *Commands) RemoveOrg(ctx context.Context, id string, permissionCheck OrganizationPermissionCheck, mustExist bool) (*domain.ObjectDetails, error) {
+	return c.retryGroupChange(ctx, func(ctx context.Context) (*domain.ObjectDetails, error) {
+		return c.removeOrgOnce(ctx, id, permissionCheck, mustExist)
+	})
+}
+
+func (c *Commands) removeOrgOnce(ctx context.Context, id string, permissionCheck OrganizationPermissionCheck, mustExist bool) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(id)
 
 	//nolint:staticcheck
@@ -605,11 +610,11 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate, permissionCheck Organizati
 			if err != nil {
 				return nil, err
 			}
-			groupNames, err := OrgGroupNames(ctx, filter, a.ID)
+			groupRemovals, err := orgGroupRemovals(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err
 			}
-			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name, usernames, domainPolicy.UserLoginMustBeDomain || organizationScopedUsername, domains, links, entityIds, groupNames)}, nil
+			return append(groupRemovals, org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name, usernames, domainPolicy.UserLoginMustBeDomain || organizationScopedUsername, domains, links, entityIds, nil)), nil
 		}, nil
 	}
 }
@@ -734,42 +739,6 @@ func OrgDomains(ctx context.Context, filter preparation.FilterToQueryReducer, or
 				}
 			}
 		}
-	}
-	return names, nil
-}
-
-// OrgGroupNames returns the names of all existing groups of the organization,
-// so their unique name constraints can be released when the organization is removed
-func OrgGroupNames(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) ([]string, error) {
-	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		ResourceOwner(orgID).
-		OrderAsc().
-		AddQuery().
-		AggregateTypes(group.AggregateType).
-		EventTypes(
-			group.GroupAddedEventType,
-			group.GroupChangedEventType,
-			group.GroupRemovedEventType,
-		).Builder())
-	if err != nil {
-		return nil, err
-	}
-	namesByGroupID := make(map[string]string)
-	for _, event := range events {
-		switch eventTyped := event.(type) {
-		case *group.GroupAddedEvent:
-			namesByGroupID[eventTyped.Aggregate().ID] = eventTyped.Name
-		case *group.GroupChangedEvent:
-			if eventTyped.Name != nil {
-				namesByGroupID[eventTyped.Aggregate().ID] = *eventTyped.Name
-			}
-		case *group.GroupRemovedEvent:
-			delete(namesByGroupID, eventTyped.Aggregate().ID)
-		}
-	}
-	names := make([]string, 0, len(namesByGroupID))
-	for _, name := range namesByGroupID {
-		names = append(names, name)
 	}
 	return names, nil
 }

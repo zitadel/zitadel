@@ -103,12 +103,21 @@ Other extended schemas are not supported.
 ### Groups
 
 The `/Groups` endpoint supports create, get, list, replace (`PUT`), update (`PATCH`), and delete.
-Group lookup supports filters on `displayName` (case-insensitive) and `id`, with `startIndex` and `count` pagination.
+Group lookup supports filters on `displayName` (case-insensitive), `id`, and `externalId` (case-exact equality), with `startIndex` and `count` pagination.
 GET and list responses include members by default; `excludedAttributes=members` omits them.
 
 #### Okta and Microsoft Entra ID
 
-Use `displayName` as the group matching attribute. Group `externalId` is not persisted or searchable.
+Use `externalId` for stable group matching; `displayName` remains available for providers that match by name.
+The external ID is persisted per organization and provisioning source, using the same
+`urn:zitadel:scim:provisioningDomain` service-account metadata as user provisioning.
+A rename preserves the binding. Duplicate external IDs within the same organization and source return HTTP 409;
+the same ID can be used in a different organization or source. External IDs are case-exact.
+GET and list return only the external ID for the calling source.
+
+POST and PUT accept `externalId`; PATCH can add, replace, or remove it. Omitting it from PUT clears
+only the calling source's binding. Removing a binding or deleting the group releases the ID for reuse.
+Identity changes commit atomically with name and membership changes, and emit `group.external_id.set` events.
 The following provisioning payloads are supported:
 
 * Rename using `path: "displayName"`, or a pathless `value: {"displayName": "Engineering"}`.
@@ -123,9 +132,26 @@ Members must already exist in the same organization as the group.
 
 Create with members, PUT, and a batch of PATCH operations validate before committing their changes in one transaction.
 A failed mutation does not leave a partial rename or membership change. Reads use eventually consistent projections.
-Atomic writes do not provide serialization between concurrent provisioning clients; coordinate writers for each group.
-Native group and membership events remain available to Actions v2 event targets for application integration.
-This does not add ordered webhook delivery or change the existing target retry behavior.
+Group writes check the group revision at commit and retry conflicting operations from fresh state, with at most three attempts.
+Continued contention returns HTTP 409; retry the request. External ID reservations belong to the claiming group,
+so stale releases cannot remove another group’s binding. Group changes, group grants, user deletion, and organization
+deletion share a database transaction lock per instance. Deletion discovers memberships from authoritative events,
+including changes that have not reached the read projections, and commits the cascade in that same transaction.
+
+### Group notifications for headless applications
+
+Native group and membership events are available to Actions v2 event targets for application integration.
+Matching webhook jobs commit in the same transaction as the group change. Delivery uses the existing Actions
+worker behavior and has no ordering guarantee across events, workers, or replicas.
+
+Receivers should handle duplicate and out-of-order notifications. The combination of `instanceID`,
+`aggregateType`, `aggregateID`, and `sequence` identifies an event; `sequence` is specific to that aggregate,
+not the organization or target. Subscriptions can omit events, so sequences need not be contiguous.
+Discarding older membership deltas can lose independent changes. Reconcile current group state instead,
+accounting for eventually consistent reads with retries or periodic reconciliation.
+
+Webhook retry reliability is unchanged by SCIM group support: target errors may cancel a job or be ignored,
+and queued jobs can expire. Reliable retry and failed-message recovery require separate Actions changes.
 
 Zitadel groups are **flat**:
 

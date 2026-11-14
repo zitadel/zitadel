@@ -41,6 +41,9 @@ func TestGroupMutations(t *testing.T) {
 		{name: "immutable member reference", payload: `[{"op":"replace","path":"members[value eq \"alice\"].value","value":"bob"}]`, invalid: true},
 		{name: "unsupported attribute", payload: `[{"op":"replace","path":"unknown","value":"x"}]`, invalid: true},
 		{name: "invalid trailing operation returns no mutations", payload: `[{"op":"replace","path":"displayName","value":"Sales"},{"op":"remove","path":"displayName"}]`, invalid: true},
+		{name: "set external identity", payload: `[{"op":"Replace","path":"externalId","value":"object-id"}]`, want: []command.GroupMutation{{ExternalID: &command.GroupExternalID{Value: "object-id"}}}},
+		{name: "remove external identity", payload: `[{"op":"remove","path":"externalId"}]`, want: []command.GroupMutation{{ExternalID: &command.GroupExternalID{}}}},
+		{name: "invalid external identity", payload: `[{"op":"replace","path":"externalId","value":123}]`, invalid: true},
 		{name: "null operation", payload: `[null]`, invalid: true},
 	}
 	for _, tt := range tests {

@@ -11,6 +11,15 @@ type UniqueConstraint struct {
 	ErrorMessage string
 	// IsGlobal defines if the unique constraint is globally unique or just within a single instance
 	IsGlobal bool
+	// Claimant identifies the aggregate allowed to release this reservation.
+	// Empty fields retain the legacy, unowned reservation behavior.
+	ClaimantType AggregateType
+	ClaimantID   string
+}
+
+func (f *UniqueConstraint) WithClaimant(typ AggregateType, id string) *UniqueConstraint {
+	f.ClaimantType, f.ClaimantID = typ, id
+	return f
 }
 
 type UniqueConstraintAction int8

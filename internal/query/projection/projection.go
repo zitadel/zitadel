@@ -99,6 +99,7 @@ var (
 
 	GroupProjection             *handler.Handler
 	GroupUsersProjection        *handler.Handler
+	GroupExternalIDsProjection  *handler.Handler
 	GroupGrantProjection        *handler.Handler
 	GroupManagerRolesProjection *handler.Handler
 )
@@ -207,6 +208,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	// Don't forget to add the new field handler to [ProjectInstanceFields]
 
 	GroupProjection = newGroupProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["groups"]))
+	GroupExternalIDsProjection = newGroupExternalIDsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["group_external_ids"]))
 	GroupUsersProjection = newGroupUsersProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["group_users"]))
 	GroupGrantProjection = newGroupGrantProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["group_grants"]))
 	GroupManagerRolesProjection = newGroupManagerRolesProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["group_manager_roles"]))
@@ -397,6 +399,7 @@ func newProjectionsList() {
 		OrganizationSettingsProjection,
 		GroupProjection,
 		GroupUsersProjection,
+		GroupExternalIDsProjection,
 		GroupGrantProjection,
 		GroupManagerRolesProjection,
 

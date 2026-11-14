@@ -56,6 +56,9 @@ func (es *Eventstore) pushWithoutFunc(ctx context.Context, client database.Query
 	if err != nil {
 		return nil, err
 	}
+	if err = checkExpectedSequences(commands, events); err != nil {
+		return nil, err
+	}
 
 	if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
 		return nil, err

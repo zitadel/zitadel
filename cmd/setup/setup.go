@@ -258,6 +258,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s73FixUserGrantRoles = &FixUserGrantRoles{eventstore: eventstoreClient}
 	steps.s74Apps7OIDCConfigsAddRegistrationToken = &Apps7OIDCConfigsAddRegistrationToken{dbClient: dbClient}
 	steps.s75Apps7OIDCConfigsAddAppLinkConfig = &Apps7OIDCConfigsAddAppLinkConfig{dbClient: dbClient}
+	steps.s76UniqueConstraintClaimants = &UniqueConstraintClaimants{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	if err != nil {
@@ -267,6 +268,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	for _, step := range []migration.Migration{
 		steps.s14NewEventsTable,
 		steps.s40InitPushFunc,
+		steps.s76UniqueConstraintClaimants, // reservation columns are needed by subsequent migrations.
 		steps.s1ProjectionTable,
 		steps.s2AssetsTable,
 		steps.s28AddFieldTable,

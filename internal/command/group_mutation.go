@@ -15,6 +15,7 @@ import (
 // A non-nil Members replaces the entire membership, including an empty slice.
 type GroupMutation struct {
 	Name          *string
+	ExternalID    *GroupExternalID
 	Members       *[]string
 	AddMembers    []string
 	RemoveMembers []string
@@ -22,6 +23,12 @@ type GroupMutation struct {
 
 // MutateGroup validates all mutations before persisting their events in one transaction.
 func (c *Commands) MutateGroup(ctx context.Context, groupID, orgID string, mutations []GroupMutation) (*domain.ObjectDetails, error) {
+	return c.retryGroupChange(ctx, func(ctx context.Context) (*domain.ObjectDetails, error) {
+		return c.mutateGroupOnce(ctx, groupID, orgID, mutations)
+	})
+}
+
+func (c *Commands) mutateGroupOnce(ctx context.Context, groupID, orgID string, mutations []GroupMutation) (*domain.ObjectDetails, error) {
 	if orgID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "CMDGRP-mut2", "Errors.Group.MissingOrganizationID")
 	}
@@ -33,10 +40,14 @@ func (c *Commands) MutateGroup(ctx context.Context, groupID, orgID string, mutat
 		return nil, zerrors.ThrowNotFound(nil, "CMDGRP-mut1", "Errors.Group.NotFound")
 	}
 	name := group.Name
+	externalIDs := maps.Clone(group.ExternalIDs)
 	members := maps.Clone(group.existingUserIDs)
 	for _, mutation := range mutations {
 		if err := c.validateGroupMutation(ctx, groupID, orgID, mutation); err != nil {
 			return nil, err
+		}
+		if mutation.ExternalID != nil {
+			externalIDs[mutation.ExternalID.Scope] = mutation.ExternalID.Value
 		}
 		if mutation.Name != nil {
 			name = *mutation.Name
@@ -69,10 +80,10 @@ func (c *Commands) MutateGroup(ctx context.Context, groupID, orgID string, mutat
 			events = append(events, repo.NewGroupUserRemovedEvent(ctx, aggregate, id))
 		}
 	}
+	events = append(events, group.externalIDChanges(ctx, externalIDs)...)
 	if len(events) == 0 {
 		return writeModelToObjectDetails(&group.WriteModel), nil
 	}
-	// shortcut: atomic persistence does not serialize concurrent writers; add expected-revision checks when the group command API supports them.
 	return c.pushAppendAndReduceDetails(ctx, group, events...)
 }
 
@@ -80,7 +91,10 @@ func (c *Commands) validateGroupMutation(ctx context.Context, groupID, orgID str
 	if err := (&UpdateGroup{Name: mutation.Name}).IsValid(); err != nil {
 		return err
 	}
-	if mutation.Name != nil {
+	if err := mutation.ExternalID.IsValid(); err != nil {
+		return err
+	}
+	if mutation.Name != nil || mutation.ExternalID != nil {
 		if err := c.checkPermissionUpdateGroup(ctx, orgID, groupID); err != nil {
 			return err
 		}

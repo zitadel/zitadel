@@ -87,6 +87,9 @@ type Aggregate struct {
 	InstanceID string `json:"instanceId"`
 	// Version is the semver this aggregate represents
 	Version Version `json:"version"`
+	// ExpectedSequence, when set, must precede the first event in this push.
+	// It is a write precondition, not part of the persisted aggregate or webhook.
+	ExpectedSequence *uint64 `json:"-"`
 }
 
 // AggregateType is the object name

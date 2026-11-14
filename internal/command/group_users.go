@@ -13,7 +13,13 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddUsersToGroup(ctx context.Context, groupID string, userIDs []string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) AddUsersToGroup(ctx context.Context, groupID string, userIDs []string) (*domain.ObjectDetails, error) {
+	return c.retryGroupChange(ctx, func(ctx context.Context) (*domain.ObjectDetails, error) {
+		return c.addUsersToGroupOnce(ctx, groupID, userIDs)
+	})
+}
+
+func (c *Commands) addUsersToGroupOnce(ctx context.Context, groupID string, userIDs []string) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -33,7 +39,13 @@ func (c *Commands) AddUsersToGroup(ctx context.Context, groupID string, userIDs 
 	return c.addUsersToGroup(ctx, group)
 }
 
-func (c *Commands) RemoveUsersFromGroup(ctx context.Context, groupID string, userIDs []string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) RemoveUsersFromGroup(ctx context.Context, groupID string, userIDs []string) (*domain.ObjectDetails, error) {
+	return c.retryGroupChange(ctx, func(ctx context.Context) (*domain.ObjectDetails, error) {
+		return c.removeUsersFromGroupOnce(ctx, groupID, userIDs)
+	})
+}
+
+func (c *Commands) removeUsersFromGroupOnce(ctx context.Context, groupID string, userIDs []string) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -184,22 +196,4 @@ func (g *GroupWriteModel) getUserIDsToRemove() []string {
 		}
 	}
 	return userIDsToRemove
-}
-
-// removeUserFromGroups returns the events to remove a user from multiple groups.
-// This is needed when a user is deleted and subsequently needs to be removed from all groups.
-// Note: Ensure that the groupIDs are retrieved via SearchGroupUsers before calling this method
-func (c *Commands) removeUserFromGroups(ctx context.Context, userID string, groupIDs []string, resourceOwner string) ([]eventstore.Command, error) {
-	events := make([]eventstore.Command, 0, len(groupIDs))
-	for _, groupID := range groupIDs {
-		events = append(
-			events,
-			repo.NewGroupUserRemovedEvent(
-				ctx,
-				&repo.NewAggregate(groupID, resourceOwner).Aggregate,
-				userID,
-			),
-		)
-	}
-	return events, nil
 }

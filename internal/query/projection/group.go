@@ -61,6 +61,7 @@ func (g *groupProjection) Reducers() []handler.AggregateReducer {
 		{
 			Aggregate: group.AggregateType,
 			EventReducers: []handler.EventReducer{
+				{Event: group.GroupExternalIDSetEventType, Reduce: g.reduceExternalIDSet},
 				{
 					Event:  group.GroupAddedEventType,
 					Reduce: g.reduceGroupAdded,
@@ -179,4 +180,12 @@ func (g *groupProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.S
 			handler.NewCond(GroupColumnResourceOwner, e.Aggregate().ID),
 		},
 	), nil
+}
+
+func (g *groupProjection) reduceExternalIDSet(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*group.GroupExternalIDSetEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	return handler.NewUpdateStatement(e, []handler.Column{handler.NewCol(GroupColumnChangeDate, e.CreationDate()), handler.NewCol(GroupColumnSequence, e.Sequence())}, []handler.Condition{handler.NewCond(GroupColumnID, e.Aggregate().ID), handler.NewCond(GroupColumnInstanceID, e.Aggregate().InstanceID)}), nil
 }

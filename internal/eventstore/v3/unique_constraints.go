@@ -39,6 +39,9 @@ func handleUniqueConstraints(ctx context.Context, tx database.Transaction, comma
 
 	for _, command := range commands {
 		for _, constraint := range command.UniqueConstraints() {
+			if (constraint.ClaimantType == "") != (constraint.ClaimantID == "") {
+				return zerrors.ThrowInvalidArgument(nil, "V3-claimant", "Reservation claimant requires both type and ID")
+			}
 			instanceID := command.Aggregate().InstanceID
 			if constraint.IsGlobal {
 				instanceID = ""
@@ -46,10 +49,16 @@ func handleUniqueConstraints(ctx context.Context, tx database.Transaction, comma
 			switch constraint.Action {
 			case eventstore.UniqueConstraintAdd:
 				constraint.UniqueField = strings.ToLower(constraint.UniqueField)
-				addPlaceholders = append(addPlaceholders, fmt.Sprintf("($%d, $%d, $%d)", len(addArgs)+1, len(addArgs)+2, len(addArgs)+3))
-				addArgs = append(addArgs, instanceID, constraint.UniqueType, constraint.UniqueField)
+				addPlaceholders = append(addPlaceholders, fmt.Sprintf("($%d, $%d, $%d, NULLIF($%d, ''), NULLIF($%d, ''))", len(addArgs)+1, len(addArgs)+2, len(addArgs)+3, len(addArgs)+4, len(addArgs)+5))
+				addArgs = append(addArgs, instanceID, constraint.UniqueType, constraint.UniqueField, string(constraint.ClaimantType), constraint.ClaimantID)
 				addConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, instanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			case eventstore.UniqueConstraintRemove:
+				if constraint.ClaimantID != "" {
+					if err := releaseClaim(ctx, tx, instanceID, constraint); err != nil {
+						return err
+					}
+					continue
+				}
 				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf(deleteConstraintPlaceholdersStmt, len(deleteArgs)+1, len(deleteArgs)+2, len(deleteArgs)+3))
 				deleteArgs = append(deleteArgs, instanceID, constraint.UniqueType, constraint.UniqueField)
 				deleteConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, instanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
@@ -82,6 +91,20 @@ func handleUniqueConstraints(ctx context.Context, tx database.Transaction, comma
 			}
 			return zerrors.ThrowAlreadyExists(err, "V3-DKcYh", errMessage)
 		}
+	}
+	return nil
+}
+
+func releaseClaim(ctx context.Context, tx database.Transaction, instanceID string, constraint *eventstore.UniqueConstraint) error {
+	count, err := tx.Exec(ctx, `DELETE FROM eventstore.unique_constraints
+		WHERE instance_id = $1 AND unique_type = $2 AND unique_field = LOWER($3)
+		AND claimant_type = $4 AND claimant_id = $5`,
+		instanceID, constraint.UniqueType, constraint.UniqueField, string(constraint.ClaimantType), constraint.ClaimantID)
+	if err != nil {
+		return zerrors.ThrowInternal(err, "V3-release-claim", "Errors.Internal")
+	}
+	if count != 1 {
+		return eventstore.ErrConcurrentModification
 	}
 	return nil
 }

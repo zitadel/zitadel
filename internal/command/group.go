@@ -18,9 +18,25 @@ type CreateGroup struct {
 	Name        string
 	Description string
 	UserIDs     []string
+	ExternalID  *GroupExternalID
+}
+
+type GroupExternalID struct {
+	Scope string
+	Value string
+}
+
+func (g *GroupExternalID) IsValid() error {
+	if g != nil && g.Scope == "" {
+		return zerrors.ThrowInvalidArgument(nil, "GROUP-ext1", "Provisioning source is required")
+	}
+	return nil
 }
 
 func (g *CreateGroup) IsValid() error {
+	if err := g.ExternalID.IsValid(); err != nil {
+		return err
+	}
 	if strings.TrimSpace(g.Name) == "" {
 		return zerrors.ThrowInvalidArgument(nil, "GROUP-m177lN", "Errors.Group.InvalidName")
 	}
@@ -28,7 +44,13 @@ func (g *CreateGroup) IsValid() error {
 }
 
 // CreateGroup creates a new user group in an organization
-func (c *Commands) CreateGroup(ctx context.Context, group *CreateGroup) (details *domain.ObjectDetails, err error) {
+func (c *Commands) CreateGroup(ctx context.Context, group *CreateGroup) (*domain.ObjectDetails, error) {
+	return c.retryGroupChange(ctx, func(ctx context.Context) (*domain.ObjectDetails, error) {
+		return c.createGroupOnce(ctx, group)
+	})
+}
+
+func (c *Commands) createGroupOnce(ctx context.Context, group *CreateGroup) (details *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -76,6 +98,9 @@ func (c *Commands) CreateGroup(ctx context.Context, group *CreateGroup) (details
 	}
 	aggregate := GroupAggregateFromWriteModel(ctx, &groupWriteModel.WriteModel)
 	events := []eventstore.Command{repo.NewGroupAddedEvent(ctx, aggregate, group.Name, group.Description)}
+	if group.ExternalID != nil && group.ExternalID.Value != "" {
+		events = append(events, repo.NewGroupExternalIDSetEvent(ctx, aggregate, group.ExternalID.Scope, "", group.ExternalID.Value))
+	}
 	seen := make(map[string]bool, len(group.UserIDs))
 	for _, id := range group.UserIDs {
 		if !seen[id] {
@@ -105,7 +130,13 @@ func (g *UpdateGroup) IsValid() error {
 }
 
 // UpdateGroup updates a user group in an organization
-func (c *Commands) UpdateGroup(ctx context.Context, groupUpdate *UpdateGroup) (details *domain.ObjectDetails, err error) {
+func (c *Commands) UpdateGroup(ctx context.Context, groupUpdate *UpdateGroup) (*domain.ObjectDetails, error) {
+	return c.retryGroupChange(ctx, func(ctx context.Context) (*domain.ObjectDetails, error) {
+		return c.updateGroupOnce(ctx, groupUpdate)
+	})
+}
+
+func (c *Commands) updateGroupOnce(ctx context.Context, groupUpdate *UpdateGroup) (details *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -147,7 +178,13 @@ func (c *Commands) UpdateGroup(ctx context.Context, groupUpdate *UpdateGroup) (d
 // DeleteGroup deletes a user group from an organization.
 // Grants of the group, provided as cascadingGrantIDs, are cascade removed
 // so their unique constraints are released.
-func (c *Commands) DeleteGroup(ctx context.Context, groupID string, cascadingGrantIDs ...string) (details *domain.ObjectDetails, err error) {
+func (c *Commands) DeleteGroup(ctx context.Context, groupID string, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
+	return c.retryGroupChange(ctx, func(ctx context.Context) (*domain.ObjectDetails, error) {
+		return c.deleteGroupOnce(ctx, groupID, cascadingGrantIDs...)
+	})
+}
+
+func (c *Commands) deleteGroupOnce(ctx context.Context, groupID string, cascadingGrantIDs ...string) (details *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -163,12 +200,7 @@ func (c *Commands) DeleteGroup(ctx context.Context, groupID string, cascadingGra
 		return nil, err
 	}
 
-	events := []eventstore.Command{
-		repo.NewGroupRemovedEvent(ctx,
-			GroupAggregateFromWriteModel(ctx, &existingGroup.WriteModel),
-			existingGroup.Name,
-		),
-	}
+	events := []eventstore.Command{groupRemoval(ctx, existingGroup)}
 	if len(cascadingGrantIDs) > 0 {
 		cascadeEvents, err := c.removeGroupGrantsFromGroup(ctx, cascadingGrantIDs)
 		if err != nil {

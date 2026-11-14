@@ -178,6 +178,12 @@ func (c *Commands) UnlockUser(ctx context.Context, userID, resourceOwner string)
 }
 
 func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string, cascadingUserMemberships []*CascadingMembership, cascadingGrantIDs, cascadingGroupIDs []string) (*domain.ObjectDetails, error) {
+	return c.retryGroupChange(ctx, func(ctx context.Context) (*domain.ObjectDetails, error) {
+		return c.removeUserOnce(ctx, userID, resourceOwner, cascadingUserMemberships, cascadingGrantIDs, cascadingGroupIDs)
+	})
+}
+
+func (c *Commands) removeUserOnce(ctx context.Context, userID, resourceOwner string, cascadingUserMemberships []*CascadingMembership, cascadingGrantIDs, cascadingGroupIDs []string) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
 	}
@@ -219,14 +225,11 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 		events = append(events, membershipEvents...)
 	}
 
-	// remove user from user groups
-	if len(cascadingGroupIDs) > 0 {
-		groupUserEvents, err := c.removeUserFromGroups(ctx, userID, cascadingGroupIDs, resourceOwner)
-		if err != nil {
-			return nil, err
-		}
-		events = append(events, groupUserEvents...)
+	groupUserEvents, err := c.removeUserGroupMemberships(ctx, userID, existingUser.ResourceOwner)
+	if err != nil {
+		return nil, err
 	}
+	events = append(events, groupUserEvents...)
 
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {

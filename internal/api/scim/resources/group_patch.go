@@ -57,6 +57,17 @@ func parseGroupOperation(op *patch.Operation) ([]command.GroupMutation, error) {
 			return nil, invalidGroupPatch("displayName must be a non-empty string")
 		}
 		mutation.Name = &name
+	case "externalid":
+		if op.Path.ValuePath != nil {
+			return nil, invalidGroupPath()
+		}
+		var value string
+		if kind != "remove" {
+			if err := json.Unmarshal(op.Value, &value); err != nil {
+				return nil, invalidGroupPatch("externalId must be a string")
+			}
+		}
+		mutation.ExternalID = &command.GroupExternalID{Value: value}
 	case "members":
 		mutation, err = groupMembershipMutation(op, kind)
 		if err != nil {
@@ -165,5 +176,5 @@ func invalidGroupPatch(message string) error {
 }
 
 func invalidGroupPath() error {
-	return serrors.ThrowInvalidPath(zerrors.ThrowInvalidArgument(nil, "SCIM-GRP9p", "Supported group paths: displayName, members, members[value eq \"id\"]"))
+	return serrors.ThrowInvalidPath(zerrors.ThrowInvalidArgument(nil, "SCIM-GRP9p", "Supported group paths: displayName, externalId, members, members[value eq \"id\"]"))
 }
