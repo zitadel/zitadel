@@ -485,7 +485,7 @@
     "tryagain": "Opnieuw proberen",
     "couldNotContinueSession": "Kon de sessie niet voortzetten - ontbrekende gebruikersinformatie",
     "couldNotClearSession": "De sessie kon niet worden beëindigd. Probeer het opnieuw.",
-    "grantRequired": "Inloggen niet mogelijk. De gebruiker moet minimaal één grant hebben op de applicatie. Neem contact op met uw beheerder.",
-    "projectRequired": "Inloggen niet mogelijk. De organisatie van de gebruiker moet toegekend zijn aan het project. Neem contact op met uw beheerder."
+    "grantRequired": "Inloggen niet mogelijk. De gebruiker heeft minimaal één roltoewijzing voor de applicatie nodig. Neem contact op met uw beheerder.",
+    "projectRequired": "Inloggen niet mogelijk. De organisatie van de gebruiker heeft een projectverlening voor dit project nodig. Neem contact op met uw beheerder."
   }
 }

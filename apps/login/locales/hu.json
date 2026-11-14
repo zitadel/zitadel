@@ -485,7 +485,7 @@
     "tryagain": "Próbáld újra",
     "couldNotContinueSession": "Nem sikerült folytatni a munkamenetet - hiányzó felhasználói információk",
     "couldNotClearSession": "A munkamenetet nem sikerült befejezni. Kérjük, próbálja újra.",
-    "grantRequired": "Bejelentkezés nem lehetséges. A felhasználónak legalább egy jogosultsággal kell rendelkeznie az alkalmazáson. Kérlek, lépj kapcsolatba az adminisztrátoroddal.",
+    "grantRequired": "Bejelentkezés nem lehetséges. A felhasználónak legalább egy szerepkör-hozzárendeléssel kell rendelkeznie az alkalmazáson. Kérlek, lépj kapcsolatba az adminisztrátoroddal.",
     "projectRequired": "Bejelentkezés nem lehetséges. A felhasználó szervezetének engedélyezve kell lennie a projektre. Kérlek, lépj kapcsolatba az adminisztrátoroddal."
   }
 }

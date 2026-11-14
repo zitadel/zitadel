@@ -486,7 +486,7 @@
     "tryagain": "Try Again",
     "couldNotContinueSession": "Could not continue with session - missing user information",
     "couldNotClearSession": "Could not end the session. Please try again.",
-    "grantRequired": "Login not possible. The user is required to have at least one grant on the application. Please contact your administrator.",
-    "projectRequired": "Login not possible. The organization of the user must be granted to the project. Please contact your administrator."
+    "grantRequired": "Login not possible. The user needs at least one role assignment for this application. Please contact your administrator.",
+    "projectRequired": "Login not possible. The user's organization needs a project grant for this project. Please contact your administrator."
   }
 }

@@ -485,7 +485,7 @@
     "tryagain": "Tentar Novamente",
     "couldNotContinueSession": "Não foi possível continuar a sessão — informações do usuário ausentes",
     "couldNotClearSession": "Não foi possível terminar a sessão. Tente novamente.",
-    "grantRequired": "Login não é possível. O usuário precisa ter pelo menos uma permissão no aplicativo. Entre em contato com o administrador.",
-    "projectRequired": "Login não é possível. A organização do usuário precisa ser concedida ao projeto. Entre em contato com o administrador."
+    "grantRequired": "Login não é possível. O usuário precisa ter pelo menos uma atribuição de função no aplicativo. Entre em contato com o administrador.",
+    "projectRequired": "Login não é possível. A organização do usuário precisa de uma concessão de projeto para este projeto. Entre em contato com o administrador."
   }
 }

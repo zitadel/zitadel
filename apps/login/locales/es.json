@@ -485,7 +485,7 @@
     "tryagain": "Intentar de nuevo",
     "couldNotContinueSession": "No se pudo continuar con la sesión - falta información del usuario",
     "couldNotClearSession": "No se pudo cerrar la sesión. Inténtelo de nuevo.",
-    "grantRequired": "No es posible iniciar sesión. El usuario debe tener al menos una autorización en la aplicación. Contacte con su administrador.",
-    "projectRequired": "No es posible iniciar sesión. La organización del usuario debe tener acceso concedido al proyecto. Contacte con su administrador."
+    "grantRequired": "No es posible iniciar sesión. El usuario necesita al menos una asignación de rol en la aplicación. Contacte con su administrador.",
+    "projectRequired": "No es posible iniciar sesión. La organización del usuario necesita una concesión de proyecto para este proyecto. Contacte con su administrador."
   }
 }
