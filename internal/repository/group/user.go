@@ -58,7 +58,10 @@ func (e *GroupUserAddedEvent) Payload() interface{} {
 
 func (e *GroupUserAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{
-		NewAddGroupUserUniqueConstraint(e.Aggregate().ID, e.UserID),
+		NewAddGroupUserUniqueConstraint(e.Aggregate().ID, e.UserID).WithOwners(
+			eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ResourceOwner),
+			eventstore.OwnerTag(eventstore.UniqueConstraintOwnerUser, e.UserID),
+		),
 	}
 }
 

@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/action"
 	"github.com/zitadel/zitadel/internal/repository/group"
+	"github.com/zitadel/zitadel/internal/repository/groupgrant"
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/member"
@@ -135,6 +136,21 @@ func TestUniqueConstraintOwners(t *testing.T) {
 			name: "group name",
 			cmd:  group.NewGroupAddedEvent(ctx, agg(group.AggregateType, "group-1", "org-1"), "engineering", ""),
 			want: [][]string{{"org:org-1"}},
+		},
+		{
+			name: "group member",
+			cmd:  group.NewGroupUserAddedEvent(ctx, agg(group.AggregateType, "group-1", "org-1"), "user-1"),
+			want: [][]string{{"org:org-1", "user:user-1"}},
+		},
+		{
+			name: "group grant",
+			cmd:  groupgrant.NewGroupGrantAddedEvent(ctx, agg(groupgrant.AggregateType, "groupgrant-1", "org-1"), "group-1", "project-1", "grant-1", nil),
+			want: [][]string{{"org:org-1", "project:project-1", "grant:grant-1"}},
+		},
+		{
+			name: "group grant without project grant",
+			cmd:  groupgrant.NewGroupGrantAddedEvent(ctx, agg(groupgrant.AggregateType, "groupgrant-1", "org-1"), "group-1", "project-1", "", nil),
+			want: [][]string{{"org:org-1", "project:project-1"}},
 		},
 		{
 			name: "action name",

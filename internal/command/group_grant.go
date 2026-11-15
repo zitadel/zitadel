@@ -49,7 +49,7 @@ func (c *Commands) AddGroupGrant(ctx context.Context, grant *AddGroupGrant) (_ *
 	err = c.pushAppendAndReduce(ctx,
 		addedGrant,
 		groupgrant.NewGroupGrantAddedEvent(ctx,
-			GroupGrantAggregateFromWriteModel(&addedGrant.WriteModel),
+			GroupGrantAggregateFromWriteModel(ctx, &addedGrant.WriteModel),
 			grant.GroupID,
 			grant.ProjectID,
 			preConditions.FoundGrantID,
@@ -96,7 +96,7 @@ func (c *Commands) ChangeGroupGrant(ctx context.Context, grantID string, roleKey
 	err = c.pushAppendAndReduce(ctx,
 		existingGrant,
 		groupgrant.NewGroupGrantChangedEvent(ctx,
-			GroupGrantAggregateFromWriteModel(&existingGrant.WriteModel),
+			GroupGrantAggregateFromWriteModel(ctx, &existingGrant.WriteModel),
 			roleKeys,
 		))
 	if err != nil {
@@ -129,7 +129,7 @@ func (c *Commands) RemoveGroupGrant(ctx context.Context, grantID string) (_ *dom
 	err = c.pushAppendAndReduce(ctx,
 		existingGrant,
 		groupgrant.NewGroupGrantRemovedEvent(ctx,
-			GroupGrantAggregateFromWriteModel(&existingGrant.WriteModel),
+			GroupGrantAggregateFromWriteModel(ctx, &existingGrant.WriteModel),
 			existingGrant.GroupID,
 			existingGrant.ProjectID,
 			existingGrant.ProjectGrantID,
@@ -153,7 +153,7 @@ func (c *Commands) removeGroupGrantsFromGroup(ctx context.Context, grantIDs []st
 			continue
 		}
 		events = append(events, groupgrant.NewGroupGrantCascadeRemovedEvent(ctx,
-			GroupGrantAggregateFromWriteModel(&existingGrant.WriteModel),
+			GroupGrantAggregateFromWriteModel(ctx, &existingGrant.WriteModel),
 			existingGrant.GroupID,
 			existingGrant.ProjectID,
 			existingGrant.ProjectGrantID,

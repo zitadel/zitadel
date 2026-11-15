@@ -26,8 +26,8 @@ func TestOrgGroupNames(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name:    "filter error, propagated",
-			filter:  func(_ []eventstore.Event) func(context.Context, *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+			name: "filter error, propagated",
+			filter: func(_ []eventstore.Event) func(context.Context, *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 				return func(context.Context, *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return nil, filterErr
 				}
