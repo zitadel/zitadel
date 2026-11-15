@@ -156,6 +156,7 @@ For the first implementation we have excluded the following features:
 
 - **Create Users:** The new TypeScript Login app is built with the session and the user V2 API, the users V2 API does have some differences to the v1 API, so make sure you create users through the new API.
 - **External IDPs:** If you want to use external identity provider login, such as Login with Google or Apple. You can follow our existing setup guides, just make sure to use the following redirect url: `${CUSTOM_DOMAIN}/idps/callback`
+- **Automatic redirect to a single external identity provider:** Login V2 does not automatically redirect to the only configured external identity provider when username/password login is disabled. Instead, it shows the identity provider selection form. To force a direct redirect to a specific identity provider, pass the custom scope `urn:zitadel:iam:org:idp:id:{idp_id}` in the authorization request. If you use a custom login policy, also include the Organization Domain scope so ZITADEL can resolve the identity provider correctly.
 - **Passkey/U2F:** Those authentication methods are bound to a domain. As your new login runs on a different domain than the previous login, existing passkey authentication (fingerprint, face id, etc.) can’t be used. Also when they are managed through the management console of ZITADEL, they are added on a different domain.
   <br />
   *Note: If you run the login on a subdomain of your current instance, this problem

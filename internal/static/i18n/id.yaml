@@ -176,6 +176,7 @@ Errors:
         NotExisting: "OTP multifaktor (OneTimePassword) tidak ada"
         NotReady: "OTP multifaktor (OneTimePassword) belum siap"
         InvalidCode: "Kode tidak valid"
+        Reused: "Kode ini sudah digunakan. Silakan tunggu kode baru"
       U2F:
         NotExisting: "U2F tidak ada"
       Passwordless:
@@ -541,6 +542,7 @@ Errors:
     NotExisting: "Permintaan Otentikasi tidak ada"
     WrongLoginClient: "Permintaan Otentikasi dibuat oleh klien login lain"
     AlreadyHandled: "Permintaan Otentikasi sudah ditangani"
+    NotAuthenticated: "Pengguna tidak diautentikasi"
   OIDCSession:
     RefreshTokenInvalid: "Token Penyegaran tidak valid"
     Token:
@@ -762,6 +764,7 @@ EventTypes:
           check:
             succeeded: "Pemeriksaan OTP multifaktor berhasil"
             failed: "Pemeriksaan OTP multifaktor gagal"
+            reused: "Kode OTP multifaktor digunakan kembali"
           sms:
             added: "OTP SMS multifaktor ditambahkan"
             removed: "OTP SMS multifaktor dihapus"

@@ -165,7 +165,7 @@ func TestAddMember(t *testing.T) {
 			},
 			want: Want{
 				Commands: []eventstore.Command{
-					org.NewMemberAddedEvent(ctx, &org.NewAggregate("test").Aggregate, "userID", "ORG_OWNER"),
+					org.NewMemberAddedEvent(ctx, &org.NewAggregate("test").Aggregate, "userID", "ORG_OWNER").WithUserResourceOwner("ro"),
 				},
 			},
 		},
@@ -482,7 +482,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 							&org.NewAggregate("org1").Aggregate,
 							"user1",
 							[]string{"ORG_OWNER"}...,
-						),
+						).WithUserResourceOwner("org1"),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -537,7 +537,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 							&org.NewAggregate("org1").Aggregate,
 							"user1",
 							[]string{"ORG_OWNER"}...,
-						),
+						).WithUserResourceOwner("org1"),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),

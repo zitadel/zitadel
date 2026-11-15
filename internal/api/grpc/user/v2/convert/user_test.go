@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/pkg/grpc/filter/v2"
@@ -912,6 +913,11 @@ func Test_UsersToPb(t *testing.T) {
 func Test_ListUsersRequestToModel(t *testing.T) {
 	t.Parallel()
 
+	queryDefaults := systemdefaults.SystemDefaults{
+		DefaultQueryLimit: 100,
+		MaxQueryLimit:     1000,
+	}
+
 	firstNameQuery, err := query.NewUserFirstNameSearchQuery("first name", query.TextEquals)
 	require.Nil(t, err)
 
@@ -969,13 +975,23 @@ func Test_ListUsersRequestToModel(t *testing.T) {
 			want: &query.UserSearchQueries{
 				SearchRequest: query.SearchRequest{
 					Offset:        0,
-					Limit:         0,
+					Limit:         100,
 					Asc:           false,
 					SortingColumn: query.UserIDCol,
 				},
 				Queries: []query.SearchQuery{},
 			},
 			wantErr: false,
+		},
+		{
+			name: "limit exceeds max returns error",
+			args: args{
+				req: &user.ListUsersRequest{
+					Query: &object.ListQuery{Limit: 1001},
+				},
+			},
+			want:    nil,
+			wantErr: true,
 		},
 		{
 			name: "invalid query type returns error",
@@ -992,14 +1008,14 @@ func Test_ListUsersRequestToModel(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "nil request returns zero values",
+			name: "nil request returns default limit",
 			args: args{
 				req: nil,
 			},
 			want: &query.UserSearchQueries{
 				SearchRequest: query.SearchRequest{
 					Offset:        0,
-					Limit:         0,
+					Limit:         100,
 					Asc:           false,
 					SortingColumn: query.UserIDCol,
 				},
@@ -1012,7 +1028,7 @@ func Test_ListUsersRequestToModel(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			got, err := ListUsersRequestToModel(tc.args.req)
+			got, err := ListUsersRequestToModel(queryDefaults, tc.args.req)
 			if tc.wantErr {
 				assert.Error(t, err)
 				assert.Nil(t, got)

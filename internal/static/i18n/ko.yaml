@@ -177,6 +177,7 @@ Errors:
         NotExisting: "다중 요소 OTP(일회용 비밀번호)가 존재하지 않습니다"
         NotReady: "다중 요소 OTP(일회용 비밀번호)가 준비되지 않았습니다"
         InvalidCode: "코드가 잘못되었습니다"
+        Reused: "이 코드는 이미 사용되었습니다. 새 코드를 기다려 주세요"
       U2F:
         NotExisting: "U2F가 존재하지 않습니다"
       Passwordless:
@@ -542,6 +543,7 @@ Errors:
     NotExisting: "인증 요청이 존재하지 않습니다"
     WrongLoginClient: "다른 로그인 클라이언트에 의해 생성된 인증 요청"
     AlreadyHandled: "인증 요청이 이미 처리되었습니다"
+    NotAuthenticated: "사용자가 인증되지 않았습니다"
   OIDCSession:
     RefreshTokenInvalid: "새로 고침 토큰이 유효하지 않습니다"
     Token:
@@ -768,6 +770,7 @@ EventTypes:
           check:
             succeeded: "다중인증 OTP 확인 성공"
             failed: "다중인증 OTP 확인 실패"
+            reused: "다중인증 OTP 코드 재사용"
           sms:
             added: "다중인증 OTP SMS 추가됨"
             removed: "다중인증 OTP SMS 삭제됨"

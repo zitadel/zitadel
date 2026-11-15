@@ -153,7 +153,8 @@
         "failedPrecondition": "Vorbedingung fehlgeschlagen",
         "sessionNotValid": "Sitzung ist nicht gültig",
         "passwordVerificationMissing": "Passwort-Verifizierung fehlt.",
-        "passwordVerificationTooOld": "Passwort-Verifizierung ist zu alt. Bitte verifizieren Sie Ihr Passwort erneut."
+        "passwordVerificationTooOld": "Passwort-Verifizierung ist zu alt. Bitte verifizieren Sie Ihr Passwort erneut.",
+        "passwordResetNotAllowed": "Das Zurücksetzen des Passworts ist nicht zulässig. Wenden Sie sich für weitere Informationen an Ihren Administrator."
       }
     },
     "idp": {
@@ -254,6 +255,11 @@
         "smsDescription": "Geben Sie Ihre Telefonnummer ein, um einen Code per SMS zu erhalten.",
         "emailDescription": "Geben Sie Ihre E-Mail-Adresse ein, um einen Code per E-Mail zu erhalten.",
         "totpRegisterDescription": "Scannen Sie den QR-Code oder navigieren Sie manuell zur URL.",
+        "emailAddDescription": "Verwenden Sie einen Einmalcode, der an Ihre verifizierte E-Mail-Adresse gesendet wird, als zweiten Faktor.",
+        "smsAddDescription": "Verwenden Sie einen Einmalcode, der an Ihre verifizierte Telefonnummer gesendet wird, als zweiten Faktor.",
+        "add": "Hinzufügen",
+        "emailAdded": "Code per E-Mail hinzugefügt.",
+        "smsAdded": "Code per SMS hinzugefügt.",
         "submit": "Weiter",
         "labels": {
           "code": "Code"
@@ -261,6 +267,16 @@
         "required": {
           "code": "Dieses Feld ist erforderlich"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "OTP-Challenge konnte nicht angefordert werden",
+        "couldNotVerifyCode": "OTP-Code konnte nicht verifiziert werden",
+        "couldNotGetSession": "Ihre Sitzung konnte nicht geladen werden. Bitte melden Sie sich erneut an.",
+        "invalidMethod": "Dieser zweite Faktor wird nicht unterstützt.",
+        "couldNotAddEmail": "Code per E-Mail konnte nicht hinzugefügt werden.",
+        "couldNotAddSms": "Code per SMS konnte nicht hinzugefügt werden.",
+        "emailNotVerified": "Verifizieren Sie Ihre E-Mail-Adresse, bevor Sie Codes per E-Mail hinzufügen.",
+        "phoneNotVerified": "Verifizieren Sie Ihre Telefonnummer, bevor Sie Codes per SMS hinzufügen."
       }
     },
     "passkey": {
@@ -422,7 +438,15 @@
       "description": "Wählen Sie die Methode, mit der Sie sich authentifizieren möchten.",
       "noMethodsAvailable": "Keine Authentifizierungsmethoden verfügbar",
       "allSetup": "Sie haben bereits einen Authentifikator eingerichtet!",
-      "linkWithIDP": "oder verknüpfe mit einem Identitätsanbieter"
+      "linkWithIDP": "oder verknüpfe mit einem Identitätsanbieter",
+      "methods": {
+        "totp": "Authentifizierungs-App",
+        "u2f": "Universeller zweiter Faktor",
+        "otpEmail": "Code per E-Mail",
+        "otpSms": "Code per SMS",
+        "passkey": "Passkeys",
+        "password": "Passwort"
+      }
     },
     "device": {
       "usercode": {
@@ -614,7 +638,8 @@
         "failedPrecondition": "Failed precondition",
         "sessionNotValid": "Session is not valid",
         "passwordVerificationMissing": "Password verification is missing.",
-        "passwordVerificationTooOld": "Password verification is too old. Please verify your password again."
+        "passwordVerificationTooOld": "Password verification is too old. Please verify your password again.",
+        "passwordResetNotAllowed": "Password reset is not allowed. Contact your administrator for more information."
       }
     },
     "idp": {
@@ -715,6 +740,11 @@
         "smsDescription": "Enter your phone number to receive a code via SMS.",
         "emailDescription": "Enter your email address to receive a code via email.",
         "totpRegisterDescription": "Scan the QR Code or navigate to the URL manually.",
+        "emailAddDescription": "Use a one-time code sent to your verified email address as a second factor.",
+        "smsAddDescription": "Use a one-time code sent to your verified phone number as a second factor.",
+        "add": "Add",
+        "emailAdded": "Code via email added.",
+        "smsAdded": "Code via SMS added.",
         "submit": "Continue",
         "labels": {
           "code": "Code"
@@ -722,6 +752,16 @@
         "required": {
           "code": "This field is required"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "Could not request OTP challenge",
+        "couldNotVerifyCode": "Could not verify OTP code",
+        "couldNotGetSession": "Your session could not be loaded. Please sign in again.",
+        "invalidMethod": "This second factor is not supported.",
+        "couldNotAddEmail": "Code via email could not be added.",
+        "couldNotAddSms": "Code via SMS could not be added.",
+        "emailNotVerified": "Verify your email address before adding codes via email.",
+        "phoneNotVerified": "Verify your phone number before adding codes via SMS."
       }
     },
     "passkey": {
@@ -883,7 +923,15 @@
       "description": "Select the method you would like to authenticate",
       "noMethodsAvailable": "No authentication methods available",
       "allSetup": "You have already setup an authenticator!",
-      "linkWithIDP": "or link with an Identity Provider"
+      "linkWithIDP": "or link with an Identity Provider",
+      "methods": {
+        "totp": "Authenticator App",
+        "u2f": "Universal Second Factor",
+        "otpEmail": "Code via Email",
+        "otpSms": "Code via SMS",
+        "passkey": "Passkeys",
+        "password": "Password"
+      }
     },
     "device": {
       "usercode": {
@@ -1075,7 +1123,8 @@
         "failedPrecondition": "Precondición fallida",
         "sessionNotValid": "La sesión no es válida",
         "passwordVerificationMissing": "Falta la verificación de la contraseña.",
-        "passwordVerificationTooOld": "La verificación de la contraseña es demasiado antigua. Por favor, verifique su contraseña de nuevo."
+        "passwordVerificationTooOld": "La verificación de la contraseña es demasiado antigua. Por favor, verifique su contraseña de nuevo.",
+        "passwordResetNotAllowed": "El restablecimiento de contraseña no está permitido. Contacte con su administrador para más información."
       }
     },
     "idp": {
@@ -1176,6 +1225,11 @@
         "smsDescription": "Introduce tu número de teléfono para recibir un código por SMS.",
         "emailDescription": "Introduce tu dirección de correo electrónico para recibir un código por correo electrónico.",
         "totpRegisterDescription": "Escanea el código QR o navega manualmente a la URL.",
+        "emailAddDescription": "Usa un código de un solo uso enviado a tu dirección de correo electrónico verificada como segundo factor.",
+        "smsAddDescription": "Usa un código de un solo uso enviado a tu número de teléfono verificado como segundo factor.",
+        "add": "Añadir",
+        "emailAdded": "Código por correo electrónico añadido.",
+        "smsAdded": "Código por SMS añadido.",
         "submit": "Continuar",
         "labels": {
           "code": "Código"
@@ -1183,6 +1237,16 @@
         "required": {
           "code": "Este campo es obligatorio"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "No se pudo solicitar el desafío OTP",
+        "couldNotVerifyCode": "No se pudo verificar el código OTP",
+        "couldNotGetSession": "No se pudo cargar tu sesión. Vuelve a iniciar sesión.",
+        "invalidMethod": "Este segundo factor no es compatible.",
+        "couldNotAddEmail": "No se pudo añadir el código por correo electrónico.",
+        "couldNotAddSms": "No se pudo añadir el código por SMS.",
+        "emailNotVerified": "Verifica tu dirección de correo electrónico antes de añadir códigos por correo electrónico.",
+        "phoneNotVerified": "Verifica tu número de teléfono antes de añadir códigos por SMS."
       }
     },
     "passkey": {
@@ -1344,7 +1408,15 @@
       "description": "Selecciona el método con el que deseas autenticarte",
       "noMethodsAvailable": "No hay métodos de autenticación disponibles",
       "allSetup": "¡Ya has configurado un autenticador!",
-      "linkWithIDP": "o vincúlalo con un proveedor de identidad"
+      "linkWithIDP": "o vincúlalo con un proveedor de identidad",
+      "methods": {
+        "totp": "Aplicación de autenticación",
+        "u2f": "Segundo factor universal",
+        "otpEmail": "Código por correo electrónico",
+        "otpSms": "Código por SMS",
+        "passkey": "Clave de acceso",
+        "password": "Contraseña"
+      }
     },
     "device": {
       "usercode": {
@@ -1536,7 +1608,8 @@
         "failedPrecondition": "Precondizione non soddisfatta",
         "sessionNotValid": "La sessione non è valida",
         "passwordVerificationMissing": "Manca la verifica della password.",
-        "passwordVerificationTooOld": "La verifica della password è troppo vecchia. Si prega di verificare nuovamente la password."
+        "passwordVerificationTooOld": "La verifica della password è troppo vecchia. Si prega di verificare nuovamente la password.",
+        "passwordResetNotAllowed": "Il ripristino della password non è consentito. Contatta il tuo amministratore per ulteriori informazioni."
       }
     },
     "idp": {
@@ -1637,6 +1710,11 @@
         "smsDescription": "Inserisci il tuo numero di telefono per ricevere un codice via SMS.",
         "emailDescription": "Inserisci il tuo indirizzo email per ricevere un codice via email.",
         "totpRegisterDescription": "Scansiona il codice QR o naviga manualmente all'URL.",
+        "emailAddDescription": "Usa un codice monouso inviato al tuo indirizzo email verificato come secondo fattore.",
+        "smsAddDescription": "Usa un codice monouso inviato al tuo numero di telefono verificato come secondo fattore.",
+        "add": "Aggiungi",
+        "emailAdded": "Codice via email aggiunto.",
+        "smsAdded": "Codice via SMS aggiunto.",
         "submit": "Continua",
         "labels": {
           "code": "Codice"
@@ -1644,6 +1722,16 @@
         "required": {
           "code": "Questo campo è obbligatorio"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "Impossibile richiedere la challenge OTP",
+        "couldNotVerifyCode": "Impossibile verificare il codice OTP",
+        "couldNotGetSession": "Impossibile caricare la sessione. Accedi di nuovo.",
+        "invalidMethod": "Questo secondo fattore non è supportato.",
+        "couldNotAddEmail": "Impossibile aggiungere il codice via email.",
+        "couldNotAddSms": "Impossibile aggiungere il codice via SMS.",
+        "emailNotVerified": "Verifica il tuo indirizzo email prima di aggiungere codici via email.",
+        "phoneNotVerified": "Verifica il tuo numero di telefono prima di aggiungere codici via SMS."
       }
     },
     "passkey": {
@@ -1805,7 +1893,15 @@
       "description": "Seleziona il metodo con cui desideri autenticarti",
       "noMethodsAvailable": "Nessun metodo di autenticazione disponibile",
       "allSetup": "Hai già configurato un autenticatore!",
-      "linkWithIDP": "o collega con un Identity Provider"
+      "linkWithIDP": "o collega con un Identity Provider",
+      "methods": {
+        "totp": "App di autenticazione",
+        "u2f": "Secondo fattore universale",
+        "otpEmail": "Codice via email",
+        "otpSms": "Codice via SMS",
+        "passkey": "Passkey",
+        "password": "Password"
+      }
     },
     "device": {
       "usercode": {
@@ -1997,7 +2093,8 @@
         "failedPrecondition": "Voorwaarde mislukt",
         "sessionNotValid": "Sessie is niet geldig",
         "passwordVerificationMissing": "Wachtwoordverificatie ontbreekt.",
-        "passwordVerificationTooOld": "Wachtwoordverificatie is te oud. Verifieer je wachtwoord opnieuw."
+        "passwordVerificationTooOld": "Wachtwoordverificatie is te oud. Verifieer je wachtwoord opnieuw.",
+        "passwordResetNotAllowed": "Wachtwoord resetten is niet toegestaan. Neem contact op met uw beheerder voor meer informatie."
       }
     },
     "idp": {
@@ -2098,6 +2195,11 @@
         "smsDescription": "Voer jouw telefoonnummer in om een code via sms te ontvangen.",
         "emailDescription": "Voer jouw e-mailadres in om een code via e-mail te ontvangen.",
         "totpRegisterDescription": "Scan de QR-code of navigeer handmatig naar de URL.",
+        "emailAddDescription": "Gebruik een eenmalige code die naar je geverifieerde e-mailadres wordt gestuurd als tweede factor.",
+        "smsAddDescription": "Gebruik een eenmalige code die naar je geverifieerde telefoonnummer wordt gestuurd als tweede factor.",
+        "add": "Toevoegen",
+        "emailAdded": "Code via e-mail toegevoegd.",
+        "smsAdded": "Code via sms toegevoegd.",
         "submit": "Verder",
         "labels": {
           "code": "Code"
@@ -2105,6 +2207,16 @@
         "required": {
           "code": "Dit veld is verplicht"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "Kon OTP-uitdaging niet aanvragen",
+        "couldNotVerifyCode": "Kon OTP-code niet verifiëren",
+        "couldNotGetSession": "Je sessie kon niet worden geladen. Meld je opnieuw aan.",
+        "invalidMethod": "Deze tweede factor wordt niet ondersteund.",
+        "couldNotAddEmail": "Code via e-mail kon niet worden toegevoegd.",
+        "couldNotAddSms": "Code via sms kon niet worden toegevoegd.",
+        "emailNotVerified": "Verifieer je e-mailadres voordat je codes via e-mail toevoegt.",
+        "phoneNotVerified": "Verifieer je telefoonnummer voordat je codes via sms toevoegt."
       }
     },
     "passkey": {
@@ -2266,7 +2378,15 @@
       "description": "Selecteer de methode waarmee u wilt verifiëren",
       "noMethodsAvailable": "Geen authenticatiemethoden beschikbaar",
       "allSetup": "U heeft al een authenticator ingesteld!",
-      "linkWithIDP": "of link met een identiteitsprovider"
+      "linkWithIDP": "of link met een identiteitsprovider",
+      "methods": {
+        "totp": "Authenticator-app",
+        "u2f": "Universele tweede factor",
+        "otpEmail": "Code via e-mail",
+        "otpSms": "Code via sms",
+        "passkey": "Passkeys",
+        "password": "Wachtwoord"
+      }
     },
     "device": {
       "usercode": {
@@ -2458,7 +2578,8 @@
         "failedPrecondition": "Nie spełniono warunków wstępnych",
         "sessionNotValid": "Sesja jest nieważna",
         "passwordVerificationMissing": "Brak weryfikacji hasła.",
-        "passwordVerificationTooOld": "Weryfikacja hasła jest przestarzała. Proszę zweryfikować hasło ponownie."
+        "passwordVerificationTooOld": "Weryfikacja hasła jest przestarzała. Proszę zweryfikować hasło ponownie.",
+        "passwordResetNotAllowed": "Resetowanie hasła jest niedozwolone. Skontaktuj się z administratorem, aby uzyskać więcej informacji."
       }
     },
     "idp": {
@@ -2559,6 +2680,11 @@
         "smsDescription": "Wprowadź swój numer telefonu, aby otrzymać kod SMS-em.",
         "emailDescription": "Wprowadź swój adres e-mail, aby otrzymać kod e-mailem.",
         "totpRegisterDescription": "Zeskanuj kod QR lub otwórz adres URL ręcznie.",
+        "emailAddDescription": "Używaj jednorazowego kodu wysyłanego na zweryfikowany adres e-mail jako drugiego składnika.",
+        "smsAddDescription": "Używaj jednorazowego kodu wysyłanego na zweryfikowany numer telefonu jako drugiego składnika.",
+        "add": "Dodaj",
+        "emailAdded": "Dodano kod przez e-mail.",
+        "smsAdded": "Dodano kod przez SMS.",
         "submit": "Kontynuuj",
         "labels": {
           "code": "Kod"
@@ -2566,6 +2692,16 @@
         "required": {
           "code": "To pole jest wymagane"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "Nie można zażądać wyzwania OTP",
+        "couldNotVerifyCode": "Nie można zweryfikować kodu OTP",
+        "couldNotGetSession": "Nie udało się wczytać sesji. Zaloguj się ponownie.",
+        "invalidMethod": "Ten drugi składnik nie jest obsługiwany.",
+        "couldNotAddEmail": "Nie udało się dodać kodu przez e-mail.",
+        "couldNotAddSms": "Nie udało się dodać kodu przez SMS.",
+        "emailNotVerified": "Zweryfikuj adres e-mail przed dodaniem kodów przez e-mail.",
+        "phoneNotVerified": "Zweryfikuj numer telefonu przed dodaniem kodów przez SMS."
       }
     },
     "passkey": {
@@ -2727,7 +2863,15 @@
       "description": "Wybierz metodę, której chcesz użyć do uwierzytelnienia.",
       "noMethodsAvailable": "Brak dostępnych metod uwierzytelniania",
       "allSetup": "Już skonfigurowałeś metodę uwierzytelniania!",
-      "linkWithIDP": "lub połącz z dostawcą tożsamości"
+      "linkWithIDP": "lub połącz z dostawcą tożsamości",
+      "methods": {
+        "totp": "Aplikacja uwierzytelniająca",
+        "u2f": "Uniwersalny drugi składnik",
+        "otpEmail": "Kod przez e-mail",
+        "otpSms": "Kod przez SMS",
+        "passkey": "Klucz dostępu",
+        "password": "Hasło"
+      }
     },
     "device": {
       "usercode": {
@@ -2919,7 +3063,8 @@
         "failedPrecondition": "Нарушено предварительное условие",
         "sessionNotValid": "Сессия недействительна",
         "passwordVerificationMissing": "Отсутствует проверка пароля.",
-        "passwordVerificationTooOld": "Проверка пароля устарела. Пожалуйста, подтвердите пароль еще раз."
+        "passwordVerificationTooOld": "Проверка пароля устарела. Пожалуйста, подтвердите пароль еще раз.",
+        "passwordResetNotAllowed": "Сброс пароля запрещен. Обратитесь к администратору за дополнительной информацией."
       }
     },
     "idp": {
@@ -3020,6 +3165,11 @@
         "smsDescription": "Введите номер телефона для получения кода по SMS.",
         "emailDescription": "Введите email для получения кода.",
         "totpRegisterDescription": "Отсканируйте QR-код или перейдите по ссылке вручную.",
+        "emailAddDescription": "Используйте одноразовый код, отправляемый на ваш подтверждённый адрес электронной почты, в качестве второго фактора.",
+        "smsAddDescription": "Используйте одноразовый код, отправляемый на ваш подтверждённый номер телефона, в качестве второго фактора.",
+        "add": "Добавить",
+        "emailAdded": "Код по электронной почте добавлен.",
+        "smsAdded": "Код по SMS добавлен.",
         "submit": "Продолжить",
         "labels": {
           "code": "Код"
@@ -3027,6 +3177,16 @@
         "required": {
           "code": "Это поле обязательно для заполнения"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "Не удалось запросить OTP-челлендж",
+        "couldNotVerifyCode": "Не удалось проверить OTP-код",
+        "couldNotGetSession": "Не удалось загрузить сессию. Войдите снова.",
+        "invalidMethod": "Этот второй фактор не поддерживается.",
+        "couldNotAddEmail": "Не удалось добавить код по электронной почте.",
+        "couldNotAddSms": "Не удалось добавить код по SMS.",
+        "emailNotVerified": "Подтвердите адрес электронной почты, прежде чем добавлять коды по электронной почте.",
+        "phoneNotVerified": "Подтвердите номер телефона, прежде чем добавлять коды по SMS."
       }
     },
     "passkey": {
@@ -3188,7 +3348,15 @@
       "description": "Выберите предпочитаемый метод аутентификации",
       "noMethodsAvailable": "Нет доступных методов аутентификации",
       "allSetup": "Аутентификатор уже настроен!",
-      "linkWithIDP": "или привязать через Identity Provider"
+      "linkWithIDP": "или привязать через Identity Provider",
+      "methods": {
+        "totp": "Приложение-аутентификатор",
+        "u2f": "Универсальный второй фактор",
+        "otpEmail": "Код по email",
+        "otpSms": "Код по SMS",
+        "passkey": "Пасскей",
+        "password": "Пароль"
+      }
     },
     "device": {
       "usercode": {
@@ -3380,7 +3548,8 @@
         "failedPrecondition": "前置条件失败",
         "sessionNotValid": "会话无效",
         "passwordVerificationMissing": "缺少密码验证。",
-        "passwordVerificationTooOld": "密码验证已过期。请重新通过验证。"
+        "passwordVerificationTooOld": "密码验证已过期。请重新通过验证。",
+        "passwordResetNotAllowed": "不允许重置密码。请联系您的管理员以获取更多信息。"
       }
     },
     "idp": {
@@ -3481,6 +3650,11 @@
         "smsDescription": "输入您的电话号码以接收短信验证码。",
         "emailDescription": "输入您的电子邮箱地址以接收电子邮件验证码。",
         "totpRegisterDescription": "扫描二维码或手动导航到URL。",
+        "emailAddDescription": "使用发送到您已验证电子邮件地址的一次性验证码作为第二因素。",
+        "smsAddDescription": "使用发送到您已验证手机号码的一次性验证码作为第二因素。",
+        "add": "添加",
+        "emailAdded": "已添加电子邮件验证码。",
+        "smsAdded": "已添加短信验证码。",
         "submit": "继续",
         "labels": {
           "code": "验证码"
@@ -3488,6 +3662,16 @@
         "required": {
           "code": "此字段为必填项"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "无法请求 OTP 质询",
+        "couldNotVerifyCode": "无法验证 OTP 验证码",
+        "couldNotGetSession": "无法加载您的会话。请重新登录。",
+        "invalidMethod": "不支持此第二因素。",
+        "couldNotAddEmail": "无法添加电子邮件验证码。",
+        "couldNotAddSms": "无法添加短信验证码。",
+        "emailNotVerified": "添加电子邮件验证码前，请先验证您的电子邮件地址。",
+        "phoneNotVerified": "添加短信验证码前，请先验证您的手机号码。"
       }
     },
     "passkey": {
@@ -3649,7 +3833,15 @@
       "description": "选择您想使用的认证方法",
       "noMethodsAvailable": "没有可用的认证方法",
       "allSetup": "您已经设置好了一个认证器！",
-      "linkWithIDP": "或将其与身份提供者关联"
+      "linkWithIDP": "或将其与身份提供者关联",
+      "methods": {
+        "totp": "认证器应用",
+        "u2f": "通用第二因素",
+        "otpEmail": "通过电子邮件接收验证码",
+        "otpSms": "通过短信接收验证码",
+        "passkey": "密钥",
+        "password": "密码"
+      }
     },
     "device": {
       "usercode": {
@@ -3841,7 +4033,8 @@
         "failedPrecondition": "Ön koşul başarısız",
         "sessionNotValid": "Oturum geçerli değil",
         "passwordVerificationMissing": "Şifre doğrulaması eksik.",
-        "passwordVerificationTooOld": "Şifre doğrulaması çok eski. Lütfen şifrenizi tekrar doğrulayın."
+        "passwordVerificationTooOld": "Şifre doğrulaması çok eski. Lütfen şifrenizi tekrar doğrulayın.",
+        "passwordResetNotAllowed": "Şifre sıfırlamaya izin verilmiyor. Daha fazla bilgi için yöneticinizle iletişime geçin."
       }
     },
     "idp": {
@@ -3942,6 +4135,11 @@
         "smsDescription": "SMS ile kod almak için telefon numaranızı girin.",
         "emailDescription": "E-posta ile kod almak için e-posta adresinizi girin.",
         "totpRegisterDescription": "QR Kodunu tarayın veya URL'ye manuel olarak gidin.",
+        "emailAddDescription": "Doğrulanmış e-posta adresinize gönderilen tek kullanımlık kodu ikinci faktör olarak kullanın.",
+        "smsAddDescription": "Doğrulanmış telefon numaranıza gönderilen tek kullanımlık kodu ikinci faktör olarak kullanın.",
+        "add": "Ekle",
+        "emailAdded": "E-posta ile kod eklendi.",
+        "smsAdded": "SMS ile kod eklendi.",
         "submit": "Devam",
         "labels": {
           "code": "Kod"
@@ -3949,6 +4147,16 @@
         "required": {
           "code": "Bu alan zorunludur"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "OTP meydan okuması istenemedi",
+        "couldNotVerifyCode": "OTP kodu doğrulanamadı",
+        "couldNotGetSession": "Oturumunuz yüklenemedi. Lütfen yeniden oturum açın.",
+        "invalidMethod": "Bu ikinci faktör desteklenmiyor.",
+        "couldNotAddEmail": "E-posta ile kod eklenemedi.",
+        "couldNotAddSms": "SMS ile kod eklenemedi.",
+        "emailNotVerified": "E-posta ile kod eklemeden önce e-posta adresinizi doğrulayın.",
+        "phoneNotVerified": "SMS ile kod eklemeden önce telefon numaranızı doğrulayın."
       }
     },
     "passkey": {
@@ -4110,7 +4318,15 @@
       "description": "Kimlik doğrulaması yapmak istediğiniz yöntemi seçin",
       "noMethodsAvailable": "Kullanılabilir kimlik doğrulama yöntemi yok",
       "allSetup": "Zaten bir kimlik doğrulayıcı kurdunuz!",
-      "linkWithIDP": "veya bir Kimlik Sağlayıcı ile bağlantı kurun"
+      "linkWithIDP": "veya bir Kimlik Sağlayıcı ile bağlantı kurun",
+      "methods": {
+        "totp": "Kimlik doğrulayıcı uygulaması",
+        "u2f": "Evrensel ikinci faktör",
+        "otpEmail": "E-posta ile kod",
+        "otpSms": "SMS ile kod",
+        "passkey": "Passkey",
+        "password": "Şifre"
+      }
     },
     "device": {
       "usercode": {
@@ -4302,7 +4518,8 @@
         "failedPrecondition": "Не виконано передумову",
         "sessionNotValid": "Сеанс недійсний",
         "passwordVerificationMissing": "Відсутня перевірка пароля.",
-        "passwordVerificationTooOld": "Перевірка пароля застаріла. Будь ласка, перевірте пароль ще раз."
+        "passwordVerificationTooOld": "Перевірка пароля застаріла. Будь ласка, перевірте пароль ще раз.",
+        "passwordResetNotAllowed": "Скидання пароля заборонено. Зверніться до адміністратора за додатковою інформацією."
       }
     },
     "idp": {
@@ -4403,6 +4620,11 @@
         "smsDescription": "Введіть номер телефону для отримання коду через SMS.",
         "emailDescription": "Введіть електронну адресу для отримання коду на пошту.",
         "totpRegisterDescription": "Відскануйте QR-код або перейдіть за URL вручну.",
+        "emailAddDescription": "Використовуйте одноразовий код, що надсилається на вашу підтверджену електронну адресу, як другий фактор.",
+        "smsAddDescription": "Використовуйте одноразовий код, що надсилається на ваш підтверджений номер телефону, як другий фактор.",
+        "add": "Додати",
+        "emailAdded": "Код електронною поштою додано.",
+        "smsAdded": "Код через SMS додано.",
         "submit": "Продовжити",
         "labels": {
           "code": "Код"
@@ -4410,6 +4632,16 @@
         "required": {
           "code": "Це поле обов'язкове"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "Не вдалося запросити OTP-виклик",
+        "couldNotVerifyCode": "Не вдалося перевірити OTP-код",
+        "couldNotGetSession": "Не вдалося завантажити сеанс. Увійдіть знову.",
+        "invalidMethod": "Цей другий фактор не підтримується.",
+        "couldNotAddEmail": "Не вдалося додати код електронною поштою.",
+        "couldNotAddSms": "Не вдалося додати код через SMS.",
+        "emailNotVerified": "Підтвердьте електронну адресу, перш ніж додавати коди електронною поштою.",
+        "phoneNotVerified": "Підтвердьте номер телефону, перш ніж додавати коди через SMS."
       }
     },
     "passkey": {
@@ -4571,7 +4803,15 @@
       "description": "Виберіть метод автентифікації",
       "noMethodsAvailable": "Немає доступних методів автентифікації",
       "allSetup": "Ви вже налаштували автентифікатор!",
-      "linkWithIDP": "або прив'яжіть до постачальника ідентичності"
+      "linkWithIDP": "або прив'яжіть до постачальника ідентичності",
+      "methods": {
+        "totp": "Додаток автентифікації",
+        "u2f": "Універсальний другий фактор",
+        "otpEmail": "Код через електронну пошту",
+        "otpSms": "Код через SMS",
+        "passkey": "Ключ доступу",
+        "password": "Пароль"
+      }
     },
     "device": {
       "usercode": {
@@ -4763,7 +5003,8 @@
         "failedPrecondition": "فشل الشرط المسبق",
         "sessionNotValid": "الجلسة غير صالحة",
         "passwordVerificationMissing": "التحقق من كلمة المرور مفقود.",
-        "passwordVerificationTooOld": "التحقق من كلمة المرور قديم جدًا. يرجى التحقق من كلمة المرور مرة أخرى."
+        "passwordVerificationTooOld": "التحقق من كلمة المرور قديم جدًا. يرجى التحقق من كلمة المرور مرة أخرى.",
+        "passwordResetNotAllowed": "إعادة تعيين كلمة المرور غير مسموح بها. اتصل بالمسؤول لمزيد من المعلومات."
       }
     },
     "idp": {
@@ -4864,6 +5105,11 @@
         "smsDescription": "أدخل رقم هاتفك لتلقي رمز عبر الرسائل القصيرة.",
         "emailDescription": "أدخل عنوان بريدك الإلكتروني لتلقي رمز عبر البريد الإلكتروني.",
         "totpRegisterDescription": "امسح رمز الاستجابة السريعة أو انتقل إلى عنوان URL يدوياً.",
+        "emailAddDescription": "استخدم رمزًا لمرة واحدة يُرسل إلى عنوان بريدك الإلكتروني الموثق كعامل ثانٍ.",
+        "smsAddDescription": "استخدم رمزًا لمرة واحدة يُرسل إلى رقم هاتفك الموثق كعامل ثانٍ.",
+        "add": "إضافة",
+        "emailAdded": "تمت إضافة الرمز عبر البريد الإلكتروني.",
+        "smsAdded": "تمت إضافة الرمز عبر الرسائل القصيرة.",
         "submit": "متابعة",
         "labels": {
           "code": "الرمز"
@@ -4871,6 +5117,16 @@
         "required": {
           "code": "هذا الحقل مطلوب"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "تعذر طلب تحدي OTP",
+        "couldNotVerifyCode": "تعذر التحقق من رمز OTP",
+        "couldNotGetSession": "تعذر تحميل جلستك. يرجى تسجيل الدخول مرة أخرى.",
+        "invalidMethod": "هذا العامل الثاني غير مدعوم.",
+        "couldNotAddEmail": "تعذرت إضافة الرمز عبر البريد الإلكتروني.",
+        "couldNotAddSms": "تعذرت إضافة الرمز عبر الرسائل القصيرة.",
+        "emailNotVerified": "وثّق عنوان بريدك الإلكتروني قبل إضافة الرموز عبر البريد الإلكتروني.",
+        "phoneNotVerified": "وثّق رقم هاتفك قبل إضافة الرموز عبر الرسائل القصيرة."
       }
     },
     "passkey": {
@@ -5032,7 +5288,15 @@
       "description": "حدد الطريقة التي ترغب في المصادقة بها",
       "noMethodsAvailable": "لا توجد طرق مصادقة متاحة",
       "allSetup": "لقد قمت بالفعل بإعداد مصادق!",
-      "linkWithIDP": "أو الربط مع مزود هوية"
+      "linkWithIDP": "أو الربط مع مزود هوية",
+      "methods": {
+        "totp": "تطبيق المصادقة",
+        "u2f": "العامل الثاني العالمي",
+        "otpEmail": "رمز عبر البريد الإلكتروني",
+        "otpSms": "رمز عبر الرسائل القصيرة",
+        "passkey": "مفاتيح المرور",
+        "password": "كلمة المرور"
+      }
     },
     "device": {
       "usercode": {
@@ -5224,7 +5488,8 @@
         "failedPrecondition": "Az előfeltétel nem teljesült",
         "sessionNotValid": "A munkamenet nem érvényes",
         "passwordVerificationMissing": "A jelszó hitelesítés hiányzik.",
-        "passwordVerificationTooOld": "A jelszó hitelesítés túl régi. Kérjük, erősítsd meg újra a jelszavadat."
+        "passwordVerificationTooOld": "A jelszó hitelesítés túl régi. Kérjük, erősítsd meg újra a jelszavadat.",
+        "passwordResetNotAllowed": "A jelszó-visszaállítás nem engedélyezett. További információért fordulj a rendszergazdához."
       }
     },
     "idp": {
@@ -5325,6 +5590,11 @@
         "smsDescription": "Add meg a telefonszámodat, hogy SMS-ben elküldhessük az ellenőrző kódot.",
         "emailDescription": "Add meg az e-mail címedet, hogy e-mailben elküldhessük az ellenőrző kódot.",
         "totpRegisterDescription": "Olvasd be a QR-kódot, vagy navigálj az URL-re manuálisan.",
+        "emailAddDescription": "Használj az ellenőrzött e-mail-címedre küldött egyszer használatos kódot második faktorként.",
+        "smsAddDescription": "Használj az ellenőrzött telefonszámodra küldött egyszer használatos kódot második faktorként.",
+        "add": "Hozzáadás",
+        "emailAdded": "E-mailes kód hozzáadva.",
+        "smsAdded": "SMS-es kód hozzáadva.",
         "submit": "Tovább",
         "labels": {
           "code": "Kód"
@@ -5332,6 +5602,16 @@
         "required": {
           "code": "Ez a mező kötelező"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "Nem sikerült OTP-kihívást kérni",
+        "couldNotVerifyCode": "Nem sikerült ellenőrizni az OTP-kódot",
+        "couldNotGetSession": "A munkamenet nem tölthető be. Jelentkezz be újra.",
+        "invalidMethod": "Ez a második faktor nem támogatott.",
+        "couldNotAddEmail": "Az e-mailes kódot nem sikerült hozzáadni.",
+        "couldNotAddSms": "Az SMS-es kódot nem sikerült hozzáadni.",
+        "emailNotVerified": "Ellenőrizd az e-mail-címedet, mielőtt e-mailes kódokat adsz hozzá.",
+        "phoneNotVerified": "Ellenőrizd a telefonszámodat, mielőtt SMS-es kódokat adsz hozzá."
       }
     },
     "passkey": {
@@ -5493,7 +5773,15 @@
       "description": "Válaszd ki, milyen módszerrel szeretnél hitelesíteni",
       "noMethodsAvailable": "Nincs elérhető hitelesítési módszer",
       "allSetup": "Már beállítottál egy hitelesítőt!",
-      "linkWithIDP": "vagy kapcsold össze egy azonosítószolgáltatóval"
+      "linkWithIDP": "vagy kapcsold össze egy azonosítószolgáltatóval",
+      "methods": {
+        "totp": "Hitelesítő alkalmazás",
+        "u2f": "Univerzális második faktor",
+        "otpEmail": "Kód e-mailben",
+        "otpSms": "Kód SMS-ben",
+        "passkey": "Jelkulcs",
+        "password": "Jelszó"
+      }
     },
     "device": {
       "usercode": {
@@ -5685,7 +5973,8 @@
         "failedPrecondition": "Pré-condition non remplie",
         "sessionNotValid": "La session n'est pas valide",
         "passwordVerificationMissing": "La vérification du mot de passe est manquante.",
-        "passwordVerificationTooOld": "La vérification du mot de passe est trop ancienne. Veuillez vérifier à nouveau votre mot de passe."
+        "passwordVerificationTooOld": "La vérification du mot de passe est trop ancienne. Veuillez vérifier à nouveau votre mot de passe.",
+        "passwordResetNotAllowed": "La réinitialisation du mot de passe n'est pas autorisée. Contactez votre administrateur pour plus d'informations."
       }
     },
     "idp": {
@@ -5786,6 +6075,11 @@
         "smsDescription": "Entrez votre numéro de téléphone pour recevoir un code par SMS.",
         "emailDescription": "Entrez votre adresse e-mail pour recevoir un code par e-mail.",
         "totpRegisterDescription": "Scannez le QR code ou saisissez l'URL manuellement.",
+        "emailAddDescription": "Utilisez un code à usage unique envoyé à votre adresse e-mail vérifiée comme second facteur.",
+        "smsAddDescription": "Utilisez un code à usage unique envoyé à votre numéro de téléphone vérifié comme second facteur.",
+        "add": "Ajouter",
+        "emailAdded": "Code par e-mail ajouté.",
+        "smsAdded": "Code par SMS ajouté.",
         "submit": "Continuer",
         "labels": {
           "code": "Code"
@@ -5793,6 +6087,16 @@
         "required": {
           "code": "Ce champ est requis"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "Impossible de demander le challenge OTP",
+        "couldNotVerifyCode": "Impossible de vérifier le code OTP",
+        "couldNotGetSession": "Votre session n'a pas pu être chargée. Veuillez vous reconnecter.",
+        "invalidMethod": "Ce second facteur n'est pas pris en charge.",
+        "couldNotAddEmail": "Le code par e-mail n'a pas pu être ajouté.",
+        "couldNotAddSms": "Le code par SMS n'a pas pu être ajouté.",
+        "emailNotVerified": "Vérifiez votre adresse e-mail avant d'ajouter des codes par e-mail.",
+        "phoneNotVerified": "Vérifiez votre numéro de téléphone avant d'ajouter des codes par SMS."
       }
     },
     "passkey": {
@@ -5954,7 +6258,15 @@
       "description": "Sélectionnez la méthode que vous souhaitez utiliser pour vous authentifier",
       "noMethodsAvailable": "Aucune méthode d'authentification disponible",
       "allSetup": "Vous avez déjà configuré un authentificateur !",
-      "linkWithIDP": "ou lier avec un fournisseur d'identité"
+      "linkWithIDP": "ou lier avec un fournisseur d'identité",
+      "methods": {
+        "totp": "Application d'authentification",
+        "u2f": "Second facteur universel",
+        "otpEmail": "Code par e-mail",
+        "otpSms": "Code par SMS",
+        "passkey": "Clés d'accès",
+        "password": "Mot de passe"
+      }
     },
     "device": {
       "usercode": {
@@ -6146,7 +6458,8 @@
         "failedPrecondition": "前提条件に失敗しました",
         "sessionNotValid": "セッションが無効です",
         "passwordVerificationMissing": "パスワード確認がありません。",
-        "passwordVerificationTooOld": "パスワード確認が古すぎます。もう一度パスワードを確認してください。"
+        "passwordVerificationTooOld": "パスワード確認が古すぎます。もう一度パスワードを確認してください。",
+        "passwordResetNotAllowed": "パスワードのリセットは許可されていません。詳細については管理者に問い合わせてください。"
       }
     },
     "idp": {
@@ -6247,6 +6560,11 @@
         "smsDescription": "SMSでコードを受信する電話番号を入力してください。",
         "emailDescription": "メールでコードを受信するメールアドレスを入力してください。",
         "totpRegisterDescription": "QRコードをスキャンするか、URLに手動でアクセスしてください。",
+        "emailAddDescription": "確認済みのメールアドレスに送信されるワンタイムコードを第2要素として使用します。",
+        "smsAddDescription": "確認済みの電話番号に送信されるワンタイムコードを第2要素として使用します。",
+        "add": "追加",
+        "emailAdded": "メールによるコードを追加しました。",
+        "smsAdded": "SMSによるコードを追加しました。",
         "submit": "続行",
         "labels": {
           "code": "コード"
@@ -6254,6 +6572,16 @@
         "required": {
           "code": "必須項目です"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "OTPチャレンジをリクエストできませんでした",
+        "couldNotVerifyCode": "OTPコードを確認できませんでした",
+        "couldNotGetSession": "セッションを読み込めませんでした。もう一度サインインしてください。",
+        "invalidMethod": "この第2要素はサポートされていません。",
+        "couldNotAddEmail": "メールによるコードを追加できませんでした。",
+        "couldNotAddSms": "SMSによるコードを追加できませんでした。",
+        "emailNotVerified": "メールによるコードを追加する前に、メールアドレスを確認してください。",
+        "phoneNotVerified": "SMSによるコードを追加する前に、電話番号を確認してください。"
       }
     },
     "passkey": {
@@ -6415,7 +6743,15 @@
       "description": "認証に使用する方法を選択してください",
       "noMethodsAvailable": "使用可能な認証方法がありません",
       "allSetup": "認証の設定は既に完了しています！",
-      "linkWithIDP": "またはIDプロバイダーと連携"
+      "linkWithIDP": "またはIDプロバイダーと連携",
+      "methods": {
+        "totp": "認証アプリ",
+        "u2f": "ユニバーサルセカンドファクター",
+        "otpEmail": "メールでコードを受け取る",
+        "otpSms": "SMSでコードを受け取る",
+        "passkey": "パスキー",
+        "password": "パスワード"
+      }
     },
     "device": {
       "usercode": {
@@ -6607,7 +6943,8 @@
         "failedPrecondition": "Pré-condição falhou",
         "sessionNotValid": "A sessão não é válida",
         "passwordVerificationMissing": "A verificação de senha está ausente.",
-        "passwordVerificationTooOld": "A verificação de senha expirou. Por favor, verifique sua senha novamente."
+        "passwordVerificationTooOld": "A verificação de senha expirou. Por favor, verifique sua senha novamente.",
+        "passwordResetNotAllowed": "A redefinição de senha não é permitida. Entre em contato com o administrador para mais informações."
       }
     },
     "idp": {
@@ -6708,6 +7045,11 @@
         "smsDescription": "Insira seu número de telefone para receber um código via SMS.",
         "emailDescription": "Insira seu endereço de e-mail para receber um código por e-mail.",
         "totpRegisterDescription": "Escaneie o QR Code ou acesse a URL manualmente.",
+        "emailAddDescription": "Use um código de uso único enviado para o seu endereço de e-mail verificado como segundo fator.",
+        "smsAddDescription": "Use um código de uso único enviado para o seu número de telefone verificado como segundo fator.",
+        "add": "Adicionar",
+        "emailAdded": "Código por e-mail adicionado.",
+        "smsAdded": "Código por SMS adicionado.",
         "submit": "Continuar",
         "labels": {
           "code": "Código"
@@ -6715,6 +7057,16 @@
         "required": {
           "code": "Este campo é obrigatório"
         }
+      },
+      "errors": {
+        "couldNotRequestChallenge": "Não foi possível solicitar o desafio OTP",
+        "couldNotVerifyCode": "Não foi possível verificar o código OTP",
+        "couldNotGetSession": "Não foi possível carregar sua sessão. Entre novamente.",
+        "invalidMethod": "Este segundo fator não é suportado.",
+        "couldNotAddEmail": "Não foi possível adicionar o código por e-mail.",
+        "couldNotAddSms": "Não foi possível adicionar o código por SMS.",
+        "emailNotVerified": "Verifique seu endereço de e-mail antes de adicionar códigos por e-mail.",
+        "phoneNotVerified": "Verifique seu número de telefone antes de adicionar códigos por SMS."
       }
     },
     "passkey": {
@@ -6876,7 +7228,15 @@
       "description": "Selecione o método de autenticação desejado",
       "noMethodsAvailable": "Nenhum método de autenticação disponível",
       "allSetup": "Você já configurou um autenticador!",
-      "linkWithIDP": "ou vincule com um Provedor de Identidade"
+      "linkWithIDP": "ou vincule com um Provedor de Identidade",
+      "methods": {
+        "totp": "Aplicativo autenticador",
+        "u2f": "Segundo fator universal",
+        "otpEmail": "Código via e-mail",
+        "otpSms": "Código via SMS",
+        "passkey": "Chave de Acesso",
+        "password": "Senha"
+      }
     },
     "device": {
       "usercode": {

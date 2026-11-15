@@ -1,4 +1,4 @@
-import { cleanup, render } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { create } from "@zitadel/client";
 import { PasswordComplexitySettingsSchema } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -12,13 +12,13 @@ vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
 }));
 
-vi.mock("@/lib/server/password", () => ({
+vi.mock("@/lib/actions/password", () => ({
   changePassword: vi.fn(),
   resetPassword: vi.fn(),
   sendPassword: vi.fn(),
 }));
 
-vi.mock("@/lib/client", () => ({
+vi.mock("@/lib/actions/flow", () => ({
   handleServerActionResponse: vi.fn(),
 }));
 
@@ -43,6 +43,19 @@ describe("SetPasswordForm", () => {
       />,
     );
     expect(getByTestId("code-text-input")).toHaveFocus();
+  });
+
+  test("should use translated resend accessible name when codeRequired is true", () => {
+    render(
+      <SetPasswordForm
+        passwordComplexitySettings={defaultComplexitySettings}
+        loginName="test@example.com"
+        userId="user-1"
+        codeRequired={true}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "set.resend" })).toBeInTheDocument();
   });
 
   test("should autofocus the password input when codeRequired is false", () => {

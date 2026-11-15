@@ -1,0 +1,376 @@
+---
+title: Hardening instance administrators
+description: "Separate instance administrators from application organizations, align login settings, and apply least privilege for instance roles and the login client."
+sidebar_label: Administrator hardening
+---
+
+<TerminologyUpdate
+    newTerm="Administrators"
+    oldTerms={["Members", "Memberships", "Managers"]}
+/>
+
+Instance administrators (`IAM_*` roles) can manage resources across every organization on an instance.
+Organization administrators (`ORG_*` roles) manage users, projects, and policies within a single organization.
+When both kinds of principals share the same organization, their authorization scope and login experience overlap in ways that can potentially lead to unexpected account takeover.
+
+This guide describes a practical layout that keeps instance administration separate from customer or application organizations, and how to harden the login client and break-glass access.
+
+## Why use a dedicated organization for instance administrators
+
+Create a **dedicated organization** reserved for instance administrators and automation—not for end users or application teams.
+
+| Concern | When instance administrators share an application organization | With a dedicated organization for instance administrators |
+| --- | --- | --- |
+| **Authorization scope** | Organization roles such as `ORG_USER_MANAGER` apply within the same organization where instance administrators may also exist. | Instance roles remain on the instance; organization roles in application organizations cannot reach instance-administrator accounts. |
+| **Login Behavior and Security** | [Login Behavior and Security](/guides/manage/console/default-settings#login-behavior-and-security) can be overridden per organization. Organization Administrators may change MFA, passkeys, external IdPs, or self-registration for the organization where instance-administrator accounts live. | You define strict Organization Login Settings only for instance administrators—without coupling them to product organization settings. |
+| **Password and lockout settings** | [Password complexity](/guides/manage/console/default-settings#password-complexity), [password expiry](/guides/manage/console/default-settings#password-expiry), and [lockout](/guides/manage/console/default-settings#lockout) follow the organization context of the user. | Instance-administrator accounts inherit the Organization Settings you chose for that dedicated organization, independent of customer organizations. |
+| **Operational clarity** | Auditing who is an Administrator mixes customers and instance administrators in one user list. | Instance administrators and service accounts are easy to inventory. |
+
+Instance [default settings](/guides/manage/console/default-settings) act as fallbacks for organizations.
+Organization-level settings and policies still override instance defaults for users in that organization.
+Placing human instance owners or shared break-glass accounts in a customer organization means that organization's administrators can shape how those users authenticate and how local settings behave.
+
+<Callout type="info">
+The default organization created at setup is often used for the Management Console and internal projects.
+Treat it as the dedicated organization for instance administrators **only** if it does not host customer users and no Organization Administrators manage it on behalf of customer organizations.
+Otherwise, create a separate organization for instance administration.
+</Callout>
+
+## Recommended layout
+
+```text
+Instance
+├── Dedicated organization (instance administrators only)
+│   ├── Break-glass IAM_OWNER service account (PAT, offline storage)
+│   ├── Login client service account (IAM_LOGIN_CLIENT only)
+│   └── Optional: other instance automation service accounts
+├── Customer / application organization A
+│   └── End users, Organization Administrators (ORG_* only)
+└── Customer / application organization B
+    └── End users, Organization Administrators (ORG_* only)
+```
+
+**Guidelines:**
+
+- Do not assign `ORG_USER_MANAGER`, `ORG_OWNER`, or similar organization roles to instance administrators or service accounts in the dedicated organization unless they truly manage that organization only.
+- Do not add customer end users to the dedicated organization: users in customer organizations inherit that organization's login and lockout settings, and Organization Administrators can grant organization roles that blur instance-administrator and customer boundaries.
+- Grant instance roles only on the **instance** administrator list, not as a substitute for organization roles on application resources. For instance service accounts (login client, break-glass), follow [Login client (`IAM_LOGIN_CLIENT`)](#login-client-iam_login_client) and review critical permissions in the [administrator permission matrix](/guides/manage/console/administrators#administrator-permission-matrix)—for example `iam.member.write`, `org.member.write`, `user.write`, `user.credential.write`, and `user.passkey.write`. Session permissions (`session.write`, `session.link`) are also granted by default and are required for the login UI—do not remove them without testing the full authentication flow. In self-hosted deployments, defaults can be customized via [`InternalAuthZ.RolePermissionMappings`](/guides/manage/console/administrators#configure-roles).
+
+## Login settings for the dedicated organization
+
+Configure Login Behavior and Security for the dedicated organization explicitly—do not rely on whatever Organization Login Settings happen to apply to a busy application organization.
+
+1. Open the dedicated organization in the Management Console.
+2. Review **Login Behavior and Security** (or set Instance Settings first, then override only where needed).
+3. For instance-administrator accounts, consider:
+   - **Enforcing MFA** for local authentication.
+   - **Restricting external IdPs** if instance administrators should only use credentials you control.
+   - **Disabling self-registration** if the organization is not meant for public signup.
+   - **Tight lockout** and **password complexity** aligned with your instance-administrator baseline.
+   - A **default redirect URI** that does not send instance administrators to a customer application by mistake.
+
+Instance-level and organization-level [identity providers](/guides/manage/console/default-settings#identity-providers) are separate from the Organization Login Settings that control whether external login is allowed and which providers are linked for a given organization.
+An instance IdP can be used by users in an organization only when the **effective Organization Login Settings** for that organization allow external IdPs (`External IDP allowed`) and the provider is **linked** to those settings—or when the organization inherits Instance Settings, which includes the default IdP links.
+Organizations with **custom Organization Login Settings** must enable external IdPs themselves and explicitly add instance or organization IdPs to their provider list; see [Let users login with preferred identity provider](/guides/integrate/identity-providers/introduction).
+Document which IdPs instance administrators may use in the dedicated organization.
+
+More context on settings and policy inheritance: [Settings and policies](/concepts/structure/policies).
+
+## Login client (`IAM_LOGIN_CLIENT`)
+
+The self-hosted [Login UI](/guides/integrate/login-ui/fork-and-deploy-login-app) authenticates to ZITADEL with a service account that holds the **Instance Login Client** role (`IAM_LOGIN_CLIENT`).
+
+**Hardening steps:**
+
+- Create the login client user in the **dedicated organization for instance administrators**, not in a customer or application organization.
+- Use a **dedicated service account** per login deployment; do not reuse administrator or application service account PATs.
+- Grant **only** `IAM_LOGIN_CLIENT` on the instance unless you have a documented exception.
+- Store the PAT in a **secrets manager**; rotate when the login stack is redeployed or team access changes.
+- Do not use the login client PAT for management automation, CI, or customer integrations.
+
+Setup reference: [Create a Login Client](/self-hosting/manage/login-client) and [Adopt Login V2](/self-hosting/manage/adopt-login-v2).
+
+The default `IAM_LOGIN_CLIENT` permission set is broad because the login UI finalizes auth requests, manages users during registration, and may synchronize instance roles when a ZITADEL identity provider grants instance roles from token claims.
+Review the [administrator permission matrix](/guides/manage/console/administrators#administrator-permission-matrix) before customizing roles in self-hosted deployments.
+
+## Break-glass instance owner access
+
+Before changing login routes, features, or Instance Settings, keep a recovery path that does not depend on the interactive login UI.
+
+<Callout type="warn" title="Avoid lockout">
+Create a service account in the dedicated organization with the **Instance Owner** role (`IAM_OWNER`) and a PAT.
+Store the PAT offline according to your incident-access procedures.
+If the login UI or Management Console becomes unreachable, you can still call the [Admin API](/reference/api/admin) to revert settings.
+</Callout>
+
+- Prefer a **service account** for break-glass access; limit human `IAM_OWNER` accounts.
+- Enroll **multiple MFA methods** for any human instance owners.
+- Invite a **second trusted administrator** on the instance so access is not tied to a single person.
+
+## Self-hosted custom role mappings
+
+If you override [`InternalAuthZ.RolePermissionMappings`](/guides/manage/console/administrators#configure-roles) in runtime configuration:
+
+- Diff your mappings against the shipped defaults in `cmd/defaults.yaml`.
+- Remove permissions that your automation does not need.
+- If you use ZITADEL-as-IdP **instance role sync**, the login client still needs permission to manage instance administrators for users logging in through that IdP; do not remove those capabilities without testing the support or federation flow you rely on.
+
+## Periodic review
+
+Review instance administrators on a schedule and after major organization or login changes.
+
+**List instance administrators** ([Internal Permission Service v2](/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.ListAdministrators)):
+
+```shell
+curl -sS -X POST \
+  "https://${CUSTOM_DOMAIN}/zitadel.internal_permission.v2.InternalPermissionService/ListAdministrators" \
+  -H "Authorization: Bearer ${IAM_OWNER_PAT}" \
+  -H "Content-Type: application/json" \
+  -H "Connect-Protocol-Version: 1" \
+  -d '{
+    "pagination": { "offset": 0, "limit": 100, "asc": true },
+    "filters": [
+      { "resource": { "instance": true } }
+    ]
+  }'
+```
+
+The response includes each user's `organizationId` and granted `roles`, which helps verify placement in the dedicated organization.
+
+<Callout type="info">
+The Admin API `POST /admin/v1/members/_search` endpoint is deprecated; prefer `ListAdministrators` above.
+</Callout>
+
+**Questions to answer:**
+
+- Does every `IAM_*` holder belong to the dedicated organization for instance administrators (or a documented exception)?
+- Does the login client service account hold **only** `IAM_LOGIN_CLIENT`?
+- Are there human `IAM_OWNER` accounts in application organizations?
+- Did any instance administrator change since the last review? Use the [Event API](/guides/integrate/zitadel-apis/event-api) or [stream audit logs to external systems](/guides/integrate/external-audit-log) for change history.
+
+## Detect grants with Actions v2
+
+Use [Actions v2](/concepts/features/actions_v2) to get notified when instance administrators change, instead of relying only on scheduled API reviews.
+Each webhook receives the stored event, including the affected user and role list.
+
+**Prerequisites**
+
+- An access token for a user with `IAM_OWNER` (or another role that can manage Actions targets and executions).
+- A reachable HTTPS endpoint (or [Webhook.site](/guides/integrate/actions/webhook-site-setup) for testing).
+- Familiarity with the [Actions event guide](/guides/integrate/actions/testing-event) and [payload format](/guides/integrate/actions/usage#sent-information-event).
+
+### 1. Create a webhook target
+
+```shell
+curl -sS -X POST "https://${CUSTOM_DOMAIN}/v2/actions/targets" \
+  -H "Authorization: Bearer ${IAM_OWNER_PAT}" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{
+    "name": "instance-administrator-monitor",
+    "restWebhook": { "interruptOnError": false },
+    "endpoint": "https://your-ops-endpoint.example/webhook/zitadel-instance-members",
+    "timeout": "10s"
+  }'
+```
+
+Save the returned target ID. Verify inbound requests with the target [signing key](/guides/integrate/actions/testing-request-signature) in production.
+
+### 2. Register executions for instance member events
+
+Create one execution per event type you want to monitor:
+
+| Event | When it fires |
+| --- | --- |
+| `instance.member.added` | A user is granted instance administrator roles for the first time |
+| `instance.member.changed` | Instance administrator roles for a user are updated |
+| `instance.member.removed` | Instance administrator roles are removed |
+
+Example for new grants:
+
+```shell
+curl -sS -X PUT "https://${CUSTOM_DOMAIN}/v2/actions/executions" \
+  -H "Authorization: Bearer ${IAM_OWNER_PAT}" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{
+    "condition": {
+      "event": {
+        "event": "instance.member.added"
+      }
+    },
+    "targets": ["<TARGET_ID>"]
+  }'
+```
+
+Repeat for `instance.member.changed` and `instance.member.removed` if you want alerts on updates and removals as well.
+
+### 3. Interpret the webhook payload
+
+The webhook body follows the [Actions event payload](/guides/integrate/actions/usage#sent-information-event). For instance member events, relevant fields include:
+
+- `event_type` — e.g. `instance.member.added`
+- `aggregateType` — `instance`
+- `userID` — actor who performed the change (when available)
+- `event_payload` — JSON with at least `userId` (administrator) and `roles` (granted instance roles)
+
+Example decoded `event_payload` for a grant:
+
+```json
+{
+  "userId": "382586560962387915",
+  "roles": ["IAM_LOGIN_CLIENT", "IAM_OWNER"]
+}
+```
+
+### 4. What to flag in your handler
+
+Combine real-time events with the [periodic `ListAdministrators` review](#periodic-review) above:
+
+- Any `IAM_OWNER` or `IAM_USER_MANAGER` grant outside your dedicated organization for instance administrators (compare `userId` to your allow-list or resolve organization via API).
+- Login client service account holding roles other than `IAM_LOGIN_CLIENT`.
+- `instance.member.changed` where `roles` includes high-privilege `IAM_*` roles you did not expect.
+- Grants performed by users or service accounts that are not on your approved administrator list (`userID` in the outer payload).
+
+Post alerts to your operations channel, SIEM, or ticket system. On [ZITADEL Cloud](/guides/manage/cloud/overview), Actions v2 webhooks are supported; self-hosted installations can use the same API.
+
+See also: [Actions v2 examples](https://github.com/zitadel/actions/tree/main/actions-v2-cloudflare-workers) and [streaming audit logs](/guides/integrate/external-audit-log).
+
+## Monitor organization administrators in the dedicated organization
+
+Instance `IAM_*` roles are not the only risk in a mixed layout: **organization roles inside the dedicated organization** (`ORG_USER_MANAGER`, `ORG_OWNER`, …) apply to users in that same organization, including break-glass accounts and service accounts.
+
+Monitor Organization Administrators for the dedicated organization alongside instance administrators.
+
+### Periodic review (API)
+
+List Organization Administrators with [ListAdministrators](/reference/api/internal_permission/zitadel.internal_permission.v2.InternalPermissionService.ListAdministrators), filtered to your dedicated organization:
+
+```shell
+curl -sS -X POST \
+  "https://${CUSTOM_DOMAIN}/zitadel.internal_permission.v2.InternalPermissionService/ListAdministrators" \
+  -H "Authorization: Bearer ${IAM_OWNER_PAT}" \
+  -H "Content-Type: application/json" \
+  -H "Connect-Protocol-Version: 1" \
+  -d '{
+    "pagination": { "offset": 0, "limit": 100, "asc": true },
+    "filters": [
+      { "resource": { "organizationId": "${PLATFORM_ORGANIZATION_ID}" } }
+    ]
+  }'
+```
+
+**Questions to answer:**
+
+- Are there `ORG_USER_MANAGER` or `ORG_OWNER` grants on the dedicated organization you did not expect?
+- Do any instance administrators or service accounts hold Organization Administrator roles in the dedicated organization without an operational reason?
+- Are customer Organization Administrators accidentally granted roles in the dedicated organization?
+
+In the Management Console, open the dedicated organization and review **ADMINISTRATORS** in the organization details panel (same UI pattern as [ZITADEL Administrators](/guides/manage/console/administrators)).
+
+### Organization member events (Actions v2)
+
+| Event | When it fires |
+| --- | --- |
+| `org.member.added` | A user is granted organization administrator roles |
+| `org.member.changed` | Organization administrator roles are updated |
+| `org.member.removed` | Organization administrator roles are removed |
+
+Use the same [target setup](#1-create-a-webhook-target) as for instance member events, then add executions:
+
+```shell
+curl -sS -X PUT "https://${CUSTOM_DOMAIN}/v2/actions/executions" \
+  -H "Authorization: Bearer ${IAM_OWNER_PAT}" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{
+    "condition": {
+      "event": {
+        "event": "org.member.added"
+      }
+    },
+    "targets": ["<TARGET_ID>"]
+  }'
+```
+
+Repeat for `org.member.changed` and `org.member.removed` as needed.
+
+The webhook payload uses the same [event structure](/guides/integrate/actions/usage#sent-information-event). For `org.member.*` events, `aggregateType` is `org` and `aggregateID` is the organization ID. Filter in your handler so you only alert when `aggregateID` equals your `${PLATFORM_ORGANIZATION_ID}`. The `event_payload` contains `userId` and `roles` (for example `ORG_USER_MANAGER`, `ORG_OWNER`).
+
+Flag grants such as unexpected `ORG_USER_MANAGER` on the dedicated organization, or any Organization Administrator role on users that should be service accounts only.
+
+## Review changes with the Event API
+
+If you already pull audit data into a SIEM or batch job, the [Event API](/guides/integrate/zitadel-apis/event-api) is an alternative to [Actions v2 webhooks](#detect-grants-with-actions-v2).
+Poll on a schedule (for example every few minutes) and process new rows since the last `sequence`.
+
+Requires `IAM_OWNER` or `IAM_OWNER_VIEWER`.
+
+### Instance administrator events
+
+```shell
+curl -sS -X POST "https://${CUSTOM_DOMAIN}/admin/v1/events/_search" \
+  -H "Authorization: Bearer ${IAM_OWNER_PAT}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "asc": true,
+    "limit": 1000,
+    "sequence": 0,
+    "aggregate_types": ["instance"],
+    "event_types": [
+      "instance.member.added",
+      "instance.member.changed",
+      "instance.member.removed"
+    ]
+  }'
+```
+
+Increase `sequence` on subsequent runs to the highest sequence returned previously so you only fetch new events.
+
+### Dedicated organization administrator events
+
+Filter by your dedicated organization ID as `resource_owner` and restrict to organization member events:
+
+```shell
+curl -sS -X POST "https://${CUSTOM_DOMAIN}/admin/v1/events/_search" \
+  -H "Authorization: Bearer ${IAM_OWNER_PAT}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "asc": true,
+    "limit": 1000,
+    "sequence": 0,
+    "resource_owner": "${PLATFORM_ORGANIZATION_ID}",
+    "aggregate_types": ["org"],
+    "event_types": [
+      "org.member.added",
+      "org.member.changed",
+      "org.member.removed"
+    ]
+  }'
+```
+
+Parse each event payload for `userId` and `roles`, then apply the same allow-list checks as in the Actions handlers above.
+
+<Callout type="info">
+**Actions v2 vs Event API:** Actions push events to your endpoint in near real time with minimal setup. The Event API fits centralized log pipelines, replay, and environments where outbound webhooks are undesirable. You can use both.
+</Callout>
+
+## Checklist
+
+- [ ] Dedicated organization for instance administrators exists; customer users are not members.
+- [ ] Login Behavior and Security for the dedicated organization enforces your instance-administrator authentication baseline (MFA, IdPs, lockout).
+- [ ] Login client service account lives in the dedicated organization with a dedicated PAT.
+- [ ] Break-glass `IAM_OWNER` PAT is stored offline and tested periodically.
+- [ ] Custom `RolePermissionMappings` (if any) are reviewed against least privilege.
+- [ ] Organization Administrators (`ORG_*`) on the dedicated organization are reviewed and monitored (`org.member.*` events or Event API).
+- [ ] Instance administrators are reviewed regularly and **Actions v2** monitors `instance.member.*` events (or changes are pulled via the **Event API** / SIEM).
+
+## Related guides
+
+- [ZITADEL Administrators](/guides/manage/console/administrators)
+- [Authenticate service accounts](/guides/integrate/service-accounts/authenticate-service-accounts)
+- [Production checklist (Cloud)](/guides/manage/production-checklist)
+- [Production checklist (self-hosting)](/self-hosting/manage/productionchecklist)
+- [Test Actions on events](/guides/integrate/actions/testing-event)
+- [Actions v2 usage and payloads](/guides/integrate/actions/usage)
+- [Get events from ZITADEL](/guides/integrate/zitadel-apis/event-api)
