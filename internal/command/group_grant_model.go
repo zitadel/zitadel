@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"slices"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -69,8 +70,8 @@ func (wm *GroupGrantWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return query
 }
 
-func GroupGrantAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
-	return eventstore.AggregateFromWriteModel(wm, groupgrant.AggregateType, groupgrant.AggregateVersion)
+func GroupGrantAggregateFromWriteModel(ctx context.Context, wm *eventstore.WriteModel) *eventstore.Aggregate {
+	return eventstore.AggregateFromWriteModelCtx(ctx, wm, groupgrant.AggregateType, groupgrant.AggregateVersion)
 }
 
 // GroupGrantPreConditionReadModel validates that the group exists in the organization

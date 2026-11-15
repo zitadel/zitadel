@@ -757,10 +757,11 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	if !idpTemplate.IsCreationAllowed && !idpTemplate.IsLinkingAllowed {
-		if err == nil {
-			err = zerrors.ThrowPreconditionFailed(nil, "LOGIN-3kl44", "Errors.User.ExternalIDP.NoOptionAllowed")
+		if err != nil {
+			l.renderError(w, r, authReq, err)
+			return
 		}
-		l.renderError(w, r, authReq, err)
+		l.renderExternalNotFoundNoOption(w, r, authReq, idpTemplate)
 		return
 	}
 
@@ -800,6 +801,26 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 		},
 	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalNotFoundOption], data, funcs)
+}
+
+// renderExternalNotFoundNoOption renders a page informing the user that their external user does not
+// match any existing ZITADEL user and that neither creating nor linking a user is possible.
+// The message can be customized per instance and organization with the ExternalNotFound.NoOptionAvailable
+// login text.
+func (l *Login) renderExternalNotFoundNoOption(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpTemplate *query.IDPTemplate) {
+	ctx := r.Context()
+	logging.WithFields(
+		"instance", authz.GetInstance(ctx).InstanceID(),
+		"authReq", authReq.ID,
+		"idpConfigID", idpTemplate.ID,
+	).Info("external user not found and neither creation nor linking is possible")
+
+	providerName := domain.IDPName(idpTemplate.Name, idpTemplate.Type)
+	translator := l.getTranslator(ctx, authReq)
+	data := l.getBaseData(r, authReq, translator, "ExternalNotFound.Title", "", nil)
+	data.ErrMessage = l.renderer.LocalizeFromRequest(translator, r, domain.LoginKeyExternalNotFoundNoOptionAvailable,
+		map[string]interface{}{"ProviderName": providerName})
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplError], data, nil)
 }
 
 // handleExternalNotFoundOptionCheck takes the data from the submitted externalNotFound page

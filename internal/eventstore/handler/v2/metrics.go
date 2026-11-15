@@ -45,7 +45,9 @@ func newProjectionMetrics(ctx context.Context, m metrics.Metrics) *ProjectionMet
 		ProjectionStateLatencyMetric,
 		"When finishing processing a batch of events, this track the age of the last events seen from current time",
 		"s",
-		[]float64{0.1, 0.5, 1, 5, 10, 30, 60, 300, 600, 1800},
+		// the upper bounds up to a week make a projection that falls hours or days behind visible,
+		// instead of reporting every latency above 30 minutes as the 1800s bucket
+		[]float64{0.1, 0.5, 1, 5, 10, 30, 60, 300, 600, 1800, 3600, 21600, 86400, 604800},
 	)
 	logging.OnError(ctx, err).Error("failed to register projection state latency metric")
 	return projectionMetrics

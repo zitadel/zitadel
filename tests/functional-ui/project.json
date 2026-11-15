@@ -31,8 +31,7 @@
         "commands": [
           "cypress install",
           "wait-on --verbose --interval 2000 --simultaneous 1 --timeout 30m \"${CYPRESS_BACKEND_URL}/debug/ready\"",
-          "DISPLAY='' cypress run",
-          "nx run @zitadel/functional-ui:stop"
+          "DISPLAY='' cypress run"
         ]
       },
       "cache": true,

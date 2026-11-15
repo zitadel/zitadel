@@ -1,0 +1,891 @@
+"use server";
+
+import { getSessionCookieById } from "@/lib/server/cookies";
+import { getEnrollmentAuthorizationError } from "@/lib/server/enrollment-guard";
+import { getBindingIdCookie } from "@/lib/server/fingerprint";
+import { isClassifiedError } from "@/lib/server/grpc/interceptors/error-classification";
+import { isIdpFlowProofValid } from "@/lib/server/idp-flow-proof";
+import { validateIDPLinkingPermissions } from "@/lib/server/idp-linking";
+import { createNewSessionFromIdpIntent } from "@/lib/server/idp-session";
+import { syncInstanceRolesFromIdpIntent } from "@/lib/server/instance-roles";
+import { createLogger } from "@/lib/server/logger";
+import { getServiceConfig } from "@/lib/server/service-url";
+import {
+  addIDPLink,
+  createUser,
+  getDefaultOrg,
+  getIDPByID,
+  getLoginSettings,
+  getOrgsByDomain,
+  getSession,
+  getUserByID,
+  listUsers,
+  retrieveIDPIntent,
+  ServiceConfig,
+  updateUser,
+} from "@/lib/server/zitadel";
+import { Code, create } from "@zitadel/client";
+import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
+import { SetHumanEmail } from "@zitadel/proto/zitadel/user/v2/email_pb";
+import { SetHumanProfile } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import {
+  CreateUserRequest,
+  CreateUserRequestSchema,
+  UpdateUserRequest,
+  UpdateUserRequestSchema,
+} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
+
+const logger = createLogger("idp-intent");
+
+const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
+
+type IDPIntentResult = Awaited<ReturnType<typeof retrieveIDPIntent>>;
+
+/**
+ * Flattened view of the "create user" information contained in an IDP intent response,
+ * used for reads (organization resolution, required-field checks and form pre-filling).
+ */
+interface ResolvedCreateUser {
+  username?: string;
+  profile?: SetHumanProfile;
+  email?: SetHumanEmail;
+}
+
+/**
+ * Reads the "create user" information from an IDP intent response.
+ *
+ * Prefers the new `user_action.create_user` oneof (CreateUserRequest, which supports metadata).
+ * Falls back to the deprecated `add_human_user` field so that responses from older API versions
+ * keep working during the transition.
+ */
+function resolveCreateUser(intent: IDPIntentResult): ResolvedCreateUser | undefined {
+  if (intent.userAction?.case === "createUser") {
+    const request = intent.userAction.value;
+    const human = request.userType?.case === "human" ? request.userType.value : undefined;
+    return {
+      username: request.username,
+      profile: human?.profile,
+      email: human?.email,
+    };
+  }
+
+  // Fallback: deprecated add_human_user (does not support the new top-level metadata).
+  if (intent.addHumanUser) {
+    return {
+      username: intent.addHumanUser.username,
+      profile: intent.addHumanUser.profile,
+      email: intent.addHumanUser.email,
+    };
+  }
+
+  return undefined;
+}
+
+/**
+ * Builds the request for the non-deprecated CreateUser endpoint from an IDP intent response.
+ *
+ * Prefers the new `user_action.create_user` oneof: the action's request is passed through as-is
+ * and only the resolved organization is injected. Falls back to mapping the deprecated
+ * `add_human_user` (flat) fields into the new nested shape for older API responses.
+ */
+function buildCreateUserRequest(intent: IDPIntentResult, organizationId: string): CreateUserRequest | undefined {
+  if (intent.userAction?.case === "createUser") {
+    return create(CreateUserRequestSchema, {
+      ...intent.userAction.value,
+      organizationId,
+    });
+  }
+
+  // Fallback: map the deprecated flat add_human_user payload into the CreateUserRequest shape.
+  if (intent.addHumanUser) {
+    const add = intent.addHumanUser;
+    return create(CreateUserRequestSchema, {
+      organizationId,
+      username: add.username,
+      userType: {
+        case: "human",
+        value: {
+          profile: add.profile,
+          email: add.email,
+          phone: add.phone,
+          idpLinks: add.idpLinks,
+        },
+      },
+      // SetMetadataEntry and Metadata share the same {key, value} shape; map explicitly.
+      metadata: add.metadata?.map((entry) => ({ key: entry.key, value: entry.value })),
+    });
+  }
+
+  return undefined;
+}
+
+/**
+ * Builds the request for the non-deprecated UpdateUser endpoint from an IDP intent response.
+ *
+ * Prefers the new `user_action.update_user` oneof (UpdateUserRequest, which supports metadata).
+ * Falls back to the deprecated `update_human_user` field for older API responses.
+ *
+ * Note: we intentionally sync only profile, email, phone and metadata here (not the username) to
+ * preserve the existing auto-update behaviour and avoid invalidating sessions on every login.
+ */
+function buildUpdateUserRequest(intent: IDPIntentResult, userId: string): UpdateUserRequest | undefined {
+  if (intent.userAction?.case === "updateUser") {
+    const request = intent.userAction.value;
+    // UpdateUserRequest.user_type is optional and also supports machine updates. Only sync a
+    // human profile (IDP users are human); for any other case we still carry the metadata over,
+    // since metadata is a top-level field independent of the user type.
+    const human = request.userType?.case === "human" ? request.userType.value : undefined;
+
+    // Nothing to apply: neither human profile data nor metadata. Skip the update entirely.
+    if (!human && (request.metadata?.length ?? 0) === 0) {
+      return undefined;
+    }
+
+    return create(UpdateUserRequestSchema, {
+      userId,
+      userType: human
+        ? {
+            case: "human",
+            value: {
+              profile: human.profile,
+              email: human.email,
+              phone: human.phone,
+            },
+          }
+        : undefined,
+      metadata: request.metadata,
+    });
+  }
+
+  // Fallback: deprecated update_human_user (has no metadata support).
+  if (intent.updateHumanUser) {
+    const update = intent.updateHumanUser;
+    return create(UpdateUserRequestSchema, {
+      userId,
+      userType: {
+        case: "human",
+        value: {
+          // The deprecated profile is a SetHumanProfile; map it to the Update profile shape.
+          profile: update.profile
+            ? {
+                givenName: update.profile.givenName,
+                familyName: update.profile.familyName,
+                nickName: update.profile.nickName,
+                displayName: update.profile.displayName,
+                preferredLanguage: update.profile.preferredLanguage,
+                gender: update.profile.gender,
+              }
+            : undefined,
+          email: update.email,
+          phone: update.phone,
+        },
+      },
+    });
+  }
+
+  return undefined;
+}
+
+async function resolveOrganizationForUser({
+  organization,
+  createUserData,
+  serviceConfig,
+}: {
+  organization?: string;
+  createUserData?: ResolvedCreateUser;
+  serviceConfig: ServiceConfig;
+}): Promise<string | undefined> {
+  if (organization) return organization;
+
+  if (createUserData?.username && ORG_SUFFIX_REGEX.test(createUserData.username)) {
+    const matched = ORG_SUFFIX_REGEX.exec(createUserData.username);
+    const suffix = matched?.[1] ?? "";
+
+    const orgs = await getOrgsByDomain({ serviceConfig, domain: suffix });
+    const orgToCheckForDiscovery = orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
+
+    if (orgToCheckForDiscovery) {
+      const orgLoginSettings = await getLoginSettings({ serviceConfig, organization: orgToCheckForDiscovery });
+      if (orgLoginSettings?.allowDomainDiscovery) {
+        return orgToCheckForDiscovery;
+      }
+    }
+  }
+
+  // Fallback to default organization if no org was resolved through discovery
+  const defaultOrg = await getDefaultOrg({ serviceConfig });
+  return defaultOrg?.id;
+}
+
+type IDPConfig = Awaited<ReturnType<typeof getIDPByID>>;
+
+interface IDPHandlerContext {
+  serviceConfig: ServiceConfig;
+  t: (key: string) => string;
+  intent: IDPIntentResult;
+  idp: NonNullable<IDPConfig>;
+  options: NonNullable<NonNullable<IDPConfig>["config"]>["options"];
+  params: {
+    provider: string;
+    id: string;
+    token: string;
+    requestId?: string;
+    organization?: string;
+    postErrorRedirectUrl?: string;
+    sessionId?: string;
+  };
+  buildRedirectParams: (additionalParams?: Record<string, string>, includeToken?: boolean) => string;
+}
+
+type IDPHandlerResult = {
+  redirect?: string;
+  error?: string;
+  samlData?: { url: string; fields: Record<string, string> };
+} | null;
+
+/**
+ * CASE 1: Explicit Linking (via sessionId)
+ * This happens when a logged-in user initiates an IDP flow to link it to their account.
+ */
+async function resolveUserIdFromSession({
+  sessionId,
+  serviceConfig,
+  provider,
+}: {
+  sessionId: string;
+  serviceConfig: ServiceConfig;
+  provider: string;
+}) {
+  try {
+    const sessionCookie = await getSessionCookieById({ sessionId });
+    if (!sessionCookie) {
+      logger.warn("Session for linking not found or invalid");
+      return { redirect: `/idp/${provider}/linking-failed?error=session_invalid` };
+    }
+
+    const sessionResp = await getSession({
+      serviceConfig,
+      sessionId: sessionCookie.id,
+      sessionToken: sessionCookie.token,
+    });
+    const session = sessionResp.session;
+
+    if (!session?.factors?.user?.id) {
+      logger.warn("Session found but no userId associated for linking");
+      return { redirect: `/idp/${provider}/linking-failed?error=session_invalid` };
+    }
+
+    // Explicit linking must be authorized the same way credential enrollment is. An
+    // "identify-only" session — produced by only submitting a login name, with no verified
+    // primary factor (password / passkey / IDP intent) — must NOT be trusted on its own:
+    // otherwise an unauthenticated attacker who merely knows a victim's login name could bind
+    // their own external identity to the victim's account (account takeover). The flowFingerprint
+    // checked at the entry of processIDPCallback only proves the link request originated from
+    // the same browser that started the flow, not that the session was ever authenticated.
+    //
+    // getEnrollmentAuthorizationError authorizes when the session has a verified, non-expired
+    // primary factor, OR the user has no authentication methods yet AND passed a
+    // user-verification check (the email/invite-code proof bound to this browser's
+    // binding id). The latter preserves the legitimate "link an IDP as the first
+    // authenticator" onboarding flow, which isSessionValid would have rejected.
+    const enrollmentError = await getEnrollmentAuthorizationError({
+      serviceConfig,
+      session,
+      userId: session.factors.user.id,
+    });
+    if (enrollmentError) {
+      logger.warn("Session for linking is not authorized", { enrollmentError });
+      return { redirect: `/idp/${provider}/linking-failed?error=session_invalid` };
+    }
+
+    return { userId: session.factors.user.id };
+  } catch (error) {
+    logger.warn("Error retrieving session for linking", { error });
+    return { redirect: `/idp/${provider}/linking-failed?error=session_invalid` };
+  }
+}
+
+async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResult> {
+  const { sessionId, provider } = ctx.params;
+  const { userId } = ctx.intent;
+  const { options, serviceConfig, intent, t, buildRedirectParams } = ctx;
+
+  if (sessionId && !userId) {
+    // Intent should not have a userId if it is a linking intent
+    // 1. The flowFingerprint checked at the entry of processIDPCallback is bound to this sessionId and browser
+    // 2. Retrieve Session & Resolve User
+    const { userId: resolvedUserId, redirect: sessionRedirect } = await resolveUserIdFromSession({
+      sessionId,
+      serviceConfig,
+      provider,
+    });
+
+    if (sessionRedirect || !resolvedUserId) {
+      return { redirect: sessionRedirect || `/idp/${provider}/linking-failed?error=session_invalid` };
+    }
+
+    logger.debug("Resolved userId from session link", { userId: resolvedUserId });
+
+    // 3. Perform Linking Logic
+    if (!options?.isLinkingAllowed) {
+      logger.error("Linking not allowed by IDP configuration");
+      const params = buildRedirectParams();
+      return { redirect: `/idp/${provider}/linking-failed?${params}&error=linking_not_allowed` };
+    }
+
+    try {
+      const targetUser = await getUserByID({ serviceConfig, userId: resolvedUserId });
+
+      if (!targetUser || !targetUser.details?.resourceOwner) {
+        logger.error("User not found or missing organization");
+        const params = buildRedirectParams();
+        return { redirect: `/idp/${provider}/linking-failed?${params}&error=user_not_found` };
+      }
+
+      const isAllowed = await validateIDPLinkingPermissions({
+        serviceConfig,
+        userOrganizationId: targetUser.details.resourceOwner,
+        idpId: intent.idpInformation!.idpId,
+      });
+
+      if (!isAllowed) {
+        logger.error("IDP linking validation failed");
+        const params = buildRedirectParams();
+        return { redirect: `/idp/${provider}/linking-failed?${params}&error=validation_failed` };
+      }
+
+      await addIDPLink({
+        serviceConfig,
+        idp: {
+          id: intent.idpInformation!.idpId,
+          userId: intent.idpInformation!.userId,
+          userName: intent.idpInformation!.userName,
+        },
+        userId: resolvedUserId,
+      });
+      logger.info("IDP linked successfully, creating session");
+
+      const sessionResult = await createNewSessionFromIdpIntent({
+        userId: resolvedUserId,
+        idpIntent: {
+          idpIntentId: ctx.params.id,
+          idpIntentToken: ctx.params.token,
+        },
+        requestId: ctx.params.requestId,
+        organization: ctx.params.organization,
+      });
+
+      if ("error" in sessionResult && sessionResult.error) {
+        logger.error("Error creating session", { error: sessionResult.error });
+        return { error: sessionResult.error };
+      }
+
+      if ("redirect" in sessionResult && sessionResult.redirect) {
+        logger.debug("Session created, redirecting", { redirect: sessionResult.redirect });
+        return { redirect: sessionResult.redirect };
+      }
+
+      if ("samlData" in sessionResult && sessionResult.samlData) {
+        logger.info("Session created, returning samlData");
+        return { samlData: sessionResult.samlData };
+      }
+
+      return { error: t("errors.sessionCreationFailed") };
+    } catch (error) {
+      logger.error("Error linking IDP", { error });
+      const errorMessage = error instanceof Error ? error.message : t("errors.unknownError");
+      let params = buildRedirectParams({ error: errorMessage });
+      if (isClassifiedError(error) && error.code === Code.AlreadyExists) {
+        params = buildRedirectParams({ error: "external_idp_taken" });
+      }
+      return { redirect: `/idp/${provider}/linking-failed?${params}` };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * CASE 2: User exists and should sign in
+ */
+async function handleUserExists(ctx: IDPHandlerContext): Promise<IDPHandlerResult> {
+  const { sessionId } = ctx.params;
+  const { userId } = ctx.intent;
+  const { options, serviceConfig, t } = ctx;
+
+  if (userId && !sessionId) {
+    // Auto-update user if enabled. Uses the non-deprecated UpdateUser endpoint so that
+    // metadata provided by the action response is applied in the same request.
+    const updateUserRequest = options?.isAutoUpdate ? buildUpdateUserRequest(ctx.intent, userId) : undefined;
+    if (updateUserRequest) {
+      try {
+        logger.debug("Auto-updating user profile");
+        await updateUser({ serviceConfig, request: updateUserRequest });
+      } catch (error) {
+        logger.warn("Failed to auto-update user", { error });
+        // Continue with login even if update fails
+      }
+    }
+
+    // Synchronize instance member roles for ZITADEL IdPs with instanceRolesInfo
+    // configured (e.g. support access). Merge-only and never blocks the login.
+    await syncInstanceRolesFromIdpIntent({ serviceConfig, intent: ctx.intent, userId });
+
+    // Create session and handle redirect
+    logger.debug("Creating session for existing user");
+    const sessionResult = await createNewSessionFromIdpIntent({
+      userId,
+      idpIntent: {
+        idpIntentId: ctx.params.id,
+        idpIntentToken: ctx.params.token,
+      },
+      requestId: ctx.params.requestId,
+      organization: ctx.params.organization,
+    });
+
+    if ("error" in sessionResult && sessionResult.error) {
+      logger.error("Error creating session", { error: sessionResult.error });
+      return { error: sessionResult.error };
+    }
+
+    if ("redirect" in sessionResult && sessionResult.redirect) {
+      logger.debug("Session created, redirecting", { redirect: sessionResult.redirect });
+      return { redirect: sessionResult.redirect };
+    }
+
+    if ("samlData" in sessionResult && sessionResult.samlData) {
+      logger.info("Session created, returning samlData");
+      return { samlData: sessionResult.samlData };
+    }
+
+    return { error: t("errors.sessionCreationFailed") };
+  }
+
+  return null;
+}
+
+/**
+ * CASE 3: Auto-linking (search for user and link)
+ */
+async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResult> {
+  const { options, intent, serviceConfig, buildRedirectParams, t } = ctx;
+  const { idpInformation } = intent;
+  const createUserData = resolveCreateUser(intent);
+  const { organization, provider } = ctx.params;
+
+  if (options?.autoLinking) {
+    let foundUser;
+    const email = createUserData?.email?.email;
+    const emailVerified =
+      createUserData?.email?.verification?.case === "isVerified" && createUserData?.email?.verification?.value;
+
+    // The lookups below are case insensitive, so they can return several users when case variants
+    // of the same address or username exist. Linking a verified IDP identity to an arbitrary one of
+    // them would be an account takeover, so only link when the match is unambiguous. Falling through
+    // with `null` leaves the user on the regular linking/creation flow.
+    const onlyMatch = <T>(response: { result?: T[] }): T | null => {
+      if (!response.result?.length) {
+        return null;
+      }
+
+      if (response.result.length > 1) {
+        logger.warn("Auto-linking skipped: user lookup was ambiguous", { matches: response.result.length });
+        return null;
+      }
+
+      return response.result[0];
+    };
+
+    if (options.autoLinking === AutoLinkingOption.EMAIL && email && emailVerified) {
+      foundUser = await listUsers({ serviceConfig, email, organizationId: organization }).then(onlyMatch);
+    } else if (options.autoLinking === AutoLinkingOption.USERNAME) {
+      foundUser = await listUsers({
+        serviceConfig,
+        userName: idpInformation!.userName,
+        organizationId: organization,
+      }).then(onlyMatch);
+    }
+
+    if (foundUser) {
+      try {
+        if (!foundUser.details?.resourceOwner) {
+          logger.error("Found user missing organization information");
+          const params = buildRedirectParams();
+          return { redirect: `/idp/${provider}/linking-failed?${params}&error=missing_organization` };
+        }
+
+        // Validate IDP linking permissions
+        const isAllowed = await validateIDPLinkingPermissions({
+          serviceConfig,
+          userOrganizationId: foundUser.details.resourceOwner,
+          idpId: idpInformation!.idpId,
+        });
+
+        if (!isAllowed) {
+          logger.error("Auto-linking validation failed");
+          const params = buildRedirectParams();
+          return { redirect: `/idp/${provider}/linking-failed?${params}&error=validation_failed` };
+        }
+
+        await addIDPLink({
+          serviceConfig,
+          idp: {
+            id: idpInformation!.idpId,
+            userId: idpInformation!.userId,
+            userName: idpInformation!.userName,
+          },
+          userId: foundUser.userId,
+        });
+        logger.info("User auto-linked successfully, creating session");
+
+        // Synchronize instance member roles for ZITADEL IdPs with instanceRolesInfo
+        // configured (e.g. support access). Merge-only and never blocks the login.
+        // Required here as well: a user that is auto-linked on this login would
+        // otherwise only receive its roles on the next one (via the existing-user path).
+        await syncInstanceRolesFromIdpIntent({ serviceConfig, intent, userId: foundUser.userId });
+
+        // Create session after auto-linking
+        const sessionResult = await createNewSessionFromIdpIntent({
+          userId: foundUser.userId,
+          idpIntent: {
+            idpIntentId: ctx.params.id,
+            idpIntentToken: ctx.params.token,
+          },
+          requestId: ctx.params.requestId,
+          organization: ctx.params.organization,
+        });
+
+        if ("error" in sessionResult && sessionResult.error) {
+          logger.error("Error creating session", { error: sessionResult.error });
+          return { error: sessionResult.error };
+        }
+
+        if ("redirect" in sessionResult && sessionResult.redirect) {
+          logger.debug("Session created, redirecting", { redirect: sessionResult.redirect });
+          return { redirect: sessionResult.redirect };
+        }
+
+        if ("samlData" in sessionResult && sessionResult.samlData) {
+          logger.info("Session created, returning samlData");
+          return { samlData: sessionResult.samlData };
+        }
+
+        return { error: t("errors.sessionCreationFailed") };
+      } catch (error) {
+        logger.error("Error auto-linking user", { error });
+        const errorMessage = error instanceof Error ? error.message : t("errors.unknownError");
+        const params = buildRedirectParams({ error: errorMessage });
+        return { redirect: `/idp/${provider}/linking-failed?${params}` };
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * CASE 4: Auto-creation of user
+ */
+async function handleAutoCreation(ctx: IDPHandlerContext): Promise<IDPHandlerResult> {
+  const { options, intent, serviceConfig, buildRedirectParams, t } = ctx;
+  const { idpInformation } = intent;
+  const createUserData = resolveCreateUser(intent);
+  const { organization, provider } = ctx.params;
+
+  if (options?.isAutoCreation && createUserData) {
+    const orgToRegisterOn = await resolveOrganizationForUser({
+      organization,
+      createUserData,
+      serviceConfig,
+    });
+
+    if (!orgToRegisterOn) {
+      logger.error("Could not determine organization for auto-creation (no default org available)");
+      const params = buildRedirectParams();
+      return { redirect: `/idp/${provider}/failure?${params}&error=no_organization_context` };
+    }
+
+    // Check if required profile fields are present
+    if (!createUserData.profile?.givenName || !createUserData.profile?.familyName) {
+      logger.info("Missing required profile fields (givenName or familyName), redirecting to complete registration");
+
+      if (!idpInformation!.userId) {
+        logger.error("IDP intent missing userId, cannot redirect to complete registration");
+        const params = buildRedirectParams();
+        return { redirect: `/idp/${provider}/failure?${params}&error=missing_idp_user_info` };
+      }
+
+      const params = buildRedirectParams(
+        {
+          organization: orgToRegisterOn,
+          idpId: idpInformation!.idpId,
+          idpUserId: idpInformation!.userId,
+          idpUserName: idpInformation!.userName || "",
+          // User data for pre-filling form
+          givenName: createUserData.profile?.givenName || "",
+          familyName: createUserData.profile?.familyName || "",
+          email: createUserData.email?.email || "",
+        },
+        true,
+      );
+      return { redirect: `/idp/${provider}/complete-registration?${params}` };
+    }
+
+    const createUserRequest = buildCreateUserRequest(intent, orgToRegisterOn);
+
+    if (!createUserRequest) {
+      logger.error("Could not build create user request from intent");
+      const params = buildRedirectParams();
+      return { redirect: `/idp/${provider}/failure?${params}&error=user_creation_failed` };
+    }
+
+    try {
+      const newUser = await createUser({ serviceConfig, request: createUserRequest });
+      logger.info("User auto-created successfully, creating session");
+
+      // Synchronize instance member roles for ZITADEL IdPs with instanceRolesInfo
+      // configured (e.g. support access). Merge-only and never blocks the login.
+      await syncInstanceRolesFromIdpIntent({ serviceConfig, intent, userId: newUser.id });
+
+      // Create session for newly created user
+      const sessionResult = await createNewSessionFromIdpIntent({
+        userId: newUser.id,
+        idpIntent: {
+          idpIntentId: ctx.params.id,
+          idpIntentToken: ctx.params.token,
+        },
+        requestId: ctx.params.requestId,
+        organization: ctx.params.organization,
+      });
+
+      if ("error" in sessionResult && sessionResult.error) {
+        logger.error("Error creating session", { error: sessionResult.error });
+        return { error: sessionResult.error };
+      }
+
+      if ("redirect" in sessionResult && sessionResult.redirect) {
+        logger.debug("Session created, redirecting", { redirect: sessionResult.redirect });
+        return { redirect: sessionResult.redirect };
+      }
+
+      if ("samlData" in sessionResult && sessionResult.samlData) {
+        logger.info("Session created, returning samlData");
+        return { samlData: sessionResult.samlData };
+      }
+
+      return { error: t("errors.sessionCreationFailed") };
+    } catch (error: unknown) {
+      logger.error("Error auto-creating user", { error });
+      const params = buildRedirectParams();
+      return { redirect: `/idp/${provider}/failure?${params}&error=user_creation_failed` };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * CASE 5: Manual user creation allowed
+ */
+async function handleManualCreation(ctx: IDPHandlerContext): Promise<IDPHandlerResult> {
+  const { options, intent, serviceConfig, buildRedirectParams } = ctx;
+  const { idpInformation } = intent;
+  const createUserData = resolveCreateUser(intent);
+  const { organization, provider } = ctx.params;
+
+  if (options?.isCreationAllowed && createUserData) {
+    const orgToRegisterOn = await resolveOrganizationForUser({
+      organization,
+      createUserData,
+      serviceConfig,
+    });
+
+    if (!orgToRegisterOn) {
+      logger.error("Could not determine organization for registration (no default org available)");
+      const params = buildRedirectParams();
+      return { redirect: `/idp/${provider}/registration-failed?${params}` };
+    }
+
+    // Store user data for manual registration form
+    // Note: includeToken=true because the session hasn't been created yet
+    // The token will be needed when registerUserAndLinkToIDP creates the session
+    if (!idpInformation!.userId) {
+      logger.error("IDP intent missing userId, cannot redirect to complete registration");
+      const params = buildRedirectParams();
+      return { redirect: `/idp/${provider}/failure?${params}&error=missing_idp_user_info` };
+    }
+
+    const params = buildRedirectParams(
+      {
+        organization: orgToRegisterOn,
+        idpId: idpInformation!.idpId,
+        idpUserId: idpInformation!.userId,
+        idpUserName: idpInformation!.userName || "",
+        // User data for pre-filling form
+        givenName: createUserData.profile?.givenName || "",
+        familyName: createUserData.profile?.familyName || "",
+        email: createUserData.email?.email || "",
+      },
+      true,
+    ); // includeToken=true
+    return { redirect: `/idp/${provider}/complete-registration?${params}` };
+  }
+
+  return null;
+}
+
+/**
+ * CASE 6: No user found and creation not allowed
+ */
+async function handleNoUserFound(ctx: IDPHandlerContext): Promise<IDPHandlerResult> {
+  const { buildRedirectParams } = ctx;
+  logger.debug("No matching user and creation not allowed");
+  const params = buildRedirectParams();
+  return { redirect: `/idp/${ctx.params.provider}/account-not-found?${params}` };
+}
+
+/**
+ * Server action to process IDP callback and handle ALL business logic.
+ * This action:
+ * 1. Consumes the single-use token once
+ * 2. Performs all IDP-related operations (auto-update, auto-linking, auto-creation)
+ * 3. Returns redirect URL or error for client-side navigation
+ */
+export async function processIDPCallback({
+  provider,
+  id,
+  token,
+  requestId,
+  organization,
+  postErrorRedirectUrl,
+  sessionId,
+  flowFingerprint,
+}: {
+  provider: string;
+  id: string;
+  token: string;
+  requestId?: string;
+  organization?: string;
+  postErrorRedirectUrl?: string;
+  sessionId?: string;
+  flowFingerprint?: string;
+}): Promise<{ redirect?: string; error?: string; samlData?: { url: string; fields: Record<string, string> } }> {
+  // ... (headers and config retrieval) ...
+  const _headers = await headers();
+  const { serviceConfig } = getServiceConfig(_headers);
+
+  const t = await getTranslations("idp");
+
+  const errorParams = new URLSearchParams();
+  if (requestId) errorParams.set("requestId", requestId);
+  if (organization) errorParams.set("organization", organization);
+  if (postErrorRedirectUrl) errorParams.set("postErrorRedirectUrl", postErrorRedirectUrl);
+
+  // Validate required parameters
+  if (!provider || !id || !token) {
+    logger.error("Missing required parameters", { provider, id, hasToken: !!token });
+    return { redirect: `/idp/${provider}/failure?${errorParams.toString()}` };
+  }
+
+  // Security Check: the flow must have been started in this browser (login CSRF) and, when linking, for this session
+  const bindingIdCookie = await getBindingIdCookie();
+  if (!isIdpFlowProofValid(flowFingerprint, bindingIdCookie?.value, sessionId)) {
+    logger.warn("IDP flow fingerprint missing or mismatch");
+    if (sessionId) {
+      return { redirect: `/idp/${provider}/linking-failed?error=session_mismatch` };
+    }
+    errorParams.set("error", "flow_mismatch");
+    return { redirect: `/idp/${provider}/failure?${errorParams.toString()}` };
+  }
+
+  try {
+    // Consume the single-use token ONCE
+    const intent = await retrieveIDPIntent({ serviceConfig, id, token });
+
+    logger.debug("Intent retrieved successfully, processing business logic");
+
+    const { idpInformation } = intent;
+
+    // Verify we have IDP info early on
+    if (!idpInformation) {
+      logger.error("IDP information missing");
+      errorParams.set("error", "missing_idp_info");
+      return { redirect: `/idp/${provider}/failure?${errorParams.toString()}` };
+    }
+
+    // Get IDP configuration
+    const idp = await getIDPByID({ serviceConfig, id: idpInformation.idpId });
+
+    if (!idp) {
+      return { error: t("errors.idpNotFound") };
+    }
+
+    const options = idp?.config?.options;
+
+    // Build base redirect params
+    const buildRedirectParams = (additionalParams?: Record<string, string>, includeToken: boolean = false) => {
+      const params = new URLSearchParams();
+      params.set("id", id);
+      if (includeToken) params.set("token", token);
+      // the token lets the complete-registration form consume the intent, so keep it bound to this browser
+      if (includeToken && flowFingerprint) params.set("flowFingerprint", flowFingerprint);
+      if (requestId) params.set("requestId", requestId);
+      if (organization) params.set("organization", organization);
+      if (postErrorRedirectUrl) params.set("postErrorRedirectUrl", postErrorRedirectUrl);
+      if (sessionId) params.set("linkToSessionId", sessionId); // Include sessionId in redirects
+
+      if (additionalParams) {
+        Object.entries(additionalParams).forEach(([key, value]) => {
+          if (value) params.set(key, value);
+        });
+      }
+
+      return params.toString();
+    };
+
+    const ctx: IDPHandlerContext = {
+      serviceConfig,
+      t,
+      intent,
+      idp,
+      options,
+      params: {
+        provider,
+        id,
+        token,
+        requestId,
+        organization,
+        postErrorRedirectUrl,
+        sessionId,
+      },
+      buildRedirectParams,
+    };
+
+    const handlers = [
+      handleExplicitLinking,
+      handleUserExists,
+      handleAutoLinking,
+      handleAutoCreation,
+      handleManualCreation,
+      handleNoUserFound,
+    ];
+
+    for (const handler of handlers) {
+      const result = await handler(ctx);
+      if (result) {
+        return result;
+      }
+    }
+
+    // Should theoretically be unreachable if handleNoUserFound covers the rest
+    return { error: t("errors.unknown") };
+  } catch (error: unknown) {
+    logger.error("Error processing intent", { error });
+
+    errorParams.set("error", error instanceof Error ? error.message : t("errors.unknownError"));
+
+    return { redirect: `/idp/${provider}/failure?${errorParams.toString()}` };
+  }
+}

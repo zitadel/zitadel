@@ -97,7 +97,7 @@ func (f *file) Stat() (_ fs.FileInfo, err error) {
 	return f, nil
 }
 
-func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, callDurationInterceptor, instanceHandler func(http.Handler) http.Handler, limitingAccessInterceptor *middleware.AccessInterceptor, customerPortal string) (http.Handler, error) {
+func Start(config Config, issuer op.IssuerFromRequest, callDurationInterceptor, instanceHandler func(http.Handler) http.Handler, limitingAccessInterceptor *middleware.AccessInterceptor, customerPortal string) (http.Handler, error) {
 	fSys, err := fs.Sub(static, "static")
 	if err != nil {
 		return nil, err
@@ -122,7 +122,7 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, call
 		instanceHandler,
 	)
 	env.HandleFunc("", func(w http.ResponseWriter, r *http.Request) {
-		url := http_util.BuildOrigin(r.Host, externalSecure)
+		url := http_util.DomainContext(r.Context()).Origin()
 		ctx := r.Context()
 		instance := authz.GetInstance(ctx)
 		instanceMgmtURL, err := templateInstanceManagementURL(config.InstanceManagementURL, instance)

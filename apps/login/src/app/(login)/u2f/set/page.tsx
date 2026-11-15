@@ -4,9 +4,9 @@ import { RegisterU2f } from "@/components/register-u2f";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getEnrollmentAuthorizationError } from "@/lib/server/enrollment-guard";
-import { getServiceConfig } from "@/lib/service-url";
-import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings } from "@/lib/zitadel";
+import { getServiceConfig } from "@/lib/server/service-url";
+import { loadMostRecentSession } from "@/lib/server/session";
+import { getBrandingSettings } from "@/lib/server/zitadel";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -72,7 +72,8 @@ export default async function Page(props: { searchParams: Promise<Record<string 
         {(!sessionFactors || !enrollmentAuthorized) && (
           <div className="py-4">
             <Alert>
-              <Translated i18nKey="unknownContext" namespace="error" />
+              {/* a loginName was provided but the session could not be resolved (cookie missing, invalid or expired) */}
+              <Translated i18nKey={!sessionFactors && loginName ? "sessionExpired" : "unknownContext"} namespace="error" />
             </Alert>
           </div>
         )}

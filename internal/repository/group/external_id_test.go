@@ -27,8 +27,10 @@ func TestGroupExternalIDConstraints(t *testing.T) {
 			for i, constraint := range constraints {
 				require.Equal(t, tt.actions[i], constraint.Action)
 				require.False(t, constraint.IsGlobal)
-				require.Equal(t, eventstore.AggregateType(AggregateType), constraint.ClaimantType)
-				require.Equal(t, aggregate.ID, constraint.ClaimantID)
+				require.Equal(t, "claimant:group:group", constraint.Claimant)
+				if constraint.Action == eventstore.UniqueConstraintAdd {
+					require.Equal(t, []string{"org:org", "claimant:group:group"}, constraint.Owners)
+				}
 			}
 		})
 	}
@@ -59,4 +61,13 @@ func TestGroupExternalIDSetEventPersistsOldExternalID(t *testing.T) {
 	require.Equal(t, event.Fields(), fields)
 	require.Len(t, fields, 2)
 	require.Equal(t, removeGroupField(aggregate, externalIDConstraintKey("org", "entra", "old"), FieldExternalIDKey), fields[0])
+}
+
+func TestGroupRemovedEventSkipUniqueConstraints(t *testing.T) {
+	aggregate := &NewAggregate("group", "org").Aggregate
+	removed := NewGroupRemovedEvent(context.Background(), aggregate, "name", map[string]string{"entra": "ABC"}).
+		WithMembers([]string{"user"}).WithExternalIDKeys([]string{"key"})
+	require.Len(t, removed.UniqueConstraints(), 4)
+	eventstore.SkipCommandUniqueConstraints(removed)
+	require.Empty(t, removed.UniqueConstraints())
 }

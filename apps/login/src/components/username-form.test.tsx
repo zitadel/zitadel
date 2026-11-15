@@ -10,7 +10,7 @@ vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
 }));
 
-vi.mock("@/lib/server/loginname", () => ({
+vi.mock("@/lib/actions/loginname", () => ({
   sendLoginname: vi.fn(),
 }));
 

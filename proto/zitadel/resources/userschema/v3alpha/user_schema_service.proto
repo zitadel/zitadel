@@ -107,7 +107,7 @@ service ZITADELUserSchemas {
 
   // Search user schemas
   //
-  // Search all matching user schemas. By default, we will return all user schema of your instance. Make sure to include a limit and sorting for pagination.
+  // Search all matching user schemas. By default, the first 100 user schemas of your instance are returned (the default and the maximum limit of 1000 can be configured). Make sure to include a limit and sorting for pagination.
   rpc SearchUserSchemas (SearchUserSchemasRequest) returns (SearchUserSchemasResponse) {
     option (google.api.http) = {
       post: "/resources/v3alpha/user_schemas/_search"

@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
@@ -25,6 +26,7 @@ var _ admin.AdminServiceServer = (*Server)(nil)
 type Server struct {
 	admin.UnimplementedAdminServiceServer
 	database          string
+	systemDefaults    systemdefaults.SystemDefaults
 	command           *command.Commands
 	query             *query.Queries
 	assetsAPIDomain   func(context.Context) string
@@ -37,6 +39,7 @@ type Config struct {
 }
 
 func CreateServer(
+	systemDefaults systemdefaults.SystemDefaults,
 	database string,
 	command *command.Commands,
 	query *query.Queries,
@@ -44,6 +47,7 @@ func CreateServer(
 	auditLogRetention time.Duration,
 ) *Server {
 	return &Server{
+		systemDefaults:    systemDefaults,
 		database:          database,
 		command:           command,
 		query:             query,

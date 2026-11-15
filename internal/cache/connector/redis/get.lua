@@ -23,7 +23,13 @@ end
 local usage_lifetime = getCall("HGET", object_id, "usage_lifetime")
 -- reset usage based TTL
 if not (usage_lifetime == nil) and tonumber(usage_lifetime) > 0 then
-    redis.call('EXPIRE', object_id, usage_lifetime)
+    if expiry == nil then
+        -- without max-age the keys share the usage based TTL of the object
+        resetTTL(object_id, tonumber(usage_lifetime))
+    else
+        -- with max-age the keys expire at max-age, only the object needs a reset
+        redis.call('EXPIRE', object_id, usage_lifetime)
+    end
 end
 
 return object

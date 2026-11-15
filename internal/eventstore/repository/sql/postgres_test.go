@@ -10,6 +10,78 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
+func TestPostgres_orderByEventSequence(t *testing.T) {
+	type args struct {
+		desc                  bool
+		shouldOrderBySequence bool
+		orderByCreationDate   bool
+		useV1                 bool
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "v1 asc",
+			args: args{useV1: true},
+			want: ` ORDER BY event_sequence`,
+		},
+		{
+			name: "v1 desc",
+			args: args{useV1: true, desc: true},
+			want: ` ORDER BY event_sequence DESC`,
+		},
+		{
+			name: "single aggregate asc",
+			args: args{shouldOrderBySequence: true},
+			want: ` ORDER BY "sequence"`,
+		},
+		{
+			name: "single aggregate desc ignores creation date",
+			args: args{shouldOrderBySequence: true, orderByCreationDate: true, desc: true},
+			want: ` ORDER BY "sequence" DESC`,
+		},
+		{
+			name: "sort key asc",
+			args: args{},
+			want: ` ORDER BY "position", in_tx_order, instance_id, aggregate_type, aggregate_id, "sequence"`,
+		},
+		{
+			name: "sort key desc is a column list, not a row constructor",
+			args: args{desc: true},
+			want: ` ORDER BY "position" DESC, in_tx_order DESC, instance_id DESC, aggregate_type DESC, aggregate_id DESC, "sequence" DESC`,
+		},
+		{
+			name: "creation date asc",
+			args: args{orderByCreationDate: true},
+			want: ` ORDER BY created_at, "position", in_tx_order, instance_id, aggregate_type, aggregate_id, "sequence"`,
+		},
+		{
+			name: "creation date desc",
+			args: args{orderByCreationDate: true, desc: true},
+			want: ` ORDER BY created_at DESC, "position" DESC, in_tx_order DESC, instance_id DESC, aggregate_type DESC, aggregate_id DESC, "sequence" DESC`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			db := &Postgres{}
+			got := db.orderByEventSequence(tt.args.desc, tt.args.shouldOrderBySequence, tt.args.orderByCreationDate, tt.args.useV1)
+			if got != tt.want {
+				t.Errorf("Postgres.orderByEventSequence() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_eventSortKeySQL_matches_columns(t *testing.T) {
+	// the resume cursor tuple and the ORDER BY must use the same columns in the same order
+	want := `"position", in_tx_order, instance_id, aggregate_type, aggregate_id, "sequence"`
+	if eventSortKeySQL != want {
+		t.Errorf("eventSortKeySQL = %q, want %q", eventSortKeySQL, want)
+	}
+}
+
 func TestPostgres_placeholder(t *testing.T) {
 	type args struct {
 		query string

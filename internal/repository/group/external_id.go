@@ -31,7 +31,9 @@ func (e *GroupExternalIDSetEvent) UniqueConstraints() []*eventstore.UniqueConstr
 		constraints = append(constraints, NewRemoveGroupExternalIDUniqueConstraint(e.Aggregate().ID, e.Aggregate().ResourceOwner, e.Scope, e.OldExternalID))
 	}
 	if e.ExternalID != "" {
-		constraints = append(constraints, eventstore.NewAddEventUniqueConstraint("group_external_id", externalIDConstraintKey(e.Aggregate().ResourceOwner, e.Scope, e.ExternalID), "Errors.Group.AlreadyExists").WithClaimant(AggregateType, e.Aggregate().ID))
+		constraints = append(constraints, eventstore.NewAddEventUniqueConstraint("group_external_id", externalIDConstraintKey(e.Aggregate().ResourceOwner, e.Scope, e.ExternalID), "Errors.Group.AlreadyExists").
+			WithOwners(eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ResourceOwner)).
+			WithClaimant(AggregateType, e.Aggregate().ID))
 	}
 	return constraints
 }

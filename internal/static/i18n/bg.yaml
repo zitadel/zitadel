@@ -176,6 +176,7 @@ Errors:
         NotExisting: "Многофакторният OTP (OneTimePassword) не съществува"
         NotReady: "Многофакторният OTP (OneTimePassword) не е готов"
         InvalidCode: "Невалиден код"
+        Reused: "Този код вече е използван. Моля, изчакайте нов код"
       U2F:
         NotExisting: "U2F не съществува"
       Passwordless:
@@ -541,6 +542,7 @@ Errors:
     NotExisting: "Auth Request не съществува"
     WrongLoginClient: "Auth Request, създаден от друг клиент за влизане"
     AlreadyHandled: "Заявката за удостоверяване вече е обработена"
+    NotAuthenticated: "Потребителят не е удостоверен"
   OIDCSession:
     RefreshTokenInvalid: "Токенът за опресняване е невалиден"
     Token:
@@ -763,6 +765,7 @@ EventTypes:
           check:
             succeeded: "Многофакторната OTP проверка е успешна"
             failed: "Многофакторната OTP проверка е неуспешна"
+            reused: "Многофакторният OTP код е използван повторно"
           sms:
             added: "Добавен Многофакторната OTP SMS"
             removed: "Премахнато многофакторно OTP SMS"

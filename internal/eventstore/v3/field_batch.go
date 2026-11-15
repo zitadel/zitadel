@@ -104,6 +104,7 @@ func handleFieldBatch(ctx context.Context, tx database.Transaction, kind fieldBa
 	case fieldBatchKindRemoveByAggregate:
 		stmt = fieldBatchRemoveAggregate
 		args = args[:aggregateKeyLen]
+	case fieldBatchKindNone, fieldBatchKindRemoveField:
 	}
 	_, err := tx.Exec(ctx, stmt, args...)
 	return err

@@ -12,12 +12,12 @@ vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
 }));
 
-vi.mock("@/lib/server/password", () => ({
+vi.mock("@/lib/actions/password", () => ({
   checkSessionAndSetPassword: vi.fn(),
   sendPassword: vi.fn(),
 }));
 
-vi.mock("@/lib/client", () => ({
+vi.mock("@/lib/actions/flow", () => ({
   handleServerActionResponse: vi.fn(),
 }));
 

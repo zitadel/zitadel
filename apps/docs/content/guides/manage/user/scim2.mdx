@@ -171,7 +171,7 @@ Older API instances do not maintain this state, so do not do a normal rolling up
 Use these steps:
 
 1. Stop all older API instances that write events.
-2. Run `zitadel setup` until it completes. This runs migrations 76 to 78, including the group lifecycle backfill.
+2. Run `zitadel setup` until it completes. This runs the group lifecycle backfill (migration 81).
 3. Start the new binaries.
 
 After you run `zitadel mirror`, increase `GroupLifecycleFields.Rerun` by one and run `zitadel setup` before you start the new binaries.

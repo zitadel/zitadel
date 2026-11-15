@@ -93,7 +93,7 @@ func (s *Server) UpdateEmailProviderSMTPPassword(ctx context.Context, req *admin
 }
 
 func (s *Server) ListEmailProviders(ctx context.Context, req *admin_pb.ListEmailProvidersRequest) (*admin_pb.ListEmailProvidersResponse, error) {
-	queries, err := listEmailProvidersToModel(req)
+	queries, err := listEmailProvidersToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}

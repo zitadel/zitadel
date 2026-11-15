@@ -1410,7 +1410,7 @@ func compareEvents(t *testing.T, want Event, got Command) {
 		t.Errorf("wrong event type got %q want %q", got.Type(), want.Type())
 	}
 	if want.Revision() != got.Revision() {
-		t.Errorf("wrong version got %q want %q", got.Revision(), want.Revision())
+		t.Errorf("wrong version got %d want %d", got.Revision(), want.Revision())
 	}
 }
 

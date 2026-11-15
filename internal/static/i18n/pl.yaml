@@ -176,6 +176,7 @@ Errors:
         NotExisting: "Wieloskładnikowe OTP (OneTimePassword) nie istnieje"
         NotReady: "Wieloskładnikowe OTP (OneTimePassword) nie jest gotowe"
         InvalidCode: "Nieprawidłowy kod"
+        Reused: "Ten kod został już użyty. Poczekaj na nowy kod"
       U2F:
         NotExisting: "U2F nie istnieje"
       Passwordless:
@@ -541,6 +542,7 @@ Errors:
     NotExisting: "Auth Request nie istnieje"
     WrongLoginClient: "Auth Request utworzony przez innego klienta logowania"
     AlreadyHandled: "Żądanie uwierzytelnienia zostało już obsłużone"
+    NotAuthenticated: "Użytkownik nie jest uwierzytelniony"
   OIDCSession:
     RefreshTokenInvalid: "Refresh Token jest nieprawidłowy"
     Token:
@@ -767,6 +769,7 @@ EventTypes:
           check:
             succeeded: "Sprawdzenie wielofaktorowego OTP zakończone powodzeniem"
             failed: "Sprawdzenie wielofaktorowego OTP nie powiodło się"
+            reused: "Kod wielofaktorowego OTP użyty ponownie"
           sms:
             added: "Dodano wieloskładnikowy OTP SMS"
             removed: "Usunięto wieloskładnikowy OTP SMS"

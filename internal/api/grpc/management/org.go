@@ -38,15 +38,9 @@ func (s *Server) GetOrgByDomainGlobal(ctx context.Context, req *mgmt_pb.GetOrgBy
 }
 
 func (s *Server) ListOrgChanges(ctx context.Context, req *mgmt_pb.ListOrgChangesRequest) (*mgmt_pb.ListOrgChangesResponse, error) {
-	var (
-		limit    uint64
-		sequence uint64
-		asc      bool
-	)
-	if req.Query != nil {
-		limit = uint64(req.Query.Limit)
-		sequence = req.Query.Sequence
-		asc = req.Query.Asc
+	limit, sequence, asc, err := change_grpc.ChangeQueryToModel(s.systemDefaults, req.Query)
+	if err != nil {
+		return nil, err
 	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
@@ -161,7 +155,7 @@ func (s *Server) GetOrgIAMPolicy(ctx context.Context, _ *mgmt_pb.GetOrgIAMPolicy
 }
 
 func (s *Server) ListOrgDomains(ctx context.Context, req *mgmt_pb.ListOrgDomainsRequest) (*mgmt_pb.ListOrgDomainsResponse, error) {
-	queries, err := ListOrgDomainsRequestToModel(req)
+	queries, err := ListOrgDomainsRequestToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -263,7 +257,7 @@ func (s *Server) ListOrgMemberRoles(ctx context.Context, _ *mgmt_pb.ListOrgMembe
 }
 
 func (s *Server) ListOrgMembers(ctx context.Context, req *mgmt_pb.ListOrgMembersRequest) (*mgmt_pb.ListOrgMembersResponse, error) {
-	queries, err := ListOrgMembersRequestToModel(ctx, req)
+	queries, err := ListOrgMembersRequestToModel(ctx, s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -320,7 +314,7 @@ func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain, or
 }
 
 func (s *Server) ListOrgMetadata(ctx context.Context, req *mgmt_pb.ListOrgMetadataRequest) (*mgmt_pb.ListOrgMetadataResponse, error) {
-	metadataQueries, err := ListOrgMetadataToDomain(req)
+	metadataQueries, err := ListOrgMetadataToDomain(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}

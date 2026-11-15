@@ -5,8 +5,7 @@ import (
 	"math/rand/v2"
 	"time"
 
-	"github.com/zitadel/logging"
-
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -14,7 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-// cmd/setup/78.go takes the same lock with pg_advisory_xact_lock.
+// cmd/setup/81.go takes the same lock with pg_advisory_xact_lock.
 const instanceLockStmt = "SELECT pg_try_advisory_xact_lock(hashtextextended('zitadel.group-lifecycle:' || $1, 0))"
 
 var (
@@ -51,7 +50,7 @@ func (es *Eventstore) WithInstanceLock(ctx context.Context, change func(context.
 		}
 		if !warned && waited >= slowInstanceLockWait {
 			warned = true
-			logging.WithFields("instance", instanceID, "waited", waited).Warn("waiting for group lifecycle instance lock")
+			logging.Warn(ctx, "waiting for group lifecycle instance lock", "instance", instanceID, "waited", waited)
 		}
 		timer := time.NewTimer(min(lockRetryDelay(attempt), maxInstanceLockWait-waited))
 		select {

@@ -1,7 +1,7 @@
 "use client";
 
+import { sendLoginname } from "@/lib/actions/loginname";
 import { handleServerActionResponse } from "@/lib/client-utils";
-import { sendLoginname } from "@/lib/server/loginname";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";

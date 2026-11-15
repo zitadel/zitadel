@@ -40,6 +40,7 @@ export function setSession(id: string, session: any, accessToken: string, challe
   };
   return new Promise((resolve, reject) => {
     let response = http.asyncRequest('PATCH', url(`/v2/sessions/${id}`), JSON.stringify(body), {
+      tags: { name: '/v2/sessions/{id}' },
       headers: {
         authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',

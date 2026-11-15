@@ -2,7 +2,6 @@ package eventstore_test
 
 import (
 	"context"
-	"os"
 	"strings"
 	"sync"
 	"testing"
@@ -40,8 +39,8 @@ func TestEventstore_ClaimedReservation_staleRelease(t *testing.T) {
 			// Deliberately omit a revision to test the ownership protection independently.
 			require.ErrorIs(t, push("g", claimedConstraint(eventstore.UniqueConstraintRemove, a, "g"), claimedConstraint(eventstore.UniqueConstraintAdd, c, "g")), eventstore.ErrConcurrentModification)
 			var claimant string
-			require.NoError(t, clients[name].DB.QueryRowContext(ctx, "SELECT claimant_id FROM eventstore.unique_constraints WHERE unique_type = 'test_claim' AND unique_field = $1", a).Scan(&claimant))
-			require.Equal(t, "h", claimant)
+			require.NoError(t, clients[name].DB.QueryRowContext(ctx, "SELECT owners[1] FROM eventstore.unique_constraints WHERE unique_type = 'test_claim' AND unique_field = $1", a).Scan(&claimant))
+			require.Equal(t, "claimant:group:h", claimant)
 			// The rejected push cannot persist its event or acquire C.
 			var count int
 			require.NoError(t, clients[name].DB.QueryRowContext(ctx, "SELECT count(*) FROM eventstore.events2 WHERE aggregate_type = $1 AND aggregate_id = 'g'", typ).Scan(&count))
@@ -65,8 +64,8 @@ func TestEventstore_ClaimedReservation_failedReplacementRollsBackRelease(t *test
 			_, err = pusher.Push(ctx, nil, claimedCommand(typ, "g", gu.Ptr(uint64(1)), claimedConstraint(eventstore.UniqueConstraintRemove, a, "g"), claimedConstraint(eventstore.UniqueConstraintAdd, b, "g")))
 			require.Error(t, err)
 			var claimant string
-			require.NoError(t, clients[name].DB.QueryRowContext(ctx, "SELECT claimant_id FROM eventstore.unique_constraints WHERE unique_type = 'test_claim' AND unique_field = $1", a).Scan(&claimant))
-			require.Equal(t, "g", claimant)
+			require.NoError(t, clients[name].DB.QueryRowContext(ctx, "SELECT owners[1] FROM eventstore.unique_constraints WHERE unique_type = 'test_claim' AND unique_field = $1", a).Scan(&claimant))
+			require.Equal(t, "claimant:group:g", claimant)
 		})
 	}
 }
@@ -129,25 +128,27 @@ func TestEventstore_ExpectedSequence_bindingReturnsToSameOwner(t *testing.T) {
 	}
 }
 
-func TestEventstore_ClaimedReservation_schemaUpgrade(t *testing.T) {
-	ctx := context.Background()
-	statement, err := os.ReadFile("../../cmd/setup/76.sql")
-	require.NoError(t, err)
-	tx, err := testClient.BeginTx(ctx, nil)
-	require.NoError(t, err)
-	t.Cleanup(func() { require.NoError(t, tx.Rollback()) })
-	// Exercise the migration against the old table shape without changing the
-	// shared test database: all schema and fixture changes roll back at cleanup.
-	_, err = tx.ExecContext(ctx, "ALTER TABLE eventstore.unique_constraints DROP COLUMN claimant_type, DROP COLUMN claimant_id")
-	require.NoError(t, err)
-	_, err = tx.ExecContext(ctx, "INSERT INTO eventstore.unique_constraints (instance_id, unique_type, unique_field) VALUES ('migration', 'legacy', 'key')")
-	require.NoError(t, err)
-	for range 2 {
-		_, err = tx.ExecContext(ctx, string(statement))
-		require.NoError(t, err)
+func TestEventstore_ClaimedReservation_releasedByOwner(t *testing.T) {
+	for name, pusher := range pushers {
+		t.Run(name, func(t *testing.T) {
+			ctx := context.Background()
+			typ := eventstore.AggregateType(t.Name())
+			key := strings.ToLower(t.Name())
+			push := func(constraints ...*eventstore.UniqueConstraint) error {
+				_, err := pusher.Push(ctx, nil, claimedCommand(typ, "g", nil, constraints...))
+				return err
+			}
+			add := claimedConstraint(eventstore.UniqueConstraintAdd, key, "g").
+				WithOwners(eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, "o"), "claimant:group:g")
+			require.NoError(t, push(add))
+			count := func() (n int) {
+				require.NoError(t, clients[name].DB.QueryRowContext(ctx, "SELECT count(*) FROM eventstore.unique_constraints WHERE unique_type = 'test_claim' AND unique_field = $1", key).Scan(&n))
+				return n
+			}
+			require.NoError(t, push(eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerOrg, "other")))
+			require.Equal(t, 1, count(), "the owner delete of another org keeps the key")
+			require.NoError(t, push(eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerOrg, "o")))
+			require.Zero(t, count(), "the org owner delete releases the claimed key")
+		})
 	}
-	var count int
-	err = tx.QueryRowContext(ctx, "SELECT count(*) FROM eventstore.unique_constraints WHERE instance_id = 'migration' AND unique_type = 'legacy' AND unique_field = 'key' AND claimant_type IS NULL AND claimant_id IS NULL").Scan(&count)
-	require.NoError(t, err)
-	require.Equal(t, 1, count)
 }

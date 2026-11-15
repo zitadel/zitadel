@@ -10,19 +10,17 @@ vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
 }));
 
-vi.mock("@/lib/server/register", () => ({
+vi.mock("@/lib/actions/register", () => ({
   registerUserAndLinkToIDP: vi.fn(),
 }));
 
-vi.mock("@/lib/client", () => ({
+vi.mock("@/lib/actions/flow", () => ({
   handleServerActionResponse: vi.fn(),
 }));
 
 const defaultProps = {
   organization: "org-1",
   idpIntent: { idpIntentId: "intent-1", idpIntentToken: "token-1" },
-  idpUserId: "user-1",
-  idpId: "idp-1",
 };
 
 describe("RegisterFormIDPIncomplete", () => {
