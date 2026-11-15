@@ -185,3 +185,8 @@ FillFields:
 RelationalTables:
   # This is used for development DO NOT USE IN PRODUCTION
   ShouldRecreateSchema: false # ZITADEL_RELATIONALTABLES_SHOULDRECREATESCHEMA
+
+GroupLifecycleFields:
+  # Increase this value and run setup to rebuild the group lifecycle state from the event history,
+  # for example after older binaries were running again. Stop older binaries first.
+  Rerun: 1 # ZITADEL_GROUPLIFECYCLEFIELDS_RERUN

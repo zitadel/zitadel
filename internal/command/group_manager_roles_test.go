@@ -147,7 +147,7 @@ func TestCommands_SetGroupManagerRoles(t *testing.T) {
 						eventFromEventPusher(addNewGroupEvent("group1", "org1")),
 					),
 					expectFilter(), // no existing manager roles
-					expectPush(
+					expectGroupPush(
 						repo.NewGroupManagerRolesSetEvent(context.Background(),
 							&repo.NewAggregate("group1", "org1").Aggregate,
 							[]string{"ORG_OWNER_VIEWER"},
@@ -181,7 +181,7 @@ func TestCommands_SetGroupManagerRoles(t *testing.T) {
 							),
 						),
 					),
-					expectPush(
+					expectGroupPush(
 						repo.NewGroupManagerRolesSetEvent(context.Background(),
 							&repo.NewAggregate("group1", "org1").Aggregate,
 							nil,

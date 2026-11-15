@@ -10,7 +10,9 @@ import (
 	"strings"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	new_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	old_db "github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -47,7 +49,11 @@ func (es *Eventstore) Search(ctx context.Context, conditions ...map[eventstore.F
 	var builder strings.Builder
 	args := buildSearchStatement(ctx, &builder, conditions...)
 
-	rows, err := es.client.Query(
+	var client database.QueryExecutor = es.client
+	if tx := old_db.TransactionFromContext(ctx); tx != nil {
+		client = new_sql.SQLTx(tx)
+	}
+	rows, err := client.Query(
 		ctx,
 		builder.String(),
 		args...,
@@ -138,43 +144,57 @@ func buildSearchCondition(builder *strings.Builder, index int, conditions map[ev
 }
 
 func (es *Eventstore) handleFieldCommands(ctx context.Context, tx database.Transaction, commands []eventstore.Command) error {
+	var operations []*eventstore.FieldOperation
 	for _, command := range commands {
-		if len(command.Fields()) > 0 {
-			if err := handleFieldOperations(ctx, tx, command.Fields()); err != nil {
-				return err
-			}
-		}
+		operations = append(operations, command.Fields()...)
 	}
-	return nil
+	return handleFieldOperations(ctx, tx, operations)
 }
 
 func handleFieldFillEvents(ctx context.Context, tx database.Transaction, events []eventstore.FillFieldsEvent) error {
+	var operations []*eventstore.FieldOperation
 	for _, event := range events {
-		if len(event.Fields()) == 0 {
-			continue
-		}
-		if err := handleFieldOperations(ctx, tx, event.Fields()); err != nil {
-			return err
-		}
+		operations = append(operations, event.Fields()...)
 	}
-	return nil
+	return handleFieldOperations(ctx, tx, operations)
 }
 
 func handleFieldOperations(ctx context.Context, tx database.Transaction, operations []*eventstore.FieldOperation) error {
-	for _, operation := range operations {
+	for i := 0; i < len(operations); {
+		operation := operations[i]
+		key, kind := batchFieldKey(operation)
+		if kind != fieldBatchKindNone {
+			keys := map[[8]string]struct{}{key: {}}
+			end := i + 1
+			for end < len(operations) {
+				next, nextKind := batchFieldKey(operations[end])
+				_, repeated := keys[next]
+				// A repeated key or a change of operation must observe preceding writes.
+				if nextKind != kind || repeated {
+					break
+				}
+				keys[next] = struct{}{}
+				end++
+			}
+			if end-i > 1 {
+				if err := handleFieldBatch(ctx, tx, kind, operations[i:end]); err != nil {
+					return err
+				}
+				i = end
+				continue
+			}
+		}
 		if operation.Set != nil {
 			if err := handleFieldSet(ctx, tx, operation.Set); err != nil {
 				return err
 			}
-			continue
-		}
-		if operation.Remove != nil {
+		} else if operation.Remove != nil {
 			if err := handleSearchDelete(ctx, tx, operation.Remove); err != nil {
 				return err
 			}
 		}
+		i++
 	}
-
 	return nil
 }
 

@@ -195,7 +195,10 @@ type Steps struct {
 	s73FixUserGrantRoles                    *FixUserGrantRoles
 	s74Apps7OIDCConfigsAddRegistrationToken *Apps7OIDCConfigsAddRegistrationToken
 	s75Apps7OIDCConfigsAddAppLinkConfig     *Apps7OIDCConfigsAddAppLinkConfig
+	s76UniqueConstraintClaimants            *UniqueConstraintClaimants
+	s77EventStatementPosition               *EventStatementPosition
 	RelationalTables                        *TransactionalTables
+	GroupLifecycleFields                    *GroupLifecycleFields
 }
 
 func NewSteps(ctx context.Context, v *viper.Viper) (*Steps, error) {

@@ -60,6 +60,9 @@ func (req *OperationRequest) Validate() error {
 }
 
 func (op *Operation) validate() error {
+	if op == nil {
+		return serrors.ThrowInvalidSyntax(zerrors.ThrowInvalidArgument(nil, "SCIM-opnil", "Missing patch operation"))
+	}
 	// ignore the casing, as some scim clients send these capitalized
 	op.Operation = OperationType(strings.ToLower(string(op.Operation)))
 

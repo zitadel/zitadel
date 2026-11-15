@@ -129,18 +129,27 @@ type GroupRemovedEvent struct {
 
 	ID string `json:"id,omitempty"`
 
-	name string
+	name           string
+	externalIDs    map[string]string
+	memberIDs      []string
+	externalIDKeys []string
 }
 
 func NewGroupRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	name string,
+	externalIDs ...map[string]string,
 ) *GroupRemovedEvent {
+	var bindings map[string]string
+	if len(externalIDs) > 0 {
+		bindings = externalIDs[0]
+	}
 	return &GroupRemovedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(ctx, aggregate, GroupRemovedEventType),
-		ID:        aggregate.ID,
-		name:      name,
+		BaseEvent:   *eventstore.NewBaseEventForPush(ctx, aggregate, GroupRemovedEventType),
+		ID:          aggregate.ID,
+		name:        name,
+		externalIDs: bindings,
 	}
 }
 
@@ -153,5 +162,25 @@ func (g *GroupRemovedEvent) Payload() any {
 }
 
 func (g *GroupRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveGroupNameUniqueConstraint(g.name, g.Aggregate().ResourceOwner)}
+	constraints := []*eventstore.UniqueConstraint{NewRemoveGroupNameUniqueConstraint(g.name, g.Aggregate().ResourceOwner)}
+	for scope, value := range g.externalIDs {
+		constraints = append(constraints, NewRemoveGroupExternalIDUniqueConstraint(g.Aggregate().ID, g.Aggregate().ResourceOwner, scope, value))
+	}
+	for _, key := range g.externalIDKeys {
+		constraints = append(constraints, eventstore.NewRemoveUniqueConstraint("group_external_id", key).WithClaimant(AggregateType, g.Aggregate().ID))
+	}
+	for _, id := range g.memberIDs {
+		constraints = append(constraints, NewRemoveGroupUserUniqueConstraint(g.Aggregate().ID, id))
+	}
+	return constraints
+}
+
+func (g *GroupRemovedEvent) WithMembers(ids []string) *GroupRemovedEvent {
+	g.memberIDs = ids
+	return g
+}
+
+func (g *GroupRemovedEvent) WithExternalIDKeys(keys []string) *GroupRemovedEvent {
+	g.externalIDKeys = keys
+	return g
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -52,8 +53,16 @@ func (es *Eventstore) pushWithoutFunc(ctx context.Context, client database.Query
 		return nil, err
 	}
 
+	_, err = tx.Exec(ctx, "SELECT pg_advisory_xact_lock_shared('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))", authz.GetInstance(ctx).InstanceID())
+	if err != nil {
+		return nil, err
+	}
+
 	events, err = es.writeEventsOld(ctx, tx, sequences, commands)
 	if err != nil {
+		return nil, err
+	}
+	if err = checkExpectedSequences(commands, events); err != nil {
 		return nil, err
 	}
 

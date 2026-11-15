@@ -14,7 +14,13 @@ import (
 // SetGroupManagerRoles sets the ZITADEL manager roles every member of the group
 // receives for the group's organization. An empty role list removes them.
 // The caller needs the permission to manage organization members.
-func (c *Commands) SetGroupManagerRoles(ctx context.Context, groupID string, roles []string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) SetGroupManagerRoles(ctx context.Context, groupID string, roles []string) (*domain.ObjectDetails, error) {
+	return c.retryGroupChange(ctx, func(ctx context.Context) (*domain.ObjectDetails, error) {
+		return c.setGroupManagerRolesOnce(ctx, groupID, roles)
+	})
+}
+
+func (c *Commands) setGroupManagerRolesOnce(ctx context.Context, groupID string, roles []string) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

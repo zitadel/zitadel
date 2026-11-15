@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"maps"
+	"slices"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -14,6 +16,7 @@ type GroupWriteModel struct {
 
 	Name        string
 	Description string
+	ExternalIDs map[string]string
 
 	State domain.GroupState
 
@@ -29,6 +32,7 @@ func NewGroupWriteModel(groupID, orgID string, userIDs []string) *GroupWriteMode
 			ResourceOwner: orgID,
 		},
 		UserIDs:         userIDs,
+		ExternalIDs:     make(map[string]string),
 		existingUserIDs: make(map[string]struct{}),
 	}
 }
@@ -39,20 +43,11 @@ func (g *GroupWriteModel) GetWriteModel() *eventstore.WriteModel {
 
 // Query constructs a search query for retrieving group-related events based on the GroupWriteModel attributes.
 func (g *GroupWriteModel) Query() *eventstore.SearchQueryBuilder {
-	eventTypes := []eventstore.EventType{
-		group.GroupAddedEventType,
-		group.GroupChangedEventType,
-		group.GroupRemovedEventType,
-	}
-	if g.UserIDs != nil {
-		eventTypes = append(eventTypes, group.GroupUserAddedEventType, group.GroupUserRemovedEventType)
-	}
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(g.ResourceOwner).
 		AddQuery().
 		AggregateTypes(group.AggregateType).
-		AggregateIDs(g.AggregateID).
-		EventTypes(eventTypes...).Builder()
+		AggregateIDs(g.AggregateID).Builder()
 }
 
 func (g *GroupWriteModel) Reduce() error {
@@ -70,11 +65,18 @@ func (g *GroupWriteModel) Reduce() error {
 			if e.Description != nil {
 				g.Description = *e.Description
 			}
+		case *group.GroupExternalIDSetEvent:
+			if e.ExternalID == "" {
+				delete(g.ExternalIDs, e.Scope)
+			} else {
+				g.ExternalIDs[e.Scope] = e.ExternalID
+			}
 		case *group.GroupRemovedEvent:
 			g.Name = ""
 			g.Description = ""
 			g.UserIDs = nil
 			g.existingUserIDs = make(map[string]struct{})
+			clear(g.ExternalIDs)
 			g.State = domain.GroupStateRemoved
 		case *group.GroupUserAddedEvent:
 			g.existingUserIDs[e.UserID] = struct{}{}
@@ -105,5 +107,21 @@ func (g *GroupWriteModel) NewChangedEvent(ctx context.Context, agg *eventstore.A
 
 // GroupAggregateFromWriteModel maps a WriteModel to a group-specific Aggregate using its type and version.
 func GroupAggregateFromWriteModel(ctx context.Context, wm *eventstore.WriteModel) *eventstore.Aggregate {
-	return eventstore.AggregateFromWriteModelCtx(ctx, wm, group.AggregateType, group.AggregateVersion)
+	aggregate := eventstore.AggregateFromWriteModelCtx(ctx, wm, group.AggregateType, group.AggregateVersion)
+	sequence := wm.ProcessedSequence
+	aggregate.ExpectedSequence = &sequence
+	return aggregate
+}
+
+func (g *GroupWriteModel) externalIDChanges(ctx context.Context, externalIDs map[string]string) []eventstore.Command {
+	scopes := maps.Clone(g.ExternalIDs)
+	maps.Copy(scopes, externalIDs)
+	var events []eventstore.Command
+	aggregate := GroupAggregateFromWriteModel(ctx, &g.WriteModel)
+	for _, scope := range slices.Sorted(maps.Keys(scopes)) {
+		if g.ExternalIDs[scope] != externalIDs[scope] {
+			events = append(events, group.NewGroupExternalIDSetEvent(ctx, aggregate, scope, g.ExternalIDs[scope], externalIDs[scope]))
+		}
+	}
+	return events
 }

@@ -593,8 +593,10 @@ Executions:
   # The maximum duration a job can do it's work before it is considered as failed.
   # This maximum duration is prioritized in case that the sum of the target's timeouts is higher,
   # to limit the runtime of a singular execution.
+  # For queued event executions, the duration covers all targets of the event, including async targets.
   TransactionDuration: 10s # ZITADEL_EXECUTIONS_TRANSACTIONDURATION
-  # Automatically cancel the notification if it cannot be handled within a specific time
+  # Cancel queued event executions older than this limit, including retries.
+  # Failed deliveries use River backoff; retries can repeat delivery to successful targets.
   MaxTtl: 5m  # ZITADEL_EXECUTIONS_MAXTTL
   # List of domains and IPs that are not valid execution target's endpoints
   # Wildcard sub domains are currently unsupported

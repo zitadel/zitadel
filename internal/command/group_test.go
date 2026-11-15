@@ -247,7 +247,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 						),
 					),
 					expectFilter(),
-					expectPushFailed(
+					expectGroupPushFailed(
 						pushErr,
 						group.NewGroupAddedEvent(context.Background(),
 							&group.NewAggregate("12345", "org1").Aggregate,
@@ -288,7 +288,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 						),
 					),
 					expectFilter(),
-					expectPush(
+					expectGroupPush(
 						group.NewGroupAddedEvent(context.Background(),
 							&group.NewAggregate("12345", "org1").Aggregate,
 							"example",
@@ -329,7 +329,7 @@ func TestCommands_CreateGroup(t *testing.T) {
 						),
 					),
 					expectFilter(),
-					expectPush(
+					expectGroupPush(
 						group.NewGroupAddedEvent(context.Background(),
 							&group.NewAggregate("9090", "org1").Aggregate,
 							"example",
@@ -502,7 +502,7 @@ func TestCommands_UpdateGroup(t *testing.T) {
 							),
 						),
 					),
-					expectPushFailed(
+					expectGroupPushFailed(
 						pushErr,
 						group.NewGroupChangedEvent(context.Background(),
 							&group.NewAggregate("1234", "org1").Aggregate,
@@ -571,7 +571,7 @@ func TestCommands_UpdateGroup(t *testing.T) {
 							),
 						),
 					),
-					expectPush(
+					expectGroupPush(
 						group.NewGroupChangedEvent(context.Background(),
 							&group.NewAggregate("1234", "org1").Aggregate,
 							"group1",
@@ -610,7 +610,7 @@ func TestCommands_UpdateGroup(t *testing.T) {
 							),
 						),
 					),
-					expectPush(
+					expectGroupPush(
 						group.NewGroupChangedEvent(context.Background(),
 							&group.NewAggregate("1234", "org1").Aggregate,
 							"group1",
@@ -649,7 +649,7 @@ func TestCommands_UpdateGroup(t *testing.T) {
 							),
 						),
 					),
-					expectPush(
+					expectGroupPush(
 						group.NewGroupChangedEvent(context.Background(),
 							&group.NewAggregate("1234", "org1").Aggregate,
 							"group1",
@@ -785,7 +785,7 @@ func TestCommands_DeleteGroup(t *testing.T) {
 							),
 						),
 					),
-					expectPushFailed(
+					expectGroupPushFailed(
 						pushErr,
 						group.NewGroupRemovedEvent(context.Background(),
 							&group.NewAggregate("1234", "org1").Aggregate,
@@ -816,12 +816,11 @@ func TestCommands_DeleteGroup(t *testing.T) {
 							),
 						),
 					),
-					expectPush(
-						eventFromEventPusher(
-							group.NewGroupRemovedEvent(context.Background(),
-								&group.NewAggregate("1234", "org1").Aggregate,
-								"group1",
-							),
+					expectGroupPush(
+
+						group.NewGroupRemovedEvent(context.Background(),
+							&group.NewAggregate("1234", "org1").Aggregate,
+							"group1",
 						),
 					),
 				),
@@ -859,12 +858,11 @@ func TestCommands_DeleteGroup(t *testing.T) {
 							addNewGroupGrantAddedEvent("grant2", "1234", "project2", "org1", []string{"role2"}),
 						),
 					),
-					expectPush(
-						eventFromEventPusher(
-							group.NewGroupRemovedEvent(context.Background(),
-								&group.NewAggregate("1234", "org1").Aggregate,
-								"group1",
-							),
+					expectGroupPush(
+
+						group.NewGroupRemovedEvent(context.Background(),
+							&group.NewAggregate("1234", "org1").Aggregate,
+							"group1",
 						),
 						eventFromEventPusher(
 							groupgrant.NewGroupGrantCascadeRemovedEvent(context.Background(),
@@ -915,12 +913,11 @@ func TestCommands_DeleteGroup(t *testing.T) {
 							addNewGroupGrantAddedEvent("grant2", "1234", "project2", "org1", []string{"role2"}),
 						),
 					),
-					expectPush(
-						eventFromEventPusher(
-							group.NewGroupRemovedEvent(context.Background(),
-								&group.NewAggregate("1234", "org1").Aggregate,
-								"group1",
-							),
+					expectGroupPush(
+
+						group.NewGroupRemovedEvent(context.Background(),
+							&group.NewAggregate("1234", "org1").Aggregate,
+							"group1",
 						),
 						eventFromEventPusher(
 							groupgrant.NewGroupGrantCascadeRemovedEvent(context.Background(),

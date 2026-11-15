@@ -232,6 +232,17 @@ func copyUniqueConstraints(ctx context.Context, source, dest *db.DB) {
 	reader, writer := io.Pipe()
 	errs := make(chan error, 1)
 
+	const columns = "instance_id, unique_type, unique_field, claimant_type, claimant_id"
+	sourceColumns := columns
+	var hasClaimants bool
+	err := source.QueryRowContext(ctx, func(row *sql.Row) error { return row.Scan(&hasClaimants) },
+		"SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'eventstore' AND table_name = 'unique_constraints' AND column_name = 'claimant_id')")
+	logging.OnError(ctx, err).Fatal("unable to query unique constraint columns of source")
+	if !hasClaimants {
+		// Sources older than setup step 76 have no claimants.
+		sourceColumns = "instance_id, unique_type, unique_field, NULL, NULL"
+	}
+
 	sourceConn, err := source.Conn(ctx)
 	logging.OnError(ctx, err).Fatal("unable to acquire source connection")
 
@@ -239,7 +250,7 @@ func copyUniqueConstraints(ctx context.Context, source, dest *db.DB) {
 		err := sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
 			var stmt database.Statement
-			stmt.WriteString("COPY (SELECT instance_id, unique_type, unique_field FROM eventstore.unique_constraints ")
+			stmt.WriteString("COPY (SELECT " + sourceColumns + " FROM eventstore.unique_constraints ")
 			stmt.WriteString(instanceClause())
 			stmt.WriteString(") TO stdout")
 
@@ -268,7 +279,7 @@ func copyUniqueConstraints(ctx context.Context, source, dest *db.DB) {
 			}
 		}
 
-		tag, err := conn.PgConn().CopyFrom(ctx, reader, "COPY eventstore.unique_constraints FROM stdin")
+		tag, err := conn.PgConn().CopyFrom(ctx, reader, "COPY eventstore.unique_constraints ("+columns+") FROM stdin")
 		eventCount = tag.RowsAffected()
 
 		return err

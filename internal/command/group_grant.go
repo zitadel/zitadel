@@ -20,7 +20,13 @@ type AddGroupGrant struct {
 
 // AddGroupGrant authorizes all members of a group for a project with the given role keys.
 // The project must be owned by or granted to the organization of the group.
-func (c *Commands) AddGroupGrant(ctx context.Context, grant *AddGroupGrant) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) AddGroupGrant(ctx context.Context, grant *AddGroupGrant) (*domain.ObjectDetails, error) {
+	return c.retryGroupChange(ctx, func(ctx context.Context) (*domain.ObjectDetails, error) {
+		return c.addGroupGrantOnce(ctx, grant)
+	})
+}
+
+func (c *Commands) addGroupGrantOnce(ctx context.Context, grant *AddGroupGrant) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -63,7 +69,13 @@ func (c *Commands) AddGroupGrant(ctx context.Context, grant *AddGroupGrant) (_ *
 
 // ChangeGroupGrant updates the role keys of a group grant.
 // If the roles are unchanged, the request succeeds as the desired state is already achieved.
-func (c *Commands) ChangeGroupGrant(ctx context.Context, grantID string, roleKeys []string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) ChangeGroupGrant(ctx context.Context, grantID string, roleKeys []string) (*domain.ObjectDetails, error) {
+	return c.retryGroupChange(ctx, func(ctx context.Context) (*domain.ObjectDetails, error) {
+		return c.changeGroupGrantOnce(ctx, grantID, roleKeys)
+	})
+}
+
+func (c *Commands) changeGroupGrantOnce(ctx context.Context, grantID string, roleKeys []string) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -107,7 +119,13 @@ func (c *Commands) ChangeGroupGrant(ctx context.Context, grantID string, roleKey
 
 // RemoveGroupGrant removes a group grant.
 // If the grant is not found, the request succeeds as the desired state is already achieved.
-func (c *Commands) RemoveGroupGrant(ctx context.Context, grantID string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) RemoveGroupGrant(ctx context.Context, grantID string) (*domain.ObjectDetails, error) {
+	return c.retryGroupChange(ctx, func(ctx context.Context) (*domain.ObjectDetails, error) {
+		return c.removeGroupGrantOnce(ctx, grantID)
+	})
+}
+
+func (c *Commands) removeGroupGrantOnce(ctx context.Context, grantID string) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

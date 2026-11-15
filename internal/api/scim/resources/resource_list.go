@@ -1,7 +1,9 @@
 package resources
 
 import (
+	"encoding/json"
 	"net/http"
+	"strings"
 
 	zhttp "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/scim/resources/filter"
@@ -12,7 +14,8 @@ import (
 )
 
 type ListRequest struct {
-	Schemas []schemas.ScimSchemaType `json:"schemas"`
+	ExcludedAttributes Attributes               `json:"excludedAttributes,omitempty" schema:"excludedAttributes"`
+	Schemas            []schemas.ScimSchemaType `json:"schemas"`
 
 	// Count An integer indicating the desired maximum number of query results per page.
 	Count int64 `json:"count" schema:"count"`
@@ -26,6 +29,33 @@ type ListRequest struct {
 	// SortBy attribute path to the sort attribute
 	SortBy    string               `json:"sortBy" schema:"sortBy"`
 	SortOrder ListRequestSortOrder `json:"sortOrder" schema:"sortOrder"`
+}
+
+// Attributes is a list of attribute paths.
+// It accepts a comma-separated string (query form) or a JSON array of strings (RFC 7644 section 3.4.3).
+type Attributes []string
+
+func (a *Attributes) UnmarshalText(text []byte) error {
+	*a = nil
+	for _, attribute := range strings.Split(string(text), ",") {
+		if attribute = strings.TrimSpace(attribute); attribute != "" {
+			*a = append(*a, attribute)
+		}
+	}
+	return nil
+}
+
+func (a *Attributes) UnmarshalJSON(data []byte) error {
+	var text string
+	if err := json.Unmarshal(data, &text); err == nil {
+		return a.UnmarshalText([]byte(text))
+	}
+	var attributes []string
+	if err := json.Unmarshal(data, &attributes); err != nil {
+		return err
+	}
+	*a = attributes
+	return nil
 }
 
 type ListResponse[T any] struct {

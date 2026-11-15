@@ -6,14 +6,17 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/riverqueue/river"
 
+	"github.com/zitadel/zitadel/internal/api/oidc/sign"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/denylist"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Worker struct {
@@ -49,12 +52,61 @@ func (w *Worker) Work(ctx context.Context, job *river.Job[*exec_repo.Request]) e
 		return river.JobCancel(fmt.Errorf("unable to unmarshal targets because %w", err))
 	}
 
-	_, err = CallTargets(ctx, targets, exec_repo.ContextInfoFromRequest(job.Args), w.targetEncAlg, w.activeSigningKey, w.httpClient)
-	if err != nil {
-		// If there is an error returned from the targets, it means that the execution was interrupted
-		return river.JobCancel(fmt.Errorf("interruption during call of targets because %w", err))
+	info := exec_repo.ContextInfoFromRequest(job.Args)
+	signerOnce := sign.GetSignerOnce(w.activeSigningKey)
+	encrypters := &sync.Map{}
+	var (
+		mu             sync.Mutex
+		async          sync.WaitGroup
+		deliveryErrors error
+		retryable      bool
+	)
+	deliver := func(target target_domain.Target) error {
+		_, err := CallTarget(ctx, target, info, w.targetEncAlg, signerOnce, encrypters, w.httpClient)
+		if err == nil {
+			return nil
+		}
+		mu.Lock()
+		defer mu.Unlock()
+		retryable = retryable || !isPermanentDeliveryError(err)
+		deliveryErrors = errors.Join(deliveryErrors, fmt.Errorf("target %s: %w", target.GetTargetID(), err))
+		return err
 	}
-	return nil
+	for _, target := range targets {
+		// The queue already provides asynchronous execution; acknowledge only after delivery finishes.
+		// Delivery stays bound to the job context, so TransactionDuration and worker shutdown limit every target.
+		// Async targets never interrupt, so they run concurrently instead of adding up their durations.
+		if target.TargetType == target_domain.TargetTypeAsync {
+			target.TargetType = target_domain.TargetTypeWebhook
+			target.InterruptOnError = false
+			async.Go(func() { _ = deliver(target) })
+			continue
+		}
+		if err := deliver(target); err != nil && target.IsInterruptOnError() {
+			break
+		}
+	}
+	async.Wait()
+	if deliveryErrors != nil && !retryable {
+		return river.JobCancel(deliveryErrors)
+	}
+	// River retries the whole target list; successful receivers may see the event again.
+	return deliveryErrors
+}
+
+// permanentDeliveryErrorIDs are target configuration errors that fail the same way on every retry.
+// Other internal errors, such as signing key query failures, can be transient and stay retryable.
+var permanentDeliveryErrorIDs = map[string]bool{
+	"EXEC-thiiCh5b":   true,
+	"EXEC-auqnansr2m": true,
+	"EXEC-2n8fhs7g":   true,
+	"EXEC-3n8fhs7g":   true,
+	"EXEC-NKJe2":      true,
+}
+
+func isPermanentDeliveryError(err error) bool {
+	zitadelErr, ok := zerrors.AsZitadelError(err)
+	return ok && permanentDeliveryErrorIDs[zitadelErr.ID]
 }
 
 // NowFunc makes [time.Now] mockable

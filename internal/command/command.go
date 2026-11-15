@@ -44,6 +44,7 @@ type Commands struct {
 	jobs sync.WaitGroup
 
 	checkPermission             domain.PermissionCheck
+	refreshMemberProjections    func(context.Context)
 	newEncryptedCode            encrypedCodeFunc
 	newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 	newHashedSecret             hashedSecretFunc
@@ -197,6 +198,7 @@ func StartCommands(
 		webauthnConfig:                  webAuthN,
 		httpClient:                      httpClient,
 		checkPermission:                 permissionCheck,
+		refreshMemberProjections:        triggerMemberProjections,
 		newEncryptedCode:                newEncryptedCode,
 		newEncryptedCodeWithDefault:     newEncryptedCodeWithDefaultConfig,
 		sessionTokenCreator:             sessionTokenCreator(idGenerator, sessionAlg),

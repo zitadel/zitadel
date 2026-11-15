@@ -1266,6 +1266,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 						),
 					),
 					expectFilterOrganizationSettings("org1", false, false),
+					expectGroupFields(),
 					expectPush(
 						user.NewUserRemovedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -1319,6 +1320,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 						),
 					),
 					expectFilterOrganizationSettings("org1", true, true),
+					expectGroupFields(),
 					expectPush(
 						user.NewUserRemovedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -1380,6 +1382,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 						),
 					),
 					expectFilterOrganizationSettings("org1", false, false),
+					expectGroupFields(),
 					expectPush(
 						user.NewUserRemovedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -1438,6 +1441,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 						),
 					),
 					expectFilterOrganizationSettings("org1", false, false),
+					expectGroupFields(),
 					expectPush(
 						user.NewUserRemovedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -1552,6 +1556,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 						),
 					),
 					expectFilterOrganizationSettings("org1", false, false),
+					expectGroupMembershipsFixture("user1", "org1", "group1", "group2"),
 					expectPush(
 						user.NewUserRemovedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,

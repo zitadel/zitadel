@@ -257,7 +257,6 @@ func Test_handleEventExecution(t *testing.T) {
 			body, err := json.Marshal(exec_repo.ContextInfoFromRequest(a.job.Args))
 			require.NoError(t, err)
 
-			closeFuncs := make([]func(), len(w.targets))
 			calledFuncs := make([]func() bool, len(w.targets))
 			for i := range w.targets {
 				url, closeF, calledF := listen(t, &callTestServer{
@@ -268,7 +267,7 @@ func Test_handleEventExecution(t *testing.T) {
 					respondBody: nil,
 				})
 				w.targets[i].Endpoint = url
-				closeFuncs[i] = closeF
+				defer closeF()
 				calledFuncs[i] = calledF
 			}
 
@@ -282,14 +281,11 @@ func Test_handleEventExecution(t *testing.T) {
 			)
 
 			if w.err != nil {
-				assert.Error(t, err)
+				assert.True(t, w.err(t, err), "unexpected error: %v", err)
 				return
 			}
 			assert.NoError(t, err)
 
-			for _, closeF := range closeFuncs {
-				closeF()
-			}
 			for _, calledF := range calledFuncs {
 				assert.True(t, calledF())
 			}

@@ -450,6 +450,10 @@ func worker() {
 }
 
 func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Context, err error) {
+	// Refreshing needs other pool connections while the lifecycle transaction holds one.
+	if database.TransactionFromContext(ctx) != nil {
+		return call.ResetTimestamp(ctx), nil
+	}
 	if slices.Contains(h.skipInstanceIDs, authz.GetInstance(ctx).InstanceID()) {
 		return call.ResetTimestamp(ctx), nil
 	}

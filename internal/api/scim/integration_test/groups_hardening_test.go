@@ -52,24 +52,6 @@ func TestGroups_duplicateDisplayName(t *testing.T) {
 	}
 }
 
-// TestGroups_patchUnsupported proves PATCH fails with a proper SCIM error
-// pointing the caller to PUT.
-func TestGroups_patchUnsupported(t *testing.T) {
-	orgID := Instance.DefaultOrg.GetId()
-	groupID := createScimGroup(t, orgID, integration.GroupName())
-
-	err := Instance.Client.SCIM.Groups.Update(CTX, orgID, groupID, []byte(`{
-		"schemas": ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
-		"Operations": [{"op": "replace", "path": "displayName", "value": "new-name"}]
-	}`))
-	require.Error(t, err)
-	scimErr := new(scim.ScimError)
-	require.ErrorAs(t, err, &scimErr)
-	assert.Equal(t, "501", scimErr.Status)
-	require.NotNil(t, scimErr.ZitadelDetail)
-	assert.Equal(t, "SCIM-GRP3p", scimErr.ZitadelDetail.ID)
-}
-
 // TestGroups_replaceUnknownMember proves a PUT referencing a user ID that
 // does not exist surfaces as a SCIM error and leaves the group untouched —
 // no dangling membership, no silent success.
@@ -90,7 +72,7 @@ func TestGroups_replaceUnknownMember(t *testing.T) {
 		"schemas": ["urn:ietf:params:scim:schemas:core:2.0:Group"],
 		"displayName": %q,
 		"members": [{"value": %q}]
-	}`, groupName, unknownUserID)))
+	}`, integration.GroupName(), unknownUserID)))
 	require.Error(t, err)
 	scimErr := new(scim.ScimError)
 	require.ErrorAs(t, err, &scimErr)
@@ -199,19 +181,6 @@ func TestGroups_listPagination(t *testing.T) {
 	}
 }
 
-// TestGroups_listFilterUnsupported proves filtering is rejected explicitly
-// instead of silently returning unfiltered results.
-func TestGroups_listFilterUnsupported(t *testing.T) {
-	orgID := Instance.DefaultOrg.GetId()
-	_, err := Instance.Client.SCIM.Groups.List(CTX, orgID, &scim.ListRequest{
-		Filter: gu.Ptr(`displayName eq "foo"`),
-	})
-	require.Error(t, err)
-	scimErr := new(scim.ScimError)
-	require.ErrorAs(t, err, &scimErr)
-	assert.Equal(t, "501", scimErr.Status)
-}
-
 // TestGroups_crossOrgIsolation proves a SCIM caller authenticated against
 // org-A cannot read, replace, or delete a group owned by org-B even when
 // the caller has group permissions on org-A. Locks down the ResourceOwner
@@ -245,10 +214,8 @@ func TestGroups_crossOrgIsolation(t *testing.T) {
 	// that prevents the secondary-org group from being returned.
 	defaultOrgID := Instance.DefaultOrg.GetId()
 
-	// Pinning the ZitadelDetail.ID to "SCIM-GRP5o" ties each assertion to the
-	// guard in getOrgGroup specifically. Without the pin, PUT/DELETE pass even
-	// when the guard is dropped, because command-layer permission checks also
-	// fail with 404 — masking the real regression.
+	// Pin errors to the organization boundary: GET/DELETE guard the projection,
+	// while PUT reads the command write model scoped to the requested organization.
 	const getOrgGroupErrorID = "SCIM-GRP5o"
 
 	t.Run("GET cross-org group returns 404", func(t *testing.T) {
@@ -271,7 +238,7 @@ func TestGroups_crossOrgIsolation(t *testing.T) {
 		require.ErrorAs(t, err, &scimErr)
 		assert.Equal(t, "404", scimErr.Status)
 		require.NotNil(t, scimErr.ZitadelDetail)
-		assert.Equal(t, getOrgGroupErrorID, scimErr.ZitadelDetail.ID)
+		assert.Equal(t, "CMDGRP-mut1", scimErr.ZitadelDetail.ID)
 	})
 
 	t.Run("DELETE cross-org group returns 404 and leaves group intact", func(t *testing.T) {

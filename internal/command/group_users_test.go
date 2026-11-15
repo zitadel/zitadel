@@ -171,7 +171,7 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 					expectFilterScoped(t, "org1",
 						eventFromEventPusher(addNewUserEvent("user1", "org1")),
 					),
-					expectPush(
+					expectGroupPush(
 						newGroupUserAddedEvent("group1", "org1", "user1"),
 					),
 				),
@@ -234,7 +234,7 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 							addNewUserEvent("user2", "org1"),
 						),
 					),
-					expectPush(
+					expectGroupPush(
 						newGroupUserAddedEvent("group1", "org1", "user2"),
 					),
 				),
@@ -286,7 +286,7 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 							addNewUserEvent("user1", "org1"),
 						),
 					),
-					expectPushFailed(
+					expectGroupPushFailed(
 						pushErr,
 						newGroupUserAddedEvent("group1", "org1", "user1"),
 					),
@@ -318,7 +318,7 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 							addNewUserEvent("user2", "org1"),
 						),
 					),
-					expectPush(
+					expectGroupPush(
 						newGroupUserAddedEvent("group1", "org1", "user1"),
 						newGroupUserAddedEvent("group1", "org1", "user2"),
 					),
@@ -351,7 +351,7 @@ func TestCommands_AddUsersToGroup(t *testing.T) {
 							addNewUserEvent("user2", "org1"),
 						),
 					),
-					expectPush(
+					expectGroupPush(
 						newGroupUserAddedEvent("group1", "org1", "user1"),
 						newGroupUserAddedEvent("group1", "org1", "user2"),
 					),
@@ -471,7 +471,7 @@ func TestCommands_RemoveUsersFromGroup(t *testing.T) {
 						eventFromEventPusher(newGroupUserAddedEvent("group1", "org1", "user1")),
 						eventFromEventPusher(newGroupUserAddedEvent("group1", "org1", "user2")),
 					),
-					expectPush(
+					expectGroupPush(
 						newGroupUserRemovedEvent("group1", "org1", "user1"),
 						newGroupUserRemovedEvent("group1", "org1", "user2"),
 					),
@@ -498,7 +498,7 @@ func TestCommands_RemoveUsersFromGroup(t *testing.T) {
 						eventFromEventPusher(newGroupUserAddedEvent("group1", "org1", "user1")),
 						eventFromEventPusher(newGroupUserAddedEvent("group1", "org1", "user2")),
 					),
-					expectPush(
+					expectGroupPush(
 						newGroupUserRemovedEvent("group1", "org1", "user1"),
 						newGroupUserRemovedEvent("group1", "org1", "user2"),
 					),
@@ -525,7 +525,7 @@ func TestCommands_RemoveUsersFromGroup(t *testing.T) {
 						eventFromEventPusher(newGroupUserAddedEvent("group1", "org1", "user1")),
 						eventFromEventPusher(newGroupUserAddedEvent("group1", "org1", "user2")),
 					),
-					expectPush(
+					expectGroupPush(
 						newGroupUserRemovedEvent("group1", "org1", "user2"),
 					),
 				),
@@ -574,7 +574,7 @@ func TestCommands_RemoveUsersFromGroup(t *testing.T) {
 						eventFromEventPusher(newGroupUserAddedEvent("group1", "org1", "user1")),
 						eventFromEventPusher(newGroupUserAddedEvent("group1", "org1", "user2")),
 					),
-					expectPushFailed(
+					expectGroupPushFailed(
 						pushErr,
 						newGroupUserRemovedEvent("group1", "org1", "user1"),
 					),
@@ -603,43 +603,6 @@ func TestCommands_RemoveUsersFromGroup(t *testing.T) {
 				return
 			}
 			assertObjectDetails(t, tt.want, got)
-		})
-	}
-}
-
-func TestCommands_removeUserFromGroups(t *testing.T) {
-	t.Parallel()
-
-	const (
-		userID = "user1"
-		orgID  = "org1"
-	)
-
-	tests := []struct {
-		name     string
-		groupIDs []string
-	}{
-		{name: "no groups, no events", groupIDs: nil},
-		{name: "single group, single event", groupIDs: []string{"group1"}},
-		{name: "multiple groups, one event per group, in order", groupIDs: []string{"group1", "group2", "group3"}},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			c := &Commands{}
-			events, err := c.removeUserFromGroups(context.Background(), userID, tt.groupIDs, orgID)
-			require.NoError(t, err)
-			require.Len(t, events, len(tt.groupIDs))
-
-			for i, ev := range events {
-				removed, ok := ev.(*group.GroupUserRemovedEvent)
-				require.Truef(t, ok, "event %d is %T, want *group.GroupUserRemovedEvent", i, ev)
-				require.Equal(t, group.GroupUserRemovedEventType, removed.EventType)
-				require.Equal(t, tt.groupIDs[i], removed.Aggregate().ID)
-				require.Equal(t, orgID, removed.Aggregate().ResourceOwner)
-				require.Equal(t, userID, removed.UserID)
-			}
 		})
 	}
 }

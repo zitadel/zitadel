@@ -19,26 +19,28 @@ import (
 var (
 	//go:embed unique_constraints_delete.sql
 	deleteConstraintStmt string
-	//go:embed unique_constraints_delete_placeholders.sql
-	deleteConstraintPlaceholdersStmt string
 	//go:embed unique_constraints_add.sql
 	addConstraintStmt string
+	//go:embed unique_constraints_release_claim.sql
+	releaseClaimStmt string
 )
 
 func handleUniqueConstraints(ctx context.Context, tx database.Transaction, commands []eventstore.Command) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	deletePlaceholders := make([]string, 0)
-	deleteArgs := make([]any, 0)
-
-	addPlaceholders := make([]string, 0)
-	addArgs := make([]any, 0)
+	var deleteInstances, deleteTypes, deleteFields, removeInstances []string
+	var releaseInstances, releaseTypes, releaseFields, releaseClaimantTypes, releaseClaimantIDs []string
+	var adds []*pendingAdd
+	pendingAdds := map[string]*pendingAdd{}
 	addConstraints := map[string]*eventstore.UniqueConstraint{}
 	deleteConstraints := map[string]*eventstore.UniqueConstraint{}
 
 	for _, command := range commands {
 		for _, constraint := range command.UniqueConstraints() {
+			if (constraint.ClaimantType == "") != (constraint.ClaimantID == "") {
+				return zerrors.ThrowInvalidArgument(nil, "V3-claimant", "Reservation claimant requires both type and ID")
+			}
 			instanceID := command.Aggregate().InstanceID
 			if constraint.IsGlobal {
 				instanceID = ""
@@ -46,23 +48,56 @@ func handleUniqueConstraints(ctx context.Context, tx database.Transaction, comma
 			switch constraint.Action {
 			case eventstore.UniqueConstraintAdd:
 				constraint.UniqueField = strings.ToLower(constraint.UniqueField)
-				addPlaceholders = append(addPlaceholders, fmt.Sprintf("($%d, $%d, $%d)", len(addArgs)+1, len(addArgs)+2, len(addArgs)+3))
-				addArgs = append(addArgs, instanceID, constraint.UniqueType, constraint.UniqueField)
-				addConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, instanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
+				key := fmt.Sprintf(uniqueConstraintPlaceholderFmt, instanceID, constraint.UniqueType, constraint.UniqueField)
+				add := &pendingAdd{instanceID: instanceID, constraint: constraint}
+				adds = append(adds, add)
+				pendingAdds[key] = add
+				addConstraints[key] = constraint
 			case eventstore.UniqueConstraintRemove:
-				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf(deleteConstraintPlaceholdersStmt, len(deleteArgs)+1, len(deleteArgs)+2, len(deleteArgs)+3))
-				deleteArgs = append(deleteArgs, instanceID, constraint.UniqueType, constraint.UniqueField)
+				if constraint.ClaimantID != "" {
+					// Adds are batched after all releases, so a release of a key added
+					// earlier in the same push cancels the pending add. The stored row is
+					// still released so a conflicting or stale claim is not silently kept.
+					key := fmt.Sprintf(uniqueConstraintPlaceholderFmt, instanceID, constraint.UniqueType, strings.ToLower(constraint.UniqueField))
+					if add := pendingAdds[key]; add != nil {
+						if add.constraint.ClaimantType != constraint.ClaimantType || add.constraint.ClaimantID != constraint.ClaimantID {
+							return eventstore.ErrConcurrentModification
+						}
+						add.released = true
+						delete(pendingAdds, key)
+					}
+					releaseInstances = append(releaseInstances, instanceID)
+					releaseTypes = append(releaseTypes, constraint.UniqueType)
+					releaseFields = append(releaseFields, constraint.UniqueField)
+					releaseClaimantTypes = append(releaseClaimantTypes, string(constraint.ClaimantType))
+					releaseClaimantIDs = append(releaseClaimantIDs, constraint.ClaimantID)
+					continue
+				}
+				deleteInstances = append(deleteInstances, instanceID)
+				deleteTypes = append(deleteTypes, constraint.UniqueType)
+				deleteFields = append(deleteFields, constraint.UniqueField)
 				deleteConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, instanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			case eventstore.UniqueConstraintInstanceRemove:
-				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf("(instance_id = $%d)", len(deleteArgs)+1))
-				deleteArgs = append(deleteArgs, instanceID)
+				removeInstances = append(removeInstances, instanceID)
 				deleteConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, instanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			}
 		}
 	}
 
-	if len(deletePlaceholders) > 0 {
-		_, err := tx.Exec(ctx, fmt.Sprintf(deleteConstraintStmt, strings.Join(deletePlaceholders, " OR ")), deleteArgs...)
+	if len(releaseFields) > 0 {
+		// One statement keeps large cascades from costing a round trip per claim.
+		var released bool
+		err := tx.QueryRow(ctx, releaseClaimStmt,
+			releaseInstances, releaseTypes, releaseFields, releaseClaimantTypes, releaseClaimantIDs).Scan(&released)
+		if err != nil {
+			return zerrors.ThrowInternal(err, "V3-release-claim", "Errors.Internal")
+		}
+		if !released {
+			return eventstore.ErrConcurrentModification
+		}
+	}
+	if len(deleteFields) > 0 {
+		_, err := tx.Exec(ctx, deleteConstraintStmt, deleteInstances, deleteTypes, deleteFields)
 		if err != nil {
 			logging.WithError(err).Warn("delete unique constraint failed")
 			errMessage := "Errors.Internal"
@@ -72,8 +107,30 @@ func handleUniqueConstraints(ctx context.Context, tx database.Transaction, comma
 			return zerrors.ThrowInternal(err, "V3-C8l3V", errMessage)
 		}
 	}
-	if len(addPlaceholders) > 0 {
-		_, err := tx.Exec(ctx, fmt.Sprintf(addConstraintStmt, strings.Join(addPlaceholders, ", ")), addArgs...)
+	if len(removeInstances) > 0 {
+		_, err := tx.Exec(ctx, "DELETE FROM eventstore.unique_constraints WHERE instance_id = ANY($1::text[])", removeInstances)
+		if err != nil {
+			logging.WithError(err).Warn("delete instance unique constraints failed")
+			errMessage := "Errors.Internal"
+			if constraint := constraintFromErr(err, deleteConstraints); constraint != nil {
+				errMessage = constraint.ErrorMessage
+			}
+			return zerrors.ThrowInternal(err, "V3-C8l3V", errMessage)
+		}
+	}
+	var addInstances, addTypes, addFields, claimantTypes, claimantIDs []string
+	for _, add := range adds {
+		if add.released {
+			continue
+		}
+		addInstances = append(addInstances, add.instanceID)
+		addTypes = append(addTypes, add.constraint.UniqueType)
+		addFields = append(addFields, add.constraint.UniqueField)
+		claimantTypes = append(claimantTypes, string(add.constraint.ClaimantType))
+		claimantIDs = append(claimantIDs, add.constraint.ClaimantID)
+	}
+	if len(addFields) > 0 {
+		_, err := tx.Exec(ctx, addConstraintStmt, addInstances, addTypes, addFields, claimantTypes, claimantIDs)
 		if err != nil {
 			logging.WithError(err).Warn("add unique constraint failed")
 			errMessage := "Errors.Internal"
@@ -84,6 +141,12 @@ func handleUniqueConstraints(ctx context.Context, tx database.Transaction, comma
 		}
 	}
 	return nil
+}
+
+type pendingAdd struct {
+	instanceID string
+	constraint *eventstore.UniqueConstraint
+	released   bool
 }
 
 func constraintFromErr(err error, constraints map[string]*eventstore.UniqueConstraint) *eventstore.UniqueConstraint {

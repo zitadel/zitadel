@@ -3,13 +3,16 @@ package resources
 import (
 	"context"
 	"strconv"
+	"strings"
 
 	"github.com/muhlemmer/gu"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/scim/metadata"
 	"github.com/zitadel/zitadel/internal/api/scim/resources/filter"
 	"github.com/zitadel/zitadel/internal/api/scim/resources/patch"
 	scim_schemas "github.com/zitadel/zitadel/internal/api/scim/schemas"
+	"github.com/zitadel/zitadel/internal/api/scim/serrors"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -25,6 +28,7 @@ type GroupsHandler struct {
 type ScimGroup struct {
 	*scim_schemas.Resource `scim:"ignoreInSchema"`
 	ID                     string             `json:"id" scim:"ignoreInSchema"`
+	ExternalID             string             `json:"externalId,omitempty"`
 	DisplayName            string             `json:"displayName,omitempty" scim:"required"`
 	Members                []*ScimGroupMember `json:"members,omitempty"`
 }
@@ -61,7 +65,7 @@ func (g *ScimGroup) GetSchemas() []scim_schemas.ScimSchemaType {
 	if g.Resource == nil {
 		return nil
 	}
-	return g.Resource.Schemas
+	return g.Schemas
 }
 
 func (h *GroupsHandler) Schema() *scim_schemas.ResourceSchema {
@@ -77,6 +81,9 @@ func (h *GroupsHandler) NewResource() *ScimGroup {
 // Rejecting them loudly beats silently misreading a group ID as a user ID.
 func validateMemberTypes(members []*ScimGroupMember) error {
 	for _, member := range members {
+		if member == nil || strings.TrimSpace(member.Value) == "" {
+			return invalidGroupPatch("Each member requires a user ID")
+		}
 		switch member.Type {
 		case "", "User":
 		case "Group":
@@ -92,27 +99,23 @@ func (h *GroupsHandler) Create(ctx context.Context, group *ScimGroup) (*ScimGrou
 	if group.DisplayName == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "SCIM-GRP1m", "Errors.Group.Invalid")
 	}
-	if err := validateMemberTypes(group.Members); err != nil {
+	ids, err := groupMemberIDs(group.Members)
+	if err != nil {
 		return nil, err
 	}
+
 	details, err := h.command.CreateGroup(ctx, &command.CreateGroup{
 		ObjectRoot: models.ObjectRoot{
 			ResourceOwner: authz.GetCtxData(ctx).OrgID,
 		},
-		Name: group.DisplayName,
+		Name:       group.DisplayName,
+		UserIDs:    ids,
+		ExternalID: &command.GroupExternalID{Scope: string(metadata.ScopeKey(ctx, metadata.KeyExternalId)), Value: group.ExternalID},
 	})
 	if err != nil {
 		return nil, err
 	}
-	if len(group.Members) > 0 {
-		userIDs := make([]string, len(group.Members))
-		for i, member := range group.Members {
-			userIDs[i] = member.Value
-		}
-		if _, err = h.command.AddUsersToGroup(ctx, details.ID, userIDs); err != nil {
-			return nil, err
-		}
-	}
+
 	group.ID = details.ID
 	group.Resource = buildResource[*ScimGroup](ctx, h, details)
 	return group, nil
@@ -122,32 +125,32 @@ func (h *GroupsHandler) Replace(ctx context.Context, id string, group *ScimGroup
 	if group.DisplayName == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "SCIM-GRP2r", "Errors.Group.Invalid")
 	}
-	if err := validateMemberTypes(group.Members); err != nil {
-		return nil, err
-	}
-	existing, err := h.getOrgGroup(ctx, id)
+
+	ids, err := groupMemberIDs(group.Members)
 	if err != nil {
 		return nil, err
 	}
-	if existing.Name != group.DisplayName {
-		if _, err = h.command.UpdateGroup(ctx, &command.UpdateGroup{
-			ObjectRoot: models.ObjectRoot{
-				AggregateID:   id,
-				ResourceOwner: existing.ResourceOwner,
-			},
-			Name: gu.Ptr(group.DisplayName),
-		}); err != nil {
-			return nil, err
-		}
-	}
-	if err = h.replaceMembers(ctx, id, group.Members); err != nil {
+	details, err := h.command.MutateGroup(ctx, id, authz.GetCtxData(ctx).OrgID, []command.GroupMutation{{Name: &group.DisplayName, Members: &ids, ExternalID: &command.GroupExternalID{Scope: string(metadata.ScopeKey(ctx, metadata.KeyExternalId)), Value: group.ExternalID}}})
+	if err != nil {
 		return nil, err
 	}
-	return h.Get(ctx, id)
+	group.ID = id
+	group.Resource = buildResource[*ScimGroup](ctx, h, details)
+	return group, nil
 }
 
 func (h *GroupsHandler) Update(ctx context.Context, id string, operations patch.OperationCollection) error {
-	return zerrors.ThrowUnimplemented(nil, "SCIM-GRP3p", "PATCH is not supported for groups, use PUT instead")
+	mutations, err := groupMutations(operations)
+	if err != nil {
+		return err
+	}
+	for i := range mutations {
+		if mutations[i].ExternalID != nil {
+			mutations[i].ExternalID.Scope = string(metadata.ScopeKey(ctx, metadata.KeyExternalId))
+		}
+	}
+	_, err = h.command.MutateGroup(ctx, id, authz.GetCtxData(ctx).OrgID, mutations)
+	return err
 }
 
 func (h *GroupsHandler) Delete(ctx context.Context, id string) error {
@@ -171,14 +174,22 @@ func (h *GroupsHandler) Get(ctx context.Context, id string) (*ScimGroup, error) 
 	if err != nil {
 		return nil, err
 	}
-	return h.mapToScimGroup(ctx, group, members), nil
+	bindings, err := h.query.GroupExternalIDs(ctx, authz.GetCtxData(ctx).OrgID, string(metadata.ScopeKey(ctx, metadata.KeyExternalId)), []string{id})
+	if err != nil {
+		return nil, err
+	}
+	result := h.mapToScimGroup(ctx, group, members)
+	result.ExternalID = bindings[id]
+	return result, nil
 }
 
 func (h *GroupsHandler) List(ctx context.Context, request *ListRequest) (*ListResponse[*ScimGroup], error) {
-	if request.Filter != nil {
-		return nil, zerrors.ThrowUnimplemented(nil, "SCIM-GRP4l", "Filtering groups is not supported")
+	mapping := filter.FieldPathMapping{
+		"displayname": {Column: query.GroupColumnName, FieldType: filter.FieldTypeString, CaseInsensitive: true},
+		"externalid":  {FieldType: filter.FieldTypeCustom, BuildMappedQuery: buildGroupExternalIDQuery},
+		"id":          {Column: query.GroupColumnID, FieldType: filter.FieldTypeString},
 	}
-	sr, err := request.toSearchRequest(query.GroupColumnName, filter.FieldPathMapping{})
+	sr, err := request.toSearchRequest(query.GroupColumnID, mapping)
 	if err != nil {
 		return nil, err
 	}
@@ -186,10 +197,26 @@ func (h *GroupsHandler) List(ctx context.Context, request *ListRequest) (*ListRe
 	if err != nil {
 		return nil, err
 	}
+	queries := []query.SearchQuery{orgIDQuery}
+	if request.Filter != nil {
+		fq, err := request.Filter.BuildQuery(ctx, h.schema.ID, mapping)
+		if err != nil {
+			return nil, err
+		}
+		queries = append(queries, fq)
+	}
 	groups, err := h.query.SearchGroups(ctx, &query.GroupSearchQuery{
 		SearchRequest: sr,
-		Queries:       []query.SearchQuery{orgIDQuery},
+		Queries:       queries,
 	}, nil)
+	if err != nil {
+		return nil, err
+	}
+	groupIDs := make([]string, len(groups.Groups))
+	for i, group := range groups.Groups {
+		groupIDs[i] = group.ID
+	}
+	bindings, err := h.query.GroupExternalIDs(ctx, authz.GetCtxData(ctx).OrgID, string(metadata.ScopeKey(ctx, metadata.KeyExternalId)), groupIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -197,6 +224,7 @@ func (h *GroupsHandler) List(ctx context.Context, request *ListRequest) (*ListRe
 	for i, group := range groups.Groups {
 		// members are omitted in listings, use a get on the single group to resolve them
 		scimGroups[i] = h.mapToScimGroup(ctx, group, nil)
+		scimGroups[i].ExternalID = bindings[group.ID]
 	}
 	return NewListResponse(groups.Count, sr, scimGroups), nil
 }
@@ -224,46 +252,6 @@ func (h *GroupsHandler) groupMembers(ctx context.Context, groupID string) ([]*qu
 		return nil, err
 	}
 	return members.GroupUsers, nil
-}
-
-func (h *GroupsHandler) replaceMembers(ctx context.Context, groupID string, members []*ScimGroupMember) error {
-	existingMembers, err := h.groupMembers(ctx, groupID)
-	if err != nil {
-		return err
-	}
-	existingSet := make(map[string]struct{}, len(existingMembers))
-	for _, member := range existingMembers {
-		existingSet[member.UserID] = struct{}{}
-	}
-	requestedSet := make(map[string]struct{}, len(members))
-	for _, member := range members {
-		requestedSet[member.Value] = struct{}{}
-	}
-
-	toAdd := make([]string, 0, len(requestedSet))
-	for id := range requestedSet {
-		if _, ok := existingSet[id]; !ok {
-			toAdd = append(toAdd, id)
-		}
-	}
-	toRemove := make([]string, 0, len(existingSet))
-	for id := range existingSet {
-		if _, ok := requestedSet[id]; !ok {
-			toRemove = append(toRemove, id)
-		}
-	}
-
-	if len(toAdd) > 0 {
-		if _, err = h.command.AddUsersToGroup(ctx, groupID, toAdd); err != nil {
-			return err
-		}
-	}
-	if len(toRemove) > 0 {
-		if _, err = h.command.RemoveUsersFromGroup(ctx, groupID, toRemove); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func (h *GroupsHandler) groupGrantIDs(ctx context.Context, groupID string) ([]string, error) {
@@ -309,4 +297,20 @@ func (h *GroupsHandler) mapToScimGroup(ctx context.Context, group *query.Group, 
 		})
 	}
 	return scimGroup
+}
+
+func excludeGroupMembers(attributes Attributes) bool {
+	for _, attribute := range attributes {
+		if strings.EqualFold(strings.TrimSpace(attribute), "members") || strings.EqualFold(strings.TrimSpace(attribute), string(scim_schemas.IdGroup)+":members") {
+			return true
+		}
+	}
+	return false
+}
+
+func buildGroupExternalIDQuery(ctx context.Context, value *filter.CompValue, op *filter.CompareOp) (query.SearchQuery, error) {
+	if !op.Equal || value.StringValue == nil {
+		return nil, serrors.ThrowInvalidFilter(zerrors.ThrowInvalidArgument(nil, "SCIM-GEXT1", "externalId supports equality with a string"))
+	}
+	return query.NewGroupExternalIDSearchQuery(string(metadata.ScopeKey(ctx, metadata.KeyExternalId)), *value.StringValue)
 }
