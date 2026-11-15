@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net"
 	"net/smtp"
+	"strings"
 
 	"github.com/zitadel/logging"
 
@@ -23,7 +24,7 @@ type Email struct {
 }
 
 func InitChannel(cfg *Config) (*Email, error) {
-	client, err := cfg.SMTP.connectToSMTP(cfg.Tls)
+	client, err := cfg.SMTP.connectToSMTP(cfg.Tls, ehloName(cfg.From))
 	if err != nil {
 		logging.New().WithError(err).Error("could not connect to smtp")
 		return nil, err
@@ -84,16 +85,26 @@ func (email *Email) HandleMessage(message channels.Message) error {
 	return email.smtpClient.Quit()
 }
 
-func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err error) {
+// ehloName returns the domain of the sender address, which the client uses in EHLO/HELO.
+// Without it net/smtp greets the server as "localhost", which some servers reject (e.g. Google's SMTP relay).
+func ehloName(senderAddress string) string {
+	at := strings.LastIndex(senderAddress, "@")
+	if at < 0 {
+		return ""
+	}
+	return strings.Trim(senderAddress[at+1:], " >")
+}
+
+func (smtpConfig SMTP) connectToSMTP(tlsRequired bool, ehloName string) (client *smtp.Client, err error) {
 	host, _, err := net.SplitHostPort(smtpConfig.Host)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "EMAIL-spR56", "Errors.SMTP.CouldNotSplit")
 	}
 
 	if !tlsRequired {
-		client, err = smtpConfig.getSMTPClient()
+		client, err = smtpConfig.getSMTPClient(ehloName)
 	} else {
-		client, err = smtpConfig.getSMTPClientWithTls(host)
+		client, err = smtpConfig.getSMTPClientWithTls(host, ehloName)
 	}
 	if err != nil {
 		return nil, err
@@ -106,20 +117,32 @@ func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err
 	return client, nil
 }
 
-func (smtpConfig SMTP) getSMTPClient() (*smtp.Client, error) {
+func (smtpConfig SMTP) getSMTPClient(ehloName string) (*smtp.Client, error) {
 	client, err := smtp.Dial(smtpConfig.Host)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "EMAIL-skwos", "Errors.SMTP.CouldNotDial")
 	}
+	return hello(client, ehloName)
+}
+
+// hello must run before any other command, as net/smtp sends its own EHLO with the first one.
+func hello(client *smtp.Client, ehloName string) (*smtp.Client, error) {
+	if ehloName == "" {
+		return client, nil
+	}
+	if err := client.Hello(ehloName); err != nil {
+		client.Close()
+		return nil, zerrors.ThrowInternal(err, "EMAIL-Hel0n", "Errors.SMTP.CouldNotCreateClient")
+	}
 	return client, nil
 }
 
-func (smtpConfig SMTP) getSMTPClientWithTls(host string) (*smtp.Client, error) {
+func (smtpConfig SMTP) getSMTPClientWithTls(host, ehloName string) (*smtp.Client, error) {
 	conn, err := tls.Dial("tcp", smtpConfig.Host, &tls.Config{})
 
 	if errors.As(err, &tls.RecordHeaderError{}) {
 		logging.OnError(err).Warn("could not connect using normal tls. trying starttls instead...")
-		return smtpConfig.getSMTPClientWithStartTls(host)
+		return smtpConfig.getSMTPClientWithStartTls(host, ehloName)
 	}
 
 	if err != nil {
@@ -130,11 +153,11 @@ func (smtpConfig SMTP) getSMTPClientWithTls(host string) (*smtp.Client, error) {
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "EMAIL-skwi4", "Errors.SMTP.CouldNotCreateClient")
 	}
-	return client, err
+	return hello(client, ehloName)
 }
 
-func (smtpConfig SMTP) getSMTPClientWithStartTls(host string) (*smtp.Client, error) {
-	client, err := smtpConfig.getSMTPClient()
+func (smtpConfig SMTP) getSMTPClientWithStartTls(host, ehloName string) (*smtp.Client, error) {
+	client, err := smtpConfig.getSMTPClient(ehloName)
 	if err != nil {
 		return nil, err
 	}
@@ -168,7 +191,7 @@ func (smtpConfig SMTP) smtpAuth(client *smtp.Client, host string) error {
 }
 
 func TestConfiguration(cfg *Config, testEmail string) error {
-	client, err := cfg.SMTP.connectToSMTP(cfg.Tls)
+	client, err := cfg.SMTP.connectToSMTP(cfg.Tls, ehloName(cfg.From))
 	if err != nil {
 		return err
 	}
