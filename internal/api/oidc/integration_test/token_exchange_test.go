@@ -797,11 +797,17 @@ func TestServer_TokenExchangeImpersonationClientCredentialsActor(t *testing.T) {
 	actorScopes := []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc_api.ScopeProjectsRoles, audScope}
 	credentialsProvider, err := rp.NewRelyingPartyOIDC(ctx, instance.OIDCIssuer(), secret.GetClientId(), secret.GetClientSecret(), "", actorScopes)
 	require.NoError(t, err)
-	actorTokens, err := rp.ClientCredentials(ctx, credentialsProvider, nil)
-	require.NoError(t, err)
+	// The client credentials grant reads the new secret from a projection.
+	var actorAccessToken string
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(collect *assert.CollectT) {
+		actorTokens, err := rp.ClientCredentials(ctx, credentialsProvider, nil)
+		require.NoError(collect, err)
+		actorAccessToken = actorTokens.AccessToken
+	}, retryDuration, tick, "the machine secret must become usable")
 
 	step2Scopes := []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc_api.ScopeProjectsRoles, audScope}
-	got, err := tokenexchange.ExchangeToken(ctx, exchanger, userResp.GetUserId(), oidc_api.UserIDTokenType, actorTokens.AccessToken, oidc.AccessTokenType, nil, nil, step2Scopes, oidc.AccessTokenType)
+	got, err := tokenexchange.ExchangeToken(ctx, exchanger, userResp.GetUserId(), oidc_api.UserIDTokenType, actorAccessToken, oidc.AccessTokenType, nil, nil, step2Scopes, oidc.AccessTokenType)
 	require.NoError(t, err)
 	assert.Equal(t, oidc.SpaceDelimitedArray(step2Scopes), got.Scopes)
 	accessTokenVerifier(ctx, resourceServer, userResp.GetUserId(), impersonatorUser.GetUserId())(t, got.AccessToken)
