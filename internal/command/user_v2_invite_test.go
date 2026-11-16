@@ -1171,6 +1171,80 @@ func TestCommands_ResendInviteCode(t *testing.T) {
 			},
 		},
 		{
+			"resend after code invalidated and further failed checks ok",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								"username", "firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.Afrikaans,
+								domain.GenderUnspecified,
+								"email",
+								false,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanInviteCodeAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code"),
+								},
+								time.Hour,
+								"",
+								false,
+								"",
+								"authRequestID",
+							),
+						),
+						eventFromEventPusher(user.NewHumanInviteCheckFailedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate)),
+						eventFromEventPusher(user.NewHumanInviteCheckFailedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate)),
+						eventFromEventPusher(user.NewHumanInviteCheckFailedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate)),
+						eventFromEventPusher(user.NewHumanInviteCheckFailedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate)),
+						eventFromEventPusher(user.NewHumanInviteCheckFailedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate)),
+					),
+					expectPush(
+						eventFromEventPusher(
+							user.NewHumanInviteCodeAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code"),
+								},
+								time.Hour,
+								"",
+								false,
+								"",
+								"authRequestID",
+							),
+						),
+					),
+				),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("code", time.Hour),
+				defaultSecretGenerators:     &SecretGenerators{},
+			},
+			args{
+				ctx:    context.Background(),
+				userID: "userID",
+			},
+			want{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+					ID:            "userID",
+				},
+			},
+		},
+		{
 			"return ok, with same user requests code",
 			fields{
 				eventstore: expectEventstore(
