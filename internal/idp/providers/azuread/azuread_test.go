@@ -3,7 +3,6 @@ package azuread
 import (
 	"context"
 	"net/http"
-	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
+	"github.com/zitadel/zitadel/internal/test"
 )
 
 func TestProvider_BeginAuth(t *testing.T) {
@@ -86,8 +86,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 			gotAuth, gotErr := session.GetAuth(ctx)
 			a.ErrorIs(gotErr, wantErr)
 			// PKCE is used by default
-			assertRedirectAuthWithPKCE(t, wantAuth, gotAuth)
-			a.NotEmpty(session.PersistentParameters()[oauth.CodeVerifier])
+			test.AssertRedirectAuthWithPKCE(t, wantAuth, gotAuth, session.PersistentParameters())
 		})
 	}
 }
@@ -184,32 +183,4 @@ func TestProvider_Options(t *testing.T) {
 			a.Equal(tt.want.pkce, provider.RelyingParty.IsPKCE())
 		})
 	}
-}
-
-// assertRedirectAuthWithPKCE asserts that the actual auth URL contains the PKCE parameters
-// and otherwise matches the expected one, since the code challenge is random.
-func assertRedirectAuthWithPKCE(t *testing.T, expected, actual idp.Auth) {
-	t.Helper()
-
-	expectedRedirect, ok := expected.(*idp.RedirectAuth)
-	require.True(t, ok)
-	actualRedirect, ok := actual.(*idp.RedirectAuth)
-	require.True(t, ok)
-
-	expectedURL, err := url.Parse(expectedRedirect.RedirectURL)
-	require.NoError(t, err)
-	actualURL, err := url.Parse(actualRedirect.RedirectURL)
-	require.NoError(t, err)
-
-	actualQuery := actualURL.Query()
-	assert.NotEmpty(t, actualQuery.Get("code_challenge"))
-	assert.Equal(t, "S256", actualQuery.Get("code_challenge_method"))
-
-	actualQuery.Del("code_challenge")
-	actualQuery.Del("code_challenge_method")
-
-	assert.Equal(t, expectedURL.Scheme, actualURL.Scheme)
-	assert.Equal(t, expectedURL.Host, actualURL.Host)
-	assert.Equal(t, expectedURL.Path, actualURL.Path)
-	assert.Equal(t, expectedURL.Query(), actualQuery)
 }

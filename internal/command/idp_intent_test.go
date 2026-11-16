@@ -34,6 +34,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/test"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -761,40 +762,13 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 				got, err = session.GetAuth(tt.args.ctx)
 				assert.NoError(t, err)
 				if tt.res.expectPKCE {
-					assertRedirectAuthWithPKCE(t, tt.res.auth, got)
-					assert.NotEmpty(t, session.PersistentParameters()[oauth.CodeVerifier])
+					test.AssertRedirectAuthWithPKCE(t, tt.res.auth, got, session.PersistentParameters())
 				} else {
 					assert.Equal(t, tt.res.auth, got)
 				}
 			}
 		})
 	}
-}
-
-func assertRedirectAuthWithPKCE(t *testing.T, expected, actual idp.Auth) {
-	t.Helper()
-
-	expectedRedirect, ok := expected.(*idp.RedirectAuth)
-	require.True(t, ok)
-	actualRedirect, ok := actual.(*idp.RedirectAuth)
-	require.True(t, ok)
-
-	expectedURL, err := url.Parse(expectedRedirect.RedirectURL)
-	require.NoError(t, err)
-	actualURL, err := url.Parse(actualRedirect.RedirectURL)
-	require.NoError(t, err)
-
-	actualQuery := actualURL.Query()
-	assert.NotEmpty(t, actualQuery.Get("code_challenge"))
-	assert.Equal(t, "S256", actualQuery.Get("code_challenge_method"))
-
-	actualQuery.Del("code_challenge")
-	actualQuery.Del("code_challenge_method")
-
-	assert.Equal(t, expectedURL.Scheme, actualURL.Scheme)
-	assert.Equal(t, expectedURL.Host, actualURL.Host)
-	assert.Equal(t, expectedURL.Path, actualURL.Path)
-	assert.Equal(t, expectedURL.Query(), actualQuery)
 }
 
 func TestCommands_AuthFromProvider_SAML(t *testing.T) {
