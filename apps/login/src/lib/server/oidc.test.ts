@@ -1,116 +1,291 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
-import { getDeviceAuthorizationRequest } from "./oidc";
+import * as loginnameModule from "@/lib/actions/loginname";
+import { loginWithOIDCAndSession } from "@/lib/server/oidc";
+import * as sessionModule from "@/lib/server/session";
+import * as zitadelModule from "@/lib/server/zitadel";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@/lib/zitadel", () => ({
-  getDeviceAuthorizationRequest: vi.fn(),
-  listSessions: vi.fn(),
+vi.mock("@/lib/server/session");
+vi.mock("@/lib/server/zitadel");
+vi.mock("@/lib/actions/loginname");
+vi.mock("@/lib/server/grpc/interceptors/error-classification", () => ({
+  isClassifiedError: (error: unknown): boolean =>
+    typeof error === "object" && error !== null && "code" in error && typeof (error as any).code === "number",
 }));
 
-vi.mock("@/lib/cookies", () => ({
-  getAllSessions: vi.fn(),
+vi.mock("@zitadel/client", () => ({
+  Code: { FailedPrecondition: 9 },
+  ConnectError: class MockConnectError extends Error {
+    code: number;
+    constructor(msg: string, code: number) {
+      super(msg);
+      this.code = code;
+    }
+  },
+  create: vi.fn(),
 }));
 
-vi.mock("../device-code-check", () => ({
-  setDeviceCodeCheckCookie: vi.fn(),
-}));
+describe("loginWithOIDCAndSession", () => {
+  const mockServiceUrl = "https://zitadel.example.com";
+  const mockAuthRequest = "auth-123";
+  const mockSessionId = "session-123";
 
-vi.mock("../service-url", () => ({
-  getServiceConfig: vi.fn(() => ({ serviceConfig: { baseUrl: "https://example.com" } })),
-}));
+  let mockSessions: any[];
+  let mockCookies: any[];
 
-vi.mock("next/headers", () => ({
-  headers: vi.fn(() => new Headers()),
-}));
-
-const deviceAuthorizationRequest = { id: "encrypted-device-code", appName: "TV", clientId: "client-1" };
-
-describe("getDeviceAuthorizationRequest", () => {
-  let zitadelGetDeviceAuthorizationRequest: any;
-  let listSessions: any;
-  let getAllSessions: any;
-  let setDeviceCodeCheckCookie: any;
-
-  beforeEach(async () => {
+  beforeEach(() => {
     vi.clearAllMocks();
-    const zitadel = await import("@/lib/zitadel");
-    const cookies = await import("@/lib/cookies");
-    const deviceCodeCheck = await import("../device-code-check");
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
 
-    zitadelGetDeviceAuthorizationRequest = vi.mocked(zitadel.getDeviceAuthorizationRequest);
-    listSessions = vi.mocked(zitadel.listSessions);
-    getAllSessions = vi.mocked(cookies.getAllSessions);
-    setDeviceCodeCheckCookie = vi.mocked(deviceCodeCheck.setDeviceCodeCheckCookie);
+    mockSessions = [
+      {
+        id: mockSessionId,
+        factors: {
+          user: {
+            id: "user-123",
+            loginName: "test@example.com",
+            organizationId: "org-123",
+          },
+          password: {
+            verifiedAt: { seconds: BigInt(Math.floor(Date.now() / 1000)) },
+          },
+        },
+      },
+    ];
 
-    zitadelGetDeviceAuthorizationRequest.mockResolvedValue({ deviceAuthorizationRequest });
-    getAllSessions.mockResolvedValue([]);
+    mockCookies = [
+      {
+        id: mockSessionId,
+        token: "token-123",
+        loginName: "test@example.com",
+        creationTs: new Date().toISOString(),
+        expirationTs: new Date(Date.now() + 3600000).toISOString(),
+        changeTs: new Date().toISOString(),
+      },
+    ];
   });
 
-  test("does not set the check cookie or look up sessions when the lookup returns no request", async () => {
-    zitadelGetDeviceAuthorizationRequest.mockResolvedValue({ deviceAuthorizationRequest: undefined });
+  it("should redirect to callback URL when session is valid", async () => {
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(true);
+    vi.mocked(zitadelModule.createCallback).mockResolvedValue({
+      callbackUrl: "https://app.example.com/callback",
+    } as any);
 
-    const result = await getDeviceAuthorizationRequest("ABCD-1234");
+    const result = await loginWithOIDCAndSession({
+      serviceUrl: mockServiceUrl,
+      authRequest: mockAuthRequest,
+      sessionId: mockSessionId,
+      sessions: mockSessions,
+      sessionCookies: mockCookies,
+    });
 
-    expect(result).toEqual({ deviceAuthorizationRequest: undefined, nextUrl: undefined });
-    expect(setDeviceCodeCheckCookie).not.toHaveBeenCalled();
-    expect(getAllSessions).not.toHaveBeenCalled();
-    expect(listSessions).not.toHaveBeenCalled();
+    expect(result).toEqual({ redirect: "https://app.example.com/callback" });
   });
 
-  test("does not set the check cookie when the lookup fails", async () => {
-    zitadelGetDeviceAuthorizationRequest.mockRejectedValue(new Error("not found"));
+  it("should redirect to re-authenticate when session is invalid", async () => {
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(false);
+    vi.mocked(loginnameModule.sendLoginname).mockResolvedValue({
+      redirect: "/password",
+    });
 
-    await expect(getDeviceAuthorizationRequest("ABCD-1234")).rejects.toThrow("not found");
-    expect(setDeviceCodeCheckCookie).not.toHaveBeenCalled();
-    expect(listSessions).not.toHaveBeenCalled();
-  });
+    const result = await loginWithOIDCAndSession({
+      serviceUrl: mockServiceUrl,
+      authRequest: mockAuthRequest,
+      sessionId: mockSessionId,
+      sessions: mockSessions,
+      sessionCookies: mockCookies,
+    });
 
-  test("continues to /loginname without session cookies and does not call listSessions", async () => {
-    const result = await getDeviceAuthorizationRequest("ABCD-1234");
-
-    expect(setDeviceCodeCheckCookie).toHaveBeenCalledWith("ABCD-1234");
-    expect(listSessions).not.toHaveBeenCalled();
-    expect(result).toEqual({
-      deviceAuthorizationRequest,
-      nextUrl: "/loginname?requestId=device_ABCD-1234",
+    expect(result).toEqual({ redirect: "/password" });
+    expect(loginnameModule.sendLoginname).toHaveBeenCalledWith({
+      loginName: "test@example.com",
+      organization: "org-123",
+      requestId: `oidc_${mockAuthRequest}`,
     });
   });
 
-  test("continues to /accounts when the browser has a live session", async () => {
-    getAllSessions.mockResolvedValue([{ id: "session-1" }, { id: "" }, { id: "session-2" }]);
-    listSessions.mockResolvedValue({ sessions: [{ id: "session-1" }] });
+  it.each([
+    ["undefined", undefined],
+    ["an error", { error: "errors.localAuthenticationNotAllowed" }],
+  ])("should not create a callback for an invalid session when re-authentication returns %s", async (_, response) => {
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(false);
+    vi.mocked(loginnameModule.sendLoginname).mockResolvedValue(response as any);
 
-    const result = await getDeviceAuthorizationRequest("ABCD-1234");
-
-    expect(listSessions).toHaveBeenCalledWith({
-      serviceConfig: { baseUrl: "https://example.com" },
-      ids: ["session-1", "session-2"],
+    const result = await loginWithOIDCAndSession({
+      serviceUrl: mockServiceUrl,
+      authRequest: mockAuthRequest,
+      sessionId: mockSessionId,
+      sessions: mockSessions,
+      sessionCookies: mockCookies,
     });
-    expect(setDeviceCodeCheckCookie).toHaveBeenCalledWith("ABCD-1234");
-    expect(result.nextUrl).toBe("/accounts?requestId=device_ABCD-1234");
+
+    expect(result).toEqual({ error: "Session not found or invalid" });
+    expect(zitadelModule.createCallback).not.toHaveBeenCalled();
   });
 
-  test("continues to /loginname when all session cookies point to ended sessions", async () => {
-    getAllSessions.mockResolvedValue([{ id: "session-1" }]);
-    listSessions.mockResolvedValue({ sessions: [] });
+  it("should pass SAML data of an upstream IDP through for an invalid session", async () => {
+    const samlData = { url: "https://idp.example.com/saml", fields: { SAMLRequest: "abc" } };
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(false);
+    vi.mocked(loginnameModule.sendLoginname).mockResolvedValue({ samlData });
 
-    const result = await getDeviceAuthorizationRequest("ABCD-1234");
+    const result = await loginWithOIDCAndSession({
+      serviceUrl: mockServiceUrl,
+      authRequest: mockAuthRequest,
+      sessionId: mockSessionId,
+      sessions: mockSessions,
+      sessionCookies: mockCookies,
+    });
 
-    expect(result.nextUrl).toBe("/loginname?requestId=device_ABCD-1234");
+    expect(result).toEqual({ samlData });
+    expect(zitadelModule.createCallback).not.toHaveBeenCalled();
   });
 
-  test("continues to /loginname and does not throw when listSessions fails", async () => {
-    getAllSessions.mockResolvedValue([{ id: "session-1" }]);
-    listSessions.mockRejectedValue(new Error("unavailable"));
+  it("should not create a callback for an invalid session without a user factor", async () => {
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(false);
 
-    const result = await getDeviceAuthorizationRequest("ABCD-1234");
+    const result = await loginWithOIDCAndSession({
+      serviceUrl: mockServiceUrl,
+      authRequest: mockAuthRequest,
+      sessionId: mockSessionId,
+      sessions: [{ id: mockSessionId, factors: {} }],
+      sessionCookies: mockCookies,
+    });
 
-    expect(setDeviceCodeCheckCookie).toHaveBeenCalledWith("ABCD-1234");
-    expect(result.nextUrl).toBe("/loginname?requestId=device_ABCD-1234");
+    expect(result).toEqual({ error: "Session not found or invalid" });
+    expect(loginnameModule.sendLoginname).not.toHaveBeenCalled();
+    expect(zitadelModule.createCallback).not.toHaveBeenCalled();
   });
 
-  test("builds the next url only from the user code", async () => {
-    const result = await getDeviceAuthorizationRequest("AB&next=https://evil.example");
+  it("should return error when session not found", async () => {
+    const result = await loginWithOIDCAndSession({
+      serviceUrl: mockServiceUrl,
+      authRequest: mockAuthRequest,
+      sessionId: "nonexistent",
+      sessions: mockSessions,
+      sessionCookies: mockCookies,
+    });
 
-    expect(result.nextUrl).toBe("/loginname?requestId=device_AB%26next%3Dhttps%3A%2F%2Fevil.example");
+    expect(result).toEqual({ error: "Session not found or invalid" });
+  });
+
+  it("should return error when cookie not found", async () => {
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(true);
+
+    const result = await loginWithOIDCAndSession({
+      serviceUrl: mockServiceUrl,
+      authRequest: mockAuthRequest,
+      sessionId: mockSessionId,
+      sessions: mockSessions,
+      sessionCookies: [],
+    });
+
+    expect(result).toEqual({ error: "Session not found or invalid" });
+  });
+
+  it("should handle error code 9 with default redirect", async () => {
+    const { ConnectError } = await import("@zitadel/client");
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(true);
+    vi.mocked(zitadelModule.createCallback).mockRejectedValue(new ConnectError("already handled", 9));
+    vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+      defaultRedirectUri: "https://default.example.com",
+    } as any);
+
+    const result = await loginWithOIDCAndSession({
+      serviceUrl: mockServiceUrl,
+      authRequest: mockAuthRequest,
+      sessionId: mockSessionId,
+      sessions: mockSessions,
+      sessionCookies: mockCookies,
+    });
+
+    expect(result).toEqual({ redirect: "https://default.example.com" });
+  });
+
+  it("should redirect to /signedin when error code 9 and no default URI", async () => {
+    const { ConnectError } = await import("@zitadel/client");
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(true);
+    vi.mocked(zitadelModule.createCallback).mockRejectedValue(new ConnectError("already handled", 9));
+    vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({} as any);
+
+    const result = await loginWithOIDCAndSession({
+      serviceUrl: mockServiceUrl,
+      authRequest: mockAuthRequest,
+      sessionId: mockSessionId,
+      sessions: mockSessions,
+      sessionCookies: mockCookies,
+    });
+
+    expect(result).toHaveProperty("redirect");
+    if ("redirect" in result) {
+      expect(result.redirect).toContain("/signedin");
+      expect(result.redirect).toContain("loginName=test%40example.com");
+      expect(result.redirect).toContain("organization=org-123");
+    }
+  });
+
+  it("should return unknown error for non-code-9 errors", async () => {
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(true);
+    vi.mocked(zitadelModule.createCallback).mockRejectedValue({
+      code: 13,
+      message: "Internal error",
+    });
+
+    const result = await loginWithOIDCAndSession({
+      serviceUrl: mockServiceUrl,
+      authRequest: mockAuthRequest,
+      sessionId: mockSessionId,
+      sessions: mockSessions,
+      sessionCookies: mockCookies,
+    });
+
+    expect(result).toEqual({ error: "Unknown error occurred" });
+  });
+
+  it("should reject javascript: defaultRedirectUri in FailedPrecondition path (XSS prevention)", async () => {
+    const { ConnectError } = await import("@zitadel/client");
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(true);
+    vi.mocked(zitadelModule.createCallback).mockRejectedValue(new ConnectError("already handled", 9));
+    vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+      defaultRedirectUri: "javascript:alert(document.cookie)",
+    } as any);
+
+    const result = await loginWithOIDCAndSession({
+      serviceUrl: mockServiceUrl,
+      authRequest: mockAuthRequest,
+      sessionId: mockSessionId,
+      sessions: mockSessions,
+      sessionCookies: mockCookies,
+    });
+
+    // Should NOT redirect to the javascript: URI — must fall back to /signedin
+    expect(result).toHaveProperty("redirect");
+    if ("redirect" in result) {
+      expect(result.redirect).not.toContain("javascript:");
+      expect(result.redirect).toContain("/signedin");
+    }
+  });
+
+  it("should reject data: defaultRedirectUri in FailedPrecondition path (XSS prevention)", async () => {
+    const { ConnectError } = await import("@zitadel/client");
+    vi.mocked(sessionModule.isSessionValid).mockResolvedValue(true);
+    vi.mocked(zitadelModule.createCallback).mockRejectedValue(new ConnectError("already handled", 9));
+    vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+      defaultRedirectUri: "data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==",
+    } as any);
+
+    const result = await loginWithOIDCAndSession({
+      serviceUrl: mockServiceUrl,
+      authRequest: mockAuthRequest,
+      sessionId: mockSessionId,
+      sessions: mockSessions,
+      sessionCookies: mockCookies,
+    });
+
+    // Should NOT redirect to the data: URI — must fall back to /signedin
+    expect(result).toHaveProperty("redirect");
+    if ("redirect" in result) {
+      expect(result.redirect).not.toContain("data:");
+      expect(result.redirect).toContain("/signedin");
+    }
   });
 });

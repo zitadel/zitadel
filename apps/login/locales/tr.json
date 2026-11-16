@@ -153,7 +153,8 @@
       "sessionNotValid": "Oturum geçerli değil",
       "passwordVerificationMissing": "Şifre doğrulaması eksik.",
       "passwordVerificationTooOld": "Şifre doğrulaması çok eski. Lütfen şifrenizi tekrar doğrulayın.",
-      "passwordResetNotAllowed": "Şifre sıfırlamaya izin verilmiyor. Daha fazla bilgi için yöneticinizle iletişime geçin."
+      "passwordResetNotAllowed": "Şifre sıfırlamaya izin verilmiyor. Daha fazla bilgi için yöneticinizle iletişime geçin.",
+      "localAuthenticationNotAllowed": "Yerel kimlik doğrulamasına izin verilmiyor! Daha fazla bilgi için yöneticinize başvurun."
     }
   },
   "idp": {
@@ -255,6 +256,11 @@
       "smsDescription": "SMS ile kod almak için telefon numaranızı girin.",
       "emailDescription": "E-posta ile kod almak için e-posta adresinizi girin.",
       "totpRegisterDescription": "QR Kodunu tarayın veya URL'ye manuel olarak gidin.",
+      "emailAddDescription": "Doğrulanmış e-posta adresinize gönderilen tek kullanımlık kodu ikinci faktör olarak kullanın.",
+      "smsAddDescription": "Doğrulanmış telefon numaranıza gönderilen tek kullanımlık kodu ikinci faktör olarak kullanın.",
+      "add": "Ekle",
+      "emailAdded": "E-posta ile kod eklendi.",
+      "smsAdded": "SMS ile kod eklendi.",
       "submit": "Devam",
       "labels": {
         "code": "Kod"
@@ -265,7 +271,13 @@
     },
     "errors": {
       "couldNotRequestChallenge": "OTP meydan okuması istenemedi",
-      "couldNotVerifyCode": "OTP kodu doğrulanamadı"
+      "couldNotVerifyCode": "OTP kodu doğrulanamadı",
+      "couldNotGetSession": "Oturumunuz yüklenemedi. Lütfen yeniden oturum açın.",
+      "invalidMethod": "Bu ikinci faktör desteklenmiyor.",
+      "couldNotAddEmail": "E-posta ile kod eklenemedi.",
+      "couldNotAddSms": "SMS ile kod eklenemedi.",
+      "emailNotVerified": "E-posta ile kod eklemeden önce e-posta adresinizi doğrulayın.",
+      "phoneNotVerified": "SMS ile kod eklemeden önce telefon numaranızı doğrulayın."
     }
   },
   "passkey": {
@@ -359,7 +371,8 @@
       "couldNotCreateSession": "Oturum oluşturulamadı",
       "userNotFound": "Kullanıcı sistemde bulunamadı",
       "couldNotLinkIDP": "IDP kullanıcıya bağlanamadı",
-      "couldNotRegisterUser": "Kullanıcı kayıt edilemedi"
+      "couldNotRegisterUser": "Kullanıcı kayıt edilemedi",
+      "sessionMismatch": "Kayıt başka bir tarayıcıda başlatıldı. Lütfen kimlik sağlayıcınızla yeniden oturum açın."
     }
   },
   "invite": {

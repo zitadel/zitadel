@@ -181,6 +181,7 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 			eventTypeFilter,
 			eventDataFilter,
 			eventPositionAfterFilter,
+			subQuerySequenceGreaterFilter,
 		} {
 			filter := f(q)
 			if filter == nil {
@@ -226,7 +227,8 @@ func eventTypeScans(builder *eventstore.SearchQueryBuilder) ([]EventTypeScan, er
 			len(query.GetEventTypes()) == 0 ||
 			len(query.GetAggregateIDs()) > 0 ||
 			len(query.GetEventData()) > 0 ||
-			!query.GetPositionAfter().IsZero() {
+			!query.GetPositionAfter().IsZero() ||
+			query.GetSequenceGreater() > 0 {
 			return nil, zerrors.ThrowInvalidArgument(nil, "REPO-Ahx6e", "scanning event types separately requires sub queries with one aggregate type and event types only")
 		}
 		for _, eventType := range query.GetEventTypes() {
@@ -343,6 +345,13 @@ func eventDataFilter(query *eventstore.SearchQuery) *Filter {
 		return nil
 	}
 	return NewFilter(FieldEventData, query.GetEventData(), OperationJSONContains)
+}
+
+func subQuerySequenceGreaterFilter(query *eventstore.SearchQuery) *Filter {
+	if sequence := query.GetSequenceGreater(); sequence > 0 {
+		return NewFilter(FieldSequence, sequence, OperationGreater)
+	}
+	return nil
 }
 
 func eventPositionAfterFilter(query *eventstore.SearchQuery) *Filter {
