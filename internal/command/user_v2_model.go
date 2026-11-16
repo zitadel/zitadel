@@ -53,6 +53,9 @@ type UserV2WriteModel struct {
 	PasswordCheckFailedCount   uint64
 	PasswordCodeGeneratorID    string
 	PasswordCodeVerificationID string
+	// passwordChecksAfterSequence limits the loaded password checks to the ones after this aggregate sequence
+	// (see [lastPasswordCheckResetSequence]); 0 loads all password checks.
+	passwordChecksAfterSequence uint64
 
 	EmailWriteModel       bool
 	Email                 domain.EmailAddress
@@ -500,11 +503,6 @@ func (wm *UserV2WriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserV1PasswordChangedType,
 			user.HumanPasswordCodeAddedType,
 			user.UserV1PasswordCodeAddedType,
-
-			user.HumanPasswordCheckFailedType,
-			user.UserV1PasswordCheckFailedType,
-			user.HumanPasswordCheckSucceededType,
-			user.UserV1PasswordCheckSucceededType,
 		)
 	}
 	if wm.IDPLinkWriteModel {
@@ -528,8 +526,23 @@ func (wm *UserV2WriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID).
 		EventTypes(eventTypes...).
 		Builder()
+	if wm.PasswordWriteModel {
+		// Only the password checks after the last reset of the failed count are relevant.
+		// This prevents loading the whole (constantly growing) login history of the user.
+		query = query.AddQuery().
+			AggregateTypes(user.AggregateType).
+			AggregateIDs(wm.AggregateID).
+			EventTypes(humanPasswordCheckEventTypes...).
+			SequenceGreater(wm.passwordChecksAfterSequence).
+			Builder()
+	}
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
+	}
+	// only load new events on a reload (e.g. the recheck after a password verification),
+	// otherwise the already reduced events would be applied twice
+	if wm.ProcessedSequence != 0 {
+		query.SequenceGreater(wm.ProcessedSequence)
 	}
 	return query
 }
