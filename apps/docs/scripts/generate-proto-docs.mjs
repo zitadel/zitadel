@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { glob } from 'glob';
-import { join, dirname, resolve } from 'path';
+import { join, dirname, resolve, basename } from 'path';
 import { spawn, spawnSync } from 'child_process';
 import { fileURLToPath } from 'url';
 
@@ -12,6 +12,42 @@ const OPENAPI_DIR = join(ROOT_DIR, 'openapi');
 const VERSIONS_FILE = join(ROOT_DIR, 'content/versions.json');
 const REPO_URL = 'https://github.com/zitadel/zitadel.git';
 const PNPM_COMMAND = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
+
+// Legacy V1 APIs declare base_path via OpenAPI v2 swagger options that
+// protoc-gen-connect-openapi ignores. Prefix paths so fumadocs shows the real URLs.
+const V1_PATH_PREFIXES = {
+  admin: '/admin/v1',
+  auth: '/auth/v1',
+  management: '/management/v1',
+  system: '/system/v1',
+};
+
+function applyV1PathPrefixes(outputPath) {
+  for (const [service, prefix] of Object.entries(V1_PATH_PREFIXES)) {
+    const files = glob.sync(`**/${service}.openapi.json`, { cwd: outputPath, absolute: true, nodir: true });
+    for (const file of files) {
+      try {
+        const doc = JSON.parse(fs.readFileSync(file, 'utf8'));
+        if (!doc.paths || Object.keys(doc.paths).length === 0) continue;
+
+        const newPaths = {};
+        let changed = false;
+        for (const [route, operations] of Object.entries(doc.paths)) {
+          const newRoute = route.startsWith(prefix) ? route : `${prefix}${route}`;
+          if (newRoute !== route) changed = true;
+          newPaths[newRoute] = operations;
+        }
+        if (!changed) continue;
+
+        doc.paths = newPaths;
+        fs.writeFileSync(file, JSON.stringify(doc, null, 2));
+        console.log(`Applied ${prefix} to ${basename(file)}`);
+      } catch (e) {
+        console.warn(`Failed to apply ${prefix} to ${basename(file)}`, e);
+      }
+    }
+  }
+}
 
 async function run() {
   if (!fs.existsSync(VERSIONS_FILE)) {
@@ -182,7 +218,13 @@ async function run() {
             } catch (e) {
               console.warn(`Failed to clean up OpenAPI specs for ${label}`, e);
             }
-                
+
+            try {
+              applyV1PathPrefixes(outputPath);
+            } catch (e) {
+              console.warn(`Failed to apply V1 path prefixes for ${label}`, e);
+            }
+
             resolvePromise();
           }
         });

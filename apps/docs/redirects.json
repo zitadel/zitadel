@@ -3258,5 +3258,10 @@
     "source": "/guides/manage/console/overview",
     "destination": "/guides/manage/console/console-overview",
     "permanent": true
+  },
+  {
+    "source": "/reference/api/group/:path*",
+    "destination": "/api-under-development",
+    "permanent": false
   }
 ]

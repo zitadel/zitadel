@@ -135,7 +135,9 @@
       "couldNotLoadSession": "セッションを読み込めませんでした",
       "couldNotLoadAuthMethods": "認証方法を読み込めませんでした",
       "failedPrecondition": "前提条件に失敗しました",
-      "sessionNotValid": "セッションが無効です"
+      "sessionNotValid": "セッションが無効です",
+      "passwordResetNotAllowed": "パスワードのリセットは許可されていません。詳細については管理者に問い合わせてください。",
+      "localAuthenticationNotAllowed": "ローカル認証は許可されていません！ 詳細については管理者に問い合わせてください。"
     },
     "complexity": {
       "length": "{minLength} 文字以上である必要があります。",
@@ -157,6 +159,7 @@
     "signInWithAzureAD": "AzureADでサインイン",
     "signInWithGithub": "GitHubでサインイン",
     "signInWithGitlab": "GitLabでサインイン",
+    "signInWithZitadel": "Zitadelでサインイン",
     "loginError": {
       "title": "ログイン失敗",
       "description": "ログインの際にエラーが発生しました。"
@@ -246,6 +249,11 @@
       "smsDescription": "SMSでコードを受信する電話番号を入力してください。",
       "emailDescription": "メールでコードを受信するメールアドレスを入力してください。",
       "totpRegisterDescription": "QRコードをスキャンするか、URLに手動でアクセスしてください。",
+      "emailAddDescription": "確認済みのメールアドレスに送信されるワンタイムコードを第2要素として使用します。",
+      "smsAddDescription": "確認済みの電話番号に送信されるワンタイムコードを第2要素として使用します。",
+      "add": "追加",
+      "emailAdded": "メールによるコードを追加しました。",
+      "smsAdded": "SMSによるコードを追加しました。",
       "submit": "続行",
       "labels": {
         "code": "コード"
@@ -253,6 +261,16 @@
       "required": {
         "code": "必須項目です"
       }
+    },
+    "errors": {
+      "couldNotRequestChallenge": "OTPチャレンジをリクエストできませんでした",
+      "couldNotVerifyCode": "OTPコードを確認できませんでした",
+      "couldNotGetSession": "セッションを読み込めませんでした。もう一度サインインしてください。",
+      "invalidMethod": "この第2要素はサポートされていません。",
+      "couldNotAddEmail": "メールによるコードを追加できませんでした。",
+      "couldNotAddSms": "SMSによるコードを追加できませんでした。",
+      "emailNotVerified": "メールによるコードを追加する前に、メールアドレスを確認してください。",
+      "phoneNotVerified": "SMSによるコードを追加する前に、電話番号を確認してください。"
     }
   },
   "passkey": {
@@ -346,7 +364,8 @@
       "couldNotCreateSession": "セッションを作成できませんでした",
       "userNotFound": "ユーザーがシステムに見つかりません",
       "couldNotLinkIDP": "IDPをユーザーにリンクできませんでした",
-      "couldNotRegisterUser": "ユーザーを登録できませんでした"
+      "couldNotRegisterUser": "ユーザーを登録できませんでした",
+      "sessionMismatch": "登録は別のブラウザで開始されました。IDプロバイダーでもう一度サインインしてください。"
     }
   },
   "invite": {
@@ -414,7 +433,15 @@
     "description": "認証に使用する方法を選択してください",
     "noMethodsAvailable": "使用可能な認証方法がありません",
     "allSetup": "認証の設定は既に完了しています！",
-    "linkWithIDP": "またはIDプロバイダーと連携"
+    "linkWithIDP": "またはIDプロバイダーと連携",
+    "methods": {
+      "totp": "認証アプリ",
+      "u2f": "ユニバーサルセカンドファクター",
+      "otpEmail": "メールでコードを受け取る",
+      "otpSms": "SMSでコードを受け取る",
+      "passkey": "パスキー",
+      "password": "パスワード"
+    }
   },
   "device": {
     "usercode": {
@@ -446,10 +473,11 @@
     "noUserCode": "ユーザーコードが指定されていません！",
     "noDeviceRequest": "デバイスリクエストが見つかりません。",
     "unknownContext": "ユーザーのコンテキストを取得できませんでした。最初にユーザー名を入力するか、検索パラメータとしてloginNameを指定してください。",
-    "sessionExpired": "現在のセッションが期限切れです。再度ログインしてください。",
+    "sessionExpired": "セッションが期限切れか、再認証が必要です。再度ログインしてください。",
     "failedLoading": "データの読み込みに失敗しました。再試行してください。",
     "tryagain": "再試行",
-    "couldNotContinueSession": "セッションを継続できませんでした - ユーザー情報が不足しています"
+    "couldNotContinueSession": "セッションを継続できませんでした - ユーザー情報が不足しています",
+    "couldNotClearSession": "セッションを終了できませんでした。もう一度お試しください。"
   },
   "zitadel": {
     "errors": {

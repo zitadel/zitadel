@@ -18,8 +18,34 @@ html {
   --dark-background-color: #000000;
 }
 
+.form-checkbox {
+  position: relative;
+}
+
 .form-checkbox:checked {
-  background-image: url("/checkbox.svg");
+  background-image: none !important;
+  background-color: var(--theme-light-primary-500);
+}
+
+.dark .form-checkbox:checked {
+  background-color: var(--theme-dark-primary-500);
+}
+
+.form-checkbox:checked::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  -webkit-mask-image: url("/checkbox.svg");
+  mask-image: url("/checkbox.svg");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  background-color: var(--theme-light-primary-contrast-500);
+}
+
+.dark .form-checkbox:checked::after {
+  background-color: var(--theme-dark-primary-contrast-500);
 }
 
 .skeleton {

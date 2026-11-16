@@ -153,17 +153,27 @@ func (c *Commands) RemoveDefaultIDPConfig(ctx context.Context, idpID string, idp
 	}
 
 	instanceAgg := InstanceAggregateFromWriteModel(&existingIDP.WriteModel)
-	events := []eventstore.Command{
-		instance.NewIDPConfigRemovedEvent(ctx, instanceAgg, idpID, existingIDP.Name),
+	ownerDeleteReady, err := c.isUniqueConstraintOwnerDeleteReady(ctx)
+	if err != nil {
+		return nil, err
 	}
+	var removed eventstore.Command
+	if ownerDeleteReady {
+		removed = instance.NewIDPConfigRemovedByOwnerEvent(ctx, instanceAgg, idpID, existingIDP.Name)
+	} else {
+		removed = instance.NewIDPConfigRemovedEvent(ctx, instanceAgg, idpID, existingIDP.Name)
+	}
+	events := []eventstore.Command{removed}
 
 	for _, idpProvider := range idpProviders {
 		if idpProvider.AggregateID == authz.GetInstance(ctx).InstanceID() {
 			userEvents := c.removeIDPProviderFromDefaultLoginPolicy(ctx, instanceAgg, idpProvider, true, externalIDPs...)
+			skipCascadeUniqueConstraints(ownerDeleteReady, userEvents...)
 			events = append(events, userEvents...)
 		}
 		orgAgg := OrgAggregateFromWriteModel(&NewOrgIdentityProviderWriteModel(idpProvider.AggregateID, idpID).WriteModel)
 		orgEvents := c.removeIDPFromLoginPolicy(ctx, orgAgg, idpID, true, externalIDPs...)
+		skipCascadeUniqueConstraints(ownerDeleteReady, orgEvents...)
 		events = append(events, orgEvents...)
 	}
 

@@ -4,9 +4,9 @@ import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
 import { UNKNOWN_USER_ID } from "@/lib/constants";
-import { getServiceConfig } from "@/lib/service-url";
-import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, getLoginSettings, getUserByID, searchUsers } from "@/lib/zitadel";
+import { getServiceConfig } from "@/lib/server/service-url";
+import { loadMostRecentSession } from "@/lib/server/session";
+import { getBrandingSettings, getLoginSettings, getUserByID, searchUsers } from "@/lib/server/zitadel";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { Metadata } from "next";
@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
 
-  const { userId, loginName, code, organization, requestId, invite, send } = searchParams;
+  const { userId, loginName, code, organization, requestId, invite } = searchParams;
 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
@@ -34,8 +34,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   let id: string | undefined;
   let loginSettings: LoginSettings | undefined;
 
-  const doSend = send === "true";
-
   const autoSubmitCode = process.env.NEXT_PUBLIC_AUTO_SUBMIT_CODE === "true";
 
   if ("loginName" in searchParams) {
@@ -45,13 +43,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         loginName,
         organization,
       },
-    }).catch(async (error) => {
-      loginSettings = await getLoginSettings({ serviceConfig, organization });
-      if (!loginSettings?.ignoreUnknownUsernames) {
-        console.error("loadMostRecentSession failed", error);
-      }
-      // ignore error, as we might not have a session yet
-      return undefined;
     });
   } else if ("userId" in searchParams && userId) {
     const userResponse = await getUserByID({ serviceConfig, userId });
@@ -162,7 +153,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
             isInvite={invite === "true"}
             requestId={requestId}
             submit={autoSubmitCode}
-            doSend={doSend}
           />
         )}
       </div>

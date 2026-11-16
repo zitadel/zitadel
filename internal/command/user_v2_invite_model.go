@@ -22,13 +22,54 @@ type UserV2InviteWriteModel struct {
 	URLTemplate     string
 	CodeReturned    bool
 	EmailVerified   bool
-	AuthMethodSet   bool
+
+	// authMethods holds the primary auth methods (password, passkeys, IDP links)
+	// the user currently has, keyed uniquely per method. It is tracked as the
+	// current set rather than a sticky flag, so that removing all auth methods
+	// re-enables the invite flow, mirroring what ListUserAuthMethodTypes reports.
+	authMethods map[authMethodKey]struct{}
 
 	UserState domain.UserState
 }
 
+// authMethodKey uniquely identifies a single primary auth method within the
+// authMethods set.
+// ID components (e.g. an externalUserID supplied by an external IDP) cannot
+// collide across method instances regardless of their contents.
+type authMethodKey struct {
+	kind           string
+	idpConfigID    string
+	externalUserID string
+	passkeyTokenID string
+}
+
+func passwordAuthMethodKey() authMethodKey {
+	return authMethodKey{kind: "password"}
+}
+
+func idpAuthMethodKey(idpConfigID, externalUserID string) authMethodKey {
+	return authMethodKey{kind: "idp", idpConfigID: idpConfigID, externalUserID: externalUserID}
+}
+
+func passkeyAuthMethodKey(tokenID string) authMethodKey {
+	return authMethodKey{kind: "passkey", passkeyTokenID: tokenID}
+}
+
+// AuthMethodSet reports whether the user currently has at least one primary
+// auth method (password, passkey or IDP link) set up.
+func (wm *UserV2InviteWriteModel) AuthMethodSet() bool {
+	return len(wm.authMethods) > 0
+}
+
 func (wm *UserV2InviteWriteModel) CreationAllowed() bool {
-	return !wm.AuthMethodSet
+	return !wm.AuthMethodSet()
+}
+
+func (wm *UserV2InviteWriteModel) addAuthMethod(key authMethodKey) {
+	if wm.authMethods == nil {
+		wm.authMethods = make(map[authMethodKey]struct{})
+	}
+	wm.authMethods[key] = struct{}{}
 }
 
 func newUserV2InviteWriteModel(userID, orgID string) *UserV2InviteWriteModel {
@@ -51,7 +92,10 @@ func (wm *UserV2InviteWriteModel) Reduce() error {
 			wm.CodeReturned = false
 			wm.EmailVerified = false
 			wm.UserState = domain.UserStateActive
-			wm.AuthMethodSet = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""
+			wm.authMethods = nil
+			if crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != "" {
+				wm.addAuthMethod(passwordAuthMethodKey())
+			}
 		case *user.HumanRegisteredEvent:
 			wm.EmptyInviteCode()
 			wm.ApplicationName = ""
@@ -60,7 +104,10 @@ func (wm *UserV2InviteWriteModel) Reduce() error {
 			wm.CodeReturned = false
 			wm.EmailVerified = false
 			wm.UserState = domain.UserStateActive
-			wm.AuthMethodSet = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""
+			wm.authMethods = nil
+			if crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != "" {
+				wm.addAuthMethod(passwordAuthMethodKey())
+			}
 		case *user.MachineAddedEvent:
 			wm.EmptyInviteCode()
 			wm.ApplicationName = ""
@@ -68,7 +115,7 @@ func (wm *UserV2InviteWriteModel) Reduce() error {
 			wm.URLTemplate = ""
 			wm.CodeReturned = false
 			wm.EmailVerified = false
-			wm.AuthMethodSet = false
+			wm.authMethods = nil
 		case *user.HumanInviteCodeAddedEvent:
 			wm.SetInviteCode(e.Code, e.Expiry, e.CreationDate())
 			wm.URLTemplate = e.URLTemplate
@@ -103,14 +150,20 @@ func (wm *UserV2InviteWriteModel) Reduce() error {
 			wm.URLTemplate = ""
 			wm.CodeReturned = false
 			wm.EmailVerified = false
-			wm.AuthMethodSet = false
+			wm.authMethods = nil
 			wm.UserState = domain.UserStateDeleted
 		case *user.HumanPasswordChangedEvent:
-			wm.AuthMethodSet = true
+			wm.addAuthMethod(passwordAuthMethodKey())
 		case *user.UserIDPLinkAddedEvent:
-			wm.AuthMethodSet = true
+			wm.addAuthMethod(idpAuthMethodKey(e.IDPConfigID, e.ExternalUserID))
+		case *user.UserIDPLinkRemovedEvent:
+			delete(wm.authMethods, idpAuthMethodKey(e.IDPConfigID, e.ExternalUserID))
+		case *user.UserIDPLinkCascadeRemovedEvent:
+			delete(wm.authMethods, idpAuthMethodKey(e.IDPConfigID, e.ExternalUserID))
 		case *user.HumanPasswordlessVerifiedEvent:
-			wm.AuthMethodSet = true
+			wm.addAuthMethod(passkeyAuthMethodKey(e.WebAuthNTokenID))
+		case *user.HumanPasswordlessRemovedEvent:
+			delete(wm.authMethods, passkeyAuthMethodKey(e.WebAuthNTokenID))
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -153,7 +206,10 @@ func (wm *UserV2InviteWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanPasswordChangedType,
 			user.UserV1PasswordChangedType,
 			user.UserIDPLinkAddedType,
+			user.UserIDPLinkRemovedType,
+			user.UserIDPLinkCascadeRemovedType,
 			user.HumanPasswordlessTokenVerifiedType,
+			user.HumanPasswordlessTokenRemovedType,
 		).Builder()
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)

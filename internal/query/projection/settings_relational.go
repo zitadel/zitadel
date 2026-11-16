@@ -1385,6 +1385,9 @@ func (p *relationalTablesProjection) reduceSecurityPolicySet(event eventstore.Ev
 				EnableIframeEmbedding: policyEvent.EnableIframeEmbedding,
 				AllowedOrigins:        allowedOrigins,
 				EnableImpersonation:   policyEvent.EnableImpersonation,
+
+				EnableDynamicClientRegistration:               policyEvent.EnableDynamicClientRegistration,
+				AllowUnauthenticatedDynamicClientRegistration: policyEvent.AllowUnauthenticatedDynamicClientRegistration,
 			},
 		}
 		return settingsRepo.Set(ctx, v3_sql.SQLTx(tx), &settings)
@@ -1584,8 +1587,12 @@ func setSecretGeneratorSettingsAttrs(generatorType legacy_domain.SecretGenerator
 		secretGeneratorSettingsAttrs.OTPEmail = &domain.OTPEmailAttributes{
 			SecretGeneratorAttrsWithExpiry: attrsWithExpiry,
 		}
-	case legacy_domain.SecretGeneratorTypeInviteCode, legacy_domain.SecretGeneratorTypeSigningKey:
-		// do nothing as these secret generators are not persisted in the settings
+	case legacy_domain.SecretGeneratorTypeInviteCode:
+		secretGeneratorSettingsAttrs.InviteCode = &domain.InviteCodeAttributes{
+			SecretGeneratorAttrsWithExpiry: attrsWithExpiry,
+		}
+	case legacy_domain.SecretGeneratorTypeSigningKey:
+		// do nothing as this secret generator is not persisted in the settings
 	case legacy_domain.SecretGeneratorTypeUnspecified:
 		return domain.SecretGeneratorSettingsAttributes{}, zerrors.ThrowInvalidArgumentf(nil, "HANDL-2n3fK", "unspecified secret generator type")
 	default:

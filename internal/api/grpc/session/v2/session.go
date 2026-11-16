@@ -126,6 +126,13 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 		if !user.State.IsEnabled() {
 			return nil, zerrors.ThrowPreconditionFailed(nil, "SESSION-Gj4ko", "Errors.User.NotActive")
 		}
+		org, err := s.query.OrgByID(ctx, user.ResourceOwner)
+		if err != nil {
+			return nil, err
+		}
+		if !org.State.IsActive() {
+			return nil, zerrors.ThrowPreconditionFailed(nil, "SESSION-oL9nT", "Errors.User.NotActive")
+		}
 
 		var preferredLanguage *language.Tag
 		if user.Human != nil && !user.Human.PreferredLanguage.IsRoot() {
@@ -273,5 +280,5 @@ type userSearchByLoginName struct {
 }
 
 func (u userSearchByLoginName) search(ctx context.Context, q *query.Queries) (*query.User, error) {
-	return q.GetUserByLoginName(ctx, true, u.loginName)
+	return q.GetUserByLoginName(ctx, false, u.loginName)
 }

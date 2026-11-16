@@ -2,9 +2,9 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { VerifySuccessContinue } from "@/components/verify-success-continue";
-import { getServiceConfig } from "@/lib/service-url";
-import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, getUserByID } from "@/lib/zitadel";
+import { getServiceConfig } from "@/lib/server/service-url";
+import { loadMostRecentSession } from "@/lib/server/session";
+import { getBrandingSettings, getUserByID } from "@/lib/server/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { headers } from "next/headers";
 
@@ -18,11 +18,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   const branding = await getBrandingSettings({ serviceConfig, organization });
 
-  const sessionFactors = await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } }).catch(
-    (error) => {
-      console.warn("Error loading session:", error);
-    },
-  );
+  const sessionFactors = await loadMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } });
 
   const id = userId ?? sessionFactors?.factors?.user?.id;
 

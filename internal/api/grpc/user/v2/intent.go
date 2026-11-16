@@ -27,6 +27,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml"
+	"github.com/zitadel/zitadel/internal/idp/providers/zitadel"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2"
@@ -181,6 +182,8 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *connec
 		idpUser, err = unmarshalRawIdpUser(intent.IDPUser, p.User())
 	case *oidc.Provider:
 		idpUser, err = unmarshalIdpUser(intent.IDPUser, oidc.InitUser())
+	case *zitadel.Provider:
+		idpUser, err = unmarshalIdpUser(intent.IDPUser, oidc.InitUser())
 	case *jwt.Provider:
 		idpUser, err = unmarshalIdpUser(intent.IDPUser, jwt.InitUser())
 	case *azuread.Provider:
@@ -234,7 +237,7 @@ func unmarshalIdpUser(idpUserData []byte, idpUser idp.User) (idp.User, error) {
 	return idpUser, nil
 }
 
-func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.EncryptionAlgorithm) (_ *user.RetrieveIdentityProviderIntentResponse, err error) {
+func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.AuthEncryptionAlgorithm) (_ *user.RetrieveIdentityProviderIntentResponse, err error) {
 	rawInformation := new(structpb.Struct)
 	err = rawInformation.UnmarshalJSON(intent.IDPUser)
 	if err != nil {
@@ -276,7 +279,7 @@ func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.Encr
 	return information, nil
 }
 
-func idpOAuthTokensToPb(idpIDToken string, idpAccessToken, idpRefreshToken *crypto.CryptoValue, alg crypto.EncryptionAlgorithm) (_ *user.IDPInformation_Oauth, err error) {
+func idpOAuthTokensToPb(idpIDToken string, idpAccessToken, idpRefreshToken *crypto.CryptoValue, alg crypto.AuthEncryptionAlgorithm) (_ *user.IDPInformation_Oauth, err error) {
 	var idToken *string
 	if idpIDToken != "" {
 		idToken = &idpIDToken

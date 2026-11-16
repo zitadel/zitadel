@@ -128,7 +128,7 @@ export const SPACING_STYLES = {
 // Appearance styling (complete design philosophies)
 export const APPEARANCE_STYLES = {
   flat: {
-    card: "bg-background-light-400 dark:bg-background-dark-500 border border-opacity-20 border border-black/10 dark:border-white/10",
+    card: "bg-background-light-400 dark:bg-background-dark-500 border border-black/10 dark:border-white/10",
     button: "border border-button-light-border dark:border-button-dark-border", // No shadows for flat design
     "idp-button": "border border-button-light-border dark:border-button-dark-border", // No shadows for flat design
     typography: "font-normal",

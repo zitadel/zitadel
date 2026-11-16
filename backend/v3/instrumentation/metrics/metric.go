@@ -28,6 +28,7 @@ type Metrics interface {
 	AddHistogramMeasurement(ctx context.Context, name string, value float64, labels map[string]attribute.Value) error
 	RegisterUpDownSumObserver(name, description string, callbackFunc metric.Int64Callback) error
 	RegisterValueObserver(name, description string, callbackFunc metric.Int64Callback) error
+	RegisterCounterObserver(name, description string, callbackFunc metric.Int64Callback) error
 	RegisterHistogram(name, description, unit string, buckets []float64) error
 }
 
@@ -68,4 +69,8 @@ func RegisterUpDownSumObserver(name, description string, callbackFunc metric.Int
 
 func RegisterValueObserver(name, description string, callbackFunc metric.Int64Callback) error {
 	return globalMeter().RegisterValueObserver(name, description, callbackFunc)
+}
+
+func RegisterCounterObserver(name, description string, callbackFunc metric.Int64Callback) error {
+	return globalMeter().RegisterCounterObserver(name, description, callbackFunc)
 }

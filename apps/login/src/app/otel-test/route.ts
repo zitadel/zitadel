@@ -1,4 +1,4 @@
-import { createLogger } from "@/lib/logger";
+import { createLogger } from "@/lib/server/logger";
 import {
   recordAuthAttempt,
   recordAuthFailure,
@@ -6,7 +6,7 @@ import {
   recordRequestEnd,
   recordRequestStart,
   recordSessionCreationDuration,
-} from "@/lib/metrics";
+} from "@/lib/server/metrics";
 import { metrics, SpanStatusCode, trace } from "@opentelemetry/api";
 import { NextResponse } from "next/server";
 

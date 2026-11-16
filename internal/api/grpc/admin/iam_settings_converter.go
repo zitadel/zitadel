@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -17,8 +18,11 @@ import (
 	settings_pb "github.com/zitadel/zitadel/pkg/grpc/settings"
 )
 
-func listSecretGeneratorToModel(req *admin_pb.ListSecretGeneratorsRequest) (*query.SecretGeneratorSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func listSecretGeneratorToModel(defaults systemdefaults.SystemDefaults, req *admin_pb.ListSecretGeneratorsRequest) (*query.SecretGeneratorSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := SecretGeneratorQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
@@ -105,6 +109,8 @@ func SecretGeneratorTypeToPb(generatorType domain.SecretGeneratorType) settings_
 		return settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_OTP_SMS
 	case domain.SecretGeneratorTypeOTPEmail:
 		return settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_OTP_EMAIL
+	case domain.SecretGeneratorTypeInviteCode:
+		return settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_INVITE_CODE
 	default:
 		return settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_UNSPECIFIED
 	}
@@ -128,6 +134,8 @@ func SecretGeneratorTypeToDomain(generatorType settings_pb.SecretGeneratorType) 
 		return domain.SecretGeneratorTypeOTPSMS
 	case settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_OTP_EMAIL:
 		return domain.SecretGeneratorTypeOTPEmail
+	case settings_pb.SecretGeneratorType_SECRET_GENERATOR_TYPE_INVITE_CODE:
+		return domain.SecretGeneratorTypeInviteCode
 	default:
 		return domain.SecretGeneratorTypeUnspecified
 	}

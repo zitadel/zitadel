@@ -149,6 +149,10 @@ func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migrat
 		return true, nil
 	}
 	if step.state == StepFailed {
+		if repeatable, ok := migration.(RepeatableMigration); ok {
+			lastRun, _ := step.LastRun.(map[string]interface{})
+			repeatable.Check(lastRun)
+		}
 		return true, nil
 	}
 	if step.state == StepStarted {

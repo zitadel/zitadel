@@ -52,6 +52,7 @@ type AuthRequest struct {
 	Audience                 []string
 	AuthTime                 time.Time
 	Code                     string
+	CodeUserID               string
 	LoginPolicy              *LoginPolicy
 	AllowedExternalIDPs      []*IDPProvider
 	LabelPolicy              *LabelPolicy
@@ -104,6 +105,11 @@ type ExternalUser struct {
 	Phone             PhoneNumber
 	IsPhoneVerified   bool
 	Metadatas         []*Metadata
+	// ProjectRoles holds the ZITADEL `urn:zitadel:iam:org:project:roles` claim
+	// ({role: {orgID: orgDomain}}) as returned by a ZITADEL provider. It is
+	// captured at authentication and carried through to user creation, where it
+	// is used to grant the support-user instance membership.
+	ProjectRoles map[string]map[string]string
 }
 
 type Prompt int32
@@ -206,6 +212,12 @@ func (a *AuthRequest) SetUserInfo(userID, userName, loginName, displayName, avat
 	a.DisplayName = displayName
 	a.AvatarKey = avatar
 	a.UserOrgID = userOrgID
+}
+
+// CodeIssuedToCurrentUser reports whether the user the code was issued to is still the request's user.
+// The request stays mutable until the code is redeemed, so the user can be switched after issuance.
+func (a *AuthRequest) CodeIssuedToCurrentUser() bool {
+	return a.CodeUserID != "" && a.CodeUserID == a.UserID
 }
 
 func (a *AuthRequest) SetOrgInformation(id, name, primaryDomain string, requestedByDomain bool) {

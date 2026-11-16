@@ -206,8 +206,20 @@ func (repo *AuthRequestRepo) SaveAuthCode(ctx context.Context, id, code, userAge
 	if err != nil {
 		return err
 	}
-	request.Code = code
-	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+	// nextSteps mutates the request (e.g. appends MFAsVerified), so save the unmodified copy
+	stored := *request
+	// check login and bind the user on the same load, so a concurrent user switch can't slip in between
+	steps, err := repo.nextSteps(ctx, request, true)
+	if err != nil {
+		return err
+	}
+	request.PossibleSteps = steps
+	if !request.Done() {
+		return zerrors.ThrowPreconditionFailed(nil, "AUTH-Cb4nd", "Errors.AuthRequest.NotAuthenticated")
+	}
+	stored.Code = code
+	stored.CodeUserID = request.UserID
+	return repo.AuthRequests.UpdateAuthRequest(ctx, &stored)
 }
 
 func (repo *AuthRequestRepo) SaveSAMLRequestID(ctx context.Context, id, requestID, userAgentID string) (err error) {
@@ -501,19 +513,6 @@ func (repo *AuthRequestRepo) VerifyMFAU2F(ctx context.Context, userID, resourceO
 		return err
 	}
 	return repo.Command.HumanFinishU2FLogin(ctx, userID, resourceOwner, credentialData, request)
-}
-
-func (repo *AuthRequestRepo) BeginPasswordlessSetup(ctx context.Context, userID, resourceOwner string, authenticatorPlatform domain.AuthenticatorAttachment) (login *domain.WebAuthNToken, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-	return repo.Command.HumanAddPasswordlessSetup(ctx, userID, resourceOwner, authenticatorPlatform)
-}
-
-func (repo *AuthRequestRepo) VerifyPasswordlessSetup(ctx context.Context, userID, resourceOwner, userAgentID, tokenName string, credentialData []byte) (err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-	_, err = repo.Command.HumanHumanPasswordlessSetup(ctx, userID, resourceOwner, tokenName, userAgentID, credentialData)
-	return err
 }
 
 func (repo *AuthRequestRepo) BeginPasswordlessInitCodeSetup(ctx context.Context, userID, resourceOwner, codeID, verificationCode string, preferredPlatformType domain.AuthenticatorAttachment) (login *domain.WebAuthNToken, err error) {

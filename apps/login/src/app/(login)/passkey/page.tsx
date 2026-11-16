@@ -3,10 +3,10 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { LoginPasskey } from "@/components/login-passkey";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getSessionCookieById } from "@/lib/cookies";
-import { getServiceConfig } from "@/lib/service-url";
-import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, getDefaultOrg, getSession } from "@/lib/zitadel";
+import { getSessionCookieById } from "@/lib/server/cookies";
+import { getServiceConfig } from "@/lib/server/service-url";
+import { loadMostRecentSession } from "@/lib/server/session";
+import { getBrandingSettings, getDefaultOrg, getSession } from "@/lib/server/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -40,9 +40,6 @@ export default async function Page(props: { searchParams: Promise<Record<string 
     sessionFactors = await loadMostRecentSession({
       serviceConfig,
       sessionParams: { loginName, organization },
-    }).catch(() => {
-      // ignore error
-      return undefined;
     });
   }
 

@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 )
 
@@ -304,6 +305,32 @@ func Test_InstancePrepares(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, tt.additionalArgs...)
+		})
+	}
+}
+
+// Mirrors Test_instance_dynamicClientRegistration in the authz package: the query-backed
+// instance must apply the same precedence, so that disabling dynamic client registration
+// closes the endpoint regardless of the open-registration setting.
+func Test_authzInstance_dynamicClientRegistration(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name                     string
+		dcr                      dcr
+		wantEnabled              bool
+		wantAllowUnauthenticated bool
+	}{
+		{name: "disabled", dcr: dcr{}},
+		{name: "disabled but unauthenticated allowed", dcr: dcr{AllowUnauthenticated: true}},
+		{name: "enabled, token mode", dcr: dcr{Enabled: true}, wantEnabled: true},
+		{name: "enabled, open registration", dcr: dcr{Enabled: true, AllowUnauthenticated: true}, wantEnabled: true, wantAllowUnauthenticated: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			i := &authzInstance{DCR: tt.dcr}
+			assert.Equal(t, tt.wantEnabled, i.EnableDynamicClientRegistration())
+			assert.Equal(t, tt.wantAllowUnauthenticated, i.AllowUnauthenticatedDynamicClientRegistration())
 		})
 	}
 }

@@ -139,6 +139,27 @@
         }
       ]
     },
+    "generate-error-reference": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm generate:error-reference",
+        "cwd": "apps/docs"
+      },
+      "outputs": [
+        "{projectRoot}/components/ErrorReference/data.json"
+      ],
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/scripts/generate-error-reference.ts",
+        "{projectRoot}/scripts/error-reference-overrides/**",
+        "{projectRoot}/lib/grpc-status.ts",
+        "{workspaceRoot}/internal/**/*.go",
+        "{workspaceRoot}/backend/**/*.go",
+        "{workspaceRoot}/internal/static/i18n/en.yaml",
+        "{workspaceRoot}/internal/api/ui/login/static/i18n/en.yaml",
+        "{workspaceRoot}/internal/notification/static/i18n/en.yaml"
+      ]
+    },
     "generate-index-pages": {
       "executor": "nx:run-commands",
       "options": {

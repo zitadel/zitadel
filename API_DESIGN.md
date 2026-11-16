@@ -613,7 +613,7 @@ rpc CreatUser(CreatUserRequest) returns (CreatUserResponse) {}
 ```
 
 ```protobuf
-// ListUsers will return all matching users. By default, we will return all users of your instance that you have permission to read. Make sure to include a limit and sorting for pagination.
+// ListUsers will return the matching users. By default, the first 100 users of your instance that you have permission to read are returned (the default and the maximum limit of 1000 can be configured). Make sure to include a limit and sorting for pagination.
 //
 // Required permission:
 //   - user.read

@@ -50,7 +50,7 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 				updatedState: &state{
 					instanceID:     "instance",
 					eventTimestamp: time.Now(),
-					position:       decimal.NewFromInt(42),
+					cursor:         eventstore.EventSortKey{Position: decimal.NewFromInt(42)},
 				},
 			},
 			isErr: func(t *testing.T, err error) {
@@ -76,7 +76,7 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 				updatedState: &state{
 					instanceID:     "instance",
 					eventTimestamp: time.Now(),
-					position:       decimal.NewFromInt(42),
+					cursor:         eventstore.EventSortKey{Position: decimal.NewFromInt(42)},
 				},
 			},
 			isErr: func(t *testing.T, err error) {
@@ -112,10 +112,12 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 				updatedState: &state{
 					instanceID:     "instance",
 					eventTimestamp: time.Now(),
-					position:       decimal.NewFromInt(42),
-					aggregateType:  "aggregate type",
-					aggregateID:    "aggregate id",
-					sequence:       42,
+					cursor: eventstore.EventSortKey{
+						Position:      decimal.NewFromInt(42),
+						AggregateType: "aggregate type",
+						AggregateID:   "aggregate id",
+						Sequence:      42,
+					},
 				},
 			},
 		},
@@ -261,11 +263,14 @@ func TestHandler_currentState(t *testing.T) {
 				currentState: &state{
 					instanceID:     "instance",
 					eventTimestamp: testTime,
-					position:       decimal.NewFromInt(42),
-					aggregateType:  "aggregate type",
-					aggregateID:    "aggregate id",
-					sequence:       42,
-					offset:         10,
+					cursor: eventstore.EventSortKey{
+						Position:      decimal.NewFromInt(42),
+						InTxOrder:     10,
+						InstanceID:    "instance",
+						AggregateType: "aggregate type",
+						AggregateID:   "aggregate id",
+						Sequence:      42,
+					},
 				},
 			},
 		},

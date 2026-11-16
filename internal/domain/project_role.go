@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"slices"
+
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
@@ -30,16 +32,7 @@ func (p *ProjectRole) IsValid() bool {
 
 func HasInvalidRoles(validRoles, roles []string) bool {
 	for _, roleKey := range roles {
-		if !containsRoleKey(roleKey, validRoles) {
-			return true
-		}
-	}
-	return false
-}
-
-func containsRoleKey(roleKey string, validRoles []string) bool {
-	for _, validRole := range validRoles {
-		if roleKey == validRole {
+		if !slices.Contains(validRoles, roleKey) {
 			return true
 		}
 	}

@@ -152,7 +152,9 @@
       "failedPrecondition": "Precondizione non soddisfatta",
       "sessionNotValid": "La sessione non è valida",
       "passwordVerificationMissing": "Manca la verifica della password.",
-      "passwordVerificationTooOld": "La verifica della password è troppo vecchia. Si prega di verificare nuovamente la password."
+      "passwordVerificationTooOld": "La verifica della password è troppo vecchia. Si prega di verificare nuovamente la password.",
+      "passwordResetNotAllowed": "Il ripristino della password non è consentito. Contatta il tuo amministratore per ulteriori informazioni.",
+      "localAuthenticationNotAllowed": "L'autenticazione locale non è consentita! Contatta il tuo amministratore per ulteriori informazioni."
     }
   },
   "idp": {
@@ -164,6 +166,7 @@
     "signInWithAzureAD": "Accedi con AzureAD",
     "signInWithGithub": "Accedi con GitHub",
     "signInWithGitlab": "Accedi con GitLab",
+    "signInWithZitadel": "Accedi con Zitadel",
     "loginError": {
       "title": "Accesso fallito",
       "description": "Si è verificato un errore durante il tentativo di accesso."
@@ -253,6 +256,11 @@
       "smsDescription": "Inserisci il tuo numero di telefono per ricevere un codice via SMS.",
       "emailDescription": "Inserisci il tuo indirizzo email per ricevere un codice via email.",
       "totpRegisterDescription": "Scansiona il codice QR o naviga manualmente all'URL.",
+      "emailAddDescription": "Usa un codice monouso inviato al tuo indirizzo email verificato come secondo fattore.",
+      "smsAddDescription": "Usa un codice monouso inviato al tuo numero di telefono verificato come secondo fattore.",
+      "add": "Aggiungi",
+      "emailAdded": "Codice via email aggiunto.",
+      "smsAdded": "Codice via SMS aggiunto.",
       "submit": "Continua",
       "labels": {
         "code": "Codice"
@@ -260,6 +268,16 @@
       "required": {
         "code": "Questo campo è obbligatorio"
       }
+    },
+    "errors": {
+      "couldNotRequestChallenge": "Impossibile richiedere la challenge OTP",
+      "couldNotVerifyCode": "Impossibile verificare il codice OTP",
+      "couldNotGetSession": "Impossibile caricare la sessione. Accedi di nuovo.",
+      "invalidMethod": "Questo secondo fattore non è supportato.",
+      "couldNotAddEmail": "Impossibile aggiungere il codice via email.",
+      "couldNotAddSms": "Impossibile aggiungere il codice via SMS.",
+      "emailNotVerified": "Verifica il tuo indirizzo email prima di aggiungere codici via email.",
+      "phoneNotVerified": "Verifica il tuo numero di telefono prima di aggiungere codici via SMS."
     }
   },
   "passkey": {
@@ -353,7 +371,8 @@
       "couldNotCreateSession": "Impossibile creare la sessione",
       "userNotFound": "Utente non trovato nel sistema",
       "couldNotLinkIDP": "Impossibile collegare l'IDP all'utente",
-      "couldNotRegisterUser": "Impossibile registrare l'utente"
+      "couldNotRegisterUser": "Impossibile registrare l'utente",
+      "sessionMismatch": "La registrazione è stata avviata in un altro browser. Accedi di nuovo con il tuo provider di identità."
     }
   },
   "invite": {
@@ -421,7 +440,15 @@
     "description": "Seleziona il metodo con cui desideri autenticarti",
     "noMethodsAvailable": "Nessun metodo di autenticazione disponibile",
     "allSetup": "Hai già configurato un autenticatore!",
-    "linkWithIDP": "o collega con un Identity Provider"
+    "linkWithIDP": "o collega con un Identity Provider",
+    "methods": {
+      "totp": "App di autenticazione",
+      "u2f": "Secondo fattore universale",
+      "otpEmail": "Codice via email",
+      "otpSms": "Codice via SMS",
+      "passkey": "Passkey",
+      "password": "Password"
+    }
   },
   "device": {
     "usercode": {
@@ -453,9 +480,10 @@
     "noUserCode": "Nessun codice utente fornito!",
     "noDeviceRequest": "Nessuna richiesta di dispositivo trovata.",
     "unknownContext": "Impossibile ottenere il contesto dell'utente. Assicurati di inserire prima il nome utente o di fornire un loginName come parametro di ricerca.",
-    "sessionExpired": "La tua sessione attuale è scaduta. Effettua nuovamente l'accesso.",
+    "sessionExpired": "La tua sessione è scaduta o richiede una nuova autenticazione. Effettua nuovamente l'accesso.",
     "failedLoading": "Impossibile caricare i dati. Riprova.",
     "tryagain": "Riprova",
-    "couldNotContinueSession": "Impossibile continuare con la sessione - informazioni utente mancanti"
+    "couldNotContinueSession": "Impossibile continuare con la sessione - informazioni utente mancanti",
+    "couldNotClearSession": "Impossibile terminare la sessione. Riprova."
   }
 }

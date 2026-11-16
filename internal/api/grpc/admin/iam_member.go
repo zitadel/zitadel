@@ -19,7 +19,7 @@ func (s *Server) ListIAMMemberRoles(ctx context.Context, req *admin_pb.ListIAMMe
 }
 
 func (s *Server) ListIAMMembers(ctx context.Context, req *admin_pb.ListIAMMembersRequest) (*admin_pb.ListIAMMembersResponse, error) {
-	queries, err := ListIAMMembersRequestToQuery(req)
+	queries, err := ListIAMMembersRequestToQuery(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}

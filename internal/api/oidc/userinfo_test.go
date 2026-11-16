@@ -3,15 +3,27 @@ package oidc
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/domain"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
+	"github.com/zitadel/zitadel/internal/logstore"
+	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/query"
+	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 )
 
 func Test_prepareRoles(t *testing.T) {
@@ -557,4 +569,292 @@ func Test_userInfoToOIDC(t *testing.T) {
 			assert.Equal(t, tt.want, got)
 		})
 	}
+}
+
+func Test_functionForTriggerType(t *testing.T) {
+	tests := []struct {
+		name        string
+		triggerType domain.TriggerType
+		want        string
+	}{
+		{
+			name:        "pre userinfo creation",
+			triggerType: domain.TriggerTypePreUserinfoCreation,
+			want:        exec_repo.ID(domain.ExecutionTypeFunction, domain.ActionFunctionPreUserinfo.LocalizationKey()),
+		},
+		{
+			name:        "pre access token creation",
+			triggerType: domain.TriggerTypePreAccessTokenCreation,
+			want:        exec_repo.ID(domain.ExecutionTypeFunction, domain.ActionFunctionPreAccessToken.LocalizationKey()),
+		},
+		{
+			name:        "unspecified",
+			triggerType: domain.TriggerTypeUnspecified,
+			want:        "",
+		},
+		{
+			name:        "post authentication",
+			triggerType: domain.TriggerTypePostAuthentication,
+			want:        "",
+		},
+		{
+			name:        "pre creation",
+			triggerType: domain.TriggerTypePreCreation,
+			want:        "",
+		},
+		{
+			name:        "post creation",
+			triggerType: domain.TriggerTypePostCreation,
+			want:        "",
+		},
+		{
+			name:        "pre saml response creation",
+			triggerType: domain.TriggerTypePreSAMLResponseCreation,
+			want:        "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, functionForTriggerType(tt.triggerType))
+		})
+	}
+}
+
+func Test_appendOrLogClaim(t *testing.T) {
+	tests := []struct {
+		name       string
+		userInfo   *oidc.UserInfo
+		key        string
+		value      any
+		wantClaims map[string]any
+		wantLogs   []string
+	}{
+		{
+			name:       "new claim is added",
+			userInfo:   &oidc.UserInfo{Claims: map[string]any{}},
+			key:        "foo",
+			value:      "bar",
+			wantClaims: map[string]any{"foo": "bar"},
+		},
+		{
+			name:       "reserved prefix is skipped",
+			userInfo:   &oidc.UserInfo{Claims: map[string]any{}},
+			key:        ClaimPrefix + ":something",
+			value:      "bar",
+			wantClaims: map[string]any{},
+		},
+		{
+			name:       "existing claim is not overwritten and logs a conflict",
+			userInfo:   &oidc.UserInfo{Claims: map[string]any{"foo": "existing"}},
+			key:        "foo",
+			value:      "bar",
+			wantClaims: map[string]any{"foo": "existing"},
+			wantLogs:   []string{`key "foo" already exists`},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var logs []string
+			appendOrLogClaim(tt.userInfo, tt.key, tt.value, &logs)
+			assert.Equal(t, tt.wantClaims, tt.userInfo.Claims)
+			assert.Equal(t, tt.wantLogs, logs)
+		})
+	}
+}
+
+func Test_errorFromRecover(t *testing.T) {
+	tests := []struct {
+		name    string
+		r       any
+		wantMsg string
+	}{
+		{
+			name:    "error value is passed through",
+			r:       errors.New("boom"),
+			wantMsg: "boom",
+		},
+		{
+			name:    "string value is wrapped",
+			r:       "boom",
+			wantMsg: "boom",
+		},
+		{
+			name:    "other value falls back to a generic message",
+			r:       42,
+			wantMsg: "unknown error occurred: 42",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := errorFromRecover(tt.r)
+			require.Error(t, err)
+			assert.Equal(t, tt.wantMsg, err.Error())
+		})
+	}
+}
+
+func Test_runUserinfoActions(t *testing.T) {
+	actions.SetLogstoreService(logstore.New[*record.ExecutionLog](nil, nil))
+
+	t.Run("happy path sets claim from script", func(t *testing.T) {
+		s := &Server{}
+		qu := &query.OIDCUserInfo{User: &query.User{ID: "user1", ResourceOwner: "org1"}}
+		userInfo := &oidc.UserInfo{Subject: "user1", Claims: map[string]any{}}
+		queriedActions := []*query.Action{
+			{
+				Name: "testFunc",
+				Script: `function testFunc(ctx, api) {
+					api.v1.userinfo.setClaim("foo", "bar")
+				}`,
+			},
+		}
+
+		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", nil, queriedActions)
+		require.NoError(t, err)
+		assert.Equal(t, "bar", userInfo.Claims["foo"])
+	})
+
+	t.Run("panic while building ctxFields is recovered, not left uncaught", func(t *testing.T) {
+		s := &Server{}
+		qu := &query.OIDCUserInfo{User: &query.User{ID: "user1", ResourceOwner: "org1"}}
+		// A non-JSON-marshalable claim value makes userinfoClaims' eager json.Marshal panic
+		// while ctxFields are being built for this (or a later) action - a phase that runs
+		// before internal/actions.executeScript's own recover is armed. Without our own
+		// recover in the loop, this panic would escape uncaught and skip cancel().
+		userInfo := &oidc.UserInfo{Subject: "user1", Claims: map[string]any{"bad": make(chan int)}}
+		queriedActions := []*query.Action{
+			{Name: "testFunc", Script: `function testFunc(ctx, api) {}`},
+		}
+
+		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", nil, queriedActions)
+		require.Error(t, err)
+	})
+
+	t.Run("panic from setMetadata bad arg count is recovered", func(t *testing.T) {
+		s := &Server{}
+		qu := &query.OIDCUserInfo{User: &query.User{ID: "user1", ResourceOwner: "org1"}}
+		userInfo := &oidc.UserInfo{Subject: "user1", Claims: map[string]any{}}
+		queriedActions := []*query.Action{
+			{
+				Name: "testFunc",
+				Script: `function testFunc(ctx, api) {
+					api.v1.user.setMetadata("onlyonearg")
+				}`,
+			},
+		}
+
+		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", nil, queriedActions)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "exactly 2")
+	})
+
+	t.Run("error from a script stops the loop and is returned", func(t *testing.T) {
+		s := &Server{}
+		qu := &query.OIDCUserInfo{User: &query.User{ID: "user1", ResourceOwner: "org1"}}
+		userInfo := &oidc.UserInfo{Subject: "user1", Claims: map[string]any{}}
+		queriedActions := []*query.Action{
+			{
+				Name:   "testFunc",
+				Script: `function testFunc(ctx, api) { throw new Error("script failure") }`,
+			},
+			{
+				Name: "shouldNotRun",
+				Script: `function shouldNotRun(ctx, api) {
+					api.v1.userinfo.setClaim("unreachable", "value")
+				}`,
+			},
+		}
+
+		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", nil, queriedActions)
+		require.Error(t, err)
+		assert.NotContains(t, userInfo.Claims, "unreachable")
+	})
+
+	t.Run("actor delegation chain is readable from the script", func(t *testing.T) {
+		s := &Server{}
+		qu := &query.OIDCUserInfo{User: &query.User{ID: "user1", ResourceOwner: "org1"}}
+		userInfo := &oidc.UserInfo{Subject: "user1", Claims: map[string]any{}}
+		actor := &domain.TokenActor{
+			UserID: "actor1",
+			Issuer: "https://issuer1.example.com",
+			Actor: &domain.TokenActor{
+				UserID: "actor2",
+				Issuer: "https://issuer2.example.com",
+			},
+		}
+		queriedActions := []*query.Action{
+			{
+				Name: "testFunc",
+				Script: `function testFunc(ctx, api) {
+					api.v1.claims.setClaim("actor_user", ctx.v1.actor.userId)
+					api.v1.claims.setClaim("actor_issuer", ctx.v1.actor.issuer)
+					api.v1.claims.setClaim("nested_actor_user", ctx.v1.actor.actor.userId)
+					api.v1.claims.setClaim("chain_end", ctx.v1.actor.actor.actor === null)
+				}`,
+			},
+		}
+
+		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", actor, queriedActions)
+		require.NoError(t, err)
+		assert.Equal(t, "actor1", userInfo.Claims["actor_user"])
+		assert.Equal(t, "https://issuer1.example.com", userInfo.Claims["actor_issuer"])
+		assert.Equal(t, "actor2", userInfo.Claims["nested_actor_user"])
+		assert.Equal(t, true, userInfo.Claims["chain_end"])
+	})
+
+	t.Run("missing actor is null in the script", func(t *testing.T) {
+		s := &Server{}
+		qu := &query.OIDCUserInfo{User: &query.User{ID: "user1", ResourceOwner: "org1"}}
+		userInfo := &oidc.UserInfo{Subject: "user1", Claims: map[string]any{}}
+		queriedActions := []*query.Action{
+			{
+				Name: "testFunc",
+				Script: `function testFunc(ctx, api) {
+					api.v1.claims.setClaim("no_actor", ctx.v1.actor === null)
+				}`,
+			},
+		}
+
+		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", nil, queriedActions)
+		require.NoError(t, err)
+		assert.Equal(t, true, userInfo.Claims["no_actor"])
+	})
+}
+
+func Test_runUserinfoExecutionTargets(t *testing.T) {
+	respBody := []byte(`{"append_claims":[{"key":"foo","value":"bar"},{"key":"foo","value":"baz"}],"append_log_claims":["extra log entry"]}`)
+	var gotBody []byte
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotBody, _ = io.ReadAll(r.Body)
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(respBody)
+	}))
+	defer server.Close()
+
+	s := &Server{httpClient: server.Client()}
+	qu := &query.OIDCUserInfo{User: &query.User{ID: "user1", ResourceOwner: "org1"}}
+	userInfo := &oidc.UserInfo{Subject: "user1", Claims: map[string]any{}}
+	actor := &domain.TokenActor{
+		UserID: "actor1",
+		Issuer: "https://issuer1.example.com",
+		Actor:  &domain.TokenActor{UserID: "actor2"},
+	}
+	targets := []target_domain.Target{
+		{TargetType: target_domain.TargetTypeCall, Endpoint: server.URL, Timeout: 5 * time.Second},
+	}
+
+	err := s.runUserinfoExecutionTargets(context.Background(), qu, userInfo, "clientID", actor, "function/test", targets)
+	require.NoError(t, err)
+
+	var sent ContextInfo
+	require.NoError(t, json.Unmarshal(gotBody, &sent))
+	assert.Equal(t, actor, sent.Actor)
+
+	assert.Equal(t, "bar", userInfo.Claims["foo"])
+	logClaim, ok := userInfo.Claims[fmt.Sprintf(ClaimActionLogFormat, "function/test")]
+	require.True(t, ok)
+	logs, ok := logClaim.([]string)
+	require.True(t, ok)
+	assert.Contains(t, logs, `key "foo" already exists`)
+	assert.Contains(t, logs, "extra log entry")
 }

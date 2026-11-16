@@ -152,7 +152,9 @@
       "failedPrecondition": "Precondición fallida",
       "sessionNotValid": "La sesión no es válida",
       "passwordVerificationMissing": "Falta la verificación de la contraseña.",
-      "passwordVerificationTooOld": "La verificación de la contraseña es demasiado antigua. Por favor, verifique su contraseña de nuevo."
+      "passwordVerificationTooOld": "La verificación de la contraseña es demasiado antigua. Por favor, verifique su contraseña de nuevo.",
+      "passwordResetNotAllowed": "El restablecimiento de contraseña no está permitido. Contacte con su administrador para más información.",
+      "localAuthenticationNotAllowed": "¡La autenticación local no está permitida! Contacte con su administrador para más información."
     }
   },
   "idp": {
@@ -164,6 +166,7 @@
     "signInWithAzureAD": "Iniciar sesión con AzureAD",
     "signInWithGithub": "Iniciar sesión con GitHub",
     "signInWithGitlab": "Iniciar sesión con GitLab",
+    "signInWithZitadel": "Iniciar sesión con Zitadel",
     "loginError": {
       "title": "Error de inicio de sesión",
       "description": "Ocurrió un error al intentar iniciar sesión."
@@ -253,6 +256,11 @@
       "smsDescription": "Introduce tu número de teléfono para recibir un código por SMS.",
       "emailDescription": "Introduce tu dirección de correo electrónico para recibir un código por correo electrónico.",
       "totpRegisterDescription": "Escanea el código QR o navega manualmente a la URL.",
+      "emailAddDescription": "Usa un código de un solo uso enviado a tu dirección de correo electrónico verificada como segundo factor.",
+      "smsAddDescription": "Usa un código de un solo uso enviado a tu número de teléfono verificado como segundo factor.",
+      "add": "Añadir",
+      "emailAdded": "Código por correo electrónico añadido.",
+      "smsAdded": "Código por SMS añadido.",
       "submit": "Continuar",
       "labels": {
         "code": "Código"
@@ -260,6 +268,16 @@
       "required": {
         "code": "Este campo es obligatorio"
       }
+    },
+    "errors": {
+      "couldNotRequestChallenge": "No se pudo solicitar el desafío OTP",
+      "couldNotVerifyCode": "No se pudo verificar el código OTP",
+      "couldNotGetSession": "No se pudo cargar tu sesión. Vuelve a iniciar sesión.",
+      "invalidMethod": "Este segundo factor no es compatible.",
+      "couldNotAddEmail": "No se pudo añadir el código por correo electrónico.",
+      "couldNotAddSms": "No se pudo añadir el código por SMS.",
+      "emailNotVerified": "Verifica tu dirección de correo electrónico antes de añadir códigos por correo electrónico.",
+      "phoneNotVerified": "Verifica tu número de teléfono antes de añadir códigos por SMS."
     }
   },
   "passkey": {
@@ -353,7 +371,8 @@
       "couldNotCreateSession": "No se pudo crear la sesión",
       "userNotFound": "Usuario no encontrado en el sistema",
       "couldNotLinkIDP": "No se pudo vincular el IdP al usuario",
-      "couldNotRegisterUser": "No se pudo registrar el usuario"
+      "couldNotRegisterUser": "No se pudo registrar el usuario",
+      "sessionMismatch": "El registro se inició en otro navegador. Vuelve a iniciar sesión con tu proveedor de identidad."
     }
   },
   "invite": {
@@ -421,7 +440,15 @@
     "description": "Selecciona el método con el que deseas autenticarte",
     "noMethodsAvailable": "No hay métodos de autenticación disponibles",
     "allSetup": "¡Ya has configurado un autenticador!",
-    "linkWithIDP": "o vincúlalo con un proveedor de identidad"
+    "linkWithIDP": "o vincúlalo con un proveedor de identidad",
+    "methods": {
+      "totp": "Aplicación de autenticación",
+      "u2f": "Segundo factor universal",
+      "otpEmail": "Código por correo electrónico",
+      "otpSms": "Código por SMS",
+      "passkey": "Clave de acceso",
+      "password": "Contraseña"
+    }
   },
   "device": {
     "usercode": {
@@ -453,9 +480,10 @@
     "noUserCode": "¡No se proporcionó código de usuario!",
     "noDeviceRequest": "No se encontró ninguna solicitud de dispositivo.",
     "unknownContext": "No se pudo obtener el contexto del usuario. Asegúrate de ingresar primero el nombre de usuario o proporcionar un loginName como parámetro de búsqueda.",
-    "sessionExpired": "Tu sesión actual ha expirado. Por favor, inicia sesión de nuevo.",
+    "sessionExpired": "Tu sesión ha expirado o requiere una nueva autenticación. Por favor, inicia sesión de nuevo.",
     "failedLoading": "No se pudieron cargar los datos. Por favor, inténtalo de nuevo.",
     "tryagain": "Intentar de nuevo",
-    "couldNotContinueSession": "No se pudo continuar con la sesión - falta información del usuario"
+    "couldNotContinueSession": "No se pudo continuar con la sesión - falta información del usuario",
+    "couldNotClearSession": "No se pudo cerrar la sesión. Inténtelo de nuevo."
   }
 }

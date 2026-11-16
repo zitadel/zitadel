@@ -85,6 +85,8 @@ func idpTypeToPb(idpType domain.IDPType) idp_pb.IDPType {
 		return idp_pb.IDPType_IDP_TYPE_APPLE
 	case domain.IDPTypeSAML:
 		return idp_pb.IDPType_IDP_TYPE_SAML
+	case domain.IDPTypeZitadel:
+		return idp_pb.IDPType_IDP_TYPE_ZITADEL
 	case domain.IDPTypeUnspecified:
 		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
 	default:
@@ -148,6 +150,10 @@ func configToPb(config *query.IDPTemplate) *idp_pb.IDPConfig {
 	}
 	if config.SAMLIDPTemplate != nil {
 		samlConfigToPb(idpConfig, config.SAMLIDPTemplate)
+		return idpConfig
+	}
+	if config.ZitadelIDPTemplate != nil {
+		zitadelConfigToPb(idpConfig, config.ZitadelIDPTemplate)
 		return idpConfig
 	}
 	return idpConfig
@@ -385,5 +391,23 @@ func signatureAlgorithmToPb(signatureAlgorithm string) idp_pb.SAMLSignatureAlgor
 		return idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA512
 	default:
 		return idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_UNSPECIFIED
+	}
+}
+
+func zitadelConfigToPb(idpConfig *idp_pb.IDPConfig, template *query.ZitadelIDPTemplate) {
+	instanceRolesInfo := make([]*idp_pb.InstanceRolesInfo, 0, len(template.InstanceRolesInfo))
+	for _, role := range template.InstanceRolesInfo {
+		instanceRolesInfo = append(instanceRolesInfo, &idp_pb.InstanceRolesInfo{
+			OrganizationId:     role.OrganizationID,
+			OrganizationDomain: role.OrganizationDomain,
+		})
+	}
+	idpConfig.Config = &idp_pb.IDPConfig_Zitadel{
+		Zitadel: &idp_pb.ZitadelConfig{
+			ClientId:          template.ClientID,
+			Issuer:            template.Issuer,
+			Scopes:            template.Scopes,
+			InstanceRolesInfo: instanceRolesInfo,
+		},
 	}
 }

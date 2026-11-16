@@ -3,14 +3,16 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { VerifyForm } from "./verify-form";
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  usePathname: () => "/verify",
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
 }));
 
-vi.mock("@/lib/server/verify", () => ({
+vi.mock("@/lib/actions/verify", () => ({
   sendVerification: vi.fn(),
   resendVerification: vi.fn(),
 }));
@@ -21,7 +23,7 @@ describe("VerifyForm", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
 
-    const { sendVerification } = await import("@/lib/server/verify");
+    const { sendVerification } = await import("@/lib/actions/verify");
     mockSendVerification = vi.mocked(sendVerification);
     mockSendVerification.mockResolvedValue({ redirect: "/success" });
   });

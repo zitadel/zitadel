@@ -28,6 +28,7 @@ type Server struct {
 type Config struct{}
 
 func CreateServer(
+	systemDefaults systemdefaults.SystemDefaults,
 	command *command.Commands,
 	query *query.Queries,
 	database string,
@@ -35,6 +36,7 @@ func CreateServer(
 	externalDomain string,
 ) *Server {
 	return &Server{
+		systemDefaults:  systemDefaults,
 		command:         command,
 		query:           query,
 		defaultInstance: defaultInstance,

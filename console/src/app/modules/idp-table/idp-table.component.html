@@ -59,6 +59,13 @@
                   Generic OIDC
                 </div>
               }
+              @case (ProviderType.PROVIDER_TYPE_ZITADEL) {
+                <div class="idp-table-provider-type">
+                  <img class="idp-logo dark" src="./assets/images/zitadel-logo-solo-light.svg" alt="zitadel" />
+                  <img class="idp-logo light" src="./assets/images/zitadel-logo-solo-dark.svg" alt="zitadel" />
+                  ZITADEL
+                </div>
+              }
               @case (ProviderType.PROVIDER_TYPE_OAUTH) {
                 <div class="idp-table-provider-type">
                   <img class="idp-logo" src="./assets/images/idp/oauth.svg" alt="oauth" />
