@@ -1192,6 +1192,7 @@ func TestCheckPassword_tarpit(t *testing.T) {
 					aggregate:         &session.NewAggregate("sessionID", "instance1").Aggregate,
 				},
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(ctx, userAgg,
