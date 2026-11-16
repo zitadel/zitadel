@@ -153,7 +153,8 @@
       "sessionNotValid": "A munkamenet nem érvényes",
       "passwordVerificationMissing": "A jelszó hitelesítés hiányzik.",
       "passwordVerificationTooOld": "A jelszó hitelesítés túl régi. Kérjük, erősítsd meg újra a jelszavadat.",
-      "passwordResetNotAllowed": "A jelszó-visszaállítás nem engedélyezett. További információért fordulj a rendszergazdához."
+      "passwordResetNotAllowed": "A jelszó-visszaállítás nem engedélyezett. További információért fordulj a rendszergazdához.",
+      "localAuthenticationNotAllowed": "A helyi hitelesítés nem engedélyezett! További információért fordulj a rendszergazdához."
     }
   },
   "idp": {
@@ -255,6 +256,11 @@
       "smsDescription": "Add meg a telefonszámodat, hogy SMS-ben elküldhessük az ellenőrző kódot.",
       "emailDescription": "Add meg az e-mail címedet, hogy e-mailben elküldhessük az ellenőrző kódot.",
       "totpRegisterDescription": "Olvasd be a QR-kódot, vagy navigálj az URL-re manuálisan.",
+      "emailAddDescription": "Használj az ellenőrzött e-mail-címedre küldött egyszer használatos kódot második faktorként.",
+      "smsAddDescription": "Használj az ellenőrzött telefonszámodra küldött egyszer használatos kódot második faktorként.",
+      "add": "Hozzáadás",
+      "emailAdded": "E-mailes kód hozzáadva.",
+      "smsAdded": "SMS-es kód hozzáadva.",
       "submit": "Tovább",
       "labels": {
         "code": "Kód"
@@ -265,7 +271,13 @@
     },
     "errors": {
       "couldNotRequestChallenge": "Nem sikerült OTP-kihívást kérni",
-      "couldNotVerifyCode": "Nem sikerült ellenőrizni az OTP-kódot"
+      "couldNotVerifyCode": "Nem sikerült ellenőrizni az OTP-kódot",
+      "couldNotGetSession": "A munkamenet nem tölthető be. Jelentkezz be újra.",
+      "invalidMethod": "Ez a második faktor nem támogatott.",
+      "couldNotAddEmail": "Az e-mailes kódot nem sikerült hozzáadni.",
+      "couldNotAddSms": "Az SMS-es kódot nem sikerült hozzáadni.",
+      "emailNotVerified": "Ellenőrizd az e-mail-címedet, mielőtt e-mailes kódokat adsz hozzá.",
+      "phoneNotVerified": "Ellenőrizd a telefonszámodat, mielőtt SMS-es kódokat adsz hozzá."
     }
   },
   "passkey": {
@@ -359,7 +371,8 @@
       "couldNotCreateSession": "Nem sikerült létrehozni a munkamenetet",
       "userNotFound": "A felhasználó nem található a rendszerben",
       "couldNotLinkIDP": "Nem sikerült összekapcsolni az azonosítószolgáltatót a felhasználóval",
-      "couldNotRegisterUser": "Nem sikerült regisztrálni a felhasználót"
+      "couldNotRegisterUser": "Nem sikerült regisztrálni a felhasználót",
+      "sessionMismatch": "A regisztráció egy másik böngészőben indult. Jelentkezz be újra az azonosítószolgáltatódnál."
     }
   },
   "invite": {

@@ -537,6 +537,7 @@ Errors:
     NotExisting: "Запит аутентифікації не існує"
     WrongLoginClient: "Запит аутентифікації створений іншим клієнтом входу"
     AlreadyHandled: "Запит аутентифікації вже оброблений"
+    NotAuthenticated: "Користувач не автентифікований"
   OIDCSession:
     RefreshTokenInvalid: "Токен оновлення недійсний"
     Token:

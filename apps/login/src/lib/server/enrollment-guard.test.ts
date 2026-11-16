@@ -6,11 +6,11 @@ vi.mock("@zitadel/client", () => ({
   timestampDate: vi.fn((ts: { seconds: bigint | number }) => new Date(Number(ts.seconds) * 1000)),
 }));
 
-vi.mock("@/lib/zitadel", () => ({
+vi.mock("@/lib/server/zitadel", () => ({
   listAuthenticationMethodTypes: vi.fn(),
 }));
 
-vi.mock("@/lib/verify-helper", () => ({
+vi.mock("@/lib/server/verify-helper", () => ({
   checkUserVerification: vi.fn(),
 }));
 
@@ -26,8 +26,8 @@ describe("getEnrollmentAuthorizationError", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    const { listAuthenticationMethodTypes } = await import("@/lib/zitadel");
-    const { checkUserVerification } = await import("@/lib/verify-helper");
+    const { listAuthenticationMethodTypes } = await import("@/lib/server/zitadel");
+    const { checkUserVerification } = await import("@/lib/server/verify-helper");
     mockListAuthenticationMethodTypes = vi.mocked(listAuthenticationMethodTypes);
     mockCheckUserVerification = vi.mocked(checkUserVerification);
   });
