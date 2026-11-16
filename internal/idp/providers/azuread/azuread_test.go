@@ -7,12 +7,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	openid "github.com/zitadel/oidc/v3/pkg/oidc"
 
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
+	"github.com/zitadel/zitadel/internal/test"
 )
 
 func TestProvider_BeginAuth(t *testing.T) {
@@ -84,8 +84,9 @@ func TestProvider_BeginAuth(t *testing.T) {
 
 			wantAuth, wantErr := tt.want.GetAuth(ctx)
 			gotAuth, gotErr := session.GetAuth(ctx)
-			a.Equal(wantAuth, gotAuth)
 			a.ErrorIs(gotErr, wantErr)
+			// PKCE is used by default
+			test.AssertRedirectAuthWithPKCE(t, wantAuth, gotAuth, session.PersistentParameters())
 		})
 	}
 }
@@ -132,7 +133,7 @@ func TestProvider_Options(t *testing.T) {
 				creationAllowed: false,
 				autoCreation:    false,
 				autoUpdate:      false,
-				pkce:            false,
+				pkce:            true,
 			},
 		},
 		{
@@ -150,7 +151,6 @@ func TestProvider_Options(t *testing.T) {
 						oauth.WithCreationAllowed(),
 						oauth.WithAutoCreation(),
 						oauth.WithAutoUpdate(),
-						oauth.WithRelyingPartyOption(rp.WithPKCE(nil)),
 					),
 				},
 			},
