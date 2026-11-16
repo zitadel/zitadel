@@ -78,14 +78,18 @@ func (h *Handler) hydrateState(s *state, filterOffset, inTxOrder sql.NullInt64) 
 		return
 	}
 	s.offset = uint32(filterOffset.Int64)
-	if inTxOrder.Valid && inTxOrder.Int64 != 0 {
+	// Valid includes 0: v2/v4 push stores 0-based in_tx_order for the first event of a tx.
+	if inTxOrder.Valid {
 		s.cursor.InTxOrder = uint32(inTxOrder.Int64)
 		s.inTxOrderSet = true
 	}
 }
 
 func (h *Handler) storedOffsets(s *state) (filterOffset any, inTxOrder any) {
-	inTx := inTxOrderValue(s.cursor.InTxOrder)
+	var inTx any
+	if h.filterOffsetIsCursor || s.inTxOrderSet {
+		inTx = s.cursor.InTxOrder
+	}
 	if h.filterOffsetIsCursor {
 		return s.cursor.InTxOrder, inTx
 	}
@@ -118,13 +122,6 @@ func (h *Handler) setState(ctx context.Context, tx *sql.Tx, updatedState *state)
 	return nil
 }
 
-func inTxOrderValue(order uint32) any {
-	if order == 0 {
-		return nil
-	}
-	return order
-}
-
 func nextFilterOffset(prev decimal.Decimal, offset uint32, pos decimal.Decimal) (decimal.Decimal, uint32) {
 	if prev.Equal(pos) {
 		return pos, offset + 1
@@ -132,13 +129,36 @@ func nextFilterOffset(prev decimal.Decimal, offset uint32, pos decimal.Decimal) 
 	return pos, 1
 }
 
+// seedFilterOffset returns the starting previousPosition/offset for counting
+// filter_offset over a fetched batch. Seed the stored values only when the
+// query continued from that cursor (OFFSET or sort-key resume). A minPosition
+// floor fetches with PositionAtLeast and no OFFSET, so recount from zero.
+func seedFilterOffset(s *state, r resume) (previousPosition decimal.Decimal, offset uint32) {
+	if s == nil {
+		return decimal.Decimal{}, 0
+	}
+	if r.offset > 0 || r.afterSortKey {
+		return s.cursor.Position, s.offset
+	}
+	return decimal.Decimal{}, 0
+}
+
+func advanceFilterOffsetOverEvents(prev decimal.Decimal, offset uint32, events []eventstore.Event) (decimal.Decimal, uint32) {
+	for _, event := range events {
+		prev, offset = nextFilterOffset(prev, offset, event.Position())
+	}
+	return prev, offset
+}
+
 func (s *state) applyStatement(stmt *Statement) {
 	s.cursor = stmt.eventSortKey()
 	s.eventTimestamp = stmt.CreationDate
 	s.offset = stmt.offset
+	s.inTxOrderSet = true
 }
 
 func (s *state) applyEvent(event eventstore.Event) {
 	s.cursor = eventstore.EventSortKeyFromEvent(event)
 	s.eventTimestamp = event.CreatedAt()
+	s.inTxOrderSet = true
 }

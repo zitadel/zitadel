@@ -1,6 +1,7 @@
 package projection
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -11,28 +12,38 @@ import (
 	"github.com/zitadel/zitadel/internal/migration"
 )
 
+func setupStepEvent(typ eventstore.EventType, name string) *migration.SetupStep {
+	agg := eventstore.NewAggregate(context.Background(), migration.SystemAggregateID, migration.SystemAggregate, "v1")
+	return &migration.SetupStep{
+		BaseEvent: eventstore.BaseEvent{EventType: typ, Agg: agg},
+		Name:      name,
+	}
+}
+
 func TestFilterOffsetIsCursorFromEventstore(t *testing.T) {
+	name := migration.EventstorePositionClockTimestampStep
+
 	t.Run("77 stored as done", func(t *testing.T) {
 		es := newMockEventStore().appendFilterResponse([]eventstore.Event{
-			&eventstore.BaseEvent{EventType: migration.DoneType},
+			setupStepEvent(migration.DoneType, name),
 		})
-		got, err := filterOffsetIsCursorFromEventstore(t.Context(), es)
+		got, err := FilterOffsetIsCursorFromEventstore(t.Context(), es)
 		require.NoError(t, err)
 		assert.True(t, got)
 	})
 
 	t.Run("77 not stored", func(t *testing.T) {
 		es := newMockEventStore().appendFilterResponse(nil)
-		got, err := filterOffsetIsCursorFromEventstore(t.Context(), es)
+		got, err := FilterOffsetIsCursorFromEventstore(t.Context(), es)
 		require.NoError(t, err)
 		assert.False(t, got)
 	})
 
 	t.Run("77 started without done errors", func(t *testing.T) {
 		es := newMockEventStore().appendFilterResponse([]eventstore.Event{
-			&eventstore.BaseEvent{EventType: migration.StartedType},
+			setupStepEvent(migration.StartedType, name),
 		})
-		got, err := filterOffsetIsCursorFromEventstore(t.Context(), es)
+		got, err := FilterOffsetIsCursorFromEventstore(t.Context(), es)
 		require.Error(t, err)
 		assert.False(t, got)
 	})
