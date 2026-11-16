@@ -1,6 +1,6 @@
 "use client";
 
-import { approveDeviceAuthorization, denyDeviceAuthorization } from "@/lib/server/device";
+import { approveDeviceAuthorization, denyDeviceAuthorization } from "@/lib/actions/device";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

@@ -12,7 +12,7 @@ vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
 }));
 
-vi.mock("@/lib/server/device", () => ({
+vi.mock("@/lib/actions/device", () => ({
   approveDeviceAuthorization: vi.fn(),
   denyDeviceAuthorization: vi.fn(),
 }));
@@ -23,7 +23,7 @@ describe("ConsentScreen", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    const device = await import("@/lib/server/device");
+    const device = await import("@/lib/actions/device");
     approveDeviceAuthorization = vi.mocked(device.approveDeviceAuthorization);
     denyDeviceAuthorization = vi.mocked(device.denyDeviceAuthorization);
 

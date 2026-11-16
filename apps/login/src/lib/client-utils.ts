@@ -70,6 +70,11 @@ export function isExternalUrl(url: string): boolean {
 const SANITIZE_BLANK = "about:blank";
 const EXTRA_BLOCKED = new Set(["file:", "blob:", "about:"]);
 
+/** Allowlist for the back link on the IdP error pages. */
+export function isAllowedPostErrorRedirectUrl(url: string | undefined): url is "/loginname" | "/idp" {
+  return url === "/loginname" || url === "/idp";
+}
+
 /**
  * Validates whether a given redirect URI is safe.
  * Safe URIs are either relative paths or absolute URLs matching the current host.

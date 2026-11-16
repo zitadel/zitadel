@@ -153,7 +153,8 @@
       "sessionNotValid": "Session is not valid",
       "passwordVerificationMissing": "Password verification is missing.",
       "passwordVerificationTooOld": "Password verification is too old. Please verify your password again.",
-      "passwordResetNotAllowed": "Password reset is not allowed. Contact your administrator for more information."
+      "passwordResetNotAllowed": "Password reset is not allowed. Contact your administrator for more information.",
+      "localAuthenticationNotAllowed": "Local authentication is not allowed! Contact your administrator for more information."
     }
   },
   "idp": {
@@ -255,6 +256,11 @@
       "smsDescription": "Enter your phone number to receive a code via SMS.",
       "emailDescription": "Enter your email address to receive a code via email.",
       "totpRegisterDescription": "Scan the QR Code or navigate to the URL manually.",
+      "emailAddDescription": "Use a one-time code sent to your verified email address as a second factor.",
+      "smsAddDescription": "Use a one-time code sent to your verified phone number as a second factor.",
+      "add": "Add",
+      "emailAdded": "Code via email added.",
+      "smsAdded": "Code via SMS added.",
       "submit": "Continue",
       "labels": {
         "code": "Code"
@@ -265,7 +271,13 @@
     },
     "errors": {
       "couldNotRequestChallenge": "Could not request OTP challenge",
-      "couldNotVerifyCode": "Could not verify OTP code"
+      "couldNotVerifyCode": "Could not verify OTP code",
+      "couldNotGetSession": "Your session could not be loaded. Please sign in again.",
+      "invalidMethod": "This second factor is not supported.",
+      "couldNotAddEmail": "Code via email could not be added.",
+      "couldNotAddSms": "Code via SMS could not be added.",
+      "emailNotVerified": "Verify your email address before adding codes via email.",
+      "phoneNotVerified": "Verify your phone number before adding codes via SMS."
     }
   },
   "passkey": {
@@ -359,7 +371,8 @@
       "couldNotCreateSession": "Could not create session",
       "userNotFound": "User not found in the system",
       "couldNotLinkIDP": "Could not link IDP to user",
-      "couldNotRegisterUser": "Could not register user"
+      "couldNotRegisterUser": "Could not register user",
+      "sessionMismatch": "The registration was started in another browser. Please sign in with your identity provider again."
     }
   },
   "invite": {

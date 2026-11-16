@@ -66,7 +66,7 @@ trap 'rm -rf "$TMP"' EXIT
 
 # ── INSTALL ───────────────────────────────────────────────────────────────────
 
-# ----- protoc-gen-connect-openapi (sudorandom/protoc-gen-connect-openapi) -----
+# ----- protoc-gen-connect-openapi (connectrpc/protoc-gen-connect-openapi) -----
 # macOS ships a single universal ("all") tarball for both amd64 and arm64.
 case "$GOOS" in
   linux)  OAI_ARCH="$GOARCH" ;;
@@ -74,8 +74,8 @@ case "$GOOS" in
 esac
 sha256_var="CONNECT_OPENAPI_SHA256_${GOOS}_${GOARCH}"
 echo "Downloading protoc-gen-connect-openapi v${CONNECT_OPENAPI_VERSION} (${GOOS}/${OAI_ARCH})..."
-curl -fsSL \
-  "https://github.com/sudorandom/protoc-gen-connect-openapi/releases/download/v${CONNECT_OPENAPI_VERSION}/protoc-gen-connect-openapi_${CONNECT_OPENAPI_VERSION}_${GOOS}_${OAI_ARCH}.tar.gz" \
+curl -fsSL --retry 3 \
+  "https://github.com/connectrpc/protoc-gen-connect-openapi/releases/download/v${CONNECT_OPENAPI_VERSION}/protoc-gen-connect-openapi_${CONNECT_OPENAPI_VERSION}_${GOOS}_${OAI_ARCH}.tar.gz" \
   -o "${TMP}/oai.tar.gz"
 verify_sha256 "${TMP}/oai.tar.gz" "${!sha256_var}"
 tar -xzf "${TMP}/oai.tar.gz" -C "${TMP}" protoc-gen-connect-openapi

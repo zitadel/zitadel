@@ -136,7 +136,8 @@
       "couldNotLoadAuthMethods": "認証方法を読み込めませんでした",
       "failedPrecondition": "前提条件に失敗しました",
       "sessionNotValid": "セッションが無効です",
-      "passwordResetNotAllowed": "パスワードのリセットは許可されていません。詳細については管理者に問い合わせてください。"
+      "passwordResetNotAllowed": "パスワードのリセットは許可されていません。詳細については管理者に問い合わせてください。",
+      "localAuthenticationNotAllowed": "ローカル認証は許可されていません！ 詳細については管理者に問い合わせてください。"
     },
     "complexity": {
       "length": "{minLength} 文字以上である必要があります。",
@@ -248,6 +249,11 @@
       "smsDescription": "SMSでコードを受信する電話番号を入力してください。",
       "emailDescription": "メールでコードを受信するメールアドレスを入力してください。",
       "totpRegisterDescription": "QRコードをスキャンするか、URLに手動でアクセスしてください。",
+      "emailAddDescription": "確認済みのメールアドレスに送信されるワンタイムコードを第2要素として使用します。",
+      "smsAddDescription": "確認済みの電話番号に送信されるワンタイムコードを第2要素として使用します。",
+      "add": "追加",
+      "emailAdded": "メールによるコードを追加しました。",
+      "smsAdded": "SMSによるコードを追加しました。",
       "submit": "続行",
       "labels": {
         "code": "コード"
@@ -258,7 +264,13 @@
     },
     "errors": {
       "couldNotRequestChallenge": "OTPチャレンジをリクエストできませんでした",
-      "couldNotVerifyCode": "OTPコードを確認できませんでした"
+      "couldNotVerifyCode": "OTPコードを確認できませんでした",
+      "couldNotGetSession": "セッションを読み込めませんでした。もう一度サインインしてください。",
+      "invalidMethod": "この第2要素はサポートされていません。",
+      "couldNotAddEmail": "メールによるコードを追加できませんでした。",
+      "couldNotAddSms": "SMSによるコードを追加できませんでした。",
+      "emailNotVerified": "メールによるコードを追加する前に、メールアドレスを確認してください。",
+      "phoneNotVerified": "SMSによるコードを追加する前に、電話番号を確認してください。"
     }
   },
   "passkey": {
@@ -352,7 +364,8 @@
       "couldNotCreateSession": "セッションを作成できませんでした",
       "userNotFound": "ユーザーがシステムに見つかりません",
       "couldNotLinkIDP": "IDPをユーザーにリンクできませんでした",
-      "couldNotRegisterUser": "ユーザーを登録できませんでした"
+      "couldNotRegisterUser": "ユーザーを登録できませんでした",
+      "sessionMismatch": "登録は別のブラウザで開始されました。IDプロバイダーでもう一度サインインしてください。"
     }
   },
   "invite": {

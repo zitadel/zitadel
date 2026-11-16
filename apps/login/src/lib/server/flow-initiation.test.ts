@@ -1,14 +1,15 @@
-import type { Cookie } from "@/lib/cookies";
+import type { Cookie } from "@/lib/server/cookies";
+import { createIdpFlowProof, isIdpFlowProofValid } from "@/lib/server/idp-flow-proof";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { FlowInitiationParams, handleOIDCFlowInitiation } from "./flow-initiation";
 
-vi.mock("@/lib/cookies", () => ({
+vi.mock("@/lib/server/cookies", () => ({
   getLanguageCookie: vi.fn(),
   setLanguageCookie: vi.fn(),
 }));
 
-vi.mock("@/lib/auth-utils", () => ({
+vi.mock("@/lib/server/auth-utils", () => ({
   getValidLocaleFromUILocales: vi.fn(),
 }));
 
@@ -16,19 +17,23 @@ vi.mock("@/lib/idp", () => ({
   idpTypeToSlug: vi.fn(),
 }));
 
-vi.mock("@/lib/server/loginname", () => ({
+vi.mock("@/lib/server/fingerprint", () => ({
+  addIdpFlowProof: vi.fn(),
+}));
+
+vi.mock("@/lib/actions/loginname", () => ({
   sendLoginname: vi.fn(),
 }));
 
-vi.mock("@/lib/service-url", () => ({
+vi.mock("@/lib/server/service-url", () => ({
   constructUrl: vi.fn(),
 }));
 
-vi.mock("@/lib/session", () => ({
+vi.mock("@/lib/server/session", () => ({
   findValidSession: vi.fn(),
 }));
 
-vi.mock("@/lib/zitadel", () => ({
+vi.mock("@/lib/server/zitadel", () => ({
   createCallback: vi.fn(),
   createResponse: vi.fn(),
   getActiveIdentityProviders: vi.fn(),
@@ -79,11 +84,11 @@ describe("handleOIDCFlowInitiation — locale / cookie handling", () => {
     vi.clearAllMocks();
     vi.unstubAllEnvs();
 
-    const cookies = await import("@/lib/cookies");
-    const authUtils = await import("@/lib/auth-utils");
-    const zitadel = await import("@/lib/zitadel");
-    const serviceUrl = await import("@/lib/service-url");
-    const session = await import("@/lib/session");
+    const cookies = await import("@/lib/server/cookies");
+    const authUtils = await import("@/lib/server/auth-utils");
+    const zitadel = await import("@/lib/server/zitadel");
+    const serviceUrl = await import("@/lib/server/service-url");
+    const session = await import("@/lib/server/session");
 
     mockGetLanguageCookie = vi.mocked(cookies.getLanguageCookie);
     mockSetLanguageCookie = vi.mocked(cookies.setLanguageCookie);
@@ -206,11 +211,11 @@ describe("handleOIDCFlowInitiation — org-scoped session filtering", () => {
     vi.clearAllMocks();
     vi.unstubAllEnvs();
 
-    const zitadel = await import("@/lib/zitadel");
-    const serviceUrl = await import("@/lib/service-url");
-    const session = await import("@/lib/session");
-    const authUtils = await import("@/lib/auth-utils");
-    const loginname = await import("@/lib/server/loginname");
+    const zitadel = await import("@/lib/server/zitadel");
+    const serviceUrl = await import("@/lib/server/service-url");
+    const session = await import("@/lib/server/session");
+    const authUtils = await import("@/lib/server/auth-utils");
+    const loginname = await import("@/lib/actions/loginname");
 
     mockGetAuthRequest = vi.mocked(zitadel.getAuthRequest);
     mockConstructUrl = vi.mocked(serviceUrl.constructUrl);
@@ -683,11 +688,11 @@ describe("handleOIDCFlowInitiation — stale session cookie fallback (#12252)", 
     vi.clearAllMocks();
     vi.unstubAllEnvs();
 
-    const zitadel = await import("@/lib/zitadel");
-    const serviceUrl = await import("@/lib/service-url");
-    const session = await import("@/lib/session");
-    const authUtils = await import("@/lib/auth-utils");
-    const loginname = await import("@/lib/server/loginname");
+    const zitadel = await import("@/lib/server/zitadel");
+    const serviceUrl = await import("@/lib/server/service-url");
+    const session = await import("@/lib/server/session");
+    const authUtils = await import("@/lib/server/auth-utils");
+    const loginname = await import("@/lib/actions/loginname");
 
     mockGetAuthRequest = vi.mocked(zitadel.getAuthRequest);
     mockConstructUrl = vi.mocked(serviceUrl.constructUrl);
@@ -850,10 +855,10 @@ describe("handleOIDCFlowInitiation — Prompt.LOGIN + loginHint requestId prefix
     vi.clearAllMocks();
     vi.unstubAllEnvs();
 
-    const zitadel = await import("@/lib/zitadel");
-    const serviceUrl = await import("@/lib/service-url");
-    const authUtils = await import("@/lib/auth-utils");
-    const loginname = await import("@/lib/server/loginname");
+    const zitadel = await import("@/lib/server/zitadel");
+    const serviceUrl = await import("@/lib/server/service-url");
+    const authUtils = await import("@/lib/server/auth-utils");
+    const loginname = await import("@/lib/actions/loginname");
 
     mockGetAuthRequest = vi.mocked(zitadel.getAuthRequest);
     mockConstructUrl = vi.mocked(serviceUrl.constructUrl);
@@ -947,9 +952,9 @@ describe("handleOIDCFlowInitiation — idp scope (urn:zitadel:iam:org:idp:id)", 
     vi.clearAllMocks();
     vi.unstubAllEnvs();
 
-    const zitadel = await import("@/lib/zitadel");
-    const serviceUrl = await import("@/lib/service-url");
-    const authUtils = await import("@/lib/auth-utils");
+    const zitadel = await import("@/lib/server/zitadel");
+    const serviceUrl = await import("@/lib/server/service-url");
+    const authUtils = await import("@/lib/server/auth-utils");
     const idpLib = await import("@/lib/idp");
 
     mockGetAuthRequest = vi.mocked(zitadel.getAuthRequest);
@@ -963,6 +968,13 @@ describe("handleOIDCFlowInitiation — idp scope (urn:zitadel:iam:org:idp:id)", 
       return new URL(`https://example.com${path}`);
     });
     mockIdpTypeToSlug.mockReturnValue("azure");
+
+    vi.stubEnv("ZITADEL_SESSION_COOKIE_SECRET", "test-session-cookie-secret-at-least-32-chars");
+    const fingerprint = await import("@/lib/server/fingerprint");
+    // the real helper reads the binding id cookie, here the browser binding id is "fp123"
+    vi.mocked(fingerprint.addIdpFlowProof).mockImplementation(async (params, linkToSessionId) => {
+      params.set("flowFingerprint", createIdpFlowProof("fp123", linkToSessionId));
+    });
   });
 
   afterEach(() => {
@@ -1090,5 +1102,35 @@ describe("handleOIDCFlowInitiation — idp scope (urn:zitadel:iam:org:idp:id)", 
         urls: expect.objectContaining({ loginHint: "user@example.com" }),
       }),
     );
+  });
+
+  test("should bind the scoped IdP flow to this browser with a flowFingerprint in the success URL", async () => {
+    const { IdentityProviderType } = await import("@zitadel/proto/zitadel/settings/v2/login_settings_pb");
+
+    mockGetAuthRequest.mockResolvedValue({
+      authRequest: {
+        id: "abc123",
+        uiLocales: [],
+        scope: ["urn:zitadel:iam:org:idp:id:idp-1"],
+        prompt: [],
+        loginHint: undefined,
+      },
+    });
+
+    mockGetActiveIdentityProviders.mockResolvedValue({
+      identityProviders: [{ id: "idp-1", type: IdentityProviderType.AZURE_AD }],
+    });
+
+    mockStartIdentityProviderFlow.mockResolvedValue({
+      url: "https://login.microsoftonline.com/tenant/oauth2/v2.0/authorize?client_id=xyz",
+    });
+
+    await handleOIDCFlowInitiation(makeBaseParams({ sessions: [] }));
+
+    const successUrl = new URL(mockStartIdentityProviderFlow.mock.calls[0][0].urls.successUrl);
+    expect(successUrl.pathname).toBe("/idp/azure/process");
+    expect(successUrl.searchParams.get("requestId")).toBe("oidc_abc123");
+    expect(isIdpFlowProofValid(successUrl.searchParams.get("flowFingerprint") ?? undefined, "fp123")).toBe(true);
+    expect(isIdpFlowProofValid(successUrl.searchParams.get("flowFingerprint") ?? undefined, "other-fp")).toBe(false);
   });
 });
