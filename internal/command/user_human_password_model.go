@@ -1,7 +1,7 @@
 package command
 
 import (
-	"slices"
+	"context"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -26,46 +26,44 @@ type HumanPasswordWriteModel struct {
 	UserState domain.UserState
 
 	// checksAfterSequence limits the password check events to the ones after this (aggregate) sequence.
-	// It must be the sequence of the last event resetting the PasswordCheckFailedCount,
-	// see [passwordCheckResetWriteModel].
+	// It must be the sequence of the last event resetting the PasswordCheckFailedCount
+	// (see [lastPasswordCheckResetSequence]); 0 loads all password checks.
 	// The sequence is used instead of the position, as historical positions can disagree with the sequence order.
 	checksAfterSequence uint64
 }
 
-// passwordCheckResetWriteModel returns the sequence of the last event of a user,
-// which resets the [HumanPasswordWriteModel.PasswordCheckFailedCount].
-type passwordCheckResetWriteModel struct {
-	eventstore.WriteModel
-
-	sequence uint64
-}
-
-func newPasswordCheckResetWriteModel(userID string) *passwordCheckResetWriteModel {
-	return &passwordCheckResetWriteModel{
-		WriteModel: eventstore.WriteModel{
-			AggregateID: userID,
-		},
-	}
-}
-
-func (wm *passwordCheckResetWriteModel) Reduce() error {
-	for _, event := range wm.Events {
-		if event.Sequence() > wm.sequence {
-			wm.sequence = event.Sequence()
-		}
-	}
-	return wm.WriteModel.Reduce()
-}
-
-func (wm *passwordCheckResetWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+// lastPasswordCheckResetSequence returns the aggregate sequence of the last event of the user,
+// which resets the [HumanPasswordWriteModel.PasswordCheckFailedCount], or 0 if there is none.
+func lastPasswordCheckResetSequence(ctx context.Context, es *eventstore.Eventstore, userID string) (uint64, error) {
+	events, err := es.Filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		OrderDesc().
 		Limit(1).
 		AddQuery().
 		AggregateTypes(user.AggregateType).
-		AggregateIDs(wm.AggregateID).
+		AggregateIDs(userID).
 		EventTypes(humanPasswordCheckResetEventTypes...).
-		Builder()
+		Builder(),
+	)
+	if err != nil || len(events) == 0 {
+		return 0, err
+	}
+	return events[0].Sequence(), nil
+}
+
+// loadHumanPasswordWriteModel loads the password state of the user,
+// but only the password checks since the last reset of the failed count,
+// so the cost doesn't grow with every login of the user.
+func loadHumanPasswordWriteModel(ctx context.Context, es *eventstore.Eventstore, userID, resourceOwner string) (*HumanPasswordWriteModel, error) {
+	checksAfterSequence, err := lastPasswordCheckResetSequence(ctx, es, userID)
+	if err != nil {
+		return nil, err
+	}
+	wm := NewHumanPasswordWriteModel(userID, resourceOwner)
+	wm.checksAfterSequence = checksAfterSequence
+	if err = es.FilterToQueryReducer(ctx, wm); err != nil {
+		return nil, err
+	}
+	return wm, nil
 }
 
 func (wm *HumanPasswordWriteModel) GetUserState() domain.UserState {
@@ -231,30 +229,20 @@ var humanPasswordCheckResetEventTypes = []eventstore.EventType{
 }
 
 func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
-	var query *eventstore.SearchQueryBuilder
-	if wm.checksAfterSequence == 0 {
-		query = eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-			AddQuery().
-			AggregateTypes(user.AggregateType).
-			AggregateIDs(wm.AggregateID).
-			EventTypes(append(slices.Clone(humanPasswordStateEventTypes), humanPasswordCheckEventTypes...)...).
-			Builder()
-	} else {
-		// Only the password checks after the last reset of the failed count are relevant.
-		// This prevents loading the whole (constantly growing) login history of the user.
-		query = eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-			AddQuery().
-			AggregateTypes(user.AggregateType).
-			AggregateIDs(wm.AggregateID).
-			EventTypes(humanPasswordStateEventTypes...).
-			Builder().
-			AddQuery().
-			AggregateTypes(user.AggregateType).
-			AggregateIDs(wm.AggregateID).
-			EventTypes(humanPasswordCheckEventTypes...).
-			SequenceGreater(wm.checksAfterSequence).
-			Builder()
-	}
+	// Only the password checks after the last reset of the failed count are relevant.
+	// This prevents loading the whole (constantly growing) login history of the user.
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(humanPasswordStateEventTypes...).
+		Builder().
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(humanPasswordCheckEventTypes...).
+		SequenceGreater(wm.checksAfterSequence).
+		Builder()
 
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)

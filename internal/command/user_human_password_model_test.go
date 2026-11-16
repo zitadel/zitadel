@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"database/sql"
+	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -11,59 +13,97 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/repository/mock"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 func TestHumanPasswordWriteModel_Query(t *testing.T) {
-	t.Run("without reset sequence, all password checks", func(t *testing.T) {
-		wm := NewHumanPasswordWriteModel("user1", "org1")
-		query := wm.Query()
+	tests := []struct {
+		name                string
+		checksAfterSequence uint64
+	}{
+		{name: "without reset sequence, all password checks", checksAfterSequence: 0},
+		{name: "with reset sequence, only password checks after it", checksAfterSequence: 42},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			wm := NewHumanPasswordWriteModel("user1", "org1")
+			wm.checksAfterSequence = tt.checksAfterSequence
+			query := wm.Query()
 
-		require.Len(t, query.GetQueries(), 1)
-		sub := query.GetQueries()[0]
-		assert.Equal(t, []string{"user1"}, sub.GetAggregateIDs())
-		assert.Subset(t, sub.GetEventTypes(), humanPasswordStateEventTypes)
-		assert.Subset(t, sub.GetEventTypes(), humanPasswordCheckEventTypes)
-		assert.Zero(t, sub.GetSequenceGreater())
-		assert.Equal(t, "org1", query.GetResourceOwner())
-	})
-	t.Run("with reset sequence, only password checks after it", func(t *testing.T) {
-		wm := NewHumanPasswordWriteModel("user1", "org1")
-		wm.checksAfterSequence = 42
-		query := wm.Query()
+			require.Len(t, query.GetQueries(), 2)
+			state, checks := query.GetQueries()[0], query.GetQueries()[1]
 
-		require.Len(t, query.GetQueries(), 2)
-		state, checks := query.GetQueries()[0], query.GetQueries()[1]
+			assert.Equal(t, []string{"user1"}, state.GetAggregateIDs())
+			assert.ElementsMatch(t, humanPasswordStateEventTypes, state.GetEventTypes())
+			assert.Zero(t, state.GetSequenceGreater())
 
-		assert.Equal(t, []string{"user1"}, state.GetAggregateIDs())
-		assert.ElementsMatch(t, humanPasswordStateEventTypes, state.GetEventTypes())
-		assert.Zero(t, state.GetSequenceGreater())
+			assert.Equal(t, []string{"user1"}, checks.GetAggregateIDs())
+			assert.ElementsMatch(t, humanPasswordCheckEventTypes, checks.GetEventTypes())
+			assert.Equal(t, tt.checksAfterSequence, checks.GetSequenceGreater())
+			assert.True(t, checks.GetPositionAfter().IsZero(), "positions can disagree with the sequence order of historical events")
 
-		assert.Equal(t, []string{"user1"}, checks.GetAggregateIDs())
-		assert.ElementsMatch(t, humanPasswordCheckEventTypes, checks.GetEventTypes())
-		assert.Equal(t, uint64(42), checks.GetSequenceGreater())
-		assert.True(t, checks.GetPositionAfter().IsZero(), "positions can disagree with the sequence order of historical events")
-
-		assert.Equal(t, "org1", query.GetResourceOwner())
-	})
+			assert.Equal(t, "org1", query.GetResourceOwner())
+		})
+	}
 }
 
-func TestPasswordCheckResetWriteModel(t *testing.T) {
-	wm := newPasswordCheckResetWriteModel("user1")
+// Test_humanPasswordCheckResetEventTypes ensures that the reset event types are exactly the events
+// which reset the failed password check count in [HumanPasswordWriteModel.Reduce].
+// A reset type which doesn't reset the count would hide failed checks and weaken the lockout.
+func Test_humanPasswordCheckResetEventTypes(t *testing.T) {
+	ctx := context.Background()
+	userAgg := &user.NewAggregate("user1", "org1").Aggregate
+	failed := eventFromEventPusher(user.NewHumanPasswordCheckFailedEvent(ctx, userAgg, nil))
 
-	query := wm.Query()
-	assert.True(t, query.GetDesc())
-	assert.Equal(t, uint64(1), query.GetLimit())
-	require.Len(t, query.GetQueries(), 1)
-	assert.Equal(t, []string{"user1"}, query.GetQueries()[0].GetAggregateIDs())
-	assert.ElementsMatch(t, humanPasswordCheckResetEventTypes, query.GetQueries()[0].GetEventTypes())
+	queried := append(slices.Clone(humanPasswordStateEventTypes), humanPasswordCheckEventTypes...)
+	assert.Subset(t, queried, humanPasswordCheckResetEventTypes, "reset events must be loaded by the write model")
 
-	event := eventFromEventPusher(user.NewHumanPasswordCheckSucceededEvent(context.Background(), &user.NewAggregate("user1", "org1").Aggregate, nil))
-	event.Seq = 42
-	wm.AppendEvents(event)
-	require.NoError(t, wm.Reduce())
-	assert.Equal(t, uint64(42), wm.sequence)
+	for _, eventType := range queried {
+		t.Run(string(eventType), func(t *testing.T) {
+			event := &repository.Event{
+				AggregateID:   "user1",
+				AggregateType: user.AggregateType,
+				ResourceOwner: sql.NullString{String: "org1", Valid: true},
+				Typ:           eventType,
+				Data:          []byte("{}"),
+			}
+			es := expectEventstore(expectFilter(failed, failed, event))(t)
+			wm := NewHumanPasswordWriteModel("user1", "org1")
+			require.NoError(t, es.FilterToQueryReducer(ctx, wm))
+
+			isReset := slices.Contains(humanPasswordCheckResetEventTypes, eventType)
+			assert.Equal(t, isReset, wm.PasswordCheckFailedCount == 0, "failed count after event: %d", wm.PasswordCheckFailedCount)
+		})
+	}
+}
+
+func Test_lastPasswordCheckResetSequence(t *testing.T) {
+	ctx := context.Background()
+	assertQuery := func(query *eventstore.SearchQueryBuilder) {
+		assert.True(t, query.GetDesc())
+		assert.Equal(t, uint64(1), query.GetLimit())
+		require.Len(t, query.GetQueries(), 1)
+		assert.Equal(t, []string{"user1"}, query.GetQueries()[0].GetAggregateIDs())
+		assert.ElementsMatch(t, humanPasswordCheckResetEventTypes, query.GetQueries()[0].GetEventTypes())
+	}
+	t.Run("last reset", func(t *testing.T) {
+		event := eventFromEventPusher(user.NewHumanPasswordCheckSucceededEvent(ctx, &user.NewAggregate("user1", "org1").Aggregate, nil))
+		event.Seq = 42
+		es := expectEventstore(expectFilterQuery(assertQuery, event))(t)
+
+		sequence, err := lastPasswordCheckResetSequence(ctx, es, "user1")
+		require.NoError(t, err)
+		assert.Equal(t, uint64(42), sequence)
+	})
+	t.Run("no reset", func(t *testing.T) {
+		es := expectEventstore(expectFilterQuery(assertQuery))(t)
+
+		sequence, err := lastPasswordCheckResetSequence(ctx, es, "user1")
+		require.NoError(t, err)
+		assert.Zero(t, sequence)
+	})
 }
 
 // expectFilterQuery expects a filter call, lets assertQuery check the query and returns the events.

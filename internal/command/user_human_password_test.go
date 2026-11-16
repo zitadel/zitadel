@@ -62,6 +62,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 			name: "user not existing, precondition error",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(),
 				),
 			},
@@ -78,6 +79,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 			name: "missing permission, error",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -120,6 +122,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 			name: "change password onetime, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -182,6 +185,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 			name: "change password no one time, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -319,6 +323,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 			name: "user not existing, precondition error",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(),
 				),
 			},
@@ -336,6 +341,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 			name: "code not existing, precondition error",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -369,6 +375,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 			name: "invalid code, invalid argument error",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -418,6 +425,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 			name: "set password, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -495,6 +503,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 			name: "set password with userAgentID, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -573,6 +582,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 			name: "set password with changeRequired, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -652,6 +662,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 			name: "set password (external code), ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -843,6 +854,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				newPassword:   "password1",
 			},
 			expect: []expect{
+				expectFilter(), // password check reset
 				expectFilter(),
 			},
 			res: res{
@@ -863,6 +875,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			expect: []expect{
+				expectFilter(), // password check reset
 				expectFilter(
 					eventFromEventPusher(
 						user.NewHumanAddedEvent(context.Background(),
@@ -898,6 +911,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			expect: []expect{
+				expectFilter(), // password check reset
 				expectFilter(
 					eventFromEventPusher(
 						user.NewHumanAddedEvent(context.Background(),
@@ -958,6 +972,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			expect: []expect{
+				expectFilter(), // password check reset
 				expectFilter(
 					eventFromEventPusher(
 						user.NewHumanAddedEvent(context.Background(),
@@ -1021,6 +1036,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			expect: []expect{
+				expectFilter(), // password check reset
 				expectFilter(
 					eventFromEventPusher(
 						user.NewHumanAddedEvent(context.Background(),
@@ -1087,6 +1103,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				newPassword:   "password1",
 			},
 			expect: []expect{
+				expectFilter(), // password check reset
 				expectFilter(
 					eventFromEventPusher(
 						user.NewHumanAddedEvent(context.Background(),
@@ -1157,6 +1174,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				userAgentID:   "userAgent1",
 			},
 			expect: []expect{
+				expectFilter(), // password check reset
 				expectFilter(
 					eventFromEventPusher(
 						user.NewHumanAddedEvent(context.Background(),
@@ -1228,6 +1246,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				changeRequired: true,
 			},
 			expect: []expect{
+				expectFilter(), // password check reset
 				expectFilter(
 					eventFromEventPusher(
 						user.NewHumanAddedEvent(context.Background(),
@@ -1578,6 +1597,7 @@ func TestCommandSide_PasswordCodeSent(t *testing.T) {
 			name: "user not existing, precondition error",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(),
 				),
 			},
@@ -1594,6 +1614,7 @@ func TestCommandSide_PasswordCodeSent(t *testing.T) {
 			name: "code sent, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1636,6 +1657,7 @@ func TestCommandSide_PasswordCodeSent(t *testing.T) {
 			name: "code sent (external code), ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),

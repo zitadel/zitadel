@@ -448,6 +448,9 @@ func (query *SearchQuery) matches(command Command) bool {
 	if ok := isEventTypes(command, query.eventTypes...); len(query.eventTypes) > 0 && !ok {
 		return false
 	}
+	if seq, ok := command.(sequencer); ok && query.sequenceGreater > 0 && seq.Sequence() <= query.sequenceGreater {
+		return false
+	}
 	return true
 }
 
