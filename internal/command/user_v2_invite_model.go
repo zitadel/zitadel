@@ -16,6 +16,10 @@ type UserV2InviteWriteModel struct {
 	InviteCodeCreationDate  time.Time
 	InviteCodeExpiry        time.Duration
 	InviteCheckFailureCount uint8
+	// InviteCodeInvalidated is set when an emailed invite code was invalidated by failed
+	// verification attempts (wrong code three times, or an expired code).
+	// The invite itself still exists, so it can be resent.
+	InviteCodeInvalidated bool
 
 	ApplicationName string
 	AuthRequestID   string
@@ -129,8 +133,10 @@ func (wm *UserV2InviteWriteModel) Reduce() error {
 			if wm.InviteCheckFailureCount >= 3 || crypto.IsCodeExpired(wm.InviteCodeCreationDate, wm.InviteCodeExpiry) { //TODO: make failure count comparison with wm.InviteCheckFailureCount configurable?
 				// invalidate the invite code after attempting to verify an expired code, or a wrong code three or more times
 				// so that a new invite code can be created for this user
+				invalidated := wm.InviteCode != nil && !wm.CodeReturned
 				wm.EmptyInviteCode()
 				wm.CodeReturned = false
+				wm.InviteCodeInvalidated = invalidated
 			}
 		case *user.HumanEmailVerifiedEvent:
 			wm.EmailVerified = true
@@ -174,6 +180,7 @@ func (wm *UserV2InviteWriteModel) SetInviteCode(code *crypto.CryptoValue, expiry
 	wm.InviteCodeExpiry = expiry
 	wm.InviteCodeCreationDate = creationDate
 	wm.InviteCheckFailureCount = 0
+	wm.InviteCodeInvalidated = false
 }
 
 func (wm *UserV2InviteWriteModel) EmptyInviteCode() {
@@ -181,6 +188,7 @@ func (wm *UserV2InviteWriteModel) EmptyInviteCode() {
 	wm.InviteCodeExpiry = 0
 	wm.InviteCodeCreationDate = time.Time{}
 	wm.InviteCheckFailureCount = 0
+	wm.InviteCodeInvalidated = false
 }
 func (wm *UserV2InviteWriteModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
