@@ -1,7 +1,7 @@
 "use client";
 
 import { Alert } from "@/components/alert";
-import { getDeviceAuthorizationRequest } from "@/lib/server/oidc";
+import { getDeviceAuthorizationRequest } from "@/lib/actions/oidc";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

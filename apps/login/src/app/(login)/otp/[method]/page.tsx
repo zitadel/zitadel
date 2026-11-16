@@ -3,10 +3,9 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { LoginOTP } from "@/components/login-otp";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getPublicHost } from "@/lib/server/host";
-import { getServiceConfig } from "@/lib/service-url";
-import { loadMostRecentSession, loadSessionById } from "@/lib/session";
-import { getBrandingSettings, getLoginSettings } from "@/lib/zitadel";
+import { getServiceConfig } from "@/lib/server/service-url";
+import { loadMostRecentSession, loadSessionById } from "@/lib/server/session";
+import { getBrandingSettings, getLoginSettings } from "@/lib/server/zitadel";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -25,7 +24,6 @@ export default async function Page(props: {
 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
-  const host = getPublicHost(_headers);
 
   const {
     loginName, // send from password page
@@ -102,7 +100,6 @@ export default async function Page(props: {
             organization={organization ?? session?.factors?.user?.organizationId}
             method={method}
             loginSettings={loginSettings}
-            host={host}
             code={code}
           ></LoginOTP>
         )}
