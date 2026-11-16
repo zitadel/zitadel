@@ -119,12 +119,13 @@ func (b *SearchQueryBuilder) ensureInstanceID(ctx context.Context) {
 }
 
 type SearchQuery struct {
-	builder        *SearchQueryBuilder
-	aggregateTypes []AggregateType
-	aggregateIDs   []string
-	eventTypes     []EventType
-	eventData      map[string]interface{}
-	positionAfter  decimal.Decimal
+	builder         *SearchQueryBuilder
+	aggregateTypes  []AggregateType
+	aggregateIDs    []string
+	eventTypes      []EventType
+	eventData       map[string]interface{}
+	positionAfter   decimal.Decimal
+	sequenceGreater uint64
 }
 
 func (q SearchQuery) GetAggregateTypes() []AggregateType {
@@ -145,6 +146,10 @@ func (q SearchQuery) GetEventData() map[string]interface{} {
 
 func (q SearchQuery) GetPositionAfter() decimal.Decimal {
 	return q.positionAfter
+}
+
+func (q SearchQuery) GetSequenceGreater() uint64 {
+	return q.sequenceGreater
 }
 
 type ExclusionQuery struct {
@@ -421,6 +426,13 @@ func (query *SearchQuery) PositionAfter(position decimal.Decimal) *SearchQuery {
 	return query
 }
 
+// SequenceGreater filters for events of the sub query with a (aggregate) sequence greater than the given one.
+// It is only meaningful together with a single aggregate (see [SearchQuery.AggregateIDs]).
+func (query *SearchQuery) SequenceGreater(sequence uint64) *SearchQuery {
+	query.sequenceGreater = sequence
+	return query
+}
+
 // Builder returns the SearchQueryBuilder of the sub query
 func (query *SearchQuery) Builder() *SearchQueryBuilder {
 	return query.builder
@@ -434,6 +446,9 @@ func (query *SearchQuery) matches(command Command) bool {
 		return false
 	}
 	if ok := isEventTypes(command, query.eventTypes...); len(query.eventTypes) > 0 && !ok {
+		return false
+	}
+	if seq, ok := command.(sequencer); ok && query.sequenceGreater > 0 && seq.Sequence() <= query.sequenceGreater {
 		return false
 	}
 	return true

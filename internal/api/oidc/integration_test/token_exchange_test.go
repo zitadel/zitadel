@@ -797,12 +797,26 @@ func TestServer_TokenExchangeImpersonationClientCredentialsActor(t *testing.T) {
 	actorScopes := []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc_api.ScopeProjectsRoles, audScope}
 	credentialsProvider, err := rp.NewRelyingPartyOIDC(ctx, instance.OIDCIssuer(), secret.GetClientId(), secret.GetClientSecret(), "", actorScopes)
 	require.NoError(t, err)
-	actorTokens, err := rp.ClientCredentials(ctx, credentialsProvider, nil)
-	require.NoError(t, err)
-
 	step2Scopes := []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc_api.ScopeProjectsRoles, audScope}
-	got, err := tokenexchange.ExchangeToken(ctx, exchanger, userResp.GetUserId(), oidc_api.UserIDTokenType, actorTokens.AccessToken, oidc.AccessTokenType, nil, nil, step2Scopes, oidc.AccessTokenType)
-	require.NoError(t, err)
+
+	// Retries are needed because the client credentials grant reads the machine secret
+	// and the token exchange reads the actor's membership from eventually consistent projections.
+	var got *oidc.TokenExchangeResponse
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		actorTokens, err := rp.ClientCredentials(ctx, credentialsProvider, nil)
+		if !assert.NoError(ttt, err) {
+			return
+		}
+		resp, err := tokenexchange.ExchangeToken(ctx, exchanger, userResp.GetUserId(), oidc_api.UserIDTokenType, actorTokens.AccessToken, oidc.AccessTokenType, nil, nil, step2Scopes, oidc.AccessTokenType)
+		if !assert.NoError(ttt, err) {
+			return
+		}
+		got = resp
+	},
+		retryDuration,
+		tick,
+		"timed out waiting for the client credentials actor to be allowed to impersonate")
 	assert.Equal(t, oidc.SpaceDelimitedArray(step2Scopes), got.Scopes)
 	accessTokenVerifier(ctx, resourceServer, userResp.GetUserId(), impersonatorUser.GetUserId())(t, got.AccessToken)
 }
