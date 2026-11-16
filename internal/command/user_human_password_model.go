@@ -35,7 +35,9 @@ type HumanPasswordWriteModel struct {
 // lastPasswordCheckResetSequence returns the aggregate sequence of the last event of the user,
 // which resets the [HumanPasswordWriteModel.PasswordCheckFailedCount], or 0 if there is none.
 func lastPasswordCheckResetSequence(ctx context.Context, es *eventstore.Eventstore, userID string) (uint64, error) {
-	events, err := es.Filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+	// the [eventstore.WriteModel] keeps the sequence of the reduced event as ProcessedSequence
+	var reset eventstore.WriteModel
+	err := es.FilterToReducer(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		OrderDesc().
 		Limit(1).
 		AddQuery().
@@ -43,11 +45,9 @@ func lastPasswordCheckResetSequence(ctx context.Context, es *eventstore.Eventsto
 		AggregateIDs(userID).
 		EventTypes(humanPasswordCheckResetEventTypes...).
 		Builder(),
+		&reset,
 	)
-	if err != nil || len(events) == 0 {
-		return 0, err
-	}
-	return events[0].Sequence(), nil
+	return reset.ProcessedSequence, err
 }
 
 // loadHumanPasswordWriteModel loads the password state of the user,
