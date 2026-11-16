@@ -137,7 +137,7 @@ func (c *AuthRequestCache) getCachedByID(ctx context.Context, id string) (*domai
 	}
 	authRequest, ok := c.idCache.Get(cacheKey(ctx, id))
 	logging.WithFields("hit", ok, "type", "id").Info("get from auth request cache")
-	return authRequest, ok
+	return copyAuthRequest(authRequest), ok
 }
 
 func (c *AuthRequestCache) getCachedByCode(ctx context.Context, code string) (*domain.AuthRequest, bool) {
@@ -146,17 +146,29 @@ func (c *AuthRequestCache) getCachedByCode(ctx context.Context, code string) (*d
 	}
 	authRequest, ok := c.codeCache.Get(cacheKey(ctx, code))
 	logging.WithFields("hit", ok, "type", "code").Info("get from auth request cache")
-	return authRequest, ok
+	return copyAuthRequest(authRequest), ok
 }
 
 func (c *AuthRequestCache) CacheAuthRequest(ctx context.Context, request *domain.AuthRequest) {
 	if c.idCache == nil {
 		return
 	}
+	request = copyAuthRequest(request)
 	c.idCache.Add(cacheKey(ctx, request.ID), request)
 	if request.Code != "" {
 		c.codeCache.Add(cacheKey(ctx, request.Code), request)
 	}
+}
+
+// copyAuthRequest keeps callers from sharing one mutable request, matching the uncached (DB) behaviour.
+// A concurrent user switch must not change the UserID a caller has already checked.
+// shortcut: shallow copy, slices/maps/Request stay shared; deep-copy if those become security relevant under concurrency.
+func copyAuthRequest(request *domain.AuthRequest) *domain.AuthRequest {
+	if request == nil {
+		return nil
+	}
+	c := *request
+	return &c
 }
 
 func cacheKey(ctx context.Context, value string) string {

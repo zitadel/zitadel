@@ -2744,7 +2744,11 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 		ClientSecret: "client_secret",
 	})
 	require.NoError(t, err)
-	_, err = Instance.Client.Mgmt.AddCustomLoginPolicy(CTX, &mgmt.AddCustomLoginPolicyRequest{})
+	_, err = Instance.Client.Mgmt.AddCustomLoginPolicy(CTX, &mgmt.AddCustomLoginPolicyRequest{
+		// keep username / password allowed: the policy stays on the shared org and later tests sign in with a password
+		AllowUsernamePassword: true,
+		AllowExternalIdp:      true,
+	})
 	require.Condition(t, func() bool {
 		code := status.Convert(err).Code()
 		return code == codes.AlreadyExists || code == codes.OK
