@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -23,6 +24,46 @@ type HumanPasswordWriteModel struct {
 	VerificationID           string
 
 	UserState domain.UserState
+
+	// checksAfterSequence limits the password check events to the ones after this (aggregate) sequence.
+	// It must be the sequence of the last event resetting the PasswordCheckFailedCount
+	// (see [lastPasswordCheckResetSequence]); 0 loads all password checks.
+	// The sequence is used instead of the position, as historical positions can disagree with the sequence order.
+	checksAfterSequence uint64
+}
+
+// lastPasswordCheckResetSequence returns the aggregate sequence of the last event of the user,
+// which resets the [HumanPasswordWriteModel.PasswordCheckFailedCount], or 0 if there is none.
+func lastPasswordCheckResetSequence(ctx context.Context, es *eventstore.Eventstore, userID string) (uint64, error) {
+	// the [eventstore.WriteModel] keeps the sequence of the reduced event as ProcessedSequence
+	var reset eventstore.WriteModel
+	err := es.FilterToReducer(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		OrderDesc().
+		Limit(1).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(userID).
+		EventTypes(humanPasswordCheckResetEventTypes...).
+		Builder(),
+		&reset,
+	)
+	return reset.ProcessedSequence, err
+}
+
+// loadHumanPasswordWriteModel loads the password state of the user,
+// but only the password checks since the last reset of the failed count,
+// so the cost doesn't grow with every login of the user.
+func loadHumanPasswordWriteModel(ctx context.Context, es *eventstore.Eventstore, userID, resourceOwner string) (*HumanPasswordWriteModel, error) {
+	checksAfterSequence, err := lastPasswordCheckResetSequence(ctx, es, userID)
+	if err != nil {
+		return nil, err
+	}
+	wm := NewHumanPasswordWriteModel(userID, resourceOwner)
+	wm.checksAfterSequence = checksAfterSequence
+	if err = es.FilterToQueryReducer(ctx, wm); err != nil {
+		return nil, err
+	}
+	return wm, nil
 }
 
 func (wm *HumanPasswordWriteModel) GetUserState() domain.UserState {
@@ -136,37 +177,71 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 	return wm.WriteModel.Reduce()
 }
 
+// humanPasswordStateEventTypes are the events which define the password state of a user,
+// except for the password checks (see [humanPasswordCheckEventTypes]).
+var humanPasswordStateEventTypes = []eventstore.EventType{
+	user.HumanAddedType,
+	user.HumanRegisteredType,
+	user.MachineAddedEventType,
+	user.HumanInitialCodeAddedType,
+	user.HumanInitializedCheckSucceededType,
+	user.HumanPasswordChangedType,
+	user.HumanPasswordCodeAddedType,
+	user.HumanPasswordCodeSentType,
+	user.HumanEmailVerifiedType,
+	user.HumanPasswordHashUpdatedType,
+	user.UserRemovedType,
+	user.UserLockedType,
+	user.UserUnlockedType,
+	user.UserV1AddedType,
+	user.UserV1RegisteredType,
+	user.UserV1InitialCodeAddedType,
+	user.UserV1InitializedCheckSucceededType,
+	user.UserV1PasswordChangedType,
+	user.UserV1PasswordCodeAddedType,
+	user.UserV1PasswordCodeSentType,
+	user.UserV1EmailVerifiedType,
+}
+
+// humanPasswordCheckEventTypes are the password check events.
+// They are created on every password check and therefore grow with every login of a user.
+var humanPasswordCheckEventTypes = []eventstore.EventType{
+	user.HumanPasswordCheckFailedType,
+	user.HumanPasswordCheckSucceededType,
+	user.UserV1PasswordCheckFailedType,
+	user.UserV1PasswordCheckSucceededType,
+}
+
+// humanPasswordCheckResetEventTypes are the events which reset the
+// [HumanPasswordWriteModel.PasswordCheckFailedCount] to 0.
+var humanPasswordCheckResetEventTypes = []eventstore.EventType{
+	user.HumanAddedType,
+	user.HumanRegisteredType,
+	user.MachineAddedEventType,
+	user.HumanPasswordChangedType,
+	user.HumanPasswordCheckSucceededType,
+	user.UserRemovedType,
+	user.UserUnlockedType,
+	user.UserV1AddedType,
+	user.UserV1RegisteredType,
+	user.UserV1PasswordChangedType,
+	user.UserV1PasswordCheckSucceededType,
+}
+
 func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
+	// Only the password checks after the last reset of the failed count are relevant.
+	// This prevents loading the whole (constantly growing) login history of the user.
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		EventTypes(user.HumanAddedType,
-			user.HumanRegisteredType,
-			user.MachineAddedEventType,
-			user.HumanInitialCodeAddedType,
-			user.HumanInitializedCheckSucceededType,
-			user.HumanPasswordChangedType,
-			user.HumanPasswordCodeAddedType,
-			user.HumanPasswordCodeSentType,
-			user.HumanEmailVerifiedType,
-			user.HumanPasswordCheckFailedType,
-			user.HumanPasswordCheckSucceededType,
-			user.HumanPasswordHashUpdatedType,
-			user.UserRemovedType,
-			user.UserLockedType,
-			user.UserUnlockedType,
-			user.UserV1AddedType,
-			user.UserV1RegisteredType,
-			user.UserV1InitialCodeAddedType,
-			user.UserV1InitializedCheckSucceededType,
-			user.UserV1PasswordChangedType,
-			user.UserV1PasswordCodeAddedType,
-			user.UserV1PasswordCodeSentType,
-			user.UserV1EmailVerifiedType,
-			user.UserV1PasswordCheckFailedType,
-			user.UserV1PasswordCheckSucceededType,
-		).
+		EventTypes(humanPasswordStateEventTypes...).
+		Builder().
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(humanPasswordCheckEventTypes...).
+		SequenceGreater(wm.checksAfterSequence).
 		Builder()
 
 	if wm.ResourceOwner != "" {
