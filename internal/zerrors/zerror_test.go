@@ -2,6 +2,7 @@ package zerrors
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -129,6 +130,40 @@ func TestThrowRecovered(t *testing.T) {
 			trace, ok := zErr.StackTrace()
 			assert.True(t, ok)
 			assert.Contains(t, string(trace), "panicWith")
+		})
+	}
+}
+
+func TestIsRecovered(t *testing.T) {
+	tests := []struct {
+		name string
+		err  error
+		want bool
+	}{
+		{
+			name: "recovered",
+			err:  recoverFrom("boom"),
+			want: true,
+		},
+		{
+			name: "wrapped recovered",
+			err:  fmt.Errorf("wrapped: %w", recoverFrom("boom")),
+			want: true,
+		},
+		{
+			name: "other internal error",
+			err:  ThrowInternal(nil, "x", "y"),
+			want: false,
+		},
+		{
+			name: "nil",
+			err:  nil,
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, IsRecovered(tt.err))
 		})
 	}
 }

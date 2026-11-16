@@ -1,10 +1,13 @@
 package handler
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
 	"database/sql/driver"
+	"encoding/json"
 	"errors"
+	"log/slog"
 	"strings"
 	"testing"
 	"time"
@@ -12,9 +15,14 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zitadel/sloggcp"
 
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/metrics"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/pseudo"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -27,8 +35,8 @@ func (c errorContains) Match(v driver.Value) bool {
 }
 
 func panickingReducer(event eventstore.Event) (*Statement, error) {
-	var policy *struct{ PasswordChange bool }
-	_ = policy.PasswordChange // nil pointer dereference
+	var policies map[string]*struct{ PasswordChange bool } // the policy is missing, like in #13057
+	_ = policies["password"].PasswordChange
 	return NewNoOpStatement(event), nil
 }
 
@@ -62,8 +70,7 @@ func passwordChangedEvent() *eventstore.BaseEvent {
 func requireRecoveredError(t *testing.T, err error, wantFrame string) {
 	t.Helper()
 	require.Error(t, err)
-	assert.True(t, zerrors.IsInternal(err), "recovered panics must be internal errors")
-	assert.Contains(t, err.Error(), zerrors.IDRecover)
+	assert.True(t, zerrors.IsRecovered(err), "recovered panics must be recovered errors")
 
 	zErr, ok := errors.AsType[*zerrors.ZitadelError](err)
 	require.True(t, ok)
@@ -79,7 +86,7 @@ func TestHandler_eventsToStatements_recoversPanic(t *testing.T) {
 		wantErr         bool
 	}{
 		{
-			name:            "stops until the max failure count is reached",
+			name:            "returns the error below the max failure count",
 			maxFailureCount: 5,
 			wantErr:         true,
 		},
@@ -103,12 +110,14 @@ func TestHandler_eventsToStatements_recoversPanic(t *testing.T) {
 			require.NotPanics(t, func() {
 				statements, err = h.eventsToStatements(t.Context(), tx, []eventstore.Event{passwordChangedEvent()})
 			})
-			assert.Empty(t, statements)
 			if tt.wantErr {
+				assert.Empty(t, statements)
 				assert.ErrorIs(t, err, &executionError{})
 				requireRecoveredError(t, errors.Unwrap(err), "panickingReducer")
 			} else {
 				assert.NoError(t, err)
+				// the skipped event is counted as processed, so the cursor moves past it
+				assert.Equal(t, []*Statement{NewNoOpStatement(passwordChangedEvent())}, statements)
 			}
 			assert.NoError(t, mock.ExpectationsWereMet())
 		})
@@ -122,7 +131,7 @@ func TestHandler_executeStatement_recoversPanic(t *testing.T) {
 		wantErr         bool
 	}{
 		{
-			name:            "stops until the max failure count is reached",
+			name:            "returns the error below the max failure count",
 			maxFailureCount: 5,
 			wantErr:         true,
 		},
@@ -204,4 +213,223 @@ func expectFailedEvent(mock sqlmock.Sqlmock, errText string) {
 	mock.ExpectExec("INSERT INTO projections.failed_events2").
 		WithArgs("projections.notifications", "instance-1", "user", "user-1", sqlmock.AnyArg(), uint64(7), uint8(1), errorContains(errText)).
 		WillReturnResult(sqlmock.NewResult(0, 1))
+}
+
+// filterStore is an EventStore whose Filter is the given function; a call to any other method panics on the nil interface.
+type filterStore struct {
+	EventStore
+	filter func() ([]eventstore.Event, error)
+}
+
+func (s filterStore) Filter(context.Context, *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+	return s.filter()
+}
+
+// fieldsEvent satisfies eventstore.FillFieldsEvent for the FieldHandler.
+type fieldsEvent struct{ *eventstore.BaseEvent }
+
+func (fieldsEvent) Fields() []*eventstore.FieldOperation { return nil }
+
+// setupProcessEvents fills h so its processEvents runs on sqlmock and records its metrics in the returned mock.
+// It fills in place, because a Handler must not be copied.
+func setupProcessEvents(t *testing.T, h *Handler, p *projection, es EventStore) (sqlmock.Sqlmock, *metrics.MockMetrics) {
+	t.Helper()
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+	t.Cleanup(func() { db.Close() })
+
+	mockMetrics := metrics.NewMockMetrics()
+	h.client = &database.DB{DB: db}
+	h.projection = p
+	h.es = es
+	h.bulkLimit = 10
+	h.metrics = newProjectionMetrics(t.Context(), mockMetrics)
+	return mock, mockMetrics
+}
+
+// expectLockedTx expects the beginning of an iteration: the transaction, the acquired lock and an empty current state.
+func expectLockedTx(mock sqlmock.Sqlmock) {
+	mock.ExpectBegin()
+	mock.ExpectQuery("pg_try_advisory_xact_lock").WillReturnRows(sqlmock.NewRows([]string{"locked"}).AddRow(true))
+	mock.ExpectQuery("projections.current_states").WillReturnError(sql.ErrNoRows)
+}
+
+// TestHandler_processEvents_recoversPanic makes sure a panic inside the transaction rolls back
+// and is counted as a failed iteration, whether it happens before or after the metrics defer is registered.
+func TestHandler_processEvents_recoversPanic(t *testing.T) {
+	tests := []struct {
+		name        string
+		reduce      Reduce
+		filter      func() ([]eventstore.Event, error)
+		wantFrame   string
+		wantMetrics bool
+	}{
+		{
+			// a reducer returning no statement and no error leaves a nil statement to execute, outside safeExecute
+			name:        "nil statement panics after the metrics defer",
+			reduce:      func(eventstore.Event) (*Statement, error) { return nil, nil },
+			filter:      func() ([]eventstore.Event, error) { return []eventstore.Event{passwordChangedEvent()}, nil },
+			wantFrame:   "executeStatement",
+			wantMetrics: true,
+		},
+		{
+			name:      "event store panics before the metrics defer",
+			reduce:    panickingReducer,
+			filter:    func() ([]eventstore.Event, error) { panic("filter failed") },
+			wantFrame: "generateStatements",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := panickingProjection()
+			p.reducers[0].EventReducers[0].Reduce = tt.reduce
+			h := new(Handler)
+			mock, mockMetrics := setupProcessEvents(t, h, p, filterStore{filter: tt.filter})
+			expectLockedTx(mock)
+			mock.ExpectRollback()
+
+			var err error
+			require.NotPanics(t, func() {
+				_, err = h.processEvents(authz.WithInstanceID(t.Context(), "instance-1"), new(triggerConfig))
+			})
+			requireRecoveredError(t, err, tt.wantFrame)
+			assert.NoError(t, mock.ExpectationsWereMet(), "the iteration must roll back and never commit")
+			assert.Empty(t, mockMetrics.GetHistogramValues(ProjectionHandleTimerMetric))
+			labels := mockMetrics.GetCounterLabels(ProjectionEventsProcessed)
+			if !tt.wantMetrics {
+				assert.Empty(t, labels, "the metrics defer was not registered yet")
+				return
+			}
+			if assert.Len(t, labels, 1) {
+				assert.False(t, labels[0][SuccessLabel].AsBool(), "a panicked iteration must count as failed")
+			}
+		})
+	}
+}
+
+func TestFieldHandler_processEvents_recoversPanic(t *testing.T) {
+	// the nil embedded EventStore panics in FillFields
+	fh := new(FieldHandler)
+	mock, _ := setupProcessEvents(t, &fh.Handler, panickingProjection(), filterStore{filter: func() ([]eventstore.Event, error) {
+		return []eventstore.Event{fieldsEvent{passwordChangedEvent()}}, nil
+	}})
+	expectLockedTx(mock)
+	mock.ExpectRollback()
+
+	var err error
+	require.NotPanics(t, func() {
+		_, err = fh.processEvents(authz.WithInstanceID(t.Context(), "instance-1"), new(triggerConfig))
+	})
+	requireRecoveredError(t, err, "FieldHandler).processEvents")
+	assert.NoError(t, mock.ExpectationsWereMet(), "the iteration must roll back and never commit")
+}
+
+// TestHandler_triggerInstances_skipsRecoveredPanic makes sure an instance which panics
+// is not retried and does not starve the instances after it.
+func TestHandler_triggerInstances_skipsRecoveredPanic(t *testing.T) {
+	StartWorkerPool(1)
+
+	tests := []struct {
+		name string
+		// errorsBeforePanic is the number of ordinary errors instance-1 returns before it panics
+		errorsBeforePanic int
+	}{
+		{
+			name: "panics at once",
+		},
+		{
+			name:              "panics after an ordinary error",
+			errorsBeforePanic: 1,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			calls := make(map[string]int)
+			h := new(Handler)
+			mock, _ := setupProcessEvents(t, h, panickingProjection(), nil)
+			h.retryFailedAfter = time.Millisecond
+			// the scheduled event carries the instance, so the reducer can fail for the first instance only
+			h.triggerWithoutEvents = func(event eventstore.Event) (*Statement, error) {
+				instanceID := event.(*pseudo.ScheduledEvent).InstanceIDs[0]
+				calls[instanceID]++
+				if instanceID != "instance-1" {
+					return NewNoOpStatement(event), nil
+				}
+				if calls[instanceID] <= tt.errorsBeforePanic {
+					return nil, errors.New("instance-1 failed")
+				}
+				panic("instance-1 is broken")
+			}
+			// instance-1 fails and finally panics, each attempt rolls back
+			for range tt.errorsBeforePanic + 1 {
+				expectLockedTx(mock)
+				mock.ExpectRollback()
+			}
+			// instance-2 stores its state and commits
+			expectLockedTx(mock)
+			mock.ExpectExec("INSERT INTO projections.current_states").WillReturnResult(sqlmock.NewResult(0, 1))
+			mock.ExpectCommit()
+
+			done := make(chan struct{})
+			go func() {
+				defer close(done)
+				h.triggerInstances(t.Context(), []string{"instance-1", "instance-2"})
+			}()
+			select {
+			case <-done:
+			case <-time.After(10 * time.Second):
+				t.Fatal("triggerInstances did not return, the panicking instance is retried forever")
+			}
+			assert.Equal(t, map[string]int{"instance-1": tt.errorsBeforePanic + 1, "instance-2": 1}, calls)
+			assert.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
+// TestHandler_eventsToStatements_logLevel makes sure a recovered panic is logged at Alert
+// and an ordinary reduce error at Error.
+func TestHandler_eventsToStatements_logLevel(t *testing.T) {
+	failingProjection := panickingProjection()
+	failingProjection.reducers[0].EventReducers[0].Reduce = func(eventstore.Event) (*Statement, error) {
+		return nil, errors.New("reduce error")
+	}
+	tests := []struct {
+		name       string
+		projection *projection
+		errText    string
+		wantLevel  slog.Level
+	}{
+		{
+			name:       "recovered panic is logged at alert",
+			projection: panickingProjection(),
+			errText:    "nil pointer dereference",
+			wantLevel:  sloggcp.LevelAlert,
+		},
+		{
+			name:       "reduce error is logged at error",
+			projection: failingProjection,
+			errText:    "reduce error",
+			wantLevel:  slog.LevelError,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var buf bytes.Buffer
+			ctx := logging.ToCtx(t.Context(), slog.New(slog.NewJSONHandler(&buf, nil)))
+			tx, mock := beginMockTx(t)
+			expectFailedEvent(mock, tt.errText)
+			h := &Handler{projection: tt.projection, maxFailureCount: 1}
+
+			_, err := h.eventsToStatements(ctx, tx, []eventstore.Event{passwordChangedEvent()})
+			require.NoError(t, err)
+
+			var record struct {
+				Level string `json:"level"`
+				Msg   string `json:"msg"`
+			}
+			require.NoError(t, json.NewDecoder(&buf).Decode(&record))
+			assert.Equal(t, "reduce failed", record.Msg)
+			assert.Equal(t, tt.wantLevel.String(), record.Level)
+		})
+	}
 }

@@ -100,6 +100,12 @@ func ThrowRecovered(rec any) error {
 	return err
 }
 
+// IsRecovered reports whether err is, or wraps, an error created by [ThrowRecovered].
+func IsRecovered(err error) bool {
+	zerr, ok := AsZitadelError(err)
+	return ok && zerr.ID == IDRecover
+}
+
 // Because errors are created through singletons, config is global.
 var (
 	enableReportLocation atomic.Bool

@@ -14,6 +14,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/rs/xid"
 	"github.com/shopspring/decimal"
+	"github.com/zitadel/sloggcp"
 
 	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -288,18 +289,14 @@ func (h *Handler) triggerInstances(ctx context.Context, instances []string, trig
 	for _, instance := range instances {
 		instanceCtx := authz.WithInstanceID(ctx, instance)
 
-		// simple implementation of do while
 		_, err := h.Trigger(instanceCtx, triggerOpts...)
-		// skip retry if everything is fine
-		if err == nil {
-			continue
-		}
-		logging.Debug(instanceCtx, "trigger failed", "err", err)
-		time.Sleep(h.retryFailedAfter)
-		// retry if trigger failed
-		for ; err != nil; _, err = h.Trigger(instanceCtx, triggerOpts...) {
-			time.Sleep(h.retryFailedAfter)
+		// retry failed triggers, except after a recovered panic: it is a bug which would fail every retry
+		// and starve the following instances, so the next scheduled run tries it again.
+		// A reducer or statement panic below MaxFailureCount is wrapped in an executionError and is retried,
+		// so its failure count reaches the max and the event is skipped.
+		for ; err != nil && (!zerrors.IsRecovered(err) || errors.Is(err, &executionError{})); _, err = h.Trigger(instanceCtx, triggerOpts...) {
 			logging.Debug(instanceCtx, "trigger failed", "err", err)
+			time.Sleep(h.retryFailedAfter)
 		}
 	}
 }
@@ -457,11 +454,26 @@ func worker() {
 func safeProcessEvents(ctx context.Context, config *triggerConfig, processEvents func(context.Context, *triggerConfig) (bool, error)) (additionalIteration bool, err error) {
 	defer func() {
 		if rec := recover(); rec != nil {
-			err = zerrors.ThrowRecovered(rec)
-			logging.WithError(ctx, err).Error("projection handler recovered from panic")
+			err = recovered(ctx, rec)
 		}
 	}()
 	return processEvents(ctx, config)
+}
+
+// recovered converts a recovered panic into an error and logs it at Alert.
+// It must be called from the deferred function that recovered.
+func recovered(ctx context.Context, rec any) error {
+	err := zerrors.ThrowRecovered(rec)
+	logging.Log(ctx, sloggcp.LevelAlert, "projection handler recovered from panic", "err", err)
+	return err
+}
+
+// errorLevel logs recovered panics at Alert, like the API recover paths (#11713).
+func errorLevel(err error) slog.Level {
+	if zerrors.IsRecovered(err) {
+		return sloggcp.LevelAlert
+	}
+	return slog.LevelError
 }
 
 func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Context, err error) {
@@ -568,6 +580,9 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		return false, err
 	}
 	defer func() {
+		if rec := recover(); rec != nil {
+			err = recovered(ctx, rec)
+		}
 		if err != nil && !errors.Is(err, &executionError{}) {
 			rollbackErr := tx.Rollback()
 			logging.OnError(ctx, rollbackErr).Error("unable to rollback tx")
@@ -609,9 +624,15 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	}
 
 	defer func() {
-		commitErr := tx.Commit()
-		if err == nil {
-			err = commitErr
+		// a panic is seen here first: convert it, so the metrics count a failure
+		// and the tx defer rolls back instead of committing a partial iteration.
+		if rec := recover(); rec != nil {
+			err = recovered(ctx, rec)
+		} else {
+			commitErr := tx.Commit()
+			if err == nil {
+				err = commitErr
+			}
 		}
 
 		h.metrics.ProjectionEventsProcessed(ctx, h.ProjectionName(), int64(len(statements)), err == nil)
@@ -668,10 +689,6 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	}
 
 	additionalIteration = eventAmount == int(h.bulkLimit)
-	if len(statements) < len(events) {
-		// retry immediately if statements failed
-		additionalIteration = true
-	}
 
 	return statements, additionalIteration, nil
 }
@@ -706,7 +723,7 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, statement *S
 	}
 
 	if err = h.safeExecute(ctx, tx, statement); err != nil {
-		logging.WithError(ctx, err).Error("statement execution failed")
+		logging.Log(ctx, errorLevel(err), "statement execution failed", "err", err)
 
 		_, rollbackErr := tx.ExecContext(ctx, "ROLLBACK TO SAVEPOINT exec_stmt")
 		logging.OnError(ctx, rollbackErr).Debug("rollback to savepoint failed")

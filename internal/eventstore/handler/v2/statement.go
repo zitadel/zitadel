@@ -45,8 +45,10 @@ func (h *Handler) eventsToStatements(ctx context.Context, tx *sql.Tx, events []e
 	for _, event := range events {
 		statement, err := h.reduce(event)
 		if err != nil {
-			logging.Error(ctx, "reduce failed", "err", err, "event", failureFromEvent(event, err))
+			logging.Log(ctx, errorLevel(err), "reduce failed", "err", err, "event", failureFromEvent(event, err))
 			if shouldContinue := h.handleFailedStmt(ctx, tx, failureFromEvent(event, err)); shouldContinue {
+				// count the skipped event as processed, so the cursor moves past it like for a skipped statement
+				statements = append(statements, NewNoOpStatement(event))
 				continue
 			}
 			return statements, &executionError{err}

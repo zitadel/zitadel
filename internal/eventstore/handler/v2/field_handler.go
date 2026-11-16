@@ -115,6 +115,9 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		return false, err
 	}
 	defer func() {
+		if rec := recover(); rec != nil {
+			err = recovered(ctx, rec)
+		}
 		if err != nil && !errors.Is(err, &executionError{}) {
 			rollbackErr := tx.Rollback()
 			logging.OnError(ctx, rollbackErr).Error("unable to rollback tx")
