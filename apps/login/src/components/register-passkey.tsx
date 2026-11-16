@@ -1,7 +1,7 @@
 "use client";
 
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
-import { registerPasskeyLink, verifyPasskeyRegistration } from "@/lib/server/passkeys";
+import { registerPasskeyLink, verifyPasskeyRegistration } from "@/lib/actions/passkeys";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";

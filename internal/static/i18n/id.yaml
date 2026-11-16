@@ -542,6 +542,7 @@ Errors:
     NotExisting: "Permintaan Otentikasi tidak ada"
     WrongLoginClient: "Permintaan Otentikasi dibuat oleh klien login lain"
     AlreadyHandled: "Permintaan Otentikasi sudah ditangani"
+    NotAuthenticated: "Pengguna tidak diautentikasi"
   OIDCSession:
     RefreshTokenInvalid: "Token Penyegaran tidak valid"
     Token:

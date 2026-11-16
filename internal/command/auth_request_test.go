@@ -188,7 +188,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 		id               string
 		sessionID        string
 		sessionToken     string
-		checkLoginClient bool
+		checkLinkPermission bool
 		permissionCheck  domain.ProjectPermissionCheck
 	}
 	type res struct {
@@ -300,7 +300,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				id:               "id",
 				sessionID:        "sessionID",
 				sessionToken:     "token",
-				checkLoginClient: true,
+				checkLinkPermission: true,
 			},
 			res{
 				wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
@@ -713,7 +713,53 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 			},
 		},
 		{
-			"linked with login client check",
+			// The login client header must no longer grant any permission on its own.
+			// A caller that only matches the stored login client, but is not granted the
+			// session.link permission, must be denied.
+			"login client without permission, not permitted",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+								"loginClient",
+								"clientID",
+								"redirectURI",
+								"state",
+								"nonce",
+								[]string{"openid"},
+								[]string{"audience"},
+								domain.OIDCResponseTypeCode,
+								domain.OIDCResponseModeQuery,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+								true,
+								"issuer",
+								"",
+							),
+						),
+					),
+				),
+				tokenVerifier:   newMockTokenVerifierValid(),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args{
+				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient"),
+				id:               "V2_id",
+				sessionID:        "sessionID",
+				sessionToken:     "token",
+				checkLinkPermission: true,
+			},
+			res{
+				wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			},
+		},
+		{
+			"linked with login client holding permission",
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -773,14 +819,15 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 						),
 					),
 				),
-				tokenVerifier: newMockTokenVerifierValid(),
+				tokenVerifier:   newMockTokenVerifierValid(),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient"),
 				id:               "V2_id",
 				sessionID:        "sessionID",
 				sessionToken:     "token",
-				checkLoginClient: true,
+				checkLinkPermission: true,
 			},
 			res{
 				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
@@ -873,7 +920,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				id:               "V2_id",
 				sessionID:        "sessionID",
 				sessionToken:     "token",
-				checkLoginClient: true,
+				checkLinkPermission: true,
 			},
 			res{
 				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
@@ -966,7 +1013,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				id:               "V2_id",
 				sessionID:        "sessionID",
 				sessionToken:     "token",
-				checkLoginClient: true,
+				checkLinkPermission: true,
 				permissionCheck:  newMockProjectPermissionCheckAllowed(),
 			},
 			res{
@@ -1052,7 +1099,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				id:               "V2_id",
 				sessionID:        "sessionID",
 				sessionToken:     "token",
-				checkLoginClient: true,
+				checkLinkPermission: true,
 				permissionCheck:  newMockProjectPermissionCheckOIDCNotAllowed(),
 			},
 			res{
@@ -1067,7 +1114,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				sessionTokenVerifier: tt.fields.tokenVerifier,
 				checkPermission:      tt.fields.checkPermission,
 			}
-			details, got, err := c.LinkSessionToAuthRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken, tt.args.checkLoginClient, tt.args.permissionCheck)
+			details, got, err := c.LinkSessionToAuthRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken, tt.args.checkLinkPermission, tt.args.permissionCheck)
 			require.ErrorIs(t, err, tt.res.wantErr)
 			assertObjectDetails(t, tt.res.details, details)
 			if err == nil {
