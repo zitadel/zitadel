@@ -69,4 +69,26 @@ describe("SetPasswordForm", () => {
     );
     expect(getByTestId("password-set-text-input")).toHaveFocus();
   });
+
+  test.each([true, false])(
+    "should render one username field before the password input (codeRequired=%s)",
+    (codeRequired) => {
+      const { container, getByTestId } = render(
+        <SetPasswordForm
+          passwordComplexitySettings={defaultComplexitySettings}
+          loginName="test@example.com"
+          userId="user-1"
+          codeRequired={codeRequired}
+        />,
+      );
+
+      const usernames = container.querySelectorAll('input[autocomplete="username"]');
+      expect(usernames).toHaveLength(1);
+      expect(usernames[0]).toHaveValue("test@example.com");
+
+      // password managers pair the password with a preceding username field
+      const password = getByTestId("password-set-text-input");
+      expect(usernames[0].compareDocumentPosition(password) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    },
+  );
 });
