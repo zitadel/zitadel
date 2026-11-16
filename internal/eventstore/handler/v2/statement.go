@@ -39,15 +39,11 @@ func (s *executionError) Unwrap() error {
 	return s.parent
 }
 
-func (h *Handler) eventsToStatements(ctx context.Context, tx *sql.Tx, events []eventstore.Event, currentState *state) (statements []*Statement, err error) {
+func (h *Handler) eventsToStatements(ctx context.Context, tx *sql.Tx, events []eventstore.Event, currentState *state, minPosition decimal.Decimal) (statements []*Statement, err error) {
 	statements = make([]*Statement, 0, len(events))
 
-	previousPosition := decimal.Decimal{}
-	offset := uint32(0)
-	if currentState != nil {
-		previousPosition = currentState.cursor.Position
-		offset = currentState.offset
-	}
+	r := h.resumeFrom(currentState, minPosition)
+	previousPosition, offset := seedFilterOffset(currentState, r)
 	for _, event := range events {
 		statement, err := h.reduce(event)
 		if err != nil {

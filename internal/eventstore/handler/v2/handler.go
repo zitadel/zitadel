@@ -654,7 +654,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	}
 	eventAmount := len(events)
 
-	statements, err := h.eventsToStatements(ctx, tx, events, currentState)
+	statements, err := h.eventsToStatements(ctx, tx, events, currentState, minPosition)
 	if err != nil || len(statements) == 0 {
 		return nil, false, err
 	}
@@ -732,8 +732,9 @@ func (h *Handler) eventQuery(currentState *state, minPosition decimal.Decimal) *
 		return builder
 	}
 
-	// OFFSET resume cannot scan event types separately (repository requires Offset == 0).
-	if r.offset > 0 {
+	// OFFSET-compatible mode must use the same single-query filter as old binaries
+	// so dual-written filter_offset counts match. Per-type scans stay on the cursor path.
+	if !h.filterOffsetIsCursor {
 		return h.eventQuerySingle(builder)
 	}
 

@@ -10,8 +10,12 @@ import (
 )
 
 var (
-	//go:embed 82.sql
-	currentStatesInTxOrder string
+	//go:embed 82_add_column.sql
+	currentStatesInTxOrderAddColumn string
+	//go:embed 82_triggers.sql
+	currentStatesInTxOrderTriggers string
+	//go:embed 82_backfill.sql
+	currentStatesInTxOrderBackfill string
 )
 
 type CurrentStatesInTxOrder struct {
@@ -23,7 +27,14 @@ func (mig *CurrentStatesInTxOrder) Execute(ctx context.Context, _ eventstore.Eve
 	if err != nil {
 		return err
 	}
-	_, err = mig.dbClient.ExecContext(ctx, fmt.Sprintf(currentStatesInTxOrder, inTxOrderType))
+	// Separate Execs so ADD COLUMN's ACCESS EXCLUSIVE lock is not held for the backfill.
+	if _, err = mig.dbClient.ExecContext(ctx, fmt.Sprintf(currentStatesInTxOrderAddColumn, inTxOrderType)); err != nil {
+		return err
+	}
+	if _, err = mig.dbClient.ExecContext(ctx, currentStatesInTxOrderTriggers); err != nil {
+		return err
+	}
+	_, err = mig.dbClient.ExecContext(ctx, currentStatesInTxOrderBackfill)
 	return err
 }
 

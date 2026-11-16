@@ -173,12 +173,9 @@ func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState
 	}
 
 	if !h.filterOffsetIsCursor {
-		prev := currentState.cursor.Position
-		offset := currentState.offset
-		for _, event := range events {
-			prev, offset = nextFilterOffset(prev, offset, event.Position())
-		}
-		currentState.offset = offset
+		r := h.resumeFrom(currentState, minPosition)
+		prev, offset := seedFilterOffset(currentState, r)
+		_, currentState.offset = advanceFilterOffsetOverEvents(prev, offset, events)
 	}
 	currentState.applyEvent(events[len(events)-1])
 	additionalIteration = len(events) == int(h.bulkLimit)

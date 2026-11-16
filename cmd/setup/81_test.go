@@ -1,9 +1,6 @@
 package setup
 
 import (
-	"os"
-	"regexp"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,9 +10,8 @@ import (
 )
 
 func TestCommandsToEventsClockTimestamp_String(t *testing.T) {
-	assert.Equal(t, migration.EventstorePositionClockTimestampStep, new(StampEventPositionAtInsert).String())
 	assert.Equal(t, "81_eventstore_commands_to_events_clock_timestamp", new(CommandsToEventsClockTimestamp).String())
-	assert.NotEqual(t, new(StampEventPositionAtInsert).String(), new(CommandsToEventsClockTimestamp).String())
+	assert.NotEqual(t, migration.EventstorePositionClockTimestampStep, new(CommandsToEventsClockTimestamp).String())
 }
 
 func TestCommandsToEventsClockTimestampSQL(t *testing.T) {
@@ -26,26 +22,35 @@ func TestCommandsToEventsClockTimestampSQL(t *testing.T) {
 	assert.Contains(t, commandsToEventsClockTimestampSQL, "CREATE OR REPLACE FUNCTION eventstore.commands_to_events")
 }
 
-func TestSetupExecutionSliceOmits77(t *testing.T) {
-	src, err := os.ReadFile("setup.go")
-	require.NoError(t, err)
-
-	re := regexp.MustCompile(`for _, step := range \[\]migration\.Migration\{([^}]+)\}`)
-	matches := re.FindAllSubmatch(src, -1)
-	require.NotEmpty(t, matches)
-
-	var found bool
-	for _, m := range matches {
-		slice := string(m[1])
-		if !regexp.MustCompile(`s81CommandsToEventsClockTimestamp`).MatchString(slice) {
+func TestOneShotMigrationsOmits77(t *testing.T) {
+	steps := &Steps{
+		s81CommandsToEventsClockTimestamp: &CommandsToEventsClockTimestamp{},
+		s82CurrentStatesInTxOrder:         &CurrentStatesInTxOrder{},
+		s29FillFieldsForProjectGrant:      &FillFieldsForProjectGrant{},
+	}
+	names := make([]string, 0, len(oneShotMigrations(steps)))
+	for _, step := range oneShotMigrations(steps) {
+		if step == nil {
 			continue
 		}
-		found = true
-		assert.NotContains(t, slice, "s77StampEventPositionAtInsert")
-		assert.Contains(t, slice, "s81CommandsToEventsClockTimestamp")
-		assert.Contains(t, slice, "s82CurrentStatesInTxOrder")
-		assert.Less(t, strings.Index(slice, "s82CurrentStatesInTxOrder"), strings.Index(slice, "s29FillFieldsForProjectGrant"),
-			"82 must add in_tx_order before field handlers query current_states")
+		names = append(names, step.String())
 	}
-	assert.True(t, found, "expected the one-shot migration slice to include 81 and 82")
+
+	assert.NotContains(t, names, migration.EventstorePositionClockTimestampStep)
+	assert.Contains(t, names, "81_eventstore_commands_to_events_clock_timestamp")
+	assert.Contains(t, names, "82_current_states_in_tx_order")
+	assert.Contains(t, names, "29_init_fields_for_project_grant")
+
+	idx82, idx29 := -1, -1
+	for i, name := range names {
+		switch name {
+		case "82_current_states_in_tx_order":
+			idx82 = i
+		case "29_init_fields_for_project_grant":
+			idx29 = i
+		}
+	}
+	require.GreaterOrEqual(t, idx82, 0)
+	require.GreaterOrEqual(t, idx29, 0)
+	assert.Less(t, idx82, idx29, "82 must add in_tx_order before field handlers query current_states")
 }

@@ -257,14 +257,16 @@ func projections(
 	config.Auth.Spooler.Eventstore = es
 	authView, err := auth_view.StartView(config.Auth.Spooler.Client, keys.OIDC, queries, config.Auth.Spooler.Eventstore)
 	logging.OnError(ctx, err).Fatal("unable to start auth view")
-	auth_handler.Register(ctx, config.Auth.Spooler, authView, queries)
+	err = auth_handler.Register(ctx, config.Auth.Spooler, authView, queries)
+	logging.OnError(ctx, err).Fatal("unable to register auth projections")
 
 	config.Admin.Spooler.Client = client
 	config.Admin.Spooler.Eventstore = es
 	adminView, err := admin_view.StartView(config.Admin.Spooler.Client)
 	logging.OnError(ctx, err).Fatal("unable to start admin view")
 
-	admin_handler.Register(ctx, config.Admin.Spooler, adminView, staticStorage)
+	err = admin_handler.Register(ctx, config.Admin.Spooler, adminView, staticStorage)
+	logging.OnError(ctx, err).Fatal("unable to register admin projections")
 
 	instances := make(chan string, config.Projections.ConcurrentInstances)
 	failedInstances := make(chan string)

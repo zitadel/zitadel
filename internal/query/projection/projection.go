@@ -297,8 +297,14 @@ func FilterOffsetIsCursor() bool {
 	return projectionConfig.FilterOffsetIsCursor
 }
 
-func filterOffsetIsCursorFromEventstore(ctx context.Context, es handler.EventStore) (bool, error) {
+// FilterOffsetIsCursorFromEventstore reports whether setup 77 is stored as done
+// without relying on Create having filled the package-global config.
+func FilterOffsetIsCursorFromEventstore(ctx context.Context, es handler.EventStore) (bool, error) {
 	return migration.IsStepDone(ctx, es, migration.EventstorePositionClockTimestampStep)
+}
+
+func filterOffsetIsCursorFromEventstore(ctx context.Context, es handler.EventStore) (bool, error) {
+	return FilterOffsetIsCursorFromEventstore(ctx, es)
 }
 
 func applyCustomConfig(config handler.Config, customConfig CustomConfig) handler.Config {
