@@ -133,7 +133,8 @@ func (wm *UserV2InviteWriteModel) Reduce() error {
 			if wm.InviteCheckFailureCount >= 3 || crypto.IsCodeExpired(wm.InviteCodeCreationDate, wm.InviteCodeExpiry) { //TODO: make failure count comparison with wm.InviteCheckFailureCount configurable?
 				// invalidate the invite code after attempting to verify an expired code, or a wrong code three or more times
 				// so that a new invite code can be created for this user
-				invalidated := wm.InviteCode != nil && !wm.CodeReturned
+				// keep the flag if further checks fail after the code was already invalidated
+				invalidated := wm.InviteCodeInvalidated || (wm.InviteCode != nil && !wm.CodeReturned)
 				wm.EmptyInviteCode()
 				wm.CodeReturned = false
 				wm.InviteCodeInvalidated = invalidated
