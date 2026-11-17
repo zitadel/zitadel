@@ -95,8 +95,8 @@ declare namespace NodeJS {
 
     /**
      * Optional: Minimum number of seconds between two OTP SMS codes sent for the same session.
-     * Enforced by the server and shown as a countdown on the "Resend code" button, it keeps users
-     * (and scripts) from requesting codes in a loop. Defaults to 30, set to "0" to disable.
+     * Enforced by the Login UI's server action and shown as a countdown on the "Resend code" button,
+     * it keeps users from requesting codes in a loop. Defaults to 30, set to "0" to disable.
      */
     OTP_SMS_RESEND_COOLDOWN_SECONDS?: string;
 
