@@ -49,6 +49,20 @@ func TestHumanPasswordWriteModel_Query(t *testing.T) {
 	}
 }
 
+func TestHumanPasswordWriteModel_Query_reload(t *testing.T) {
+	wm := NewHumanPasswordWriteModel("user1", "org1")
+	wm.checksAfterSequence = 42
+	assert.Zero(t, wm.Query().GetEventSequenceGreater(), "the first load must not filter by sequence")
+
+	// the last reduced event is a state event before the last reset:
+	// the reload doesn't need to scan the checks up to the reset
+	wm.ProcessedSequence = 7
+	assert.Equal(t, uint64(42), wm.Query().GetEventSequenceGreater())
+
+	wm.ProcessedSequence = 50
+	assert.Equal(t, uint64(50), wm.Query().GetEventSequenceGreater())
+}
+
 // Test_humanPasswordCheckResetEventTypes ensures that the reset event types are exactly the events
 // which reset the failed password check count in [HumanPasswordWriteModel.Reduce].
 // A reset type which doesn't reset the count would hide failed checks and weaken the lockout.

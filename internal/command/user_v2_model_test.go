@@ -1385,6 +1385,7 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 			name: "user added password hashchanged",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
@@ -1430,6 +1431,7 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 			name: "user added password changed",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
@@ -1477,6 +1479,7 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 			name: "user added with password code",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
@@ -1540,6 +1543,7 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 			name: "user added with password code and then change",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),

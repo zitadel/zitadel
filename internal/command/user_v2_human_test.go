@@ -3420,6 +3420,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			name: "change human password, not initialized",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
@@ -3459,6 +3460,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			name: "change human password, not in complexity",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
@@ -3534,6 +3536,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			name: "change human password, not allowed",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
@@ -3570,6 +3573,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			name: "change human password, permission, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
@@ -3628,6 +3632,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			name: "change human password, old password, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
@@ -3688,6 +3693,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			name: "change human password, old password, failed",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
@@ -3742,6 +3748,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			name: "change human password, password code, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
@@ -3818,6 +3825,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			name: "change human password, password code, wrong code",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
@@ -3872,6 +3880,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			name: "change human password, password code, not matching policy",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
@@ -3936,6 +3945,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			name: "change human password encoded, password code, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
@@ -4000,6 +4010,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			name: "change human password encoded, old password, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
