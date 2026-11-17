@@ -84,6 +84,10 @@ type OIDC struct {
 	UserNameMapping       OIDCMappingField    `json:"usernameMapping,omitempty"`
 	IsIDTokenMapping      bool                `json:"idTokenMapping,omitempty"`
 	UsePKCE               bool                `json:"usePKCE,omitempty"`
+	// TokenEndpointAuthMethod is 0 for client secret (default) and 1 for private_key_jwt.
+	TokenEndpointAuthMethod int32               `json:"tokenEndpointAuthMethod,omitempty"`
+	PrivateKey              *crypto.CryptoValue `json:"privateKey,omitempty"`
+	KeyID                   string              `json:"keyId,omitempty"`
 }
 
 type IDPOIDC struct {

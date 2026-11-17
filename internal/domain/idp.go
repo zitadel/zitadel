@@ -147,3 +147,14 @@ const (
 	SAMLNameIDFormatPersistent
 	SAMLNameIDFormatTransient
 )
+
+// OIDCTokenEndpointAuthMethod is the client authentication method
+// ZITADEL uses on the token endpoint of a generic OIDC identity provider.
+type OIDCTokenEndpointAuthMethod int32
+
+const (
+	// OIDCTokenEndpointAuthMethodClientSecret is the default, so existing providers keep using their client secret.
+	OIDCTokenEndpointAuthMethodClientSecret OIDCTokenEndpointAuthMethod = iota
+	// OIDCTokenEndpointAuthMethodPrivateKeyJWT signs a client assertion (RFC 7523) with a private key.
+	OIDCTokenEndpointAuthMethodPrivateKeyJWT
+)
