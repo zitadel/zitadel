@@ -26,8 +26,10 @@
     "title": "Welkom terug!",
     "description": "Voer jouw inloggegevens in.",
     "register": "Nieuwe gebruiker registreren",
+    "passkey": "Inloggen met een passkey",
     "submit": "Verder",
     "labels": {
+      "email": "E-Mail",
       "loginname": "Loginnaam",
       "username": "Gebruikersnaam",
       "usernameOrPhoneNumber": "Telefoonnummer of gebruikersnaam",

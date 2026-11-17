@@ -26,8 +26,10 @@
     "title": "Bentornato!",
     "description": "Inserisci i tuoi dati di accesso.",
     "register": "Registrati come nuovo utente",
+    "passkey": "Accedi con una passkey",
     "submit": "Continua",
     "labels": {
+      "email": "E-mail",
       "loginname": "Nome di accesso",
       "username": "Nome utente",
       "usernameOrPhoneNumber": "Nome utente o numero di telefono",

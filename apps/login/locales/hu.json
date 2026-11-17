@@ -26,8 +26,10 @@
     "title": "Üdvözlünk újra!",
     "description": "Add meg a bejelentkezési adataidat.",
     "register": "Új felhasználó regisztrálása",
+    "passkey": "Bejelentkezés jelkulccsal (Passkey)",
     "submit": "Tovább",
     "labels": {
+      "email": "E-mail cím",
       "loginname": "Bejelentkezési név",
       "username": "Felhasználónév",
       "usernameOrPhoneNumber": "Felhasználónév vagy telefonszám",

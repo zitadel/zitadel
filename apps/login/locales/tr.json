@@ -26,8 +26,10 @@
     "title": "Tekrar hoş geldiniz!",
     "description": "Giriş bilgilerinizi girin.",
     "register": "Yeni kullanıcı kaydet",
+    "passkey": "Passkey ile giriş yap",
     "submit": "Devam",
     "labels": {
+      "email": "E-posta",
       "loginname": "Kullanıcı adı",
       "username": "Kullanıcı adı",
       "usernameOrPhoneNumber": "Kullanıcı adı veya telefon numarası",

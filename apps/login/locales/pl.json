@@ -26,8 +26,10 @@
     "title": "Witamy ponownie!",
     "description": "Wprowadź dane logowania.",
     "register": "Zarejestruj nowego użytkownika",
+    "passkey": "Zaloguj się za pomocą klucza dostępu",
     "submit": "Kontynuuj",
     "labels": {
+      "email": "E-mail",
       "loginname": "Login",
       "username": "Nazwa użytkownika",
       "usernameOrPhoneNumber": "Nazwa użytkownika lub numer telefonu",

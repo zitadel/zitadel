@@ -3,7 +3,7 @@ import { test } from "@playwright/test";
 import dotenv from "dotenv";
 import path from "path";
 import { loginScreenExpect } from "./login";
-import { registerWithPasskey, registerWithPassword } from "./register";
+import { registerWithPassword, registerWithPasswordAndPasskey } from "./register";
 import { removeUserByUsername } from "./zitadel";
 
 // Read from ".env" file.
@@ -23,12 +23,12 @@ test("register with password", async ({ page }) => {
   await removeUserByUsername(username);
 });
 
-test("register with passkey", async ({ page }) => {
+test("register with password and add a passkey", async ({ page }) => {
   const username = faker.internet.email();
   const firstname = faker.person.firstName();
   const lastname = faker.person.lastName();
 
-  await registerWithPasskey(page, firstname, lastname, username);
+  await registerWithPasswordAndPasskey(page, firstname, lastname, username, "Password1!");
   await loginScreenExpect(page, firstname + " " + lastname);
 
   // wait for projection of user
@@ -123,39 +123,6 @@ test("register with username and password - wrong password symboo missing", asyn
   // Only password is shown as an option - no passkey
   // User enters "firstname", "lastname", "username" and a password without an symbol
   // Error is shown "Password doesn't match the policy - symbol missing"
-});
-
-test("register with username and password - password and passkey enabled", async ({ page }) => {
-  test.skip();
-  // Given on the default organization "username and password is allowed" is enabled
-  // Given on the default organization "username registeration allowed" is enabled
-  // Given on the default organization no idp is configured and enabled
-  // Given on the default organization passkey is enabled
-  // Given user doesn't exist
-  // Click on button "register new user"
-  // User is redirected to registration page
-  // User enters "firstname", "lastname", "username"
-  // Password and passkey are shown as authentication option
-  // User clicks password
-  // User enters password
-  // User is redirected to app (default redirect url)
-});
-
-test("register with username and passkey - password and passkey enabled", async ({ page }) => {
-  test.skip();
-  // Given on the default organization "username and password is allowed" is enabled
-  // Given on the default organization "username registeration allowed" is enabled
-  // Given on the default organization no idp is configured and enabled
-  // Given on the default organization passkey is enabled
-  // Given user doesn't exist
-  // Click on button "register new user"
-  // User is redirected to registration page
-  // User enters "firstname", "lastname", "username"
-  // Password and passkey are shown as authentication option
-  // User clicks passkey
-  // Passkey is opened automatically
-  // User verifies passkey
-  // User is redirected to app (default redirect url)
 });
 
 test("register with username and password - registration disabled", async ({ page }) => {

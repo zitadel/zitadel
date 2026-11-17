@@ -26,8 +26,10 @@
     "title": "Bem-vindo de volta!",
     "description": "Insira seus dados de acesso.",
     "register": "Cadastrar novo usuário",
+    "passkey": "Entrar com chave de acesso",
     "submit": "Continuar",
     "labels": {
+      "email": "E-mail",
       "loginname": "Nome de usuário",
       "username": "Usuário",
       "usernameOrPhoneNumber": "Usuário ou número de telefone",

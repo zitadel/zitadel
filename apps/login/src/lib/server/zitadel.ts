@@ -121,6 +121,8 @@ export async function getHostedLoginTranslation({
                 value: true,
               },
           locale: locale,
+          // only what is stored on this level, the API's built-in defaults would override the local locale files
+          ignoreInheritance: true,
         },
         {},
       )
