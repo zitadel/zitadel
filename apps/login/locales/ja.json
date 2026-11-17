@@ -26,7 +26,7 @@
     "title": "お帰りなさい！",
     "description": "ログイン情報を入力してください。",
     "noAccountYet": "まだアカウントをお持ちでないですか？",
-    "register": "新規ユーザー登録",
+    "register": "アカウントを作成",
     "passkey": "パスキーでログイン",
     "submit": "続行",
     "labels": {

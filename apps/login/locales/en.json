@@ -26,7 +26,7 @@
     "title": "Welcome back!",
     "description": "Enter your login details.",
     "noAccountYet": "Don't have an account yet?",
-    "register": "Register new user",
+    "register": "Create an account",
     "passkey": "Sign in with a passkey",
     "submit": "Continue",
     "labels": {

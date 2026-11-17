@@ -26,7 +26,7 @@
     "title": "Bienvenue!",
     "description": "Entrez vos données de connexion.",
     "noAccountYet": "Vous n'avez pas encore de compte ?",
-    "register": "Enregistrer un nouveau compte",
+    "register": "Créer un compte",
     "passkey": "Se connecter avec une clé d'accès",
     "submit": "Continuer",
     "labels": {
