@@ -398,12 +398,11 @@ func (wm *OIDCIDPWriteModel) reduceOIDCConfigChangedEvent(e *idpconfig.OIDCConfi
 }
 
 func (wm *OIDCIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, httpClient *http.Client) (providers.Provider, error) {
-	secret, err := crypto.DecryptString(wm.ClientSecret, idpAlg)
+	secret, opts, err := oidc.ClientAuth(wm.TokenEndpointAuthMethod, wm.ClientSecret, wm.PrivateKey, wm.KeyID, idpAlg)
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]oidc.ProviderOpts, 1, 7)
-	opts[0] = oidc.WithSelectAccount()
+	opts = append(opts, oidc.WithSelectAccount())
 	if wm.IsIDTokenMapping {
 		opts = append(opts, oidc.WithIDTokenMapping())
 	}

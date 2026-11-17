@@ -88,6 +88,13 @@ func (s *Session) Authorize(ctx context.Context) (err error) {
 	if s.CodeVerifier != "" {
 		opts = append(opts, rp.WithCodeVerifier(s.CodeVerifier))
 	}
+	assertion, err := clientAssertion(s.Provider.RelyingParty)
+	if err != nil {
+		return err
+	}
+	if assertion != "" {
+		opts = append(opts, rp.WithClientAssertionJWT(assertion))
+	}
 	s.Tokens, err = rp.CodeExchange[*oidc.IDTokenClaims](ctx, s.Code, s.Provider.RelyingParty, opts...)
 	return err
 }
