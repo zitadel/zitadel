@@ -1,6 +1,6 @@
 "use client";
 
-import { clearSession } from "@/lib/server/session";
+import { clearSession } from "@/lib/actions/session";
 import { timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import moment from "moment";

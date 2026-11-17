@@ -206,8 +206,20 @@ func (repo *AuthRequestRepo) SaveAuthCode(ctx context.Context, id, code, userAge
 	if err != nil {
 		return err
 	}
-	request.Code = code
-	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+	// nextSteps mutates the request (e.g. appends MFAsVerified), so save the unmodified copy
+	stored := *request
+	// check login and bind the user on the same load, so a concurrent user switch can't slip in between
+	steps, err := repo.nextSteps(ctx, request, true)
+	if err != nil {
+		return err
+	}
+	request.PossibleSteps = steps
+	if !request.Done() {
+		return zerrors.ThrowPreconditionFailed(nil, "AUTH-Cb4nd", "Errors.AuthRequest.NotAuthenticated")
+	}
+	stored.Code = code
+	stored.CodeUserID = request.UserID
+	return repo.AuthRequests.UpdateAuthRequest(ctx, &stored)
 }
 
 func (repo *AuthRequestRepo) SaveSAMLRequestID(ctx context.Context, id, requestID, userAgentID string) (err error) {

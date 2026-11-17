@@ -52,6 +52,7 @@ type AuthRequest struct {
 	Audience                 []string
 	AuthTime                 time.Time
 	Code                     string
+	CodeUserID               string
 	LoginPolicy              *LoginPolicy
 	AllowedExternalIDPs      []*IDPProvider
 	LabelPolicy              *LabelPolicy
@@ -211,6 +212,12 @@ func (a *AuthRequest) SetUserInfo(userID, userName, loginName, displayName, avat
 	a.DisplayName = displayName
 	a.AvatarKey = avatar
 	a.UserOrgID = userOrgID
+}
+
+// CodeIssuedToCurrentUser reports whether the user the code was issued to is still the request's user.
+// The request stays mutable until the code is redeemed, so the user can be switched after issuance.
+func (a *AuthRequest) CodeIssuedToCurrentUser() bool {
+	return a.CodeUserID != "" && a.CodeUserID == a.UserID
 }
 
 func (a *AuthRequest) SetOrgInformation(id, name, primaryDomain string, requestedByDomain bool) {

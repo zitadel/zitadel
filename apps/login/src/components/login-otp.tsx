@@ -1,8 +1,8 @@
 "use client";
 
-import { completeFlowOrGetUrl } from "@/lib/client";
+import { completeFlowOrGetUrl } from "@/lib/actions/flow";
+import { updateOrCreateSession } from "@/lib/actions/session";
 import { handleServerActionResponse } from "@/lib/client-utils";
-import { updateOrCreateSession } from "@/lib/server/session";
 import { create } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -21,7 +21,6 @@ import { Translated } from "./translated";
 
 // either loginName or sessionId must be provided
 type Props = {
-  host: string | null;
   loginName?: string;
   sessionId?: string;
   requestId?: string;
@@ -35,12 +34,15 @@ type Inputs = {
   code: string;
 };
 
-export function LoginOTP({ host, loginName, sessionId, requestId, organization, method, code, loginSettings }: Props) {
+export function LoginOTP({ loginName, sessionId, requestId, organization, method, code, loginSettings }: Props) {
   const t = useTranslations("otp");
 
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
+  // seconds until the server accepts another OTP SMS request
+  const [resendCooldown, setResendCooldown] = useState<number>(0);
+  const resendAvailableAt = useRef<number>(0);
 
   const router = useRouter();
 
@@ -53,28 +55,14 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
     },
   });
 
-  const updateSessionForOTPChallenge = useCallback(async (): Promise<{
-    error?: string;
-    [key: string]: any;
-  }> => {
+  // resolves to the error to show to the user, if any
+  const updateSessionForOTPChallenge = useCallback(async (): Promise<string | undefined> => {
     let challenges;
 
-    const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-
     if (method === "email") {
+      // the link in the email is built on the server
       challenges = create(RequestChallengesSchema, {
-        otpEmail: {
-          deliveryType: {
-            case: "sendCode",
-            value: host
-              ? {
-                  urlTemplate:
-                    `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/otp/${method}?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}` +
-                    (requestId ? `&requestId=${requestId}` : ""),
-                }
-              : {},
-          },
-        },
+        otpEmail: {},
       });
     }
 
@@ -94,24 +82,41 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
         requestId,
       });
     } catch {
-      return { error: t("errors.couldNotRequestChallenge") };
+      return t("errors.couldNotRequestChallenge");
     }
 
-    if (response && "error" in response && response.error) {
-      return { error: response.error };
+    if (response && "retryAfterSeconds" in response && response.retryAfterSeconds) {
+      // the code was either just sent or, if the server refused, sent moments ago (e.g. before a reload): the countdown covers both
+      resendAvailableAt.current = Date.now() + response.retryAfterSeconds * 1000;
+      setResendCooldown(response.retryAfterSeconds);
+      return;
     }
 
-    return response;
-  }, [method, host, requestId, loginName, sessionId, organization, t]);
+    if (response && "error" in response) {
+      return response.error;
+    }
+  }, [method, requestId, loginName, sessionId, organization, t]);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) {
+      return;
+    }
+    const timer = setTimeout(() => {
+      // timers are throttled or suspended in background tabs, so catch up with the time that actually passed
+      const remainingSeconds = Math.ceil((resendAvailableAt.current - Date.now()) / 1000);
+      setResendCooldown(Math.max(Math.min(resendCooldown - 1, remainingSeconds), 0));
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
 
   useEffect(() => {
     if (!initialized.current && ["email", "sms"].includes(method) && !code) {
       initialized.current = true;
       setLoading(true);
       updateSessionForOTPChallenge()
-        .then((response) => {
-          if (response?.error) {
-            setError(response.error);
+        .then((challengeError) => {
+          if (challengeError) {
+            setError(challengeError);
           }
         })
         .finally(() => {
@@ -220,21 +225,24 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
                 <Translated i18nKey="verify.noCodeReceived" namespace="otp" />
               </span>
               <button
-                aria-label={t("verify.resendCode")}
-                disabled={loading}
+                disabled={loading || resendCooldown > 0}
                 type="button"
                 className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
                 onClick={async () => {
                   setLoading(true);
-                  const response = await updateSessionForOTPChallenge();
-                  if (response?.error) {
-                    setError(response.error);
+                  const challengeError = await updateSessionForOTPChallenge();
+                  if (challengeError) {
+                    setError(challengeError);
                   }
                   setLoading(false);
                 }}
                 data-testid="resend-button"
               >
-                <Translated i18nKey="verify.resendCode" namespace="otp" />
+                {resendCooldown > 0 ? (
+                  <Translated i18nKey="verify.resendCodeIn" namespace="otp" data={{ seconds: resendCooldown }} />
+                ) : (
+                  <Translated i18nKey="verify.resendCode" namespace="otp" />
+                )}
               </button>
             </div>
           </Alert>

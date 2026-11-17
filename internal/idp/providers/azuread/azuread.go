@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
@@ -97,8 +98,10 @@ func New(name, clientID, clientSecret, redirectURI string, scopes []string, http
 	for _, opt := range opts {
 		opt(provider)
 	}
+	// PKCE is used by default
+	provider.options = append(provider.options, oauth.WithRelyingPartyOption(rp.WithPKCE(nil)))
 	config := newConfig(provider.tenant, clientID, clientSecret, redirectURI, scopes)
-	rp, err := oauth.New(
+	oauthProvider, err := oauth.New(
 		config,
 		name,
 		userURL,
@@ -111,7 +114,7 @@ func New(name, clientID, clientSecret, redirectURI string, scopes []string, http
 	if err != nil {
 		return nil, err
 	}
-	provider.Provider = rp
+	provider.Provider = oauthProvider
 	return provider, nil
 }
 

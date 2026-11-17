@@ -18,13 +18,14 @@ var _ idp.Session = (*Session)(nil)
 // Session extends the [oauth.Session] to be able to handle the id_token and to implement the [idp.SessionSupportsMigration] functionality
 type Session struct {
 	*Provider
-	Code string
+	Code         string
+	IDPArguments map[string]any
 
 	OAuthSession *oauth.Session
 }
 
-func NewSession(provider *Provider, code string) *Session {
-	return &Session{Provider: provider, Code: code}
+func NewSession(provider *Provider, code string, idpArguments map[string]any) *Session {
+	return &Session{Provider: provider, Code: code, IDPArguments: idpArguments}
 }
 
 // GetAuth implements the [idp.Provider] interface by calling the wrapped [oauth.Session].
@@ -46,9 +47,9 @@ func (s *Session) RetrievePreviousID() (string, error) {
 	return userinfo.Subject, nil
 }
 
-// PersistentParameters implements the [idp.Session] interface.
+// PersistentParameters implements the [idp.Session] interface by calling the wrapped [oauth.Session].
 func (s *Session) PersistentParameters() map[string]any {
-	return nil
+	return s.oauth().PersistentParameters()
 }
 
 // FetchUser implements the [idp.Session] interface.
@@ -98,9 +99,6 @@ func (s *Session) oauth() *oauth.Session {
 	if s.OAuthSession != nil {
 		return s.OAuthSession
 	}
-	s.OAuthSession = &oauth.Session{
-		Code:     s.Code,
-		Provider: s.Provider.Provider,
-	}
+	s.OAuthSession = oauth.NewSession(s.Provider.Provider, s.Code, s.IDPArguments)
 	return s.OAuthSession
 }

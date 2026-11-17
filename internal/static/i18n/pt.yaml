@@ -541,6 +541,7 @@ Errors:
     NotExisting: "A solicitação de autenticação não existe"
     WrongLoginClient: "A solicitação de autenticação foi criada por outro cliente de login"
     AlreadyHandled: "O pedido de autenticação já foi processado"
+    NotAuthenticated: "O usuário não está autenticado"
   OIDCSession:
     RefreshTokenInvalid: "O Refresh Token é inválido"
     Token:

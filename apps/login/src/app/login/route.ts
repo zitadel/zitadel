@@ -1,9 +1,9 @@
-import { isRSCRequest, validateAuthRequest } from "@/lib/auth-utils";
-import { getAllSessions } from "@/lib/cookies";
-import { createLogger } from "@/lib/logger";
+import { isRSCRequest, validateAuthRequest } from "@/lib/server/auth-utils";
+import { getAllSessions } from "@/lib/server/cookies";
 import { FlowInitiationParams, handleOIDCFlowInitiation, handleSAMLFlowInitiation } from "@/lib/server/flow-initiation";
-import { getServiceConfig } from "@/lib/service-url";
-import { listSessions, ServiceConfig } from "@/lib/zitadel";
+import { createLogger } from "@/lib/server/logger";
+import { getServiceConfig } from "@/lib/server/service-url";
+import { listSessions, ServiceConfig } from "@/lib/server/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 
 import { NextRequest, NextResponse } from "next/server";

@@ -2,22 +2,18 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import Page from "./page";
 
-vi.mock("@/lib/zitadel", () => ({
+vi.mock("@/lib/server/zitadel", () => ({
   getBrandingSettings: vi.fn(),
   getLoginSettings: vi.fn(),
 }));
 
-vi.mock("@/lib/session", () => ({
+vi.mock("@/lib/server/session", () => ({
   loadMostRecentSession: vi.fn(),
   loadSessionById: vi.fn(),
 }));
 
-vi.mock("@/lib/service-url", () => ({
+vi.mock("@/lib/server/service-url", () => ({
   getServiceConfig: vi.fn(() => ({ serviceConfig: { baseUrl: "https://example.com" } })),
-}));
-
-vi.mock("@/lib/server/host", () => ({
-  getPublicHost: vi.fn(() => "example.com"),
 }));
 
 vi.mock("@/components/dynamic-theme", () => ({
@@ -54,8 +50,8 @@ describe("otp page", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    const zitadel = await import("@/lib/zitadel");
-    const sessionLib = await import("@/lib/session");
+    const zitadel = await import("@/lib/server/zitadel");
+    const sessionLib = await import("@/lib/server/session");
 
     loadSessionById = vi.mocked(sessionLib.loadSessionById);
     loadMostRecentSession = vi.mocked(sessionLib.loadMostRecentSession);
