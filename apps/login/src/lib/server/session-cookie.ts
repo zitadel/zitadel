@@ -2,7 +2,7 @@
 // and lifetimes, so only server actions that applied the login policy may call them.
 import "server-only";
 
-import { sanitizeChallenges } from "@/lib/server/challenges";
+import { sanitizeChallenges, SessionUpdatedError } from "@/lib/server/challenges";
 import { addSessionToCookie, updateSessionCookie } from "@/lib/server/cookies";
 import { createLogger } from "@/lib/server/logger";
 import { getServiceConfig } from "@/lib/server/service-url";
@@ -31,9 +31,14 @@ type CustomCookieData = {
   expirationTs: string;
   changeTs: string;
   requestId?: string; // if its linked to an OIDC flow
+  otpSmsSentTs?: string; // when the last OTP SMS was requested for this session, enforces the resend cooldown
 };
 
-const passwordAttemptsHandler = (error: ConnectError) => {
+const passwordAttemptsHandler = (error: ConnectError | SessionUpdatedError) => {
+  if (error instanceof SessionUpdatedError) {
+    throw error;
+  }
+
   const details = error.findDetails(CredentialsCheckErrorSchema);
 
   if (details[0] && "failedAttempts" in details[0]) {
@@ -91,6 +96,10 @@ export async function createSessionAndUpdateCookie(command: {
 
         if (command.requestId) {
           sessionCookie.requestId = command.requestId;
+        }
+
+        if (command.challenges?.otpSms) {
+          sessionCookie.otpSmsSentTs = `${Date.now()}`;
         }
 
         if (response.session.factors.user.organizationId) {
@@ -235,8 +244,8 @@ export async function setSessionAndUpdateCookie(command: {
           sessionCookie.requestId = command.requestId;
         }
 
-        return getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token }).then(
-          async (response) => {
+        return getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token })
+          .then(async (response) => {
             if (!response?.session || !response.session.factors?.user?.loginName) {
               throw new Error("could not get session or session does not have loginName");
             }
@@ -257,6 +266,12 @@ export async function setSessionAndUpdateCookie(command: {
               newCookie.requestId = sessionCookie.requestId;
             }
 
+            // carried over on every update, otherwise any other update of the session would reset the resend cooldown
+            const otpSmsSentTs = command.challenges?.otpSms ? `${Date.now()}` : command.recentCookie.otpSmsSentTs;
+            if (otpSmsSentTs) {
+              newCookie.otpSmsSentTs = otpSmsSentTs;
+            }
+
             const securitySettings = await getSecuritySettings({ serviceConfig });
             const iFrameEnabled = !!securitySettings?.embeddedIframe?.enabled;
 
@@ -267,8 +282,11 @@ export async function setSessionAndUpdateCookie(command: {
             }).then(() => {
               return { challenges: updatedSession.challenges, ...session };
             });
-          },
-        );
+          })
+          .catch((error) => {
+            // the session is already updated at this point, which the caller has to know before it retries
+            throw new SessionUpdatedError(error);
+          });
       } else {
         throw new Error("Session could not be set");
       }
