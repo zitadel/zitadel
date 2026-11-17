@@ -25,6 +25,7 @@
   "loginname": {
     "title": "Üdvözlünk újra!",
     "description": "Add meg a bejelentkezési adataidat.",
+    "firstTimeHere": "Először jársz itt?",
     "register": "Új felhasználó regisztrálása",
     "passkey": "Bejelentkezés jelkulccsal (Passkey)",
     "submit": "Tovább",

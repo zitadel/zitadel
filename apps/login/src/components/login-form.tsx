@@ -35,7 +35,6 @@ type Props = {
   suffix?: string;
   hideSuffix?: boolean;
   submit: boolean;
-  allowRegister: boolean;
 };
 
 export function LoginForm({
@@ -47,7 +46,6 @@ export function LoginForm({
   hideSuffix,
   loginSettings,
   submit,
-  allowRegister,
 }: Props) {
   const { register, handleSubmit, trigger, getValues, formState } = useForm<Inputs>({
     mode: "onChange",
@@ -180,18 +178,6 @@ export function LoginForm({
     return router.push("/password/set?" + params);
   }
 
-  function goToRegister() {
-    const registerParams = new URLSearchParams();
-    if (organization) {
-      registerParams.append("organization", organization);
-    }
-    if (requestId) {
-      registerParams.append("requestId", requestId);
-    }
-
-    router.push("/register?" + registerParams);
-  }
-
   const emailLogin = !loginSettings?.disableLoginWithEmail;
 
   let inputLabel = t("labels.email");
@@ -274,21 +260,6 @@ export function LoginForm({
             {pending === "passkey" && <Spinner className="mr-2 h-5 w-5" />}
             <Translated i18nKey="passkey" namespace="loginname" />
           </Button>
-        )}
-
-        {allowRegister && (
-          <div className="border-divider-light dark:border-divider-dark mt-4 border-t pt-4">
-            <Button
-              type="button"
-              className="text-primary-light-500 dark:text-primary-dark-500 border-primary-light-500 dark:border-primary-dark-500 w-full justify-center font-semibold"
-              variant={ButtonVariants.Secondary}
-              onClick={goToRegister}
-              disabled={loading}
-              data-testid="register-button"
-            >
-              <Translated i18nKey="register" namespace="loginname" />
-            </Button>
-          </div>
         )}
       </form>
     </>

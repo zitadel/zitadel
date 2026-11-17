@@ -25,6 +25,7 @@
   "loginname": {
     "title": "Welkom terug!",
     "description": "Voer jouw inloggegevens in.",
+    "firstTimeHere": "Voor het eerst hier?",
     "register": "Nieuwe gebruiker registreren",
     "passkey": "Inloggen met een passkey",
     "submit": "Verder",

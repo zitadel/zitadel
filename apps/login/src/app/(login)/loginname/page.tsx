@@ -1,5 +1,6 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { LoginForm } from "@/components/login-form";
+import { RegisterPrompt } from "@/components/register-prompt";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { Translated } from "@/components/translated";
 import { getServiceConfig } from "@/lib/server/service-url";
@@ -72,7 +73,6 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             suffix={orgDomain}
             hideSuffix={branding?.hideLoginNameSuffix}
             submit={submit}
-            allowRegister={!!loginSettings?.allowRegister}
           ></LoginForm>
         )}
 
@@ -88,6 +88,8 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             ></SignInWithIdp>
           </div>
         )}
+
+        {loginSettings?.allowRegister && <RegisterPrompt organization={organization} requestId={requestId} />}
       </div>
     </DynamicTheme>
   );

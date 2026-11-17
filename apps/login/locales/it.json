@@ -25,6 +25,7 @@
   "loginname": {
     "title": "Bentornato!",
     "description": "Inserisci i tuoi dati di accesso.",
+    "firstTimeHere": "Prima volta qui?",
     "register": "Registrati come nuovo utente",
     "passkey": "Accedi con una passkey",
     "submit": "Continua",

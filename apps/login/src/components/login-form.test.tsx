@@ -26,16 +26,7 @@ vi.mock("@/lib/actions/password", () => ({
 const passkeySettings = create(LoginSettingsSchema, { passkeysType: PasskeysType.ALLOWED });
 
 function renderForm(props: Partial<Parameters<typeof LoginForm>[0]> = {}) {
-  return render(
-    <LoginForm
-      loginName=""
-      requestId={undefined}
-      loginSettings={passkeySettings}
-      submit={false}
-      allowRegister={false}
-      {...props}
-    />,
-  );
+  return render(<LoginForm loginName="" requestId={undefined} loginSettings={passkeySettings} submit={false} {...props} />);
 }
 
 function type(input: HTMLElement, value: string) {
@@ -160,14 +151,6 @@ describe("LoginForm", () => {
 
     await waitFor(() => expect(push).toHaveBeenCalledWith("/password/set?loginName=john%40example.com&organization=org-1"));
     expect(resetPassword).toHaveBeenCalledWith(expect.objectContaining({ loginName: "john@example.com" }));
-  });
-
-  test("links to the registration only when it is allowed", () => {
-    const { queryByTestId, rerender } = renderForm({ allowRegister: false });
-    expect(queryByTestId("register-button")).toBeNull();
-
-    rerender(<LoginForm loginName="" requestId={undefined} loginSettings={passkeySettings} submit={false} allowRegister />);
-    expect(queryByTestId("register-button")).not.toBeNull();
   });
 
   test("discovers the user when the page asks to submit the login hint", async () => {
