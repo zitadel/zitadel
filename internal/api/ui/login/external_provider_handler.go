@@ -1386,19 +1386,19 @@ func (l *Login) githubProvider(ctx context.Context, identityProvider *query.IDPT
 }
 
 func (l *Login) githubEnterpriseProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*github.Provider, error) {
-	secret, err := crypto.DecryptString(identityProvider.GitHubIDPTemplate.ClientSecret, l.idpConfigAlg)
+	secret, err := crypto.DecryptString(identityProvider.GitHubEnterpriseIDPTemplate.ClientSecret, l.idpConfigAlg)
 	if err != nil {
 		return nil, err
 	}
 	return github.NewCustomURL(
 		identityProvider.Name,
-		identityProvider.GitHubIDPTemplate.ClientID,
+		identityProvider.GitHubEnterpriseIDPTemplate.ClientID,
 		secret,
 		l.baseURL(ctx)+EndpointExternalLoginCallback,
 		identityProvider.GitHubEnterpriseIDPTemplate.AuthorizationEndpoint,
 		identityProvider.GitHubEnterpriseIDPTemplate.TokenEndpoint,
 		identityProvider.GitHubEnterpriseIDPTemplate.UserEndpoint,
-		identityProvider.GitHubIDPTemplate.Scopes,
+		identityProvider.GitHubEnterpriseIDPTemplate.Scopes,
 		l.httpClient,
 	)
 }
