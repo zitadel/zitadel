@@ -25,7 +25,7 @@
   "loginname": {
     "title": "Willkommen zurück!",
     "description": "Geben Sie Ihre Anmeldedaten ein.",
-    "firstTimeHere": "Zum ersten Mal hier?",
+    "noAccountYet": "Haben Sie noch kein Konto?",
     "register": "Neuen Benutzer registrieren",
     "passkey": "Mit einem Passkey anmelden",
     "submit": "Weiter",

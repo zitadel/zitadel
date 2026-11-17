@@ -25,7 +25,7 @@
   "loginname": {
     "title": "Tekrar hoş geldiniz!",
     "description": "Giriş bilgilerinizi girin.",
-    "firstTimeHere": "İlk kez mi geliyorsunuz?",
+    "noAccountYet": "Henüz bir hesabınız yok mu?",
     "register": "Yeni kullanıcı kaydet",
     "passkey": "Passkey ile giriş yap",
     "submit": "Devam",

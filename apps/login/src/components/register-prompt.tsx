@@ -27,8 +27,8 @@ export function RegisterPrompt({ organization, requestId }: Props) {
 
   return (
     <div className="border-divider-light dark:border-divider-dark mt-4 flex flex-col items-center border-t pt-4">
-      <p className="ztdl-p mb-2 text-center" data-testid="first-time-here">
-        <Translated i18nKey="firstTimeHere" namespace="loginname" />
+      <p className="ztdl-p mb-2 text-center" data-testid="no-account-yet">
+        <Translated i18nKey="noAccountYet" namespace="loginname" />
       </p>
       <Button
         type="button"

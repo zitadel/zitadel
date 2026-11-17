@@ -25,7 +25,7 @@
   "loginname": {
     "title": "欢迎回来！",
     "description": "请输入您的登录信息。",
-    "firstTimeHere": "第一次使用？",
+    "noAccountYet": "还没有账户？",
     "register": "注册新用户",
     "passkey": "使用密钥登录",
     "submit": "继续",

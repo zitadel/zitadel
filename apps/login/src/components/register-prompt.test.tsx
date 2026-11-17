@@ -16,10 +16,10 @@ describe("RegisterPrompt", () => {
   beforeEach(() => vi.clearAllMocks());
   afterEach(cleanup);
 
-  test("asks first time visitors to register", () => {
+  test("asks visitors without an account to register", () => {
     const { getByTestId } = render(<RegisterPrompt />);
 
-    expect(getByTestId("first-time-here").textContent).toBe("firstTimeHere");
+    expect(getByTestId("no-account-yet").textContent).toBe("noAccountYet");
     expect(getByTestId("register-button").textContent).toBe("register");
   });
 
