@@ -1,6 +1,7 @@
 "use server";
 
 import { completeFlowOrGetUrl } from "@/lib/actions/flow";
+import { getOTPSMSResendCooldownSeconds, getOTPSMSRetryAfterSeconds, SessionUpdatedError } from "@/lib/server/challenges";
 import {
   getMostRecentSessionCookie,
   getSessionCookieById,
@@ -308,9 +309,9 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       user: { search: { case: "loginName", value: loginName } },
     });
 
+    // the challenges are requested by the setSession call below, requesting them here as well would send every code twice
     const result = await createSessionAndUpdateCookie({
       checks,
-      challenges,
       requestId,
     }).catch((error) => {
       if (isClassifiedError(error) && error.isUserError) {
@@ -329,6 +330,14 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       return {
         error: t("couldNotFindSession"),
       };
+    }
+  }
+
+  if (challenges?.otpSms) {
+    const retryAfterSeconds = getOTPSMSRetryAfterSeconds(recentSession.otpSmsSentTs);
+    if (retryAfterSeconds > 0) {
+      // no error message: the UI shows the countdown on the resend button instead
+      return { retryAfterSeconds };
     }
   }
 
@@ -360,6 +369,12 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       lifetime,
     });
   } catch (error) {
+    // the code was already sent for this session: creating a new session with the same challenge would send
+    // a second code, and the first one could not be verified against the new session
+    if (error instanceof SessionUpdatedError && (challenges?.otpSms || challenges?.otpEmail)) {
+      throw error;
+    }
+
     // Creating a new session below replaces the cookie entry and drops the factors of the existing session.
     const existing = await resolveSession(serviceConfig, recentSession, "update_session");
 
@@ -440,6 +455,8 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
     // keeping the projection explicit means no OTP code can leak through this boundary even
     // if that ever regresses (GHSA-3gwm-5wx8-4gm6).
     challenges: challengeResponse?.webAuthN ? { webAuthN: challengeResponse.webAuthN } : undefined,
+    // lets the UI count down until the next OTP SMS may be requested
+    retryAfterSeconds: challenges?.otpSms ? getOTPSMSResendCooldownSeconds() : undefined,
   };
 }
 

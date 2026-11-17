@@ -4,6 +4,7 @@ import {
   skipMFAAndContinueWithNextUrl,
   updateOrCreateSession,
 } from "@/lib/actions/session";
+import { SessionUpdatedError } from "@/lib/server/challenges";
 import { Code } from "@connectrpc/connect";
 import { UserVerificationRequirement } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
@@ -583,8 +584,11 @@ describe("server actions resolve the session from the caller's cookie", () => {
         challenges: { webAuthN: { domain: "evil.example", userVerificationRequirement: 1 } },
       } as any);
 
+      // the challenges are only requested once, on the update of the new session
       const [createCommand] = cookieHelpers.createSessionAndUpdateCookie.mock.calls[0];
-      expect(createCommand.challenges.webAuthN).toEqual({ domain: "test.com", userVerificationRequirement: 1 });
+      expect(createCommand).not.toHaveProperty("challenges");
+      const [setCommand] = cookieHelpers.setSessionAndUpdateCookie.mock.calls[0];
+      expect(setCommand.challenges.webAuthN).toEqual({ domain: "test.com", userVerificationRequirement: 1 });
     });
 
     test("does not create a session to send an OTP email to a login name without a cookie entry", async () => {
@@ -602,5 +606,84 @@ describe("server actions resolve the session from the caller's cookie", () => {
       expect(cookieHelpers.createSessionAndUpdateCookie).not.toHaveBeenCalled();
       expect(cookieHelpers.setSessionAndUpdateCookie).not.toHaveBeenCalled();
     });
+  });
+});
+
+describe("updateOrCreateSession OTP SMS resend cooldown", () => {
+  let getSessionCookieById: any;
+  let createSessionAndUpdateCookie: any;
+  let setSessionAndUpdateCookie: any;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+
+    const zitadel = vi.mocked(await import("@/lib/server/zitadel"));
+    const cookies = vi.mocked(await import("@/lib/server/cookies"));
+    const cookieHelpers = vi.mocked(await import("@/lib/server/session-cookie"));
+    getSessionCookieById = cookies.getSessionCookieById;
+    createSessionAndUpdateCookie = cookieHelpers.createSessionAndUpdateCookie;
+    setSessionAndUpdateCookie = cookieHelpers.setSessionAndUpdateCookie;
+
+    zitadel.getLoginSettings.mockResolvedValue({ secondFactorCheckLifetime: { seconds: BigInt(60) } } as any);
+    setSessionAndUpdateCookie.mockResolvedValue({ id: "session-1", factors: {} });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  test("refuses another OTP SMS within the cooldown without calling the API", async () => {
+    getSessionCookieById.mockResolvedValue({ ...cookie, otpSmsSentTs: `${1_000_000 - 10_000}` });
+
+    const res = await updateOrCreateSession({ sessionId: "session-1", challenges: { otpSms: {} } as any });
+
+    expect(res).toEqual({ retryAfterSeconds: 20 });
+    expect(setSessionAndUpdateCookie).not.toHaveBeenCalled();
+  });
+
+  test("sends the OTP SMS once the cooldown has passed and returns the next cooldown", async () => {
+    getSessionCookieById.mockResolvedValue({ ...cookie, otpSmsSentTs: `${1_000_000 - 30_000}` });
+
+    const res = await updateOrCreateSession({ sessionId: "session-1", challenges: { otpSms: {} } as any });
+
+    expect(setSessionAndUpdateCookie).toHaveBeenCalledTimes(1);
+    expect(res).toEqual(expect.objectContaining({ sessionId: "session-1", retryAfterSeconds: 30 }));
+  });
+
+  // A code is only ever requested on the session the cookie holds: without a cookie entry no session
+  // is created for it, so there is no path that could request the code twice.
+  test("does not create a session to request an OTP SMS for a login name without a cookie entry", async () => {
+    const cookies = vi.mocked(await import("@/lib/server/cookies"));
+    const sessionLib = vi.mocked(await import("@/lib/server/session"));
+    cookies.getSessionCookieByLoginName.mockResolvedValue(undefined);
+    sessionLib.reportMissingSessionCookie.mockResolvedValue("session_entry_not_found");
+
+    const res = await updateOrCreateSession({ loginName: "user@example.com", challenges: { otpSms: {} } as any });
+
+    expect(res).toEqual({ error: "sessionResolution.entryNotFound", sessionLost: true });
+    expect(createSessionAndUpdateCookie).not.toHaveBeenCalled();
+    expect(setSessionAndUpdateCookie).not.toHaveBeenCalled();
+  });
+
+  test("does not send a second OTP SMS on a new session when the update failed after the code was sent", async () => {
+    getSessionCookieById.mockResolvedValue(cookie);
+    setSessionAndUpdateCookie.mockRejectedValue(new SessionUpdatedError(new Error("could not get session")));
+
+    await expect(updateOrCreateSession({ sessionId: "session-1", challenges: { otpSms: {} } as any })).rejects.toThrow(
+      SessionUpdatedError,
+    );
+
+    expect(createSessionAndUpdateCookie).not.toHaveBeenCalled();
+  });
+
+  test("does not apply the cooldown to code checks", async () => {
+    getSessionCookieById.mockResolvedValue({ ...cookie, otpSmsSentTs: `${1_000_000}` });
+
+    const res = await updateOrCreateSession({ sessionId: "session-1", checks: { otpSms: { code: "123456" } } as any });
+
+    expect(setSessionAndUpdateCookie).toHaveBeenCalledTimes(1);
+    expect(res).toEqual(expect.objectContaining({ sessionId: "session-1", retryAfterSeconds: undefined }));
   });
 });

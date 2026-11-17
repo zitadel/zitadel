@@ -543,6 +543,7 @@ Errors:
     NotExisting: "طلب المصادقة غير موجود"
     WrongLoginClient: "تم إنشاء طلب المصادقة بواسطة عميل تسجيل دخول آخر"
     AlreadyHandled: "تم التعامل مع طلب المصادقة بالفعل"
+    NotAuthenticated: "المستخدم غير مصادق عليه"
   OIDCSession:
     RefreshTokenInvalid: "رمز التحديث غير صالح"
     Token:

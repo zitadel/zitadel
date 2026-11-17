@@ -242,6 +242,7 @@
       "emailDescription": "E-posta ile aldığınız kodu girin.",
       "noCodeReceived": "Kod almadınız mı?",
       "resendCode": "Kodu tekrar gönder",
+      "resendCodeIn": "Kodu tekrar gönder ({seconds} sn)",
       "submit": "Devam",
       "labels": {
         "code": "Kod"

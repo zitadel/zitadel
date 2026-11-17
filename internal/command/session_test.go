@@ -577,6 +577,7 @@ func TestCommands_updateSession(t *testing.T) {
 			"set user, invalid password",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset position
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
@@ -629,6 +630,7 @@ func TestCommands_updateSession(t *testing.T) {
 			"set user, password, metadata and token",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset position
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
@@ -1190,6 +1192,7 @@ func TestCheckPassword_tarpit(t *testing.T) {
 					aggregate:         &session.NewAggregate("sessionID", "instance1").Aggregate,
 				},
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(ctx, userAgg,
