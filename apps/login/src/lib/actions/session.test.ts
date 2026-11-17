@@ -5,6 +5,7 @@ import {
   updateOrCreateSession,
 } from "@/lib/actions/session";
 import { Code } from "@connectrpc/connect";
+import { UserVerificationRequirement } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 const mockLogger = vi.hoisted(() => ({
@@ -174,8 +175,15 @@ describe("updateOrCreateSession", () => {
   const userOnly = { id: "session-1", expirationDate: inFuture, factors: { user: { id: "user-1" } } };
 
   const totpCheck = { totp: { code: "123456" } } as any;
+  const webAuthNCheck = { webAuthN: { credentialAssertionData: {} } } as any;
   const smsChallenge = { otpSms: {} } as any;
-  const passkeyChallenge = { webAuthN: { domain: "test.com" } } as any;
+  // what LoginPasskey requests: user verification is required for a passkey login and discouraged for U2F
+  const passkeyChallenge = {
+    webAuthN: { domain: "test.com", userVerificationRequirement: UserVerificationRequirement.REQUIRED },
+  } as any;
+  const u2fChallenge = {
+    webAuthN: { domain: "test.com", userVerificationRequirement: UserVerificationRequirement.DISCOURAGED },
+  } as any;
 
   let getSessionCookieByLoginName: any;
   let getSessionCookieById: any;
@@ -223,25 +231,47 @@ describe("updateOrCreateSession", () => {
     test.each([
       ["a TOTP check", { checks: totpCheck }],
       ["an SMS challenge", { challenges: smsChallenge }],
+      // U2F is a second factor too: a new session would end up with the user and U2F, without a first factor
+      ["a U2F challenge", { challenges: u2fChallenge }],
+      ["a WebAuthN challenge without a user verification requirement", { challenges: { webAuthN: {} } as any }],
+      // an assertion answers the challenge of the session that got lost
+      ["a WebAuthN assertion", { checks: webAuthNCheck }],
     ])("does not create a session for %s and reports the session as lost", async (_name, step) => {
       const res = await updateOrCreateSession({ loginName: "user@example.com", organization: "org-1", ...step });
 
       expect(res).toEqual({ error: "sessionResolution.cookieMissing", sessionLost: true });
       expect(reportMissingSessionCookie).toHaveBeenCalledWith("update_session", {
+        by: "loginName",
         loginName: "user@example.com",
         organization: "org-1",
-        sessionId: undefined,
       });
       expect(createSessionAndUpdateCookie).not.toHaveBeenCalled();
       expect(setSessionAndUpdateCookie).not.toHaveBeenCalled();
     });
 
+    // The miss is explained for the lookup that was used: by id and for the most recent entry the
+    // organization is not part of it.
     test("reports the session as lost when neither a login name nor a cookie entry identifies it", async () => {
       reportMissingSessionCookie.mockResolvedValue("session_entry_not_found");
 
-      const res = await updateOrCreateSession({ sessionId: "session-1", challenges: passkeyChallenge });
+      const res = await updateOrCreateSession({
+        sessionId: "session-1",
+        organization: "org-1",
+        challenges: passkeyChallenge,
+      });
 
       expect(res).toEqual({ error: "sessionResolution.entryNotFound", sessionLost: true });
+      expect(getSessionCookieById).toHaveBeenCalledWith({ sessionId: "session-1" });
+      expect(reportMissingSessionCookie).toHaveBeenCalledWith("update_session", { by: "id", sessionId: "session-1" });
+      expect(createSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    test("reports the session as lost when the request names no session and the cookie holds none", async () => {
+      const res = await updateOrCreateSession({ organization: "org-1", challenges: passkeyChallenge });
+
+      expect(res).toEqual({ error: "sessionResolution.cookieMissing", sessionLost: true });
+      expect(getMostRecentSessionCookie).toHaveBeenCalled();
+      expect(reportMissingSessionCookie).toHaveBeenCalledWith("update_session", { by: "mostRecent" });
       expect(createSessionAndUpdateCookie).not.toHaveBeenCalled();
     });
 
@@ -263,10 +293,14 @@ describe("updateOrCreateSession", () => {
       setSessionAndUpdateCookie.mockRejectedValue(updateError);
     });
 
-    test("rethrows in a second factor step while the session is intact (e.g. a wrong code)", async () => {
+    test.each([
+      ["a TOTP check (e.g. a wrong code)", { checks: totpCheck }],
+      ["a U2F challenge", { challenges: u2fChallenge }],
+      ["a WebAuthN assertion", { checks: webAuthNCheck }],
+    ])("rethrows for %s while the session is intact", async (_name, step) => {
       resolveSession.mockResolvedValue({ session: passwordVerified });
 
-      await expect(updateOrCreateSession({ loginName: "user@example.com", checks: totpCheck })).rejects.toBe(updateError);
+      await expect(updateOrCreateSession({ loginName: "user@example.com", ...step })).rejects.toBe(updateError);
 
       expect(resolveSession).toHaveBeenCalledWith({ baseUrl: "https://example.com" }, sessionCookie, "update_session");
       expect(createSessionAndUpdateCookie).not.toHaveBeenCalled();
@@ -275,7 +309,6 @@ describe("updateOrCreateSession", () => {
     test.each([
       ["session_token_rejected", "sessionResolution.cookieInvalid"],
       ["server_session_not_found", "sessionResolution.sessionNotFound"],
-      ["session_lookup_failed", "sessionResolution.lookupFailed"],
     ])("returns %s in a second factor step instead of creating a session", async (reason, message) => {
       resolveSession.mockResolvedValue({ reason });
 
@@ -289,9 +322,41 @@ describe("updateOrCreateSession", () => {
           code: "LOGIN_SESSION_UPDATE_FAILED",
           reason,
           sessionId: "session-1",
-          secondFactorStep: true,
+          expired: false,
           grpcCode: Code.InvalidArgument,
         }),
+      );
+    });
+
+    test.each([
+      ["a U2F challenge", { challenges: u2fChallenge }],
+      ["a WebAuthN assertion", { checks: webAuthNCheck }],
+    ])("reports the session as lost for %s when the session is gone", async (_name, step) => {
+      resolveSession.mockResolvedValue({ reason: "server_session_not_found" });
+
+      const res = await updateOrCreateSession({ loginName: "user@example.com", ...step });
+
+      expect(res).toEqual({ error: "sessionResolution.sessionNotFound", sessionLost: true });
+      expect(listUsers).not.toHaveBeenCalled();
+      expect(createSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    // The re-fetch failed for another reason than NotFound or PermissionDenied (e.g. the API is
+    // unavailable): the session may still be valid, so it is neither replaced nor reported as lost.
+    test.each([
+      ["a second factor step", { challenges: smsChallenge }],
+      ["a U2F step", { challenges: u2fChallenge }],
+      ["a step that starts a passkey login", { challenges: passkeyChallenge }],
+    ])("rethrows in %s when it is unknown whether the session still exists", async (_name, step) => {
+      resolveSession.mockResolvedValue({ reason: "session_lookup_failed" });
+
+      await expect(updateOrCreateSession({ loginName: "user@example.com", ...step })).rejects.toBe(updateError);
+
+      expect(listUsers).not.toHaveBeenCalled();
+      expect(createSessionAndUpdateCookie).not.toHaveBeenCalled();
+      expect(mockLogger.warn).not.toHaveBeenCalledWith(
+        expect.stringContaining("LOGIN_SESSION_UPDATE_FAILED"),
+        expect.anything(),
       );
     });
 
@@ -324,7 +389,7 @@ describe("updateOrCreateSession", () => {
       ["can no longer be resolved", { reason: "server_session_not_found" }],
       // a returning user whose cookie still holds an old session must be able to start a passkey login
       ["has expired", { session: { ...passwordVerified, expirationDate: inPast } }],
-    ])("creates a new session when the existing one %s and no second factor is asked for", async (_name, existing) => {
+    ])("creates a new session when the existing one %s and a passkey login starts", async (_name, existing) => {
       resolveSession.mockResolvedValue(existing);
 
       const res = await updateOrCreateSession({ loginName: "user@example.com", challenges: passkeyChallenge });

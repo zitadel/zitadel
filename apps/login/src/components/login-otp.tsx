@@ -74,6 +74,9 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
       });
     }
 
+    // only the answer to this request says whether the session is lost
+    setSessionLost(false);
+
     let response;
     try {
       response = await updateOrCreateSession({
@@ -113,6 +116,7 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
 
   async function submitCode(values: Inputs, organization?: string) {
     setLoading(true);
+    setSessionLost(false);
 
     let body: any = {
       code: values.code,

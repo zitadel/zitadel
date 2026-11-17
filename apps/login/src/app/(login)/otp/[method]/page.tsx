@@ -5,7 +5,12 @@ import { RestartSignIn } from "@/components/restart-sign-in";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceConfig } from "@/lib/server/service-url";
-import { resolveMostRecentSession, resolveSessionById, SESSION_RESOLUTION_MESSAGE_KEYS } from "@/lib/server/session";
+import {
+  loadMostRecentSession,
+  resolveMostRecentSession,
+  resolveSessionById,
+  SESSION_RESOLUTION_MESSAGE_KEYS,
+} from "@/lib/server/session";
 import { getBrandingSettings, getLoginSettings } from "@/lib/server/zitadel";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -36,9 +41,13 @@ export default async function Page(props: {
 
   const { method } = params;
 
+  // Without a session id or login name no particular session is expected (bookmarks, bots): the most
+  // recent one is used when there is one, and a miss is not a failure worth a reason or a log line.
   const { session, reason } = sessionId
     ? await resolveSessionById(serviceConfig, sessionId, organization, "otp_page")
-    : await resolveMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } }, "otp_page");
+    : loginName
+      ? await resolveMostRecentSession({ serviceConfig, sessionParams: { loginName, organization } }, "otp_page")
+      : { session: await loadMostRecentSession({ serviceConfig, sessionParams: { organization } }), reason: undefined };
 
   // email links do not come with organization, thus we need to use the session's organization
   const branding = await getBrandingSettings({
@@ -77,10 +86,7 @@ export default async function Page(props: {
           <div className="py-4">
             <Alert>
               {/* context was provided but the session could not be resolved, the reason picks the message */}
-              <Translated
-                i18nKey={loginName || sessionId ? SESSION_RESOLUTION_MESSAGE_KEYS[reason] : "unknownContext"}
-                namespace="error"
-              />
+              <Translated i18nKey={reason ? SESSION_RESOLUTION_MESSAGE_KEYS[reason] : "unknownContext"} namespace="error" />
             </Alert>
             <RestartSignIn loginName={loginName} organization={organization} requestId={requestId} />
           </div>

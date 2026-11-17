@@ -10,6 +10,7 @@ vi.mock("@/lib/server/zitadel", () => ({
 vi.mock("@/lib/server/session", async () => {
   const actual = await vi.importActual<typeof import("@/lib/server/session")>("@/lib/server/session");
   return {
+    loadMostRecentSession: vi.fn(),
     resolveMostRecentSession: vi.fn(),
     resolveSessionById: vi.fn(),
     SESSION_RESOLUTION_MESSAGE_KEYS: actual.SESSION_RESOLUTION_MESSAGE_KEYS,
@@ -86,11 +87,6 @@ describe("otp page", () => {
       searchParams: { loginName: "user@example.com", organization: "org-1" },
       expectedAlert: "sessionResolution.sessionNotFound",
     },
-    {
-      name: "neither sessionId nor loginName",
-      searchParams: {},
-      expectedAlert: "unknownContext",
-    },
   ])(
     "renders the $expectedAlert alert and no OTP form when the session cannot be loaded ($name)",
     async ({ searchParams, expectedAlert }) => {
@@ -121,6 +117,37 @@ describe("otp page", () => {
       expect(screen.queryByTestId("login-otp")).toBeNull();
     },
   );
+
+  // No session is expected without a session id or login name (bookmarks, bots), so a miss must not
+  // be resolved with a reason: that would log a session resolution failure for every such request.
+  test("renders the unknownContext alert without resolving a reason when no context is given", async () => {
+    const sessionLib = await import("@/lib/server/session");
+    vi.mocked(sessionLib.loadMostRecentSession).mockResolvedValue(undefined);
+
+    await renderPage({ organization: "org-1" });
+
+    expect(sessionLib.loadMostRecentSession).toHaveBeenCalledWith({
+      serviceConfig: { baseUrl: "https://example.com" },
+      sessionParams: { organization: "org-1" },
+    });
+    expect(resolveMostRecentSession).not.toHaveBeenCalled();
+    expect(resolveSessionById).not.toHaveBeenCalled();
+    expect(screen.getByRole("alert").textContent).toBe("unknownContext");
+    expect(screen.queryByTestId("login-otp")).toBeNull();
+  });
+
+  test("uses the most recent session when no context is given", async () => {
+    const sessionLib = await import("@/lib/server/session");
+    vi.mocked(sessionLib.loadMostRecentSession).mockResolvedValue({
+      id: "session-1",
+      factors: { user: { loginName: "user" } },
+    } as any);
+
+    await renderPage({});
+
+    expect(screen.getByTestId("login-otp")).toBeTruthy();
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
 
   test.each([
     ["cookie_missing", "sessionResolution.cookieMissing"],

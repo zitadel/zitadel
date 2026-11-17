@@ -6,6 +6,7 @@ import {
   getSessionCookieById,
   getSessionCookieByLoginName,
   removeSessionFromCookie,
+  SessionCookieLookup,
 } from "@/lib/server/cookies";
 import { isClassifiedError } from "@/lib/server/grpc/interceptors/error-classification";
 import { getPublicHost, getPublicHostWithProtocol } from "@/lib/server/host";
@@ -35,6 +36,7 @@ import {
   Challenges,
   RequestChallenges,
   RequestChallenges_OTPEmail_SendCodeSchema,
+  UserVerificationRequirement,
 } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -183,9 +185,27 @@ export type UpdateSessionCommand = {
   challenges?: RequestChallenges;
 };
 
-// A second factor can only complete a session that already holds a verified first factor.
-function isSecondFactorStep(checks?: Checks, challenges?: RequestChallenges): boolean {
-  return !!(checks?.totp || checks?.otpSms || checks?.otpEmail || challenges?.otpSms || challenges?.otpEmail);
+/**
+ * Steps that only work on the session they were started on. A second factor completes a session
+ * that already holds a verified first factor, and a WebAuthN assertion answers the challenge of one
+ * session. A new session has neither, so these steps never create one.
+ *
+ * U2F is a WebAuthN challenge that does not require user verification. Only the challenge of a
+ * passkey login (user verification required) may start on a new session.
+ */
+function needsExistingSession(checks?: Checks, challenges?: RequestChallenges): boolean {
+  const u2fChallenge =
+    !!challenges?.webAuthN && challenges.webAuthN.userVerificationRequirement !== UserVerificationRequirement.REQUIRED;
+
+  return !!(
+    checks?.totp ||
+    checks?.otpSms ||
+    checks?.otpEmail ||
+    checks?.webAuthN ||
+    challenges?.otpSms ||
+    challenges?.otpEmail ||
+    u2fChallenge
+  );
 }
 
 /**
@@ -267,13 +287,19 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       ? await getSessionCookieByLoginName({ loginName, organization })
       : await getMostRecentSessionCookie();
 
-  const secondFactorStep = isSecondFactorStep(checks, challenges);
+  const stepNeedsSession = needsExistingSession(checks, challenges);
 
   if (!recentSession) {
-    // A new session only holds the user check. That starts a passkey flow, but it can never complete
-    // a second factor step: the verified first factor of the session that got lost would be missing.
-    if (!loginName || secondFactorStep) {
-      const reason = await reportMissingSessionCookie("update_session", { loginName, organization, sessionId });
+    // A new session only holds the user check. That starts a passkey login, but it can never complete
+    // a step that was started on the session that got lost.
+    if (!loginName || stepNeedsSession) {
+      // exactly the lookup of the getter above, so the miss is explained for what was looked up
+      const lookup: SessionCookieLookup = sessionId
+        ? { by: "id", sessionId }
+        : loginName
+          ? { by: "loginName", loginName, organization }
+          : { by: "mostRecent" };
+      const reason = await reportMissingSessionCookie("update_session", lookup);
       // the reason stays in the logs, the caller only learns that retrying cannot succeed
       return { error: tError(SESSION_RESOLUTION_MESSAGE_KEYS[reason]), sessionLost: true };
     }
@@ -336,24 +362,31 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
   } catch (error) {
     // Creating a new session below replaces the cookie entry and drops the factors of the existing session.
     const existing = await resolveSession(serviceConfig, recentSession, "update_session");
+
+    // Whether the session still exists is unknown (e.g. the API is unavailable), so it is neither
+    // replaced nor reported as lost: the caller reports the failed update and the user can retry.
+    if (existing.reason === "session_lookup_failed") {
+      throw error;
+    }
+
     const expired = existing.session?.expirationDate ? timestampDate(existing.session.expirationDate) < new Date() : false;
 
     // The session is still usable, so the update itself was rejected (e.g. a wrong code). The caller
     // reports that, and a session with a verified first factor is never replaced by one without.
-    if (existing.session && !expired && (secondFactorStep || hasVerifiedPrimaryFactor(existing.session).verifiedAt)) {
+    const usable = existing.session && (stepNeedsSession ? !expired : hasVerifiedPrimaryFactor(existing.session).valid);
+    if (usable) {
       throw error;
     }
 
-    // The session is gone or expired. A second factor needs its verified first factor, which a new
-    // session cannot have, so only the steps that start a login continue with a new session.
-    if (secondFactorStep) {
+    // The session is gone or expired. A step that was started on it cannot continue on a new session,
+    // so only the steps that start a login do.
+    if (stepNeedsSession) {
       const reason = existing.reason ?? "server_session_not_found";
       logger.warn("LOGIN_SESSION_UPDATE_FAILED: could not update the session and did not replace it with a new one", {
         code: "LOGIN_SESSION_UPDATE_FAILED",
         reason,
         sessionId: recentSession.id,
         expired,
-        secondFactorStep,
         grpcCode: isClassifiedError(error) ? error.code : undefined,
       });
       return { error: tError(SESSION_RESOLUTION_MESSAGE_KEYS[reason]), sessionLost: true };

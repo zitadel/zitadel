@@ -1,8 +1,13 @@
 import "server-only";
 
-import { Cookie, getMostRecentCookieWithLoginname, getSessionCookieById } from "@/lib/server/cookies";
+import {
+  explainSessionCookieMiss,
+  getMostRecentCookieWithLoginname,
+  getSessionCookieById,
+  SessionCookieLookup,
+  SessionCookieMiss,
+} from "@/lib/server/cookies";
 import { createLogger } from "@/lib/server/logger";
-import { parseAndVerifySessions } from "@/lib/server/session-cookie-signature";
 import { shouldEnforceMFA } from "@/lib/server/verify-helper";
 import {
   getLoginSettings,
@@ -16,27 +21,21 @@ import { AuthRequest } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import { SAMLRequest } from "@zitadel/proto/zitadel/saml/v2/authorization_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { cookies, headers } from "next/headers";
 
 const logger = createLogger("session");
 
 /**
  * Why a session that a flow expected could not be resolved from the browser's `sessions` cookie.
  *
- * - `cookie_missing`: the browser sent no `sessions` cookie
- * - `cookie_invalid`: the cookie is unreadable, or the wanted entry has a missing or invalid signature
- * - `session_entry_not_found`: the cookie is fine but holds no entry for the wanted session
- * - `server_session_not_found`: the cookie entry exists, the API no longer knows the session
+ * The cookie reasons (`cookie_missing`, `cookie_invalid`, `session_entry_not_found`) come from
+ * `explainSessionCookieMiss`. The others are answers of the API for an entry the cookie holds:
+ *
+ * - `server_session_not_found`: the API no longer knows the session
  * - `session_token_rejected`: the session exists, the API rejects the token of the cookie entry
  * - `session_lookup_failed`: the API call failed for another reason
  */
 type SessionResolutionFailure =
-  | "cookie_missing"
-  | "cookie_invalid"
-  | "session_entry_not_found"
-  | "server_session_not_found"
-  | "session_token_rejected"
-  | "session_lookup_failed";
+  SessionCookieMiss["reason"] | "server_session_not_found" | "session_token_rejected" | "session_lookup_failed";
 
 type SessionResolution =
   { session: Session; reason?: undefined } | { session?: undefined; reason: SessionResolutionFailure };
@@ -64,12 +63,6 @@ export const SESSION_RESOLUTION_MESSAGE_KEYS: Record<SessionResolutionFailure, s
   session_lookup_failed: "sessionResolution.lookupFailed",
 };
 
-type SessionLookup = {
-  loginName?: string;
-  organization?: string;
-  sessionId?: string;
-};
-
 type SessionResolutionFailureDetails = {
   reason: SessionResolutionFailure;
   context: Record<string, unknown>;
@@ -87,86 +80,17 @@ function logSessionResolutionFailure(source: string, { reason, context, error }:
   }
 }
 
-function matchesLookup(entry: Partial<Cookie>, { loginName, organization, sessionId }: SessionLookup): boolean {
-  if (organization && entry.organization !== organization) {
-    return false;
-  }
-  if (sessionId) {
-    return entry.id === sessionId;
-  }
-  return loginName ? entry.loginName === loginName : true;
-}
-
-// The entries of the cookie before any signature check, undefined when the value is not a JSON array.
-function readUnverifiedEntries(value: string | undefined): Partial<Cookie>[] | undefined {
-  if (!value) {
-    return [];
-  }
-  try {
-    const parsed = JSON.parse(value);
-    return Array.isArray(parsed) ? parsed.filter((entry) => !!entry && typeof entry === "object") : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
 /**
- * Explains why the `sessions` cookie holds no usable entry for the lookup. Only counts and sizes
- * end up in the context: no token, signature or login name.
+ * Classifies and logs why the `sessions` cookie holds no entry for the lookup. For callers that
+ * need a session to continue: pass the lookup of the cookie getter that returned nothing.
  */
-async function describeSessionCookieFailure(lookup: SessionLookup): Promise<SessionResolutionFailureDetails> {
-  const value = (await cookies()).get("sessions")?.value;
-  const cookieHeader = (await headers()).get("cookie") ?? "";
-
-  const unverified = readUnverifiedEntries(value);
-  const entries = unverified ?? [];
-  const verified = parseAndVerifySessions<Cookie>(value);
-
-  const context: Record<string, unknown> = {
-    hasLoginName: !!lookup.loginName,
-    hasOrganization: !!lookup.organization,
-    hasSessionId: !!lookup.sessionId,
-    sessionId: lookup.sessionId,
-    cookieEntries: entries.length,
-    cookieEntriesDropped: entries.length - verified.length,
-    // as the browser sent it (URL-encoded), browsers cap a single cookie at ~4096 bytes
-    cookieSize: value ? `sessions=${encodeURIComponent(value)}`.length : 0,
-    cookieHeaderSize: cookieHeader.length,
-    // more than one means cookies with different domain or path attributes shadow each other
-    sessionsCookieCount: cookieHeader.match(/(?:^|;\s*)sessions=/g)?.length ?? 0,
-  };
-
-  if (lookup.loginName) {
-    const loginName = lookup.loginName;
-    // an entry exists for the login name but not for the organization, or only with different casing
-    context.entriesMatchingLoginName = verified.filter((entry) => entry.loginName === loginName).length;
-    context.entriesMatchingLoginNameIgnoringCase = verified.filter(
-      (entry) => entry.loginName?.toLowerCase() === loginName.toLowerCase(),
-    ).length;
-  }
-
-  if (!value) {
-    return { reason: "cookie_missing", context };
-  }
-
-  // the wanted entry is in the cookie, but it was dropped for its missing or invalid signature
-  const wantedEntryDropped =
-    entries.some((entry) => matchesLookup(entry, lookup)) && !verified.some((entry) => matchesLookup(entry, lookup));
-  if (!unverified || wantedEntryDropped) {
-    return { reason: "cookie_invalid", context };
-  }
-
-  return { reason: "session_entry_not_found", context };
-}
-
-/**
- * Classifies and logs why no entry of the `sessions` cookie matches the lookup.
- * For callers that looked the cookie entry up themselves and need a session to continue.
- */
-export async function reportMissingSessionCookie(source: string, lookup: SessionLookup): Promise<SessionResolutionFailure> {
-  const failure = await describeSessionCookieFailure(lookup);
-  logSessionResolutionFailure(source, failure);
-  return failure.reason;
+export async function reportMissingSessionCookie(
+  source: string,
+  lookup: SessionCookieLookup,
+): Promise<SessionCookieMiss["reason"]> {
+  const miss = await explainSessionCookieMiss(lookup);
+  logSessionResolutionFailure(source, miss);
+  return miss.reason;
 }
 
 async function fetchSession(
@@ -238,7 +162,7 @@ export async function resolveMostRecentSession(
   const recent = await getMostRecentCookieWithLoginname(sessionParams);
 
   if (!recent) {
-    return { reason: await reportMissingSessionCookie(source, sessionParams) };
+    return { reason: await reportMissingSessionCookie(source, { by: "mostRecent", ...sessionParams }) };
   }
 
   return resolveSession(serviceConfig, recent, source);
@@ -257,7 +181,7 @@ export async function resolveSessionById(
   const recent = await getSessionCookieById({ sessionId, organization });
 
   if (!recent) {
-    return { reason: await reportMissingSessionCookie(source, { sessionId, organization }) };
+    return { reason: await reportMissingSessionCookie(source, { by: "id", sessionId, organization }) };
   }
 
   return resolveSession(serviceConfig, recent, source);
