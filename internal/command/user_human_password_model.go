@@ -247,8 +247,11 @@ func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
 	}
-	if wm.WriteModel.ProcessedSequence != 0 {
-		query.SequenceGreater(wm.WriteModel.ProcessedSequence)
+	// On a reload (e.g. the recheck after a password verification) only new events are loaded.
+	// The events up to the last reset are already reduced or not relevant,
+	// so the reload doesn't need to scan the checks between the last reduced event and the reset.
+	if wm.ProcessedSequence != 0 {
+		query.SequenceGreater(max(wm.ProcessedSequence, wm.checksAfterSequence))
 	}
 	return query
 }

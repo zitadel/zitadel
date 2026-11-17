@@ -50,6 +50,13 @@ func TestUserV2WriteModel_Query_passwordChecks(t *testing.T) {
 
 		wm.ProcessedSequence = 7
 		assert.Equal(t, uint64(7), wm.Query().GetEventSequenceGreater())
+
+		// the checks up to the reset are not loaded, the reload doesn't need to scan them
+		wm.passwordChecksAfterSequence = 42
+		assert.Equal(t, uint64(42), wm.Query().GetEventSequenceGreater())
+
+		wm.ProcessedSequence = 50
+		assert.Equal(t, uint64(50), wm.Query().GetEventSequenceGreater())
 	})
 }
 
