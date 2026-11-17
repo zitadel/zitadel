@@ -277,16 +277,17 @@ export function LoginForm({
         )}
 
         {allowRegister && (
-          <div className="mt-4 text-center">
-            <button
-              className="hover:text-primary-light-500 dark:hover:text-primary-dark-500 text-sm transition-all"
-              onClick={goToRegister}
+          <div className="border-divider-light dark:border-divider-dark mt-6 border-t pt-6">
+            <Button
               type="button"
+              className="text-primary-light-500 dark:text-primary-dark-500 border-primary-light-500 dark:border-primary-dark-500 w-full justify-center font-semibold"
+              variant={ButtonVariants.Secondary}
+              onClick={goToRegister}
               disabled={loading}
               data-testid="register-button"
             >
               <Translated i18nKey="register" namespace="loginname" />
-            </button>
+            </Button>
           </div>
         )}
       </form>
