@@ -1,6 +1,8 @@
-import { createLogger } from "@/lib/logger";
-import { createServiceForHost } from "@/lib/service";
-import { getIDPByID, getInstanceId, ServiceConfig } from "@/lib/zitadel";
+import "server-only";
+
+import { createLogger } from "@/lib/server/logger";
+import { createServiceForHost } from "@/lib/server/service";
+import { getIDPByID, getInstanceId, ServiceConfig } from "@/lib/server/zitadel";
 import { Client, Code, ConnectError } from "@zitadel/client";
 import type { InstanceRolesInfo } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { InternalPermissionService } from "@zitadel/proto/zitadel/internal_permission/v2/internal_permission_service_pb";

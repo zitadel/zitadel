@@ -195,8 +195,11 @@ type Steps struct {
 	s73FixUserGrantRoles                    *FixUserGrantRoles
 	s74Apps7OIDCConfigsAddRegistrationToken *Apps7OIDCConfigsAddRegistrationToken
 	s75Apps7OIDCConfigsAddAppLinkConfig     *Apps7OIDCConfigsAddAppLinkConfig
-	s76UniqueConstraintClaimants            *UniqueConstraintClaimants
-	s77EventStatementPosition               *EventStatementPosition
+	s76Users14LoginEqualityIndexes          *Users14LoginEqualityIndexes
+	s77StampEventPositionAtInsert           *StampEventPositionAtInsert
+	s78UniqueConstraintOwners               *UniqueConstraintOwners
+	s80Users14InstanceResourceOwnerIndex    *Users14InstanceResourceOwnerIndex
+	BackfillUniqueConstraintOwners          *BackfillUniqueConstraintOwners
 	RelationalTables                        *TransactionalTables
 	GroupLifecycleFields                    *GroupLifecycleFields
 }

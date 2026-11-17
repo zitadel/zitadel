@@ -47,7 +47,7 @@ func (g *GroupAddedEvent) Payload() any {
 }
 
 func (g *GroupAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddGroupNameUniqueConstraint(g.Name, g.Aggregate().ResourceOwner)}
+	return []*eventstore.UniqueConstraint{NewAddGroupNameUniqueConstraint(g.Name, g.Aggregate().ResourceOwner).WithOwners(eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, g.Aggregate().ResourceOwner))}
 }
 
 func NewAddGroupNameUniqueConstraint(groupName, organizationID string) *eventstore.UniqueConstraint {
@@ -121,7 +121,7 @@ func (g *GroupChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	}
 	return []*eventstore.UniqueConstraint{
 		NewRemoveGroupNameUniqueConstraint(g.oldName, g.Aggregate().ResourceOwner),
-		NewAddGroupNameUniqueConstraint(*g.Name, g.Aggregate().ResourceOwner)}
+		NewAddGroupNameUniqueConstraint(*g.Name, g.Aggregate().ResourceOwner).WithOwners(eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, g.Aggregate().ResourceOwner))}
 }
 
 type GroupRemovedEvent struct {
@@ -133,6 +133,8 @@ type GroupRemovedEvent struct {
 	externalIDs    map[string]string
 	memberIDs      []string
 	externalIDKeys []string
+
+	skipUniqueConstraints bool
 }
 
 func NewGroupRemovedEvent(
@@ -162,6 +164,9 @@ func (g *GroupRemovedEvent) Payload() any {
 }
 
 func (g *GroupRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	if g.skipUniqueConstraints {
+		return nil
+	}
 	constraints := []*eventstore.UniqueConstraint{NewRemoveGroupNameUniqueConstraint(g.name, g.Aggregate().ResourceOwner)}
 	for scope, value := range g.externalIDs {
 		constraints = append(constraints, NewRemoveGroupExternalIDUniqueConstraint(g.Aggregate().ID, g.Aggregate().ResourceOwner, scope, value))
@@ -173,6 +178,11 @@ func (g *GroupRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 		constraints = append(constraints, NewRemoveGroupUserUniqueConstraint(g.Aggregate().ID, id))
 	}
 	return constraints
+}
+
+// SkipUniqueConstraints is used when the org removal releases the keys by owner.
+func (g *GroupRemovedEvent) SkipUniqueConstraints() {
+	g.skipUniqueConstraints = true
 }
 
 func (g *GroupRemovedEvent) WithMembers(ids []string) *GroupRemovedEvent {

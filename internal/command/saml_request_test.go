@@ -145,7 +145,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 		id               string
 		sessionID        string
 		sessionToken     string
-		checkLoginClient bool
+		checkLinkPermission bool
 		checkPermission  domain.ProjectPermissionCheck
 	}
 	type res struct {
@@ -240,7 +240,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				id:               "id",
 				sessionID:        "sessionID",
 				sessionToken:     "token",
-				checkLoginClient: true,
+				checkLinkPermission: true,
 			},
 			res{
 				wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
@@ -459,8 +459,11 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 			},
 		},
 		{
-			"linked with login client check",
+			// A login client that holds the session.link permission (as the hosted login does)
+			// may link the session; the login client header alone grants nothing.
+			"linked with login client holding permission",
 			fields{
+				checkPermission: newMockPermissionCheckAllowed(),
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
@@ -517,7 +520,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				id:               "V2_id",
 				sessionID:        "sessionID",
 				sessionToken:     "token",
-				checkLoginClient: true,
+				checkLinkPermission: true,
 			},
 			res{
 				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
@@ -599,7 +602,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				id:               "V2_id",
 				sessionID:        "sessionID",
 				sessionToken:     "token",
-				checkLoginClient: true,
+				checkLinkPermission: true,
 			},
 			res{
 				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
@@ -623,8 +626,9 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 			},
 		},
 		{
-			"linked with login client check, application permission check",
+			"linked with login client holding permission, application permission check",
 			fields{
+				checkPermission: newMockPermissionCheckAllowed(),
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
@@ -681,7 +685,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				id:               "V2_id",
 				sessionID:        "sessionID",
 				sessionToken:     "token",
-				checkLoginClient: true,
+				checkLinkPermission: true,
 				checkPermission:  newMockProjectPermissionCheckAllowed(),
 			},
 			res{
@@ -706,8 +710,9 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 			},
 		},
 		{
-			"linked with login client check, no application permission",
+			"linked with login client holding permission, no application permission",
 			fields{
+				checkPermission: newMockPermissionCheckAllowed(),
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
@@ -756,11 +761,47 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				id:               "V2_id",
 				sessionID:        "sessionID",
 				sessionToken:     "token",
-				checkLoginClient: true,
+				checkLinkPermission: true,
 				checkPermission:  newMockProjectPermissionCheckSAMLNotAllowed(),
 			},
 			res{
 				wantErr: zerrors.ThrowPermissionDenied(nil, "SAML-foSyH49RvL", "Errors.PermissionDenied"),
+			},
+		},
+		{
+			// The login client header must not grant any permission on its own: a caller that
+			// matches the stored login client but lacks session.link must be denied.
+			"login client without permission, not permitted",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							samlrequest.NewAddedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+								"loginClient",
+								"application",
+								"acs",
+								"relaystate",
+								"request",
+								"binding",
+								"issuer",
+								"destination",
+								"responseissuer",
+							),
+						),
+					),
+				),
+				tokenVerifier:   newMockTokenVerifierValid(),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args{
+				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient"),
+				id:               "V2_id",
+				sessionID:        "sessionID",
+				sessionToken:     "token",
+				checkLinkPermission: true,
+			},
+			res{
+				wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 			},
 		},
 	}
@@ -771,7 +812,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				sessionTokenVerifier: tt.fields.tokenVerifier,
 				checkPermission:      tt.fields.checkPermission,
 			}
-			details, got, err := c.LinkSessionToSAMLRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken, tt.args.checkLoginClient, tt.args.checkPermission)
+			details, got, err := c.LinkSessionToSAMLRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken, tt.args.checkLinkPermission, tt.args.checkPermission)
 			require.ErrorIs(t, err, tt.res.wantErr)
 			assertObjectDetails(t, tt.res.details, details)
 			if err == nil {

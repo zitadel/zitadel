@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	z_oidc "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	instance_pb "github.com/zitadel/zitadel/pkg/grpc/instance"
@@ -201,8 +202,11 @@ func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInst
 	return &instance
 }
 
-func ListInstancesRequestToModel(req *system_pb.ListInstancesRequest) (*query.InstanceSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func ListInstancesRequestToModel(defaults systemdefaults.SystemDefaults, req *system_pb.ListInstancesRequest) (*query.InstanceSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := instance_grpc.InstanceQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
@@ -231,8 +235,11 @@ func fieldNameToInstanceColumn(fieldName instance_pb.FieldName) query.Column {
 	}
 }
 
-func ListInstanceDomainsRequestToModel(req *system_pb.ListDomainsRequest) (*query.InstanceDomainSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func ListInstanceDomainsRequestToModel(defaults systemdefaults.SystemDefaults, req *system_pb.ListDomainsRequest) (*query.InstanceDomainSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := instance_grpc.DomainQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
@@ -263,8 +270,11 @@ func fieldNameToInstanceDomainColumn(fieldName instance_pb.DomainFieldName) quer
 	}
 }
 
-func ListIAMMembersRequestToQuery(req *system_pb.ListIAMMembersRequest) (*query.IAMMembersQuery, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func ListIAMMembersRequestToQuery(defaults systemdefaults.SystemDefaults, req *system_pb.ListIAMMembersRequest) (*query.IAMMembersQuery, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := member_grpc.MemberQueriesToQuery(req.Queries)
 	if err != nil {
 		return nil, err

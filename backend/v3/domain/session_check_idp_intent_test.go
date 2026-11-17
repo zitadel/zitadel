@@ -101,7 +101,7 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 		sessionRepo         func(ctrl *gomock.Controller) domain.SessionRepository
 		idpIntentRepo       func(ctrl *gomock.Controller) domain.IDPIntentRepository
 		userRepo            func(ctrl *gomock.Controller) domain.UserRepository
-		encryptionAlgorithm func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm
+		encryptionAlgorithm func(ctrl *gomock.Controller) crypto.AuthEncryptionAlgorithm
 		cmd                 *domain.IDPIntentCheckCommand
 		expectedError       error
 		expectedUser        domain.User
@@ -191,13 +191,10 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
-			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
+			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.AuthEncryptionAlgorithm {
+				cryptoAlg := crypto.NewMockAuthEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
-					EncryptionKeyID().
-					Times(1)
-				cryptoAlg.EXPECT().
-					DecryptString(gomock.Any(), gomock.Any()).
+					DecryptToken(gomock.Any()).
 					Times(1).
 					Return("", decryptionError)
 				return cryptoAlg
@@ -218,13 +215,10 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
-			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
+			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.AuthEncryptionAlgorithm {
+				cryptoAlg := crypto.NewMockAuthEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
-					EncryptionKeyID().
-					Times(1)
-				cryptoAlg.EXPECT().
-					DecryptString(gomock.Any(), gomock.Any()).
+					DecryptToken(gomock.Any()).
 					Times(1).
 					Return("intent-123", nil)
 				return cryptoAlg
@@ -252,13 +246,10 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
-			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
+			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.AuthEncryptionAlgorithm {
+				cryptoAlg := crypto.NewMockAuthEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
-					EncryptionKeyID().
-					Times(1)
-				cryptoAlg.EXPECT().
-					DecryptString(gomock.Any(), gomock.Any()).
+					DecryptToken(gomock.Any()).
 					Times(1).
 					Return("intent-123", nil)
 				return cryptoAlg
@@ -286,13 +277,10 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
-			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
+			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.AuthEncryptionAlgorithm {
+				cryptoAlg := crypto.NewMockAuthEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
-					EncryptionKeyID().
-					Times(1)
-				cryptoAlg.EXPECT().
-					DecryptString(gomock.Any(), gomock.Any()).
+					DecryptToken(gomock.Any()).
 					Times(1).
 					Return("intent-123", nil)
 				return cryptoAlg
@@ -320,13 +308,10 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
-			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
+			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.AuthEncryptionAlgorithm {
+				cryptoAlg := crypto.NewMockAuthEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
-					EncryptionKeyID().
-					Times(1)
-				cryptoAlg.EXPECT().
-					DecryptString(gomock.Any(), gomock.Any()).
+					DecryptToken(gomock.Any()).
 					Times(1).
 					Return("intent-123", nil)
 				return cryptoAlg
@@ -354,13 +339,10 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
-			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
+			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.AuthEncryptionAlgorithm {
+				cryptoAlg := crypto.NewMockAuthEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
-					EncryptionKeyID().
-					Times(1)
-				cryptoAlg.EXPECT().
-					DecryptString(gomock.Any(), gomock.Any()).
+					DecryptToken(gomock.Any()).
 					Times(1).
 					Return("intent-123", nil)
 				return cryptoAlg
@@ -388,13 +370,10 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
-			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
+			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.AuthEncryptionAlgorithm {
+				cryptoAlg := crypto.NewMockAuthEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
-					EncryptionKeyID().
-					Times(1)
-				cryptoAlg.EXPECT().
-					DecryptString(gomock.Any(), gomock.Any()).
+					DecryptToken(gomock.Any()).
 					Times(1).
 					Return("intent-123", nil)
 				return cryptoAlg
@@ -429,13 +408,10 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
-			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
+			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.AuthEncryptionAlgorithm {
+				cryptoAlg := crypto.NewMockAuthEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
-					EncryptionKeyID().
-					Times(1)
-				cryptoAlg.EXPECT().
-					DecryptString(gomock.Any(), gomock.Any()).
+					DecryptToken(gomock.Any()).
 					Times(1).
 					Return("intent-123", nil)
 				return cryptoAlg
@@ -470,13 +446,10 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
-			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
+			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.AuthEncryptionAlgorithm {
+				cryptoAlg := crypto.NewMockAuthEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
-					EncryptionKeyID().
-					Times(1)
-				cryptoAlg.EXPECT().
-					DecryptString(gomock.Any(), gomock.Any()).
+					DecryptToken(gomock.Any()).
 					Times(1).
 					Return("intent-123", nil)
 				return cryptoAlg
@@ -511,13 +484,10 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
-			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
+			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.AuthEncryptionAlgorithm {
+				cryptoAlg := crypto.NewMockAuthEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
-					EncryptionKeyID().
-					Times(1)
-				cryptoAlg.EXPECT().
-					DecryptString(gomock.Any(), gomock.Any()).
+					DecryptToken(gomock.Any()).
 					Times(1).
 					Return("intent-123", nil)
 				return cryptoAlg
@@ -565,13 +535,10 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
-			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
+			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.AuthEncryptionAlgorithm {
+				cryptoAlg := crypto.NewMockAuthEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
-					EncryptionKeyID().
-					Times(1)
-				cryptoAlg.EXPECT().
-					DecryptString(gomock.Any(), gomock.Any()).
+					DecryptToken(gomock.Any()).
 					Times(1).
 					Return("intent-123", nil)
 				return cryptoAlg
@@ -610,13 +577,10 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
-			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
+			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.AuthEncryptionAlgorithm {
+				cryptoAlg := crypto.NewMockAuthEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
-					EncryptionKeyID().
-					Times(1)
-				cryptoAlg.EXPECT().
-					DecryptString(gomock.Any(), gomock.Any()).
+					DecryptToken(gomock.Any()).
 					Times(1).
 					Return("intent-123", nil)
 				return cryptoAlg
@@ -655,13 +619,10 @@ func TestIDPIntentCheckCommand_Validate(t *testing.T) {
 					Return(&domain.Session{ID: "session-1", UserID: "user-1"}, nil)
 				return repo
 			},
-			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.EncryptionAlgorithm {
-				cryptoAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
+			encryptionAlgorithm: func(ctrl *gomock.Controller) crypto.AuthEncryptionAlgorithm {
+				cryptoAlg := crypto.NewMockAuthEncryptionAlgorithm(ctrl)
 				cryptoAlg.EXPECT().
-					EncryptionKeyID().
-					Times(1)
-				cryptoAlg.EXPECT().
-					DecryptString(gomock.Any(), gomock.Any()).
+					DecryptToken(gomock.Any()).
 					Times(1).
 					Return("intent-123", nil)
 				return cryptoAlg

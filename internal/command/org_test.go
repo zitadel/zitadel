@@ -214,7 +214,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 							context.Background(),
 							&org.NewAggregate("org2").Aggregate,
 							"user1", domain.RoleOrgOwner,
-						),
+						).WithUserResourceOwner("org1"),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "org2"),
@@ -280,7 +280,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 							context.Background(),
 							&org.NewAggregate("org2").Aggregate,
 							"user1", domain.RoleOrgOwner,
-						),
+						).WithUserResourceOwner("org1"),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "org2"),
@@ -341,7 +341,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 							&org.NewAggregate("org2").Aggregate,
 							"user1",
 							domain.RoleOrgOwner,
-						),
+						).WithUserResourceOwner("org1"),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "org2"),
@@ -410,7 +410,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 							&org.NewAggregate("org2").Aggregate,
 							"user1",
 							domain.RoleOrgOwner,
-						),
+						).WithUserResourceOwner("org1"),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "org2"),
@@ -1444,21 +1444,6 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 								"org"),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							org.NewDomainPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								true,
-								true,
-								true,
-							),
-						),
-					),
-					expectFilterOrganizationSettings("org1", false, false),
-					expectFilter(), // OrgUsers
-					expectFilter(), // OrgDomains
-					expectFilter(), // OrgUserIDPLinks
-					expectFilter(), // OrgSamlEntityIDs
 					expectGroupSearchError(zerrors.ThrowInternal(nil, "TEST-grp-er", "group names search failed")),
 				),
 			},
@@ -1544,6 +1529,33 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCommandSide_RemoveOrgOwnerDeleteReady(t *testing.T) {
+	r := &Commands{
+		eventstore: expectEventstore(
+			expectFilter(), // zitadel project check
+			expectFilter(
+				eventFromEventPusher(
+					org.NewOrgAddedEvent(context.Background(),
+						&org.NewAggregate("org1").Aggregate,
+						"org"),
+				),
+			),
+			expectGroupFields(),
+			expectPush(
+				org.NewOrgRemovedByOwnerEvent(
+					context.Background(), &org.NewAggregate("org1").Aggregate, "org",
+				),
+			),
+		)(t),
+		ownerDeleteReady: func(context.Context) (bool, error) { return true, nil },
+	}
+	assertOwnerOnlyUniqueConstraints(t, org.NewOrgRemovedByOwnerEvent(
+		context.Background(), &org.NewAggregate("org1").Aggregate, "org",
+	), eventstore.UniqueConstraintOwnerOrg, "org1")
+	_, err := r.RemoveOrg(context.Background(), "org1", nil, false)
+	assert.NoError(t, err)
 }
 
 func TestCommandSide_SetUpOrg(t *testing.T) {

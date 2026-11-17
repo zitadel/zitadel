@@ -1,8 +1,8 @@
 "use client";
 
-import { completeFlowOrGetUrl } from "@/lib/client";
+import { completeFlowOrGetUrl } from "@/lib/actions/flow";
+import { updateOrCreateSession } from "@/lib/actions/session";
 import { handleServerActionResponse } from "@/lib/client-utils";
-import { updateOrCreateSession } from "@/lib/server/session";
 import { create } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -21,7 +21,6 @@ import { Translated } from "./translated";
 
 // either loginName or sessionId must be provided
 type Props = {
-  host: string | null;
   loginName?: string;
   sessionId?: string;
   requestId?: string;
@@ -35,7 +34,7 @@ type Inputs = {
   code: string;
 };
 
-export function LoginOTP({ host, loginName, sessionId, requestId, organization, method, code, loginSettings }: Props) {
+export function LoginOTP({ loginName, sessionId, requestId, organization, method, code, loginSettings }: Props) {
   const t = useTranslations("otp");
 
   const [error, setError] = useState<string>("");
@@ -59,22 +58,10 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
   }> => {
     let challenges;
 
-    const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-
     if (method === "email") {
+      // the link in the email is built on the server
       challenges = create(RequestChallengesSchema, {
-        otpEmail: {
-          deliveryType: {
-            case: "sendCode",
-            value: host
-              ? {
-                  urlTemplate:
-                    `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/otp/${method}?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}` +
-                    (requestId ? `&requestId=${requestId}` : ""),
-                }
-              : {},
-          },
-        },
+        otpEmail: {},
       });
     }
 
@@ -94,7 +81,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
         requestId,
       });
     } catch {
-      return { error: "Could not request OTP challenge" };
+      return { error: t("errors.couldNotRequestChallenge") };
     }
 
     if (response && "error" in response && response.error) {
@@ -102,7 +89,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
     }
 
     return response;
-  }, [method, host, requestId, loginName, sessionId, organization]);
+  }, [method, requestId, loginName, sessionId, organization, t]);
 
   useEffect(() => {
     if (!initialized.current && ["email", "sms"].includes(method) && !code) {
@@ -162,7 +149,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
       requestId,
     })
       .catch(() => {
-        setError("Could not verify OTP code");
+        setError(t("errors.couldNotVerifyCode"));
         return;
       })
       .finally(() => {
@@ -220,7 +207,7 @@ export function LoginOTP({ host, loginName, sessionId, requestId, organization, 
                 <Translated i18nKey="verify.noCodeReceived" namespace="otp" />
               </span>
               <button
-                aria-label="Resend OTP Code"
+                aria-label={t("verify.resendCode")}
                 disabled={loading}
                 type="button"
                 className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"

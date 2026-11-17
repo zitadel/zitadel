@@ -1,42 +1,12 @@
--- represents an event to be created.
-DO $$ BEGIN
-    CREATE TYPE eventstore.command2 AS (
-        instance_id TEXT
-        , aggregate_type TEXT
-        , aggregate_id TEXT
-        , command_type TEXT
-        , revision INT2
-        , payload JSONB
-        , creator TEXT
-        , owner TEXT
-        , enforce_owner BOOLEAN
-    );
-EXCEPTION
-    WHEN duplicate_object THEN null;
-END $$;
-
-DO $$ BEGIN
-    CREATE TYPE eventstore.latest_command AS (
-        instance_id TEXT
-        , aggregate_type TEXT
-        , aggregate_id TEXT
-        , owner TEXT
-        , sequence BIGINT
-    );
-EXCEPTION
-    WHEN duplicate_object THEN null;
-END $$;
-
-CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command2[])
-    RETURNS SETOF eventstore.events2
+CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command2[]) 
+    RETURNS SETOF eventstore.events2 
     LANGUAGE 'plpgsql'
-    STABLE PARALLEL SAFE
+    VOLATILE PARALLEL SAFE
     ROWS 10
 AS $$
 DECLARE
     _latest_events eventstore.latest_command[];
     command eventstore.command2;
-    last_owner TEXT;
     i INTEGER;
 BEGIN
 
@@ -116,7 +86,7 @@ BEGIN
             THEN c.owner
             ELSE COALESCE(e.owner, c.owner)
         END AS owner
-        , EXTRACT(EPOCH FROM statement_timestamp()) AS position
+        , EXTRACT(EPOCH FROM clock_timestamp()) AS position
         , c.ordinality::%s AS in_tx_order
     FROM UNNEST(commands) WITH ORDINALITY AS c
     LEFT JOIN unnest(_latest_events) AS e
@@ -127,10 +97,3 @@ BEGIN
         in_tx_order;
 END;
 $$;
-
-CREATE OR REPLACE FUNCTION eventstore.push(commands eventstore.command2[]) RETURNS SETOF eventstore.events2 VOLATILE AS $$
-INSERT INTO eventstore.events2
-SELECT * FROM eventstore.commands_to_events(commands)
-ORDER BY in_tx_order
-RETURNING *
-$$ LANGUAGE SQL;

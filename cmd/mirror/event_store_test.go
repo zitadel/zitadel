@@ -28,13 +28,13 @@ func TestCopyUniqueConstraints(t *testing.T) {
 		_, err := dest.ExecContext(ctx, "CREATE DATABASE "+name)
 		require.NoError(t, err)
 	}
-	const table = "CREATE SCHEMA eventstore; CREATE TABLE eventstore.unique_constraints (instance_id TEXT, unique_type TEXT, unique_field TEXT, claimant_type TEXT, claimant_id TEXT, PRIMARY KEY (instance_id, unique_type, unique_field));"
+	const table = "CREATE SCHEMA eventstore; CREATE TABLE eventstore.unique_constraints (instance_id TEXT, unique_type TEXT, unique_field TEXT, owners TEXT[] NOT NULL DEFAULT '{}', PRIMARY KEY (instance_id, unique_type, unique_field));"
 	_, err := dest.ExecContext(ctx, table)
 	require.NoError(t, err)
 	current := open("current")
-	_, err = current.ExecContext(ctx, table+"INSERT INTO eventstore.unique_constraints VALUES ('i1', 'group_external_id', 'key', 'group', 'g1'), ('i1', 'username', 'u', NULL, NULL)")
+	_, err = current.ExecContext(ctx, table+"INSERT INTO eventstore.unique_constraints VALUES ('i1', 'group_external_id', 'key', '{org:o1,group:g1}'), ('i1', 'username', 'u', '{}')")
 	require.NoError(t, err)
-	// Releases before setup step 76 have no claimant columns.
+	// Releases before setup step 78 have no owners column.
 	legacy := open("legacy")
 	_, err = legacy.ExecContext(ctx, `CREATE SCHEMA eventstore; CREATE TABLE eventstore.unique_constraints (instance_id TEXT, unique_type TEXT, unique_field TEXT);
  INSERT INTO eventstore.unique_constraints VALUES ('i2', 'username', 'u')`)
@@ -45,19 +45,19 @@ func TestCopyUniqueConstraints(t *testing.T) {
 	copyUniqueConstraints(ctx, current, dest)
 	copyUniqueConstraints(ctx, legacy, dest)
 
-	rows, err := dest.DB.QueryContext(ctx, "SELECT instance_id, unique_type, unique_field, COALESCE(claimant_type, '-'), COALESCE(claimant_id, '-') FROM eventstore.unique_constraints ORDER BY 1, 2")
+	rows, err := dest.DB.QueryContext(ctx, "SELECT instance_id, unique_type, unique_field, array_to_string(owners, ',') FROM eventstore.unique_constraints ORDER BY 1, 2")
 	require.NoError(t, err)
 	defer rows.Close()
-	var got [][5]string
+	var got [][4]string
 	for rows.Next() {
-		var row [5]string
-		require.NoError(t, rows.Scan(&row[0], &row[1], &row[2], &row[3], &row[4]))
+		var row [4]string
+		require.NoError(t, rows.Scan(&row[0], &row[1], &row[2], &row[3]))
 		got = append(got, row)
 	}
 	require.NoError(t, rows.Err())
-	require.Equal(t, [][5]string{
-		{"i1", "group_external_id", "key", "group", "g1"},
-		{"i1", "username", "u", "-", "-"},
-		{"i2", "username", "u", "-", "-"},
+	require.Equal(t, [][4]string{
+		{"i1", "group_external_id", "key", "org:o1,group:g1"},
+		{"i1", "username", "u", ""},
+		{"i2", "username", "u", ""},
 	}, got)
 }

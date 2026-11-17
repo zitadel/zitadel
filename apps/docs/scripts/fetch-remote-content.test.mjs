@@ -2,7 +2,7 @@ import { test, describe, beforeEach, afterEach, mock } from 'node:test';
 import assert from 'node:assert';
 import fs from 'fs';
 import path from 'path';
-import { getCurrentRef, resetCache, downloadFileContent, isValidRef, safeLog } from './fetch-remote-content.mjs';
+import { getCurrentRef, resetCache, downloadFileContent, isValidRef, safeLog, unwrapHeadingLinks, parseLsRemoteTags } from './fetch-remote-content.mjs';
 
 const TEST_TMP_DIR = path.join(process.cwd(), '.test-tmp');
 const MOCK_REPO_ROOT = path.join(TEST_TMP_DIR, 'mock-repo');
@@ -155,6 +155,47 @@ describe('fetch-remote-content', () => {
         assert.ok(!result.includes('v5.0.0-alpha'), 'alpha prerelease should be excluded');
         assert.ok(!result.includes('v5.0.0-beta.1'), 'beta prerelease should be excluded');
         assert.ok(!result.includes('v4.11.0-rc.1'), 'rc prerelease should be excluded');
+    });
+  });
+
+  // --- parseLsRemoteTags Tests ---
+  describe('parseLsRemoteTags', () => {
+    test('extracts tag names and de-duplicates peeled annotated tags', () => {
+      const output = [
+        'aaa\trefs/tags/v4.17.3',
+        'bbb\trefs/tags/v4.17.3^{}',
+        'ccc\trefs/tags/v4.16.0',
+        'ddd\trefs/heads/main',
+        '',
+      ].join('\n');
+      assert.deepStrictEqual(parseLsRemoteTags(output), [{ name: 'v4.17.3' }, { name: 'v4.16.0' }]);
+    });
+  });
+
+  // --- unwrapHeadingLinks Tests ---
+  describe('unwrapHeadingLinks', () => {
+    test('unwraps markdown links inside headings only', () => {
+      const input = [
+        '### [Identity Providers & Federation](/guides/integrate/identity-providers/introduction)',
+        '#### **1. [List my project roles](/reference/api/auth/AuthService.ListMyProjectPermissions)**',
+        'A paragraph with a [link](/kept) is left untouched.',
+      ].join('\n');
+      const expected = [
+        '### Identity Providers & Federation',
+        '#### **1. List my project roles**',
+        'A paragraph with a [link](/kept) is left untouched.',
+      ].join('\n');
+      assert.strictEqual(unwrapHeadingLinks(input), expected);
+    });
+
+    test('leaves images in headings and comments inside code fences alone', () => {
+      const input = [
+        '## ![logo](/img/logo.png) Title',
+        '```bash',
+        '# [not a heading](https://example.com)',
+        '```',
+      ].join('\n');
+      assert.strictEqual(unwrapHeadingLinks(input), input);
     });
   });
 

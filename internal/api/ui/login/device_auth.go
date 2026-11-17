@@ -97,7 +97,7 @@ func (l *Login) handleDeviceAuthUserCode(w http.ResponseWriter, r *http.Request)
 		l.renderDeviceAuthUserCode(w, r, err)
 		return
 	}
-	deviceAuthReq, err := l.query.DeviceAuthRequestByUserCode(ctx, userCode)
+	deviceAuthReq, err := l.query.DeviceAuthRequestByUserCode(ctx, userCode, false)
 	if err != nil {
 		l.renderDeviceAuthUserCode(w, r, err)
 		return

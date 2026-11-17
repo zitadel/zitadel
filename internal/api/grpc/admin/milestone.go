@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Server) ListMilestones(ctx context.Context, req *admin.ListMilestonesRequest) (*admin.ListMilestonesResponse, error) {
-	queries, err := listMilestonesToModel(authz.GetInstance(ctx).InstanceID(), req)
+	queries, err := listMilestonesToModel(s.systemDefaults, authz.GetInstance(ctx).InstanceID(), req)
 	if err != nil {
 		return nil, err
 	}

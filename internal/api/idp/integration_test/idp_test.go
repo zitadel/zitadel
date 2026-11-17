@@ -458,6 +458,64 @@ func TestServer_SAMLACS(t *testing.T) {
 	}
 }
 
+// TestServer_SAMLACSIntentIDPMismatch reproduces the SAML IdP-confusion issue: an assertion validly
+// signed by and targeted at IdP-A must not be accepted for a login intent that was started for a
+// different IdP-B. Before the fix the ACS handler verified the assertion against the IdP named in the
+// request path but resolved the user under the intent's IdP, so the forged response below succeeded
+// and returned a session as the victim. It must now be rejected.
+func TestServer_SAMLACSIntentIDPMismatch(t *testing.T) {
+	victim := Instance.CreateHumanUser(CTX)
+	externalUserID := "victim-external-id"
+
+	// IdP-B is the victim's IdP (the intent target); IdP-A is the attacker's IdP (whose signing key the
+	// attacker controls). Both are backed by the same instance SAML key here, which is irrelevant to the
+	// attack — it turns on Destination/Audience/InResponseTo, not on a distinct key.
+	idpB := Instance.AddSAMLRedirectProvider(CTX, "")
+	idpA := Instance.AddSAMLRedirectProvider(CTX, "")
+	Instance.CreateUserIDPlink(CTX, victim.UserId, externalUserID, idpB, externalUserID)
+
+	baseURL := http_util.BuildOrigin(Instance.Host(), Instance.Config.Secure)
+	idp, err := getIDP(baseURL, []string{idpA, idpB}, externalUserID, externalUserID+"-2")
+	require.NoError(t, err)
+
+	const (
+		successURL = "https://example.com/success"
+		failureURL = "https://example.com/failure"
+	)
+
+	// Start a genuine intent for IdP-B and keep its RelayState; this is the intent the attacker confuses.
+	intentB, err := Client.StartIdentityProviderIntent(CTX, &user.StartIdentityProviderIntentRequest{
+		IdpId:   idpB,
+		Content: &user.StartIdentityProviderIntentRequest_Urls{Urls: &user.RedirectURLs{SuccessUrl: successURL, FailureUrl: failureURL}},
+	})
+	require.NoError(t, err)
+	authURLB, err := url.Parse(intentB.GetAuthUrl())
+	require.NoError(t, err)
+	relayStateB := authURLB.Query().Get("RelayState")
+	reqB := &http.Request{Method: http.MethodGet, URL: authURLB}
+
+	// Start an intent for IdP-A only to obtain a valid AuthnRequest targeting IdP-A's SP.
+	intentA, err := Client.StartIdentityProviderIntent(CTX, &user.StartIdentityProviderIntentRequest{
+		IdpId:   idpA,
+		Content: &user.StartIdentityProviderIntentRequest_Urls{Urls: &user.RedirectURLs{SuccessUrl: successURL, FailureUrl: failureURL}},
+	})
+	require.NoError(t, err)
+	authURLA, err := url.Parse(intentA.GetAuthUrl())
+	require.NoError(t, err)
+	reqA := &http.Request{Method: http.MethodGet, URL: authURLA}
+
+	// Forge a response validly signed for IdP-A (Destination/Audience = IdP-A's SP), but whose
+	// InResponseTo is copied from the IdP-B intent so it satisfies that intent's RequestID check.
+	response := createConfusedResponse(t, idp, reqA, reqB, externalUserID, string(saml.PersistentNameIDFormat))
+
+	// Post it to IdP-A's ACS with the IdP-B intent's RelayState: the URL names A, the RelayState names B.
+	callbackURL := baseURL + "/idps/" + idpA + "/saml/acs"
+	_, err = integration.CheckPost(callbackURL, httpPostFormRequest(relayStateB, response))
+	// Must be rejected. Before the fix this returned a 302 to the success URL carrying the victim's
+	// session, so CheckPost would return no error; now the mismatch yields a 400 (no Location).
+	require.Error(t, err)
+}
+
 func getIDP(zitadelBaseURL string, idpIDs []string, user1, user2 string) (*saml.IdentityProvider, error) {
 	baseURL, err := url.Parse("http://localhost:8000")
 	if err != nil {
@@ -543,6 +601,40 @@ func createResponse(t *testing.T, idp *saml.IdentityProvider, req *http.Request,
 	doc.SetRoot(authnReq.ResponseEl)
 	responseBuf, err := doc.WriteToBytes()
 	assert.NoError(t, err)
+	responseBuf = append([]byte("<?xml version=\"1.0\"?>"), responseBuf...)
+
+	return base64.StdEncoding.EncodeToString(responseBuf)
+}
+
+// createConfusedResponse builds a SAML response that is validly signed for and targeted at the SP of
+// spReq's IdP, but whose InResponseTo is taken from idReq (a different IdP's intent). This mirrors the
+// IdP-confusion attack: the assertion verifies against one IdP while answering another IdP's intent.
+func createConfusedResponse(t *testing.T, idp *saml.IdentityProvider, spReq, idReq *http.Request, nameID, nameIDFormat string) string {
+	sp, err := saml.NewIdpAuthnRequest(idp, spReq)
+	require.NoError(t, err)
+	require.NoError(t, sp.Validate())
+
+	id, err := saml.NewIdpAuthnRequest(idp, idReq)
+	require.NoError(t, err)
+	require.NoError(t, id.Validate())
+
+	// Keep spReq's SP (Destination/Recipient/Audience), but answer idReq's request ID so the response
+	// passes the RequestID (InResponseTo) check of the confused intent.
+	sp.Request.ID = id.Request.ID
+
+	err = idp.AssertionMaker.MakeAssertion(sp, &saml.Session{
+		CreateTime:   time.Now().UTC(),
+		NameID:       nameID,
+		NameIDFormat: nameIDFormat,
+		UserName:     nameID,
+	})
+	require.NoError(t, err)
+	require.NoError(t, sp.MakeResponse())
+
+	doc := etree.NewDocument()
+	doc.SetRoot(sp.ResponseEl)
+	responseBuf, err := doc.WriteToBytes()
+	require.NoError(t, err)
 	responseBuf = append([]byte("<?xml version=\"1.0\"?>"), responseBuf...)
 
 	return base64.StdEncoding.EncodeToString(responseBuf)

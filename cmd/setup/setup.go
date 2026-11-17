@@ -258,12 +258,19 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s73FixUserGrantRoles = &FixUserGrantRoles{eventstore: eventstoreClient}
 	steps.s74Apps7OIDCConfigsAddRegistrationToken = &Apps7OIDCConfigsAddRegistrationToken{dbClient: dbClient}
 	steps.s75Apps7OIDCConfigsAddAppLinkConfig = &Apps7OIDCConfigsAddAppLinkConfig{dbClient: dbClient}
-	steps.s76UniqueConstraintClaimants = &UniqueConstraintClaimants{dbClient: dbClient}
-	steps.s77EventStatementPosition = &EventStatementPosition{dbClient: dbClient}
+	steps.s76Users14LoginEqualityIndexes = &Users14LoginEqualityIndexes{dbClient: dbClient}
+	steps.s77StampEventPositionAtInsert = &StampEventPositionAtInsert{dbClient: dbClient}
+	steps.s78UniqueConstraintOwners = &UniqueConstraintOwners{dbClient: dbClient}
+	steps.s80Users14InstanceResourceOwnerIndex = &Users14InstanceResourceOwnerIndex{dbClient: dbClient}
+	if steps.BackfillUniqueConstraintOwners == nil {
+		steps.BackfillUniqueConstraintOwners = &BackfillUniqueConstraintOwners{}
+	}
+	steps.BackfillUniqueConstraintOwners.dbClient = dbClient
+	steps.BackfillUniqueConstraintOwners.Version = build.Version()
 
-	// Every pushed unique constraint writes the columns of step 76, also the one of each migration started event.
-	if setupErr = steps.s76UniqueConstraintClaimants.Execute(ctx, nil); setupErr != nil {
-		return fmt.Errorf("unable to add unique constraint claimant columns: %w", setupErr)
+	// Unique constraint writes name the owners column of step 78, also the writes of the steps before it.
+	if _, setupErr = dbClient.ExecContext(ctx, uniqueConstraintsOwnersColumn); setupErr != nil {
+		return fmt.Errorf("unable to add unique constraint owners column: %w", setupErr)
 	}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
@@ -274,7 +281,6 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	for _, step := range []migration.Migration{
 		steps.s14NewEventsTable,
 		steps.s40InitPushFunc,
-		steps.s76UniqueConstraintClaimants, // reservation columns are needed by subsequent migrations.
 		steps.s1ProjectionTable,
 		steps.s2AssetsTable,
 		steps.s28AddFieldTable,
@@ -324,7 +330,10 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s67SyncMemberRoleFields,
 		steps.s69CacheTablesLogged,
 		steps.s70AddEventStoreCommandEnforceOwner,
-		steps.s77EventStatementPosition,
+		steps.s76Users14LoginEqualityIndexes,
+		steps.s77StampEventPositionAtInsert,
+		steps.s78UniqueConstraintOwners,
+		steps.s80Users14InstanceResourceOwnerIndex,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
@@ -418,6 +427,12 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		if setupErr != nil {
 			return
 		}
+	}
+
+	// Owner backfill joins projection rows, so it runs after those tables are created and after event replay when prefill is enabled.
+	setupErr = executeMigration(ctx, eventstoreClient, steps.BackfillUniqueConstraintOwners, "migration failed")
+	if setupErr != nil {
+		return setupErr
 	}
 	return nil
 }

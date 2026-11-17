@@ -75,8 +75,8 @@ func TestEventstore_UniqueConstraintArrays_legacyMatching(t *testing.T) {
 							owner = "group"
 						}
 						_, err := clients[name].ExecContext(ctx, `INSERT INTO eventstore.unique_constraints
-							(instance_id, unique_type, unique_field, claimant_type, claimant_id)
-							VALUES ('', $1, $2, NULLIF($3, ''), NULLIF($3, ''))`, typ, field, owner)
+							(instance_id, unique_type, unique_field, owners)
+							VALUES ('', $1, $2, CASE WHEN $3::TEXT = '' THEN '{}'::TEXT[] ELSE ARRAY['claimant:group:' || $3::TEXT] END)`, typ, field, owner)
 						require.NoError(t, err)
 					}
 					_, err := pusher.Push(ctx, nil, claimedCommand(typ, "group", nil, eventstore.NewRemoveUniqueConstraint(string(typ), "MiXeD")))
@@ -122,9 +122,9 @@ func TestEventstore_UniqueConstraintArrays_scopesAndEscaping(t *testing.T) {
 			require.NoError(t, push(instance, add(false), eventstore.NewAddGlobalUniqueConstraint(string(typ), key, "duplicate")))
 			require.NoError(t, push(otherInstance, add(true)))
 			var field, owner string
-			require.NoError(t, clients[name].DB.QueryRowContext(ctx, "SELECT unique_field, claimant_id FROM eventstore.unique_constraints WHERE instance_id = $1 AND unique_type = $2", otherInstance, typ).Scan(&field, &owner))
+			require.NoError(t, clients[name].DB.QueryRowContext(ctx, "SELECT unique_field, owners[1] FROM eventstore.unique_constraints WHERE instance_id = $1 AND unique_type = $2", otherInstance, typ).Scan(&field, &owner))
 			require.Equal(t, strings.ToLower(key), field)
-			require.Equal(t, key, owner)
+			require.Equal(t, "claimant:group:"+key, owner)
 			require.NoError(t, push(instance, eventstore.NewRemoveUniqueConstraint(string(typ), key)))
 			// The global and other instance's owned reservation must survive the unowned release.
 			var count int

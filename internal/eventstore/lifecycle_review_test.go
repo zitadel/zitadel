@@ -228,7 +228,7 @@ func TestEventstore_GroupCascadeStatementsDoNotGrow(t *testing.T) {
 		var left int
 		require.NoError(t, sqlTx.QueryRowContext(ctx, "SELECT count(*) FROM eventstore.fields WHERE instance_id = $1 AND resource_owner = $2", instance, org).Scan(&left))
 		require.Zero(t, left)
-		require.NoError(t, sqlTx.QueryRowContext(ctx, "SELECT count(*) FROM eventstore.unique_constraints WHERE instance_id = $1 AND unique_type = 'group_external_id' AND claimant_id LIKE $2", instance, org+"-%").Scan(&left))
+		require.NoError(t, sqlTx.QueryRowContext(ctx, "SELECT count(*) FROM eventstore.unique_constraints WHERE instance_id = $1 AND unique_type = 'group_external_id' AND EXISTS (SELECT 1 FROM unnest(owners) AS tag WHERE tag LIKE $2)", instance, "claimant:group:"+org+"-%").Scan(&left))
 		require.Zero(t, left)
 		return tx.statements
 	}

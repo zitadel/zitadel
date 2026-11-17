@@ -24,6 +24,8 @@ type Event struct {
 	Seq uint64
 	// Pos is the global sequence of the event multiple events can have the same sequence
 	Pos decimal.Decimal
+	// InTx is the 1-based ordinal of the event inside its push transaction
+	InTx uint32
 
 	// CreationDate is the time the event is created
 	// it's used for human readability.
@@ -100,6 +102,11 @@ func (e *Event) Sequence() uint64 {
 // Position implements [eventstore.Event]
 func (e *Event) Position() decimal.Decimal {
 	return e.Pos
+}
+
+// InTxOrder implements [eventstore.Event]
+func (e *Event) InTxOrder() uint32 {
+	return e.InTx
 }
 
 // CreatedAt implements [eventstore.Event]

@@ -369,6 +369,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: 외부 사용자 찾을 수 없음
   Description: 외부 사용자를 찾을 수 없습니다. 사용자 계정을 연결하거나 새 계정을 자동 등록하시겠습니까?
+  NoOptionAvailable: 외부 사용자와 일치하는 계정을 찾을 수 없으며 새 계정도 생성할 수 없습니다. 관리자 또는 지원팀에 문의하세요.
   LinkButtonText: 연결
   AutoRegisterButtonText: 등록
   TosAndPrivacyLabel: 동의사항
@@ -504,6 +505,7 @@ Errors:
         AlreadyReady: 다중 인증 OTP(일회용 비밀번호)가 이미 설정되었습니다
         NotExisting: 다중 인증 OTP(일회용 비밀번호)가 존재하지 않습니다
         InvalidCode: 잘못된 코드입니다
+        Reused: 이 코드는 이미 사용되었습니다. 새 코드를 기다려 주세요
         NotReady: 다중 인증 OTP(일회용 비밀번호)가 준비되지 않았습니다
     Locked: 사용자가 잠겼습니다
     SomethingWentWrong: 문제가 발생했습니다

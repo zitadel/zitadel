@@ -44,7 +44,11 @@ func (e *GroupGrantAddedEvent) Payload() interface{} {
 }
 
 func (e *GroupGrantAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddGroupGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.GroupID, e.ProjectID, e.ProjectGrantID)}
+	return []*eventstore.UniqueConstraint{NewAddGroupGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.GroupID, e.ProjectID, e.ProjectGrantID).WithOwners(
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ResourceOwner),
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerProject, e.ProjectID),
+		eventstore.OwnerTag(eventstore.UniqueConstraintOwnerGrant, e.ProjectGrantID),
+	)}
 }
 
 func NewGroupGrantAddedEvent(

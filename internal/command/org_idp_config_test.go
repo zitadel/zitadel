@@ -24,7 +24,7 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 	type fields struct {
 		eventstore   *eventstore.Eventstore
 		idGenerator  id.Generator
-		secretCrypto crypto.EncryptionAlgorithm
+		secretCrypto crypto.AuthEncryptionAlgorithm
 	}
 	type args struct {
 		ctx           context.Context
@@ -118,7 +118,7 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "config1"),
-				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -656,4 +656,114 @@ func TestCommands_RemoveIDPConfig(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCommands_RemoveIDPConfigOwnerDeleteReady(t *testing.T) {
+	c := &Commands{
+		eventstore: eventstoreExpect(t,
+			expectFilter(
+				eventFromEventPusher(
+					org.NewIDPConfigAddedEvent(context.Background(),
+						&org.NewAggregate("org1").Aggregate,
+						"idp1",
+						"name1",
+						domain.IDPConfigTypeOIDC,
+						domain.IDPConfigStylingTypeGoogle,
+						false,
+					),
+				),
+			),
+			expectPush(
+				org.NewIDPConfigRemovedByOwnerEvent(context.Background(),
+					&org.NewAggregate("org1").Aggregate,
+					"idp1",
+					"name1",
+				),
+			),
+		),
+		checkPermission:  newMockPermissionCheckAllowed(),
+		ownerDeleteReady: func(context.Context) (bool, error) { return true, nil },
+	}
+	assertOwnerOnlyUniqueConstraints(t, org.NewIDPConfigRemovedByOwnerEvent(context.Background(),
+		&org.NewAggregate("org1").Aggregate,
+		"idp1",
+		"name1",
+	), eventstore.UniqueConstraintOwnerIDP, "idp1")
+	got, err := c.RemoveIDPConfig(context.Background(), "idp1", "org1", false, nil)
+	assert.NoError(t, err)
+	assertObjectDetails(t, &domain.ObjectDetails{ResourceOwner: "org1"}, got)
+}
+
+func TestCommands_RemoveIDPConfigOwnerDeleteReadyCascade(t *testing.T) {
+	cascade := user.NewUserIDPLinkCascadeRemovedEvent(context.Background(),
+		&user.NewAggregate("user1", "org1").Aggregate,
+		"idp1",
+		"id1",
+	)
+	eventstore.SkipCommandUniqueConstraints(cascade)
+
+	c := &Commands{
+		eventstore: eventstoreExpect(t,
+			expectFilter(
+				eventFromEventPusher(
+					org.NewIDPConfigAddedEvent(context.Background(),
+						&org.NewAggregate("org1").Aggregate,
+						"idp1",
+						"name1",
+						domain.IDPConfigTypeOIDC,
+						domain.IDPConfigStylingTypeGoogle,
+						false,
+					),
+				),
+			),
+			expectFilter(
+				eventFromEventPusher(
+					user.NewHumanAddedEvent(context.Background(),
+						&user.NewAggregate("user1", "org1").Aggregate,
+						"username",
+						"firstname",
+						"lastname",
+						"nickname",
+						"displayName",
+						language.German,
+						domain.GenderUnspecified,
+						"email@test.com",
+						true,
+					),
+				),
+				eventFromEventPusher(
+					user.NewUserIDPLinkAddedEvent(context.Background(),
+						&user.NewAggregate("user1", "org1").Aggregate,
+						"idp1",
+						"name",
+						"id1",
+					),
+				),
+			),
+			expectPush(
+				org.NewIDPConfigRemovedByOwnerEvent(context.Background(),
+					&org.NewAggregate("org1").Aggregate,
+					"idp1",
+					"name1",
+				),
+				org.NewIdentityProviderCascadeRemovedEvent(context.Background(),
+					&org.NewAggregate("org1").Aggregate,
+					"idp1",
+				),
+				cascade,
+			),
+		),
+		checkPermission:  newMockPermissionCheckAllowed(),
+		ownerDeleteReady: func(context.Context) (bool, error) { return true, nil },
+	}
+	got, err := c.RemoveIDPConfig(context.Background(), "idp1", "org1", true, &domain.UserIDPLink{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: "user1",
+		},
+		IDPConfigID:    "idp1",
+		ExternalUserID: "id1",
+		DisplayName:    "name",
+	})
+	assert.NoError(t, err)
+	assertObjectDetails(t, &domain.ObjectDetails{ResourceOwner: "org1"}, got)
 }

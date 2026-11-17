@@ -59,7 +59,7 @@ func TestWithInstanceLock(t *testing.T) {
 		holder, err := db.BeginTx(ctx, nil)
 		require.NoError(t, err)
 		defer func() { _ = holder.Rollback() }()
-		// The blocking form cmd/setup/78.go uses must take the same lock.
+		// The blocking form cmd/setup/81.go uses must take the same lock.
 		_, err = holder.ExecContext(ctx, "SELECT pg_advisory_xact_lock(hashtextextended('zitadel.group-lifecycle:' || $1, 0))", "instance")
 		require.NoError(t, err)
 

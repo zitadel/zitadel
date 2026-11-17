@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/go-jose/go-jose/v4"
@@ -57,7 +58,7 @@ type Commands struct {
 	externalSecure bool
 	externalPort   uint16
 
-	idpConfigEncryption             crypto.EncryptionAlgorithm
+	idpConfigEncryption             crypto.AuthEncryptionAlgorithm
 	smtpEncryption                  crypto.EncryptionAlgorithm
 	smsEncryption                   crypto.EncryptionAlgorithm
 	userEncryption                  crypto.EncryptionAlgorithm
@@ -110,6 +111,9 @@ type Commands struct {
 	loginPaths       LoginPaths
 	ipLookupFunction internal_net.IPLookupFunc
 	denyList         []denylist.AddressChecker
+
+	ownerDeleteReady       func(context.Context) (bool, error)
+	ownerDeleteReadyCached atomic.Bool
 }
 
 //go:generate mockgen -package command -destination ./mock_login_paths.go . LoginPaths
@@ -131,7 +135,8 @@ func StartCommands(
 	externalDomain string,
 	externalSecure bool,
 	externalPort uint16,
-	idpConfigEncryption, otpEncryption, smtpEncryption, smsEncryption, userEncryption, domainVerificationEncryption, samlEncryption, targetEncryption crypto.EncryptionAlgorithm,
+	idpConfigEncryption crypto.AuthEncryptionAlgorithm,
+	otpEncryption, smtpEncryption, smsEncryption, userEncryption, domainVerificationEncryption, samlEncryption, targetEncryption crypto.EncryptionAlgorithm,
 	oidcEncryption crypto.AuthEncryptionAlgorithm,
 	httpClient *http.Client,
 	permissionCheck domain.PermissionCheck,
@@ -239,6 +244,8 @@ func StartCommands(
 		ipLookupFunction: ipLookupFunction,
 		denyList:         denyList,
 	}
+
+	repo.ownerDeleteReady = repo.uniqueConstraintOwnersBackfillFinalized
 
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {
 		repo.newHashedSecret = newHashedSecretWithDefault(secretHasher, defaultSecretGenerators.ClientSecret)

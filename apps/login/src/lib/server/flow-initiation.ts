@@ -1,13 +1,18 @@
-import { getValidLocaleFromUILocales } from "@/lib/auth-utils";
-import { isExternalUrl, isSafeRedirectUri } from "@/lib/client-utils";
-import { getLanguageCookie, setLanguageCookie } from "@/lib/cookies";
+import "server-only";
 
+import { addIdpFlowProof } from "@/lib/server/fingerprint";
+
+import { isExternalUrl, isSafeRedirectUri } from "@/lib/client-utils";
+import { getValidLocaleFromUILocales } from "@/lib/server/auth-utils";
+import { getLanguageCookie, setLanguageCookie, type Cookie } from "@/lib/server/cookies";
+
+import { sendLoginname } from "@/lib/actions/loginname";
 import { shouldUILocalesOverrideCookie } from "@/lib/i18n";
 import { idpTypeToSlug } from "@/lib/idp";
-import { createLogger } from "@/lib/logger";
-import { sendLoginname } from "@/lib/server/loginname";
-import { constructUrl } from "@/lib/service-url";
-import { findValidSession } from "@/lib/session";
+import { buildCSP } from "@/lib/server/csp";
+import { createLogger } from "@/lib/server/logger";
+import { constructUrl } from "@/lib/server/service-url";
+import { findValidSession } from "@/lib/server/session";
 import {
   createCallback,
   createResponse,
@@ -18,7 +23,7 @@ import {
   getSecuritySettings,
   ServiceConfig,
   startIdentityProviderFlow,
-} from "@/lib/zitadel";
+} from "@/lib/server/zitadel";
 import { create } from "@zitadel/client";
 import { Prompt } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import { CreateCallbackRequestSchema, SessionSchema } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
@@ -28,7 +33,6 @@ import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_s
 import { SecuritySettings } from "@zitadel/proto/zitadel/settings/v2/security_settings_pb";
 import escapeHtml from "escape-html";
 import { NextRequest, NextResponse } from "next/server";
-import { buildCSP } from "../csp";
 
 const logger = createLogger("flow-initiation");
 
@@ -222,11 +226,22 @@ function getEligibleSessions(sessions: Session[], organization?: string): Sessio
   return sessions.filter((s) => s.factors?.user?.organizationId === organization);
 }
 
+/**
+ * Whether the `sessions` cookie references any previous account for the given
+ * organization (or for any org when `organization` is unset).
+ */
+function hasCookieAccount(sessionCookies: Cookie[], organization?: string): boolean {
+  if (!sessionCookies || sessionCookies.length === 0) {
+    return false;
+  }
+  return sessionCookies.some((c) => !!c.loginName && (!organization || c.organization === organization));
+}
+
 export interface FlowInitiationParams {
   serviceConfig: ServiceConfig;
   requestId: string;
   sessions: Session[];
-  sessionCookies: any[];
+  sessionCookies: Cookie[];
   request: NextRequest;
 }
 
@@ -312,12 +327,16 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
           params.set("organization", organization);
         }
 
+        // binds the flow to this browser; Next.js adds the cookie set via cookies() to the returned response
+        await addIdpFlowProof(params);
+
         const response = await startIdentityProviderFlow({
           serviceConfig,
           idpId,
           urls: {
             successUrl: constructUrl(request, `/idp/${provider}/process?${params.toString()}`).toString(),
             failureUrl: constructUrl(request, `/idp/${provider}/failure?${params.toString()}`).toString(),
+            loginHint: authRequest.loginHint,
           },
         });
 
@@ -366,13 +385,19 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
     if (authRequest.prompt.includes(Prompt.SELECT_ACCOUNT)) {
       if (eligibleSessions.length === 0) {
-        return gotoLoginname({
-          request,
-          requestId,
-          loginHint: authRequest.loginHint,
-          organization,
-          orgDomain,
-        });
+        // No live session is eligible. If the session cookie still references
+        // a previous account (and the RP did not pass a login_hint, which always
+        // takes precedence over the cookie fallback), keep account selection so
+        // the user can pick it.
+        if (authRequest.loginHint || !hasCookieAccount(sessionCookies, organization)) {
+          return gotoLoginname({
+            request,
+            requestId,
+            loginHint: authRequest.loginHint,
+            organization,
+            orgDomain,
+          });
+        }
       }
       return gotoAccounts({
         request,
@@ -464,7 +489,9 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
 
         // Prefill loginname (not the account picker) for an unresolved hint or when
         // no session is eligible: the picker would only list non-matching accounts.
-        if (authRequest.loginHint || eligibleSessions.length === 0) {
+        // Exception: if the sessions cookie still references a previous account for
+        // this organization, keep the picker so the user can select it (#12252).
+        if (authRequest.loginHint || (eligibleSessions.length === 0 && !hasCookieAccount(sessionCookies, organization))) {
           return gotoLoginname({
             request,
             requestId,
@@ -534,6 +561,26 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
       }
     }
   } else {
+    // No live sessions were resolved. If the sessions cookie still references a
+    // previous account and the RP did not pass a login_hint, show account
+    // selection (mirrors Login V1 behavior after RP-initiated logout, #12252).
+    // prompt=none must never render UI and prompt=login goes straight to
+    // /loginname like it does when live sessions exist, so both keep the
+    // existing behavior.
+    if (
+      !authRequest?.loginHint &&
+      !authRequest?.prompt.includes(Prompt.NONE) &&
+      !authRequest?.prompt.includes(Prompt.LOGIN) &&
+      hasCookieAccount(sessionCookies, organization)
+    ) {
+      return gotoAccounts({
+        request,
+        requestId,
+        organization,
+        orgDomain,
+      });
+    }
+
     // No session: resolve a login_hint straight to the next step if we can.
     const hintResponse = await resolveLoginHint({
       request,

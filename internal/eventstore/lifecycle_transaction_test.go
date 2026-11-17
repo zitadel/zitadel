@@ -3,8 +3,6 @@ package eventstore_test
 import (
 	"context"
 	"database/sql"
-	"os"
-	"strings"
 	"testing"
 	"time"
 
@@ -19,11 +17,6 @@ import (
 func TestEventstore_LifecycleLateCommitPosition(t *testing.T) {
 	ctx, cancel := context.WithTimeout(authz.WithInstanceID(t.Context(), t.Name()), 5*time.Second)
 	defer cancel()
-	setup, err := os.ReadFile("../../cmd/setup/77.sql")
-	require.NoError(t, err)
-	restorePushFunctions(t)
-	_, err = testClient.ExecContext(ctx, strings.ReplaceAll(string(setup), "%s", "INTEGER"))
-	require.NoError(t, err)
 	conn, err := testClient.Conn(ctx)
 	require.NoError(t, err)
 	require.NoError(t, conn.Raw(func(driver any) error { return new_es.RegisterEventstoreTypes(ctx, driver.(*stdlib.Conn).Conn()) }))
@@ -91,22 +84,4 @@ func TestEventstore_LifecycleReadsReuseConnection(t *testing.T) {
 		}, "SELECT 1")
 	})
 	require.NoError(t, err)
-}
-
-// restorePushFunctions puts back the push functions 77.sql replaces so other
-// tests do not depend on running after this one.
-func restorePushFunctions(t *testing.T) {
-	ctx := context.Background()
-	for _, signature := range []string{"eventstore.commands_to_events(eventstore.command2[])", "eventstore.push(eventstore.command2[])"} {
-		var definition sql.NullString
-		require.NoError(t, testClient.DB.QueryRowContext(ctx, "SELECT pg_get_functiondef(to_regprocedure($1))", signature).Scan(&definition))
-		t.Cleanup(func() {
-			statement := "DROP FUNCTION IF EXISTS " + signature
-			if definition.Valid {
-				statement = definition.String
-			}
-			_, err := testClient.ExecContext(ctx, statement)
-			require.NoError(t, err)
-		})
-	}
 }

@@ -48,7 +48,7 @@ func (e *OrgAddedEvent) Payload() interface{} {
 }
 
 func (e *OrgAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddOrgNameUniqueConstraint(e.Name)}
+	return []*eventstore.UniqueConstraint{NewAddOrgNameUniqueConstraint(e.Name).WithOwners(eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ID))}
 }
 
 func (e *OrgAddedEvent) Fields() []*eventstore.FieldOperation {
@@ -125,7 +125,7 @@ func (e *OrgChangedEvent) Payload() interface{} {
 func (e *OrgChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{
 		NewRemoveOrgNameUniqueConstraint(e.oldName),
-		NewAddOrgNameUniqueConstraint(e.Name),
+		NewAddOrgNameUniqueConstraint(e.Name).WithOwners(eventstore.OwnerTag(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ID)),
 	}
 }
 
@@ -285,6 +285,7 @@ type OrgRemovedEvent struct {
 	samlEntityIDs               []string
 	groupNames                  []string
 	groupConstraints            []*eventstore.UniqueConstraint
+	removeByOwner               bool
 }
 
 func (e *OrgRemovedEvent) Payload() interface{} {
@@ -292,6 +293,11 @@ func (e *OrgRemovedEvent) Payload() interface{} {
 }
 
 func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	if e.removeByOwner {
+		return []*eventstore.UniqueConstraint{
+			eventstore.NewRemoveUniqueConstraintsByOwner(eventstore.UniqueConstraintOwnerOrg, e.Aggregate().ID),
+		}
+	}
 	constraints := []*eventstore.UniqueConstraint{
 		NewRemoveOrgNameUniqueConstraint(e.name),
 	}
@@ -336,6 +342,12 @@ func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, na
 		groupNames:                  groupNames,
 		groupConstraints:            groupConstraints,
 	}
+}
+
+func NewOrgRemovedByOwnerEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string) *OrgRemovedEvent {
+	removed := NewOrgRemovedEvent(ctx, aggregate, name, nil, false, nil, nil, nil, nil)
+	removed.removeByOwner = true
+	return removed
 }
 
 func OrgRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {

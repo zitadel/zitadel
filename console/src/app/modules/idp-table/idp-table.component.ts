@@ -266,6 +266,8 @@ export class IdpTableComponent implements OnInit, OnDestroy {
           return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'apple', row.id];
         case ProviderType.PROVIDER_TYPE_SAML:
           return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'saml', row.id];
+        case ProviderType.PROVIDER_TYPE_ZITADEL:
+          return [row.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM ? '/instance' : '/org', 'provider', 'zitadel', row.id];
       }
     }
   }

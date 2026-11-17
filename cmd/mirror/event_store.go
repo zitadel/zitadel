@@ -232,15 +232,15 @@ func copyUniqueConstraints(ctx context.Context, source, dest *db.DB) {
 	reader, writer := io.Pipe()
 	errs := make(chan error, 1)
 
-	const columns = "instance_id, unique_type, unique_field, claimant_type, claimant_id"
+	const columns = "instance_id, unique_type, unique_field, owners"
 	sourceColumns := columns
-	var hasClaimants bool
-	err := source.QueryRowContext(ctx, func(row *sql.Row) error { return row.Scan(&hasClaimants) },
-		"SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'eventstore' AND table_name = 'unique_constraints' AND column_name = 'claimant_id')")
+	var hasOwners bool
+	err := source.QueryRowContext(ctx, func(row *sql.Row) error { return row.Scan(&hasOwners) },
+		"SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'eventstore' AND table_name = 'unique_constraints' AND column_name = 'owners')")
 	logging.OnError(ctx, err).Fatal("unable to query unique constraint columns of source")
-	if !hasClaimants {
-		// Sources older than setup step 76 have no claimants.
-		sourceColumns = "instance_id, unique_type, unique_field, NULL, NULL"
+	if !hasOwners {
+		// Sources older than setup step 78 have no owners.
+		sourceColumns = "instance_id, unique_type, unique_field, '{}'::TEXT[]"
 	}
 
 	sourceConn, err := source.Conn(ctx)
