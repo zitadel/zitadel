@@ -736,8 +736,10 @@ func (c *Commands) prepareAddInstanceOIDCProvider(a *instance.Aggregate, writeMo
 		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-fb5jm", "Errors.Invalid.Argument")
 		}
-		if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
-			return nil, zerrors.ThrowInvalidArgument(nil, "INST-Sfdf4", "Errors.Invalid.Argument")
+		provider.ClientSecret = strings.TrimSpace(provider.ClientSecret)
+		provider.KeyID = strings.TrimSpace(provider.KeyID)
+		if err := provider.checkClientAuth(provider.ClientSecret != "", len(provider.PrivateKey) > 0); err != nil {
+			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
@@ -748,9 +750,18 @@ func (c *Commands) prepareAddInstanceOIDCProvider(a *instance.Aggregate, writeMo
 			if err = writeModel.Reduce(); err != nil {
 				return nil, err
 			}
-			secret, err := crypto.Encrypt([]byte(provider.ClientSecret), c.idpConfigEncryption)
-			if err != nil {
-				return nil, err
+			var secret, privateKey *crypto.CryptoValue
+			if provider.ClientSecret != "" {
+				secret, err = crypto.Encrypt([]byte(provider.ClientSecret), c.idpConfigEncryption)
+				if err != nil {
+					return nil, err
+				}
+			}
+			if len(provider.PrivateKey) > 0 {
+				privateKey, err = crypto.Encrypt(provider.PrivateKey, c.idpConfigEncryption)
+				if err != nil {
+					return nil, err
+				}
 			}
 			return []eventstore.Command{
 				instance.NewOIDCIDPAddedEvent(
@@ -764,9 +775,9 @@ func (c *Commands) prepareAddInstanceOIDCProvider(a *instance.Aggregate, writeMo
 					provider.Scopes,
 					provider.IsIDTokenMapping,
 					provider.UsePKCE,
-					domain.OIDCTokenEndpointAuthMethodClientSecret,
-					nil,
-					"",
+					provider.TokenEndpointAuthMethod,
+					privateKey,
+					provider.KeyID,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -800,6 +811,14 @@ func (c *Commands) prepareUpdateInstanceOIDCProvider(a *instance.Aggregate, writ
 			if !writeModel.State.Exists() {
 				return nil, zerrors.ThrowNotFound(nil, "INST-Dg331", "Errors.IDPConfig.NotExisting")
 			}
+			provider.ClientSecret = strings.TrimSpace(provider.ClientSecret)
+			provider.KeyID = strings.TrimSpace(provider.KeyID)
+			if err = provider.checkClientAuth(
+				provider.ClientSecret != "" || writeModel.ClientSecret != nil,
+				len(provider.PrivateKey) > 0 || writeModel.PrivateKey != nil,
+			); err != nil {
+				return nil, err
+			}
 			event, err := writeModel.NewChangedEvent(
 				ctx,
 				&a.Aggregate,
@@ -812,6 +831,9 @@ func (c *Commands) prepareUpdateInstanceOIDCProvider(a *instance.Aggregate, writ
 				provider.Scopes,
 				provider.IsIDTokenMapping,
 				provider.UsePKCE,
+				provider.TokenEndpointAuthMethod,
+				provider.PrivateKey,
+				provider.KeyID,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {

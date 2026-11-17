@@ -316,6 +316,9 @@ func (wm *OIDCIDPWriteModel) NewChanges(
 	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
 	idTokenMapping, usePKCE bool,
+	tokenEndpointAuthMethod domain.OIDCTokenEndpointAuthMethod,
+	privateKey []byte,
+	keyID string,
 	options idp.Options,
 ) ([]idp.OIDCIDPChanges, error) {
 	changes := make([]idp.OIDCIDPChanges, 0)
@@ -345,6 +348,19 @@ func (wm *OIDCIDPWriteModel) NewChanges(
 	}
 	if wm.UsePKCE != usePKCE {
 		changes = append(changes, idp.ChangeOIDCUsePKCE(usePKCE))
+	}
+	if wm.TokenEndpointAuthMethod != tokenEndpointAuthMethod {
+		changes = append(changes, idp.ChangeOIDCTokenEndpointAuthMethod(tokenEndpointAuthMethod))
+	}
+	if len(privateKey) > 0 {
+		encryptedKey, err := crypto.Crypt(privateKey, secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeOIDCPrivateKey(encryptedKey))
+	}
+	if wm.KeyID != keyID {
+		changes = append(changes, idp.ChangeOIDCKeyID(keyID))
 	}
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {

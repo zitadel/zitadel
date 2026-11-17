@@ -748,8 +748,147 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Sfdf4", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-Wq2ft", ""))
 				},
+			},
+		},
+		{
+			"private_key_jwt without key",
+			fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: GenericOIDCProvider{
+					Name:                    "name",
+					Issuer:                  "issuer",
+					ClientID:                "clientID",
+					TokenEndpointAuthMethod: domain.OIDCTokenEndpointAuthMethodPrivateKeyJWT,
+					KeyID:                   "kid",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-Pk3jw", ""))
+				},
+			},
+		},
+		{
+			"private_key_jwt without key id",
+			fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: GenericOIDCProvider{
+					Name:                    "name",
+					Issuer:                  "issuer",
+					ClientID:                "clientID",
+					TokenEndpointAuthMethod: domain.OIDCTokenEndpointAuthMethodPrivateKeyJWT,
+					PrivateKey:              oidcTestPrivateKey,
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-Pk3jw", ""))
+				},
+			},
+		},
+		{
+			"private_key_jwt invalid key",
+			fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: GenericOIDCProvider{
+					Name:                    "name",
+					Issuer:                  "issuer",
+					ClientID:                "clientID",
+					TokenEndpointAuthMethod: domain.OIDCTokenEndpointAuthMethodPrivateKeyJWT,
+					PrivateKey:              []byte("not a key"),
+					KeyID:                   "kid",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-Ke5yp", ""))
+				},
+			},
+		},
+		{
+			"unknown auth method",
+			fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: GenericOIDCProvider{
+					Name:                    "name",
+					Issuer:                  "issuer",
+					ClientID:                "clientID",
+					TokenEndpointAuthMethod: 42,
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-Am4th", ""))
+				},
+			},
+		},
+		{
+			name: "ok private_key_jwt",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectPush(
+						org.NewOIDCIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+							"id1",
+							"name",
+							"issuer",
+							"clientID",
+							nil,
+							nil,
+							false,
+							false,
+							domain.OIDCTokenEndpointAuthMethodPrivateKeyJWT,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    oidcTestPrivateKey,
+							},
+							"kid",
+							idp.Options{},
+						),
+					),
+				),
+				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: GenericOIDCProvider{
+					Name:                    "name",
+					Issuer:                  "issuer",
+					ClientID:                "clientID",
+					TokenEndpointAuthMethod: domain.OIDCTokenEndpointAuthMethodPrivateKeyJWT,
+					PrivateKey:              oidcTestPrivateKey,
+					KeyID:                   "kid",
+				},
+			},
+			res: res{
+				id:   "id1",
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
 			},
 		},
 		{
@@ -1029,6 +1168,171 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 					Name:     "name",
 					Issuer:   "issuer",
 					ClientID: "clientID",
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+			},
+		},
+		{
+			name: "change to private_key_jwt without key",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOIDCIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								nil,
+								false,
+								false,
+								domain.OIDCTokenEndpointAuthMethodClientSecret,
+								nil,
+								"",
+								idp.Options{},
+							)),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: GenericOIDCProvider{
+					Name:                    "name",
+					Issuer:                  "issuer",
+					ClientID:                "clientID",
+					TokenEndpointAuthMethod: domain.OIDCTokenEndpointAuthMethodPrivateKeyJWT,
+					KeyID:                   "kid",
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-Pk3jw", ""))
+				},
+			},
+		},
+		{
+			name: "private_key_jwt keeps stored key",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOIDCIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								nil,
+								nil,
+								false,
+								false,
+								domain.OIDCTokenEndpointAuthMethodPrivateKeyJWT,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    oidcTestPrivateKey,
+								},
+								"kid",
+								idp.Options{},
+							)),
+					),
+					expectPush(
+						func() eventstore.Command {
+							event, _ := org.NewOIDCIDPChangedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								[]idp.OIDCIDPChanges{
+									idp.ChangeOIDCKeyID("kid2"),
+								},
+							)
+							return event
+						}(),
+					),
+				),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: GenericOIDCProvider{
+					Name:                    "name",
+					Issuer:                  "issuer",
+					ClientID:                "clientID",
+					TokenEndpointAuthMethod: domain.OIDCTokenEndpointAuthMethodPrivateKeyJWT,
+					KeyID:                   "kid2",
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+			},
+		},
+		{
+			name: "change from private_key_jwt to client secret",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOIDCIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								nil,
+								nil,
+								false,
+								false,
+								domain.OIDCTokenEndpointAuthMethodPrivateKeyJWT,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    oidcTestPrivateKey,
+								},
+								"kid",
+								idp.Options{},
+							)),
+					),
+					expectPush(
+						func() eventstore.Command {
+							event, _ := org.NewOIDCIDPChangedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								[]idp.OIDCIDPChanges{
+									idp.ChangeOIDCClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("secret"),
+									}),
+									idp.ChangeOIDCTokenEndpointAuthMethod(domain.OIDCTokenEndpointAuthMethodClientSecret),
+									idp.ChangeOIDCKeyID(""),
+								},
+							)
+							return event
+						}(),
+					),
+				),
+				secretCrypto: crypto.CreateMockAuthEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: GenericOIDCProvider{
+					Name:                    "name",
+					Issuer:                  "issuer",
+					ClientID:                "clientID",
+					ClientSecret:            "secret",
+					TokenEndpointAuthMethod: domain.OIDCTokenEndpointAuthMethodClientSecret,
 				},
 			},
 			res: res{
