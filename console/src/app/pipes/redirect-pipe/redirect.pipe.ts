@@ -10,12 +10,18 @@ export class RedirectPipe implements PipeTransform {
     if (parsedURI === null) {
       return false;
     }
-    if (!isNative) {
-      return parsedURI.protocol === 'https:';
-    }
-    if (parsedURI.protocol !== 'http:' && parsedURI.protocol !== 'https:') {
+    // https is valid for all application types
+    if (parsedURI.protocol === 'https:') {
       return true;
     }
+    if (!isNative) {
+      return false;
+    }
+    // native applications can also use custom schemes
+    if (parsedURI.protocol !== 'http:') {
+      return true;
+    }
+    // native http redirects are restricted to loopback addresses
     const hostname = parsedURI.hostname;
     return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]';
   }

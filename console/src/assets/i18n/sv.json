@@ -2611,7 +2611,7 @@
       "REDIRECTTITLE": "Ange de URI:er där inloggningen kommer att omdirigera till.",
       "POSTREDIRECTTITLE": "Detta är omdirigerings-URI:n efter utloggning.",
       "REDIRECTDESCRIPTIONWEB": "Omdirigerings-URI:er måste börja med https://. http:// är endast giltigt med aktiverat utvecklingsläge.",
-      "REDIRECTDESCRIPTIONNATIVE": "Omdirigerings-URI:er måste börja med ditt eget protokoll, http://127.0.0.1, http://[::1] eller http://localhost.",
+      "REDIRECTDESCRIPTIONNATIVE": "Omdirigerings-URI:er måste börja med https://, ditt eget protokoll, http://127.0.0.1, http://[::1] eller http://localhost.",
       "REDIRECTNOTVALID": "Denna omdirigerings-URI är inte giltig.",
       "COMMAORENTERSEPERATION": "separera med ↵",
       "TYPEREQUIRED": "Typen är obligatorisk.",

@@ -2604,7 +2604,7 @@
       "REDIRECTTITLE": "Specificați URI-urile unde se va redirecționa conectarea.",
       "POSTREDIRECTTITLE": "Acesta este URI-ul de redirecționare după deconectare.",
       "REDIRECTDESCRIPTIONWEB": "URI-urile de redirecționare trebuie să înceapă cu https://. http:// este valabil numai cu modul de dezvoltare activat.",
-      "REDIRECTDESCRIPTIONNATIVE": "URI-urile de redirecționare trebuie să înceapă cu propriul protocol, http://127.0.0.1, http://[::1] sau http://localhost.",
+      "REDIRECTDESCRIPTIONNATIVE": "URI-urile de redirecționare trebuie să înceapă cu https://, propriul protocol, http://127.0.0.1, http://[::1] sau http://localhost.",
       "REDIRECTNOTVALID": "Acest URI de redirecționare nu este valabil.",
       "COMMAORENTERSEPERATION": "separați cu ↵",
       "TYPEREQUIRED": "Tipul este necesar.",

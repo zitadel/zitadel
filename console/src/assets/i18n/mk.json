@@ -2580,7 +2580,7 @@
       "REDIRECTTITLE": "Наведете URIs каде што ќе се пренасочи најавата.",
       "POSTREDIRECTTITLE": "Ова е URI за пренасочување по одјавата.",
       "REDIRECTDESCRIPTIONWEB": "URIs за пренасочување мора да започнуваат со https://. http:// е валидно само со овозможен development mode.",
-      "REDIRECTDESCRIPTIONNATIVE": "URIs за пренасочување мора да започнуваат со вашиот протокол, http://127.0.0.1, http://[::1] или http://localhost.",
+      "REDIRECTDESCRIPTIONNATIVE": "URIs за пренасочување мора да започнуваат со https://, вашиот протокол, http://127.0.0.1, http://[::1] или http://localhost.",
       "REDIRECTNOTVALID": "Ова URI за пренасочување не е валидно.",
       "COMMAORENTERSEPERATION": "одделувајте со ↵",
       "TYPEREQUIRED": "Типот е задолжителен.",

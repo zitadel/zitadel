@@ -2612,7 +2612,7 @@
       "REDIRECTTITLE": "Add meg az URI-kat, ahová a bejelentkezés át fog irányítani.",
       "POSTREDIRECTTITLE": "Ez az URI lesz az átirányítási pont kijelentkezés után.",
       "REDIRECTDESCRIPTIONWEB": "Az átirányítási URI-knak https://-sel kell kezdődniük. Az http:// csak fejlesztői mód bekapcsolásával érvényes.",
-      "REDIRECTDESCRIPTIONNATIVE": "Az átirányítási URI-knak saját protokolloddal, http://127.0.0.1, http://[::1] vagy http://localhost címekkel kell kezdődniük.",
+      "REDIRECTDESCRIPTIONNATIVE": "Az átirányítási URI-knak https://, saját protokolloddal, http://127.0.0.1, http://[::1] vagy http://localhost címekkel kell kezdődniük.",
       "REDIRECTNOTVALID": "Ez az átirányítási URI érvénytelen.",
       "COMMAORENTERSEPERATION": "separate with ↵",
       "TYPEREQUIRED": "A típus megadása kötelező.",

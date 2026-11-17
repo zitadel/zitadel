@@ -2614,7 +2614,7 @@
       "REDIRECTTITLE": "Вкажіть URI, куди буде перенаправлено після входу.",
       "POSTREDIRECTTITLE": "Це URI перенаправлення після виходу.",
       "REDIRECTDESCRIPTIONWEB": "URI перенаправлення повинні починатися з https://. http:// дійсний лише з увімкненим режимом розробки.",
-      "REDIRECTDESCRIPTIONNATIVE": "URI перенаправлення повинні починатися з вашого власного протоколу, http://127.0.0.1, http://[::1] або http://localhost.",
+      "REDIRECTDESCRIPTIONNATIVE": "URI перенаправлення повинні починатися з https://, вашого власного протоколу, http://127.0.0.1, http://[::1] або http://localhost.",
       "REDIRECTNOTVALID": "Цей URI перенаправлення недійсний.",
       "COMMAORENTERSEPERATION": "розділяйте за допомогою ↵",
       "TYPEREQUIRED": "Тип є обов'язковим.",

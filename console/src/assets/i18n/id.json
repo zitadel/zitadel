@@ -2606,7 +2606,7 @@
       "REDIRECTTITLE": "Tentukan URI tempat login akan dialihkan.",
       "POSTREDIRECTTITLE": "Ini adalah URI pengalihan setelah logout.",
       "REDIRECTDESCRIPTIONWEB": "URI pengalihan harus diawali dengan https://. http:// hanya valid dengan mode pengembangan yang diaktifkan.",
-      "REDIRECTDESCRIPTIONNATIVE": "URI pengalihan harus diawali dengan protokol Anda sendiri, http://127.0.0.1, http://[::1] atau http://localhost.",
+      "REDIRECTDESCRIPTIONNATIVE": "URI pengalihan harus diawali dengan https://, protokol Anda sendiri, http://127.0.0.1, http://[::1] atau http://localhost.",
       "REDIRECTNOTVALID": "URI pengalihan ini tidak valid.",
       "COMMAORENTERSEPERATION": "pisahkan dengan ↵",
       "TYPEREQUIRED": "Jenisnya wajib diisi.",
