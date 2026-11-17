@@ -277,7 +277,7 @@ export function LoginForm({
         )}
 
         {allowRegister && (
-          <div className="border-divider-light dark:border-divider-dark mt-6 border-t pt-6">
+          <div className="border-divider-light dark:border-divider-dark mt-4 border-t pt-4">
             <Button
               type="button"
               className="text-primary-light-500 dark:text-primary-dark-500 border-primary-light-500 dark:border-primary-dark-500 w-full justify-center font-semibold"
