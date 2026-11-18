@@ -312,6 +312,58 @@ describe("sendLoginname", () => {
         );
       });
 
+      test("should redirect to LDAP form when user has a linked LDAP IdP", async () => {
+        const { idpTypeToIdentityProviderType } = await import("@/lib/idp");
+        const { IdentityProviderType } = await import("@zitadel/proto/zitadel/settings/v2/login_settings_pb");
+        const { IDPType } = await import("@zitadel/proto/zitadel/idp/v2/idp_pb");
+
+        mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD],
+        });
+        mockListIDPLinks.mockResolvedValue({
+          result: [{ idpId: "ldap-idp-1" }],
+        });
+        mockGetIDPByID.mockResolvedValue({
+          id: "ldap-idp-1",
+          name: "LDAP",
+          type: IDPType.IDP_TYPE_LDAP,
+        });
+        vi.mocked(idpTypeToIdentityProviderType).mockReturnValue(IdentityProviderType.LDAP);
+        mockIdpTypeToSlug.mockReturnValue("ldap");
+
+        const result = await sendLoginname({
+          loginName: "user@example.com",
+          organization: "org123",
+        });
+
+        expect(result).toHaveProperty("redirect");
+        expect((result as any).redirect).toMatch(/^\/idp\/ldap\?/);
+        expect((result as any).redirect).toContain("idpId=ldap-idp-1");
+        expect(mockStartIdentityProviderFlow).not.toHaveBeenCalled();
+      });
+
+      test("should redirect to LDAP form when organization has single active LDAP IdP", async () => {
+        mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
+        mockListAuthenticationMethodTypes.mockResolvedValue({
+          authMethodTypes: [AuthenticationMethodType.PASSWORD],
+        });
+        mockListIDPLinks.mockResolvedValue({ result: [] });
+        mockGetActiveIdentityProviders.mockResolvedValue({
+          identityProviders: [{ id: "ldap-org-1", type: 0, options: { isAutoCreation: true } }],
+        });
+        mockIdpTypeToSlug.mockReturnValue("ldap");
+
+        const result = await sendLoginname({
+          loginName: "user@example.com",
+        });
+
+        expect(result).toHaveProperty("redirect");
+        expect((result as any).redirect).toMatch(/^\/idp\/ldap\?/);
+        expect((result as any).redirect).toContain("idpId=ldap-org-1");
+        expect(mockStartIdentityProviderFlow).not.toHaveBeenCalled();
+      });
+
       test("should prefer the username known by the linked IDP over the login name as a login hint", async () => {
         mockGetLoginSettings.mockResolvedValue({ allowLocalAuthentication: false });
         mockListAuthenticationMethodTypes.mockResolvedValue({
