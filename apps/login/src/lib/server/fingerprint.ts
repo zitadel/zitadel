@@ -2,6 +2,8 @@ import "server-only";
 
 import { create } from "@zitadel/client";
 import { UserAgent, UserAgentSchema } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { isIP } from "net";
+import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
 import { cookies, headers } from "next/headers";
 import { userAgent } from "next/server";
 import { v4 as uuidv4 } from "uuid";
@@ -75,6 +77,54 @@ export async function addIdpFlowProof(params: URLSearchParams, linkToSessionId?:
   params.set("flowFingerprint", createIdpFlowProof(await getOrSetBindingId(), linkToSessionId));
 }
 
+const DEFAULT_TRUSTED_PROXY_HOPS = 0;
+
+/**
+ * Number of proxies between the client and the login that append their own address to
+ * `X-Forwarded-For`. The default of 0 fits a single reverse proxy and Vercel, which write the
+ * client address as the last entry; the GCP load balancer appends its own address, so it needs 1.
+ */
+function trustedProxyHops(): number {
+  const configured = process.env.TRUSTED_PROXY_HOPS?.trim();
+  if (!configured) {
+    return DEFAULT_TRUSTED_PROXY_HOPS;
+  }
+  const hops = Number(configured);
+  if (!Number.isInteger(hops) || hops < 0) {
+    logger.warn("Ignoring invalid TRUSTED_PROXY_HOPS, falling back to the default", { configured });
+    return DEFAULT_TRUSTED_PROXY_HOPS;
+  }
+  return hops;
+}
+
+// drops the port and IPv6 brackets, and anything that is not an address at all ("unknown", RFC 7239 obfuscated names)
+function toIp(value: string): string {
+  const trimmed = value.trim();
+  if (isIP(trimmed)) {
+    return trimmed; // IPv4, or IPv6 without brackets (which may not carry a port)
+  }
+  const bracketed = /^\[(.+)\](?::\d+)?$/.exec(trimmed);
+  const withoutPort = bracketed ? bracketed[1] : trimmed.replace(/:\d+$/, "");
+  return isIP(withoutPort) ? withoutPort : "";
+}
+
+/**
+ * The client address, as far as it can be trusted. Every `X-Forwarded-For` entry left of the
+ * trusted proxies was written by whoever sent the request, so it is spoofable and never used.
+ * Returns "" when no address can be trusted: the backend then omits the IP from the session event
+ * instead of recording an attacker-supplied one.
+ */
+function getClientIp(requestHeaders: ReadonlyHeaders): string {
+  const forwardedFor = requestHeaders.get("x-forwarded-for");
+  if (!forwardedFor) {
+    // nothing in front of the login, or a front that doesn't set the header
+    return toIp(requestHeaders.get("remoteAddress") ?? "");
+  }
+  // shortcut: a hop count rather than a list of trusted proxy addresses, which is all a fixed
+  // deployment needs; match on addresses once a front can vary the number of hops per request
+  return toIp(forwardedFor.split(",").at(-1 - trustedProxyHops()) ?? "");
+}
+
 export async function getUserAgent(): Promise<UserAgent> {
   const _headers = await headers();
 
@@ -92,7 +142,7 @@ export async function getUserAgent(): Promise<UserAgent> {
   const browserDescription = `${browser?.name ? `${browser.name},` : ""} ${browser.version ? `${browser.version},` : ""} `;
 
   const userAgentData: UserAgent = create(UserAgentSchema, {
-    ip: _headers.get("x-forwarded-for") ?? _headers.get("remoteAddress") ?? "",
+    ip: getClientIp(_headers),
     header: { "user-agent": { values: userAgentHeaderValues } },
     description: `${browserDescription}, ${deviceDescription}, ${engineDescription}, ${osDescription}`,
     fingerprintId: fingerprintId,

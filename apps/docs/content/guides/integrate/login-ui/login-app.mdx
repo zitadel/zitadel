@@ -148,6 +148,11 @@ If you want to enforce users to have their email verified, you can set the optio
 By default, verification codes are not automatically submitted on page load. This protects against enterprise email link scanners that pre-fetch URLs and could inadvertently consume one-time codes before users click them.
 If you want to enable automatic code submission (e.g. for a smoother UX when link scanners are not a concern), set `NEXT_PUBLIC_AUTO_SUBMIT_CODE` to `true`.
 
+Sessions record the client IP address, which the login reads from the `X-Forwarded-For` header.
+Only the entries written by proxies you control are trusted, so set `TRUSTED_PROXY_HOPS` to the number of proxies in front of the login that append their own address to that header.
+The default of `0` fits a single reverse proxy and Vercel; the Google Cloud load balancer appends its own address, so it needs `1`.
+If no address can be trusted, the session is created without an IP rather than with one a client could have spoofed.
+
 A new OTP SMS code can only be requested 30 seconds after the previous one for the same session; the "Resend code" button shows a countdown until then.
 Set `OTP_SMS_RESEND_COOLDOWN_SECONDS` to change the cooldown, or to `0` to disable it.
 

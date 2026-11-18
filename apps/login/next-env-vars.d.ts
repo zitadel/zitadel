@@ -101,6 +101,16 @@ declare namespace NodeJS {
     OTP_SMS_RESEND_COOLDOWN_SECONDS?: string;
 
     /**
+     * Optional: Number of proxies between the client and the login that append their own address
+     * to the `X-Forwarded-For` header. The client address is read that many entries from the right;
+     * entries further left are supplied by the caller and are ignored, because they are spoofable.
+     * Defaults to 0, which fits a single reverse proxy and Vercel. The GCP load balancer appends
+     * its own address, so it needs "1". When no address can be trusted, sessions are created
+     * without an IP instead of with an untrusted one.
+     */
+    TRUSTED_PROXY_HOPS?: string;
+
+    /**
      * Optional: Enable the SWR in-memory cache for API requests globally.
      * Defaults to true. Set to "false" to disable completely.
      */
