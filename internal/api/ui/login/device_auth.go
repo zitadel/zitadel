@@ -30,20 +30,23 @@ func (l *Login) renderDeviceAuthUserCode(w http.ResponseWriter, r *http.Request,
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplDeviceAuthUserCode], data, nil)
 }
 
-func (l *Login) renderDeviceAuthAction(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, scopes []string) {
+func (l *Login) renderDeviceAuthAction(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, authDev *domain.AuthRequestDevice) {
 	translator := l.getTranslator(r.Context(), authReq)
 	data := &struct {
 		baseData
 		AuthRequestID string
 		Username      string
-		ClientID      string
+		AppName       string
 		Scopes        []string
 	}{
 		baseData:      l.getBaseData(r, authReq, translator, "DeviceAuth.Title", "DeviceAuth.Action.Description", nil),
 		AuthRequestID: authReq.ID,
 		Username:      authReq.UserName,
-		ClientID:      authReq.ApplicationID,
-		Scopes:        scopes,
+		AppName:       authDev.AppName,
+		Scopes:        authDev.Scopes,
+	}
+	if data.AppName == "" {
+		data.AppName = authReq.ApplicationID
 	}
 
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplDeviceAuthAction], data, nil)
@@ -162,9 +165,9 @@ func (l *Login) handleDeviceAuthAction(w http.ResponseWriter, r *http.Request) {
 	case deviceAuthAllowed:
 		_, err = l.command.ApproveDeviceAuth(r.Context(), authDev.DeviceCode, authReq.UserID, authReq.UserOrgID, authReq.UserAuthMethodTypes(), authReq.AuthTime, authReq.PreferredLanguage, authReq.ToUserAgent(), authReq.SessionID)
 	case deviceAuthDenied:
-		_, err = l.command.CancelDeviceAuth(r.Context(), authDev.DeviceCode, domain.DeviceAuthCanceledDenied)
+		_, err = l.command.DenyDeviceAuth(r.Context(), authDev.DeviceCode)
 	default:
-		l.renderDeviceAuthAction(w, r, authReq, authDev.Scopes)
+		l.renderDeviceAuthAction(w, r, authReq, authDev)
 		return
 	}
 	if err != nil {
