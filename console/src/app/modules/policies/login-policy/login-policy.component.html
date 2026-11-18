@@ -171,7 +171,7 @@
   >
     <cnsl-form-field class="lifetime-form-field" label="Password Check Lifetime" required="true">
       <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.LABEL' | translate }}</cnsl-label>
-      <input cnslInput type="number" name="passwordCheckLifetime" formControlName="passwordCheckLifetime" min="1" step="1" />
+      <input cnslInput type="number" name="passwordCheckLifetime" formControlName="passwordCheckLifetime" min="0" step="1" />
     </cnsl-form-field>
   </cnsl-card>
   <cnsl-card
@@ -185,7 +185,7 @@
         type="number"
         name="externalLoginCheckLifetime"
         formControlName="externalLoginCheckLifetime"
-        min="1"
+        min="0"
         step="1"
       />
     </cnsl-form-field>
@@ -210,7 +210,7 @@
         type="number"
         name="secondFactorCheckLifetime"
         formControlName="secondFactorCheckLifetime"
-        min="1"
+        min="0"
         step="1"
       />
     </cnsl-form-field>
@@ -226,7 +226,7 @@
         type="number"
         name="multiFactorCheckLifetime"
         formControlName="multiFactorCheckLifetime"
-        min="1"
+        min="0"
         step="1"
       />
     </cnsl-form-field>
