@@ -34,6 +34,10 @@ VerifyEmailOTP:
   Text: "Silakan gunakan OTP {{.OTP}} untuk mengautentikasi dalam lima menit berikutnya atau klik tombol \"Otentikasi\"."
   ButtonText: "Otentikasi"
 VerifySMSOTP:
+  Title: "Verifikasi OTP"
+  PreHeader: "Verifikasi OTP"
+  Subject: "Verifikasi OTP"
+  Greeting: "Halo {{.DisplayName}},"
   Text: |-
     {{.OTP}} adalah OTP Anda untuk {{ .Domain }}. {{.Expiry}}.
     {{.Domain}} #{{.OTP}}

@@ -34,6 +34,10 @@ VerifyEmailOTP:
   Text: "Önümüzdeki beş dakika içinde kimlik doğrulaması yapmak için {{.OTP}} OTP'yi kullanın veya \"Kimlik Doğrula\" düğmesine tıklayın."
   ButtonText: "Kimlik Doğrula"
 VerifySMSOTP:
+  Title: "OTP'yi Doğrula"
+  PreHeader: "OTP'yi Doğrula"
+  Subject: "OTP'yi Doğrula"
+  Greeting: "Merhaba {{.DisplayName}},"
   Text: |-
     {{.OTP}}, {{ .Domain }} için OTP'nizdir. Önümüzdeki {{.Expiry}} içinde kullanın.
     @{{.Domain}} #{{.OTP}}

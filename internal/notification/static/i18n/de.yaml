@@ -34,6 +34,10 @@ VerifyEmailOTP:
   Text: "Bitte nutze den 'Authentifizieren'-Button oder kopiere das OTP {{.OTP}} und gib es zur Bestätigung ein, um dich innerhalb der nächsten fünf Minuten zu authentifizieren."
   ButtonText: "Authentifizieren"
 VerifySMSOTP:
+  Title: "OTP verifizieren"
+  PreHeader: "OTP verifizieren"
+  Subject: "OTP verifizieren"
+  Greeting: "Hallo {{.DisplayName}},"
   Text: |-
     {{.OTP}} ist dein OTP für {{ .Domain }}. Verwende es innerhalb der nächsten {{.Expiry}}.
     @{{.Domain}} #{{.OTP}}

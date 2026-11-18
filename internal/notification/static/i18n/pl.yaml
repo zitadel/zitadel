@@ -34,6 +34,10 @@ VerifyEmailOTP:
   Text: "Proszę, użyj przycisku 'Uwierzytelnij' lub skopiuj OTP {{.OTP}} i wklej go na ekran uwierzytelniania, aby uwierzytelnić się w Zitadel w ciągu najbliższych pięciu minut."
   ButtonText: "Uwierzytelnij"
 VerifySMSOTP:
+  Title: "Zitadel - Zatwierdź OTP"
+  PreHeader: "Zatwierdź OTP"
+  Subject: "Zatwierdź OTP"
+  Greeting: "Witaj {{.DisplayName}},"
   Text: |-
     {{.OTP}} to Twoje OTP do domeny {{ .Domain }}. Użyj go w ciągu najbliższych {{.Expiry}}.
     @{{.Domain}} #{{.OTP}}
