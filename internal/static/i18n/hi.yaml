@@ -1,0 +1,1417 @@
+Errors:
+  Internal: "एक आंतरिक त्रुटि हुई है"
+  NoChangesFound: "कोई बदलाव नहीं मिले"
+  OriginNotAllowed: "यह \"Origin\" मान्य नहीं है"
+  IDMissing: "ID गायब है"
+  ResourceOwnerMissing: "संसाधन स्वामी संस्था गायब है"
+  RemoveFailed: "हटाया नहीं जा सका"
+  ProjectionName:
+    Invalid: "प्रोजेक्शन का नाम अमान्य है"
+  Assets:
+    EmptyKey: "एसेट की (Asset key) खाली है"
+    Store:
+      NotInitialized: "एसेट स्टोरेज शुरू नहीं हुआ है"
+      NotConfigured: "एसेट स्टोरेज कॉन्फ़िगर नहीं है"
+    Bucket:
+      Internal: "बकेट बनाने में आंतरिक त्रुटि हुई"
+      AlreadyExists: "बकेट पहले से मौजूद है"
+      CreateFailed: "बकेट नहीं बनाया जा सका"
+      ListFailed: "बकेट की सूची नहीं पढ़ी जा सकी"
+      RemoveFailed: "बकेट हटाया नहीं जा सका"
+      SetPublicFailed: "बकेट को सार्वजनिक सेट नहीं किया जा सका"
+    Object:
+      PutFailed: "ऑब्जेक्ट नहीं बनाया जा सका"
+      GetFailed: "ऑब्जेक्ट पढ़ा नहीं जा सका"
+      NotFound: "ऑब्जेक्ट नहीं मिला"
+      PresignedTokenFailed: "साइंड टोकन नहीं बनाया जा सका"
+      ListFailed: "ऑब्जेक्ट सूची नहीं पढ़ी जा सकी"
+      RemoveFailed: "ऑब्जेक्ट हटाया नहीं जा सका"
+  Limit:
+    ExceedsDefault: "सीमा डिफॉल्ट सीमा से अधिक है"
+  Limits:
+    NotFound: "सीमाएं नहीं मिलीं"
+    NoneSpecified: "कोई सीमा निर्दिष्ट नहीं की गई है"
+    Instance:
+      Blocked: "इन्स्टेंस ब्लॉक कर दिया गया है"
+  Restrictions:
+    NoneSpecified: "कोई प्रतिबंध निर्दिष्ट नहीं किया गया है"
+    DefaultLanguageMustBeAllowed: "डिफॉल्ट भाषा की अनुमति होनी चाहिए"
+  Language:
+    NotParsed: "भाषा का विश्लेषण नहीं किया जा सका"
+    NotSupported: "भाषा समर्थित नहीं है"
+    NotAllowed: "भाषा की अनुमति नहीं है"
+    Undefined: "भाषा अपरिभाषित है"
+    Duplicate: "भाषाओं में दोहराव (duplicate) है"
+  OIDCSettings:
+    NotFound: "OIDC कॉन्फ़िगरेशन नहीं मिला"
+    AlreadyExists: "OIDC कॉन्फ़िगरेशन पहले से मौजूद है"
+  SecretGenerator:
+    AlreadyExists: "सीक्रेट जनरेटर पहले से मौजूद है"
+    TypeMissing: "सीक्रेट जनरेटर का प्रकार गायब है"
+    NotFound: "सीक्रेट जनरेटर नहीं मिला"
+  SMSConfig:
+    NotFound: "SMS कॉन्फ़िगरेशन नहीं मिला"
+    AlreadyActive: "SMS कॉन्फ़िगरेशन पहले से सक्रिय है"
+    AlreadyDeactivated: "SMS कॉन्फ़िगरेशन पहले से निष्क्रिय है"
+    NotExternalVerification: "SMS कॉन्फ़िगरेशन कोड वेरिफिकेशन का समर्थन नहीं करता"
+  SMTP:
+    NotEmailMessage: "संदेश 'EmailMessage' नहीं है"
+    RequiredAttributes: "विषय, प्राप्तकर्ता और कंटेंट सेट होना अनिवार्य है"
+    CouldNotSplit: "कनेक्शन के लिए होस्ट और पोर्ट को अलग नहीं किया जा सका"
+    CouldNotDial: "SMTP सर्वर से संपर्क नहीं हो सका, पोर्ट या फ़ायरवॉल की जांच करें"
+    CouldNotDialTLS: "TLS के साथ SMTP सर्वर से संपर्क नहीं हो सका"
+    CouldNotCreateClient: "SMTP क्लाइंट नहीं बनाया जा सका"
+    CouldNotStartTLS: "TLS शुरू नहीं किया जा सका"
+    CouldNotAuth: "SMTP ऑथेंटिकेशन विफल रहा, यूजर और पासवर्ड की जांच करें"
+    CouldNotSetSender: "प्रेषक सेट नहीं किया जा सका"
+    CouldNotSetRecipient: "प्राप्तकर्ता सेट नहीं किया जा सका"
+  SMTPConfig:
+    TestPassword: "टेस्ट पासवर्ड नहीं मिला"
+    NotFound: "SMTP कॉन्फ़िगरेशन नहीं मिला"
+    AlreadyExists: "SMTP कॉन्फ़िगरेशन पहले से मौजूद है"
+    AlreadyDeactivated: "SMTP कॉन्फ़िगरेशन पहले से निष्क्रिय है"
+    SenderAdressNotCustomDomain: "प्रेषक का पता कस्टम डोमेन के रूप में कॉन्फ़िगर होना चाहिए"
+    TestEmailNotFound: "टेस्ट ईमेल एड्रेस नहीं मिला"
+  Notification:
+    NoDomain: "संदेश के लिए कोई डोमेन नहीं मिला"
+  User:
+    NotFound: "यूजर नहीं मिला"
+    AlreadyExists: "यूजर पहले से मौजूद है"
+    NotFoundOnOrg: "चुनी गई संस्था में यूजर नहीं मिला"
+    NotAllowedOrg: "यूजर आवश्यक संस्था का सदस्य नहीं है"
+    UserIDMissing: "यूजर ID गायब है"
+    UserIDWrong: "अनुरोध करने वाला यूजर और ऑथेंटिकेटेड यूजर समान नहीं हैं"
+    DomainPolicyNil: "संस्था की नीति खाली है"
+    EmailAsUsernameNotAllowed: "ईमेल को यूजरनेम के रूप में उपयोग करने की अनुमति नहीं है"
+    Invalid: "यूजर डेटा अमान्य है"
+    DomainNotAllowedAsUsername: "डोमेन आरक्षित है और इसका उपयोग नहीं किया जा सकता"
+    AlreadyInactive: "यूजर पहले से निष्क्रिय है"
+    NotInactive: "यूजर निष्क्रिय नहीं है"
+    CantDeactivateInitial: "आरंभिक स्थिति वाले यूजर को केवल हटाया जा सकता है"
+    ShouldBeActiveOrInitial: "यूजर सक्रिय या आरंभिक स्थिति में नहीं है"
+    AlreadyInitialised: "यूजर पहले ही सेटअप हो चुका है"
+    NotInitialised: "यूजर अभी तक सेटअप नहीं हुआ है"
+    NotLocked: "यूजर लॉक नहीं है"
+    NoChanges: "कोई बदलाव नहीं मिले"
+    InitCodeNotFound: "सेटअप कोड नहीं मिला"
+    UsernameNotChanged: "यूजरनेम नहीं बदला गया"
+    InvalidURLTemplate: "URL टेम्पलेट अमान्य है"
+    Locked: "यूजर लॉक है"
+    Profile:
+      NotFound: "प्रोफाइल नहीं मिली"
+      NotChanged: "प्रोफाइल में कोई बदलाव नहीं हुआ"
+      Empty: "प्रोफाइल खाली है"
+      FirstNameEmpty: "प्रथम नाम खाली है"
+      LastNameEmpty: "अंतिम नाम खाली है"
+      IDMissing: "प्रोफाइल ID गायब है"
+    Email:
+      NotFound: "ईमेल नहीं मिला"
+      Invalid: "ईमेल अमान्य है"
+      AlreadyVerified: "ईमेल पहले से सत्यापित है"
+      NotChanged: "ईमेल नहीं बदला गया"
+      Empty: "ईमेल खाली है"
+      IDMissing: "ईमेल ID गायब है"
+    Phone:
+      NotFound: "फोन नंबर नहीं मिला"
+      Invalid: "फोन नंबर अमान्य है"
+      AlreadyVerified: "फोन नंबर पहले से सत्यापित है"
+      Empty: "फोन नंबर खाली है"
+      NotChanged: "फोन नंबर नहीं बदला गया"
+      VerifyingRemovalIsNotSupported: "नंबर हटाने के सत्यापन का समर्थन नहीं है"
+    Address:
+      NotFound: "पता नहीं मिला"
+      NotChanged: "पता नहीं बदला गया"
+    Machine:
+      Key:
+        NotFound: "मशीन की (key) नहीं मिली"
+        AlreadyExisting: "मशीन की पहले से मौजूद है"
+        Invalid: "पब्लिक की मान्य RSA फॉर्मेट में नहीं है"
+      Secret:
+        NotExisting: "सीक्रेट मौजूद नहीं है"
+        Invalid: "सीक्रेट अमान्य है"
+        CouldNotGenerate: "सीक्रेट जनरेट नहीं किया जा सका"
+    PAT:
+      NotFound: "पर्सनल एक्सेस टोकन नहीं मिला"
+    Metadata:
+      Conflicting: "मेटाडेटा यूजर और ह्यूमन दोनों फील्ड में सेट नहीं होना चाहिए"
+    NotHuman: "यूजर एक व्यक्ति (human) होना चाहिए"
+    NotMachine: "यूजर एक तकनीकी (machine) अकाउंट होना चाहिए"
+    WrongType: "इस यूजर प्रकार के लिए अनुमति नहीं है"
+    NotAllowedToLink: "यूजर को बाहरी लॉगिन प्रोवाइडर से लिंक करने की अनुमति नहीं है"
+    Username:
+      AlreadyExists: "यूजरनेम पहले से लिया जा चुका है"
+      Reserved: "यूजरनेम आरक्षित है"
+      Empty: "यूजरनेम खाली है"
+    Code:
+      Empty: "कोड खाली है"
+      NotFound: "कोड नहीं मिला"
+      Expired: "कोड की समय सीमा समाप्त हो गई है"
+      GeneratorAlgNotSupported: "जनरेटर एल्गोरिथ्म समर्थित नहीं है"
+      Invalid: "कोड अमान्य है"
+    Password:
+      NotFound: "पासवर्ड नहीं मिला"
+      Empty: "पासवर्ड खाली है"
+      Invalid: "पासवर्ड अमान्य है"
+      NotSet: "यूजर ने पासवर्ड सेट नहीं किया है"
+      NotChanged: "नया पासवर्ड वर्तमान पासवर्ड के समान नहीं हो सकता"
+      NotSupported: "पासवर्ड हैश एन्कोडिंग समर्थित नहीं है"
+    PasswordComplexityPolicy:
+      NotFound: "पासवर्ड नीति नहीं मिली"
+      MinLength: "पासवर्ड बहुत छोटा है"
+      MinLengthNotAllowed: "दी गई न्यूनतम लंबाई की अनुमति नहीं है"
+      HasLower: "पासवर्ड में छोटे अक्षर होने चाहिए"
+      HasUpper: "पासवर्ड में बड़े अक्षर होने चाहिए"
+      HasNumber: "पासवर्ड में अंक होना चाहिए"
+      HasSymbol: "पासवर्ड में विशेष चिन्ह होना चाहिए"
+    ExternalIDP:
+      Invalid: "बाहरी IDP अमान्य है"
+      IDPConfigNotExisting: "इस संस्था के लिए IDP प्रोवाइडर मौजूद नहीं है"
+      NotAllowed: "बाहरी IDP की अनुमति नहीं है"
+      MinimumExternalIDPNeeded: "कम से कम एक IDP होना आवश्यक है"
+      AlreadyExists: "बाहरी IDP पहले से उपयोग में है"
+      NotFound: "बाहरी IDP नहीं मिला"
+      LoginFailed: "बाहरी IDP पर लॉगिन विफल रहा"
+    MFA:
+      OTP:
+        AlreadyReady: "OTP पहले से ही सेटअप है"
+        NotExisting: "OTP मौजूद नहीं है"
+        NotReady: "OTP तैयार नहीं है"
+        InvalidCode: "कोड अमान्य है"
+      U2F:
+        NotExisting: "U2F मौजूद नहीं है"
+      Passwordless:
+        NotExisting: "पासकी मौजूद नहीं है"
+      RecoveryCodes:
+        Empty: "रिकवरी कोड खाली है"
+        InvalidCode: "गलत रिकवरी कोड दिया गया"
+        MaxCountExceeded: "रिकवरी कोड की अधिकतम संख्या पार हो गई है"
+        NotReady: "रिकवरी कोड उपयोग के लिए तैयार नहीं हैं"
+        ConfigInvalid: "रिकवरी कोड कॉन्फ़िगरेशन अमान्य है"
+    WebAuthN:
+      NotFound: "WebAuthN टोकन नहीं मिला"
+      BeginRegisterFailed: "WebAuthN रजिस्ट्रेशन शुरू करने में विफल"
+      MarshalError: "डेटा मार्शलिंग में त्रुटि"
+      ErrorOnParseCredential: "क्रेडेंशियल विश्लेषण में त्रुटि"
+      CreateCredentialFailed: "क्रेडेंशियल बनाने में त्रुटि"
+      BeginLoginFailed: "WebAuthN लॉगिन शुरू करने में विफल"
+      ValidateLoginFailed: "लॉगिन क्रेडेंशियल सत्यापन में त्रुटि"
+      CloneWarning: "क्रेडेंशियल क्लोन किए जा सकते हैं"
+    RefreshToken:
+      Invalid: "रिफ्रेश टोकन अमान्य है"
+      NotFound: "रिफ्रेश टोकन नहीं मिला"
+  Org:
+    AlreadyExists: "संस्था का नाम या ID पहले से लिया जा चुका है"
+    Invalid: "संस्था अमान्य है"
+    AlreadyDeactivated: "संस्था पहले से निष्क्रिय है"
+    AlreadyActive: "संस्था पहले से सक्रिय है"
+    Empty: "संस्था खाली है"
+    NotFound: "संस्था नहीं मिली"
+    NotChanged: "संस्था में कोई बदलाव नहीं हुआ"
+    DefaultOrgNotDeletable: "डिफॉल्ट संस्था को डिलीट नहीं किया जा सकता"
+    ZitadelOrgNotDeletable: "Zitadel प्रोजेक्ट वाली संस्था को डिलीट नहीं किया जा सकता"
+    InvalidDomain: "डोमेन अमान्य है"
+    DomainMissing: "डोमेन गायब है"
+    DomainNotOnOrg: "संस्था पर डोमेन मौजूद नहीं है"
+    DomainNotVerified: "डोमेन सत्यापित नहीं है"
+    DomainAlreadyVerified: "डोमेन पहले से सत्यापित है"
+    DomainVerificationTypeInvalid: "सत्यापन का प्रकार अमान्य है"
+    DomainVerificationMissing: "डोमेन सत्यापन अभी शुरू नहीं हुआ है"
+    DomainVerificationFailed: "डोमेन सत्यापन विफल रहा"
+    DomainVerificationTXTNotFound: "डोमेन के लिए TXT रिकॉर्ड नहीं मिला"
+    DomainVerificationTXTNoMatch: "TXT रिकॉर्ड मिला, लेकिन टोकन टेक्स्ट गलत है"
+    DomainVerificationHTTPNotFound: "चुनौती फ़ाइल अपेक्षित URL पर नहीं मिली"
+    DomainVerificationHTTPNoMatch: "चुनौती फ़ाइल मिली, लेकिन टोकन टेक्स्ट गलत है"
+    DomainVerificationTimeout: "DNS सर्वर रिस्पॉन्स समय समाप्त हो गया"
+    PrimaryDomainNotDeletable: "संस्था का मुख्य डोमेन डिलीट नहीं किया जा सकता"
+    DomainNotFound: "डोमेन नहीं मिला"
+    MemberIDMissing: "सदस्य ID गायब है"
+    MemberNotFound: "संस्था का सदस्य नहीं मिला"
+    InvalidMember: "संस्था का सदस्य अमान्य है"
+    UserIDMissing: "यूजर ID गायब है"
+    PolicyAlreadyExists: "नीति पहले से मौजूद है"
+    PolicyNotExisting: "नीति मौजूद नहीं है"
+    IdpInvalid: "IDP कॉन्फ़िगरेशन अमान्य है"
+    IdpNotExisting: "IDP कॉन्फ़िगरेशन मौजूद नहीं है"
+    OIDCConfigInvalid: "OIDC IDP कॉन्फ़िगरेशन अमान्य है"
+    IdpIsNotOIDC: "IDP कॉन्फ़िगरेशन OIDC प्रकार का नहीं है"
+    Domain:
+      AlreadyExists: "डोमेन पहले से मौजूद है"
+      InvalidCharacter: "डोमेन में केवल अक्षर, अंक, . और - मान्य हैं"
+      EmptyString: "अमान्य वर्णों को हटाने के बाद डोमेन खाली रह गया है"
+    IDP:
+      InvalidSearchQuery: "खोज अनुरोध अमान्य है"
+      ClientIDMissing: "ClientID गायब है"
+      TeamIDMissing: "TeamID गायब है"
+      KeyIDMissing: "KeyID गायब है"
+      PrivateKeyMissing: "प्राइवेट की गायब है"
+    LoginPolicy:
+      NotFound: "लॉगिन नीति नहीं मिली"
+      Invalid: "लॉगिन नीति अमान्य है"
+      RedirectURIInvalid: "डिफॉल्ट रीडायरेक्ट URI अमान्य है"
+      NotExisting: "लॉगिन नीति मौजूद नहीं है"
+      AlreadyExists: "लॉगिन नीति पहले से मौजूद है"
+      IdpProviderAlreadyExisting: "आइडेंटिटी प्रोवाइडर पहले से मौजूद है"
+      IdpProviderNotExisting: "आइडेंटिटी प्रोवाइडर मौजूद नहीं है"
+      RegistrationNotAllowed: "रजिस्ट्रेशन की अनुमति नहीं है"
+      UsernamePasswordNotAllowed: "यूजरनेम/पासवर्ड लॉगिन की अनुमति नहीं है"
+      MFA:
+        AlreadyExists: "मल्टीफैक्टर पहले से मौजूद है"
+        NotExisting: "मल्टीफैक्टर मौजूद नहीं है"
+        Unspecified: "मल्टीफैक्टर अमान्य है"
+    MailTemplate:
+      NotFound: "डिफॉल्ट मेल टेम्पलेट नहीं मिला"
+      NotChanged: "डिफॉल्ट मेल टेम्पलेट बदला नहीं गया"
+      AlreadyExists: "डिफॉल्ट मेल टेम्पलेट पहले से मौजूद है"
+      Invalid: "डिफॉल्ट मेल टेम्पलेट अमान्य है"
+    CustomMessageText:
+      NotFound: "डिफॉल्ट संदेश टेक्स्ट नहीं मिला"
+      NotChanged: "डिफॉल्ट संदेश टेक्स्ट बदला नहीं गया"
+      AlreadyExists: "डिफॉल्ट संदेश टेक्स्ट पहले से मौजूद है"
+      Invalid: "डिफॉल्ट संदेश टेक्स्ट अमान्य है"
+    PasswordComplexityPolicy:
+      NotFound: "पासवर्ड जटिलता नीति नहीं मिली"
+      Empty: "पासवर्ड जटिलता नीति खाली है"
+      NotExisting: "पासवर्ड जटिलता नीति मौजूद नहीं है"
+      AlreadyExists: "पासवर्ड जटिलता नीति पहले से मौजूद है"
+    PasswordLockoutPolicy:
+      NotFound: "पासवर्ड लॉकआउट नीति नहीं मिली"
+      Empty: "पासवर्ड लॉकआउट नीति खाली है"
+      NotExisting: "पासवर्ड लॉकआउट नीति मौजूद नहीं है"
+      AlreadyExists: "पासवर्ड लॉकआउट नीति पहले से मौजूद है"
+    PasswordAgePolicy:
+      NotFound: "पासवर्ड आयु नीति नहीं मिली"
+      Empty: "पासवर्ड आयु नीति खाली है"
+      NotExisting: "पासवर्ड आयु नीति मौजूद नहीं है"
+      AlreadyExists: "पासवर्ड आयु नीति पहले से मौजूद है"
+    NotificationPolicy:
+      NotFound: "सूचना नीति नहीं मिली"
+      NotChanged: "सूचना नीति नहीं बदली गई"
+      AlreadyExists: "सूचना नीति पहले से मौजूद है"
+    LabelPolicy:
+      NotFound: "प्राइवेट लेबल नीति नहीं मिली"
+      NotChanged: "प्राइवेट लेबल नीति नहीं बदली गई"
+  Project:
+    ProjectIDMissing: "प्रोजेक्ट ID गायब है"
+    AlreadyExists: "संस्था पर प्रोजेक्ट पहले से मौजूद है"
+    OrgNotExisting: "संस्था मौजूद नहीं है"
+    UserNotExisting: "यूजर मौजूद नहीं है"
+    CouldNotGenerateClientSecret: "क्लाइंट सीक्रेट जनरेट नहीं किया जा सका"
+    Invalid: "प्रोजेक्ट अमान्य है"
+    NotActive: "प्रोजेक्ट सक्रिय नहीं है"
+    NotInactive: "प्रोजेक्ट निष्क्रिय नहीं है"
+    NotFound: "प्रोजेक्ट नहीं मिला"
+    UserIDMissing: "यूजर ID गायब है"
+    Member:
+      NotFound: "प्रोजेक्ट सदस्य नहीं मिला"
+      Invalid: "प्रोजेक्ट सदस्य अमान्य है"
+      AlreadyExists: "प्रोजेक्ट सदस्य पहले से मौजूद है"
+      NotExisting: "प्रोजेक्ट सदस्य मौजूद नहीं है"
+    MinimumOneRoleNeeded: "कम से कम एक रोल होना आवश्यक है"
+    Role:
+      AlreadyExists: "रोल पहले से मौजूद है"
+      Invalid: "रोल अमान्य है"
+      NotExisting: "रोल मौजूद नहीं है"
+    IDMissing: "ID गायब है"
+    App:
+      AlreadyExists: "एप्लिकेशन पहले से मौजूद है"
+      NotFound: "एप्लिकेशन नहीं मिला"
+      Invalid: "एप्लिकेशन अमान्य है"
+      NotExisting: "एप्लिकेशन मौजूद नहीं है"
+      NotActive: "एप्लिकेशन सक्रिय नहीं है"
+      NotInactive: "एप्लिकेशन निष्क्रिय नहीं है"
+      OIDCConfigInvalid: "OIDC कॉन्फ़िगरेशन अमान्य है"
+      APIConfigInvalid: "API कॉन्फ़िगरेशन अमान्य है"
+      SAMLConfigInvalid: "SAML कॉन्फ़िगरेशन अमान्य है"
+      IsNotOIDC: "एप्लिकेशन OIDC प्रकार का नहीं है"
+      IsNotAPI: "एप्लिकेशन API प्रकार का नहीं है"
+      IsNotSAML: "एप्लिकेशन SAML प्रकार का नहीं है"
+      SAMLMetadataMissing: "SAML मेटाडेटा गायब है"
+      SAMLMetadataFormat: "SAML मेटाडेटा फॉर्मेट त्रुटि"
+      SAMLEntityIDAlreadyExisting: "SAML EntityID पहले से मौजूद है"
+      OIDCAuthMethodNoSecret: "चुने गए OIDC ऑथ मेथड को सीक्रेट की आवश्यकता नहीं है"
+      APIAuthMethodNoSecret: "चुने गए API ऑथ मेथड को सीक्रेट की आवश्यकता नहीं है"
+      AuthMethodNoPrivateKeyJWT: "चुने गए ऑथ मेथड को की (key) की आवश्यकता नहीं है"
+      ClientSecretInvalid: "क्लाइंट सीक्रेट अमान्य है"
+      Key:
+        AlreadyExisting: "एप्लिकेशन की पहले से मौजूद है"
+        NotFound: "एप्लिकेशन की नहीं मिली"
+    RequiredFieldsMissing: "कुछ आवश्यक फ़ील्ड खाली हैं"
+    Grant:
+      AlreadyExists: "प्रोजेक्ट ग्रांट पहले से मौजूद है"
+      NotFound: "प्रोजेक्ट ग्रांट नहीं मिला"
+      Invalid: "प्रोजेक्ट ग्रांट अमान्य है"
+      NotExisting: "प्रोजेक्ट ग्रांट मौजूद नहीं है"
+      HasNotExistingRole: "एक रोल प्रोजेक्ट पर मौजूद नहीं है"
+      NotActive: "प्रोजेक्ट ग्रांट सक्रिय नहीं है"
+      NotInactive: "प्रोजेक्ट ग्रांट निष्क्रिय नहीं है"
+  Instance:
+    AlreadyExists: "इन्स्टेंस पहले से मौजूद है"
+    NotChanged: "इन्स्टेंस बदला नहीं गया"
+    NotFound: "इन्स्टेंस नहीं मिला। कृपया डोमेन की जांच करें।"
+    Member:
+      RolesNotChanged: "भूमिकाएं बदली नहीं गई हैं"
+    MemberInvalid: "सदस्य अमान्य है"
+    MemberAlreadyExisting: "सदस्य पहले से मौजूद है"
+    MemberNotExisting: "सदस्य मौजूद नहीं है"
+    IDMissing: "ID गायब है"
+    IdpInvalid: "IDP कॉन्फ़िगरेशन अमान्य है"
+    IdpNotExisting: "IDP कॉन्फ़िगरेशन मौजूद नहीं है"
+    OIDCConfigInvalid: "OIDC IDP कॉन्फ़िगरेशन अमान्य है"
+    IdpIsNotOIDC: "IDP कॉन्फ़िगरेशन OIDC प्रकार का नहीं है"
+    LoginPolicyInvalid: "लॉगिन नीति अमान्य है"
+    LoginPolicyNotExisting: "लॉगिन नीति मौजूद नहीं है"
+    IdpProviderInvalid: "आइडेंटिटी प्रोवाइडर अमान्य है"
+    LoginPolicy:
+      NotFound: "डिफॉल्ट लॉगिन नीति नहीं मिली"
+      NotChanged: "डिफॉल्ट लॉगिन नीति बदली नहीं गई"
+      NotExisting: "डिफॉल्ट लॉगिन नीति मौजूद नहीं है"
+      AlreadyExists: "डिफॉल्ट लॉगिन नीति पहले से मौजूद है"
+      RedirectURIInvalid: "डिफॉल्ट रीडायरेक्ट URI अमान्य है"
+      MFA:
+        AlreadyExists: "मल्टीफैक्टर पहले से मौजूद है"
+        NotExisting: "मल्टीफैक्टर मौजूद नहीं है"
+        Unspecified: "मल्टीफैक्टर अमान्य है"
+      IDP:
+        AlreadyExists: "आइडेंटिटी प्रोवाइडर पहले से मौजूद है"
+        NotExisting: "आइडेंटिटी प्रोवाइडर मौजूद नहीं है"
+        Invalid: "आइडेंटिटी प्रोवाइडर अमान्य है"
+      IDPConfig:
+        AlreadyExists: "आइडेंटिटी प्रोवाइडर कॉन्फ़िगरेशन पहले से मौजूद है"
+        NotInactive: "आइडेंटिटी प्रोवाइडर कॉन्फ़िगरेशन निष्क्रिय नहीं है"
+        NotActive: "आइडेंटिटी प्रोवाइडर कॉन्फ़िगरेशन सक्रिय नहीं है"
+    LabelPolicy:
+      NotFound: "डिफॉल्ट प्राइवेट लेबल नीति नहीं मिली"
+      NotChanged: "डिफॉल्ट प्राइवेट लेबल नीति नहीं बदली गई"
+    MailTemplate:
+      NotFound: "डिफॉल्ट मेल टेम्पलेट नहीं मिला"
+      NotChanged: "डिफॉल्ट मेल टेम्पलेट नहीं बदला गया"
+      AlreadyExists: "डिफॉल्ट मेल टेम्पलेट पहले से मौजूद है"
+      Invalid: "डिफॉल्ट मेल टेम्पलेट अमान्य है"
+    CustomMessageText:
+      NotFound: "डिफॉल्ट संदेश टेक्स्ट नहीं मिला"
+      NotChanged: "डिफॉल्ट संदेश टेक्स्ट नहीं बदला गया"
+      AlreadyExists: "डिफॉल्ट संदेश टेक्स्ट पहले से मौजूद है"
+      Invalid: "डिफॉल्ट संदेश टेक्स्ट अमान्य है"
+    PasswordComplexityPolicy:
+      NotFound: "डिफॉल्ट पासवर्ड जटिलता नीति नहीं मिली"
+      NotExisting: "डिफॉल्ट पासवर्ड जटिलता नीति मौजूद नहीं है"
+      AlreadyExists: "डिफॉल्ट पासवर्ड जटिलता नीति पहले से मौजूद है"
+      Empty: "डिफॉल्ट पासवर्ड जटिलता नीति खाली है"
+      NotChanged: "डिफॉल्ट पासवर्ड जटिलता नीति बदली नहीं गई"
+    PasswordAgePolicy:
+      NotFound: "डिफॉल्ट पासवर्ड आयु नीति नहीं मिली"
+      NotExisting: "डिफॉल्ट पासवर्ड आयु नीति मौजूद नहीं है"
+      AlreadyExists: "डिफॉल्ट पासवर्ड आयु नीति पहले से मौजूद है"
+      Empty: "डिफॉल्ट पासवर्ड आयु नीति खाली है"
+      NotChanged: "डिफॉल्ट पासवर्ड आयु नीति बदली नहीं गई"
+    PasswordLockoutPolicy:
+      NotFound: "डिफॉल्ट पासवर्ड लॉकआउट नीति नहीं मिली"
+      NotExisting: "डिफॉल्ट पासवर्ड लॉकआउट नीति मौजूद नहीं है"
+      AlreadyExists: "डिफॉल्ट पासवर्ड लॉकआउट नीति पहले से मौजूद है"
+      Empty: "डिफॉल्ट पासवर्ड लॉकआउट नीति खाली है"
+      NotChanged: "डिफॉल्ट पासवर्ड लॉकआउट नीति बदली नहीं गई"
+    DomainPolicy:
+      NotFound: "संस्था डोमेन नीति नहीं मिली"
+      Empty: "संस्था डोमेन नीति खाली है"
+      NotExisting: "संस्था डोमेन नीति मौजूद नहीं है"
+      AlreadyExists: "संस्था डोमेन नीति पहले से मौजूद है"
+      NotChanged: "संस्था डोमेन नीति बदली नहीं गई"
+    NotificationPolicy:
+      NotFound: "डिफॉल्ट सूचना नीति नहीं मिली"
+      NotChanged: "डिफॉल्ट सूचना नीति बदली नहीं गई"
+      AlreadyExists: "डिफॉल्ट सूचना नीति पहले से मौजूद है"
+  Policy:
+    AlreadyExists: "नीति पहले से मौजूद है"
+    Label:
+      Invalid:
+        PrimaryColor: "प्राथमिक रंग मान्य Hex कोड नहीं है"
+        BackgroundColor: "पृष्ठभूमि रंग मान्य Hex कोड नहीं है"
+        WarnColor: "चेतावनी रंग मान्य Hex कोड नहीं है"
+        FontColor: "फॉन्ट रंग मान्य Hex कोड नहीं है"
+        PrimaryColorDark: "प्राथमिक रंग (डार्क) मान्य नहीं है"
+        BackgroundColorDark: "पृष्ठभूमि रंग (डार्क) मान्य नहीं है"
+        WarnColorDark: "चेतावनी रंग (डार्क) मान्य नहीं है"
+        FontColorDark: "फॉन्ट रंग (डार्क) मान्य नहीं है"
+  UserGrant:
+    AlreadyExists: "यूजर ग्रांट पहले से मौजूद है"
+    NotFound: "यूजर ग्रांट नहीं मिला"
+    Invalid: "यूजर ग्रांट अमान्य है"
+    NotChanged: "यूजर ग्रांट बदला नहीं गया"
+    IDMissing: "ID गायब है"
+    NoPermissionForProject: "यूजर के पास इस प्रोजेक्ट पर अनुमति नहीं है"
+    RoleKeyNotFound: "भूमिका नहीं मिली"
+  Member:
+    AlreadyExists: "सदस्य पहले से मौजूद है"
+  IDPConfig:
+    AlreadyExists: "इस नाम के साथ IDP कॉन्फ़िगरेशन पहले से मौजूद है"
+    NotExisting: "आइडेंटिटी प्रोवाइडर कॉन्फ़िगरेशन मौजूद नहीं है"
+  Changes:
+    NotFound: "कोई इतिहास नहीं मिला"
+    AuditRetention: "इतिहास ऑडिट लॉग रिटेंशन सीमा के बाहर है"
+  Token:
+    NotFound: "टोकन नहीं मिला"
+    Invalid: "टोकन अमान्य है"
+  UserSession:
+    NotFound: "यूजर सेशन नहीं मिला"
+  Key:
+    NotFound: "की (key) नहीं मिली"
+    ExpireBeforeNow: "समाप्ति तिथि बीत चुकी है"
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: "मल्टीफैक्टर आवश्यक है, लेकिन कोई प्रोवाइडर कॉन्फ़िगर नहीं है"
+  Step:
+    Started:
+      AlreadyExists: "चरण पहले ही शुरू हो चुका है"
+    Done:
+      AlreadyExists: "चरण पहले ही पूरा हो चुका है"
+  CustomText:
+    AlreadyExists: "कस्टम टेक्स्ट पहले से मौजूद है"
+    Invalid: "कस्टम टेक्स्ट अमान्य है"
+    NotFound: "कस्टम टेक्स्ट नहीं मिला"
+  TranslationFile:
+    ReadError: "अनुवाद फ़ाइल पढ़ने में त्रुटि"
+    MergeError: "अनुवाद फ़ाइल को कस्टम अनुवादों के साथ मर्ज नहीं किया जा सका"
+    NotFound: "अनुवाद फ़ाइल मौजूद नहीं है"
+  Metadata:
+    NotFound: "मेटाडेटा नहीं मिला"
+    NoData: "मेटाडेटा सूची खाली है"
+    Invalid: "मेटाडेटा अमान्य है"
+    KeyNotExisting: "एक या अधिक कीज़ मौजूद नहीं हैं"
+  Action:
+    Invalid: "एक्शन अमान्य है"
+    NotFound: "एक्शन नहीं मिला"
+    NotActive: "एक्शन सक्रिय नहीं है"
+    NotInactive: "एक्शन निष्क्रिय नहीं है"
+    MaxAllowed: "अतिरिक्त सक्रिय एक्शन्स की अनुमति नहीं है"
+    NotEnabled: "\"Action\" फीचर सक्षम नहीं है"
+  Flow:
+    FlowTypeMissing: "FlowType गायब है"
+    Empty: "फ्लो पहले से ही खाली है"
+    WrongTriggerType: "TriggerType अमान्य है"
+    NoChanges: "कोई बदलाव नहीं"
+    ActionIDsNotExist: "एक्शन IDs मौजूद नहीं हैं"
+  Query:
+    CloseRows: "SQL स्टेटमेंट समाप्त नहीं किया जा सका"
+    SQLStatement: "SQL स्टेटमेंट नहीं बनाया जा सका"
+    InvalidRequest: "अनुरोध अमान्य है"
+    TooManyNestingLevels: "क्वेरी नेस्टिंग स्तर बहुत अधिक हैं (अधिकतम 20)"
+    LimitExceeded: "सीमा पार हो गई"
+  Quota:
+    AlreadyExists: "इस यूनिट के लिए कोटा पहले से मौजूद है"
+    NotFound: "इस यूनिट के लिए कोटा नहीं मिला"
+    Invalid:
+      CallURL: "कोटा कॉल URL अमान्य है"
+      Percent: "कोटा प्रतिशत 1 से कम है"
+      Unimplemented: "इस यूनिट के लिए कोटा लागू नहीं है"
+      Amount: "कोटा राशि 1 से कम है"
+      ResetInterval: "कोटा रीसेट अंतराल एक मिनट से कम है"
+      Noop: "बिना सूचना के असीमित कोटे का कोई प्रभाव नहीं है"
+    Access:
+      Exhausted: "ऑथेंटिकेटेड अनुरोधों का कोटा समाप्त हो गया है"
+    Execution:
+      Exhausted: "एक्जीक्यूशन सेकंड का कोटा समाप्त हो गया है"
+  LogStore:
+    Access:
+      StorageFailed: "एक्सेस लॉग स्टोर करना विफल रहा"
+      ScanFailed: "उपयोग की क्वेरी विफल रही"
+    Execution:
+      StorageFailed: "एक्शन एक्जीक्यूशन लॉग स्टोर करना विफल रहा"
+      ScanFailed: "एक्जीक्यूशन सेकंड के उपयोग की क्वेरी विफल रही"
+  Session:
+    NotExisting: "सेशन मौजूद नहीं है"
+    Terminated: "सेशन पहले ही समाप्त हो चुका है"
+    Expired: "सेशन समाप्त हो गया है"
+    PositiveLifetime: "सेशन जीवनकाल 0 से कम नहीं होना चाहिए"
+    Token:
+      Invalid: "सेशन टोकन अमान्य है"
+    WebAuthN:
+      NoChallenge: "बिना WebAuthN चुनौती के सेशन"
+  Intent:
+    IDPMissing: "अनुरोध में IDP ID गायब है"
+    IDPInvalid: "अनुरोध के लिए IDP अमान्य है"
+    ResponseInvalid: "IDP प्रतिक्रिया अमान्य है"
+    MissingSingleMappingAttribute: "IDP प्रतिक्रिया में मैपिंग एट्रिब्यूट नहीं है"
+    SuccessURLMissing: "सफलता URL गायब है"
+    FailureURLMissing: "विफलता URL गायब है"
+    StateMissing: "स्टेट पैरामीटर गायब है"
+    NotStarted: "इंटेंट शुरू नहीं हुआ है"
+    NotSucceeded: "इंटेंट सफल नहीं हुआ है"
+    Expired: "इंटेंट समाप्त हो गया है"
+    TokenCreationFailed: "टोकन निर्माण विफल रहा"
+    InvalidToken: "इंटेंट टोकन अमान्य है"
+    OtherUser: "इंटेंट किसी अन्य यूजर के लिए है"
+  AuthRequest:
+    AlreadyExists: "ऑथ अनुरोध पहले से मौजूद है"
+    NotExisting: "ऑथ अनुरोध मौजूद नहीं है"
+    WrongLoginClient: "ऑथ अनुरोध अन्य एप्लिकेशन द्वारा बनाया गया है"
+    AlreadyHandled: "ऑथ अनुरोध पहले ही संभाला जा चुका है"
+  OIDCSession:
+    RefreshTokenInvalid: "रिफ्रेश टोकन अमान्य है"
+    Token:
+      Invalid: "टोकन अमान्य है"
+      Expired: "टोकन समाप्त हो गया है"
+    InvalidClient: "टोकन इस एप्लिकेशन के लिए जारी नहीं किया गया था"
+  SAMLRequest:
+    AlreadyExists: "SAML अनुरोध पहले से मौजूद है"
+    NotExisting: "SAML अनुरोध मौजूद नहीं है"
+    WrongLoginClient: "SAML अनुरोध अन्य एप्लिकेशन द्वारा बनाया गया है"
+    AlreadyHandled: "SAML अनुरोध पहले ही संभाला जा चुका है"
+  SAMLSession:
+    InvalidClient: "SAMLResponse इस एप्लिकेशन के लिए जारी नहीं किया गया था"
+  DeviceAuth:
+    NotFound: "डिवाइस ऑथराइजेशन अनुरोध मौजूद नहीं है"
+    AlreadyHandled: "डिवाइस ऑथराइजेशन अनुरोध पहले ही संभाला जा चुका है"
+  Feature:
+    NotExisting: "फीचर मौजूद नहीं है"
+    TypeNotSupported: "फीचर प्रकार समर्थित नहीं है"
+    InvalidValue: "इस फीचर के लिए अमान्य मान"
+  Target:
+    Invalid: "टारगेट अमान्य है"
+    NoTimeout: "टारगेट में कोई टाइमआउट नहीं है"
+    InvalidURL: "टारगेट का URL अमान्य है"
+    NotFound: "टारगेट नहीं मिला"
+    InvalidExpirationDate: "की समाप्ति तिथि भविष्य की होनी चाहिए"
+    PublicKeyExpired: "टारगेट पब्लिक की समाप्त हो गई है"
+    PublicKeyActive: "सक्रिय टारगेट पब्लिक की को डिलीट नहीं किया जा सकता"
+    InvalidPublicKey: "पब्लिक की अमान्य है। यह PKCS#8 फॉर्मेट में होनी चाहिए"
+  Execution:
+    ConditionInvalid: "एक्जीक्यूशन शर्त अमान्य है"
+    Invalid: "एक्जीक्यूशन अमान्य है"
+    NotFound: "एक्जीक्यूशन नहीं मिला"
+    IncludeNotFound: "Include नहीं मिला"
+    NoTargets: "कोई टारगेट परिभाषित नहीं है"
+    Failed: "एक्जीक्यूशन विफल रहा"
+    ResponseIsNotValidJSON: "रिस्पॉन्स मान्य JSON नहीं है"
+    MissingEncryptionKey: "टारगेट के लिए एन्क्रिप्शन की नहीं मिली"
+  UserSchema:
+    NotEnabled: "\"User Schema\" फीचर सक्षम नहीं है"
+    Type:
+      Missing: "यूजर स्कीमा प्रकार गायब है"
+      AlreadyExists: "यूजर स्कीमा प्रकार पहले से मौजूद है"
+    Authenticator:
+      Invalid: "अमान्य ऑथेंटिकेटर प्रकार"
+    NotActive: "यूजर स्कीमा सक्रिय नहीं है"
+    NotInactive: "यूजर स्कीमा निष्क्रिय नहीं है"
+    NotExists: "यूजर स्कीमा मौजूद नहीं है"
+    ID:
+      Missing: "यूजर स्कीमा ID गायब है"
+    Invalid: "यूजर स्कीमा अमान्य है"
+    Data:
+      Invalid: "यूजर स्कीमा के लिए डेटा अमान्य है"
+  TokenExchange:
+    Token:
+      Missing: "टोकन गायब है"
+      Invalid: "टोकन अमान्य है"
+      TypeMissing: "टोकन का प्रकार गायब है"
+      TypeNotAllowed: "टोकन प्रकार की अनुमति नहीं है"
+      TypeNotSupported: "टोकन प्रकार समर्थित नहीं है"
+      NotForAPI: "API के लिए इम्पर्सनेटेड टोकन की अनुमति नहीं है"
+    Impersonation:
+      PolicyDisabled: "सुरक्षा नीति में इम्पर्सनेशन अक्षम है"
+  WebKey:
+    ActiveDelete: "सक्रिय वेब की को डिलीट नहीं किया जा सकता"
+    Config: "वेब की कॉन्फ़िगरेशन अमान्य है"
+    Duplicate: "वेब की ID अद्वितीय नहीं है"
+    NoActive: "कोई सक्रिय वेब की नहीं मिली"
+    NotFound: "वेब की नहीं मिली"
+
+AggregateTypes:
+  action: "एक्शन (Action)"
+  instance: "इन्स्टेंस (Instance)"
+  key_pair: "की पेयर (Key Pair)"
+  org: "संस्था (Organization)"
+  project: "प्रोजेक्ट (Project)"
+  user: "यूजर (User)"
+  usergrant: "यूजर ग्रांट (User Grant)"
+  quota: "कोटा (Quota)"
+  feature: "फीचर (Feature)"
+  target: "टारगेट (Target)"
+  execution: "निष्पादन (Execution)"
+  user_schema: "यूजर स्कीमा (User Schema)"
+  auth_request: "ऑथ अनुरोध (Auth Request)"
+  device_auth: "डिवाइस ऑथ (Device Auth)"
+  idpintent: "IDP इंटेंट"
+  limits: "सीमाएं (Limits)"
+  milestone: "माइलस्टोन (Milestone)"
+  oidc_session: "OIDC सेशन"
+  restrictions: "प्रतिबंध (Restrictions)"
+  system: "सिस्टम (System)"
+  session: "सेशन (Session)"
+  web_key: "वेब की (Web Key)"
+  saml_request: "SAML अनुरोध"
+  saml_session: "SAML सेशन"
+
+EventTypes:
+  execution:
+    set: "निष्पादन सेट किया गया"
+    removed: "निष्पादन डिलीट किया गया"
+  target:
+    added: "टारगेट बनाया गया"
+    changed: "टारगेट बदला गया"
+    removed: "टारगेट डिलीट किया गया"
+  user:
+    added: "यूजर जोड़ा गया"
+    selfregistered: "यूजर ने स्वयं रजिस्टर किया"
+    initialization:
+      code:
+        added: "सेटअप कोड जनरेट किया गया"
+        sent: "सेटअप कोड भेजा गया"
+      check:
+        succeeded: "सेटअप जांच सफल रही"
+        failed: "सेटअप जांच विफल रही"
+    token:
+      added: "एक्सेस टोकन बनाया गया"
+      v2.added: "एक्सेस टोकन बनाया गया"
+      removed: "एक्सेस टोकन हटाया गया"
+    impersonated: "यूजर इम्पर्सनेट किया गया"
+    username:
+      reserved: "यूजरनेम आरक्षित किया गया"
+      released: "यूजरनेम जारी किया गया"
+      changed: "यूजरनेम बदला गया"
+    email:
+      reserved: "ईमेल एड्रेस आरक्षित किया गया"
+      released: "ईमेल एड्रेस जारी किया गया"
+      changed: "ईमेल एड्रेस बदला गया"
+      verified: "ईमेल एड्रेस सत्यापित किया गया"
+      verification:
+        failed: "ईमेल एड्रेस सत्यापन विफल रहा"
+      code:
+        added: "ईमेल वेरिफिकेशन कोड जनरेट किया गया"
+        sent: "ईमेल वेरिफिकेशन कोड भेजा गया"
+    machine:
+      added: "तकनीकी यूजर जोड़ा गया"
+      changed: "तकनीकी यूजर बदला गया"
+      key:
+        added: "की जोड़ी गई"
+        removed: "की हटाई गई"
+      secret:
+        set: "सीक्रेट सेट किया गया"
+        updated: "सीक्रेट हैश अपडेट किया गया"
+        removed: "सीक्रेट हटाया गया"
+        check:
+          succeeded: "सीक्रेट जांच सफल रही"
+          failed: "सीक्रेट जांच विफल रही"
+    human:
+      added: "व्यक्ति जोड़ा गया"
+      selfregistered: "व्यक्ति ने स्वयं रजिस्टर किया"
+      avatar:
+        added: "अवतार जोड़ा गया"
+        removed: "अवतार हटाया गया"
+      initialization:
+        code:
+          added: "सेटअप कोड जनरेट किया गया"
+          sent: "सेटअप कोड भेजा गया"
+        check:
+          succeeded: "सेटअप जांच सफल रही"
+          failed: "सेटअप जांच विफल रही"
+      invite:
+        code:
+          added: "आमंत्रण कोड जनरेट किया गया"
+          sent: "आमंत्रण कोड भेजा गया"
+        check:
+          succeeded: "आमंत्रण जांच सफल रही"
+          failed: "आमंत्रण जांच विफल रही"
+      username:
+        reserved: "यूजरनेम आरक्षित किया गया"
+        released: "यूजरनेम जारी किया गया"
+      email:
+        changed: "ईमेल एड्रेस बदला गया"
+        verified: "ईमेल एड्रेस सत्यापित किया गया"
+        verification:
+          failed: "ईमेल एड्रेस सत्यापन विफल रहा"
+        code:
+          added: "ईमेल वेरिफिकेशन कोड जनरेट किया गया"
+          sent: "ईमेल वेरिफिकेशन कोड भेजा गया"
+      password:
+        changed: "पासवर्ड बदला गया"
+        code:
+          added: "पासवर्ड कोड जनरेट किया गया"
+          sent: "पासवर्ड कोड भेजा गया"
+        check:
+          succeeded: "पासवर्ड जांच सफल रही"
+          failed: "पासवर्ड जांच विफल रही"
+        change:
+          sent: "पासवर्ड बदलाव भेजा गया"
+        hash:
+          updated: "पासवर्ड हैश अपडेट किया गया"
+      externallogin:
+        check:
+          succeeded: "बाहरी लॉगिन सफल रहा"
+      externalidp:
+        added: "बाहरी IDP जोड़ा गया"
+        removed: "बाहरी IDP हटाया गया"
+        cascade:
+          removed: "बाहरी IDP कैस्केड हटाया गया"
+        id:
+          migrated: "बाहरी यूजर ID माइग्रेट की गई"
+      phone:
+        changed: "फोन नंबर बदला गया"
+        verified: "फोन नंबर सत्यापित किया गया"
+        verification:
+          failed: "फोन नंबर सत्यापन विफल रहा"
+        code:
+          added: "फोन नंबर कोड जनरेट किया गया"
+          sent: "फोन नंबर कोड भेजा गया"
+        removed: "फोन नंबर हटाया गया"
+      profile:
+        changed: "यूजर प्रोफाइल बदली गई"
+      address:
+        changed: "यूजर पता बदला गया"
+      mfa:
+        otp:
+          added: "मल्टीफैक्टर OTP जोड़ा गया"
+          verified: "मल्टीफैक्टर OTP सत्यापित किया गया"
+          removed: "मल्टीफैक्टर OTP हटाया गया"
+          check:
+            succeeded: "मल्टीफैक्टर OTP जांच सफल रही"
+            failed: "मल्टीफैक्टर OTP जांच विफल रही"
+          sms:
+            added: "मल्टीफैक्टर OTP SMS जोड़ा गया"
+            removed: "मल्टीफैक्टर OTP SMS हटाया गया"
+            code:
+              added: "OTP SMS कोड जोड़ा गया"
+              sent: "OTP SMS कोड भेजा गया"
+            check:
+              succeeded: "OTP SMS जांच सफल रही"
+              failed: "OTP SMS जांच विफल रही"
+          email:
+            added: "मल्टीफैक्टर OTP ईमेल जोड़ा गया"
+            removed: "मल्टीफैक्टर OTP ईमेल हटाया गया"
+            code:
+              added: "OTP ईमेल कोड जोड़ा गया"
+              sent: "OTP ईमेल कोड भेजा गया"
+            check:
+              succeeded: "OTP ईमेल जांच सफल रही"
+              failed: "OTP ईमेल जांच विफल रही"
+        u2f:
+          token:
+            added: "मल्टीफैक्टर U2F टोकन जोड़ा गया"
+            verified: "मल्टीफैक्टर U2F टोकन सत्यापित किया गया"
+            removed: "मल्टीफैक्टर U2F टोकन हटाया गया"
+            begin:
+              login: "U2F जांच शुरू हुई"
+            check:
+              succeeded: "U2F जांच सफल रही"
+              failed: "U2F जांच विफल रही"
+            signcount:
+              changed: "U2F टोकन का चेकसम बदला गया"
+        init:
+          skipped: "मल्टीफैक्टर सेटअप छोड़ा गया"
+      passwordless:
+        token:
+          added: "पासकी लॉगिन टोकन जोड़ा गया"
+          verified: "पासकी लॉगिन टोकन सत्यापित किया गया"
+          removed: "पासकी लॉगिन टोकन हटाया गया"
+          begin:
+            login: "पासकी लॉगिन जांच शुरू हुई"
+          check:
+            succeeded: "पासकी लॉगिन जांच सफल रही"
+            failed: "पासकी लॉगिन जांच विफल रही"
+          signcount:
+            changed: "पासकी लॉगिन टोकन का चेकसम बदला गया"
+        initialization:
+          code:
+            added: "पासकी सेटअप कोड जोड़ा गया"
+            sent: "पासकी सेटअप कोड भेजा गया"
+            requested: "पासकी सेटअप कोड का अनुरोध किया गया"
+            check:
+              succeeded: "पासकी सेटअप कोड जांच सफल रही"
+              failed: "पासकी सेटअप कोड जांच विफल रही"
+      signed:
+        out: "यूजर लॉगआउट हुआ"
+      refresh:
+        token:
+          added: "रिफ्रेश टोकन बनाया गया"
+          renewed: "रिफ्रेश टोकन रिन्यू किया गया"
+          removed: "रिफ्रेश टोकन हटाया गया"
+    locked: "यूजर लॉक किया गया"
+    unlocked: "यूजर अनलॉक किया गया"
+    deactivated: "यूजर निष्क्रिय किया गया"
+    reactivated: "यूजर पुनः सक्रिय किया गया"
+    removed: "यूजर हटाया गया"
+    password:
+      changed: "पासवर्ड बदला गया"
+      code:
+        added: "पासवर्ड कोड जनरेट किया गया"
+        sent: "पासवर्ड कोड भेजा गया"
+      check:
+        succeeded: "पासवर्ड जांच सफल रही"
+        failed: "पासवर्ड जांच विफल रही"
+    phone:
+      changed: "फोन नंबर बदला गया"
+      verified: "फोन नंबर सत्यापित किया गया"
+      verification:
+        failed: "फोन नंबर सत्यापन विफल रहा"
+      code:
+        added: "फोन नंबर कोड जनरेट किया गया"
+        sent: "फोन नंबर कोड भेजा गया"
+    profile:
+      changed: "यूजर प्रोफाइल बदली गई"
+    address:
+      changed: "यूजर पता बदला गया"
+    mfa:
+      otp:
+        added: "मल्टीफैक्टर OTP जोड़ा गया"
+        verified: "मल्टीफैक्टर OTP सत्यापित किया गया"
+        removed: "मल्टीफैक्टर OTP हटाया गया"
+        check:
+          succeeded: "मल्टीफैक्टर OTP जांच सफल रही"
+          failed: "मल्टीफैक्टर OTP जांच विफल रही"
+        init:
+          skipped: "OTP सेटअप छोड़ा गया"
+      init:
+        skipped: "मल्टीफैक्टर सेटअप छोड़ा गया"
+    signed:
+      out: "यूजर लॉगआउट हुआ"
+    grant:
+      added: "अनुमति जोड़ी गई"
+      changed: "अनुमति बदली गई"
+      removed: "अनुमति हटाई गई"
+      deactivated: "अनुमति निष्क्रिय की गई"
+      reactivated: "अनुमति पुनः सक्रिय की गई"
+      reserved: "अनुमति आरक्षित की गई"
+      released: "अनुमति जारी की गई"
+      cascade:
+        removed: "अनुमति हटाई गई"
+        changed: "अनुमति बदली गई"
+    metadata:
+      set: "यूजर मेटाडेटा सेट किया गया"
+      removed: "यूजर मेटाडेटा हटाया गया"
+      removed.all: "सभी यूजर मेटाडेटा हटाए गए"
+    domain:
+      claimed: "डोमेन क्लेम किया गया"
+      claimed.sent: "डोमेन क्लेम सूचना भेजी गई"
+    pat:
+      added: "पर्सनल एक्सेस टोकन जोड़ा गया"
+      removed: "पर्सनल एक्सेस टोकन हटाया गया"
+  org:
+    added: "संस्था जोड़ी गई"
+    changed: "संस्था बदली गई"
+    deactivated: "संस्था निष्क्रिय की गई"
+    reactivated: "संस्था पुनः सक्रिय की गई"
+    removed: "संस्था हटाई गई"
+    domain:
+      added: "डोमेन जोड़ा गया"
+      verification:
+        added: "डोमेन सत्यापन जोड़ा गया"
+        failed: "डोमेन सत्यापन विफल रहा"
+      verified: "डोमेन सत्यापित किया गया"
+      removed: "डोमेन हटाया गया"
+      primary:
+        set: "मुख्य संस्था डोमेन सेट किया गया"
+      reserved: "डोमेन आरक्षित किया गया"
+      released: "डोमेन जारी किया गया"
+    name:
+      reserved: "संस्था का नाम आरक्षित किया गया"
+      released: "संस्था का नाम जारी किया गया"
+    member:
+      added: "संस्था सदस्य जोड़ा गया"
+      changed: "संस्था सदस्य बदला गया"
+      removed: "संस्था सदस्य हटाया गया"
+      cascade:
+        removed: "संस्था सदस्य कैस्केड हटाया गया"
+    iam:
+      policy:
+        added: "सिस्टम नीति जोड़ी गई"
+        changed: "सिस्टम नीति बदली गई"
+        removed: "सिस्टम नीति हटाई गई"
+    idp:
+      config:
+        added: "IDP कॉन्फ़िगरेशन जोड़ा गया"
+        changed: "IDP कॉन्फ़िगरेशन बदला गया"
+        removed: "IDP कॉन्फ़िगरेशन हटाया गया"
+        deactivated: "IDP कॉन्फ़िगरेशन निष्क्रिय किया गया"
+        reactivated: "IDP कॉन्फ़िगरेशन पुनः सक्रिय किया गया"
+      oidc:
+        config:
+          added: "OIDC कॉन्फ़िगरेशन जोड़ा गया"
+          changed: "OIDC कॉन्फ़िगरेशन बदला गया"
+      saml:
+        config:
+          added: "SAML कॉन्फ़िगरेशन जोड़ा गया"
+          changed: "SAML कॉन्फ़िगरेशन बदला गया"
+      jwt:
+        config:
+          added: "JWT कॉन्फ़िगरेशन जोड़ा गया"
+          changed: "JWT कॉन्फ़िगरेशन बदला गया"
+    customtext:
+      set: "कस्टम टेक्स्ट सेट किया गया"
+      removed: "कस्टम टेक्स्ट हटाया गया"
+      template:
+        removed: "कस्टम टेक्स्ट टेम्पलेट हटाया गया"
+    policy:
+      login:
+        added: "लॉगिन नीति जोड़ी गई"
+        changed: "लॉगिन नीति बदली गई"
+        removed: "लॉगिन नीति हटाई गई"
+        idpprovider:
+          added: "लॉगिन नीति में IDP जोड़ा गया"
+          removed: "लॉगिन नीति से IDP हटाया गया"
+          cascade:
+            removed: "IDP कैस्केड हटाया गया"
+        secondfactor:
+          added: "लॉगिन नीति में सेकंड फैक्टर जोड़ा गया"
+          removed: "लॉगिन नीति से सेकंड फैक्टर हटाया गया"
+        multifactor:
+          added: "लॉगिन नीति में मल्टीफैक्टर जोड़ा गया"
+          removed: "लॉगिन नीति से मल्टीफैक्टर हटाया गया"
+      password:
+        complexity:
+          added: "पासवर्ड जटिलता नीति जोड़ी गई"
+          changed: "पासवर्ड जटिलता नीति बदली गई"
+          removed: "पासवर्ड जटिलता नीति हटाई गई"
+        age:
+          added: "पासवर्ड आयु नीति जोड़ी गई"
+          changed: "पासवर्ड आयु नीति बदली गई"
+          removed: "पासवर्ड आयु नीति हटाई गई"
+        lockout:
+          added: "पासवर्ड लॉकआउट नीति जोड़ी गई"
+          changed: "पासवर्ड लॉकआउट नीति बदली गई"
+          removed: "पासवर्ड लॉकआउट नीति हटाई गई"
+      label:
+        added: "लेबल नीति जोड़ी गई"
+        changed: "लेबल नीति बदली गई"
+        activated: "लेबल नीति सक्रिय की गई"
+        removed: "लेबल नीति हटाई गई"
+        logo:
+          added: "लोगो जोड़ा गया"
+          removed: "लोगो हटाया गया"
+          dark:
+            added: "डार्क लोगो जोड़ा गया"
+            removed: "डार्क लोगो हटाया गया"
+        icon:
+          added: "आइकन जोड़ा गया"
+          removed: "आइकन हटाया गया"
+          dark:
+            added: "डार्क आइकन जोड़ा गया"
+            removed: "डार्क आइकन हटाया गया"
+        font:
+          added: "फॉन्ट जोड़ा गया"
+          removed: "फॉन्ट हटाया गया"
+        assets:
+          removed: "एसेट्स हटाए गए"
+      privacy:
+        added: "गोपनीयता नीति जोड़ी गई"
+        changed: "गोपनीयता नीति बदली गई"
+        removed: "गोपनीयता नीति हटाई गई"
+      domain:
+        added: "डोमेन नीति जोड़ी गई"
+        changed: "डोमेन नीति बदली गई"
+        removed: "डोमेन नीति हटाई गई"
+      lockout:
+        added: "लॉकआउट नीति जोड़ी गई"
+        changed: "लॉकआउट नीति बदली गई"
+        removed: "लॉकआउट नीति हटाई गई"
+      notification:
+        added: "सूचना नीति जोड़ी गई"
+        changed: "सूचना नीति बदली गई"
+        removed: "सूचना नीति हटाई गई"
+    flow:
+      trigger_actions:
+        set: "एक्शन सेट किया गया"
+        cascade:
+          removed: "एक्शन कैस्केड हटाया गया"
+        removed: "एक्शन हटाया गया"
+      cleared: "फ्लो साफ किया गया"
+    mail:
+      template:
+        added: "ईमेल टेम्पलेट जोड़ा गया"
+        changed: "ईमेल टेम्पलेट बदला गया"
+        removed: "ईमेल टेम्पलेट हटाया गया"
+      text:
+        added: "ईमेल टेक्स्ट जोड़ा गया"
+        changed: "ईमेल टेक्स्ट बदला गया"
+        removed: "ईमेल टेक्स्ट हटाया गया"
+    metadata:
+      removed: "मेटाडेटा हटाया गया"
+      removed.all: "सभी मेटाडेटा हटाए गए"
+      set: "मेटाडेटा सेट किया गया"
+  project:
+    added: "प्रोजेक्ट जोड़ा गया"
+    changed: "प्रोजेक्ट बदला गया"
+    deactivated: "प्रोजेक्ट निष्क्रिय किया गया"
+    reactivated: "प्रोजेक्ट पुनः सक्रिय किया गया"
+    removed: "प्रोजेक्ट हटाया गया"
+    member:
+      added: "प्रोजेक्ट सदस्य जोड़ा गया"
+      changed: "प्रोजेक्ट सदस्य बदला गया"
+      removed: "प्रोजेक्ट सदस्य हटाया गया"
+      cascade:
+        removed: "प्रोजेक्ट सदस्य कैस्केड हटाया गया"
+    role:
+      added: "प्रोजेक्ट रोल जोड़ा गया"
+      changed: "प्रोजेक्ट रोल बदला गया"
+      removed: "प्रोजेक्ट रोल हटाया गया"
+    grant:
+      added: "मैनेजमेंट एक्सेस जोड़ा गया"
+      changed: "मैनेजमेंट एक्सेस बदला गया"
+      removed: "मैनेजमेंट एक्सेस हटाया गया"
+      deactivated: "मैनेजमेंट एक्सेस निष्क्रिय किया गया"
+      reactivated: "मैनेजमेंट एक्सेस पुनः सक्रिय किया गया"
+      cascade:
+        changed: "मैनेजमेंट एक्सेस बदला गया"
+      member:
+        added: "मैनेजमेंट सदस्य जोड़ा गया"
+        changed: "मैनेजमेंट सदस्य बदला गया"
+        removed: "मैनेजमेंट सदस्य हटाया गया"
+        cascade:
+          removed: "मैनेजमेंट सदस्य कैस्केड हटाया गया"
+    application:
+      added: "एप्लिकेशन जोड़ा गया"
+      changed: "एप्लिकेशन बदला गया"
+      removed: "एप्लिकेशन हटाया गया"
+      deactivated: "एप्लिकेशन निष्क्रिय किया गया"
+      reactivated: "एप्लिकेशन पुनः सक्रिय किया गया"
+      oidc:
+        secret:
+          check:
+            succeeded: "OIDC सीक्रेट जांच सफल रही"
+            failed: "OIDC सीक्रेट जांच विफल रही"
+        key:
+          added: "OIDC एप्लिकेशन की (key) जोड़ी गई"
+          removed: "OIDC एप्लिकेशन की हटाई गई"
+      api:
+        secret:
+          check:
+            succeeded: "API सीक्रेट जांच सफल रही"
+            failed: "API सीक्रेट जांच विफल रही"
+        key:
+          added: "एप्लिकेशन की जोड़ी गई"
+          removed: "एप्लिकेशन की हटाई गई"
+      config:
+        saml:
+          added: "SAML कॉन्फ़िगरेशन जोड़ा गया"
+          changed: "SAML कॉन्फ़िगरेशन बदला गया"
+        oidc:
+          added: "OIDC कॉन्फ़िगरेशन जोड़ा गया"
+          changed: "OIDC कॉन्फ़िगरेशन बदला गया"
+          secret:
+            changed: "OIDC सीक्रेट बदला गया"
+            updated: "OIDC सीक्रेट हैश अपडेट किया गया"
+        api:
+          added: "API कॉन्फ़िगरेशन जोड़ा गया"
+          changed: "API कॉन्फ़िगरेशन बदला गया"
+          secret:
+            changed: "API सीक्रेट बदला गया"
+            updated: "API सीक्रेट हैश अपडेट किया गया"
+  policy:
+    password:
+      complexity:
+        added: "पासवर्ड जटिलता नीति जोड़ी गई"
+        changed: "पासवर्ड जटिलता नीति बदली गई"
+      age:
+        added: "पासवर्ड आयु नीति जोड़ी गई"
+        changed: "पासवर्ड आयु नीति बदली गई"
+      lockout:
+        added: "पासवर्ड लॉकआउट नीति जोड़ी गई"
+        changed: "पासवर्ड लॉकआउट नीति बदली गई"
+  iam:
+    setup:
+      started: "ZITADEL सेटअप शुरू हुआ"
+      done: "ZITADEL सेटअप पूरा हुआ"
+    global:
+      org:
+        set: "वैश्विक संस्था सेट की गई"
+    project:
+      iam:
+        set: "ZITADEL प्रोजेक्ट सेट किया गया"
+    member:
+      added: "ZITADEL सदस्य जोड़ा गया"
+      changed: "ZITADEL सदस्य बदला गया"
+      removed: "ZITADEL सदस्य हटाया गया"
+      cascade:
+        removed: "सदस्य कैस्केड हटाया गया"
+    idp:
+      config:
+        added: "IDP कॉन्फ़िगरेशन जोड़ा गया"
+        changed: "IDP कॉन्फ़िगरेशन बदला गया"
+        removed: "IDP कॉन्फ़िगरेशन हटाया गया"
+        deactivated: "IDP कॉन्फ़िगरेशन निष्क्रिय किया गया"
+        reactivated: "IDP कॉन्फ़िगरेशन पुनः सक्रिय किया गया"
+      oidc:
+        config:
+          added: "OIDC IDP कॉन्फ़िगरेशन जोड़ा गया"
+          changed: "OIDC IDP कॉन्फ़िगरेशन बदला गया"
+      saml:
+        config:
+          added: "SAML IDP कॉन्फ़िगरेशन जोड़ा गया"
+          changed: "SAML IDP कॉन्फ़िगरेशन बदला गया"
+      jwt:
+        config:
+          added: "IDP में JWT कॉन्फ़िगरेशन जोड़ा गया"
+          changed: "IDP से JWT कॉन्फ़िगरेशन हटाया गया"
+    customtext:
+      set: "टेक्स्ट सेट किया गया"
+      removed: "टेक्स्ट हटाया गया"
+    policy:
+      login:
+        added: "डिफॉल्ट लॉगिन नीति जोड़ी गई"
+        changed: "डिफॉल्ट लॉगिन नीति बदली गई"
+        idpprovider:
+          added: "डिफॉल्ट नीति में IDP जोड़ा गया"
+          removed: "डिफॉल्ट नीति से IDP हटाया गया"
+      label:
+        added: "लेबल नीति जोड़ी गई"
+        changed: "लेबल नीति बदली गई"
+        activated: "लेबल नीति सक्रिय की गई"
+        logo:
+          added: "लोगो जोड़ा गया"
+          removed: "लोगो हटाया गया"
+          dark:
+            added: "डार्क लोगो जोड़ा गया"
+            removed: "डार्क लोगो हटाया गया"
+        icon:
+          added: "आइकन जोड़ा गया"
+          removed: "आइकन हटाया गया"
+          dark:
+            added: "डार्क आइकन जोड़ा गया"
+            removed: "डार्क आइकन हटाया गया"
+        font:
+          added: "फॉन्ट जोड़ा गया"
+          removed: "फॉन्ट हटाया गया"
+        assets:
+          removed: "एसेट्स हटाए गए"
+    default:
+      language:
+        set: "डिफॉल्ट भाषा सेट की गई"
+    oidc:
+      settings:
+        added: "OIDC कॉन्फ़िगरेशन जोड़ा गया"
+        changed: "OIDC कॉन्फ़िगरेशन बदला गया"
+        removed: "OIDC कॉन्फ़िगरेशन हटाया गया"
+    secret:
+      generator:
+        added: "सीक्रेट जनरेटर जोड़ा गया"
+        changed: "सीक्रेट जनरेटर बदला गया"
+        removed: "सीक्रेट जनरेटर हटाया गया"
+    smtp:
+      config:
+        added: "SMTP कॉन्फ़िगरेशन जोड़ा गया"
+        changed: "SMTP कॉन्फ़िगरेशन बदला गया"
+        activated: "SMTP कॉन्फ़िगरेशन सक्रिय किया गया"
+        deactivated: "SMTP कॉन्फ़िगरेशन निष्क्रिय किया गया"
+        removed: "SMTP कॉन्फ़िगरेशन हटाया गया"
+        password:
+          changed: "SMTP पासवर्ड बदला गया"
+    sms:
+      config:
+        twilio:
+          added: "Twilio SMS प्रदाता जोड़ा गया"
+          changed: "Twilio SMS प्रदाता बदला गया"
+          token:
+            changed: "Twilio SMS टोकन बदला गया"
+          removed: "Twilio SMS प्रदाता हटाया गया"
+          activated: "Twilio SMS प्रदाता सक्रिय किया गया"
+          deactivated: "Twilio SMS प्रदाता निष्क्रिय किया गया"
+  key_pair:
+    added: "की पेयर (Key pair) जोड़ा गया"
+    certificate:
+      added: "सर्टिफिकेट जोड़ा गया"
+  action:
+    added: "एक्शन जोड़ा गया"
+    changed: "एक्शन बदला गया"
+    deactivated: "एक्शन निष्क्रिय किया गया"
+    reactivated: "एक्शन पुनः सक्रिय किया गया"
+    removed: "एक्शन हटाया गया"
+  instance:
+    added: "इन्स्टेंस जोड़ा गया"
+    changed: "इन्स्टेंस बदला गया"
+    customtext:
+      removed: "कस्टम टेक्स्ट हटाया गया"
+      set: "कस्टम टेक्स्ट सेट किया गया"
+      template:
+        removed: "कस्टम टेक्स्ट टेम्पलेट हटाया गया"
+    default:
+      language:
+        set: "डिफॉल्ट भाषा सेट की गई"
+      org:
+        set: "डिफॉल्ट संस्था सेट की गई"
+    domain:
+      added: "डोमेन जोड़ा गया"
+      primary:
+        set: "मुख्य डोमेन सेट किया गया"
+      removed: "डोमेन हटाया गया"
+    iam:
+      console:
+        set: "मैनेजमेंट कंसोल एप्लिकेशन सेट किया गया"
+      project:
+        set: "ZITADEL प्रोजेक्ट सेट किया गया"
+    mail:
+      template:
+        added: "ईमेल टेम्पलेट जोड़ा गया"
+        changed: "ईमेल टेम्पलेट बदला गया"
+      text:
+        added: "ईमेल टेक्स्ट जोड़ा गया"
+        changed: "ईमेल टेक्स्ट बदला गया"
+    member:
+      added: "इन्स्टेंस सदस्य जोड़ा गया"
+      changed: "इन्स्टेंस सदस्य बदला गया"
+      removed: "इन्स्टेंस सदस्य हटाया गया"
+      cascade:
+        removed: "सदस्य कैस्केड हटाया गया"
+    notification:
+      provider:
+        debug:
+          fileadded: "फाइल नोटिफिकेशन प्रदाता जोड़ा गया"
+          filechanged: "फाइल नोटिफिकेशन प्रदाता बदला गया"
+          fileremoved: "फाइल नोटिफिकेशन प्रदाता हटाया गया"
+          logadded: "लॉग नोटिफिकेशन प्रदाता जोड़ा गया"
+          logchanged: "लॉग नोटिफिकेशन प्रदाता बदला गया"
+          logremoved: "लॉग नोटिफिकेशन प्रदाता हटाया गया"
+    oidc:
+      settings:
+        added: "OIDC सेटिंग्स जोड़ी गईं"
+        changed: "OIDC सेटिंग्स बदली गईं"
+    policy:
+      domain:
+        added: "डोमेन नीति जोड़ी गई"
+        changed: "डोमेन नीति बदली गई"
+      label:
+        activated: "लेबल नीति सक्रिय की गई"
+        added: "लेबल नीति जोड़ी गई"
+        assets:
+          removed: "लेबल नीति से एसेट्स हटाए गए"
+        changed: "लेबल नीति बदली गई"
+        font:
+          added: "लेबल नीति में फॉन्ट जोड़ा गया"
+          removed: "लेबल नीति से फॉन्ट हटाया गया"
+        icon:
+          added: "आइकन जोड़ा गया"
+          removed: "आइकन हटाया गया"
+          dark:
+            added: "डार्क आइकन जोड़ा गया"
+            removed: "डार्क आइकन हटाया गया"
+        logo:
+          added: "लोगो जोड़ा गया"
+          removed: "लोगो हटाया गया"
+          dark:
+            added: "डार्क लोगो जोड़ा गया"
+            removed: "डार्क लोगो हटाया गया"
+      lockout:
+        added: "लॉकआउट नीति जोड़ी गई"
+        changed: "लॉकआउट नीति बदली गई"
+      login:
+        added: "लॉगिन नीति जोड़ी गई"
+        changed: "लॉगिन नीति बदली गई"
+        idpprovider:
+          added: "लॉगिन नीति में IDP जोड़ा गया"
+          cascade:
+            removed: "IDP कैस्केड हटाया गया"
+          removed: "लॉगिन नीति से IDP हटाया गया"
+        multifactor:
+          added: "लॉगिन नीति में मल्टीफैक्टर जोड़ा गया"
+          removed: "लॉगिन नीति से मल्टीफैक्टर हटाया गया"
+        secondfactor:
+          added: "लॉगिन नीति में सेकंड फैक्टर जोड़ा गया"
+          removed: "लॉगिन नीति से सेकंड फैक्टर हटाया गया"
+      password:
+        age:
+          added: "पासवर्ड आयु नीति जोड़ी गई"
+          changed: "पासवर्ड आयु नीति बदली गई"
+        complexity:
+          added: "पासवर्ड जटिलता नीति जोड़ी गई"
+          changed: "पासवर्ड जटिलता नीति बदली गई"
+      privacy:
+        added: "गोपनीयता नीति जोड़ी गई"
+        changed: "गोपनीयता नीति बदली गई"
+      security:
+        set: "सुरक्षा नीति सेट की गई"
+    removed: "इन्स्टेंस हटाया गया"
+    secret:
+      generator:
+        added: "सीक्रेट जनरेटर जोड़ा गया"
+        changed: "सीक्रेट जनरेटर बदला गया"
+        removed: "सीक्रेट जनरेटर हटाया गया"
+    sms:
+      configtwilio:
+        activated: "Twilio SMS सक्रिय किया गया"
+        added: "Twilio SMS जोड़ा गया"
+        changed: "Twilio SMS बदला गया"
+        deactivated: "Twilio SMS निष्क्रिय किया गया"
+        removed: "Twilio SMS हटाया गया"
+        token:
+          changed: "Twilio SMS टोकन बदला गया"
+    smtp:
+      config:
+        added: "SMTP कॉन्फ़िगरेशन जोड़ा गया"
+        changed: "SMTP कॉन्फ़िगरेशन बदला गया"
+        activated: "SMTP सक्रिय किया गया"
+        deactivated: "SMTP निष्क्रिय किया गया"
+        password:
+          changed: "SMTP पासवर्ड बदला गया"
+        removed: "SMTP हटाया गया"
+  user_schema:
+    created: "यूजर स्कीमा बनाया गया"
+    updated: "यूजर स्कीमा अपडेट किया गया"
+    deactivated: "यूजर स्कीमा निष्क्रिय किया गया"
+    reactivated: "यूजर स्कीमा पुनः सक्रिय किया गया"
+    deleted: "यूजर स्कीमा डिलीट किया गया"
+    user:
+      created: "यूजर बनाया गया"
+      updated: "यूजर अपडेट किया गया"
+      deleted: "यूजर डिलीट किया गया"
+      email:
+        updated: "ईमेल एड्रेस बदला गया"
+        verified: "ईमेल एड्रेस सत्यापित किया गया"
+        verification:
+          failed: "ईमेल एड्रेस सत्यापन विफल रहा"
+        code:
+          added: "ईमेल वेरिफिकेशन कोड जनरेट किया गया"
+          sent: "ईमेल वेरिफिकेशन कोड भेजा गया"
+      phone:
+        updated: "फोन नंबर बदला गया"
+        verified: "फोन नंबर सत्यापित किया गया"
+        verification:
+          failed: "फोन नंबर सत्यापन विफल रहा"
+        code:
+          added: "फोन नंबर कोड जनरेट किया गया"
+          sent: "फोन नंबर कोड भेजा गया"
+  web_key:
+    added: "वेब की (Web Key) जोड़ी गई"
+    activated: "वेब की सक्रिय की गई"
+    deactivated: "वेब की निष्क्रिय की गई"
+    removed: "वेब की हटाई गई"
+Application:
+  OIDC:
+    UnsupportedVersion: "आपका OIDC वर्जन समर्थित नहीं है"
+    V1:
+      NotCompliant: "आपका कॉन्फ़िगरेशन OIDC 1.0 मानक के अनुरूप नहीं है।"
+      NoRedirectUris: "कम से कम एक रीडायरेक्ट URI होना चाहिए।"
+      NotAllCombinationsAreAllowed: "कॉन्फ़िगरेशन सही है, लेकिन सभी संयोजन मान्य नहीं हैं।"
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: "ग्रांट टाइप 'code' केवल 'web' के लिए http की अनुमति देता है।"
+          CustomOnlyForNative: "ग्रांट टाइप 'code' केवल 'native' के लिए कस्टम URI की अनुमति देता है।"
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: "ग्रांट टाइप 'implicit' कस्टम URI की अनुमति नहीं देता"
+          HttpNotAllowed: "ग्रांट टाइप 'implicit' http URI की अनुमति नहीं देता"
+          HttpLocalhostOnlyForNative: "Http://localhost केवल नेटिव एप्लिकेशन्स के लिए है।"
+      Native:
+        AuthMethodType:
+          NotNone: "नेटिव एप्लिकेशन्स का ऑथ मेथड 'none' होना चाहिए।"
+        RedirectUris:
+          MustBeHttpLocalhost: "रीडायरेक्ट URI आपके प्रोटोकॉल या localhost से शुरू होने चाहिए।"
+      UserAgent:
+        AuthMethodType:
+          NotNone: "यूजर एजेंट एप्लिकेशन्स का ऑथ मेथड 'none' होना चाहिए।"
+      GrantType:
+        Refresh:
+          NoAuthCode: "रिफ्रेश टोकन केवल ऑथराइजेशन कोड के साथ मान्य है।"
+Action:
+  Flow:
+    Type:
+      Unspecified: "अनिर्दिष्ट"
+      ExternalAuthentication: "बाहरी ऑथेंटिकेशन"
+      CustomiseToken: "टोकन को पूरक करें (Complement Token)"
+      InternalAuthentication: "आंतरिक ऑथेंटिकेशन"
+      CustomizeSAMLResponse: "SAML रिस्पॉन्स को पूरक करें"
+  TriggerType:
+    Unspecified: "अनिर्दिष्ट"
+    PostAuthentication: "ऑथेंटिकेशन के बाद"
+    PreCreation: "निर्माण से पहले"
+    PostCreation: "निर्माण के बाद"
+    PreUserinfoCreation: "यूजरइनफो निर्माण से पहले"
+    PreAccessTokenCreation: "एक्सेस टोकन निर्माण से पहले"
+    PreSAMLResponseCreation: "SAML रिस्पॉन्स निर्माण से पहले"
