@@ -130,6 +130,7 @@ func NewServer(
 	hashConfig crypto.HashConfig,
 	federatedLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
 	httpClient *http.Client,
+	trustRemoteSpans bool,
 ) (*Server, error) {
 	opConfig, err := createOPConfig(config, defaultLogoutRedirectURI, cryptoKey)
 	if err != nil {
@@ -210,7 +211,7 @@ func NewServer(
 			middleware.CallDurationHandler,
 			middleware.RequestDetailsHandler(),
 			middleware.MetricsHandler(metricTypes),
-			middleware.TraceHandler(),
+			middleware.TraceHandler(trustRemoteSpans),
 			middleware.LogHandler("oidc"),
 			middleware.RecoverHandler(writeRecoverError),
 			middleware.NoCacheInterceptor().Handler,
