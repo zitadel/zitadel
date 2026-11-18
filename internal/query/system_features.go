@@ -27,6 +27,7 @@ type SystemFeatures struct {
 	LoginV2                        FeatureSource[*feature.LoginV2]
 	PermissionCheckV2              FeatureSource[bool]
 	EnableRelationalTables         FeatureSource[bool]
+	AllowOTPCodeOverride           FeatureSource[bool]
 }
 
 func (q *Queries) GetSystemFeatures(ctx context.Context) (_ *SystemFeatures, err error) {

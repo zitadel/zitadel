@@ -2942,6 +2942,7 @@ func TestCommandSide_HumanSendOTPEmail(t *testing.T) {
 							},
 							time.Hour,
 							nil,
+							"",
 						),
 					),
 				),
@@ -2989,6 +2990,7 @@ func TestCommandSide_HumanSendOTPEmail(t *testing.T) {
 									RemoteIP:       net.IP{192, 0, 2, 1},
 								},
 							},
+							"",
 						),
 					),
 				),
@@ -3125,9 +3127,10 @@ func TestCommandSide_HumanOTPEmailCodeSent(t *testing.T) {
 func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 	ctx := authz.NewMockContext("inst1", "org1", "user1")
 	type fields struct {
-		eventstore     func(*testing.T) *eventstore.Eventstore
-		userEncryption crypto.EncryptionAlgorithm
-		tarpit         Tarpit
+		eventstore        func(*testing.T) *eventstore.Eventstore
+		userEncryption    crypto.EncryptionAlgorithm
+		emailCodeVerifier func(ctx context.Context, id string) (senders.CodeGenerator, error)
+		tarpit            Tarpit
 	}
 	type (
 		args struct {
@@ -3251,6 +3254,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 										RemoteIP:       net.IP{192, 0, 2, 1},
 									},
 								},
+								"",
 							),
 						),
 					),
@@ -3329,6 +3333,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 										RemoteIP:       net.IP{192, 0, 2, 1},
 									},
 								},
+								"",
 							),
 						),
 					),
@@ -3410,6 +3415,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 										RemoteIP:       net.IP{192, 0, 2, 1},
 									},
 								},
+								"",
 							),
 						),
 					),
@@ -3482,6 +3488,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 										RemoteIP:       net.IP{192, 0, 2, 1},
 									},
 								},
+								"",
 							),
 						),
 					),
@@ -3513,13 +3520,87 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-S6h4R", "Errors.User.Locked"),
 			},
 		},
+		{
+			name: "code ok (external)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPEmailAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanOTPEmailCodeAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+								nil,
+								0,
+								&user.AuthRequestInfo{
+									ID:          "authRequestID",
+									UserAgentID: "userAgentID",
+									BrowserInfo: &user.BrowserInfo{
+										UserAgent:      "user-agent",
+										AcceptLanguage: "en",
+										RemoteIP:       net.IP{192, 0, 2, 1},
+									},
+								},
+								"id",
+							),
+						),
+					),
+					expectFilter(), // recheck
+					expectPush(
+						user.NewHumanOTPEmailCheckSucceededEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&user.AuthRequestInfo{
+								ID:          "authRequestID",
+								UserAgentID: "userAgentID",
+								BrowserInfo: &user.BrowserInfo{
+									UserAgent:      "user-agent",
+									AcceptLanguage: "en",
+									RemoteIP:       net.IP{192, 0, 2, 1},
+								},
+							},
+						),
+					),
+				),
+				userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				emailCodeVerifier: func(ctx context.Context, id string) (senders.CodeGenerator, error) {
+					sender := mock.NewMockCodeGenerator(gomock.NewController(t))
+					sender.EXPECT().VerifyCode("", "code").Return(nil)
+					return sender, nil
+				},
+				tarpit: expectTarpit(0),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				code:          "code",
+				resourceOwner: "org1",
+				authRequest: &domain.AuthRequest{
+					ID:      "authRequestID",
+					AgentID: "userAgentID",
+					BrowserInfo: &domain.BrowserInfo{
+						UserAgent:      "user-agent",
+						AcceptLanguage: "en",
+						RemoteIP:       net.IP{192, 0, 2, 1},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:     tt.fields.eventstore(t),
-				userEncryption: tt.fields.userEncryption,
-				tarpit:         tt.fields.tarpit.tarpit,
+				eventstore:        tt.fields.eventstore(t),
+				userEncryption:    tt.fields.userEncryption,
+				emailCodeVerifier: tt.fields.emailCodeVerifier,
+				tarpit:            tt.fields.tarpit.tarpit,
 			}
 			err := r.HumanCheckOTPEmail(tt.args.ctx, tt.args.userID, tt.args.code, tt.args.resourceOwner, tt.args.authRequest)
 			assert.ErrorIs(t, err, tt.res.err)
