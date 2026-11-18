@@ -1,10 +1,16 @@
 package systemdefaults
 
 import (
+	"context"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/sdk/trace/tracetest"
 )
 
 func TestTarpitConfig_duration(t *testing.T) {
@@ -80,4 +86,31 @@ func TestTarpitConfig_duration(t *testing.T) {
 			assert.Equal(t, tt.want, got)
 		})
 	}
+}
+
+func TestTarpitConfig_Tarpit(t *testing.T) {
+	spans := tracetest.NewSpanRecorder()
+	otel.SetTracerProvider(sdk_trace.NewTracerProvider(sdk_trace.WithSpanProcessor(spans)))
+	c := &TarpitConfig{
+		MinFailedAttempts: 2,
+		StepDuration:      10 * time.Millisecond,
+		StepSize:          1,
+		MaxDuration:       50 * time.Millisecond,
+	}
+
+	t.Run("no tarpit, no span", func(t *testing.T) {
+		c.Tarpit()(context.Background(), 1)
+		assert.Empty(t, spans.Ended())
+	})
+	t.Run("tarpit, delayed and recorded as span", func(t *testing.T) {
+		start := time.Now()
+		c.Tarpit()(context.Background(), 4)
+		assert.GreaterOrEqual(t, time.Since(start), 20*time.Millisecond)
+
+		ended := spans.Ended()
+		require.Len(t, ended, 1)
+		assert.Equal(t, "tarpit", ended[0].Name())
+		assert.Contains(t, ended[0].Attributes(), attribute.Int64("tarpit.failed_attempts", 4))
+		assert.Contains(t, ended[0].Attributes(), attribute.String("tarpit.duration", "20ms"))
+	})
 }

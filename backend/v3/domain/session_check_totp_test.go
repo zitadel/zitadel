@@ -1,6 +1,7 @@
 package domain_test
 
 import (
+	"context"
 	"errors"
 	"testing"
 	"time"
@@ -675,7 +676,7 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 							Secret: &crypto.CryptoValue{Crypted: []byte("encrypted-secret")}, FailedAttempts: 0},
 					},
 				},
-				TarpitFunc:   func(_ uint64) {},
+				TarpitFunc:   func(_ context.Context, _ uint64) {},
 				ValidateFunc: func(_, _ string) bool { return false },
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.HumanUserRepository {
@@ -748,7 +749,7 @@ func TestTOTPCheckCommand_Execute(t *testing.T) {
 							Secret: &crypto.CryptoValue{Crypted: []byte("encrypted-secret")}, FailedAttempts: 4},
 					},
 				},
-				TarpitFunc:   func(_ uint64) {},
+				TarpitFunc:   func(_ context.Context, _ uint64) {},
 				ValidateFunc: func(_, _ string) bool { return false },
 			},
 			userRepo: func(ctrl *gomock.Controller) domain.HumanUserRepository {
