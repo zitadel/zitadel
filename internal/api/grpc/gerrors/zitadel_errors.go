@@ -128,7 +128,7 @@ func extractError(err error) (c codes.Code, msg, id string, lvl slog.Level) {
 	default:
 		c, lvl = codes.Unknown, slog.LevelError
 	}
-	if id == zerrors.IDRecover {
+	if zerrors.IsRecovered(err) {
 		lvl = sloggcp.LevelAlert
 	}
 	return c, msg, id, lvl
