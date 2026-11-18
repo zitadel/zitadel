@@ -531,6 +531,7 @@ Errors:
     NotExisting: "Запрос на аутентификацию не существует"
     WrongLoginClient: "Запрос на аутентификацию, созданный другим клиентом входа"
     AlreadyHandled: "Запрос аутентификации уже обработан"
+    NotAuthenticated: "Пользователь не аутентифицирован"
   OIDCSession:
     RefreshTokenInvalid: "Маркер обновления недействителен"
     Token:

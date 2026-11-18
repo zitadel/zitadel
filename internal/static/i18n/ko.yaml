@@ -543,6 +543,7 @@ Errors:
     NotExisting: "인증 요청이 존재하지 않습니다"
     WrongLoginClient: "다른 로그인 클라이언트에 의해 생성된 인증 요청"
     AlreadyHandled: "인증 요청이 이미 처리되었습니다"
+    NotAuthenticated: "사용자가 인증되지 않았습니다"
   OIDCSession:
     RefreshTokenInvalid: "새로 고침 토큰이 유효하지 않습니다"
     Token:

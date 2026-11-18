@@ -542,6 +542,7 @@ Errors:
     NotExisting: "Az Auth Request nem létezik"
     WrongLoginClient: "Az Auth Requestet egy másik bejelentkezési kliens hozta létre"
     AlreadyHandled: "A hitelesítési kérelem már feldolgozva"
+    NotAuthenticated: "A felhasználó nincs hitelesítve"
   OIDCSession:
     RefreshTokenInvalid: "Az Refresh Token érvénytelen"
     Token:

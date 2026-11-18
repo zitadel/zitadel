@@ -10,6 +10,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
+	"github.com/zitadel/zitadel/internal/test"
 )
 
 func TestProvider_BeginAuth(t *testing.T) {
@@ -51,8 +52,9 @@ func TestProvider_BeginAuth(t *testing.T) {
 
 			wantAuth, wantErr := tt.want.GetAuth(ctx)
 			gotAuth, gotErr := session.GetAuth(ctx)
-			a.Equal(wantAuth, gotAuth)
 			a.ErrorIs(gotErr, wantErr)
+			// PKCE is used by default
+			test.AssertRedirectAuthWithPKCE(t, wantAuth, gotAuth, session.PersistentParameters())
 		})
 	}
 }
