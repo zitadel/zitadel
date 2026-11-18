@@ -17,6 +17,7 @@ import (
 	handler2 "github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/id"
 	query2 "github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/query/projection"
 )
 
 type Config struct {
@@ -39,32 +40,38 @@ type ConfigOverwrites struct {
 
 var projections []*handler.Handler
 
-func Register(ctx context.Context, configs Config, view *view.View, queries *query2.Queries) {
+func Register(ctx context.Context, configs Config, view *view.View, queries *query2.Queries) error {
+	filterOffsetIsCursor, err := projection.FilterOffsetIsCursorFromEventstore(ctx, configs.Eventstore)
+	if err != nil {
+		return fmt.Errorf("unable to detect projection cursor compatibility: %w", err)
+	}
+
 	// make sure the slice does not contain old values
 	projections = nil
 
 	projections = append(projections, newUser(ctx,
-		configs.overwrite("User"),
+		configs.overwrite("User", filterOffsetIsCursor),
 		view,
 		queries,
 	))
 
 	projections = append(projections, newUserSession(ctx,
-		configs.overwrite("UserSession"),
+		configs.overwrite("UserSession", filterOffsetIsCursor),
 		view,
 		queries,
 		id.SonyFlakeGenerator(),
 	))
 
 	projections = append(projections, newToken(ctx,
-		configs.overwrite("Token"),
+		configs.overwrite("Token", filterOffsetIsCursor),
 		view,
 	))
 
 	projections = append(projections, newRefreshToken(ctx,
-		configs.overwrite("RefreshToken"),
+		configs.overwrite("RefreshToken", filterOffsetIsCursor),
 		view,
 	))
+	return nil
 }
 
 func Start(ctx context.Context) {
@@ -97,15 +104,16 @@ func ProjectInstance(ctx context.Context) error {
 	return nil
 }
 
-func (config Config) overwrite(viewModel string) handler2.Config {
+func (config Config) overwrite(viewModel string, filterOffsetIsCursor bool) handler2.Config {
 	c := handler2.Config{
-		Client:              config.Client,
-		Eventstore:          config.Eventstore,
-		BulkLimit:           uint16(config.BulkLimit),
-		RequeueEvery:        3 * time.Minute,
-		MaxFailureCount:     uint8(config.FailureCountUntilSkip),
-		TransactionDuration: config.TransactionDuration,
-		ActiveInstancer:     config.ActiveInstancer,
+		Client:               config.Client,
+		Eventstore:           config.Eventstore,
+		BulkLimit:            uint16(config.BulkLimit),
+		RequeueEvery:         3 * time.Minute,
+		MaxFailureCount:      uint8(config.FailureCountUntilSkip),
+		TransactionDuration:  config.TransactionDuration,
+		ActiveInstancer:      config.ActiveInstancer,
+		FilterOffsetIsCursor: filterOffsetIsCursor,
 	}
 	overwrite, ok := config.Handlers[viewModel]
 	if !ok {

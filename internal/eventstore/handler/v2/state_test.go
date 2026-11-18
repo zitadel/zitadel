@@ -12,6 +12,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/shopspring/decimal"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database/mock"
@@ -103,6 +104,7 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 							mock.AnyType[time.Time]{},
 							decimal.NewFromInt(42),
 							uint32(0),
+							uint32(0),
 						),
 						mock.WithExecRowsAffected(1),
 					),
@@ -137,7 +139,8 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 			}
 
 			h := &Handler{
-				projection: tt.fields.projection,
+				projection:           tt.fields.projection,
+				filterOffsetIsCursor: true,
 			}
 			err = h.setState(t.Context(), tx, tt.args.updatedState)
 
@@ -241,7 +244,7 @@ func TestHandler_currentState(t *testing.T) {
 							"projection",
 						),
 						mock.WithQueryResult(
-							[]string{"aggregate_id", "aggregate_type", "event_sequence", "event_date", "position", "offset"},
+							[]string{"aggregate_id", "aggregate_type", "event_sequence", "event_date", "position", "offset", "in_tx_order"},
 							[][]driver.Value{
 								{
 									"aggregate id",
@@ -250,6 +253,7 @@ func TestHandler_currentState(t *testing.T) {
 									testTime,
 									decimal.NewFromInt(42).String(),
 									uint16(10),
+									nil,
 								},
 							},
 						),
@@ -285,7 +289,8 @@ func TestHandler_currentState(t *testing.T) {
 		}
 		t.Run(tt.name, func(t *testing.T) {
 			h := &Handler{
-				projection: tt.fields.projection,
+				projection:           tt.fields.projection,
+				filterOffsetIsCursor: true,
 			}
 
 			tx, err := tt.fields.mock.DB.BeginTx(context.Background(), nil)
@@ -302,4 +307,232 @@ func TestHandler_currentState(t *testing.T) {
 			tt.fields.mock.Assert(t)
 		})
 	}
+}
+
+func TestHandler_setState_offsetModeWritesCountAndOrdinal(t *testing.T) {
+	sqlMock := mock.NewSQLMock(t,
+		mock.ExpectBegin(nil),
+		mock.ExcpectExec(updateStateStmt,
+			mock.WithExecArgs(
+				"projection",
+				"instance",
+				"aggregate id",
+				eventstore.AggregateType("aggregate type"),
+				uint64(42),
+				mock.AnyType[time.Time]{},
+				decimal.NewFromInt(42),
+				uint32(3),
+				uint32(9),
+			),
+			mock.WithExecRowsAffected(1),
+		),
+	)
+	tx, err := sqlMock.DB.BeginTx(context.Background(), nil)
+	if err != nil {
+		t.Fatalf("unable to begin transaction: %v", err)
+	}
+	h := &Handler{
+		projection: &projection{name: "projection"},
+	}
+	err = h.setState(t.Context(), tx, &state{
+		instanceID:     "instance",
+		eventTimestamp: time.Now(),
+		offset:         3,
+		inTxOrderSet:   true,
+		cursor: eventstore.EventSortKey{
+			Position:      decimal.NewFromInt(42),
+			InTxOrder:     9,
+			AggregateType: "aggregate type",
+			AggregateID:   "aggregate id",
+			Sequence:      42,
+		},
+	})
+	if err != nil {
+		t.Error("expected no error got:", err)
+	}
+	sqlMock.Assert(t)
+}
+
+func TestHandler_setState_offsetModeWritesZeroOrdinal(t *testing.T) {
+	sqlMock := mock.NewSQLMock(t,
+		mock.ExpectBegin(nil),
+		mock.ExcpectExec(updateStateStmt,
+			mock.WithExecArgs(
+				"projection",
+				"instance",
+				"aggregate id",
+				eventstore.AggregateType("aggregate type"),
+				uint64(42),
+				mock.AnyType[time.Time]{},
+				decimal.NewFromInt(42),
+				uint32(1),
+				uint32(0),
+			),
+			mock.WithExecRowsAffected(1),
+		),
+	)
+	tx, err := sqlMock.DB.BeginTx(context.Background(), nil)
+	if err != nil {
+		t.Fatalf("unable to begin transaction: %v", err)
+	}
+	h := &Handler{projection: &projection{name: "projection"}}
+	err = h.setState(t.Context(), tx, &state{
+		instanceID:     "instance",
+		eventTimestamp: time.Now(),
+		offset:         1,
+		inTxOrderSet:   true,
+		cursor: eventstore.EventSortKey{
+			Position:      decimal.NewFromInt(42),
+			InTxOrder:     0,
+			AggregateType: "aggregate type",
+			AggregateID:   "aggregate id",
+			Sequence:      42,
+		},
+	})
+	if err != nil {
+		t.Error("expected no error got:", err)
+	}
+	sqlMock.Assert(t)
+}
+
+func TestStoredOffsets_zeroIsWrittenWhenSet(t *testing.T) {
+	h := &Handler{}
+	filterOffset, inTx := h.storedOffsets(&state{
+		offset:       1,
+		inTxOrderSet: true,
+		cursor:       eventstore.EventSortKey{InTxOrder: 0},
+	})
+	assert.Equal(t, uint32(1), filterOffset)
+	assert.Equal(t, uint32(0), inTx)
+
+	_, inTx = h.storedOffsets(&state{offset: 1})
+	assert.Nil(t, inTx)
+}
+
+func TestHandler_currentState_offsetMode(t *testing.T) {
+	testTime := time.Now()
+	t.Run("ordinal set uses new column", func(t *testing.T) {
+		sqlMock := mock.NewSQLMock(t,
+			mock.ExpectBegin(nil),
+			mock.ExpectQuery(currentStateStmt,
+				mock.WithQueryArgs("instance", "projection"),
+				mock.WithQueryResult(
+					[]string{"aggregate_id", "aggregate_type", "event_sequence", "event_date", "position", "offset", "in_tx_order"},
+					[][]driver.Value{{
+						"aggregate id",
+						"aggregate type",
+						int64(42),
+						testTime,
+						decimal.NewFromInt(42).String(),
+						uint16(3),
+						int64(9),
+					}},
+				),
+			),
+		)
+		h := &Handler{projection: &projection{name: "projection"}}
+		tx, err := sqlMock.DB.BeginTx(context.Background(), nil)
+		if err != nil {
+			t.Fatalf("unable to begin transaction: %v", err)
+		}
+		got, err := h.currentState(authz.WithInstanceID(context.Background(), "instance"), tx)
+		if err != nil {
+			t.Fatal(err)
+		}
+		want := &state{
+			instanceID:     "instance",
+			eventTimestamp: testTime,
+			offset:         3,
+			inTxOrderSet:   true,
+			cursor: eventstore.EventSortKey{
+				Position:      decimal.NewFromInt(42),
+				InTxOrder:     9,
+				InstanceID:    "instance",
+				AggregateType: "aggregate type",
+				AggregateID:   "aggregate id",
+				Sequence:      42,
+			},
+		}
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("Handler.currentState() got = %#v, want %#v", got, want)
+		}
+		sqlMock.Assert(t)
+	})
+
+	t.Run("null ordinal keeps OFFSET count", func(t *testing.T) {
+		sqlMock := mock.NewSQLMock(t,
+			mock.ExpectBegin(nil),
+			mock.ExpectQuery(currentStateStmt,
+				mock.WithQueryArgs("instance", "projection"),
+				mock.WithQueryResult(
+					[]string{"aggregate_id", "aggregate_type", "event_sequence", "event_date", "position", "offset", "in_tx_order"},
+					[][]driver.Value{{
+						"aggregate id",
+						"aggregate type",
+						int64(42),
+						testTime,
+						decimal.NewFromInt(42).String(),
+						uint16(3),
+						nil,
+					}},
+				),
+			),
+		)
+		h := &Handler{projection: &projection{name: "projection"}}
+		tx, err := sqlMock.DB.BeginTx(context.Background(), nil)
+		if err != nil {
+			t.Fatalf("unable to begin transaction: %v", err)
+		}
+		got, err := h.currentState(authz.WithInstanceID(context.Background(), "instance"), tx)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got.offset != 3 {
+			t.Errorf("offset = %d, want 3", got.offset)
+		}
+		if got.inTxOrderSet {
+			t.Error("inTxOrderSet should be false when in_tx_order is null")
+		}
+		if got.cursor.InTxOrder != 0 {
+			t.Errorf("InTxOrder = %d, want 0", got.cursor.InTxOrder)
+		}
+		sqlMock.Assert(t)
+	})
+
+	t.Run("zero ordinal is set", func(t *testing.T) {
+		sqlMock := mock.NewSQLMock(t,
+			mock.ExpectBegin(nil),
+			mock.ExpectQuery(currentStateStmt,
+				mock.WithQueryArgs("instance", "projection"),
+				mock.WithQueryResult(
+					[]string{"aggregate_id", "aggregate_type", "event_sequence", "event_date", "position", "offset", "in_tx_order"},
+					[][]driver.Value{{
+						"aggregate id",
+						"aggregate type",
+						int64(42),
+						testTime,
+						decimal.NewFromInt(42).String(),
+						uint16(3),
+						int64(0),
+					}},
+				),
+			),
+		)
+		h := &Handler{projection: &projection{name: "projection"}}
+		tx, err := sqlMock.DB.BeginTx(context.Background(), nil)
+		if err != nil {
+			t.Fatalf("unable to begin transaction: %v", err)
+		}
+		got, err := h.currentState(authz.WithInstanceID(context.Background(), "instance"), tx)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !got.inTxOrderSet {
+			t.Error("inTxOrderSet should be true when in_tx_order is 0")
+		}
+		if got.cursor.InTxOrder != 0 {
+			t.Errorf("InTxOrder = %d, want 0", got.cursor.InTxOrder)
+		}
+		sqlMock.Assert(t)
+	})
 }
