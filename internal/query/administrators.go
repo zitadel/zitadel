@@ -67,12 +67,12 @@ func NewAdministratorUserResourceOwnerSearchQuery(value string) (SearchQuery, er
 	return NewTextQuery(UserResourceOwnerCol, value, TextEquals)
 }
 
-func NewAdministratorUserLoginNameSearchQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(LoginNameNameCol, value, TextEquals)
+func NewAdministratorUserLoginNameSearchQuery(value string, method TextComparison) (SearchQuery, error) {
+	return NewTextQuery(LoginNameNameCol, value, method)
 }
 
-func NewAdministratorUserDisplayNameSearchQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(HumanDisplayNameCol, value, TextEquals)
+func NewAdministratorUserDisplayNameSearchQuery(value string, method TextComparison) (SearchQuery, error) {
+	return NewTextQuery(HumanDisplayNameCol, value, method)
 }
 
 func administratorInstancePermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool) sq.SelectBuilder {
