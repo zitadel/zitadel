@@ -32,7 +32,7 @@ vi.mock("@/lib/server/session", () => ({
 }));
 
 vi.mock("@/lib/server/enrollment-guard", () => ({
-  getEnrollmentAuthorizationError: vi.fn(),
+  getSetupAuthorizationError: vi.fn(),
 }));
 
 vi.mock("next/headers", () => ({
@@ -376,7 +376,7 @@ describe("verifyTOTP", () => {
     mockLoadMostRecentSession = vi.mocked((await import("@/lib/server/session")).loadMostRecentSession);
     mockVerifyTOTPRegistration = vi.mocked((await import("@/lib/server/zitadel")).verifyTOTPRegistration);
     mockGetEnrollmentAuthorizationError = vi.mocked(
-      (await import("@/lib/server/enrollment-guard")).getEnrollmentAuthorizationError,
+      (await import("@/lib/server/enrollment-guard")).getSetupAuthorizationError,
     );
 
     mockLoadMostRecentSession.mockResolvedValue(totpSession);
@@ -394,6 +394,7 @@ describe("verifyTOTP", () => {
       serviceConfig: {},
       session: totpSession,
       userId: "victim-1",
+      method: "totp",
     });
     expect(mockVerifyTOTPRegistration).not.toHaveBeenCalled();
   });

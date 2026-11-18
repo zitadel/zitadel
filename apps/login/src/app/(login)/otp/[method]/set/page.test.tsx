@@ -12,8 +12,9 @@ vi.mock("@/lib/server/zitadel", () => ({
   addOTPSMS: vi.fn(),
 }));
 
-vi.mock("@/lib/server/enrollment-guard", () => ({
-  getEnrollmentAuthorizationError: vi.fn(),
+vi.mock("@/lib/server/enrollment-guard", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/server/enrollment-guard")>()),
+  getSetupAuthorizationError: vi.fn(),
 }));
 
 vi.mock("@/lib/actions/otp", () => ({
@@ -71,7 +72,7 @@ describe("otp set page", () => {
     vi.mocked(zitadel.getLoginSettings).mockResolvedValue({} as any);
     vi.mocked(sessionLib.loadMostRecentSession).mockResolvedValue(session as any);
     vi.mocked(sessionLib.loadSessionById).mockResolvedValue(session as any);
-    vi.mocked(guard.getEnrollmentAuthorizationError).mockResolvedValue(null);
+    vi.mocked(guard.getSetupAuthorizationError).mockResolvedValue(null);
   });
 
   // Rendering the page (e.g. by following a link) must never add a second factor to the
@@ -104,8 +105,12 @@ describe("otp set page", () => {
     expect(forms[0].props.urlToContinue).toBe(`/otp/${method}?loginName=user%40example.com`);
   });
 
-  test("hides the confirmation and shows the error when enrollment is not authorized", async () => {
-    vi.mocked(guard.getEnrollmentAuthorizationError).mockResolvedValue("You have to authenticate");
+  test.each([
+    ["You have to verify your second factor first", "secondFactorRequired"],
+    ["This second factor is not allowed", "authenticatorNotAllowed"],
+    ["You have to authenticate", "sessionExpired"],
+  ])("hides the confirmation and shows a translated error for %s", async (enrollmentError, i18nKey) => {
+    vi.mocked(guard.getSetupAuthorizationError).mockResolvedValue(enrollmentError);
 
     const result = await Page({
       params: Promise.resolve({ method: "email" }),
@@ -113,7 +118,10 @@ describe("otp set page", () => {
     });
 
     expect(findElements(result, OTPAddForm)).toHaveLength(0);
-    expect(JSON.stringify(result)).toContain("You have to authenticate");
+    expect(findElements(result, Translated).map((t) => t.props)).toContainEqual(
+      expect.objectContaining({ i18nKey, namespace: "error" }),
+    );
+    expect(JSON.stringify(result)).not.toContain(enrollmentError);
   });
 
   test("renders an alert instead of the confirmation without a session", async () => {

@@ -688,7 +688,7 @@ describe("processIDPCallback", () => {
     // fingerprint matches. Otherwise an unauthenticated attacker who only knows a victim's
     // login name could bind their own external identity to the victim's account (ATO).
     //
-    // These four cases run the real enrollment guard (getEnrollmentAuthorizationError); only
+    // These cases run the real enrollment guard (getEnrollmentAuthorizationError); only
     // its leaf dependencies (listAuthenticationMethodTypes, checkUserVerification) are mocked.
     const linkingAllowedIdp = {
       ...defaultIdp,
@@ -786,6 +786,55 @@ describe("processIDPCallback", () => {
         authMethodTypes: [AuthenticationMethodType.PASSWORD],
       });
       mockCheckUserVerification.mockResolvedValue(false);
+      mockGetIDPByID.mockResolvedValue(linkingAllowedIdp);
+
+      const result = await processIDPCallback(linkParams);
+
+      expect(mockAddIDPLink).toHaveBeenCalled();
+      expect(result.redirect).toBe("https://app.example.com/success");
+    });
+
+    test("should reject linking for a password-only session when the user has a second factor", async () => {
+      // The session passed only the first factor of a user with TOTP. Linking an external
+      // identity from it would give whoever holds the password lasting access that bypasses
+      // the second factor, so the second factor has to be verified first.
+      const future = { seconds: BigInt(Math.floor(Date.now() / 1000) + 3600), nanos: 0 };
+      mockGetSession.mockResolvedValue({
+        session: {
+          factors: {
+            user: { id: "user123" },
+            password: { verifiedAt: future },
+          },
+          expirationDate: future,
+        },
+      });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.TOTP],
+      });
+      mockGetIDPByID.mockResolvedValue(linkingAllowedIdp);
+
+      const result = await processIDPCallback(linkParams);
+
+      expect(result.redirect).toContain("/idp/google/linking-failed");
+      expect(result.redirect).toContain("error=session_invalid");
+      expect(mockAddIDPLink).not.toHaveBeenCalled();
+    });
+
+    test("should allow linking when the session also verified the user's second factor", async () => {
+      const future = { seconds: BigInt(Math.floor(Date.now() / 1000) + 3600), nanos: 0 };
+      mockGetSession.mockResolvedValue({
+        session: {
+          factors: {
+            user: { id: "user123" },
+            password: { verifiedAt: future },
+            totp: { verifiedAt: future },
+          },
+          expirationDate: future,
+        },
+      });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD, AuthenticationMethodType.TOTP],
+      });
       mockGetIDPByID.mockResolvedValue(linkingAllowedIdp);
 
       const result = await processIDPCallback(linkParams);

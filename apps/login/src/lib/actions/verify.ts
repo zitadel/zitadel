@@ -15,7 +15,7 @@ import {
 
 import { completeFlowOrGetUrl } from "@/lib/actions/flow";
 import { getSessionCookieByLoginName } from "@/lib/server/cookies";
-import { getEnrollmentAuthorizationError } from "@/lib/server/enrollment-guard";
+import { getSetupAuthorizationError } from "@/lib/server/enrollment-guard";
 import { getPublicHostWithProtocol } from "@/lib/server/host";
 import { checkMFAFactors } from "@/lib/server/mfa-helper";
 import { getServiceConfig } from "@/lib/server/service-url";
@@ -46,10 +46,11 @@ export async function verifyTOTP(code: string, loginName?: string, organization?
     if (session?.factors?.user?.id) {
       // Enrollment must be authorized: a bare identify-only session must not be able to
       // activate a TOTP factor on the account (GHSA-45f2-5q3r-xgg6).
-      const enrollmentError = await getEnrollmentAuthorizationError({
+      const enrollmentError = await getSetupAuthorizationError({
         serviceConfig,
         session,
         userId: session.factors.user.id,
+        method: "totp",
       });
       if (enrollmentError) {
         return { error: enrollmentError };

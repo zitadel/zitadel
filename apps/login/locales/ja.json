@@ -478,7 +478,9 @@
     "failedLoading": "データの読み込みに失敗しました。再試行してください。",
     "tryagain": "再試行",
     "couldNotContinueSession": "セッションを継続できませんでした - ユーザー情報が不足しています",
-    "couldNotClearSession": "セッションを終了できませんでした。もう一度お試しください。"
+    "couldNotClearSession": "セッションを終了できませんでした。もう一度お試しください。",
+    "secondFactorRequired": "新しい認証方法を設定するには、まず2要素目を確認してください。",
+    "authenticatorNotAllowed": "この認証方法は組織で許可されていません。"
   },
   "zitadel": {
     "errors": {

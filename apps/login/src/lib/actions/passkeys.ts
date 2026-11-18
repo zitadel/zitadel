@@ -3,7 +3,7 @@
 import { completeFlowOrGetUrl } from "@/lib/actions/flow";
 import { updateOrCreateSession } from "@/lib/actions/session";
 import { getSessionCookieById } from "@/lib/server/cookies";
-import { getEnrollmentAuthorizationError } from "@/lib/server/enrollment-guard";
+import { getSetupAuthorizationError } from "@/lib/server/enrollment-guard";
 import { getPublicHost } from "@/lib/server/host";
 import { createLogger } from "@/lib/server/logger";
 import { getServiceConfig } from "@/lib/server/service-url";
@@ -77,10 +77,11 @@ export async function registerPasskeyLink(
 
     currentUserId = session.session.factors.user.id;
 
-    const enrollmentError = await getEnrollmentAuthorizationError({
+    const enrollmentError = await getSetupAuthorizationError({
       serviceConfig,
       session: session.session,
       userId: currentUserId,
+      method: "passkey",
     });
 
     if (enrollmentError) {
@@ -192,6 +193,19 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
 
     if (!userId) {
       throw new Error("Could not get session");
+    }
+
+    // Same check as registerPasskeyLink: completing the registration must not be possible from a
+    // session that may not add a passkey. The userId flow below is the emailed code flow, where
+    // the code already authorized the registration that is being completed.
+    const setupError = await getSetupAuthorizationError({
+      serviceConfig,
+      session: session.session!,
+      userId,
+      method: "passkey",
+    });
+    if (setupError) {
+      return { error: setupError };
     }
 
     currentUserId = userId;
