@@ -66,7 +66,19 @@ the format specified in [RFC7517](https://datatracker.ietf.org/doc/html/rfc7517)
 The expected audience (`aud` claim) in the JWT. If set, ZITADEL will validate that the JWT contains this audience.
 It's recommended to set this to ensure the JWT is intended to be used by ZITADEL.
 If the JWT contains multiple audiences, the configured audience must be one of them.
-If no audience is configured, ZITADEL will not validate the `aud` claim.
+
+<Callout type="warn" title="Security Notice">
+If no audience is configured, ZITADEL does not validate the `aud` claim at all. The remaining checks still apply, so
+the token must come from the configured issuer, carry a valid signature, and pass the expiration and issued-at checks.
+Any otherwise valid token is then accepted, no matter which application it was issued for.
+
+Issuers commonly serve more than one application. Without an audience, a token minted for any of them, including an
+application with weaker security requirements, can be presented to ZITADEL and will authenticate the user it describes.
+The signature only proves who issued the token, not who it was meant for.
+
+Leaving the field empty stays supported for backward compatibility, but configuring an audience is the only way to
+restrict this identity provider to tokens actually intended for ZITADEL.
+</Callout>
 
 *Example: `my-client`*
 

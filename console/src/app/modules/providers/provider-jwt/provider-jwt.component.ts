@@ -25,6 +25,7 @@ import { requiredValidator } from '../../form-field/validators/validators';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 import { BehaviorSubject } from 'rxjs';
 import { ProviderNextService } from '../provider-next/provider-next.service';
+import { InfoSectionType } from '../../info-section/info-section.component';
 
 @Component({
   selector: 'cnsl-provider-jwt',
@@ -32,6 +33,7 @@ import { ProviderNextService } from '../provider-next/provider-next.service';
   standalone: false,
 })
 export class ProviderJWTComponent {
+  public InfoSectionType: any = InfoSectionType;
   public showOptional: boolean = false;
   public options: Options = new Options()
     .setIsCreationAllowed(true)

@@ -2369,7 +2369,8 @@
       "HEADERNAME": "Nome do Cabeçalho",
       "JWTENDPOINT": "Endpoint JWT",
       "JWTKEYSENDPOINT": "Endpoint de Chaves JWT",
-      "AUDIENCE": "Audiência"
+      "AUDIENCE": "Audiência",
+      "AUDIENCE_EMPTY_WARNING": "Sem uma Audiência, o ZITADEL aceita qualquer token válido deste emissor, independentemente da aplicação para a qual ele foi emitido. Recomenda-se fortemente definir uma Audiência."
     },
     "TOAST": {
       "SAVED": "Salvo com sucesso.",
