@@ -102,6 +102,7 @@ Instrumentation:
       # Adds the source file, line number and function where the error was created.
       ReportLocation: true # ZITADEL_INSTRUMENTATION_LOG_ERRORS_REPORTLOCATION
       # Adds stack traces to logged errors.
+      # Errors from recovered panics always carry a stack trace.
       StackTrace: false # ZITADEL_INSTRUMENTATION_LOG_ERRORS_STACKTRACE
     Exporter:
       # The following exporter types are supported:

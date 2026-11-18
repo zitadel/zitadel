@@ -238,9 +238,7 @@ func ProjectInstance(ctx context.Context) error {
 			if err == nil {
 				break
 			}
-			var pgErr *pgconn.PgError
-			errors.As(err, &pgErr)
-			if pgErr.Code != database.PgUniqueConstraintErrorCode {
+			if pgErr, ok := errors.AsType[*pgconn.PgError](err); !ok || pgErr.Code != database.PgUniqueConstraintErrorCode {
 				return err
 			}
 			logging.WithFields("name", projection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID()).WithError(err).Debug("projection failed because of unique constraint, retrying")
@@ -258,9 +256,7 @@ func ProjectInstanceFields(ctx context.Context) error {
 			if err == nil {
 				break
 			}
-			var pgErr *pgconn.PgError
-			errors.As(err, &pgErr)
-			if pgErr.Code != database.PgUniqueConstraintErrorCode {
+			if pgErr, ok := errors.AsType[*pgconn.PgError](err); !ok || pgErr.Code != database.PgUniqueConstraintErrorCode {
 				return err
 			}
 			logging.WithFields("name", fieldProjection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID()).WithError(err).Debug("fields projection failed because of unique constraint, retrying")
