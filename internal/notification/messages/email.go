@@ -42,7 +42,9 @@ func (msg *Email) GetContent() (string, error) {
 	}
 	headers["Return-Path"] = msg.SenderEmail
 	headers["To"] = strings.Join(msg.Recipients, ", ")
-	headers["Cc"] = strings.Join(msg.CC, ", ")
+	if len(msg.CC) > 0 {
+		headers["Cc"] = strings.Join(msg.CC, ", ")
+	}
 	headers["Date"] = time.Now().Format(time.RFC1123Z)
 
 	message := ""
