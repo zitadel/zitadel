@@ -709,7 +709,7 @@ func Test_runUserinfoActions(t *testing.T) {
 			},
 		}
 
-		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", nil, queriedActions)
+		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", "projectID", nil, queriedActions)
 		require.NoError(t, err)
 		assert.Equal(t, "bar", userInfo.Claims["foo"])
 	})
@@ -726,7 +726,7 @@ func Test_runUserinfoActions(t *testing.T) {
 			{Name: "testFunc", Script: `function testFunc(ctx, api) {}`},
 		}
 
-		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", nil, queriedActions)
+		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", "projectID", nil, queriedActions)
 		require.Error(t, err)
 	})
 
@@ -743,7 +743,7 @@ func Test_runUserinfoActions(t *testing.T) {
 			},
 		}
 
-		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", nil, queriedActions)
+		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", "projectID", nil, queriedActions)
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "exactly 2")
 	})
@@ -765,7 +765,7 @@ func Test_runUserinfoActions(t *testing.T) {
 			},
 		}
 
-		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", nil, queriedActions)
+		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", "projectID", nil, queriedActions)
 		require.Error(t, err)
 		assert.NotContains(t, userInfo.Claims, "unreachable")
 	})
@@ -794,7 +794,7 @@ func Test_runUserinfoActions(t *testing.T) {
 			},
 		}
 
-		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", actor, queriedActions)
+		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", "projectID", actor, queriedActions)
 		require.NoError(t, err)
 		assert.Equal(t, "actor1", userInfo.Claims["actor_user"])
 		assert.Equal(t, "https://issuer1.example.com", userInfo.Claims["actor_issuer"])
@@ -815,9 +815,29 @@ func Test_runUserinfoActions(t *testing.T) {
 			},
 		}
 
-		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", nil, queriedActions)
+		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", "projectID", nil, queriedActions)
 		require.NoError(t, err)
 		assert.Equal(t, true, userInfo.Claims["no_actor"])
+	})
+
+	t.Run("application client and project id are readable from the script", func(t *testing.T) {
+		s := &Server{}
+		qu := &query.OIDCUserInfo{User: &query.User{ID: "user1", ResourceOwner: "org1"}}
+		userInfo := &oidc.UserInfo{Subject: "user1", Claims: map[string]any{}}
+		queriedActions := []*query.Action{
+			{
+				Name: "testFunc",
+				Script: `function testFunc(ctx, api) {
+					api.v1.claims.setClaim("app_client", ctx.v1.application.getClientId())
+					api.v1.claims.setClaim("app_project", ctx.v1.application.getProjectId())
+				}`,
+			},
+		}
+
+		err := s.runUserinfoActions(context.Background(), qu, userInfo, "clientID", "projectID", nil, queriedActions)
+		require.NoError(t, err)
+		assert.Equal(t, "clientID", userInfo.Claims["app_client"])
+		assert.Equal(t, "projectID", userInfo.Claims["app_project"])
 	})
 }
 
@@ -843,12 +863,15 @@ func Test_runUserinfoExecutionTargets(t *testing.T) {
 		{TargetType: target_domain.TargetTypeCall, Endpoint: server.URL, Timeout: 5 * time.Second},
 	}
 
-	err := s.runUserinfoExecutionTargets(context.Background(), qu, userInfo, "clientID", actor, "function/test", targets)
+	err := s.runUserinfoExecutionTargets(context.Background(), qu, userInfo, "clientID", "projectID", actor, "function/test", targets)
 	require.NoError(t, err)
 
 	var sent ContextInfo
 	require.NoError(t, json.Unmarshal(gotBody, &sent))
 	assert.Equal(t, actor, sent.Actor)
+	require.NotNil(t, sent.Application)
+	assert.Equal(t, "clientID", sent.Application.ClientID)
+	assert.Equal(t, "projectID", sent.Application.ProjectID)
 
 	assert.Equal(t, "bar", userInfo.Claims["foo"])
 	logClaim, ok := userInfo.Claims[fmt.Sprintf(ClaimActionLogFormat, "function/test")]
