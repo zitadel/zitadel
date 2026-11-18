@@ -307,11 +307,16 @@ func (repo *TokenVerifierRepo) getTokenIDAndSubject(ctx context.Context, accessT
 	// let's try opaque first:
 	tokenIDSubject, err := repo.AuthAlgorithm.DecryptToken(accessToken)
 	if err != nil {
-		logging.WithError(err).Warn("token verifier repo: decrypt access token")
+		// Failing to decrypt only rules out the opaque format, it does not mean the
+		// token is invalid, so this is logged at debug level: every JWT access token
+		// takes this path and would otherwise produce a warning on success.
+		logging.WithError(err).Debug("token verifier repo: decrypt access token")
 		// if decryption did not work, it might be a JWT
 		accessTokenClaims, err := op.VerifyAccessToken[*oidc.AccessTokenClaims](ctx, accessToken, repo.jwtTokenVerifier(ctx))
 		if err != nil {
-			logging.WithError(err).Warn("token verifier repo: verify JWT access token")
+			// The caller falls back to system token verification, so this is not yet
+			// a terminal failure either. The final verdict is logged by the caller.
+			logging.WithError(err).Debug("token verifier repo: verify JWT access token")
 			return "", "", false
 		}
 		return accessTokenClaims.JWTID, accessTokenClaims.Subject, true
