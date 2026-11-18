@@ -6,7 +6,8 @@ import { RESEND_COOLDOWN_SECONDS } from "./constants";
 /**
  * Countdown for "Resend code" buttons. Started with the default duration it is
  * a UX guard against accidental repeated clicks (each resend invalidates the
- * previous code), not a security control.
+ * previous code), not a security control; the OTP page starts it with the
+ * cooldown the server enforces.
  *
  * `start()` begins the countdown, for `seconds` or the duration passed to it
  * (e.g. the server's `retryAfterSeconds`); `remaining` is the number of seconds

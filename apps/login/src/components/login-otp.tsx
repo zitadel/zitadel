@@ -3,6 +3,7 @@
 import { completeFlowOrGetUrl } from "@/lib/actions/flow";
 import { updateOrCreateSession } from "@/lib/actions/session";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useResendCooldown } from "@/lib/use-resend-cooldown";
 import { create } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -16,6 +17,7 @@ import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
+import { ResendButton } from "./resend-button";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 
@@ -40,9 +42,9 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
-  // seconds until the server accepts another OTP SMS request
-  const [resendCooldown, setResendCooldown] = useState<number>(0);
-  const resendAvailableAt = useRef<number>(0);
+  // counts down until the server accepts another OTP request
+  const resendCooldown = useResendCooldown();
+  const { start: startResendCooldown } = resendCooldown;
 
   const router = useRouter();
 
@@ -87,27 +89,14 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
 
     if (response && "retryAfterSeconds" in response && response.retryAfterSeconds) {
       // the code was either just sent or, if the server refused, sent moments ago (e.g. before a reload): the countdown covers both
-      resendAvailableAt.current = Date.now() + response.retryAfterSeconds * 1000;
-      setResendCooldown(response.retryAfterSeconds);
+      startResendCooldown(response.retryAfterSeconds);
       return;
     }
 
     if (response && "error" in response) {
       return response.error;
     }
-  }, [method, requestId, loginName, sessionId, organization, t]);
-
-  useEffect(() => {
-    if (resendCooldown <= 0) {
-      return;
-    }
-    const timer = setTimeout(() => {
-      // timers are throttled or suspended in background tabs, so catch up with the time that actually passed
-      const remainingSeconds = Math.ceil((resendAvailableAt.current - Date.now()) / 1000);
-      setResendCooldown(Math.max(Math.min(resendCooldown - 1, remainingSeconds), 0));
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [resendCooldown]);
+  }, [method, requestId, loginName, sessionId, organization, t, startResendCooldown]);
 
   useEffect(() => {
     if (!initialized.current && ["email", "sms"].includes(method) && !code) {
@@ -224,10 +213,12 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
               <span className="mr-auto flex-1 text-left">
                 <Translated i18nKey="verify.noCodeReceived" namespace="otp" />
               </span>
-              <button
-                disabled={loading || resendCooldown > 0}
-                type="button"
-                className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-500 dark:disabled:text-gray-400"
+              <ResendButton
+                namespace="otp"
+                i18nKey="verify.resendCode"
+                countdownI18nKey="verify.resendCodeIn"
+                cooldown={resendCooldown}
+                disabled={loading}
                 onClick={async () => {
                   setLoading(true);
                   const challengeError = await updateSessionForOTPChallenge();
@@ -236,14 +227,7 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
                   }
                   setLoading(false);
                 }}
-                data-testid="resend-button"
-              >
-                {resendCooldown > 0 ? (
-                  <Translated i18nKey="verify.resendCodeIn" namespace="otp" data={{ seconds: resendCooldown }} />
-                ) : (
-                  <Translated i18nKey="verify.resendCode" namespace="otp" />
-                )}
-              </button>
+              />
             </div>
           </Alert>
         )}
