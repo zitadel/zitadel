@@ -79,22 +79,13 @@ export async function addIdpFlowProof(params: URLSearchParams, linkToSessionId?:
 
 const DEFAULT_TRUSTED_PROXY_HOPS = 0;
 
-/**
- * Number of proxies between the client and the login that append their own address to
- * `X-Forwarded-For`. The default of 0 fits a single reverse proxy and Vercel, which write the
- * client address as the last entry; the GCP load balancer appends its own address, so it needs 1.
- */
+// number of X-Forwarded-For entries the fronts add after the client address, see next-env-vars.d.ts
 function trustedProxyHops(): number {
   const configured = process.env.TRUSTED_PROXY_HOPS?.trim();
-  if (!configured) {
+  if (!configured || !/^\d+$/.test(configured)) {
     return DEFAULT_TRUSTED_PROXY_HOPS;
   }
-  const hops = Number(configured);
-  if (!Number.isInteger(hops) || hops < 0) {
-    logger.warn("Ignoring invalid TRUSTED_PROXY_HOPS, falling back to the default", { configured });
-    return DEFAULT_TRUSTED_PROXY_HOPS;
-  }
-  return hops;
+  return Number(configured);
 }
 
 // drops the port and IPv6 brackets, and anything that is not an address at all ("unknown", RFC 7239 obfuscated names)
@@ -110,9 +101,10 @@ function toIp(value: string): string {
 
 /**
  * The client address, as far as it can be trusted. Every `X-Forwarded-For` entry left of the
- * trusted proxies was written by whoever sent the request, so it is spoofable and never used.
- * Returns "" when no address can be trusted: the backend then omits the IP from the session event
- * instead of recording an attacker-supplied one.
+ * trusted hops was written by whoever sent the request, so it is spoofable and never used. Returns
+ * "" when no address can be trusted: the backend then omits the IP from the session event instead
+ * of recording an attacker-supplied one. The trust ends at the front in use — a client that can
+ * reach the login directly writes the whole header.
  */
 function getClientIp(requestHeaders: ReadonlyHeaders): string {
   const forwardedFor = requestHeaders.get("x-forwarded-for");

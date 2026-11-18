@@ -293,6 +293,10 @@ describe("fingerprint", () => {
         expect(await ipFor({ "x-forwarded-for": "9.9.9.9, 198.51.100.7" })).toBe("198.51.100.7");
       });
 
+      it("should prefer the forwarded header over the direct connection address", async () => {
+        expect(await ipFor({ "x-forwarded-for": "198.51.100.7", remoteAddress: "192.0.2.1" })).toBe("198.51.100.7");
+      });
+
       it("should use the direct connection address when no proxy set the header", async () => {
         expect(await ipFor({ remoteAddress: "198.51.100.7:4711" })).toBe("198.51.100.7");
         expect(await ipFor({ "x-forwarded-for": "", remoteAddress: "198.51.100.7" })).toBe("198.51.100.7");

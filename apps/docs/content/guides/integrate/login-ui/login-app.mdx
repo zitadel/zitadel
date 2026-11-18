@@ -149,9 +149,11 @@ By default, verification codes are not automatically submitted on page load. Thi
 If you want to enable automatic code submission (e.g. for a smoother UX when link scanners are not a concern), set `NEXT_PUBLIC_AUTO_SUBMIT_CODE` to `true`.
 
 Sessions record the client IP address, which the login reads from the `X-Forwarded-For` header.
-Only the entries written by proxies you control are trusted, so set `TRUSTED_PROXY_HOPS` to the number of proxies in front of the login that append their own address to that header.
-The default of `0` fits a single reverse proxy and Vercel; the Google Cloud load balancer appends its own address, so it needs `1`.
-If no address can be trusted, the session is created without an IP rather than with one a client could have spoofed.
+Entries that your own fronts did not write are supplied by the caller and are spoofable, so the login reads the address from the right and ignores everything further left.
+Set `TRUSTED_PROXY_HOPS` to the number of entries your fronts add after the client address, counted in the header the login actually receives: a single reverse proxy and Vercel add none (`0`, the default), each further proxy in a chain adds one, and the Google Cloud load balancer adds its own address next to the client's, so it counts as one on its own.
+If no address can be trusted — the header is missing, the list is shorter than the configured hops, or the entry is not an address — the session is created without an IP rather than with an untrusted one.
+
+This trust ends at your fronts: anyone who can reach the login directly can set `X-Forwarded-For` to any address and have it recorded, so only expose the login through the proxy you counted.
 
 A new OTP SMS code can only be requested 30 seconds after the previous one for the same session; the "Resend code" button shows a countdown until then.
 Set `OTP_SMS_RESEND_COOLDOWN_SECONDS` to change the cooldown, or to `0` to disable it.
