@@ -320,6 +320,116 @@ func TestCommands_CheckPermissionUserDelete(t *testing.T) {
 	}
 }
 
+func TestCommands_CheckPermissionOrganizationCreate(t *testing.T) {
+	type fields struct {
+		domainPermissionCheck func(*testing.T) domain.PermissionCheck
+	}
+	type args struct {
+		ctx            context.Context
+		organizationID string
+	}
+	type want struct {
+		err func(error) bool
+	}
+	orgCtx := authz.SetCtxData(context.Background(), authz.CtxData{
+		UserID: "userID",
+		OrgID:  "ctxOrgID",
+	})
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   want
+	}{
+		{
+			name: "org.create in request org allowed, no further check",
+			fields: fields{
+				domainPermissionCheck: mockDomainPermissionCheck(
+					orgCtx,
+					"org.create",
+					"ctxOrgID",
+					"newOrgID"),
+			},
+			args: args{
+				ctx:            orgCtx,
+				organizationID: "newOrgID",
+			},
+		},
+		{
+			name: "org.create not allowed, org.write on new org allowed",
+			fields: fields{
+				domainPermissionCheck: mockDomainPermissionChecks(
+					expectedCheck{
+						orgCtx,
+						"org.create",
+						"ctxOrgID",
+						"newOrgID",
+						zerrors.ThrowNotFound(nil, "id", "membership not found"),
+					},
+					expectedCheck{
+						orgCtx,
+						"org.write",
+						"newOrgID",
+						"newOrgID",
+						nil,
+					},
+				),
+			},
+			args: args{
+				ctx:            orgCtx,
+				organizationID: "newOrgID",
+			},
+		},
+		{
+			name: "neither org.create nor org.write allowed, permission denied",
+			fields: fields{
+				domainPermissionCheck: mockDomainPermissionChecks(
+					expectedCheck{
+						orgCtx,
+						"org.create",
+						"ctxOrgID",
+						"newOrgID",
+						zerrors.ThrowPermissionDenied(nil, "id", "permission denied"),
+					},
+					expectedCheck{
+						orgCtx,
+						"org.write",
+						"newOrgID",
+						"newOrgID",
+						zerrors.ThrowPermissionDenied(nil, "id", "permission denied"),
+					},
+				),
+			},
+			args: args{
+				ctx:            orgCtx,
+				organizationID: "newOrgID",
+			},
+			want: want{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				checkPermission: func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+					assert.Failf(t, "Domain permission check should not be called", "Called c.checkPermission(%v,%v,%v,%v)", ctx, permission, orgID, resourceID)
+					return nil
+				},
+			}
+			if tt.fields.domainPermissionCheck != nil {
+				c.checkPermission = tt.fields.domainPermissionCheck(t)
+			}
+			err := c.CheckPermissionOrganizationCreate(tt.args.ctx, tt.args.organizationID)
+			if tt.want.err != nil {
+				assert.True(t, tt.want.err(err))
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
 func mockDomainPermissionCheck(expectCtx context.Context, expectPermission, expectResourceOwner, expectResourceID string) func(t *testing.T) domain.PermissionCheck {
 	return func(t *testing.T) domain.PermissionCheck {
 		return func(ctx context.Context, permission, orgID, resourceID string) (err error) {
