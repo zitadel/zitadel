@@ -411,7 +411,10 @@ func idpUserToUpdateHumanUser(userID string, idpUser idp.User) *user.UpdateHuman
 	if displayName := idpUser.GetDisplayName(); displayName != "" {
 		updateHumanUser.Profile.DisplayName = &displayName
 	}
-	if lang := idpUser.GetPreferredLanguage().String(); lang != "" {
+	// An absent IdP locale is undefined ("und"), not an empty string.
+	// Omit it from the patch so the existing profile language is preserved.
+	if tag := idpUser.GetPreferredLanguage(); !tag.IsRoot() {
+		lang := tag.String()
 		updateHumanUser.Profile.PreferredLanguage = &lang
 	}
 	if email := string(idpUser.GetEmail()); email != "" {
@@ -510,7 +513,10 @@ func idpUserToUpdateUser(userID string, idpUser idp.User) *user.RetrieveIdentity
 	if displayName := idpUser.GetDisplayName(); displayName != "" {
 		updateUser.GetHuman().GetProfile().DisplayName = &displayName
 	}
-	if lang := idpUser.GetPreferredLanguage().String(); lang != "" {
+	// An absent IdP locale is undefined ("und"), not an empty string.
+	// Omit it from the patch so the existing profile language is preserved.
+	if tag := idpUser.GetPreferredLanguage(); !tag.IsRoot() {
+		lang := tag.String()
 		updateUser.GetHuman().GetProfile().PreferredLanguage = &lang
 	}
 	if email := string(idpUser.GetEmail()); email != "" {
