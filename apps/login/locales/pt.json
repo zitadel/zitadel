@@ -485,6 +485,8 @@
     "failedLoading": "Falha ao carregar dados. Por favor, tente novamente.",
     "tryagain": "Tentar Novamente",
     "couldNotContinueSession": "Não foi possível continuar a sessão — informações do usuário ausentes",
-    "couldNotClearSession": "Não foi possível terminar a sessão. Tente novamente."
+    "couldNotClearSession": "Não foi possível terminar a sessão. Tente novamente.",
+    "secondFactorRequired": "Verifique primeiro o seu segundo fator para configurar um novo método de autenticação.",
+    "authenticatorNotAllowed": "Este método de autenticação não é permitido para a sua organização."
   }
 }
