@@ -32,7 +32,16 @@ type Props = {
   checkAfter?: boolean;
   loginSettings?: LoginSettings;
 };
-export function TotpRegister({ uri, loginName, sessionId, requestId, organization, checkAfter, loginSettings }: Props) {
+export function TotpRegister({
+  uri,
+  secret,
+  loginName,
+  sessionId,
+  requestId,
+  organization,
+  checkAfter,
+  loginSettings,
+}: Props) {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
@@ -113,6 +122,17 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
 
             <CopyToClipboard value={uri}></CopyToClipboard>
           </div>
+          {secret && (
+            <div className="border-divider-light dark:border-divider-dark mb-4 flex w-96 items-center rounded-lg border px-4 py-2 pr-2 text-sm">
+              <span className="text-text-light-secondary-500 dark:text-text-dark-secondary-500 mr-2 whitespace-nowrap">
+                {t("set.labels.secret")}
+              </span>
+              <span className="flex-1 overflow-x-auto font-mono" data-testid="totp-secret">
+                {secret}
+              </span>
+              <CopyToClipboard value={secret}></CopyToClipboard>
+            </div>
+          )}
           <form className="w-full">
             <div className="">
               <TextInput
