@@ -5,10 +5,11 @@ import {
   Options,
   Provider,
   SAMLBinding,
+  SAMLCertificate,
   SAMLNameIDFormat,
   SAMLSignatureAlgorithm,
 } from 'src/app/proto/generated/zitadel/idp_pb';
-import { FormControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, ValidationErrors } from '@angular/forms';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { AdminService } from 'src/app/services/admin.service';
@@ -33,6 +34,9 @@ import { filter, map } from 'rxjs/operators';
 import { ProviderNextService } from '../provider-next/provider-next.service';
 import { getEnumKeys, getEnumKeyFromValue } from 'src/app/utils/enum.utils';
 
+const MAX_ALLOWED_CERTIFICATE_SIZE = 20 * 1024;
+const MAX_ALLOWED_KEY_SIZE = 10 * 1024;
+
 interface SAMLProviderForm {
   name: FormControl<string>;
   metadataXml: FormControl<string>;
@@ -43,6 +47,13 @@ interface SAMLProviderForm {
   nameIdFormat: FormControl<string>;
   transientMappingAttributeName: FormControl<string>;
   federatedLogoutEnabled: FormControl<boolean>;
+  certificate: FormControl<string>;
+  privateKey: FormControl<string>;
+}
+
+// the certificate and the private key can only be provided together
+function certificateAndKeyValidator(g: AbstractControl): ValidationErrors | null {
+  return !g.get('certificate')?.value === !g.get('privateKey')?.value ? null : { certificateAndKey: true };
 }
 
 @Component({
@@ -58,6 +69,7 @@ export class ProviderSamlSpComponent {
   public provider?: Provider.AsObject;
   public form!: FormGroup<SAMLProviderForm>;
   public showOptional: boolean = false;
+  public updateCertificate: boolean = false;
   public options: Options = new Options()
     .setIsCreationAllowed(true)
     .setIsLinkingAllowed(true)
@@ -152,9 +164,12 @@ export class ProviderSamlSpComponent {
         nameIdFormat: new FormControl(defaultNameIdFormat, { nonNullable: true }),
         transientMappingAttributeName: new FormControl('', { nonNullable: true }),
         federatedLogoutEnabled: new FormControl(false, { nonNullable: true }),
+        certificate: new FormControl('', { nonNullable: true }),
+        privateKey: new FormControl('', { nonNullable: true }),
       },
       atLeastOneIsFilled('metadataXml', 'metadataUrl'),
     );
+    this.form.addValidators(certificateAndKeyValidator);
   }
 
   private _checkFormPermissions(): void {
@@ -239,6 +254,9 @@ export class ProviderSamlSpComponent {
       req.setTransientMappingAttributeName(this.transientMapping.value);
       req.setFederatedLogoutEnabled(this.federatedLogoutEnabled.value);
       req.setProviderOptions(this.options);
+      if (!this.provider || this.updateCertificate) {
+        req.setCertificate(this.samlCertificate());
+      }
 
       this.loading = true;
       this.service
@@ -283,6 +301,7 @@ export class ProviderSamlSpComponent {
     }
     req.setTransientMappingAttributeName(this.transientMapping.value);
     req.setFederatedLogoutEnabled(this.federatedLogoutEnabled.value);
+    req.setCertificate(this.samlCertificate());
     this.loading = true;
     this.service
       .addSAMLProvider(req)
@@ -294,6 +313,42 @@ export class ProviderSamlSpComponent {
         this.toast.showError(error);
         this.loading = false;
       });
+  }
+
+  private samlCertificate(): SAMLCertificate | undefined {
+    if (!this.certificate.value || !this.privateKey.value) {
+      return undefined;
+    }
+    return new SAMLCertificate().setCertificate(this.certificate.value).setPrivateKey(this.privateKey.value);
+  }
+
+  public onDropCertificate(filelist: FileList): void {
+    this.readFile(filelist, this.certificate, MAX_ALLOWED_CERTIFICATE_SIZE);
+  }
+
+  public onDropPrivateKey(filelist: FileList): void {
+    this.readFile(filelist, this.privateKey, MAX_ALLOWED_KEY_SIZE);
+  }
+
+  // reads the file as base64, as expected for bytes fields
+  private readFile(filelist: FileList, control: FormControl<string>, maxSize: number): void {
+    const file = filelist.item(0);
+    if (!file) {
+      return;
+    }
+    if (file.size > maxSize) {
+      this.toast.showInfo('IDP.SAML.FILEMAXSIZEEXCEEDED', true);
+      return;
+    }
+    control.setValue('');
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      if (typeof dataUrl === 'string') {
+        control.setValue(dataUrl.substring(dataUrl.indexOf(',') + 1));
+      }
+    };
+    reader.readAsDataURL(file);
   }
 
   public submitForm(): void {
@@ -377,5 +432,13 @@ export class ProviderSamlSpComponent {
 
   private get federatedLogoutEnabled(): FormControl<boolean> {
     return this.form.controls.federatedLogoutEnabled;
+  }
+
+  public get certificate(): FormControl<string> {
+    return this.form.controls.certificate;
+  }
+
+  public get privateKey(): FormControl<string> {
+    return this.form.controls.privateKey;
   }
 }

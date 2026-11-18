@@ -2400,7 +2400,14 @@
       "SIGNATUREALGORITHM": "Signature Algorithm",
       "NAMEIDFORMAT": "NameID Format",
       "TRANSIENTMAPPINGATTRIBUTENAME": "Custom Mapping Attribute Name",
-      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Алтернативно име на атрибут за съпоставяне на потребителя, в случай че върнатият `nameid-format` е `transient`, например `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Алтернативно име на атрибут за съпоставяне на потребителя, в случай че върнатият `nameid-format` е `transient`, например `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`",
+      "CERTIFICATE": "Сертификат",
+      "PRIVATEKEY": "Частен ключ",
+      "UPLOADCERTIFICATE": "Качване на сертификат",
+      "UPLOADPRIVATEKEY": "Качване на частен ключ",
+      "UPDATECERTIFICATE": "Замяна на сертификата",
+      "FILEMAXSIZEEXCEEDED": "Превишен е максималният размер на файла.",
+      "CERTIFICATE_DESC": "По избор качете сертификат и неговия частен ключ (PEM), например издаден от удостоверяващ орган, изискван от доставчика на идентичност. Те се използват за подписване на заявките и дешифриране на твърденията. Ако не е зададен, се генерира самоподписан сертификат."
     },
     "TOAST": {
       "SAVED": "Успешно запазено.",

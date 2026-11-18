@@ -126,6 +126,10 @@ type SAMLProvider struct {
 	TransientMappingAttributeName string
 	FederatedLogoutEnabled        bool
 	IDPOptions                    idp.Options
+	// Certificate and Key are optional and PEM encoded.
+	// If provided, they are used instead of a generated self-signed certificate.
+	Certificate []byte
+	Key         []byte
 }
 
 type AppleProvider struct {

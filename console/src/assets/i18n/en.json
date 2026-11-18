@@ -2400,7 +2400,14 @@
       "SIGNATUREALGORITHM": "Signature Algorithm",
       "NAMEIDFORMAT": "NameID Format",
       "TRANSIENTMAPPINGATTRIBUTENAME": "Custom Mapping Attribute Name",
-      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`",
+      "CERTIFICATE": "Certificate",
+      "PRIVATEKEY": "Private Key",
+      "UPLOADCERTIFICATE": "Upload Certificate",
+      "UPLOADPRIVATEKEY": "Upload Private Key",
+      "UPDATECERTIFICATE": "Replace Certificate",
+      "FILEMAXSIZEEXCEEDED": "Maximum file size exceeded.",
+      "CERTIFICATE_DESC": "Optionally upload a certificate and its private key (PEM), e.g. issued by a certificate authority required by the identity provider. They are used to sign requests and decrypt assertions. If none is provided, a self-signed certificate is generated."
     },
     "TOAST": {
       "SAVED": "Successfully saved.",

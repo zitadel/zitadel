@@ -2398,7 +2398,16 @@
     "ISIDTOKENMAPPING": "Mapování z ID tokenu",
     "ISIDTOKENMAPPING_DESC": "Pokud je vybráno, informace o poskytovateli jsou mapovány z ID tokenu, nikoli z koncového bodu userinfo.",
     "USEPKCE": "Použijte PKCE",
-    "USEPKCE_DESC": "Určuje, zda jsou v požadavku na ověření zahrnuty parametry code_challenge a code_challenge_method"
+    "USEPKCE_DESC": "Určuje, zda jsou v požadavku na ověření zahrnuty parametry code_challenge a code_challenge_method",
+    "SAML": {
+      "CERTIFICATE": "Certifikát",
+      "PRIVATEKEY": "Privátní klíč",
+      "UPLOADCERTIFICATE": "Nahrát certifikát",
+      "UPLOADPRIVATEKEY": "Nahrát privátní klíč",
+      "UPDATECERTIFICATE": "Nahradit certifikát",
+      "FILEMAXSIZEEXCEEDED": "Byla překročena maximální velikost souboru.",
+      "CERTIFICATE_DESC": "Volitelně nahrajte certifikát a jeho privátní klíč (PEM), např. vydaný certifikační autoritou, kterou vyžaduje poskytovatel identity. Slouží k podepisování požadavků a dešifrování assertions. Pokud není zadán, vygeneruje se certifikát podepsaný sám sebou."
+    }
   },
   "MFA": {
     "LIST": {
