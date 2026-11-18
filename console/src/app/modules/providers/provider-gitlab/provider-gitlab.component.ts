@@ -5,6 +5,7 @@ import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, take } from 'rxjs';
+import { providerOptionsFromStored } from 'src/app/modules/provider-options/provider-options';
 import {
   AddGitLabProviderRequest as AdminAddGitLabProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -153,6 +154,7 @@ export class ProviderGitlabComponent {
       .getProviderByID(req)
       .then((resp) => {
         this.provider = resp.idp;
+        this.options = providerOptionsFromStored(this.provider?.config?.options);
         this.loading = false;
         if (this.provider?.config?.gitlab) {
           this.form.patchValue(this.provider.config.gitlab);
