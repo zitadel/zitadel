@@ -2,6 +2,7 @@ package systemdefaults
 
 import (
 	"context"
+	"sync"
 	"testing"
 	"time"
 
@@ -88,9 +89,19 @@ func TestTarpitConfig_duration(t *testing.T) {
 	}
 }
 
+// testTracerProvider installs the global tracer provider once,
+// as the instrumentation package caches its tracer on first use.
+var testTracerProvider = sync.OnceValue(func() *sdk_trace.TracerProvider {
+	provider := sdk_trace.NewTracerProvider()
+	otel.SetTracerProvider(provider)
+	return provider
+})
+
 func TestTarpitConfig_Tarpit(t *testing.T) {
+	provider := testTracerProvider()
 	spans := tracetest.NewSpanRecorder()
-	otel.SetTracerProvider(sdk_trace.NewTracerProvider(sdk_trace.WithSpanProcessor(spans)))
+	provider.RegisterSpanProcessor(spans)
+	t.Cleanup(func() { provider.UnregisterSpanProcessor(spans) })
 	c := &TarpitConfig{
 		MinFailedAttempts: 2,
 		StepDuration:      10 * time.Millisecond,
