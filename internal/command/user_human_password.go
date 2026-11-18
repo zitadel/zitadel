@@ -402,8 +402,7 @@ func checkPassword(ctx context.Context, userID, password string, es *eventstore.
 	if userID == "" {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sfw3f", "Errors.User.UserIDMissing")
 	}
-	wm := NewHumanPasswordWriteModel(userID, "")
-	err := es.FilterToQueryReducer(ctx, wm)
+	wm, err := loadHumanPasswordWriteModel(ctx, es, userID, "")
 	if err != nil {
 		return nil, err
 	}
@@ -480,12 +479,7 @@ func (c *Commands) passwordWriteModel(ctx context.Context, userID, resourceOwner
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewHumanPasswordWriteModel(userID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
-	if err != nil {
-		return nil, err
-	}
-	return writeModel, nil
+	return loadHumanPasswordWriteModel(ctx, c.eventstore, userID, resourceOwner)
 }
 
 func convertLoginPasswapErr(passwordCheckFailedCount uint64, err error) error {

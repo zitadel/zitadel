@@ -371,6 +371,34 @@ func TestSearchQueryBuilder_Matches(t *testing.T) {
 			wantedLen: 0,
 		},
 		{
+			name: "sub query sequence too low",
+			builder: NewSearchQueryBuilder(ColumnsEvent).
+				AddQuery().
+				SequenceGreater(60).
+				Builder(),
+			args: args{
+				commands: []Command{
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								InstanceID: "instance",
+							},
+							Seq: 60,
+						},
+					},
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								InstanceID: "instance",
+							},
+							Seq: 61,
+						},
+					},
+				},
+			},
+			wantedLen: 1,
+		},
+		{
 			name: "limit exeeded",
 			builder: NewSearchQueryBuilder(ColumnsEvent).
 				Limit(2),

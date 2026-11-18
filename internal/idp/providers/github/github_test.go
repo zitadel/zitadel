@@ -10,6 +10,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
+	"github.com/zitadel/zitadel/internal/test"
 )
 
 func TestProvider_BeginAuth(t *testing.T) {
@@ -51,8 +52,24 @@ func TestProvider_BeginAuth(t *testing.T) {
 
 			wantAuth, wantErr := tt.want.GetAuth(ctx)
 			gotAuth, gotErr := session.GetAuth(ctx)
-			a.Equal(wantAuth, gotAuth)
 			a.ErrorIs(gotErr, wantErr)
+			// PKCE is used by default
+			test.AssertRedirectAuthWithPKCE(t, wantAuth, gotAuth, session.PersistentParameters())
 		})
 	}
+}
+
+func TestProvider_BeginAuth_EnterpriseServerWithoutPKCE(t *testing.T) {
+	// GitHub Enterprise Server does not support PKCE (yet)
+	provider, err := NewCustomURL("GitHub Enterprise", "clientID", "clientSecret", "redirectURI", "https://ghes.com/login/oauth/authorize", "https://ghes.com/login/oauth/access_token", "https://ghes.com/api/v3/user", nil, http.DefaultClient)
+	require.NoError(t, err)
+
+	ctx := context.Background()
+	session, err := provider.BeginAuth(ctx, "testState")
+	require.NoError(t, err)
+
+	auth, err := session.GetAuth(ctx)
+	require.NoError(t, err)
+	assert.Equal(t, &idp.RedirectAuth{RedirectURL: "https://ghes.com/login/oauth/authorize?client_id=clientID&prompt=select_account&redirect_uri=redirectURI&response_type=code&state=testState"}, auth)
+	assert.Empty(t, session.PersistentParameters())
 }
