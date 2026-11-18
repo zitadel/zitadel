@@ -18,7 +18,7 @@ vi.mock("@/lib/server/cookies", () => ({
 }));
 
 vi.mock("@/lib/server/enrollment-guard", () => ({
-  getEnrollmentAuthorizationError: vi.fn(),
+  getSetupAuthorizationError: vi.fn(),
 }));
 
 vi.mock("next-intl/server", () => ({
@@ -38,7 +38,7 @@ describe("addOTP", () => {
   let getSession: any;
   let addOTPEmail: any;
   let addOTPSMS: any;
-  let getEnrollmentAuthorizationError: any;
+  let getSetupAuthorizationError: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -46,13 +46,11 @@ describe("addOTP", () => {
     getSession = vi.mocked((await import("@/lib/server/zitadel")).getSession);
     addOTPEmail = vi.mocked((await import("@/lib/server/zitadel")).addOTPEmail);
     addOTPSMS = vi.mocked((await import("@/lib/server/zitadel")).addOTPSMS);
-    getEnrollmentAuthorizationError = vi.mocked(
-      (await import("@/lib/server/enrollment-guard")).getEnrollmentAuthorizationError,
-    );
+    getSetupAuthorizationError = vi.mocked((await import("@/lib/server/enrollment-guard")).getSetupAuthorizationError);
 
     getSessionCookieById.mockResolvedValue({ id: "session-1", token: "token-1" });
     getSession.mockResolvedValue(session);
-    getEnrollmentAuthorizationError.mockResolvedValue(null);
+    getSetupAuthorizationError.mockResolvedValue(null);
   });
 
   test("returns an error without a session cookie", async () => {
@@ -74,15 +72,16 @@ describe("addOTP", () => {
   });
 
   test("rejects an unauthorized (identify-only) session without adding the factor", async () => {
-    getEnrollmentAuthorizationError.mockResolvedValue("You have to authenticate or have a valid User Verification Check");
+    getSetupAuthorizationError.mockResolvedValue("You have to authenticate or have a valid User Verification Check");
 
     const result = await addOTP({ method: "sms", sessionId: "session-1" });
 
     expect(result).toEqual({ error: "You have to authenticate or have a valid User Verification Check" });
-    expect(getEnrollmentAuthorizationError).toHaveBeenCalledWith({
+    expect(getSetupAuthorizationError).toHaveBeenCalledWith({
       serviceConfig: { baseUrl: "https://example.com" },
       session: session.session,
       userId: "user-1",
+      method: "otp_sms",
     });
     expect(addOTPSMS).not.toHaveBeenCalled();
   });

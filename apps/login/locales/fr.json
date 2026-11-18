@@ -485,6 +485,8 @@
     "failedLoading": "Échec du chargement des données. Veuillez réessayer.",
     "tryagain": "Réessayer",
     "couldNotContinueSession": "Impossible de continuer la session - informations utilisateur manquantes",
-    "couldNotClearSession": "La session n'a pas pu être terminée. Veuillez réessayer."
+    "couldNotClearSession": "La session n'a pas pu être terminée. Veuillez réessayer.",
+    "secondFactorRequired": "Vérifiez d'abord votre second facteur pour configurer une nouvelle méthode d'authentification.",
+    "authenticatorNotAllowed": "Cette méthode d'authentification n'est pas autorisée pour votre organisation."
   }
 }

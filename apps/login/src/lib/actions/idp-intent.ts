@@ -286,10 +286,14 @@ async function resolveUserIdFromSession({
     // the same browser that started the flow, not that the session was ever authenticated.
     //
     // getEnrollmentAuthorizationError authorizes when the session has a verified, non-expired
-    // primary factor, OR the user has no authentication methods yet AND passed a
-    // user-verification check (the email/invite-code proof bound to this browser's
-    // binding id). The latter preserves the legitimate "link an IDP as the first
+    // primary factor AND, if the user has a second factor configured, has also verified it
+    // (otherwise a session that only passed the first factor could link an external identity
+    // and keep access to the account through it), OR the user has no authentication methods
+    // yet AND passed a user-verification check (the email/invite-code proof bound to this
+    // browser's binding id). The latter preserves the legitimate "link an IDP as the first
     // authenticator" onboarding flow, which isSessionValid would have rejected.
+    // Whether this IDP may be linked at all is checked separately below
+    // (isLinkingAllowed, validateIDPLinkingPermissions).
     const enrollmentError = await getEnrollmentAuthorizationError({
       serviceConfig,
       session,

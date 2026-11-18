@@ -485,6 +485,8 @@
     "failedLoading": "Impossibile caricare i dati. Riprova.",
     "tryagain": "Riprova",
     "couldNotContinueSession": "Impossibile continuare con la sessione - informazioni utente mancanti",
-    "couldNotClearSession": "Impossibile terminare la sessione. Riprova."
+    "couldNotClearSession": "Impossibile terminare la sessione. Riprova.",
+    "secondFactorRequired": "Verifica prima il tuo secondo fattore per configurare un nuovo metodo di autenticazione.",
+    "authenticatorNotAllowed": "Questo metodo di autenticazione non è consentito per la tua organizzazione."
   }
 }
