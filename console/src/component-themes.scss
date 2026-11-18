@@ -17,6 +17,7 @@
 @import 'src/app/modules/table-actions/table-actions.component';
 @import 'src/app/modules/org-context/org-context.component.scss';
 @import 'src/app/modules/action-keys/action-keys.component.scss';
+@import 'src/app/modules/table-search/table-search.component.scss';
 @import 'src/app/modules/header/header.component';
 @import 'src/app/modules/keyboard-shortcuts/keyboard-shortcuts.component';
 @import 'src/app/modules/footer/footer.component';
@@ -144,6 +145,7 @@
   @include info-section-theme($theme);
   @include actions-theme($theme);
   @include filter-theme($theme);
+  @include table-search-theme($theme);
   @include private-label-theme($theme);
   @include project-grid-theme($theme);
   @include granted-project-detail-theme($theme);

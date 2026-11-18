@@ -1,23 +1,30 @@
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ActivatedRoute, Router } from '@angular/router';
-import { take } from 'rxjs';
+import { from, of, Subject, take } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { SuggestionField, UserSuggestionService } from 'src/app/services/user-suggestion.service';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import {
   DisplayNameQuery,
   UserGrantOrgNameQuery,
   UserGrantProjectNameQuery,
   UserGrantQuery,
+  UserGrantRoleKeyQuery,
+  UserGrantWithGrantedQuery,
   UserNameQuery,
 } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { FilterComponent } from '../filter/filter.component';
 
-enum SubQuery {
+export enum SubQuery {
   DISPLAYNAME,
   USERNAME,
   ORGNAME,
   PROJECTNAME,
+  ROLEKEY,
+  WITHGRANTED,
 }
 
 @Component({
@@ -30,8 +37,58 @@ export class FilterUserGrantsComponent extends FilterComponent implements OnInit
   public SubQuery: any = SubQuery;
   public searchQueries: UserGrantQuery[] = [];
 
+  private readonly suggestionService = inject(UserSuggestionService);
+
+  /** Role keys are left out: suggesting them needs a project, this list spans all. */
+  protected suggestions: string[] = [];
+  private suggestionSubQuery: SubQuery | undefined;
+  private readonly suggest$ = new Subject<{ subquery: SubQuery; value: string }>();
+
   constructor(router: Router, route: ActivatedRoute, destroyRef: DestroyRef) {
     super(router, route, destroyRef);
+
+    this.suggest$
+      .pipe(
+        debounceTime(250),
+        distinctUntilChanged((a, b) => a.subquery === b.subquery && a.value === b.value),
+        switchMap(({ subquery, value }) => {
+          const field = FilterUserGrantsComponent.suggestionField(subquery);
+          if (!field) {
+            return of([] as string[]);
+          }
+          // a failed lookup must not break typing, it just means no suggestions
+          return from(this.suggestionService.suggest(field, value)).pipe(catchError(() => of([] as string[])));
+        }),
+        takeUntilDestroyed(destroyRef),
+      )
+      .subscribe((values) => (this.suggestions = values));
+  }
+
+  protected onSuggestionInput(subquery: SubQuery, event: Event): void {
+    // drop the previous field's values, they would briefly show under the new field
+    this.suggestions = [];
+    this.suggestionSubQuery = subquery;
+    this.suggest$.next({ subquery, value: (event.target as HTMLInputElement).value });
+  }
+
+  /** Scoped per field so an open second filter never shows the first one's values. */
+  protected suggestionsFor(subquery: SubQuery): string[] {
+    return this.suggestionSubQuery === subquery ? this.suggestions : [];
+  }
+
+  protected selectSuggestion(subquery: SubQuery, query: any, value: string): void {
+    this.setValue(subquery, query, { target: { value } });
+  }
+
+  private static suggestionField(subquery: SubQuery): SuggestionField | undefined {
+    switch (subquery) {
+      case SubQuery.DISPLAYNAME:
+        return 'displayName';
+      case SubQuery.USERNAME:
+        return 'userName';
+      default:
+        return undefined;
+    }
   }
 
   ngOnInit(): void {
@@ -74,8 +131,26 @@ export class FilterUserGrantsComponent extends FilterComponent implements OnInit
 
             const projectNameQuery = new UserGrantProjectNameQuery();
             projectNameQuery.setProjectName(filter.projectNameQuery.projectName);
+            projectNameQuery.setMethod(filter.projectNameQuery.method);
 
             userGrantQuery.setProjectNameQuery(projectNameQuery);
+            return userGrantQuery;
+          } else if (filter.roleKeyQuery) {
+            const userGrantQuery = new UserGrantQuery();
+
+            const roleKeyQuery = new UserGrantRoleKeyQuery();
+            roleKeyQuery.setRoleKey(filter.roleKeyQuery.roleKey);
+            roleKeyQuery.setMethod(filter.roleKeyQuery.method);
+
+            userGrantQuery.setRoleKeyQuery(roleKeyQuery);
+            return userGrantQuery;
+          } else if (filter.withGrantedQuery) {
+            const userGrantQuery = new UserGrantQuery();
+
+            const withGrantedQuery = new UserGrantWithGrantedQuery();
+            withGrantedQuery.setWithGranted(filter.withGrantedQuery.withGranted);
+
+            userGrantQuery.setWithGrantedQuery(withGrantedQuery);
             return userGrantQuery;
           } else {
             return undefined;
@@ -83,7 +158,7 @@ export class FilterUserGrantsComponent extends FilterComponent implements OnInit
         });
 
         this.searchQueries = userQueries.filter((q) => q !== undefined) as UserGrantQuery[];
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        this.emitQueries();
         // this.showFilter = true;
         // this.filterOpen.emit(true);
       }
@@ -136,6 +211,28 @@ export class FilterUserGrantsComponent extends FilterComponent implements OnInit
 
           this.searchQueries.push(pn_sq);
           break;
+
+        case SubQuery.ROLEKEY:
+          const rkq = new UserGrantRoleKeyQuery();
+          rkq.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+          rkq.setRoleKey('');
+
+          const rk_sq = new UserGrantQuery();
+          rk_sq.setRoleKeyQuery(rkq);
+
+          this.searchQueries.push(rk_sq);
+          break;
+
+        case SubQuery.WITHGRANTED:
+          // a plain toggle, the API takes a bool with nothing to compare against
+          const wgq = new UserGrantWithGrantedQuery();
+          wgq.setWithGranted(true);
+
+          const wg_sq = new UserGrantQuery();
+          wg_sq.setWithGrantedQuery(wgq);
+
+          this.searchQueries.push(wg_sq);
+          break;
       }
     } else {
       switch (subquery) {
@@ -163,6 +260,18 @@ export class FilterUserGrantsComponent extends FilterComponent implements OnInit
             this.searchQueries.splice(index_pn, 1);
           }
           break;
+        case SubQuery.ROLEKEY:
+          const index_rk = this.searchQueries.findIndex((q) => q.toObject().roleKeyQuery !== undefined);
+          if (index_rk > -1) {
+            this.searchQueries.splice(index_rk, 1);
+          }
+          break;
+        case SubQuery.WITHGRANTED:
+          const index_wg = this.searchQueries.findIndex((q) => q.toObject().withGrantedQuery !== undefined);
+          if (index_wg > -1) {
+            this.searchQueries.splice(index_wg, 1);
+          }
+          break;
       }
     }
   }
@@ -171,19 +280,23 @@ export class FilterUserGrantsComponent extends FilterComponent implements OnInit
     switch (subquery) {
       case SubQuery.DISPLAYNAME:
         (query as DisplayNameQuery).setDisplayName(event?.target?.value);
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        this.emitQueries();
         break;
       case SubQuery.USERNAME:
         (query as UserNameQuery).setUserName(event?.target?.value);
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        this.emitQueries();
         break;
       case SubQuery.ORGNAME:
         (query as UserGrantOrgNameQuery).setOrgName(event?.target?.value);
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        this.emitQueries();
         break;
       case SubQuery.PROJECTNAME:
         (query as UserGrantProjectNameQuery).setProjectName(event?.target?.value);
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        this.emitQueries();
+        break;
+      case SubQuery.ROLEKEY:
+        (query as UserGrantRoleKeyQuery).setRoleKey(event?.target?.value);
+        this.emitQueries();
         break;
     }
   }
@@ -219,18 +332,67 @@ export class FilterUserGrantsComponent extends FilterComponent implements OnInit
         } else {
           return undefined;
         }
+      case SubQuery.ROLEKEY:
+        const rk = this.searchQueries.find((q) => q.toObject().roleKeyQuery !== undefined);
+        if (rk) {
+          return rk.getRoleKeyQuery();
+        } else {
+          return undefined;
+        }
+      case SubQuery.WITHGRANTED:
+        const wg = this.searchQueries.find((q) => q.toObject().withGrantedQuery !== undefined);
+        if (wg) {
+          return wg.getWithGrantedQuery();
+        } else {
+          return undefined;
+        }
     }
   }
 
   public setMethod(query: any, event: any) {
     (query as UserNameQuery).setMethod(event.value);
-    this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+    this.emitQueries();
   }
 
   public override emitFilter(): void {
-    this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+    this.emitQueries();
     this.showFilter = false;
     this.filterOpen.emit(false);
+  }
+
+  /** Ticking a checkbox creates the query with an empty string, which the API rejects. */
+  private emitQueries(): void {
+    this.filterChanged.emit(this.activeQueries);
+  }
+
+  private get activeQueries(): UserGrantQuery[] {
+    return this.searchQueries.filter((query) => FilterUserGrantsComponent.hasValue(query));
+  }
+
+  /** Badge count, so a checkbox without a value does not look like an active filter. */
+  public get activeQueryCount(): number {
+    return this.activeQueries.length;
+  }
+
+  private static hasValue(query: UserGrantQuery): boolean {
+    const q = query.toObject();
+    if (q.displayNameQuery) {
+      return !!q.displayNameQuery.displayName.trim();
+    }
+    if (q.userNameQuery) {
+      return !!q.userNameQuery.userName.trim();
+    }
+    if (q.orgNameQuery) {
+      return !!q.orgNameQuery.orgName.trim();
+    }
+    if (q.projectNameQuery) {
+      return !!q.projectNameQuery.projectName.trim();
+    }
+    if (q.roleKeyQuery) {
+      return !!q.roleKeyQuery.roleKey.trim();
+    }
+    // withGrantedQuery carries a boolean, it is complete as soon as it exists
+    return true;
   }
 
   public resetFilter(): void {

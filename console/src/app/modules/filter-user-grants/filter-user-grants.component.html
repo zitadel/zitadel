@@ -1,4 +1,4 @@
-<cnsl-filter (resetted)="resetFilter()" (trigger)="emitFilter()" [queryCount]="searchQueries.length">
+<cnsl-filter (resetted)="resetFilter()" (trigger)="emitFilter()" [queryCount]="activeQueryCount">
   <div class="filter-row" id="filtercomp">
     <div class="name-query">
       <mat-checkbox
@@ -24,9 +24,19 @@
               cnslInput
               name="value"
               [value]="dnq.getDisplayName()"
+              [matAutocomplete]="grantDisplayNameAuto"
+              (input)="onSuggestionInput(SubQuery.DISPLAYNAME, $event)"
               (change)="setValue(SubQuery.DISPLAYNAME, dnq, $event)"
             />
           </cnsl-form-field>
+          <mat-autocomplete
+            #grantDisplayNameAuto="matAutocomplete"
+            (optionSelected)="selectSuggestion(SubQuery.DISPLAYNAME, dnq, $event.option.value)"
+          >
+            @for (suggestion of suggestionsFor(SubQuery.DISPLAYNAME); track suggestion) {
+              <mat-option [value]="suggestion">{{ suggestion }}</mat-option>
+            }
+          </mat-autocomplete>
         </div>
       }
     </div>
@@ -51,8 +61,23 @@
             </mat-select>
           </cnsl-form-field>
           <cnsl-form-field class="filter-input-value">
-            <input cnslInput name="value" [value]="unq.getUserName()" (change)="setValue(SubQuery.USERNAME, unq, $event)" />
+            <input
+              cnslInput
+              name="value"
+              [value]="unq.getUserName()"
+              [matAutocomplete]="grantUserNameAuto"
+              (input)="onSuggestionInput(SubQuery.USERNAME, $event)"
+              (change)="setValue(SubQuery.USERNAME, unq, $event)"
+            />
           </cnsl-form-field>
+          <mat-autocomplete
+            #grantUserNameAuto="matAutocomplete"
+            (optionSelected)="selectSuggestion(SubQuery.USERNAME, unq, $event.option.value)"
+          >
+            @for (suggestion of suggestionsFor(SubQuery.USERNAME); track suggestion) {
+              <mat-option [value]="suggestion">{{ suggestion }}</mat-option>
+            }
+          </mat-autocomplete>
         </div>
       }
     </div>
@@ -112,6 +137,42 @@
           </cnsl-form-field>
         </div>
       }
+    </div>
+
+    <div class="rolekey-query">
+      <mat-checkbox
+        id="rolekey"
+        class="cb"
+        [checked]="getSubFilter(SubQuery.ROLEKEY)"
+        (change)="changeCheckbox(SubQuery.ROLEKEY, $event)"
+        >{{ 'FILTER.ROLEKEY' | translate }}
+      </mat-checkbox>
+      @if (getSubFilter(SubQuery.ROLEKEY); as rkq) {
+        <div class="subquery">
+          <cnsl-form-field class="filter-select-method">
+            <mat-select [value]="rkq.getMethod()" (selectionChange)="setMethod(rkq, $event)">
+              @for (method of methods; track method) {
+                <mat-option [value]="method">
+                  {{ 'FILTER.METHODS.' + method | translate }}
+                </mat-option>
+              }
+            </mat-select>
+          </cnsl-form-field>
+          <cnsl-form-field class="filter-input-value">
+            <input cnslInput name="value" [value]="rkq.getRoleKey()" (change)="setValue(SubQuery.ROLEKEY, rkq, $event)" />
+          </cnsl-form-field>
+        </div>
+      }
+    </div>
+
+    <div class="withgranted-query">
+      <mat-checkbox
+        id="withgranted"
+        class="cb"
+        [checked]="getSubFilter(SubQuery.WITHGRANTED)"
+        (change)="changeCheckbox(SubQuery.WITHGRANTED, $event)"
+        >{{ 'FILTER.WITHGRANTED' | translate }}
+      </mat-checkbox>
     </div>
   </div>
 </cnsl-filter>

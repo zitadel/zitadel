@@ -29,6 +29,7 @@ export class UserGrantsDataSource extends DataSource<UserGrantAsObject> {
 
   public grantsSubject: BehaviorSubject<Array<UserGrantAsObject>> = new BehaviorSubject<Array<UserGrantAsObject>>([]);
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private requestSequence = 0;
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
   constructor(
@@ -128,9 +129,20 @@ export class UserGrantsDataSource extends DataSource<UserGrantAsObject> {
     }
   }
 
+  /**
+   * Requests can overlap, most visibly while typing in the search box. Responses are not
+   * guaranteed to arrive in order, so each one carries the sequence it was started with
+   * and only the newest is allowed to publish.
+   */
   private loadResponse(promise: Promise<ListUserGrantResponse.AsObject | ListMyUserGrantsResponse.AsObject>): void {
+    const sequence = ++this.requestSequence;
+
     promise
       .then((resp) => {
+        if (sequence !== this.requestSequence) {
+          // superseded in flight; the newer request owns the table and the loading flag
+          return;
+        }
         this.loadingSubject.next(false);
         if (resp.resultList) {
           this.grantsSubject.next(resp.resultList);
@@ -143,6 +155,9 @@ export class UserGrantsDataSource extends DataSource<UserGrantAsObject> {
         }
       })
       .catch((error) => {
+        if (sequence !== this.requestSequence) {
+          return;
+        }
         console.error(error);
         this.grantsSubject.next([]);
         this.loadingSubject.next(false);
