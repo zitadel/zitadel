@@ -2,7 +2,7 @@
 // and lifetimes, so only server actions that applied the login policy may call them.
 import "server-only";
 
-import { sanitizeChallenges, SessionUpdatedError } from "@/lib/server/challenges";
+import { getOTPSentTimestamps, OTPSentTimestamps, sanitizeChallenges, SessionUpdatedError } from "@/lib/server/challenges";
 import { addSessionToCookie, updateSessionCookie } from "@/lib/server/cookies";
 import { createLogger } from "@/lib/server/logger";
 import { getServiceConfig } from "@/lib/server/service-url";
@@ -31,8 +31,7 @@ type CustomCookieData = {
   expirationTs: string;
   changeTs: string;
   requestId?: string; // if its linked to an OIDC flow
-  otpSmsSentTs?: string; // when the last OTP SMS was requested for this session, enforces the resend cooldown
-};
+} & OTPSentTimestamps; // when each OTP was last requested for this session, enforces the resend cooldown
 
 const passwordAttemptsHandler = (error: ConnectError | SessionUpdatedError) => {
   if (error instanceof SessionUpdatedError) {
@@ -98,9 +97,7 @@ export async function createSessionAndUpdateCookie(command: {
           sessionCookie.requestId = command.requestId;
         }
 
-        if (command.challenges?.otpSms) {
-          sessionCookie.otpSmsSentTs = `${Date.now()}`;
-        }
+        Object.assign(sessionCookie, getOTPSentTimestamps(command.challenges));
 
         if (response.session.factors.user.organizationId) {
           sessionCookie.organization = response.session.factors.user.organizationId;
@@ -266,11 +263,7 @@ export async function setSessionAndUpdateCookie(command: {
               newCookie.requestId = sessionCookie.requestId;
             }
 
-            // carried over on every update, otherwise any other update of the session would reset the resend cooldown
-            const otpSmsSentTs = command.challenges?.otpSms ? `${Date.now()}` : command.recentCookie.otpSmsSentTs;
-            if (otpSmsSentTs) {
-              newCookie.otpSmsSentTs = otpSmsSentTs;
-            }
+            Object.assign(newCookie, getOTPSentTimestamps(command.challenges, command.recentCookie));
 
             const securitySettings = await getSecuritySettings({ serviceConfig });
             const iFrameEnabled = !!securitySettings?.embeddedIframe?.enabled;

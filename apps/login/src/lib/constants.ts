@@ -1,4 +1,4 @@
 export const UNKNOWN_USER_ID = "000000000000000000";
 
-/** Seconds the "Resend code" buttons stay disabled after a code was sent. */
+/** Seconds the "Resend code" buttons stay disabled after a code was sent, and the default OTP resend cooldown. */
 export const RESEND_COOLDOWN_SECONDS = 30;

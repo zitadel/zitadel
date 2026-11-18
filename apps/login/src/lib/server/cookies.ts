@@ -3,6 +3,7 @@
 import "server-only";
 
 import { LANGUAGE_COOKIE_NAME } from "@/lib/i18n";
+import type { OTPSentTimestamps } from "@/lib/server/challenges";
 import { createLogger } from "@/lib/server/logger";
 import { parseAndVerifySessions, signSession } from "@/lib/server/session-cookie-signature";
 import { timestampDate, timestampFromMs } from "@zitadel/client";
@@ -27,8 +28,7 @@ export type Cookie = {
   expirationTs: string;
   changeTs: string;
   requestId?: string; // if its linked to an OIDC flow
-  otpSmsSentTs?: string; // when the last OTP SMS was requested for this session, enforces the resend cooldown
-};
+} & OTPSentTimestamps; // when each OTP was last requested for this session, enforces the resend cooldown
 
 type SessionCookie<T> = Cookie & T;
 

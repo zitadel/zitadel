@@ -390,6 +390,33 @@ describe("updateOrCreateSession OTP SMS resend cooldown", () => {
     expect(createSessionAndUpdateCookie).not.toHaveBeenCalled();
   });
 
+  test("refuses another OTP e-mail within the cooldown without calling the API", async () => {
+    getSessionCookieById.mockResolvedValue({ ...cookie, otpEmailSentTs: `${1_000_000 - 10_000}` });
+
+    const res = await updateOrCreateSession({ sessionId: "session-1", challenges: { otpEmail: {} } as any });
+
+    expect(res).toEqual({ retryAfterSeconds: 20 });
+    expect(setSessionAndUpdateCookie).not.toHaveBeenCalled();
+  });
+
+  test("sends the OTP e-mail once the cooldown has passed and returns the next cooldown", async () => {
+    getSessionCookieById.mockResolvedValue({ ...cookie, otpEmailSentTs: `${1_000_000 - 30_000}` });
+
+    const res = await updateOrCreateSession({ sessionId: "session-1", challenges: { otpEmail: {} } as any });
+
+    expect(setSessionAndUpdateCookie).toHaveBeenCalledTimes(1);
+    expect(res).toEqual(expect.objectContaining({ sessionId: "session-1", retryAfterSeconds: 30 }));
+  });
+
+  test("keeps the e-mail and SMS cooldowns apart", async () => {
+    getSessionCookieById.mockResolvedValue({ ...cookie, otpSmsSentTs: `${1_000_000}` });
+
+    const res = await updateOrCreateSession({ sessionId: "session-1", challenges: { otpEmail: {} } as any });
+
+    expect(setSessionAndUpdateCookie).toHaveBeenCalledTimes(1);
+    expect(res).toEqual(expect.objectContaining({ sessionId: "session-1", retryAfterSeconds: 30 }));
+  });
+
   test("does not apply the cooldown to code checks", async () => {
     getSessionCookieById.mockResolvedValue({ ...cookie, otpSmsSentTs: `${1_000_000}` });
 
