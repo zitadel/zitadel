@@ -131,9 +131,9 @@ Pylon provides a auth module and a decorator to check the validity of the token 
 
 Now we will create a new Pylon service with the following endpoints:
 
-- `/api/public`: Public endpoint
-- `/api/private`: Private endpoint
-- `/api/private-scoped`: Private endpoint with specific role
+- `/api/info`: Public endpoint
+- `/api/me`: Private endpoint that returns the current user
+- `/api/me/messages`: Private endpoint that returns the user's messages and requires the role `read:messages`
 - `/graphql`: GraphQL endpoint
   - Query: `me`: Private endpoint that returns the current user and the messages if the role is `read:messages`
   - Query: `info`: Public endpoint
@@ -236,19 +236,19 @@ app.use(async (_, next) => {
   await next();
 });
 
-app.get("/img/api/info", (c) => {
+app.get("/api/info", (c) => {
   return new Response("Public Data");
 });
 
 // The `auth.require()` middleware is optional here, as the `User.me` method already checks for it.
-app.get("/img/api/me", auth.require(), async (c) => {
+app.get("/api/me", auth.require(), async (c) => {
   const user = await User.me();
 
   return c.json(user);
 });
 
 // A role check for `read:messages` is not required here, as the `user.messages` method already checks for it.
-app.get("/img/api/me/messages", auth.require(), async (c) => {
+app.get("/api/me/messages", auth.require(), async (c) => {
   const user = await User.me();
 
   // This will throw an error if the user does not have the `read:messages` role
