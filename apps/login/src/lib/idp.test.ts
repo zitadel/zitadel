@@ -179,6 +179,11 @@ describe("idp type mapping utilities", () => {
       expect(result).toBe(IdentityProviderType.OIDC);
     });
 
+    it("should map IDP_TYPE_LDAP to LDAP", () => {
+      const result = idpTypeToIdentityProviderType(IDPType.IDP_TYPE_LDAP);
+      expect(result).toBe(IdentityProviderType.LDAP);
+    });
+
     it("should map IDP_TYPE_JWT to JWT", () => {
       const result = idpTypeToIdentityProviderType(IDPType.IDP_TYPE_JWT);
       expect(result).toBe(IdentityProviderType.JWT);
@@ -213,6 +218,7 @@ describe("idp type mapping utilities", () => {
         IDPType.IDP_TYPE_SAML,
         IDPType.IDP_TYPE_OAUTH,
         IDPType.IDP_TYPE_OIDC,
+        IDPType.IDP_TYPE_LDAP,
         IDPType.IDP_TYPE_JWT,
         IDPType.IDP_TYPE_ZITADEL,
       ];
