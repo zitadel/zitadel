@@ -405,7 +405,7 @@ func prepareSessionQuery() (sq.SelectBuilder, func(*sql.Row) (*Session, string, 
 			SessionColumnUserAgentHeader.identifier(),
 			SessionColumnExpiration.identifier(),
 		).From(sessionsTable.identifier()).
-			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
+			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID) + " AND " + LoginNameIsPrimaryCol.identifier() + " = true").
 			LeftJoin(join(HumanUserIDCol, SessionColumnUserID)).
 			LeftJoin(join(UserIDCol, SessionColumnUserID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*Session, string, error) {
@@ -522,7 +522,7 @@ func prepareSessionsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Sessions, error
 			SessionColumnExpiration.identifier(),
 			countColumn.identifier(),
 		).From(sessionsTable.identifier()).
-			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
+			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID) + " AND " + LoginNameIsPrimaryCol.identifier() + " = true").
 			LeftJoin(join(HumanUserIDCol, SessionColumnUserID)).
 			LeftJoin(join(UserIDCol, SessionColumnUserID)).
 			PlaceholderFormat(sq.Dollar), func(rows *sql.Rows) (*Sessions, error) {
