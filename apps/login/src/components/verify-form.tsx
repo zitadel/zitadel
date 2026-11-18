@@ -4,6 +4,7 @@ import { Alert, AlertType } from "@/components/alert";
 import { resendVerification, sendVerification } from "@/lib/actions/verify";
 import { handleServerActionResponse } from "@/lib/client-utils";
 import { UNKNOWN_USER_ID } from "@/lib/constants";
+import { useResendCooldown } from "@/lib/use-resend-cooldown";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -12,6 +13,7 @@ import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
+import { ResendButton } from "./resend-button";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 
@@ -48,6 +50,8 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
+  // `codeSent` is set when a code was just sent before arriving here, so the initial send is covered as well
+  const resendCooldown = useResendCooldown({ startNow: codeSent });
 
   async function resendCode() {
     setError("");
@@ -57,6 +61,8 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
     if (userId === UNKNOWN_USER_ID) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setLoading(false);
+      // behave like a real send, so the cooldown does not reveal that the user is unknown
+      resendCooldown.start();
       return;
     }
 
@@ -76,6 +82,10 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
     if (response && "error" in response && response?.error) {
       setError(response.error);
       return;
+    }
+
+    if (response) {
+      resendCooldown.start();
     }
 
     // Signal success via URL search param so the "code sent" alert is shown
@@ -136,18 +146,16 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
             <span className="mr-auto flex-1 text-left">
               <Translated i18nKey="verify.noCodeReceived" namespace="verify" />
             </span>
-            <button
-              aria-label="Resend Code"
+            <ResendButton
+              namespace="verify"
+              i18nKey="verify.resendCode"
+              countdownI18nKey="verify.resendCodeIn"
+              cooldown={resendCooldown}
               disabled={loading}
-              type="button"
-              className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
               onClick={() => {
                 resendCode();
               }}
-              data-testid="resend-button"
-            >
-              <Translated i18nKey="verify.resendCode" namespace="verify" />
-            </button>
+            />
           </div>
         </Alert>
         <div className="mt-4">

@@ -86,6 +86,7 @@
       "codeSent": "Az új kódot elküldtük az e-mail címedre.",
       "noCodeReceived": "Nem kaptál kódot?",
       "resend": "Kód újraküldése",
+      "resendIn": "Kód újraküldése ({seconds} mp)",
       "submit": "Tovább",
       "labels": {
         "code": "Kód",
@@ -410,6 +411,7 @@
       "description": "Add meg az ellenőrző e-mailben kapott kódot.",
       "noCodeReceived": "Nem kaptál kódot?",
       "resendCode": "Kód újraküldése",
+      "resendCodeIn": "Kód újraküldése ({seconds} mp)",
       "codeSent": "Új kódot küldtünk az e-mail címedre.",
       "submit": "Tovább",
       "labels": {

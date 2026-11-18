@@ -86,6 +86,7 @@
       "codeSent": "Er is een nieuwe code naar uw e-mailadres verzonden.",
       "noCodeReceived": "Geen code ontvangen?",
       "resend": "Code opnieuw versturen",
+      "resendIn": "Code opnieuw versturen ({seconds}s)",
       "submit": "Verder",
       "labels": {
         "code": "Code",
@@ -410,6 +411,7 @@
       "description": "Voer de code in uit de verificatie-e-mail.",
       "noCodeReceived": "Geen code ontvangen?",
       "resendCode": "Code opnieuw versturen",
+      "resendCodeIn": "Code opnieuw versturen ({seconds}s)",
       "codeSent": "Er is zojuist een code naar jouw e-mailadres gestuurd.",
       "submit": "Doorgaan",
       "labels": {

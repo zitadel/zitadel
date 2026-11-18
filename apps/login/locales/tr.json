@@ -86,6 +86,7 @@
       "codeSent": "E-posta adresinize yeni bir kod gönderildi.",
       "noCodeReceived": "Kod almadınız mı?",
       "resend": "Kodu tekrar gönder",
+      "resendIn": "Kodu tekrar gönder ({seconds} sn)",
       "submit": "Devam",
       "labels": {
         "code": "Kod",
@@ -410,6 +411,7 @@
       "description": "Doğrulama e-postasında sağlanan Kodu girin.",
       "noCodeReceived": "Kod almadınız mı?",
       "resendCode": "Kodu tekrar gönder",
+      "resendCodeIn": "Kodu tekrar gönder ({seconds} sn)",
       "codeSent": "E-posta adresinize bir kod gönderildi.",
       "submit": "Devam",
       "labels": {

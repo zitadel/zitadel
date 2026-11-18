@@ -79,6 +79,7 @@
       "codeSent": "新しいコードがメールアドレスに送信されました。",
       "noCodeReceived": "コードが届きませんか？",
       "resend": "コードを再送信",
+      "resendIn": "コードを再送信 ({seconds}秒)",
       "submit": "続行",
       "labels": {
         "code": "コード",
@@ -403,6 +404,7 @@
       "description": "確認メールに記載されたコードを入力してください。",
       "noCodeReceived": "コードが届きませんか？",
       "resendCode": "コードを再送信",
+      "resendCodeIn": "コードを再送信 ({seconds}秒)",
       "codeSent": "確認コードをメールアドレスに送信しました。",
       "submit": "続行",
       "labels": {
