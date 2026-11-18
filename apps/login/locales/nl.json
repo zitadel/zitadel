@@ -485,6 +485,8 @@
     "failedLoading": "Gegevens laden mislukt. Probeer het opnieuw.",
     "tryagain": "Opnieuw proberen",
     "couldNotContinueSession": "Kon de sessie niet voortzetten - ontbrekende gebruikersinformatie",
-    "couldNotClearSession": "De sessie kon niet worden beëindigd. Probeer het opnieuw."
+    "couldNotClearSession": "De sessie kon niet worden beëindigd. Probeer het opnieuw.",
+    "grantRequired": "Inloggen niet mogelijk. De gebruiker heeft minimaal één roltoewijzing voor de applicatie nodig. Neem contact op met uw beheerder.",
+    "projectRequired": "Inloggen niet mogelijk. De organisatie van de gebruiker heeft een projectverlening voor dit project nodig. Neem contact op met uw beheerder."
   }
 }

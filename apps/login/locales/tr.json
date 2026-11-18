@@ -485,6 +485,8 @@
     "failedLoading": "Veri yüklenemedi. Lütfen tekrar deneyin.",
     "tryagain": "Tekrar Dene",
     "couldNotContinueSession": "Oturuma devam edilemedi - kullanıcı bilgileri eksik",
-    "couldNotClearSession": "Oturum sonlandırılamadı. Lütfen tekrar deneyin."
+    "couldNotClearSession": "Oturum sonlandırılamadı. Lütfen tekrar deneyin.",
+    "grantRequired": "Giriş mümkün değil. Kullanıcının uygulamada en az bir rol ataması olması gerekiyor. Lütfen yöneticinizle iletişime geçin.",
+    "projectRequired": "Giriş mümkün değil. Kullanıcının organizasyonunun bu proje için bir proje yetkisine sahip olması gerekiyor. Lütfen yöneticinizle iletişime geçin."
   }
 }
