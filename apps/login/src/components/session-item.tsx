@@ -92,7 +92,7 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
 
                   handleServerActionResponse(res, router, setSamlData, (e) => setError(e));
                 } catch {
-                  setError("An internal error occurred");
+                  setError(t("internalError"));
                 } finally {
                   setLoading(false);
                 }
