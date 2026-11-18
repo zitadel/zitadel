@@ -1,7 +1,10 @@
 "use server";
 
 import { completeAuthFlow } from "@/lib/server/auth-flow";
+import { createLogger } from "@/lib/server/logger";
 import { FinishFlowCommand, getNextUrl } from "@/lib/server/next-url";
+
+const logger = createLogger("flow");
 
 /**
  * Complete authentication flow or get next URL for navigation
@@ -13,7 +16,7 @@ export async function completeFlowOrGetUrl(
   command: FinishFlowCommand & { organization?: string },
   defaultRedirectUri?: string,
 ): Promise<{ redirect: string } | { error: string } | { samlData: { url: string; fields: Record<string, string> } }> {
-  console.log("completeFlowOrGetUrl called with:", command, "defaultRedirectUri:", defaultRedirectUri);
+  logger.debug("completeFlowOrGetUrl called", { command, defaultRedirectUri });
 
   // Complete OIDC/SAML flows directly with server action
   if (
@@ -21,21 +24,21 @@ export async function completeFlowOrGetUrl(
     "requestId" in command &&
     (command.requestId.startsWith("saml_") || command.requestId.startsWith("oidc_"))
   ) {
-    console.log("completeFlowOrGetUrl: OIDC/SAML flow detected");
+    logger.debug("completeFlowOrGetUrl: OIDC/SAML flow detected");
     // This completes the flow and returns a redirect URL or error
     const result = await completeAuthFlow({
       sessionId: command.sessionId,
       requestId: command.requestId,
     });
-    console.log("completeFlowOrGetUrl: got OIDC/SAML flow result");
+    logger.debug("completeFlowOrGetUrl: got OIDC/SAML flow result");
     return result;
   }
 
-  console.log("completeFlowOrGetUrl: Regular flow, getting next URL");
+  logger.debug("completeFlowOrGetUrl: Regular flow, getting next URL");
   // For all other cases, return URL for navigation
   const url = await getNextUrl(command, defaultRedirectUri);
-  console.log("completeFlowOrGetUrl: got Next URL:", url);
+  logger.debug("completeFlowOrGetUrl: got Next URL", { url });
   const result = { redirect: url };
-  console.log("completeFlowOrGetUrl: got final result");
+  logger.debug("completeFlowOrGetUrl: got final result");
   return result;
 }
