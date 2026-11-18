@@ -30,4 +30,21 @@
       </a>
     </div>
   }
+  <div>
+    <a
+      class="item card"
+      role="button"
+      tabindex="0"
+      (click)="addHttpProvider()"
+      (keydown.enter)="addHttpProvider()"
+      data-e2e="add-http-email-provider"
+    >
+      <div class="smtp-icon">
+        <mat-icon class="icon" svgIcon="mdi_api" />
+      </div>
+      <div class="text-container">
+        <span class="title">HTTP</span>
+      </div>
+    </a>
+  </div>
 </div>

@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "SMS beállítások",
-        "DESCRIPTION": "A Zitadel összes funkciójának eléréséhez konfiguráld a Twilio-t SMS üzenetek küldésére a felhasználóidnak."
+        "DESCRIPTION": "A Zitadel összes funkciójának feloldásához állítsa be a Twiliót vagy saját HTTP végpontját SMS-üzenetek küldésére a felhasználóknak."
       },
       "IAM_EVENTS": {
         "TITLE": "Események",
@@ -1606,6 +1606,25 @@
         "SETTOKEN": "Token beállítása",
         "TOKENSET": "A token sikeresen beállítva."
       }
+    },
+    "HTTPPROVIDER": {
+      "ADD_TITLE": "HTTP szolgáltató hozzáadása",
+      "EDIT_TITLE": "HTTP szolgáltató szerkesztése",
+      "EMAIL_DESCRIPTION": "SMTP helyett a Zitadel minden e-mailt aláírt JSON-kérésként küld az Ön végpontjára. Az Ön szolgáltatása állítja össze és kézbesíti az üzenetet.",
+      "SMS_DESCRIPTION": "A Zitadel minden SMS-t aláírt JSON-kérésként küld az Ön végpontjára. Az Ön szolgáltatása kézbesíti az üzenetet.",
+      "ENDPOINT": "Végpont",
+      "ENDPOINT_INVALID": "Adjon meg egy http:// vagy https:// kezdetű URL-t.",
+      "DESCRIPTION": "Leírás",
+      "SIGNINGKEY": "Aláírókulcs",
+      "SIGNINGKEY_DESCRIPTION": "Minden kérés tartalmaz egy ZITADEL-Signature fejlécet, amelyet ennek a szolgáltatónak a kulcsa ír alá. Ellenőrizze a szolgáltatásában.",
+      "SIGNINGKEY_STORE": "Másolja ki az aláírókulcsot, és tárolja biztonságosan. A szolgáltatásának szüksége van rá a ZITADEL-Signature fejléc ellenőrzéséhez.",
+      "REGENERATE_SIGNINGKEY": "Új aláírókulcs létrehozása. A jelenlegi kulcs azonnal érvényét veszti.",
+      "ADDED": "HTTP szolgáltató hozzáadva.",
+      "UPDATED": "HTTP szolgáltató frissítve.",
+      "REMOVED": "HTTP szolgáltató eltávolítva.",
+      "DELETE_TITLE": "HTTP szolgáltató törlése",
+      "DELETE_DESCRIPTION": "Egy HTTP szolgáltató törlésére készül. Erősítse meg a végpontja beírásával.",
+      "DELETE_CONFIRM": "Írja be: {{value}}, a HTTP szolgáltató törléséhez."
     },
     "SECRETS": {
       "TYPES": "Titkos típusok",

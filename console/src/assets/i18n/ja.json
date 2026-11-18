@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "SMS設定",
-        "DESCRIPTION": "Zitadelのすべての機能を解放するために、ユーザーにSMSメッセージを送信するためにTwilioを設定します。"
+        "DESCRIPTION": "Zitadel のすべての機能を利用するには、Twilio または独自の HTTP エンドポイントを設定して、ユーザーに SMS を送信できるようにしてください。"
       },
       "IAM_EVENTS": {
         "TITLE": "イベント",
@@ -1603,6 +1603,25 @@
         "SETTOKEN": "トークンを設定する",
         "TOKENSET": "トークンは正常に設定されています。"
       }
+    },
+    "HTTPPROVIDER": {
+      "ADD_TITLE": "HTTP プロバイダーを追加",
+      "EDIT_TITLE": "HTTP プロバイダーを編集",
+      "EMAIL_DESCRIPTION": "SMTP の代わりに、Zitadel は各メールを署名付き JSON リクエストとしてエンドポイントに送信します。メッセージの作成と配信はお使いのサービスが行います。",
+      "SMS_DESCRIPTION": "Zitadel は各 SMS を署名付き JSON リクエストとしてエンドポイントに送信します。メッセージの配信はお使いのサービスが行います。",
+      "ENDPOINT": "エンドポイント",
+      "ENDPOINT_INVALID": "http:// または https:// で始まる URL を入力してください。",
+      "DESCRIPTION": "説明",
+      "SIGNINGKEY": "署名キー",
+      "SIGNINGKEY_DESCRIPTION": "すべてのリクエストには、このプロバイダーのキーで署名された ZITADEL-Signature ヘッダーが含まれます。サービス側で検証してください。",
+      "SIGNINGKEY_STORE": "署名キーをコピーして安全に保管してください。ZITADEL-Signature ヘッダーの検証に必要です。",
+      "REGENERATE_SIGNINGKEY": "新しい署名キーを生成します。現在のキーはただちに無効になります。",
+      "ADDED": "HTTP プロバイダーを追加しました。",
+      "UPDATED": "HTTP プロバイダーを更新しました。",
+      "REMOVED": "HTTP プロバイダーを削除しました。",
+      "DELETE_TITLE": "HTTP プロバイダーを削除",
+      "DELETE_DESCRIPTION": "HTTP プロバイダーを削除しようとしています。エンドポイントを入力して確認してください。",
+      "DELETE_CONFIRM": "この HTTP プロバイダーを削除するには {{value}} と入力してください。"
     },
     "SECRETS": {
       "TYPES": "シークレットの種類",

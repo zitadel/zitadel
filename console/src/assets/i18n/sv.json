@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "SMS-inställningar",
-        "DESCRIPTION": "För att låsa upp alla Zitadel-funktioner, konfigurera Twilio för att skicka SMS-meddelanden till dina användare."
+        "DESCRIPTION": "För att låsa upp alla Zitadel-funktioner, konfigurera Twilio eller din egen HTTP-endpoint för att skicka sms till dina användare."
       },
       "IAM_EVENTS": {
         "TITLE": "Händelser",
@@ -1606,6 +1606,25 @@
         "SETTOKEN": "Ange token",
         "TOKENSET": "Token har angetts framgångsrikt."
       }
+    },
+    "HTTPPROVIDER": {
+      "ADD_TITLE": "Lägg till HTTP-leverantör",
+      "EDIT_TITLE": "Redigera HTTP-leverantör",
+      "EMAIL_DESCRIPTION": "I stället för SMTP skickar Zitadel varje e-post som en signerad JSON-förfrågan till din endpoint. Din tjänst skapar och levererar meddelandet.",
+      "SMS_DESCRIPTION": "Zitadel skickar varje sms som en signerad JSON-förfrågan till din endpoint. Din tjänst levererar meddelandet.",
+      "ENDPOINT": "Endpoint",
+      "ENDPOINT_INVALID": "Ange en URL som börjar med http:// eller https://.",
+      "DESCRIPTION": "Beskrivning",
+      "SIGNINGKEY": "Signeringsnyckel",
+      "SIGNINGKEY_DESCRIPTION": "Varje förfrågan har en ZITADEL-Signature-header som är signerad med den här leverantörens nyckel. Verifiera den i din tjänst.",
+      "SIGNINGKEY_STORE": "Kopiera signeringsnyckeln och förvara den säkert. Din tjänst behöver den för att verifiera ZITADEL-Signature-headern.",
+      "REGENERATE_SIGNINGKEY": "Generera en ny signeringsnyckel. Den nuvarande nyckeln slutar fungera direkt.",
+      "ADDED": "HTTP-leverantören har lagts till.",
+      "UPDATED": "HTTP-leverantören har uppdaterats.",
+      "REMOVED": "HTTP-leverantören har tagits bort.",
+      "DELETE_TITLE": "Ta bort HTTP-leverantör",
+      "DELETE_DESCRIPTION": "Du håller på att ta bort en HTTP-leverantör. Bekräfta genom att skriva dess endpoint.",
+      "DELETE_CONFIRM": "Skriv {{value}} för att ta bort den här HTTP-leverantören."
     },
     "SECRETS": {
       "TYPES": "Hemlighetstyper",

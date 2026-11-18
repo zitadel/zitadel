@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "SMS设置",
-        "DESCRIPTION": "为了解锁Zitadel的所有功能，配置Twilio向您的用户发送SMS消息。"
+        "DESCRIPTION": "要解锁 Zitadel 的全部功能，请配置 Twilio 或您自己的 HTTP 端点，以向用户发送短信。"
       },
       "IAM_EVENTS": {
         "TITLE": "事件",
@@ -1606,6 +1606,25 @@
         "SETTOKEN": "设置令牌",
         "TOKENSET": "令牌设置成功。"
       }
+    },
+    "HTTPPROVIDER": {
+      "ADD_TITLE": "添加 HTTP 提供商",
+      "EDIT_TITLE": "编辑 HTTP 提供商",
+      "EMAIL_DESCRIPTION": "Zitadel 不使用 SMTP，而是将每封邮件作为签名的 JSON 请求发送到您的端点，由您的服务生成并投递邮件。",
+      "SMS_DESCRIPTION": "Zitadel 将每条短信作为签名的 JSON 请求发送到您的端点，由您的服务投递消息。",
+      "ENDPOINT": "端点",
+      "ENDPOINT_INVALID": "请输入以 http:// 或 https:// 开头的 URL。",
+      "DESCRIPTION": "描述",
+      "SIGNINGKEY": "签名密钥",
+      "SIGNINGKEY_DESCRIPTION": "每个请求都带有使用此提供商密钥签名的 ZITADEL-Signature 头。请在您的服务中进行验证。",
+      "SIGNINGKEY_STORE": "请复制签名密钥并妥善保存。您的服务需要它来验证 ZITADEL-Signature 头。",
+      "REGENERATE_SIGNINGKEY": "生成新的签名密钥。当前密钥将立即失效。",
+      "ADDED": "已添加 HTTP 提供商。",
+      "UPDATED": "已更新 HTTP 提供商。",
+      "REMOVED": "已移除 HTTP 提供商。",
+      "DELETE_TITLE": "删除 HTTP 提供商",
+      "DELETE_DESCRIPTION": "您即将删除一个 HTTP 提供商。请输入其端点以确认。",
+      "DELETE_CONFIRM": "输入 {{value}} 以删除此 HTTP 提供商。"
     },
     "SECRETS": {
       "TYPES": "验证码类型",
