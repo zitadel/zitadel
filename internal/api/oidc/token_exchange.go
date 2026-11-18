@@ -132,14 +132,16 @@ func (s *Server) verifyExchangeToken(ctx context.Context, client *Client, token 
 		return accessToExchangeToken(token, op.IssuerFromContext(ctx)), nil
 
 	case oidc.IDTokenType:
-		verifier := op.NewIDTokenHintVerifier(op.IssuerFromContext(ctx), s.idTokenHintKeySet)
+		verifier := op.NewIDTokenHintVerifier(op.IssuerFromContext(ctx), s.idTokenHintKeySet, op.WithSupportedIDTokenHintSigningAlgorithms(
+			supportedSigningAlgs()...,
+		))
 		claims, err := op.VerifyIDTokenHint[*oidc.IDTokenClaims](ctx, token, verifier)
 		if err != nil {
 			return nil, zerrors.ThrowPermissionDenied(err, "OIDC-Rei0f", "Errors.TokenExchange.Token.Invalid")
 		}
 		resourceOwner, ok := claims.Claims[ClaimResourceOwnerID].(string)
 		if !ok || resourceOwner == "" {
-			user, err := s.query.GetUserByID(ctx, false, token)
+			user, err := s.query.GetUserByID(ctx, false, claims.Subject)
 			if err != nil {
 				return nil, zerrors.ThrowPermissionDenied(err, "OIDC-aD0Oo", "Errors.TokenExchange.Token.Invalid")
 			}
