@@ -96,6 +96,10 @@ func (p *idpUserLinkProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceIDPConfigRemoved,
 				},
 				{
+					Event:  org.IDPRemovedEventType,
+					Reduce: p.reduceIDPRemoved,
+				},
+				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: p.reduceOwnerRemoved,
 				},
@@ -107,6 +111,10 @@ func (p *idpUserLinkProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  instance.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPConfigRemoved,
+				},
+				{
+					Event:  instance.IDPRemovedEventType,
+					Reduce: p.reduceIDPRemoved,
 				},
 				{
 					Event:  instance.InstanceRemovedEventType,
@@ -260,4 +268,26 @@ func (p *idpUserLinkProjection) reduceIDPConfigRemoved(event eventstore.Event) (
 			handler.NewCond(IDPUserLinkInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
+}
+
+func (p *idpUserLinkProjection) reduceIDPRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var conditions []handler.Condition
+
+	switch e := event.(type) {
+	case *org.IDPRemovedEvent:
+		conditions = []handler.Condition{
+			handler.NewCond(IDPUserLinkIDPIDCol, e.ID),
+			handler.NewCond(IDPUserLinkResourceOwnerCol, event.Aggregate().ResourceOwner),
+			handler.NewCond(IDPUserLinkInstanceIDCol, event.Aggregate().InstanceID),
+		}
+	case *instance.IDPRemovedEvent:
+		conditions = []handler.Condition{
+			handler.NewCond(IDPUserLinkIDPIDCol, e.ID),
+			handler.NewCond(IDPUserLinkInstanceIDCol, event.Aggregate().InstanceID),
+		}
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qR7xz", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPRemovedEventType, instance.IDPRemovedEventType})
+	}
+
+	return handler.NewDeleteStatement(event, conditions), nil
 }
