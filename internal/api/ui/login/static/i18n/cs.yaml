@@ -536,5 +536,6 @@ Errors:
       RegistrationNotAllowed: Registrace není povolena
   DeviceAuth:
     NotExisting: Kód uživatelského zařízení neexistuje
+    NotFound: Žádost o autorizaci zařízení neexistuje
 
 optional: (volitelné)
