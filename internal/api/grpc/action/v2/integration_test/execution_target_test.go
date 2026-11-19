@@ -904,8 +904,11 @@ func contextInfoForUserOIDC(instance *integration.Instance, function string, cli
 			PrimaryDomain: instance.DefaultOrg.GetPrimaryDomain(),
 		},
 		UserGrants: nil,
-		Actor:      actor,
-		Response:   nil,
+		Request: &oidc_api.ContextInfoRequest{
+			Scope: []string{oidc.ScopeOpenID},
+		},
+		Actor:    actor,
+		Response: nil,
 	}
 }
 
