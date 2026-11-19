@@ -3,6 +3,7 @@
 package management_test
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -11,9 +12,14 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/internal/integration/sink"
+	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
+	internal_permission_v2 "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object"
 	"github.com/zitadel/zitadel/pkg/grpc/settings"
+	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func TestServer_ActivateOrgEmailProvider(t *testing.T) {
@@ -403,4 +409,81 @@ func TestServer_OrgEmailProvider_PermissionDenied(t *testing.T) {
 		Id: "some-id",
 	})
 	require.Error(t, err)
+}
+
+// TestServer_OrgEmailProvider_InstanceMemberUsesInstanceProvider proves that the mails of a user
+// with an instance membership are delivered through the instance provider, even though
+// the organization of the user has an active email provider.
+// The active org provider is an external address that is not the sink, so a mail that is routed
+// through it never reaches the sink and the test fails.
+func TestServer_OrgEmailProvider_InstanceMemberUsesInstanceProvider(t *testing.T) {
+	// an own instance, because activating an instance provider replaces the one the other tests use
+	instance := integration.NewInstance(CTX)
+	iamOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	orgOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner)
+
+	enabled := true
+	integration.EnsureInstanceFeature(t, CTX, instance,
+		&feature.SetInstanceFeaturesRequest{OrgEmailProviders: &enabled},
+		func(tt *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+			assert.True(tt, got.GetOrgEmailProviders().GetEnabled())
+		},
+	)
+
+	// the instance provider delivers to the sink
+	instanceProvider, err := instance.Client.Admin.AddEmailProviderHTTP(iamOwnerCTX, &admin_pb.AddEmailProviderHTTPRequest{
+		Endpoint:    sink.CallURL(sink.ChannelEmail),
+		Description: "instance provider of the instance member test",
+	})
+	require.NoError(t, err)
+	_, err = instance.Client.Admin.ActivateEmailProvider(iamOwnerCTX, &admin_pb.ActivateEmailProviderRequest{Id: instanceProvider.GetId()})
+	require.NoError(t, err)
+
+	// the organization has its own active provider, which never reaches the sink
+	orgProvider, err := instance.Client.Mgmt.AddOrgEmailProviderHTTP(orgOwnerCTX, &mgmt_pb.AddOrgEmailProviderHTTPRequest{
+		Endpoint:    "https://relay.example.com/email",
+		Description: "org provider of the instance member test",
+	})
+	require.NoError(t, err)
+	_, err = instance.Client.Mgmt.ActivateOrgEmailProvider(orgOwnerCTX, &mgmt_pb.ActivateOrgEmailProviderRequest{Id: orgProvider.GetId()})
+	require.NoError(t, err)
+
+	// a user of that organization, who is also a member of the instance
+	email := integration.Email()
+	member := instance.CreateHumanUserVerified(iamOwnerCTX, instance.DefaultOrg.GetId(), email, integration.Phone())
+	_, err = instance.Client.InternalPermissionV2.CreateAdministrator(iamOwnerCTX, &internal_permission_v2.CreateAdministratorRequest{
+		UserId: member.GetUserId(),
+		Resource: &internal_permission_v2.ResourceType{
+			Resource: &internal_permission_v2.ResourceType_Instance{Instance: true},
+		},
+		Roles: []string{"IAM_OWNER"},
+	})
+	require.NoError(t, err)
+
+	sub := sink.Subscribe(CTX, sink.ChannelEmail)
+	defer sub.Close()
+
+	_, err = instance.Client.UserV2.PasswordReset(iamOwnerCTX, &user_v2.PasswordResetRequest{
+		UserId: member.GetUserId(),
+		Medium: &user_v2.PasswordResetRequest_SendLink{
+			SendLink: &user_v2.SendPasswordResetLink{
+				NotificationType: user_v2.NotificationType_NOTIFICATION_TYPE_Email,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	timeout, _ := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	deadline := time.After(timeout)
+	for {
+		select {
+		case req, ok := <-sub.Recv():
+			require.True(t, ok, "subscription closed before the mail arrived at the instance provider")
+			if strings.Contains(string(req.Body), email) {
+				return
+			}
+		case <-deadline:
+			t.Fatal("the password reset mail of the instance member did not arrive at the instance provider")
+		}
+	}
 }

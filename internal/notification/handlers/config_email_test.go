@@ -447,3 +447,104 @@ func TestNotificationQueries_GetActiveEmailConfig_OrgFallback(t *testing.T) {
 		assert.False(t, zerrors.IsNotFound(err))
 	})
 }
+
+func TestNotificationQueries_GetActiveEmailConfig_InstanceMember(t *testing.T) {
+	const instId = "instance-1"
+	const orgId = "org-1"
+	const userId = "user-1"
+
+	instanceSMTPConfig := &query.SMTPConfig{
+		ID:          "instance-smtp",
+		Description: "instance SMTP",
+		SMTPConfig: &query.SMTP{
+			Host:          "instance-mail.com",
+			SenderAddress: "noreply@instance.com",
+			SenderName:    "Instance",
+		},
+	}
+	orgSMTPConfig := &query.SMTPConfig{
+		ID:          "org-smtp",
+		Description: "org SMTP",
+		SMTPConfig: &query.SMTP{
+			Host:          "org-mail.com",
+			SenderAddress: "noreply@org.com",
+			SenderName:    "Org",
+		},
+	}
+	// the lookup must be limited to the recipient (user ID) and to instance memberships
+	userAndInstanceMembershipQuery := gomock.Cond(func(q *query.MembershipSearchQuery) bool {
+		return len(q.Queries) == 2
+	})
+	instanceMember := &query.Memberships{Memberships: []*query.Membership{{UserID: userId}}}
+
+	// the org provider is never looked up for an instance member,
+	// so the mock has no expectation for OrgSMTPConfigActive and fails the test if it is called.
+	for _, fallbackToInstance := range []bool{true, false} {
+		name := "instance member with an active org provider → uses instance SMTP"
+		if !fallbackToInstance {
+			name += ", fallback disabled"
+		}
+		t.Run(name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			ctx := authz.NewMockContext(instId, orgId, userId, authz.WithMockFeatures(feature.Features{OrgEmailProviders: true}))
+			queryMock := mock.NewMockQueries(ctrl)
+			queryMock.EXPECT().InstanceByID(gomock.Any(), instId).Return(authz.GetInstance(ctx), nil)
+			queryMock.EXPECT().Memberships(gomock.Any(), userAndInstanceMembershipQuery, false).Return(instanceMember, nil)
+			queryMock.EXPECT().SMTPConfigActive(gomock.Any(), instId).Return(instanceSMTPConfig, nil)
+
+			nq := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext", uint16(443), true, "", nil, nil, nil, nil, nil, fallbackToInstance)
+			cfg, err := nq.GetActiveEmailConfig(ctx, orgId, userId)
+			require.NoError(t, err)
+			assert.Equal(t, "instance-smtp", cfg.ProviderConfig.ID)
+		})
+	}
+
+	t.Run("membership query error propagates, no provider is resolved", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		ctx := authz.NewMockContext(instId, orgId, userId, authz.WithMockFeatures(feature.Features{OrgEmailProviders: true}))
+		queryMock := mock.NewMockQueries(ctrl)
+		queryMock.EXPECT().InstanceByID(gomock.Any(), instId).Return(authz.GetInstance(ctx), nil)
+		queryMock.EXPECT().Memberships(gomock.Any(), gomock.Any(), false).Return(nil, zerrors.ThrowInternal(nil, "QUERY-test", "db failure"))
+
+		nq := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext", uint16(443), true, "", nil, nil, nil, nil, nil, true)
+		cfg, err := nq.GetActiveEmailConfig(ctx, orgId, userId)
+		require.Error(t, err)
+		assert.Nil(t, cfg)
+		assert.False(t, zerrors.IsNotFound(err))
+	})
+
+	t.Run("empty user ID is refused, no provider is resolved", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		ctx := authz.NewMockContext(instId, orgId, userId, authz.WithMockFeatures(feature.Features{OrgEmailProviders: true}))
+		queryMock := mock.NewMockQueries(ctrl)
+		queryMock.EXPECT().InstanceByID(gomock.Any(), instId).Return(authz.GetInstance(ctx), nil)
+
+		nq := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext", uint16(443), true, "", nil, nil, nil, nil, nil, true)
+		cfg, err := nq.GetActiveEmailConfig(ctx, orgId, "")
+		require.Error(t, err)
+		assert.Nil(t, cfg)
+		assert.True(t, zerrors.IsErrorInvalidArgument(err))
+	})
+
+	t.Run("no instance membership → still uses the org provider", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		ctx := authz.NewMockContext(instId, orgId, userId, authz.WithMockFeatures(feature.Features{OrgEmailProviders: true}))
+		queryMock := mock.NewMockQueries(ctrl)
+		queryMock.EXPECT().InstanceByID(gomock.Any(), instId).Return(authz.GetInstance(ctx), nil)
+		queryMock.EXPECT().Memberships(gomock.Any(), gomock.Any(), false).Return(&query.Memberships{}, nil)
+		queryMock.EXPECT().OrgSMTPConfigActive(gomock.Any(), orgId).Return(orgSMTPConfig, nil)
+
+		nq := NewNotificationQueries(queryMock, &eventstore.Eventstore{}, "ext", uint16(443), true, "", nil, nil, nil, nil, nil, true)
+		cfg, err := nq.GetActiveEmailConfig(ctx, orgId, userId)
+		require.NoError(t, err)
+		assert.Equal(t, "org-smtp", cfg.ProviderConfig.ID)
+	})
+}
