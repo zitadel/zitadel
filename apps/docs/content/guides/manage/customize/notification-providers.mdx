@@ -41,6 +41,12 @@ Email providers that are configured for an organization are restricted, because 
 
 These restrictions do not apply to the email providers of the instance, which are managed by instance administrators.
 
+Emails to users with an instance membership (any `IAM_*` role) are always sent through the email provider of the instance, whatever the organization configures.
+This is checked for every delivery and cannot be turned off, so the owner of an organization never receives password resets, one-time passwords or verification links of an instance administrator.
+
+Before you enable the feature `org_email_providers`, add the internal address ranges of your network to `HTTPClient.DenyList`, IPv6 ranges included.
+The default deny list cannot know your network. Internal services often have global IPv6 addresses, which the default list does not cover.
+
 ## Webhook / HTTP provider
 
 Webhook (HTTP Provider) allows you to fully customize the messages and use integrate with any provider or custom solution to deliver the messages to users.

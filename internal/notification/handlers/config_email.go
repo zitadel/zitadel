@@ -20,10 +20,21 @@ import (
 // SMTP (backward compatibility). When orgID is set but org has no config,
 // behavior depends on OrgSMTPFallbackToInstance: if true, falls back to
 // instance-level; if false, returns an error.
-func (n *NotificationQueries) GetActiveEmailConfig(ctx context.Context, orgID string) (*email.Config, error) {
+// Mails to users with an instance membership (IAM_* roles) always use the
+// instance-level SMTP, checked on every delivery. No setting overrides this,
+// so an organization can never receive the mails of an instance administrator.
+// userID is the recipient and is required whenever orgID is set.
+func (n *NotificationQueries) GetActiveEmailConfig(ctx context.Context, orgID, userID string) (*email.Config, error) {
 	orgProviders, err := n.orgEmailProvidersEnabled(ctx, orgID)
 	if err != nil {
 		return nil, err
+	}
+	if orgProviders {
+		instanceMember, err := n.hasInstanceMembership(ctx, userID)
+		if err != nil {
+			return nil, err
+		}
+		orgProviders = !instanceMember
 	}
 	if orgProviders {
 		config, err := n.OrgSMTPConfigActive(ctx, orgID)
@@ -61,6 +72,31 @@ func (n *NotificationQueries) orgEmailConfig(config *query.SMTPConfig) (*email.C
 		}
 	}
 	return emailConfig, nil
+}
+
+// hasInstanceMembership returns true if the user is a member of the instance (any IAM_* role).
+// The memberships are read for every delivery and never cached, so a granted membership
+// takes effect as soon as the member projection has caught up.
+func (n *NotificationQueries) hasInstanceMembership(ctx context.Context, userID string) (bool, error) {
+	if userID == "" {
+		return false, zerrors.ThrowInvalidArgument(nil, "NOTIF-Ek3Wq", "Errors.User.UserIDMissing")
+	}
+	userQuery, err := query.NewMembershipUserIDQuery(userID)
+	if err != nil {
+		return false, err
+	}
+	instanceQuery, err := query.NewMembershipIsIAMQuery()
+	if err != nil {
+		return false, err
+	}
+	memberships, err := n.Memberships(ctx, &query.MembershipSearchQuery{
+		SearchRequest: query.SearchRequest{Limit: 1},
+		Queries:       []query.SearchQuery{userQuery, instanceQuery},
+	}, false)
+	if err != nil {
+		return false, err
+	}
+	return len(memberships.Memberships) > 0, nil
 }
 
 // orgEmailProvidersEnabled returns true if the org email providers must be considered for the given org.

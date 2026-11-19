@@ -1954,7 +1954,7 @@ type notificationChannels struct {
 	SMSConfig   *sms.Config
 }
 
-func (c *notificationChannels) Email(_ context.Context, _ string) (*senders.Chain, *email.Config, error) {
+func (c *notificationChannels) Email(_ context.Context, _, _ string) (*senders.Chain, *email.Config, error) {
 	return &c.Chain, c.EmailConfig, nil
 }
 

@@ -29,6 +29,7 @@ type Queries interface {
 	SMSProviderConfigActive(ctx context.Context, resourceOwner string) (config *query.SMSConfig, err error)
 	SMTPConfigActive(ctx context.Context, resourceOwner string) (*query.SMTPConfig, error)
 	OrgSMTPConfigActive(ctx context.Context, orgID string) (*query.SMTPConfig, error)
+	Memberships(ctx context.Context, queries *query.MembershipSearchQuery, shouldTrigger bool) (*query.Memberships, error)
 	GetDefaultLanguage(ctx context.Context) language.Tag
 	GetInstanceRestrictions(ctx context.Context) (restrictions query.Restrictions, err error)
 	InstanceByID(ctx context.Context, id string) (instance authz.Instance, err error)
