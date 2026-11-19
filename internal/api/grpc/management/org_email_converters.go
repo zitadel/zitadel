@@ -69,11 +69,12 @@ func orgEmailProviderToPb(config *query.SMTPConfig) settings_pb.EmailConfig {
 	return nil
 }
 
+// orgHttpToPb never returns the signing key: it is only handed out in the
+// responses of adding and updating a provider, never on reads.
 func orgHttpToPb(http *query.HTTP) *settings_pb.EmailProvider_Http {
 	return &settings_pb.EmailProvider_Http{
 		Http: &settings_pb.EmailProviderHTTP{
-			Endpoint:   http.Endpoint,
-			SigningKey: http.SigningKey,
+			Endpoint: http.Endpoint,
 		},
 	}
 }

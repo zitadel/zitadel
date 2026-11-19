@@ -136,8 +136,7 @@ func Test_orgEmailProvidersToPb(t *testing.T) {
 					Description: "http provider",
 					Config: &settings_pb.EmailProvider_Http{
 						Http: &settings_pb.EmailProviderHTTP{
-							Endpoint:   "https://email.example.com",
-							SigningKey: "key123",
+							Endpoint: "https://email.example.com",
 						},
 					},
 				},
@@ -230,8 +229,7 @@ func Test_orgEmailProviderToProviderPb(t *testing.T) {
 				Description: "description",
 				Config: &settings_pb.EmailProvider_Http{
 					Http: &settings_pb.EmailProviderHTTP{
-						Endpoint:   "endpoint",
-						SigningKey: "key",
+						Endpoint: "endpoint",
 					},
 				},
 			},
@@ -299,8 +297,7 @@ func Test_orgHttpToPb(t *testing.T) {
 			},
 			res: &settings_pb.EmailProvider_Http{
 				Http: &settings_pb.EmailProviderHTTP{
-					Endpoint:   "endpoint",
-					SigningKey: "key",
+					Endpoint: "endpoint",
 				},
 			},
 		},
