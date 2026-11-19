@@ -14,7 +14,14 @@ export async function setup() {
   const user = await createHuman('gigi', org, adminTokens.accessToken!);
   console.info(`setup: user (${user.userId}) created`);
 
-  return { org, tokens: loginByUsernamePassword({ loginName: user.loginNames[0], password: 'Password1!' } as User) };
+  // The measured call needs the user's token, but only the admin may remove the org. Tearing
+  // down with the user's token failed with `membership not found (AUTHZ-cdgFk)` and leaked the
+  // org on every run.
+  return {
+    org,
+    adminTokens,
+    tokens: loginByUsernamePassword({ loginName: user.loginNames[0], password: 'Password1!' } as User),
+  };
 }
 
 export default function (data: any) {
@@ -22,6 +29,6 @@ export default function (data: any) {
 }
 
 export function teardown(data: any) {
-  removeOrg(data.org, data.tokens.accessToken);
+  removeOrg(data.org, data.adminTokens.accessToken);
   console.info('teardown: org removed');
 }
