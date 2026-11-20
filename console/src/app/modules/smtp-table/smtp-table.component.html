@@ -38,6 +38,16 @@
         <th mat-header-cell *matHeaderCellDef>{{ 'SETTING.SMTP.DESCRIPTION' | translate }}</th>
         <td [ngClass]="{ pointer: config.senderAddress }" mat-cell *matCellDef="let config">
           <span>{{ config?.description }}</span>
+          @if (isRestricted(config.id)) {
+            <i
+              class="smtp-restricted cnsl-secondary-text las la-info-circle"
+              role="img"
+              tabindex="0"
+              [attr.aria-label]="'SMTP.RESTRICTIONS.ROW_TOOLTIP' | translate"
+              matTooltip="{{ 'SMTP.RESTRICTIONS.ROW_TOOLTIP' | translate }}"
+              data-e2e="restricted-provider"
+            ></i>
+          }
         </td>
       </ng-container>
 
