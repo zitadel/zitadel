@@ -68,6 +68,9 @@ export function idpTypeToIdentityProviderType(idpType: IDPType): IdentityProvide
     case IDPType.IDP_TYPE_OIDC:
       return IdentityProviderType.OIDC;
 
+    case IDPType.IDP_TYPE_LDAP:
+      return IdentityProviderType.LDAP;
+
     case IDPType.IDP_TYPE_JWT:
       return IdentityProviderType.JWT;
 
