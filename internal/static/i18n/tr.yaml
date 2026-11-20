@@ -656,6 +656,8 @@ EventTypes:
     removed: "Hedef silindi"
   user:
     added: "Kullanıcı eklendi"
+    notification:
+      rejected: "Bildirim reddedildi"
     selfregistered: "Kullanıcı kendini kaydetti"
     initialization:
       code:

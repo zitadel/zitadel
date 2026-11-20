@@ -10,6 +10,7 @@ import (
 
 	"github.com/riverqueue/river"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
@@ -1922,6 +1923,9 @@ type fields struct {
 	es             *eventstore.Eventstore
 	userDataCrypto crypto.EncryptionAlgorithm
 	SMSTokenCrypto crypto.EncryptionAlgorithm
+	smtpRules      smtp.Rules
+	// sentEmails is the amount of emails already sent through the provider
+	sentEmails uint64
 }
 type fieldsWorker struct {
 	queries        *mock.MockQueries
@@ -1931,6 +1935,9 @@ type fieldsWorker struct {
 	SMSTokenCrypto crypto.EncryptionAlgorithm
 	now            nowFunc
 	backOff        func(current time.Duration) time.Duration
+	smtpRules      smtp.Rules
+	// sentEmails is the amount of emails already sent through the provider
+	sentEmails uint64
 }
 type args struct {
 	event eventstore.Event
@@ -1979,6 +1986,8 @@ type notificationChannels struct {
 	emailConfig *email.Config
 	SMSConfig   *sms.Config
 	SMTPRules   smtp.Rules
+	// sentEmails is the amount of emails already sent through the provider
+	sentEmails uint64
 }
 
 func (c *notificationChannels) EmailConfig(context.Context) (*email.Config, error) {
@@ -1999,6 +2008,10 @@ func (c *notificationChannels) Webhook(context.Context, webhook.Config) (*sender
 
 func (c *notificationChannels) SecurityTokenEvent(context.Context, set.Config) (*senders.Chain, error) {
 	return &c.Chain, nil
+}
+
+func (c *notificationChannels) SentEmails(context.Context, string, time.Time, uint64) (uint64, error) {
+	return c.sentEmails, nil
 }
 
 func (c *notificationChannels) SMTPRule(ctx context.Context, config *smtp.Config, orgID string) smtp.Rule {
@@ -2034,6 +2047,15 @@ func expectTemplateWithNotifyUserQueries(queries *mock.MockQueries, template str
 		VerifiedPhone:      verifiedPhone,
 	}, nil)
 	expectTemplateQueries(queries, template)
+}
+
+// limitRules limits the emails sent through the provider to 10 per day.
+func limitRules(t *testing.T) smtp.Rules {
+	rules, err := smtp.CompileRules([]smtp.RuleConfig{{RuleOptions: smtp.RuleOptions{
+		Limit: &smtp.RuleLimit{Count: 10, Window: smtp.RuleDuration(24 * time.Hour)},
+	}}})
+	require.NoError(t, err)
+	return rules
 }
 
 func expectTemplateWithNotifyUserQueriesSMS(queries *mock.MockQueries) {

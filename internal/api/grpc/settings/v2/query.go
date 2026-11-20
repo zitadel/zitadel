@@ -190,11 +190,16 @@ func (s *Server) GetGeneralSettings(ctx context.Context, _ *connect.Request[sett
 	if len(allowedLanguages) == 0 {
 		allowedLanguages = i18n.SupportedLanguages()
 	}
+	restrictions, err := s.emailProviderRestrictions(ctx)
+	if err != nil {
+		return nil, err
+	}
 	return connect.NewResponse(&settings.GetGeneralSettingsResponse{
-		SupportedLanguages: domain.LanguagesToStrings(i18n.SupportedLanguages()),
-		DefaultOrgId:       instance.DefaultOrganisationID(),
-		DefaultLanguage:    instance.DefaultLanguage().String(),
-		AllowedLanguages:   domain.LanguagesToStrings(allowedLanguages),
+		SupportedLanguages:        domain.LanguagesToStrings(i18n.SupportedLanguages()),
+		DefaultOrgId:              instance.DefaultOrganisationID(),
+		DefaultLanguage:           instance.DefaultLanguage().String(),
+		AllowedLanguages:          domain.LanguagesToStrings(allowedLanguages),
+		EmailProviderRestrictions: restrictions,
 	}), nil
 }
 
