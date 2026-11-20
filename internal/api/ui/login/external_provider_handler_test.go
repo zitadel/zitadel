@@ -1,18 +1,84 @@
 package login
 
 import (
+	"errors"
+	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 
+	http_util "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/query"
 	provideridp "github.com/zitadel/zitadel/internal/repository/idp"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
+
+// deniedIssuerError returns the error of a generic OIDC provider,
+// whose issuer is blocked by the deny list of the HTTP client.
+// The address is rejected before a connection is opened.
+func deniedIssuerError(t *testing.T) error {
+	t.Helper()
+
+	client := (&http_util.ClientConfig{
+		MaxBodySize:  1 << 20,
+		Timeout:      5 * time.Second,
+		MaxRedirects: 1,
+		DenyList:     []denylist.AddressChecker{denylist.NewHostChecker("127.0.0.0/8")},
+	}).NewClient()
+	_, err := openid.New("denied", "https://127.0.0.1:9999", "clientID", "clientSecret", "https://example.com/callback", nil, openid.DefaultMapper, client)
+	require.Error(t, err)
+
+	var addressDeniedErr *denylist.AddressDeniedError
+	require.ErrorAs(t, err, &addressDeniedErr)
+	return err
+}
+
+// Regression test for https://github.com/zitadel/zitadel/issues/12554:
+// the error of a request blocked by the deny list must be rendered and not panic.
+func TestLogin_getErrorMessage_addressDenied(t *testing.T) {
+	err := deniedIssuerError(t)
+	r := httptest.NewRequest("GET", "/login/externalidp", nil)
+
+	t.Run("idp error without local authentication", func(t *testing.T) {
+		errID, errMsg, popup := new(Login).getErrorMessage(r, err)
+		assert.Empty(t, errID)
+		assert.Equal(t, err.Error(), errMsg)
+		assert.False(t, popup)
+	})
+	t.Run("idp error with passwordless fallback", func(t *testing.T) {
+		assert.False(t, errors.Is(err, &IdPError{}))
+		assert.True(t, errors.Is(WrapIdPError(err), &IdPError{}))
+	})
+}
+
+func TestIdPError(t *testing.T) {
+	parent := zerrors.ThrowInternal(nil, "ID", "message")
+
+	t.Run("zero value does not unwrap to a typed nil", func(t *testing.T) {
+		assert.NoError(t, new(IdPError).Unwrap())
+	})
+	t.Run("wrapped error is kept in the chain", func(t *testing.T) {
+		err := WrapIdPError(parent)
+		assert.ErrorIs(t, err, new(IdPError))
+		assert.ErrorIs(t, err, parent)
+
+		zErr := new(zerrors.ZitadelError)
+		require.ErrorAs(t, err, &zErr)
+		assert.Equal(t, "ID", zErr.ID)
+		assert.Equal(t, "Errors.User.ExternalIDP.LoginFailedSwitchLocal", zErr.Message)
+	})
+	t.Run("other errors are no idp errors", func(t *testing.T) {
+		assert.NotErrorIs(t, parent, new(IdPError))
+	})
+}
 
 // Test_mapExternalNotFoundOptionFormDataToLoginUser is a regression test for
 // GHSA-738m-7888-jfv8. The "external account not found" page lets a user edit
