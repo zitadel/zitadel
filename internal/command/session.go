@@ -42,7 +42,7 @@ type SessionCommands struct {
 	getCodeVerifier      func(ctx context.Context, id string) (senders.CodeGenerator, error)
 	now                  func() time.Time
 	maxIdPIntentLifetime time.Duration
-	tarpit               func(failedAttempts uint64)
+	tarpit               func(ctx context.Context, failedAttempts uint64)
 	getLoginPolicy       func(ctx context.Context, orgID string) (*domain.LoginPolicy, error)
 }
 
@@ -86,7 +86,7 @@ func CheckPassword(password string) SessionCommand {
 		if err != nil {
 			return nil, err
 		}
-		var tarpit func(failedAttempts uint64)
+		var tarpit func(ctx context.Context, failedAttempts uint64)
 		if !loginPolicy.IgnoreUnknownUsernames {
 			tarpit = cmd.tarpit
 		}
