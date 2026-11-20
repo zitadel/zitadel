@@ -263,6 +263,34 @@ If an account is locked, the administrator has to unlock it in the ZITADEL Manag
 
 <img src="/docs/img/guides/console/lockout.png" alt="Lockout" width="600px" />
 
+### Response delay after failed attempts
+
+In addition to the lockout, ZITADEL delays the response of a failed check (tarpit) to slow down brute-force attacks.
+The delay grows with the number of failed attempts of the user, counted separately for the password and each OTP method.
+The count is reset by a successful check of the same method or an unlock, and for the password also by a password change.
+With the default configuration, there's no delay for the first 9 failed attempts, then 1 second is added for every 5 further failed attempts, up to 10 seconds:
+
+| Failed attempts | Delay        |
+| --------------- | ------------ |
+| 1–9             | none         |
+| 10–14           | 1 second     |
+| 30–34           | 5 seconds    |
+| 55 and more     | 10 seconds   |
+
+The delay applies to failed:
+
+- password checks of the [Session API](/guides/integrate/login-ui/username-password) and the hosted login
+- TOTP, SMS and email code checks of the [Session API](/guides/integrate/login-ui/mfa) and the hosted login
+- password changes with the current password, e.g. [Set Password](/reference/api/user/zitadel.user.v2.UserService.SetPassword) or [Update User](/reference/api/user/zitadel.user.v2.UserService.UpdateUser) with the current password
+
+The delay is independent of the lockout settings: if the Maximum Password Attempts or Maximum OTP Attempts are set to 0, the user isn't locked, but the delay continues to grow up to its maximum.
+
+In the hosted login v1 and the event-based Session API, enabling [Ignore unknown usernames](#login-behavior-and-security) disables the delay for failed login password checks, so the response time doesn't reveal whether a user exists.
+This exception does not apply to checks of the current password during password changes, which remain subject to the delay.
+
+The delay is a system-wide setting and can't be changed per instance or organization.
+Self-hosted installations can configure it in the [runtime configuration](/self-hosting/manage/production#tarpit-for-failed-checks).
+
 ## Domain settings
 
 ### Add Organization Domain as suffix to loginnames
