@@ -467,6 +467,7 @@
       "title": "{appName} möchte eine Verbindung herstellen:",
       "disclaimer": "Durch Klicken auf Zulassen erlauben Sie {appName} und Zitadel, Ihre Informationen gemäß ihren jeweiligen Nutzungsbedingungen und Datenschutzrichtlinien zu verwenden. Sie können diesen Zugriff jederzeit widerrufen.",
       "description": "{appName} hat Zugriff auf:",
+      "usercode": "Auf Ihrem Gerät angezeigter Code:",
       "submit": "Zulassen",
       "deny": "Ablehnen"
     },

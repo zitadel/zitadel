@@ -467,6 +467,7 @@
       "title": "{appName} bağlanmak istiyor",
       "description": "{appName} şunlara erişim sahibi olacak:",
       "disclaimer": "İzin Ver'e tıklayarak, {appName} ve Zitadel'in bilgilerinizi kendi hizmet şartları ve gizlilik politikalarına uygun olarak kullanmasına izin vermiş olursunuz. Bu erişimi istediğiniz zaman iptal edebilirsiniz.",
+      "usercode": "Cihazınızda görüntülenen kod:",
       "submit": "İzin Ver",
       "deny": "Reddet"
     },

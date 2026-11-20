@@ -465,6 +465,7 @@
         "title": "{appName} möchte eine Verbindung herstellen:",
         "description": "{appName} hat Zugriff auf:",
         "disclaimer": "Durch Klicken auf Zulassen erlauben Sie {appName} und Zitadel, Ihre Informationen gemäß ihren jeweiligen Nutzungsbedingungen und Datenschutzrichtlinien zu verwenden. Sie können diesen Zugriff jederzeit widerrufen.",
+        "usercode": "Auf Ihrem Gerät angezeigter Code:",
         "submit": "Zulassen",
         "deny": "Ablehnen"
       },
@@ -951,6 +952,7 @@
         "title": "{appName} would like to connect",
         "description": "{appName} will have access to:",
         "disclaimer": "By clicking Allow, you allow {appName} and Zitadel to use your information in accordance with their respective terms of service and privacy policies. You can revoke this access at any time.",
+        "usercode": "Code displayed on your device:",
         "submit": "Allow",
         "deny": "Deny"
       },
@@ -1437,6 +1439,7 @@
         "title": "{appName} desea conectarse:",
         "description": "{appName} tendrá acceso a:",
         "disclaimer": "Al hacer clic en Permitir, autorizas a {appName} y a Zitadel a usar tu información de acuerdo con sus respectivos términos de servicio y políticas de privacidad. Puedes revocar este acceso en cualquier momento.",
+        "usercode": "Código mostrado en tu dispositivo:",
         "submit": "Permitir",
         "deny": "Denegar"
       },
@@ -1923,6 +1926,7 @@
         "title": "{appName} desidera connettersi:",
         "description": "{appName} avrà accesso a:",
         "disclaimer": "Cliccando su Consenti, autorizzi {appName} e Zitadel a utilizzare le tue informazioni in conformità con i rispettivi termini di servizio e politiche sulla privacy. Puoi revocare questo accesso in qualsiasi momento.",
+        "usercode": "Codice visualizzato sul tuo dispositivo:",
         "submit": "Consenti",
         "deny": "Nega"
       },
@@ -2409,6 +2413,7 @@
         "title": "{appName} wil verbinding maken",
         "description": "{appName} krijgt toegang tot:",
         "disclaimer": "Door op Toestaan te klikken geeft u {appName} en Zitadel toestemming om jouw informatie te gebruiken overeenkomstig hun respectieve servicevoorwaarden en privacybeleid. U kunt deze toegang op elk moment intrekken.",
+        "usercode": "Code die op jouw apparaat wordt weergegeven:",
         "submit": "Toestaan",
         "deny": "Weigeren"
       },
@@ -2895,6 +2900,7 @@
         "title": "{appName} chce się połączyć:",
         "description": "{appName} będzie miało dostęp do:",
         "disclaimer": "Klikając Zezwól, pozwalasz tej aplikacji i Zitadel na korzystanie z Twoich informacji zgodnie z ich odpowiednimi warunkami użytkowania i politykami prywatności. Możesz cofnąć ten dostęp w dowolnym momencie.",
+        "usercode": "Kod wyświetlony na Twoim urządzeniu:",
         "submit": "Zezwól",
         "deny": "Odmów"
       },
@@ -3381,6 +3387,7 @@
         "title": "{appName} хочет подключиться:",
         "description": "{appName} получит доступ к:",
         "disclaimer": "Нажимая «Разрешить», вы разрешаете этому приложению и Zitadel использовать вашу информацию в соответствии с их условиями использования и политиками конфиденциальности. Вы можете отозвать этот доступ в любое время.",
+        "usercode": "Код, отображаемый на вашем устройстве:",
         "submit": "Разрешить",
         "deny": "Запретить"
       },
@@ -3867,6 +3874,7 @@
         "title": "{appName} 想要连接：",
         "description": "{appName} 将访问：",
         "disclaimer": "点击“允许”即表示您允许此应用程序和 Zitadel 根据其各自的服务条款和隐私政策使用您的信息。您可以随时撤销此访问权限。",
+        "usercode": "您设备上显示的代码：",
         "submit": "允许",
         "deny": "拒绝"
       },
@@ -4353,6 +4361,7 @@
         "title": "{appName} bağlanmak istiyor",
         "description": "{appName} şunlara erişim sahibi olacak:",
         "disclaimer": "İzin Ver'e tıklayarak, {appName} ve Zitadel'in bilgilerinizi kendi hizmet şartları ve gizlilik politikalarına uygun olarak kullanmasına izin vermiş olursunuz. Bu erişimi istediğiniz zaman iptal edebilirsiniz.",
+        "usercode": "Cihazınızda görüntülenen kod:",
         "submit": "İzin Ver",
         "deny": "Reddet"
       },
@@ -4839,6 +4848,7 @@
         "title": "{appName} хоче підключитися",
         "description": "{appName} матиме доступ до:",
         "disclaimer": "Натискаючи Дозволити, ви дозволяєте {appName} та Zitadel використовувати вашу інформацію відповідно до їхніх умов надання послуг та політик конфіденційності. Ви можете скасувати цей доступ у будь-який час.",
+        "usercode": "Код, показаний на вашому пристрої:",
         "submit": "Дозволити",
         "deny": "Відхилити"
       },
@@ -5325,6 +5335,7 @@
         "title": "{appName} يود الاتصال",
         "description": "{appName} سيكون لديه حق الوصول إلى:",
         "disclaimer": "بالنقر فوق سماح، فإنك تسمح لـ {appName} و Zitadel استخدام معلوماتك وفقاً لشروط الخدمة وسياسات الخصوصية الخاصة بكل منهما. يمكنك إلغاء هذا الوصول في أي وقت.",
+        "usercode": "الرمز المعروض على جهازك:",
         "submit": "سماح",
         "deny": "رفض"
       },
@@ -5811,6 +5822,7 @@
         "title": "A(z) {appName} kapcsolódni szeretne",
         "description": "A(z) {appName} hozzáférést kap a következőkhöz:",
         "disclaimer": "Az Engedélyezés gombra kattintva engedélyezed, hogy a(z) {appName} és a Zitadel a saját felhasználási feltételeik és adatvédelmi irányelveik szerint használja az adataidat. Ezt a hozzáférést bármikor visszavonhatod.",
+        "usercode": "Az eszközödön megjelenő kód:",
         "submit": "Engedélyezés",
         "deny": "Elutasítás"
       },
@@ -6297,6 +6309,7 @@
         "title": "{appName} souhaite se connecter",
         "description": "{appName} aura accès à :",
         "disclaimer": "En cliquant sur Autoriser, vous permettez à {appName} et à Zitadel d'utiliser vos informations conformément à leurs conditions d'utilisation et politiques de confidentialité respectives. Vous pouvez révoquer cet accès à tout moment.",
+        "usercode": "Code affiché sur votre appareil :",
         "submit": "Autoriser",
         "deny": "Refuser"
       },
@@ -6783,6 +6796,7 @@
         "title": "{appName}が接続を要求しています",
         "description": "{appName}は以下にアクセスします：",
         "disclaimer": "「許可」をクリックすることで、{appName}とZitadelがそれぞれの利用規約およびプライバシーポリシーに従ってあなたの情報を使用することを許可します。このアクセスはいつでも取り消すことができます。",
+        "usercode": "デバイスに表示されているコード：",
         "submit": "許可",
         "deny": "拒否"
       },
@@ -7269,6 +7283,7 @@
         "title": "{appName} deseja se conectar",
         "description": "{appName} terá acesso a:",
         "disclaimer": "Ao clicar em Permitir, você autoriza {appName} e Zitadel a usar suas informações de acordo com seus respectivos termos de serviço e políticas de privacidade. Você pode revogar este acesso a qualquer momento.",
+        "usercode": "Código exibido no seu dispositivo:",
         "submit": "Permitir",
         "deny": "Negar"
       },

@@ -467,6 +467,7 @@
       "title": "{appName} chce się połączyć:",
       "description": "{appName} będzie miało dostęp do:",
       "disclaimer": "Klikając Zezwól, pozwalasz tej aplikacji i Zitadel na korzystanie z Twoich informacji zgodnie z ich odpowiednimi warunkami użytkowania i politykami prywatności. Możesz cofnąć ten dostęp w dowolnym momencie.",
+      "usercode": "Kod wyświetlony na Twoim urządzeniu:",
       "submit": "Zezwól",
       "deny": "Odmów"
     },
