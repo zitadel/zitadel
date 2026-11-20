@@ -72,6 +72,11 @@ func (c *Commands) sendInviteCode(ctx context.Context, invite *CreateUserInvite,
 	if invite.URLTemplate == "" {
 		invite.URLTemplate = wm.URLTemplate
 	}
+	// If neither the request nor a previous code defines a URL template, the default of the login is used.
+	// It is empty for the login v1, so the notification falls back to the link of the login v1.
+	if invite.URLTemplate == "" && !invite.ReturnCode {
+		invite.URLTemplate = c.loginPaths.DefaultInviteCodeURLTemplate(ctx)
+	}
 	if invite.ApplicationName == "" {
 		invite.ApplicationName = wm.ApplicationName
 	}
