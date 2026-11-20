@@ -348,7 +348,7 @@ describe("sendPassword", () => {
 
     const verifyHelper = await import("@/lib/server/verify-helper");
     vi.mocked(verifyHelper.checkPasswordChangeRequired).mockReturnValue(undefined);
-    vi.mocked(verifyHelper.checkEmailVerification).mockReturnValue(undefined);
+    vi.mocked(verifyHelper.checkEmailVerification).mockResolvedValue(undefined);
     vi.mocked(verifyHelper.checkMFAFactors).mockResolvedValue(undefined);
 
     mockHeaders.mockResolvedValue({});

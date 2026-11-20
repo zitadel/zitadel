@@ -66,7 +66,7 @@ describe("verifyApiCredentials", () => {
   });
 
   test("returns skipped when ZITADEL_API_URL is not set", async () => {
-    delete process.env.ZITADEL_API_URL;
+    Reflect.deleteProperty(process.env, "ZITADEL_API_URL");
 
     await expect(verifyApiCredentials()).resolves.toBe("skipped");
 
@@ -74,7 +74,7 @@ describe("verifyApiCredentials", () => {
   });
 
   test("returns missing when no credentials are configured", async () => {
-    delete process.env.ZITADEL_SERVICE_USER_TOKEN;
+    Reflect.deleteProperty(process.env, "ZITADEL_SERVICE_USER_TOKEN");
 
     await expect(verifyApiCredentials()).resolves.toBe("missing");
 
