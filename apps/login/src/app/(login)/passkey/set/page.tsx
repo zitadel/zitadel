@@ -85,6 +85,8 @@ export default async function Page(props: { searchParams: Promise<Record<string 
         {session && !showCodeUser ? (
           <UserAvatar
             loginName={loginName ?? session.factors?.user?.loginName}
+            organizationId={session.factors?.user?.organizationId}
+            hideLoginNameSuffix={branding?.hideLoginNameSuffix}
             displayName={session.factors?.user?.displayName}
             showDropdown
             searchParams={searchParams}
@@ -92,6 +94,8 @@ export default async function Page(props: { searchParams: Promise<Record<string 
         ) : user ? (
           <UserAvatar
             loginName={user?.preferredLoginName}
+            organizationId={user?.details?.resourceOwner}
+            hideLoginNameSuffix={branding?.hideLoginNameSuffix}
             displayName={displayName}
             showDropdown
             searchParams={searchParams}

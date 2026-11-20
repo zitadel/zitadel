@@ -32,7 +32,18 @@ export function isSessionPrimaryFactorAndLifetimeValid(session: Partial<Session>
   return { valid, verifiedAt };
 }
 
-export function SessionItem({ session, reload, requestId }: { session: Session; reload: () => void; requestId?: string }) {
+export function SessionItem({
+  session,
+  reload,
+  requestId,
+  shownLoginName,
+}: {
+  session: Session;
+  reload: () => void;
+  requestId?: string;
+  // The login name to display; the session's own login name is still the one used to sign in.
+  shownLoginName?: string;
+}) {
   const currentLocale = useLocale();
   moment.locale(currentLocale === "zh" ? "zh-cn" : currentLocale);
   const t = useTranslations("error");
@@ -110,7 +121,7 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
 
             <div className="flex flex-col items-start overflow-hidden">
               <span className="">{session.factors?.user?.displayName}</span>
-              <span className="text-xs text-ellipsis opacity-80">{session.factors?.user?.loginName}</span>
+              <span className="text-xs text-ellipsis opacity-80">{shownLoginName ?? session.factors?.user?.loginName}</span>
               {valid ? (
                 <span className="text-xs text-ellipsis opacity-80">
                   <Translated i18nKey="verified" namespace="accounts" />{" "}

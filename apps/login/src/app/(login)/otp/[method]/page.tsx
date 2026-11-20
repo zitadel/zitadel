@@ -84,6 +84,8 @@ export default async function Page(props: {
         {session && (
           <UserAvatar
             loginName={loginName ?? session.factors?.user?.loginName}
+            organizationId={session.factors?.user?.organizationId}
+            hideLoginNameSuffix={branding?.hideLoginNameSuffix}
             displayName={session.factors?.user?.displayName}
             showDropdown
             searchParams={searchParams}

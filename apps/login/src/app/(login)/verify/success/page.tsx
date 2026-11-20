@@ -65,13 +65,21 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         {sessionFactors ? (
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
+            organizationId={sessionFactors.factors?.user?.organizationId}
+            hideLoginNameSuffix={branding?.hideLoginNameSuffix}
             displayName={sessionFactors.factors?.user?.displayName}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
         ) : (
           user && (
-            <UserAvatar loginName={user.preferredLoginName} displayName={human?.profile?.displayName} showDropdown={false} />
+            <UserAvatar
+              loginName={user.preferredLoginName}
+              displayName={human?.profile?.displayName}
+              showDropdown={false}
+              organizationId={user.details?.resourceOwner}
+              hideLoginNameSuffix={branding?.hideLoginNameSuffix}
+            />
           )
         )}
       </div>
