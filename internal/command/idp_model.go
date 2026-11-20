@@ -1689,6 +1689,12 @@ func (wm *AppleIDPWriteModel) reduceChangedEvent(e *idp.AppleIDPChangedEvent) {
 	if e.ClientID != nil {
 		wm.ClientID = *e.ClientID
 	}
+	if e.TeamID != nil {
+		wm.TeamID = *e.TeamID
+	}
+	if e.KeyID != nil {
+		wm.KeyID = *e.KeyID
+	}
 	if e.PrivateKey != nil {
 		wm.PrivateKey = e.PrivateKey
 	}
