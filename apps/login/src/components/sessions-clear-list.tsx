@@ -26,16 +26,20 @@ export function SessionsClearList({ sessions, logoutHint, postLogoutRedirectUri,
   const clearHintedSession = useCallback(async () => {
     console.log("Clearing session for login hint:", logoutHint);
     // If a login hint is provided, we logout that specific session
-    const sessionIdToBeCleared = sessions.find((session) => {
-      return session.factors?.user?.loginName === logoutHint;
-    })?.id;
+    // clear ALL sessions of the hinted user, not only the first one: a remaining session would still carry
+    // previously verified factors (e.g. TOTP) and could be reused to complete a later login.
+    const sessionIdsToBeCleared = sessions
+      .filter((session) => session.factors?.user?.loginName?.toLowerCase() === logoutHint?.toLowerCase())
+      .map((session) => session.id);
 
-    if (sessionIdToBeCleared) {
+    if (sessionIdsToBeCleared.length) {
       let clearError: string | undefined;
       try {
-        const clearSessionResponse = await clearSession({ sessionId: sessionIdToBeCleared });
-        if (clearSessionResponse && "error" in clearSessionResponse) {
-          clearError = clearSessionResponse.error;
+        for (const sessionId of sessionIdsToBeCleared) {
+          const clearSessionResponse = await clearSession({ sessionId });
+          if (clearSessionResponse && "error" in clearSessionResponse) {
+            clearError = clearSessionResponse.error;
+          }
         }
       } catch (error) {
         console.error("Error clearing session:", error);
