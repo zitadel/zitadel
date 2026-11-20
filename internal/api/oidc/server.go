@@ -134,7 +134,27 @@ func (s *Server) VerifyAuthRequest(ctx context.Context, r *op.Request[oidc.AuthR
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	return s.LegacyServer.VerifyAuthRequest(ctx, r)
+	clientRequest, err := s.LegacyServer.VerifyAuthRequest(ctx, r)
+	if err != nil {
+		return nil, err
+	}
+	if err = validatePKCEAuthRequest(clientRequest.Client, clientRequest.Data); err != nil {
+		return nil, err
+	}
+	return clientRequest, nil
+}
+
+func validatePKCEAuthRequest(client op.Client, request *oidc.AuthRequest) error {
+	if client.AuthMethod() != oidc.AuthMethodNone || request.ResponseType != oidc.ResponseTypeCode {
+		return nil
+	}
+	if request.CodeChallenge == "" {
+		return oidc.ErrInvalidRequest().WithDescription("code_challenge required")
+	}
+	if request.CodeChallengeMethod != oidc.CodeChallengeMethodS256 {
+		return oidc.ErrInvalidRequest().WithDescription("code_challenge_method must be S256")
+	}
+	return nil
 }
 
 func (s *Server) Authorize(ctx context.Context, r *op.ClientRequest[oidc.AuthRequest]) (_ *op.Redirect, err error) {

@@ -72,10 +72,8 @@ func (s *Server) codeExchangeV1(ctx context.Context, client *Client, req *oidc.A
 		return nil, oidc.ErrInvalidGrant().WithDescription("user changed after the code was issued")
 	}
 
-	if challenge := authReq.GetCodeChallenge(); challenge != nil || client.AuthMethod() == oidc.AuthMethodNone {
-		if err = op.AuthorizeCodeChallenge(req.CodeVerifier, challenge); err != nil {
-			return nil, err
-		}
+	if err = validatePKCECodeExchange(client.AuthMethod(), req.CodeVerifier, authReq.GetCodeChallenge()); err != nil {
+		return nil, err
 	}
 	if req.RedirectURI != authReq.GetRedirectURI() {
 		return nil, oidc.ErrInvalidGrant().WithDescription("redirect_uri does not correspond")
@@ -134,11 +132,8 @@ func codeExchangeComplianceChecker(client *Client, req *oidc.AccessTokenRequest)
 		if authReq.ClientID != client.client.ClientID {
 			return oidc.ErrInvalidClient().WithDescription("client_id does not correspond to the client_id in the authorization request")
 		}
-		if authReq.CodeChallenge != nil || client.AuthMethod() == oidc.AuthMethodNone {
-			err := op.AuthorizeCodeChallenge(req.CodeVerifier, CodeChallengeToOIDC(authReq.CodeChallenge))
-			if err != nil {
-				return err
-			}
+		if err := validatePKCECodeExchange(client.AuthMethod(), req.CodeVerifier, CodeChallengeToOIDC(authReq.CodeChallenge)); err != nil {
+			return err
 		}
 		if req.RedirectURI != authReq.RedirectURI {
 			return oidc.ErrInvalidGrant().WithDescription("redirect_uri does not correspond")
@@ -148,4 +143,14 @@ func codeExchangeComplianceChecker(client *Client, req *oidc.AccessTokenRequest)
 		}
 		return nil
 	}
+}
+
+func validatePKCECodeExchange(authMethod oidc.AuthMethod, codeVerifier string, challenge *oidc.CodeChallenge) error {
+	if challenge == nil && authMethod != oidc.AuthMethodNone {
+		return nil
+	}
+	if authMethod == oidc.AuthMethodNone && codeVerifier == "" {
+		return oidc.ErrInvalidRequest().WithDescription("code_verifier required")
+	}
+	return op.AuthorizeCodeChallenge(codeVerifier, challenge)
 }
