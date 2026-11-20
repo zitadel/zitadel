@@ -52,22 +52,21 @@ export default getRequestConfig(async () => {
 
   const i18nOrganization = _headers.get("x-zitadel-i18n-organization") || ""; // You may need to set this header in middleware
 
-  let translations: JsonObject | Record<string, never> = {};
-  try {
-    const i18nJSON = await getHostedLoginTranslation({
-      serviceConfig,
-      locale,
-      organization: i18nOrganization,
-    });
-
-    if (i18nJSON) {
-      translations = i18nJSON;
+  // a failing level must not take the page down, the remaining messages still render
+  const loadCustomMessages = async (organization?: string): Promise<JsonObject | undefined> => {
+    try {
+      return await getHostedLoginTranslation({ serviceConfig, locale, organization });
+    } catch (error) {
+      console.warn("Error fetching custom translations:", error);
+      return undefined;
     }
-  } catch (error) {
-    console.warn("Error fetching custom translations:", error);
-  }
+  };
 
-  const customMessages = translations;
+  // each level is loaded on its own, an organization request does not include the instance customizations
+  const [instanceMessages, organizationMessages] = await Promise.all([
+    loadCustomMessages(),
+    i18nOrganization ? loadCustomMessages(i18nOrganization) : undefined,
+  ]);
 
   // Load locale messages, fall back to default language messages if locale not found
   let localeMessages;
@@ -85,6 +84,10 @@ export default getRequestConfig(async () => {
 
   return {
     locale,
-    messages: mergeMessages(fallbackMessages, localeMessages, customMessages) as Record<string, string>,
+    // later sources win: local files are the defaults, then the instance, then the organization
+    messages: mergeMessages(fallbackMessages, localeMessages, instanceMessages, organizationMessages) as Record<
+      string,
+      string
+    >,
   };
 });

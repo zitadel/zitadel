@@ -25,9 +25,12 @@
   "loginname": {
     "title": "Bentornato!",
     "description": "Inserisci i tuoi dati di accesso.",
-    "register": "Registrati come nuovo utente",
+    "noAccountYet": "Non hai ancora un account?",
+    "register": "Crea un account",
+    "passkey": "Accedi con una passkey",
     "submit": "Continua",
     "labels": {
+      "email": "E-mail",
       "loginname": "Nome di accesso",
       "username": "Nome utente",
       "usernameOrPhoneNumber": "Nome utente o numero di telefono",

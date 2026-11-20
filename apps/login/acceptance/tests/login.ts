@@ -1,6 +1,6 @@
 import { expect, Page } from "@playwright/test";
 import { code, otpFromSink } from "./code";
-import { loginname } from "./loginname";
+import { loginnameScreen } from "./loginname-screen";
 import { password } from "./password";
 import { totp } from "./zitadel";
 
@@ -10,13 +10,14 @@ export async function startLogin(page: Page) {
 
 export async function loginWithPassword(page: Page, username: string, pw: string) {
   await startLogin(page);
-  await loginname(page, username);
+  await loginnameScreen(page, username);
   await password(page, pw);
 }
 
 export async function loginWithPasskey(page: Page, authenticatorId: string, username: string) {
   await startLogin(page);
-  await loginname(page, username);
+  await loginnameScreen(page, username);
+  await page.getByTestId("passkey-button").click();
   // await passkey(page, authenticatorId);
 }
 

@@ -25,9 +25,12 @@
   "loginname": {
     "title": "Willkommen zurück!",
     "description": "Geben Sie Ihre Anmeldedaten ein.",
-    "register": "Neuen Benutzer registrieren",
+    "noAccountYet": "Haben Sie noch kein Konto?",
+    "register": "Konto erstellen",
+    "passkey": "Mit einem Passkey anmelden",
     "submit": "Weiter",
     "labels": {
+      "email": "E-Mail",
       "loginname": "Loginname",
       "username": "Benutzername",
       "usernameOrPhoneNumber": "Benutzername oder Telefonnummer",

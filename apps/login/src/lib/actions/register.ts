@@ -6,7 +6,6 @@ import { isIdpFlowProofValid } from "@/lib/server/idp-flow-proof";
 import { createLogger } from "@/lib/server/logger";
 import { getServiceConfig } from "@/lib/server/service-url";
 import { createSessionAndUpdateCookie, createSessionForIdpAndUpdateCookie } from "@/lib/server/session-cookie";
-import { setUserVerificationCheckCookie } from "@/lib/server/verification-check";
 import { checkEmailVerification, checkMFAFactors } from "@/lib/server/verify-helper";
 import {
   addHumanUser,
@@ -18,7 +17,7 @@ import {
 } from "@/lib/server/zitadel";
 import { Code, ConnectError, Duration, create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { Checks, ChecksJson, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
@@ -57,7 +56,7 @@ type RegisterUserCommand = {
   email: string;
   firstName: string;
   lastName: string;
-  password?: string;
+  password: string;
   organization: string;
   requestId?: string;
 };
@@ -71,21 +70,28 @@ export async function registerUser(
   command: RegisterUserCommand,
 ): Promise<{ error: string } | { redirect: string } | { samlData: { url: string; fields: Record<string, string> } }> {
   const t = await getTranslations("register");
+  // the login settings messages are only translated in the loginname namespace
+  const tLoginname = await getTranslations("loginname");
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
   const loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
 
   if (!loginSettings) {
-    return { error: t("errors.couldNotGetLoginSettings") };
+    return { error: tLoginname("errors.couldNotGetLoginSettings") };
   }
 
   if (!loginSettings.allowRegister) {
-    return { error: t("errors.registerNotAllowed") };
+    return { error: t("disabled.description") };
   }
 
-  if (command.password && !loginSettings.allowLocalAuthentication) {
-    return { error: t("errors.localAuthenticationNotAllowed") };
+  if (!loginSettings.allowLocalAuthentication) {
+    return { error: tLoginname("errors.localAuthenticationNotAllowed") };
+  }
+
+  // registration always sets a password, other methods are added after the first sign in
+  if (!command.password) {
+    return { error: t("password.required.password") };
   }
 
   const addResponse = await addHumanUser({
@@ -93,7 +99,7 @@ export async function registerUser(
     email: command.email,
     firstName: command.firstName,
     lastName: command.lastName,
-    password: command.password ? command.password : undefined,
+    password: command.password,
     organization: command.organization,
   }).catch((error) => {
     logger.error("Failed to create user", { error });
@@ -104,23 +110,15 @@ export async function registerUser(
     return { error: t("errors.couldNotCreateUser") };
   }
 
-  let checkPayload: any = {
+  const checks = create(ChecksSchema, {
     user: { search: { case: "userId", value: addResponse.userId } },
-  };
-
-  if (command.password) {
-    checkPayload = {
-      ...checkPayload,
-      password: { password: command.password },
-    } as ChecksJson;
-  }
-
-  const checks = create(ChecksSchema, checkPayload);
+    password: { password: command.password },
+  });
 
   const result = await createSessionWithRetry({
     checks,
     requestId: command.requestId,
-    lifetime: command.password ? loginSettings?.passwordCheckLifetime : undefined,
+    lifetime: loginSettings.passwordCheckLifetime,
   }).catch((error) => {
     logger.error("Failed to create session after user creation", { error });
     return null;
@@ -132,58 +130,41 @@ export async function registerUser(
     return { error: t("errors.couldNotCreateSession") };
   }
 
-  if (!command.password) {
-    const params = new URLSearchParams({
-      loginName: session.factors.user.loginName,
-      organization: session.factors.user.organizationId,
-    });
+  const userResponse = await getUserByID({ serviceConfig, userId: session?.factors?.user?.id }).catch((error) => {
+    logger.error("Failed to get user after session creation", { error });
+    return null;
+  });
 
-    if (command.requestId) {
-      params.append("requestId", command.requestId);
-    }
-
-    // Set verification cookie for users registering with passkey (no password)
-    // This allows them to proceed with passkey registration without additional verification
-    await setUserVerificationCheckCookie(session.factors.user.id);
-
-    return { redirect: "/passkey/set?" + params };
-  } else {
-    const userResponse = await getUserByID({ serviceConfig, userId: session?.factors?.user?.id }).catch((error) => {
-      logger.error("Failed to get user after session creation", { error });
-      return null;
-    });
-
-    if (!userResponse?.user) {
-      return { error: t("errors.userNotFound") };
-    }
-
-    const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
-
-    const emailVerificationCheck = await checkEmailVerification(
-      session,
-      humanUser,
-      session.factors.user.organizationId,
-      command.requestId,
-    );
-
-    if (emailVerificationCheck?.redirect) {
-      return emailVerificationCheck;
-    }
-
-    return completeFlowOrGetUrl(
-      command.requestId && session.id
-        ? {
-            sessionId: session.id,
-            requestId: command.requestId,
-            organization: session.factors.user.organizationId,
-          }
-        : {
-            loginName: session.factors.user.loginName,
-            organization: session.factors.user.organizationId,
-          },
-      loginSettings?.defaultRedirectUri,
-    );
+  if (!userResponse?.user) {
+    return { error: t("errors.userNotFound") };
   }
+
+  const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
+
+  const emailVerificationCheck = await checkEmailVerification(
+    session,
+    humanUser,
+    session.factors.user.organizationId,
+    command.requestId,
+  );
+
+  if (emailVerificationCheck?.redirect) {
+    return emailVerificationCheck;
+  }
+
+  return completeFlowOrGetUrl(
+    command.requestId && session.id
+      ? {
+          sessionId: session.id,
+          requestId: command.requestId,
+          organization: session.factors.user.organizationId,
+        }
+      : {
+          loginName: session.factors.user.loginName,
+          organization: session.factors.user.organizationId,
+        },
+    loginSettings?.defaultRedirectUri,
+  );
 }
 
 type RegisterUserAndLinkToIDPommand = {
@@ -210,6 +191,8 @@ export async function registerUserAndLinkToIDP(
   command: RegisterUserAndLinkToIDPommand,
 ): Promise<{ error: string } | { redirect: string } | { samlData: { url: string; fields: Record<string, string> } }> {
   const t = await getTranslations("register");
+  // the login settings messages are only translated in the loginname namespace
+  const tLoginname = await getTranslations("loginname");
 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
@@ -217,11 +200,11 @@ export async function registerUserAndLinkToIDP(
   const loginSettings = await getLoginSettings({ serviceConfig, organization: command.organization });
 
   if (!loginSettings) {
-    return { error: t("errors.couldNotGetLoginSettings") };
+    return { error: tLoginname("errors.couldNotGetLoginSettings") };
   }
 
   if (!loginSettings.allowRegister) {
-    return { error: t("errors.registerNotAllowed") };
+    return { error: t("disabled.description") };
   }
 
   // the intent must belong to an IdP flow started in this browser (login CSRF)

@@ -525,6 +525,35 @@ describe("sendPassword", () => {
     });
   });
 
+  test("should report the failed attempts when the password is rejected while creating the session", async () => {
+    const { getTranslations } = await import("next-intl/server");
+    const { CredentialsCheckErrorSchema } = await import("@zitadel/proto/zitadel/message_pb");
+    const t = vi.fn((key: string, values?: Record<string, unknown>) =>
+      values ? `${key} ${values.failedAttempts}/${values.maxPasswordAttempts}` : key,
+    );
+    vi.mocked(getTranslations).mockReturnValueOnce(t as any);
+
+    mockGetSessionCookieByLoginName.mockResolvedValue(null);
+    mockSearchUsers.mockResolvedValue({
+      result: [{ userId: "user123", type: { case: "human", value: {} }, state: 1 }],
+    });
+    mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: false, allowLocalAuthentication: true });
+    mockGetLockoutSettings.mockResolvedValue({ maxPasswordAttempts: BigInt(5) });
+    // the API rejects a wrong password with the attempt count in the error details
+    mockCreateSessionAndUpdateCookie.mockRejectedValue(
+      new ConnectError("Errors.User.Password.Invalid", Code.InvalidArgument, undefined, [
+        { desc: CredentialsCheckErrorSchema, value: { failedAttempts: 2 } },
+      ]),
+    );
+
+    const result = await sendPassword({
+      loginName: "user@example.com",
+      checks: { password: { password: "wrong" } } as any,
+    });
+
+    expect(result).toEqual({ error: "errors.failedToAuthenticate 2/5" });
+  });
+
   test("should forward only the password check when updating an existing session", async () => {
     const { create } = await import("@zitadel/client");
     vi.mocked(create).mockImplementation((_schema: any, value: any) => value);

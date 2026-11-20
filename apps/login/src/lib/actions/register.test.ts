@@ -1,4 +1,4 @@
-import { registerUserAndLinkToIDP } from "@/lib/actions/register";
+import { registerUser, registerUserAndLinkToIDP } from "@/lib/actions/register";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 vi.mock("@/lib/server/zitadel", () => ({
@@ -112,5 +112,98 @@ describe("registerUserAndLinkToIDP", () => {
     expect(res).toEqual({ error: "errors.couldNotLinkIDP" });
     expect(zitadel.addHumanUser).not.toHaveBeenCalled();
     expect(zitadel.addIDPLink).not.toHaveBeenCalled();
+  });
+});
+
+describe("registerUser", () => {
+  let zitadel: any;
+  let cookieHelpers: any;
+  let verifyHelper: any;
+  let flow: any;
+
+  const registration = {
+    email: "jane@example.com",
+    firstName: "Jane",
+    lastName: "Doe",
+    password: "Password1!",
+    organization: "org-1",
+  };
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    zitadel = vi.mocked(await import("@/lib/server/zitadel"));
+    cookieHelpers = vi.mocked(await import("@/lib/server/session-cookie"));
+    verifyHelper = vi.mocked(await import("@/lib/server/verify-helper"));
+    flow = vi.mocked(await import("@/lib/actions/flow"));
+
+    zitadel.getLoginSettings.mockResolvedValue({
+      allowRegister: true,
+      allowLocalAuthentication: true,
+      passwordCheckLifetime: { seconds: BigInt(864000), nanos: 0 },
+    });
+    zitadel.addHumanUser.mockResolvedValue({ userId: "new-user" });
+    zitadel.getUserByID.mockResolvedValue({ user: { type: { case: "human", value: {} } } });
+    cookieHelpers.createSessionAndUpdateCookie.mockResolvedValue({
+      session: {
+        id: "session-1",
+        factors: { user: { id: "new-user", loginName: "jane@example.com", organizationId: "org-1" } },
+      },
+    });
+    verifyHelper.checkEmailVerification.mockResolvedValue(undefined);
+    flow.completeFlowOrGetUrl.mockResolvedValue({ redirect: "/signedin?loginName=jane%40example.com" });
+  });
+
+  test("creates the user with the password and signs in with a password check", async () => {
+    const res = await registerUser({ ...registration, requestId: "oidc_1" });
+
+    expect(zitadel.addHumanUser).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: "jane@example.com",
+        firstName: "Jane",
+        lastName: "Doe",
+        password: "Password1!",
+        organization: "org-1",
+      }),
+    );
+    const sessionCommand = cookieHelpers.createSessionAndUpdateCookie.mock.calls[0][0];
+    expect(sessionCommand.checks.user.search).toEqual({ case: "userId", value: "new-user" });
+    expect(sessionCommand.checks.password.password).toBe("Password1!");
+    expect(sessionCommand.lifetime).toEqual({ seconds: BigInt(864000), nanos: 0 });
+    expect(sessionCommand.requestId).toBe("oidc_1");
+    expect(res).toEqual({ redirect: "/signedin?loginName=jane%40example.com" });
+  });
+
+  test("creates no user without a password", async () => {
+    const res = await registerUser({ ...registration, password: "" });
+
+    expect(res).toEqual({ error: "password.required.password" });
+    expect(zitadel.addHumanUser).not.toHaveBeenCalled();
+  });
+
+  test("creates no user when the registration is disabled", async () => {
+    zitadel.getLoginSettings.mockResolvedValue({ allowRegister: false, allowLocalAuthentication: true });
+
+    const res = await registerUser(registration);
+
+    expect(res).toEqual({ error: "disabled.description" });
+    expect(zitadel.addHumanUser).not.toHaveBeenCalled();
+  });
+
+  test("creates no user when passwords are not allowed", async () => {
+    zitadel.getLoginSettings.mockResolvedValue({ allowRegister: true, allowLocalAuthentication: false });
+
+    const res = await registerUser(registration);
+
+    expect(res).toEqual({ error: "errors.localAuthenticationNotAllowed" });
+    expect(zitadel.addHumanUser).not.toHaveBeenCalled();
+  });
+
+  test("continues with the email verification when it is required", async () => {
+    verifyHelper.checkEmailVerification.mockResolvedValue({ redirect: "/verify?loginName=jane%40example.com" });
+
+    const res = await registerUser(registration);
+
+    expect(res).toEqual({ redirect: "/verify?loginName=jane%40example.com" });
+    expect(flow.completeFlowOrGetUrl).not.toHaveBeenCalled();
   });
 });

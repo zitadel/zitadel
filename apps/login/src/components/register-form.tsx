@@ -1,84 +1,85 @@
 "use client";
 
+import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from "@/helpers/validators";
 import { registerUser } from "@/lib/actions/register";
 import { handleServerActionResponse } from "@/lib/client-utils";
 import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
-import { LoginSettings, PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FieldValues, useForm } from "react-hook-form";
-import { Alert, AlertType } from "./alert";
-import { AuthenticationMethod, AuthenticationMethodRadio, methods } from "./authentication-method-radio";
+import { useForm } from "react-hook-form";
+import { Alert } from "./alert";
 import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
+import { PasswordComplexity } from "./password-complexity";
 import { PrivacyPolicyCheckboxes } from "./privacy-policy-checkboxes";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 
-type Inputs =
-  | {
-      firstname: string;
-      lastname: string;
-      email: string;
-    }
-  | FieldValues;
+type Inputs = {
+  firstname: string;
+  lastname: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
 
 type Props = {
   legal: LegalAndSupportSettings;
+  passwordComplexitySettings: PasswordComplexitySettings;
   firstname?: string;
   lastname?: string;
   email?: string;
   organization: string;
   requestId?: string;
-  loginSettings?: LoginSettings;
-  idpCount: number;
 };
 
 export function RegisterForm({
   legal,
+  passwordComplexitySettings,
   email,
   firstname,
   lastname,
   organization,
   requestId,
-  loginSettings,
-  idpCount = 0,
 }: Props) {
-  const { register, handleSubmit, formState } = useForm<Inputs>({
+  const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onChange",
     defaultValues: {
       email: email ?? "",
       firstname: firstname ?? "",
       lastname: lastname ?? "",
+      password: "",
+      confirmPassword: "",
     },
   });
 
   const t = useTranslations("register");
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [selected, setSelected] = useState<AuthenticationMethod>(methods[0]);
   const [error, setError] = useState<string>("");
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
+  const [tosAndPolicyAccepted, setTosAndPolicyAccepted] = useState(false);
 
   const router = useRouter();
 
-  async function submitAndRegister(values: Inputs) {
+  async function submitRegister(values: Inputs) {
+    setError("");
     setLoading(true);
     try {
       const response = await registerUser({
         email: values.email,
         firstName: values.firstname,
         lastName: values.lastname,
-        organization: organization,
-        requestId: requestId,
+        password: values.password,
+        organization,
+        requestId,
       });
 
       handleServerActionResponse(response, router, setSamlData, setError);
-
-      return response;
     } catch {
       setError(t("errors.couldNotRegisterUser"));
     } finally {
@@ -86,32 +87,23 @@ export function RegisterForm({
     }
   }
 
-  async function submitAndContinue(value: Inputs, withPassword: boolean = false) {
-    const registerParams: any = value;
-
-    if (organization) {
-      registerParams.organization = organization;
-    }
-
-    if (requestId) {
-      registerParams.requestId = requestId;
-    }
-
-    // redirect user to /register/password if password is chosen
-    if (withPassword) {
-      return router.push(`/register/password?` + new URLSearchParams(registerParams));
-    } else {
-      return submitAndRegister(value);
-    }
-  }
-
   const { errors } = formState;
 
-  const [tosAndPolicyAccepted, setTosAndPolicyAccepted] = useState(false);
+  const watchPassword = watch("password", "");
+  const watchConfirmPassword = watch("confirmPassword", "");
 
-  // Check if legal acceptance is required
+  const policyIsValid =
+    watchPassword.length >= passwordComplexitySettings.minLength &&
+    (!passwordComplexitySettings.requiresLowercase || lowerCaseValidator(watchPassword)) &&
+    (!passwordComplexitySettings.requiresNumber || numberValidator(watchPassword)) &&
+    (!passwordComplexitySettings.requiresUppercase || upperCaseValidator(watchPassword)) &&
+    (!passwordComplexitySettings.requiresSymbol || symbolValidator(watchPassword));
+
+  const passwordsMatch = !!watchPassword && watchPassword === watchConfirmPassword;
+
   const isLegalAcceptanceRequired = !!(legal?.tosLink || legal?.privacyPolicyLink);
-  const canSubmit = formState.isValid && (!isLegalAcceptanceRequired || tosAndPolicyAccepted);
+  const canSubmit =
+    formState.isValid && policyIsValid && passwordsMatch && (!isLegalAcceptanceRequired || tosAndPolicyAccepted);
 
   return (
     <>
@@ -120,24 +112,24 @@ export function RegisterForm({
         <div className="mb-4 grid grid-cols-2 gap-4">
           <div className="">
             <TextInput
-              type="firstname"
-              autoComplete="firstname"
+              type="text"
+              autoComplete="given-name"
               autoFocus
               required
               {...register("firstname", { required: t("required.firstname") })}
               label={t("labels.firstname")}
-              error={errors.firstname?.message as string}
+              error={errors.firstname?.message}
               data-testid="firstname-text-input"
             />
           </div>
           <div className="">
             <TextInput
-              type="lastname"
-              autoComplete="lastname"
+              type="text"
+              autoComplete="family-name"
               required
               {...register("lastname", { required: t("required.lastname") })}
               label={t("labels.lastname")}
-              error={errors.lastname?.message as string}
+              error={errors.lastname?.message}
               data-testid="lastname-text-input"
             />
           </div>
@@ -148,38 +140,44 @@ export function RegisterForm({
               required
               {...register("email", { required: t("required.email") })}
               label={t("labels.email")}
-              error={errors.email?.message as string}
+              error={errors.email?.message}
               data-testid="email-text-input"
             />
           </div>
+          <div className="col-span-2">
+            <TextInput
+              type="password"
+              autoComplete="new-password"
+              required
+              {...register("password", { required: t("password.required.password") })}
+              label={t("password.labels.password")}
+              error={errors.password?.message}
+              data-testid="password-text-input"
+            />
+          </div>
+          <div className="col-span-2">
+            <TextInput
+              type="password"
+              autoComplete="new-password"
+              required
+              {...register("confirmPassword", { required: t("password.required.confirmPassword") })}
+              label={t("password.labels.confirmPassword")}
+              error={errors.confirmPassword?.message}
+              data-testid="password-confirm-text-input"
+            />
+          </div>
         </div>
-        {(legal?.tosLink || legal?.privacyPolicyLink) && (
-          <PrivacyPolicyCheckboxes legal={legal} onChange={setTosAndPolicyAccepted} />
-        )}
-        {/* show chooser if both methods are allowed */}
-        {loginSettings && loginSettings.allowLocalAuthentication && loginSettings.passkeysType == PasskeysType.ALLOWED && (
-          <>
-            <p className="ztdl-p mt-4 mb-6 block text-left">
-              <Translated i18nKey="selectMethod" namespace="register" />
-            </p>
 
-            <div className="pb-4">
-              <AuthenticationMethodRadio selected={selected} selectionChanged={setSelected} />
-            </div>
-          </>
-        )}
-        {!loginSettings?.allowLocalAuthentication &&
-          loginSettings?.passkeysType !== PasskeysType.ALLOWED &&
-          (!loginSettings?.allowExternalIdp || !idpCount) && (
-            <div className="py-4">
-              <Alert type={AlertType.INFO}>
-                <Translated i18nKey="noMethodAvailableWarning" namespace="register" />
-              </Alert>
-            </div>
-          )}
+        <PasswordComplexity
+          passwordComplexitySettings={passwordComplexitySettings}
+          password={watchPassword}
+          equals={passwordsMatch}
+        />
+
+        {isLegalAcceptanceRequired && <PrivacyPolicyCheckboxes legal={legal} onChange={setTosAndPolicyAccepted} />}
 
         {error && (
-          <div className="py-4">
+          <div className="py-4" data-testid="error">
             <Alert>{error}</Alert>
           </div>
         )}
@@ -190,14 +188,7 @@ export function RegisterForm({
             type="submit"
             variant={ButtonVariants.Primary}
             disabled={loading || !canSubmit}
-            onClick={handleSubmit((values) => {
-              const usePasswordToContinue: boolean =
-                loginSettings?.allowLocalAuthentication && loginSettings?.passkeysType == PasskeysType.ALLOWED
-                  ? !(selected === methods[0]) // choose selection if both available
-                  : !!loginSettings?.allowLocalAuthentication; // if password is chosen
-              // set password as default if only password is allowed
-              return submitAndContinue(values, usePasswordToContinue);
-            })}
+            onClick={handleSubmit(submitRegister)}
             data-testid="submit-button"
           >
             {loading && <Spinner className="mr-2 h-5 w-5" />}

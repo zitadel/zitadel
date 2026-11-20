@@ -1,5 +1,5 @@
 import { Page } from "@playwright/test";
-import { registerWithPasskey } from "./register";
+import { registerWithPasswordAndPasskey } from "./register";
 import { activateOTP, addTOTP, addUser, eventualNewUser, getUserByUsername, removeUser } from "./zitadel";
 
 export interface userProps {
@@ -156,7 +156,13 @@ export class PasskeyUser extends User {
   }
 
   public async ensure(page: Page) {
-    const authId = await registerWithPasskey(page, this.getFirstname(), this.getLastname(), this.getUsername());
+    const authId = await registerWithPasswordAndPasskey(
+      page,
+      this.getFirstname(),
+      this.getLastname(),
+      this.getUsername(),
+      "Password1!",
+    );
     this.authenticatorId = authId;
 
     // wait for projection of user

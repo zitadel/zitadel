@@ -28,6 +28,7 @@ import {
   setUserPassword,
 } from "@/lib/server/zitadel";
 import { Code, create, Duration } from "@zitadel/client";
+import { CredentialsCheckErrorSchema } from "@zitadel/proto/zitadel/message_pb";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
@@ -36,6 +37,12 @@ import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 const logger = createLogger("password");
+
+// A rejected password on session creation is a Connect error that carries the attempt count in its details.
+function failedPasswordAttempts(error: any): number | undefined {
+  const attempts = error?.failedAttempts ?? error?.findDetails?.(CredentialsCheckErrorSchema)?.[0]?.failedAttempts;
+  return attempts ? Number(attempts) : undefined;
+}
 
 type ResetPasswordCommand = {
   loginName: string;
@@ -320,7 +327,8 @@ export async function sendPassword(
         session = result.session;
         sessionCookie = result.sessionCookie;
       } catch (error: any) {
-        if ("failedAttempts" in error && error.failedAttempts) {
+        const failedAttempts = failedPasswordAttempts(error);
+        if (failedAttempts) {
           recordAuthFailure("password", "invalid_password", command.organization);
           if (loginSettingsByContext?.ignoreUnknownUsernames) {
             return { error: t("errors.failedToAuthenticateNoLimit") };
@@ -329,12 +337,12 @@ export async function sendPassword(
 
           const hasLimit =
             lockoutSettings?.maxPasswordAttempts !== undefined && lockoutSettings?.maxPasswordAttempts > BigInt(0);
-          const locked = hasLimit && error.failedAttempts >= lockoutSettings?.maxPasswordAttempts;
+          const locked = hasLimit && BigInt(failedAttempts) >= (lockoutSettings?.maxPasswordAttempts ?? BigInt(0));
           const messageKey = hasLimit ? "errors.failedToAuthenticate" : "errors.failedToAuthenticateNoLimit";
 
           return {
             error: t(messageKey, {
-              failedAttempts: error.failedAttempts,
+              failedAttempts,
               maxPasswordAttempts: hasLimit ? String(lockoutSettings?.maxPasswordAttempts ?? 0) : "?",
               lockoutMessage: locked ? t("errors.accountLockedContactAdmin") : "",
             }),

@@ -25,9 +25,12 @@
   "loginname": {
     "title": "مرحباً بعودتك!",
     "description": "أدخل بيانات الدخول الخاصة بك.",
-    "register": "تسجيل مستخدم جديد",
+    "noAccountYet": "ليس لديك حساب بعد؟",
+    "register": "إنشاء حساب",
+    "passkey": "تسجيل الدخول باستخدام مفتاح مرور",
     "submit": "متابعة",
     "labels": {
+      "email": "البريد الإلكتروني",
       "loginname": "اسم الدخول",
       "username": "اسم المستخدم",
       "usernameOrPhoneNumber": "اسم المستخدم أو رقم الهاتف",

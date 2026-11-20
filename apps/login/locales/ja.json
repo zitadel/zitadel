@@ -25,9 +25,12 @@
   "loginname": {
     "title": "お帰りなさい！",
     "description": "ログイン情報を入力してください。",
-    "register": "新規ユーザー登録",
+    "noAccountYet": "まだアカウントをお持ちでないですか？",
+    "register": "アカウントを作成",
+    "passkey": "パスキーでログイン",
     "submit": "続行",
     "labels": {
+      "email": "メールアドレス",
       "loginname": "ログイン名",
       "username": "ユーザー名",
       "usernameOrPhoneNumber": "ユーザー名または電話番号",
