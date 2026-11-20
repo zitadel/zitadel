@@ -3176,7 +3176,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping, use_pkce) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping, use_pkce, token_endpoint_auth_method, private_key, key_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -3186,6 +3186,9 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								database.TextArray[string]{"profile"},
 								true,
 								true,
+								domain.OIDCTokenEndpointAuthMethodClientSecret,
+								anyArg{},
+								"",
 							},
 						},
 					},
@@ -3246,7 +3249,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping, use_pkce) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_oidc (idp_id, instance_id, issuer, client_id, client_secret, scopes, id_token_mapping, use_pkce, token_endpoint_auth_method, private_key, key_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -3256,6 +3259,9 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								database.TextArray[string]{"profile"},
 								true,
 								true,
+								domain.OIDCTokenEndpointAuthMethodClientSecret,
+								anyArg{},
+								"",
 							},
 						},
 					},

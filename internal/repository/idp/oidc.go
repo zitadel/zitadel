@@ -2,6 +2,7 @@ package idp
 
 import (
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -17,6 +18,10 @@ type OIDCIDPAddedEvent struct {
 	Scopes           []string            `json:"scopes,omitempty"`
 	IsIDTokenMapping bool                `json:"idTokenMapping,omitempty"`
 	UsePKCE          bool                `json:"usePKCE,omitempty"`
+	// TokenEndpointAuthMethod defaults to client secret for existing events.
+	TokenEndpointAuthMethod domain.OIDCTokenEndpointAuthMethod `json:"tokenEndpointAuthMethod,omitempty"`
+	PrivateKey              *crypto.CryptoValue                `json:"privateKey,omitempty"`
+	KeyID                   string                             `json:"keyId,omitempty"`
 	Options
 }
 
@@ -29,19 +34,25 @@ func NewOIDCIDPAddedEvent(
 	clientSecret *crypto.CryptoValue,
 	scopes []string,
 	isIDTokenMapping, usePKCE bool,
+	tokenEndpointAuthMethod domain.OIDCTokenEndpointAuthMethod,
+	privateKey *crypto.CryptoValue,
+	keyID string,
 	options Options,
 ) *OIDCIDPAddedEvent {
 	return &OIDCIDPAddedEvent{
-		BaseEvent:        *base,
-		ID:               id,
-		Name:             name,
-		Issuer:           issuer,
-		ClientID:         clientID,
-		ClientSecret:     clientSecret,
-		Scopes:           scopes,
-		IsIDTokenMapping: isIDTokenMapping,
-		UsePKCE:          usePKCE,
-		Options:          options,
+		BaseEvent:               *base,
+		ID:                      id,
+		Name:                    name,
+		Issuer:                  issuer,
+		ClientID:                clientID,
+		ClientSecret:            clientSecret,
+		Scopes:                  scopes,
+		IsIDTokenMapping:        isIDTokenMapping,
+		UsePKCE:                 usePKCE,
+		TokenEndpointAuthMethod: tokenEndpointAuthMethod,
+		PrivateKey:              privateKey,
+		KeyID:                   keyID,
+		Options:                 options,
 	}
 }
 
@@ -69,14 +80,17 @@ func OIDCIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 type OIDCIDPChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID               string              `json:"id"`
-	Name             *string             `json:"name,omitempty"`
-	Issuer           *string             `json:"issuer,omitempty"`
-	ClientID         *string             `json:"clientId,omitempty"`
-	ClientSecret     *crypto.CryptoValue `json:"clientSecret,omitempty"`
-	Scopes           []string            `json:"scopes,omitempty"`
-	IsIDTokenMapping *bool               `json:"idTokenMapping,omitempty"`
-	UsePKCE          *bool               `json:"usePKCE,omitempty"`
+	ID                      string                              `json:"id"`
+	Name                    *string                             `json:"name,omitempty"`
+	Issuer                  *string                             `json:"issuer,omitempty"`
+	ClientID                *string                             `json:"clientId,omitempty"`
+	ClientSecret            *crypto.CryptoValue                 `json:"clientSecret,omitempty"`
+	Scopes                  []string                            `json:"scopes,omitempty"`
+	IsIDTokenMapping        *bool                               `json:"idTokenMapping,omitempty"`
+	UsePKCE                 *bool                               `json:"usePKCE,omitempty"`
+	TokenEndpointAuthMethod *domain.OIDCTokenEndpointAuthMethod `json:"tokenEndpointAuthMethod,omitempty"`
+	PrivateKey              *crypto.CryptoValue                 `json:"privateKey,omitempty"`
+	KeyID                   *string                             `json:"keyId,omitempty"`
 	OptionChanges
 }
 
@@ -145,6 +159,24 @@ func ChangeOIDCIsIDTokenMapping(idTokenMapping bool) func(*OIDCIDPChangedEvent) 
 func ChangeOIDCUsePKCE(usePKCE bool) func(*OIDCIDPChangedEvent) {
 	return func(e *OIDCIDPChangedEvent) {
 		e.UsePKCE = &usePKCE
+	}
+}
+
+func ChangeOIDCTokenEndpointAuthMethod(method domain.OIDCTokenEndpointAuthMethod) func(*OIDCIDPChangedEvent) {
+	return func(e *OIDCIDPChangedEvent) {
+		e.TokenEndpointAuthMethod = &method
+	}
+}
+
+func ChangeOIDCPrivateKey(privateKey *crypto.CryptoValue) func(*OIDCIDPChangedEvent) {
+	return func(e *OIDCIDPChangedEvent) {
+		e.PrivateKey = privateKey
+	}
+}
+
+func ChangeOIDCKeyID(keyID string) func(*OIDCIDPChangedEvent) {
+	return func(e *OIDCIDPChangedEvent) {
+		e.KeyID = &keyID
 	}
 }
 

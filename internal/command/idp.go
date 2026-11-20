@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	oidc_crypto "github.com/zitadel/oidc/v3/pkg/crypto"
+
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/idp"
@@ -25,14 +27,40 @@ type GenericOAuthProvider struct {
 }
 
 type GenericOIDCProvider struct {
-	Name             string
-	Issuer           string
-	ClientID         string
-	ClientSecret     string
-	Scopes           []string
-	IsIDTokenMapping bool
-	UsePKCE          bool
-	IDPOptions       idp.Options
+	Name                    string
+	Issuer                  string
+	ClientID                string
+	ClientSecret            string
+	Scopes                  []string
+	IsIDTokenMapping        bool
+	UsePKCE                 bool
+	TokenEndpointAuthMethod domain.OIDCTokenEndpointAuthMethod
+	PrivateKey              []byte
+	KeyID                   string
+	IDPOptions              idp.Options
+}
+
+// checkClientAuth returns an error if the credentials required by the token endpoint auth method are missing
+// or the private key cannot be parsed. On updates, hasSecret and hasKey must include already stored credentials.
+func (p *GenericOIDCProvider) checkClientAuth(hasSecret, hasKey bool) error {
+	switch p.TokenEndpointAuthMethod {
+	case domain.OIDCTokenEndpointAuthMethodClientSecret:
+		if !hasSecret {
+			return zerrors.ThrowInvalidArgument(nil, "COMMAND-Wq2ft", "Errors.Invalid.Argument")
+		}
+	case domain.OIDCTokenEndpointAuthMethodPrivateKeyJWT:
+		if !hasKey || p.KeyID == "" {
+			return zerrors.ThrowInvalidArgument(nil, "COMMAND-Pk3jw", "Errors.Invalid.Argument")
+		}
+	default:
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-Am4th", "Errors.Invalid.Argument")
+	}
+	if len(p.PrivateKey) > 0 {
+		if _, _, err := oidc_crypto.BytesToPrivateKey(p.PrivateKey); err != nil {
+			return zerrors.ThrowInvalidArgument(err, "COMMAND-Ke5yp", "Errors.Invalid.Argument")
+		}
+	}
+	return nil
 }
 
 type JWTProvider struct {
