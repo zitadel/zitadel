@@ -171,7 +171,7 @@ func (c *Commands) AddSMSConfigHTTP(ctx context.Context, config *AddSMSHTTP) (er
 		}
 	}
 
-	if err := c.validateNotificationWebhookEndpoint(config.Endpoint); err != nil {
+	if err := c.validateNotificationWebhookEndpoint(config.Endpoint, false); err != nil {
 		return err
 	}
 
@@ -224,7 +224,7 @@ func (c *Commands) ChangeSMSConfigHTTP(ctx context.Context, config *ChangeSMSHTT
 	}
 
 	if config.Endpoint != nil {
-		if err := c.validateNotificationWebhookEndpoint(*config.Endpoint); err != nil {
+		if err := c.validateNotificationWebhookEndpoint(*config.Endpoint, false); err != nil {
 			return err
 		}
 	}

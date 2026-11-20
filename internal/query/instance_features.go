@@ -18,6 +18,7 @@ type InstanceFeatures struct {
 	PermissionCheckV2              FeatureSource[bool]
 	ManagementConsoleUseV2UserApi  FeatureSource[bool]
 	EnableRelationalTables         FeatureSource[bool]
+	OrgEmailProviders              FeatureSource[bool]
 }
 
 func (q *Queries) GetInstanceFeatures(ctx context.Context, cascade bool) (_ *InstanceFeatures, err error) {

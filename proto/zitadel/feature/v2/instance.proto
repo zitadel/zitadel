@@ -94,6 +94,13 @@ message SetInstanceFeaturesRequest{
       description: "If this is enabled Zitadel will use the relational tables instead of the projections as the main source to store the data. Regardless of the flag state, both the relational table and the projections are kept up to date. Currently the flag has no effect.";
     }
   ];
+
+  optional bool org_email_providers = 17 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If this is enabled, organizations can configure their own email providers (SMTP and HTTP) and notification emails of an organization are sent through its active provider. If it is disabled (default), the organization email provider commands are refused and all emails are sent through the instance email provider.";
+    }
+  ];
 }
 
 message SetInstanceFeaturesResponse {
@@ -194,6 +201,13 @@ message GetInstanceFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "If this is enabled Zitadel will use the relational tables instead of the projections as the main source to store the data. Regardless of the flag state, both the relational table and the projections are kept up to date. Currently the flag has no effect.";
+    }
+  ];
+
+  FeatureFlag org_email_providers = 18 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If this is enabled, organizations can configure their own email providers (SMTP and HTTP) and notification emails of an organization are sent through its active provider. If it is disabled (default), the organization email provider commands are refused and all emails are sent through the instance email provider.";
     }
   ];
 }

@@ -69,8 +69,13 @@ Errors:
     NotFound: "SMTP-konfiguration hittades inte"
     AlreadyExists: "SMTP-konfiguration finns redan"
     AlreadyDeactivated: "SMTP-konfiguration redan avaktiverad"
+    OrgProvidersDisabled: "E-postleverantörer för organisationer är inaktiverade på denna instans"
+    OrgHTTPSRequired: "Organisationers e-postleverantörer måste använda https"
     SenderAdressNotCustomDomain: "Avsändaradressen måste sättas som kundanpassad domän på instansen."
     TestEmailNotFound: "E-postadressen för testet hittades inte"
+  NotificationProvider:
+    Blocked:
+      Endpoint: "Adressen till den här aviseringsleverantören är inte tillåten"
   Notification:
     NoDomain: "Ingen domän hittades för meddelandet"
   User:

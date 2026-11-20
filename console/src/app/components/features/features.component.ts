@@ -35,6 +35,7 @@ const FEATURE_KEYS = [
   'permissionCheckV2',
   'userSchema',
   'enableRelationalTables',
+  'orgEmailProviders',
 ] as const;
 
 export type ToggleState = { source: Source; enabled: boolean };

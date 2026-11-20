@@ -8,7 +8,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
@@ -30,4 +33,17 @@ func TestMain(m *testing.M) {
 		Client = Instance.Client.Mgmt
 		return m.Run()
 	}())
+}
+
+// ensureOrgEmailProviders turns on the org_email_providers instance feature,
+// which is off by default and gates every org email provider endpoint.
+func ensureOrgEmailProviders(t *testing.T) {
+	t.Helper()
+	enabled := true
+	integration.EnsureInstanceFeature(t, CTX, Instance,
+		&feature.SetInstanceFeaturesRequest{OrgEmailProviders: &enabled},
+		func(tt *assert.CollectT, got *feature.GetInstanceFeaturesResponse) {
+			assert.True(tt, got.GetOrgEmailProviders().GetEnabled())
+		},
+	)
 }

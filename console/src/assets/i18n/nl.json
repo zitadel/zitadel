@@ -1664,7 +1664,9 @@
       "LOGINV2_DESCRIPTION": "Door dit in te schakelen wordt de nieuwe TypeScript-gebaseerde login-UI geactiveerd met verbeterde beveiliging, prestaties en aanpasbaarheid.",
       "LOGINV2_BASEURI": "Basis-URI",
       "ENABLERELATIONALTABLES": "Relationele tabellen",
-      "ENABLERELATIONALTABLES_DESCRIPTION": "Schakel dit in om relationele tabellen te gebruiken in plaats van projecties voor het opslaan van gegevens. Momenteel doet deze schakelaar niets."
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Schakel dit in om relationele tabellen te gebruiken in plaats van projecties voor het opslaan van gegevens. Momenteel doet deze schakelaar niets.",
+      "ORGEMAILPROVIDERS": "E-mailproviders van de organisatie",
+      "ORGEMAILPROVIDERS_DESCRIPTION": "Schakel dit in zodat organisaties hun eigen e-mailproviders kunnen configureren. Indien uitgeschakeld, worden alle e-mails verzonden via de e-mailprovider van de instantie."
     },
     "DIALOG": {
       "RESET": {

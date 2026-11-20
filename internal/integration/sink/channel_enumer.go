@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _ChannelName = "milestonequota"
+const _ChannelName = "milestonequotaemail"
 
-var _ChannelIndex = [...]uint8{0, 9, 14}
+var _ChannelIndex = [...]uint8{0, 9, 14, 19}
 
-const _ChannelLowerName = "milestonequota"
+const _ChannelLowerName = "milestonequotaemail"
 
 func (i Channel) String() string {
 	if i < 0 || i >= Channel(len(_ChannelIndex)-1) {
@@ -26,20 +26,24 @@ func _ChannelNoOp() {
 	var x [1]struct{}
 	_ = x[ChannelMilestone-(0)]
 	_ = x[ChannelQuota-(1)]
+	_ = x[ChannelEmail-(2)]
 }
 
-var _ChannelValues = []Channel{ChannelMilestone, ChannelQuota}
+var _ChannelValues = []Channel{ChannelMilestone, ChannelQuota, ChannelEmail}
 
 var _ChannelNameToValueMap = map[string]Channel{
-	_ChannelName[0:9]:       ChannelMilestone,
-	_ChannelLowerName[0:9]:  ChannelMilestone,
-	_ChannelName[9:14]:      ChannelQuota,
-	_ChannelLowerName[9:14]: ChannelQuota,
+	_ChannelName[0:9]:        ChannelMilestone,
+	_ChannelLowerName[0:9]:   ChannelMilestone,
+	_ChannelName[9:14]:       ChannelQuota,
+	_ChannelLowerName[9:14]:  ChannelQuota,
+	_ChannelName[14:19]:      ChannelEmail,
+	_ChannelLowerName[14:19]: ChannelEmail,
 }
 
 var _ChannelNames = []string{
 	_ChannelName[0:9],
 	_ChannelName[9:14],
+	_ChannelName[14:19],
 }
 
 // ChannelString retrieves an enum value from the enum constants string name.

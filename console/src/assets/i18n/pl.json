@@ -1663,7 +1663,9 @@
       "LOGINV2_DESCRIPTION": "Włączenie tej opcji aktywuje nowy interfejs logowania oparty na TypeScript z ulepszonym bezpieczeństwem, wydajnością i możliwością dostosowania.",
       "LOGINV2_BASEURI": "Podstawowy URI",
       "ENABLERELATIONALTABLES": "Tabele relacyjne",
-      "ENABLERELATIONALTABLES_DESCRIPTION": "Włącz to, aby używać tabel relacyjnych zamiast projekcji do przechowywania danych. Obecnie ten przełącznik nic nie robi."
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Włącz to, aby używać tabel relacyjnych zamiast projekcji do przechowywania danych. Obecnie ten przełącznik nic nie robi.",
+      "ORGEMAILPROVIDERS": "Dostawcy poczty e-mail organizacji",
+      "ORGEMAILPROVIDERS_DESCRIPTION": "Włącz tę opcję, aby umożliwić organizacjom konfigurowanie własnych dostawców poczty e-mail. Jeśli opcja jest wyłączona, wszystkie wiadomości e-mail są wysyłane przez dostawcę poczty e-mail instancji."
     },
     "DIALOG": {
       "RESET": {

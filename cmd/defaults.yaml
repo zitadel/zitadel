@@ -603,6 +603,9 @@ Notifications:
   MaxAttempts: 3 # ZITADEL_NOTIFICATIONS_MAXATTEMPTS
   # Automatically cancel the notification if it cannot be handled within a specific time
   MaxTtl: 5m  # ZITADEL_NOTIFICATIONS_MAXTTL
+  # When an org has no SMTP config, fall back to the instance-level SMTP config.
+  # Set to false to require each org to have its own SMTP provider.
+  OrgSMTPFallbackToInstance: true # ZITADEL_NOTIFICATIONS_ORGSMTPFALLBACKTOINSTANCE
 
 Executions:
   # The amount of workers processing the execution request events.
@@ -1484,6 +1487,7 @@ DefaultInstance:
     PermissionCheckV2: # ZITADEL_DEFAULTINSTANCE_FEATURES_PERMISSIONCHECKV2
     ConsoleUseV2UserApi: true # ZITADEL_DEFAULTINSTANCE_FEATURES_CONSOLEUSEV2USERAPI
     EnableRelationalTables: # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLERELATIONALTABLES
+    OrgEmailProviders: # ZITADEL_DEFAULTINSTANCE_FEATURES_ORGEMAILPROVIDERS
 
   Limits:
     # AuditLogRetention limits the number of events that can be queried via the events API by their age.
@@ -1648,6 +1652,8 @@ InternalAuthZ:
         - "org.global.read"
         - "org.create"
         - "org.write"
+        - "org.smtp.read"
+        - "org.smtp.write"
         - "org.delete"
         - "org.member.read"
         - "org.member.write"
@@ -1764,6 +1770,8 @@ InternalAuthZ:
         - "org.global.read"
         - "org.create"
         - "org.write"
+        - "org.smtp.read"
+        - "org.smtp.write"
         - "org.delete"
         - "org.member.read"
         - "org.member.write"
@@ -1867,6 +1875,8 @@ InternalAuthZ:
         - "org.read"
         - "org.global.read"
         - "org.write"
+        - "org.smtp.read"
+        - "org.smtp.write"
         - "org.delete"
         - "org.member.read"
         - "org.member.write"
@@ -2247,6 +2257,8 @@ SystemAuthZ:
         - "org.global.read"
         - "org.create"
         - "org.write"
+        - "org.smtp.read"
+        - "org.smtp.write"
         - "org.delete"
         - "org.member.read"
         - "org.member.write"
@@ -2363,6 +2375,8 @@ SystemAuthZ:
         - "org.global.read"
         - "org.create"
         - "org.write"
+        - "org.smtp.read"
+        - "org.smtp.write"
         - "org.delete"
         - "org.member.read"
         - "org.member.write"

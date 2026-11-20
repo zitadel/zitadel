@@ -1973,6 +1973,8 @@ func newUserNotifierLegacy(t *testing.T, ctrl *gomock.Controller, queries *mock.
 			smtpAlg,
 			f.SMSTokenCrypto,
 			nil,
+			nil,
+			true,
 		),
 		otpEmailTmpl: func(origin *url.URL) string {
 			return origin.String() + defaultOTPEmailTemplate

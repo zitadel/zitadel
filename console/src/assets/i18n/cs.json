@@ -1664,7 +1664,9 @@
       "LOGINV2_DESCRIPTION": "Povolením této možnosti se aktivuje nové přihlašovací rozhraní založené na TypeScriptu s vylepšeným zabezpečením, výkonem a přizpůsobitelností.",
       "LOGINV2_BASEURI": "Základní URI",
       "ENABLERELATIONALTABLES": "Relační tabulky",
-      "ENABLERELATIONALTABLES_DESCRIPTION": "Povolte toto pro použití relačních tabulek místo projekcí pro ukládání dat. Momentálně tento přepínač nic nedělá."
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Povolte toto pro použití relačních tabulek místo projekcí pro ukládání dat. Momentálně tento přepínač nic nedělá.",
+      "ORGEMAILPROVIDERS": "Poskytovatelé e-mailu organizace",
+      "ORGEMAILPROVIDERS_DESCRIPTION": "Povolením umožníte organizacím nastavit vlastní poskytovatele e-mailu. Pokud je zakázáno, všechny e-maily se odesílají přes poskytovatele e-mailu instance."
     },
     "DIALOG": {
       "RESET": {
