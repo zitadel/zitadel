@@ -1,4 +1,8 @@
 {
+  "reauthenticate": {
+    "title": "Bestätigen Sie Ihre Identität",
+    "description": "Melden Sie sich erneut an, um sicher fortzufahren."
+  },
   "common": {
     "back": "Zurück",
     "title": "Anmelden mit Zitadel"
