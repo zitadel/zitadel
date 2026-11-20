@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/internal/api/oidc/sign"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -26,9 +27,10 @@ func (s *Server) RefreshToken(ctx context.Context, r *op.ClientRequest[oidc.Refr
 		return nil, zerrors.ThrowInternal(nil, "OIDC-ga0EP", "Error.Internal")
 	}
 
-	session, err := s.command.ExchangeOIDCSessionRefreshAndAccessToken(ctx, r.Data.RefreshToken, r.Data.Scopes, client.client.ClientID, refreshTokenComplianceChecker())
+	prepared := new(preparedTokenResponse)
+	session, err := s.command.ExchangeOIDCSessionRefreshAndAccessToken(ctx, r.Data.RefreshToken, r.Data.Scopes, client.client.ClientID, s.prepareRefreshTokenResponse(client, prepared))
 	if err == nil {
-		return response(s.accessTokenResponseFromSession(ctx, client, session, "", client.client.ProjectID, client.client.ProjectRoleAssertion, client.client.AccessTokenRoleAssertion, client.client.IDTokenRoleAssertion, client.client.IDTokenUserinfoAssertion))
+		return response(s.accessTokenResponse(ctx, client, session, "", prepared.getUserInfo, prepared.getSigner, client.client.AccessTokenRoleAssertion, client.client.IDTokenRoleAssertion))
 	} else if errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "OIDCS-JOI23", "Errors.OIDCSession.RefreshTokenInvalid")) {
 		// We try again for v1 tokens when we encountered specific parsing error
 		return s.refreshTokenV1(ctx, client, r)
@@ -82,6 +84,56 @@ func (s *Server) refreshTokenV1(ctx context.Context, client *Client, r *op.Clien
 	}
 
 	return response(s.accessTokenResponseFromSession(ctx, client, session, "", client.client.ProjectID, client.client.ProjectRoleAssertion, client.client.AccessTokenRoleAssertion, client.client.IDTokenRoleAssertion, client.client.IDTokenUserinfoAssertion))
+}
+
+// preparedTokenResponse holds the parts of a token response which can fail,
+// resolved before the OIDC session is updated.
+type preparedTokenResponse struct {
+	getUserInfo userInfoFunc
+	getSigner   sign.SignerFunc
+}
+
+// prepareRefreshTokenResponse returns the compliance check for the refresh token grant.
+// It runs before the refresh token is renewed and the new access token is added to the session.
+//
+// Besides validating the client and the scope, it resolves the parts of the token response which can fail:
+// the user info, including the preaccesstoken and preuserinfo actions, and the signing key.
+// A failure therefore leaves the refresh token and the previous access token valid,
+// so the client can retry, for example after an action target was unavailable.
+// The results are kept in prepared, so the response is built from them and the actions are not called twice.
+func (s *Server) prepareRefreshTokenResponse(client *Client, prepared *preparedTokenResponse) command.RefreshTokenComplianceChecker {
+	checkCompliance := refreshTokenComplianceChecker()
+	return func(ctx context.Context, model *command.OIDCSessionWriteModel, requestedScope []string, reqClientID string) ([]string, error) {
+		scope, err := checkCompliance(ctx, model, requestedScope, reqClientID)
+		if err != nil {
+			return nil, err
+		}
+		getUserInfo := cacheUserInfo(s.getUserInfo(model.UserID, client.client.ProjectID, client.GetID(), client.client.ProjectRoleAssertion, client.client.IDTokenUserinfoAssertion, scope))
+		getSigner := s.getSignerOnce()
+
+		// The same calls accessTokenResponse makes; a refresh always issues an access token.
+		jwtAccessToken := client.AccessTokenType() == op.AccessTokenTypeJWT
+		idToken := slices.Contains(scope, oidc.ScopeOpenID)
+		if jwtAccessToken {
+			if _, err = getUserInfo(ctx, client.client.AccessTokenRoleAssertion, domain.TriggerTypePreAccessTokenCreation, model.AccessTokenActor); err != nil {
+				return nil, err
+			}
+		}
+		if idToken {
+			if _, err = getUserInfo(ctx, client.client.IDTokenRoleAssertion, domain.TriggerTypePreUserinfoCreation, model.AccessTokenActor); err != nil {
+				return nil, err
+			}
+		}
+		if jwtAccessToken || idToken {
+			if _, _, err = getSigner(ctx); err != nil {
+				return nil, err
+			}
+		}
+
+		prepared.getUserInfo = getUserInfo
+		prepared.getSigner = getSigner
+		return scope, nil
+	}
 }
 
 // refreshTokenComplianceChecker validates that the requested scope is a subset of the original auth request scope.
