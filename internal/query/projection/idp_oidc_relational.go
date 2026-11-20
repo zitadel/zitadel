@@ -249,5 +249,17 @@ func (p *relationalTablesProjection) reduceOIDCIDPChangedColumns(payload *domain
 		payloadChanged = true
 		payload.UsePKCE = *idpEvent.UsePKCE
 	}
+	if idpEvent.TokenEndpointAuthMethod != nil && int32(*idpEvent.TokenEndpointAuthMethod) != payload.TokenEndpointAuthMethod {
+		payloadChanged = true
+		payload.TokenEndpointAuthMethod = int32(*idpEvent.TokenEndpointAuthMethod)
+	}
+	if idpEvent.PrivateKey != nil {
+		payloadChanged = true
+		payload.PrivateKey = idpEvent.PrivateKey
+	}
+	if idpEvent.KeyID != nil && *idpEvent.KeyID != payload.KeyID {
+		payloadChanged = true
+		payload.KeyID = *idpEvent.KeyID
+	}
 	return payloadChanged
 }

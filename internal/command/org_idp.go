@@ -735,6 +735,9 @@ func (c *Commands) prepareAddOrgOIDCProvider(a *org.Aggregate, writeModel *OrgOI
 					provider.Scopes,
 					provider.IsIDTokenMapping,
 					provider.UsePKCE,
+					domain.OIDCTokenEndpointAuthMethodClientSecret,
+					nil,
+					"",
 					provider.IDPOptions,
 				),
 			}, nil
