@@ -33,8 +33,11 @@ type RuleOptions struct {
 	// Simple formatting (line breaks, bold, italic, underline, paragraphs) is kept,
 	// all other elements like links, images or styles are removed, their text is kept.
 	RestrictCustomHTML bool
+	// SuppressReservedRecipientDomains accepts notifications to recipients of reserved domains (RFC 2606, RFC 6761)
+	// like example.com or .test, but does not send them to the provider.
+	SuppressReservedRecipientDomains bool
 	// Limit restricts the amount of emails an instance can send through the provider.
-	// Notifications exceeding it are rejected.
+	// Notifications exceeding it are rejected. Suppressed emails are not counted.
 	Limit *RuleLimit
 }
 

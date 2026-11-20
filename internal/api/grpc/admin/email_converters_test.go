@@ -921,13 +921,14 @@ func Test_emailProviderRestrictionsToPb(t *testing.T) {
 		{
 			Match: smtp.RuleMatch{Hosts: []string{"smtp.example.com"}, Users: []string{"token"}},
 			RuleOptions: smtp.RuleOptions{
-				RestrictCustomHTML: true,
-				Limit:              &smtp.RuleLimit{Count: 100, Window: smtp.RuleDuration(24 * time.Hour)},
+				RestrictCustomHTML:               true,
+				SuppressReservedRecipientDomains: true,
+				Limit:                            &smtp.RuleLimit{Count: 100, Window: smtp.RuleDuration(24 * time.Hour)},
 			},
 		},
 		{
 			Match:       smtp.RuleMatch{Hosts: []string{"smtp.other.example"}},
-			RuleOptions: smtp.RuleOptions{RestrictCustomHTML: true},
+			RuleOptions: smtp.RuleOptions{SuppressReservedRecipientDomains: true},
 		},
 		{
 			// a rule without options, e.g. only adding headers, does not restrict the provider
@@ -975,7 +976,8 @@ func Test_emailProviderRestrictionsToPb(t *testing.T) {
 			rules:  rules,
 			config: provider("smtp.example.com:587", "token"),
 			want: &settings_pb.EmailProviderRestrictions{
-				CustomHtmlRestricted: true,
+				CustomHtmlRestricted:               true,
+				ReservedRecipientDomainsSuppressed: true,
 				SendingLimit: &settings_pb.EmailProviderSendingLimit{
 					Count:  100,
 					Window: durationpb.New(24 * time.Hour),
@@ -987,7 +989,7 @@ func Test_emailProviderRestrictionsToPb(t *testing.T) {
 			rules:  rules,
 			config: provider("smtp.other.example:25", ""),
 			want: &settings_pb.EmailProviderRestrictions{
-				CustomHtmlRestricted: true,
+				ReservedRecipientDomainsSuppressed: true,
 			},
 		},
 	}

@@ -61,7 +61,8 @@ func emailProviderRestrictionsToPb(config *query.SMTPConfig, rules smtp.Rules) *
 		return nil
 	}
 	restrictions := &settings_pb.EmailProviderRestrictions{
-		CustomHtmlRestricted: options.RestrictCustomHTML,
+		CustomHtmlRestricted:               options.RestrictCustomHTML,
+		ReservedRecipientDomainsSuppressed: options.SuppressReservedRecipientDomains,
 	}
 	if options.Limit != nil {
 		restrictions.SendingLimit = &settings_pb.EmailProviderSendingLimit{

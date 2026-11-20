@@ -455,8 +455,9 @@ func TestRules_Match(t *testing.T) {
 					SenderDomains: []string{"example.com"},
 				},
 				RuleOptions: RuleOptions{
-					RestrictCustomHTML: true,
-					Limit:              &RuleLimit{Count: 100, Window: RuleDuration(24 * time.Hour)},
+					RestrictCustomHTML:               true,
+					SuppressReservedRecipientDomains: true,
+					Limit:                            &RuleLimit{Count: 100, Window: RuleDuration(24 * time.Hour)},
 				},
 				Headers: map[string]string{
 					"X-Instance-ID": "{{.InstanceID}}",
@@ -468,8 +469,9 @@ func TestRules_Match(t *testing.T) {
 			config: defaultProvider,
 			want: Rule{
 				RuleOptions: RuleOptions{
-					RestrictCustomHTML: true,
-					Limit:              &RuleLimit{Count: 100, Window: RuleDuration(24 * time.Hour)},
+					RestrictCustomHTML:               true,
+					SuppressReservedRecipientDomains: true,
+					Limit:                            &RuleLimit{Count: 100, Window: RuleDuration(24 * time.Hour)},
 				},
 				Headers: map[string]string{
 					"X-Instance-Id": "instance1",
@@ -541,7 +543,7 @@ func TestRules_Options(t *testing.T) {
 		},
 		{
 			Match:       RuleMatch{Hosts: []string{"smtp.example.com"}},
-			RuleOptions: RuleOptions{RestrictCustomHTML: true},
+			RuleOptions: RuleOptions{SuppressReservedRecipientDomains: true},
 		},
 	})
 	require.NoError(t, err)
@@ -556,8 +558,8 @@ func TestRules_Options(t *testing.T) {
 	}{
 		{name: "no rules", rules: nil, host: "smtp.example.com:587", user: "token", sender: "noreply@example.com", want: RuleOptions{}},
 		{name: "first rule", rules: rules, host: "smtp.example.com:587", user: "token", sender: "noreply@example.com", want: RuleOptions{RestrictCustomHTML: true, Limit: limit}},
-		{name: "other user, second rule", rules: rules, host: "smtp.example.com:587", user: "other", sender: "noreply@example.com", want: RuleOptions{RestrictCustomHTML: true}},
-		{name: "no user, second rule", rules: rules, host: "smtp.example.com:587", user: "", sender: "noreply@example.com", want: RuleOptions{RestrictCustomHTML: true}},
+		{name: "other user, second rule", rules: rules, host: "smtp.example.com:587", user: "other", sender: "noreply@example.com", want: RuleOptions{SuppressReservedRecipientDomains: true}},
+		{name: "no user, second rule", rules: rules, host: "smtp.example.com:587", user: "", sender: "noreply@example.com", want: RuleOptions{SuppressReservedRecipientDomains: true}},
 		{name: "other host, no rule", rules: rules, host: "smtp.other.example:587", user: "token", sender: "noreply@example.com", want: RuleOptions{}},
 	}
 	for _, tt := range tests {

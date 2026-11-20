@@ -470,7 +470,7 @@ func DomainClaimedEventMapper(event eventstore.Event) (eventstore.Event, error) 
 type DomainClaimedSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	// DeliveryInfo states the provider the email was sent through.
+	// DeliveryInfo states the provider the email was sent through or that the delivery was suppressed.
 	senders.DeliveryInfo
 }
 
