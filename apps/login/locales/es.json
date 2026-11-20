@@ -493,6 +493,8 @@
     "failedLoading": "No se pudieron cargar los datos. Por favor, inténtalo de nuevo.",
     "tryagain": "Intentar de nuevo",
     "couldNotContinueSession": "No se pudo continuar con la sesión - falta información del usuario",
-    "couldNotClearSession": "No se pudo cerrar la sesión. Inténtelo de nuevo."
+    "couldNotClearSession": "No se pudo cerrar la sesión. Inténtelo de nuevo.",
+    "secondFactorRequired": "Verifica primero tu segundo factor para configurar un nuevo método de autenticación.",
+    "authenticatorNotAllowed": "Este método de autenticación no está permitido para tu organización."
   }
 }

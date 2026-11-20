@@ -273,6 +273,29 @@ export function hasVerifiedPrimaryFactor(session: Partial<Session>): {
   return { valid, verifiedAt };
 }
 
+/** The authentication methods that are second factors (a passkey is multi-factor on its own). */
+export const SECOND_FACTOR_METHODS = [
+  AuthenticationMethodType.TOTP,
+  AuthenticationMethodType.OTP_EMAIL,
+  AuthenticationMethodType.OTP_SMS,
+  AuthenticationMethodType.U2F,
+];
+
+/**
+ * Reports whether the session has verified one of the second factors in `authMethods`, the
+ * user's configured authentication methods. A user-verified passkey is not considered here;
+ * callers that treat it as multi-factor check it separately.
+ */
+export function hasVerifiedSecondFactor(session: Partial<Session>, authMethods: AuthenticationMethodType[]): boolean {
+  const factors = session.factors;
+  return (
+    (authMethods.includes(AuthenticationMethodType.TOTP) && !!factors?.totp?.verifiedAt) ||
+    (authMethods.includes(AuthenticationMethodType.OTP_EMAIL) && !!factors?.otpEmail?.verifiedAt) ||
+    (authMethods.includes(AuthenticationMethodType.OTP_SMS) && !!factors?.otpSms?.verifiedAt) ||
+    (authMethods.includes(AuthenticationMethodType.U2F) && !!factors?.webAuthN?.verifiedAt)
+  );
+}
+
 /**
  * mfa is required, session is not valid anymore (e.g. session expired, user logged out, etc.)
  * to check for mfa for automatically selected session -> const response = await listAuthenticationMethodTypes(userId);
@@ -307,13 +330,7 @@ export async function isSessionValid({
 
   const authMethods = authMethodTypes.authMethodTypes;
   // Filter to only MFA methods (exclude PASSWORD and PASSKEY)
-  const mfaMethods = authMethods?.filter(
-    (method) =>
-      method === AuthenticationMethodType.TOTP ||
-      method === AuthenticationMethodType.OTP_EMAIL ||
-      method === AuthenticationMethodType.OTP_SMS ||
-      method === AuthenticationMethodType.U2F,
-  );
+  const mfaMethods = authMethods?.filter((method) => SECOND_FACTOR_METHODS.includes(method));
 
   // A user-verified passkey (possession + user verification) is inherently multi-factor.
   // Mirrors the passkey escape in checkMFAFactors, which never prompts for an additional
@@ -325,12 +342,7 @@ export async function isSessionValid({
   if (mfaMethods && mfaMethods.length > 0) {
     // User has MFA methods configured — they must be verified regardless of policy,
     // unless the session was already authenticated with a user-verified passkey
-    const totpValid = mfaMethods.includes(AuthenticationMethodType.TOTP) && !!session.factors.totp?.verifiedAt;
-    const otpEmailValid = mfaMethods.includes(AuthenticationMethodType.OTP_EMAIL) && !!session.factors.otpEmail?.verifiedAt;
-    const otpSmsValid = mfaMethods.includes(AuthenticationMethodType.OTP_SMS) && !!session.factors.otpSms?.verifiedAt;
-    const u2fValid = mfaMethods.includes(AuthenticationMethodType.U2F) && !!session.factors.webAuthN?.verifiedAt;
-
-    mfaValid = hasAuthenticatedWithPasskey || totpValid || otpEmailValid || otpSmsValid || u2fValid;
+    mfaValid = hasAuthenticatedWithPasskey || hasVerifiedSecondFactor(session, mfaMethods);
   } else if (isMfaRequired) {
     // No MFA methods configured, but MFA is forced by policy — check for any verified MFA factors
     const otpEmail = session.factors.otpEmail?.verifiedAt;

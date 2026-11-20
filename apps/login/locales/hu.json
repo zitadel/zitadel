@@ -493,6 +493,8 @@
     "failedLoading": "Nem sikerült betölteni az adatokat. Kérjük, próbáld újra.",
     "tryagain": "Próbáld újra",
     "couldNotContinueSession": "Nem sikerült folytatni a munkamenetet - hiányzó felhasználói információk",
-    "couldNotClearSession": "A munkamenetet nem sikerült befejezni. Kérjük, próbálja újra."
+    "couldNotClearSession": "A munkamenetet nem sikerült befejezni. Kérjük, próbálja újra.",
+    "secondFactorRequired": "Új hitelesítési mód beállításához először erősítsd meg a második faktort.",
+    "authenticatorNotAllowed": "Ez a hitelesítési mód nem engedélyezett a szervezeted számára."
   }
 }

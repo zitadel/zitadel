@@ -1,7 +1,7 @@
 "use server";
 
 import { getSessionCookieById } from "@/lib/server/cookies";
-import { getEnrollmentAuthorizationError } from "@/lib/server/enrollment-guard";
+import { getSetupAuthorizationError } from "@/lib/server/enrollment-guard";
 import { getPublicHost } from "@/lib/server/host";
 import { getServiceConfig } from "@/lib/server/service-url";
 import { getSession, registerU2F, verifyU2FRegistration } from "@/lib/server/zitadel";
@@ -50,7 +50,12 @@ export async function addU2F(command: RegisterU2FCommand) {
 
   // Enrollment must be authorized: a bare identify-only session (only the user factor set)
   // must not be able to attach a new authenticator to the account (GHSA-45f2-5q3r-xgg6).
-  const enrollmentError = await getEnrollmentAuthorizationError({ serviceConfig, session: session.session!, userId });
+  const enrollmentError = await getSetupAuthorizationError({
+    serviceConfig,
+    session: session.session!,
+    userId,
+    method: "u2f",
+  });
   if (enrollmentError) {
     return { error: enrollmentError };
   }
@@ -89,7 +94,12 @@ export async function verifyU2F(command: VerifyU2FCommand) {
 
   // Enrollment must be authorized: only an authenticated session (or a valid onboarding
   // verification) may finish registering a new authenticator (GHSA-45f2-5q3r-xgg6).
-  const enrollmentError = await getEnrollmentAuthorizationError({ serviceConfig, session: session.session!, userId });
+  const enrollmentError = await getSetupAuthorizationError({
+    serviceConfig,
+    session: session.session!,
+    userId,
+    method: "u2f",
+  });
   if (enrollmentError) {
     return { error: enrollmentError };
   }

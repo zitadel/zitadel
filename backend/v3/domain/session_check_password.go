@@ -173,7 +173,7 @@ func (p *PasswordCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (e
 	}
 
 	if err != nil && p.TarpitFunc != nil {
-		p.TarpitFunc(uint64(p.FetchedUser.Human.Password.FailedAttempts + 1))
+		p.TarpitFunc(ctx, uint64(p.FetchedUser.Human.Password.FailedAttempts+1))
 	}
 
 	p.IsValidated = true

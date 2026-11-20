@@ -1037,7 +1037,7 @@ func TestCheckOTPSMS(t *testing.T) {
 				now: func() time.Time {
 					return testNow
 				},
-				tarpit: func(failedAttempts uint64) {
+				tarpit: func(ctx context.Context, failedAttempts uint64) {
 
 				},
 			}
@@ -1324,7 +1324,7 @@ type mockTarpit struct {
 	failedAttempts         uint64
 }
 
-func (m *mockTarpit) tarpit(failedAttempts uint64) {
+func (m *mockTarpit) tarpit(_ context.Context, failedAttempts uint64) {
 	m.failedAttempts = failedAttempts
 }
 
@@ -1334,6 +1334,6 @@ func (m *mockTarpit) metExpectedCalls(t *testing.T) bool {
 }
 
 type Tarpit interface {
-	tarpit(failedAttempts uint64)
+	tarpit(ctx context.Context, failedAttempts uint64)
 	metExpectedCalls(t *testing.T) bool
 }

@@ -6,7 +6,7 @@ import { RestartSignIn } from "@/components/restart-sign-in";
 import { TotpRegister } from "@/components/totp-register";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getEnrollmentAuthorizationError } from "@/lib/server/enrollment-guard";
+import { getSetupAuthorizationError, setupErrorTranslationKey, SetupMethod } from "@/lib/server/enrollment-guard";
 import { getServiceConfig } from "@/lib/server/service-url";
 import { loadMostRecentSession, loadSessionById } from "@/lib/server/session";
 import { getBrandingSettings, getLoginSettings, registerTOTP } from "@/lib/server/zitadel";
@@ -41,15 +41,23 @@ export default async function Page(props: {
       });
 
   let totpResponse: RegisterTOTPResponse | undefined, error: Error | undefined;
+  let setupError: string | null = null;
   if (session && session.factors?.user?.id) {
     // Enrollment must be authorized: a bare identify-only session must not be able to
     // attach a new OTP/TOTP factor to the account (GHSA-45f2-5q3r-xgg6).
-    const enrollmentError = await getEnrollmentAuthorizationError({
+    const setupMethod: SetupMethod | undefined =
+      method === "time-based" ? "totp" : method === "sms" ? "otp_sms" : method === "email" ? "otp_email" : undefined;
+    if (!setupMethod) {
+      throw new Error("Invalid method");
+    }
+    const enrollmentError = await getSetupAuthorizationError({
       serviceConfig,
       session,
       userId: session.factors.user.id,
+      method: setupMethod,
     });
     if (enrollmentError) {
+      setupError = enrollmentError;
       error = new Error(enrollmentError);
     } else if (method === "time-based") {
       // registering only creates a pending secret, which is not used for authentication until
@@ -63,11 +71,9 @@ export default async function Page(props: {
         .catch((err) => {
           error = err;
         });
-    } else if (method !== "sms" && method !== "email") {
-      // OTP via SMS and email are only added on explicit confirmation of the user (see OTPAddForm),
-      // never while rendering, so that a link alone can't change the second factors of a user
-      throw new Error("Invalid method");
     }
+    // OTP via SMS and email are only added on explicit confirmation of the user (see OTPAddForm),
+    // never while rendering, so that a link alone can't change the second factors of a user
   }
 
   const paramsToContinue = new URLSearchParams({});
@@ -133,7 +139,9 @@ export default async function Page(props: {
 
         {error && (
           <div className="py-4">
-            <Alert>{error?.message}</Alert>
+            <Alert>
+              {setupError ? <Translated i18nKey={setupErrorTranslationKey(setupError)} namespace="error" /> : error?.message}
+            </Alert>
           </div>
         )}
 
