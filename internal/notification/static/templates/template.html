@@ -235,6 +235,7 @@
                                       >
                                         <tbody>
 
+                                        {{if .IncludeGreeting}}
                                         <tr>
                                           <td
                                                   align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;"
@@ -246,6 +247,7 @@
 
                                           </td>
                                         </tr>
+                                        {{end}}
 
                                         <tr>
                                           <td
@@ -260,6 +262,7 @@
                                         </tr>
 
 
+                                        {{if .IncludeButton}}
                                         <tr>
                                           <td
                                                   align="center" vertical-align="middle" class="shadow" style="font-size:0px;padding:10px 25px;word-break:break-word;"
@@ -283,6 +286,7 @@
 
                                           </td>
                                         </tr>
+                                        {{end}}
                                         {{if .IncludeFooter}}
                                         <tr>
                                           <td
