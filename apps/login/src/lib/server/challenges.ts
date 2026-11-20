@@ -1,5 +1,6 @@
 import "server-only";
 
+import { RESEND_COOLDOWN_SECONDS } from "@/lib/constants";
 import { create } from "@zitadel/client";
 import {
   RequestChallenges,
@@ -45,40 +46,105 @@ export function sanitizeChallenges(challenges?: RequestChallenges): RequestChall
   return sanitized;
 }
 
-const DEFAULT_OTP_SMS_RESEND_COOLDOWN_SECONDS = 30;
+/** When an OTP was last requested for a session, in ms since epoch: fields of the session cookie entry. */
+export type OTPSentTimestamps = {
+  otpSmsSentTs?: string;
+  otpEmailSentTs?: string;
+};
+
+type OTPChallenges = Pick<RequestChallenges, "otpSms" | "otpEmail">;
 
 /**
- * Minimum number of seconds between two OTP SMS challenges on the same session.
+ * The OTP challenges that send a code, each with the cookie field that records when it was last
+ * requested and its resend cooldown. Every such challenge makes Zitadel send a text message or a
+ * mail; without a cooldown a user (or a script) can request codes in a loop, and each new code
+ * invalidates the previous one.
  *
- * Every OTP SMS challenge makes Zitadel send a text message. Without a cooldown a user (or a script)
- * can hit "resend" in a loop and flood the user's phone with codes.
- *
- * Configurable via `OTP_SMS_RESEND_COOLDOWN_SECONDS`, defaults to 30. `0` disables the cooldown;
- * anything that is not a non-negative integer falls back to the default.
+ * The cooldowns are configured with `OTP_SMS_RESEND_COOLDOWN_SECONDS` and
+ * `OTP_EMAIL_RESEND_COOLDOWN_SECONDS`, read on every call.
  */
-export function getOTPSMSResendCooldownSeconds(): number {
-  const configured = process.env.OTP_SMS_RESEND_COOLDOWN_SECONDS?.trim();
-  if (!configured || !/^\d+$/.test(configured)) {
-    return DEFAULT_OTP_SMS_RESEND_COOLDOWN_SECONDS;
+const OTP_CHANNELS = [
+  {
+    challenge: "otpSms",
+    sentTsField: "otpSmsSentTs",
+    configuredCooldown: () => process.env.OTP_SMS_RESEND_COOLDOWN_SECONDS,
+  },
+  {
+    challenge: "otpEmail",
+    sentTsField: "otpEmailSentTs",
+    configuredCooldown: () => process.env.OTP_EMAIL_RESEND_COOLDOWN_SECONDS,
+  },
+] as const;
+
+// a value that is not a non-negative integer falls back to RESEND_COOLDOWN_SECONDS, `0` disables the cooldown
+function parseCooldownSeconds(configured: string | undefined): number {
+  const trimmed = configured?.trim();
+  if (!trimmed || !/^\d+$/.test(trimmed)) {
+    return RESEND_COOLDOWN_SECONDS;
   }
-  return Number(configured);
+  return Number(trimmed);
 }
 
-/**
- * Returns how many seconds are left until another OTP SMS may be sent, or 0 if one may be sent now.
- *
- * @param otpSmsSentTs the `otpSmsSentTs` (ms since epoch) of the session cookie entry
- */
-export function getOTPSMSRetryAfterSeconds(otpSmsSentTs: string | undefined, now: number = Date.now()): number {
-  const sentAt = Number(otpSmsSentTs);
-  if (!otpSmsSentTs || !Number.isFinite(sentAt)) {
+function getRetryAfterSeconds(sentTs: string | undefined, cooldownSeconds: number, now: number): number {
+  const sentAt = Number(sentTs);
+  if (!sentTs || !Number.isFinite(sentAt)) {
     return 0;
   }
 
-  const cooldownSeconds = getOTPSMSResendCooldownSeconds();
   const remainingSeconds = Math.ceil((sentAt + cooldownSeconds * 1000 - now) / 1000);
   // a timestamp in the future can only come from clock skew between replicas, cap it at the full cooldown
   return Math.min(Math.max(remainingSeconds, 0), cooldownSeconds);
+}
+
+function requestedChannels(challenges: OTPChallenges | undefined) {
+  return OTP_CHANNELS.filter((channel) => !!challenges?.[channel.challenge]);
+}
+
+/**
+ * Returns the resend cooldown of the OTP challenges requested, the longest if both are, or 0 if none
+ * is requested or the cooldown is disabled.
+ */
+export function getOTPResendCooldownSeconds(challenges: OTPChallenges | undefined): number {
+  return Math.max(0, ...requestedChannels(challenges).map((channel) => parseCooldownSeconds(channel.configuredCooldown())));
+}
+
+/**
+ * Returns how many seconds are left until the OTP challenges requested may be sent again, or 0 if
+ * they may be sent now.
+ *
+ * @param sentTimestamps the session cookie entry, which records when each OTP was last requested
+ */
+export function getOTPRetryAfterSeconds(
+  challenges: OTPChallenges | undefined,
+  sentTimestamps: OTPSentTimestamps,
+  now: number = Date.now(),
+): number {
+  return Math.max(
+    0,
+    ...requestedChannels(challenges).map((channel) =>
+      getRetryAfterSeconds(sentTimestamps[channel.sentTsField], parseCooldownSeconds(channel.configuredCooldown()), now),
+    ),
+  );
+}
+
+/**
+ * Returns the timestamps a session cookie entry carries after an update: now for each OTP challenge
+ * requested, the previous value for the others. They are carried over on every update, otherwise any
+ * other update of the session would reset the resend cooldown.
+ */
+export function getOTPSentTimestamps(
+  challenges: OTPChallenges | undefined,
+  previous: OTPSentTimestamps = {},
+  now: number = Date.now(),
+): OTPSentTimestamps {
+  const timestamps: OTPSentTimestamps = {};
+  for (const channel of OTP_CHANNELS) {
+    const sentTs = challenges?.[channel.challenge] ? `${now}` : previous[channel.sentTsField];
+    if (sentTs) {
+      timestamps[channel.sentTsField] = sentTs;
+    }
+  }
+  return timestamps;
 }
 
 /**

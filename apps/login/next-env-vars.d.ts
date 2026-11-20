@@ -101,6 +101,12 @@ declare namespace NodeJS {
     OTP_SMS_RESEND_COOLDOWN_SECONDS?: string;
 
     /**
+     * Optional: Minimum number of seconds between two OTP e-mails sent for the same session.
+     * Enforced and shown like OTP_SMS_RESEND_COOLDOWN_SECONDS. Defaults to 30, set to "0" to disable.
+     */
+    OTP_EMAIL_RESEND_COOLDOWN_SECONDS?: string;
+
+    /**
      * Optional: Enable the SWR in-memory cache for API requests globally.
      * Defaults to true. Set to "false" to disable completely.
      */

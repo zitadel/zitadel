@@ -3,6 +3,7 @@
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from "@/helpers/validators";
 import { changePassword, resetPassword, sendPassword } from "@/lib/actions/password";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useResendCooldown } from "@/lib/use-resend-cooldown";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
@@ -16,6 +17,7 @@ import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { PasswordComplexity } from "./password-complexity";
+import { ResendButton } from "./resend-button";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 
@@ -36,6 +38,8 @@ type Props = {
   defaultOrganization?: string;
   requestId?: string;
   codeRequired: boolean;
+  /** a reset code was just sent before arriving here, so start the resend cooldown */
+  codeSent?: boolean;
 };
 
 export function SetPasswordForm({
@@ -47,6 +51,7 @@ export function SetPasswordForm({
   userId,
   code,
   codeRequired,
+  codeSent,
 }: Props) {
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onChange",
@@ -62,6 +67,7 @@ export function SetPasswordForm({
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const router = useRouter();
+  const resendCooldown = useResendCooldown({ startNow: !!codeSent && codeRequired });
 
   async function resendCode() {
     setError("");
@@ -84,6 +90,10 @@ export function SetPasswordForm({
     if (response && "error" in response && typeof response.error === "string") {
       setError(response.error);
       return;
+    }
+
+    if (response) {
+      resendCooldown.start();
     }
   }
 
@@ -189,18 +199,16 @@ export function SetPasswordForm({
                 <span className="mr-auto flex-1 text-left">
                   <Translated i18nKey="set.noCodeReceived" namespace="password" />
                 </span>
-                <button
-                  aria-label={t("set.resend")}
+                <ResendButton
+                  namespace="password"
+                  i18nKey="set.resend"
+                  countdownI18nKey="set.resendIn"
+                  cooldown={resendCooldown}
                   disabled={loading}
-                  type="button"
-                  className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
                   onClick={() => {
                     resendCode();
                   }}
-                  data-testid="resend-button"
-                >
-                  <Translated i18nKey="set.resend" namespace="password" />
-                </button>
+                />
               </div>
             </Alert>
           )}

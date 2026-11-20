@@ -160,6 +160,27 @@ describe("OTP SMS resend cooldown timestamp", () => {
     expect(writtenSessionCookie()).not.toHaveProperty("otpSmsSentTs");
   });
 
+  test("setSessionAndUpdateCookie records when an OTP e-mail was requested, without touching the SMS timestamp", async () => {
+    await setSessionAndUpdateCookie({
+      recentCookie: { ...recentCookie, otpSmsSentTs: "999000" },
+      challenges: create(RequestChallengesSchema, { otpEmail: {} }),
+      lifetime: {} as any,
+    });
+
+    expect(writtenSessionCookie().otpEmailSentTs).toBe("1000000");
+    expect(writtenSessionCookie().otpSmsSentTs).toBe("999000");
+  });
+
+  test("setSessionAndUpdateCookie keeps the e-mail timestamp on updates without an OTP e-mail challenge", async () => {
+    await setSessionAndUpdateCookie({
+      recentCookie: { ...recentCookie, otpEmailSentTs: "999000" },
+      lifetime: {} as any,
+    });
+
+    expect(writtenSessionCookie().otpEmailSentTs).toBe("999000");
+    expect(writtenSessionCookie()).not.toHaveProperty("otpSmsSentTs");
+  });
+
   test("setSessionAndUpdateCookie reports a failure after the session was updated as SessionUpdatedError", async () => {
     vi.mocked(getSession).mockRejectedValue(new Error("not found"));
 

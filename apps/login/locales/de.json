@@ -86,6 +86,7 @@
       "codeSent": "Ein neuer Code wurde an Ihre E-Mail-Adresse gesendet.",
       "noCodeReceived": "Keinen Code erhalten?",
       "resend": "Erneut senden",
+      "resendIn": "Erneut senden ({seconds}s)",
       "submit": "Weiter",
       "labels": {
         "code": "Code",
@@ -410,6 +411,7 @@
       "description": "Geben Sie den Code ein, der in der Bestätigungs-E-Mail angegeben ist.",
       "noCodeReceived": "Keinen Code erhalten?",
       "resendCode": "Code erneut senden",
+      "resendCodeIn": "Code erneut senden ({seconds}s)",
       "codeSent": "Ein Code wurde gerade an Ihre E-Mail-Adresse gesendet.",
       "submit": "Weiter",
       "labels": {
