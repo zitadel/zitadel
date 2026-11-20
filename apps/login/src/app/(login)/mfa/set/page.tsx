@@ -2,6 +2,7 @@ import { Alert } from "@/components/alert";
 import { BackButton } from "@/components/back-button";
 import { ChooseSecondFactorToSetup } from "@/components/choose-second-factor-to-setup";
 import { DynamicTheme } from "@/components/dynamic-theme";
+import { RestartSignIn } from "@/components/restart-sign-in";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/server/cookies";
@@ -158,9 +159,12 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           )}
 
           {!valid && (
-            <Alert>
-              <Translated i18nKey="sessionExpired" namespace="error" />
-            </Alert>
+            <>
+              <Alert>
+                <Translated i18nKey="sessionExpired" namespace="error" />
+              </Alert>
+              <RestartSignIn loginName={loginName} organization={organization} requestId={requestId} />
+            </>
           )}
 
           {valid && loginSettings && sessionWithData && sessionWithData.factors?.user?.id && (
