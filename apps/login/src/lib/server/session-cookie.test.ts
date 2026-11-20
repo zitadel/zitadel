@@ -1,4 +1,5 @@
-import { create } from "@zitadel/client";
+import { Code, ConnectError, create } from "@zitadel/client";
+import { CredentialsCheckErrorSchema } from "@zitadel/proto/zitadel/message_pb";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -185,5 +186,40 @@ describe("OTP SMS resend cooldown timestamp", () => {
     });
 
     expect((vi.mocked(addSessionToCookie).mock.calls[0][0].session as any).otpSmsSentTs).toBe("1000000");
+  });
+});
+
+describe("failed password attempts", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(headers).mockResolvedValue({} as any);
+    vi.mocked(getServiceConfig).mockReturnValue({ serviceConfig: {} } as any);
+  });
+
+  test("createSessionAndUpdateCookie reports the failed attempts of a wrong password", async () => {
+    vi.mocked(createSessionFromChecksAndChallenges).mockRejectedValue(
+      new ConnectError("Errors.User.Password.Invalid", Code.InvalidArgument, undefined, [
+        { desc: CredentialsCheckErrorSchema, value: { failedAttempts: 2 } },
+      ]),
+    );
+
+    await expect(createSessionAndUpdateCookie({ checks: {} as any, requestId: undefined })).rejects.toEqual(
+      expect.objectContaining({ failedAttempts: 2 }),
+    );
+    expect(getSession).not.toHaveBeenCalled();
+  });
+
+  test("createSessionAndUpdateCookie passes other errors through", async () => {
+    const error = new ConnectError("Errors.User.NotFound", Code.NotFound);
+    vi.mocked(createSessionFromChecksAndChallenges).mockRejectedValue(error);
+
+    await expect(createSessionAndUpdateCookie({ checks: {} as any, requestId: undefined })).rejects.toBe(error);
+  });
+
+  test("createSessionAndUpdateCookie passes errors that are no ConnectError through", async () => {
+    const error = new Error("network down");
+    vi.mocked(createSessionFromChecksAndChallenges).mockRejectedValue(error);
+
+    await expect(createSessionAndUpdateCookie({ checks: {} as any, requestId: undefined })).rejects.toBe(error);
   });
 });
