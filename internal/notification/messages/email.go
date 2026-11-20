@@ -2,6 +2,7 @@ package messages
 
 import (
 	"fmt"
+	"log/slog"
 	"mime"
 	"regexp"
 	"strings"
@@ -19,19 +20,29 @@ var (
 var _ channels.Message = (*Email)(nil)
 
 type Email struct {
-	Recipients          []string
-	BCC                 []string
-	CC                  []string
-	SenderEmail         string
-	SenderName          string
-	ReplyToAddress      string
-	Subject             string
-	Content             string
+	Recipients     []string
+	BCC            []string
+	CC             []string
+	SenderEmail    string
+	SenderName     string
+	ReplyToAddress string
+	Subject        string
+	Content        string
+	// Headers are added to the headers set by ZITADEL.
+	// Invalid headers and headers set by ZITADEL itself are ignored.
+	Headers             map[string]string
 	TriggeringEventType eventstore.EventType
 }
 
 func (msg *Email) GetContent() (string, error) {
 	headers := make(map[string]string)
+	for name, value := range msg.Headers {
+		if !IsValidEmailHeaderName(name) || IsReservedEmailHeader(name) || !IsValidEmailHeaderValue(value) {
+			slog.Warn("additional email header ignored", "header", name)
+			continue
+		}
+		headers[name] = bEncodeWord(value)
+	}
 	from := msg.SenderEmail
 	if msg.SenderName != "" {
 		from = fmt.Sprintf("%s <%s>", bEncodeWord(msg.SenderName), msg.SenderEmail)
