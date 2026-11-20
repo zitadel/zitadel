@@ -35,7 +35,7 @@ type CustomCookieData = {
 };
 
 const passwordAttemptsHandler = (error: ConnectError | SessionUpdatedError) => {
-  if (error instanceof SessionUpdatedError) {
+  if (error instanceof SessionUpdatedError || typeof (error as ConnectError)?.findDetails !== "function") {
     throw error;
   }
 
@@ -76,7 +76,7 @@ export async function createSessionAndUpdateCookie(command: {
     checks: command.checks,
     lifetime: sessionLifetime,
     challenges: sanitizeChallenges(command.challenges),
-  });
+  }).catch(passwordAttemptsHandler);
 
   if (createdSession) {
     return getSession({

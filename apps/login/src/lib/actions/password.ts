@@ -71,6 +71,20 @@ async function failedPasswordCheckError({
   };
 }
 
+// A failed password check (or a locked user) is reported as { failedAttempts } by the session helpers.
+function isFailedPasswordCheck(error: unknown): error is { failedAttempts: number } {
+  return !!error && typeof error === "object" && "failedAttempts" in error && !!error.failedAttempts;
+}
+
+// Errors that mean the session itself can no longer be used: it was terminated or expired (FailedPrecondition),
+// its token is invalid (PermissionDenied) or it does not exist anymore. Temporary errors keep the session.
+function isUnusableSessionError(error: unknown): boolean {
+  return (
+    isClassifiedError(error) &&
+    [Code.FailedPrecondition, Code.PermissionDenied, Code.NotFound, Code.Unauthenticated].includes(error.code)
+  );
+}
+
 type ResetPasswordCommand = {
   loginName: string;
   organization?: string;
@@ -247,25 +261,37 @@ export async function sendPassword(
     } catch (error: any) {
       // The password was checked against the existing session and was wrong.
       // Do not fall back, as checking it again on a new session would count the failed attempt twice.
-      if (error && "failedAttempts" in error && error.failedAttempts) {
+      if (isFailedPasswordCheck(error)) {
         recordAuthFailure("password", "invalid_password", command.organization);
+        // same settings as on the fallback below, so both paths answer the same way
+        if (!loginSettingsByContext) {
+          loginSettingsByContext = await getLoginSettings({
+            serviceConfig,
+            organization: command.organization ?? command.defaultOrganization,
+          });
+        }
         return failedPasswordCheckError({
           serviceConfig,
           orgId: sessionCookie.organization,
           failedAttempts: error.failedAttempts,
-          ignoreUnknownUsernames: loginSettingsByUser?.ignoreUnknownUsernames,
+          ignoreUnknownUsernames: loginSettingsByContext?.ignoreUnknownUsernames,
           t,
         });
       }
 
-      logger.warn("[Password] Could not update session, removing it from the cookie", { error });
-      // If the session was terminated, no longer exists or any other error occurred during update,
-      // we remove it from the cookie, so it is not reused, and fall back to creating a new session.
-      const securitySettings = await getSecuritySettings({ serviceConfig });
-      await removeSessionFromCookie({
-        session: sessionCookie,
-        iFrameEnabled: !!securitySettings?.embeddedIframe?.enabled,
-      });
+      if (isUnusableSessionError(error)) {
+        logger.warn("[Password] Session can no longer be used, removing it from the cookie", { error });
+        // The session was terminated, has expired or no longer exists: remove it from the cookie,
+        // so it is not reused, and fall back to creating a new session.
+        const securitySettings = await getSecuritySettings({ serviceConfig });
+        await removeSessionFromCookie({
+          session: sessionCookie,
+          iFrameEnabled: !!securitySettings?.embeddedIframe?.enabled,
+        });
+      } else {
+        // A temporary error must not drop the session, just fall back to creating a new one.
+        logger.warn("[Password] Could not update session", { error });
+      }
       sessionCookie = undefined;
       session = undefined;
     }
@@ -372,11 +398,12 @@ export async function sendPassword(
         session = result.session;
         sessionCookie = result.sessionCookie;
       } catch (error: any) {
-        if ("failedAttempts" in error && error.failedAttempts) {
+        if (isFailedPasswordCheck(error)) {
           recordAuthFailure("password", "invalid_password", command.organization);
           return failedPasswordCheckError({
             serviceConfig,
-            orgId: command.organization,
+            // the lockout policy of the user's organization applies, not the one of the login context
+            orgId: user.details?.resourceOwner ?? command.organization,
             failedAttempts: error.failedAttempts,
             ignoreUnknownUsernames: loginSettingsByContext?.ignoreUnknownUsernames,
             t,
@@ -640,7 +667,7 @@ export async function checkSessionAndSetPassword({
       requestId: sessionCookie.requestId,
     });
   } catch (error: any) {
-    if ("failedAttempts" in error && error.failedAttempts) {
+    if (isFailedPasswordCheck(error)) {
       return failedPasswordCheckError({
         serviceConfig,
         orgId: sessionCookie.organization,
