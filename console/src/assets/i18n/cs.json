@@ -2592,7 +2592,7 @@
       "REDIRECTTITLE": "Určete URI, kam se přesměruje přihlášení.",
       "POSTREDIRECTTITLE": "Toto je URI přesměrování po odhlášení.",
       "REDIRECTDESCRIPTIONWEB": "URI pro přesměrování musí začínat na https://. http:// je platný pouze v povoleném vývojovém režimu.",
-      "REDIRECTDESCRIPTIONNATIVE": "URI pro přesměrování musí začínat vaším vlastním protokolem, http://127.0.0.1, http://[::1] nebo http://localhost.",
+      "REDIRECTDESCRIPTIONNATIVE": "URI pro přesměrování musí začínat https://, vaším vlastním protokolem, http://127.0.0.1, http://[::1] nebo http://localhost.",
       "REDIRECTNOTVALID": "Toto URI pro přesměrování není platné.",
       "COMMAORENTERSEPERATION": "oddělte ↵",
       "TYPEREQUIRED": "Typ je vyžadován.",

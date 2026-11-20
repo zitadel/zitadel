@@ -2579,7 +2579,7 @@
       "REDIRECTTITLE": "Especifique as URIs para onde o login será redirecionado.",
       "POSTREDIRECTTITLE": "Esta é a URI de redirecionamento após o logout.",
       "REDIRECTDESCRIPTIONWEB": "URIs de redirecionamento devem começar com https://. http:// é válido apenas com o modo de desenvolvimento habilitado.",
-      "REDIRECTDESCRIPTIONNATIVE": "URIs de redirecionamento devem começar com seu próprio protocolo, http://127.0.0.1, http://[::1] ou http://localhost.",
+      "REDIRECTDESCRIPTIONNATIVE": "URIs de redirecionamento devem começar com https://, seu próprio protocolo, http://127.0.0.1, http://[::1] ou http://localhost.",
       "REDIRECTNOTVALID": "Esta URI de redirecionamento não é válida.",
       "COMMAORENTERSEPERATION": "separar com ↵",
       "TYPEREQUIRED": "O tipo é obrigatório.",

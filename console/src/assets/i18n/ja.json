@@ -2609,7 +2609,7 @@
       "REDIRECTTITLE": "ログインのリダイレクト先となるURIを指定します。",
       "POSTREDIRECTTITLE": "ログアウト後のリダイレクトURIです。",
       "REDIRECTDESCRIPTIONWEB": "リダイレクトURIは https:// で開始する必要があります。 http:// は、開発モードでのみ有効です。",
-      "REDIRECTDESCRIPTIONNATIVE": "リダイレクトURIは、独自のプロトコル、http://127.0.0.1、http://[::1] または http://localhost で開始する必要があります。",
+      "REDIRECTDESCRIPTIONNATIVE": "リダイレクトURIは、https://、独自のプロトコル、http://127.0.0.1、http://[::1] または http://localhost で開始する必要があります。",
       "REDIRECTNOTVALID": "このリダイレクトURIは無効です。",
       "COMMAORENTERSEPERATION": "↵で分離する",
       "TYPEREQUIRED": "タイプが必要です。",

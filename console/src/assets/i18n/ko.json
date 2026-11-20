@@ -2608,7 +2608,7 @@
       "REDIRECTTITLE": "로그인 후 리디렉션될 URI를 지정하세요.",
       "POSTREDIRECTTITLE": "로그아웃 후 리디렉션 URI입니다.",
       "REDIRECTDESCRIPTIONWEB": "리디렉션 URI는 https://로 시작해야 합니다. 개발 모드에서만 http://가 유효합니다.",
-      "REDIRECTDESCRIPTIONNATIVE": "리디렉션 URI는 http://127.0.0.1, http://[::1] 또는 http://localhost와 같은 자체 프로토콜로 시작해야 합니다.",
+      "REDIRECTDESCRIPTIONNATIVE": "리디렉션 URI는 https://, 자체 프로토콜, http://127.0.0.1, http://[::1] 또는 http://localhost로 시작해야 합니다.",
       "REDIRECTNOTVALID": "유효하지 않은 리디렉션 URI입니다.",
       "COMMAORENTERSEPERATION": "↵로 구분",
       "TYPEREQUIRED": "유형은 필수 항목입니다.",

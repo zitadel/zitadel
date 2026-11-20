@@ -2610,7 +2610,7 @@
       "REDIRECTTITLE": "Посочете URI адресите, към които ще се пренасочва влизането.",
       "POSTREDIRECTTITLE": "Това е URI за пренасочване след излизане.",
       "REDIRECTDESCRIPTIONWEB": "URI адресите за пренасочване трябва да започват с https://. ",
-      "REDIRECTDESCRIPTIONNATIVE": "URI адресите за пренасочване трябва да започват с вашия собствен протокол, http://127.0.0.1, http://[::1] или http://localhost.",
+      "REDIRECTDESCRIPTIONNATIVE": "URI адресите за пренасочване трябва да започват с https://, вашия собствен протокол, http://127.0.0.1, http://[::1] или http://localhost.",
       "REDIRECTNOTVALID": "Този URI адрес за пренасочване не е валиден.",
       "COMMAORENTERSEPERATION": "отделете с ↵",
       "TYPEREQUIRED": "Типът е задължителен.",
