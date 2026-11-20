@@ -128,13 +128,29 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 		sq.Eq{hostedLoginTranslationColLocale.identifier(): lang.String()},
 		sq.Eq{hostedLoginTranslationColLocale.identifier(): parentLang.String()},
 	}
-	eq := sq.Eq{
-		hostedLoginTranslationColInstanceID.identifier():        inst.InstanceID(),
-		hostedLoginTranslationColResourceOwner.identifier():     levelID,
-		hostedLoginTranslationColResourceOwnerType.identifier(): resourceOwner,
+
+	if resourceOwner == org.AggregateType && !req.GetIgnoreInheritance() {
+		stmt = stmt.Where(sq.Or{
+			sq.Eq{
+				hostedLoginTranslationColResourceOwner.identifier():     levelID,
+				hostedLoginTranslationColResourceOwnerType.identifier(): org.AggregateType,
+			},
+			sq.Eq{
+				hostedLoginTranslationColResourceOwner.identifier():     inst.InstanceID(),
+				hostedLoginTranslationColResourceOwnerType.identifier(): instance.AggregateType,
+			},
+		}).Where(sq.Eq{
+			hostedLoginTranslationColInstanceID.identifier(): inst.InstanceID(),
+		})
+	} else {
+		stmt = stmt.Where(sq.Eq{
+			hostedLoginTranslationColResourceOwner.identifier():     levelID,
+			hostedLoginTranslationColResourceOwnerType.identifier(): resourceOwner,
+			hostedLoginTranslationColInstanceID.identifier():        inst.InstanceID(),
+		})
 	}
 
-	query, args, err := stmt.Where(eq).Where(langORBaseLang).ToSql()
+	query, args, err := stmt.Where(langORBaseLang).ToSql()
 	if err != nil {
 		logging.WithError(err).Error("unable to generate sql statement")
 		return nil, zerrors.ThrowInternal(err, "QUERY-ZgCMux", "Errors.Query.SQLStatement")
