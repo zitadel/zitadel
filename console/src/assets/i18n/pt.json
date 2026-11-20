@@ -209,7 +209,9 @@
         "PREVIOUS_TABLE": {
           "TITLE": "Chaves Web Anteriores",
           "DESCRIPTION": "Estas são suas chaves web anteriores que não estão mais ativas.",
-          "DEACTIVATED_ON": "Desativada em"
+          "DEACTIVATED_ON": "Desativada em",
+          "DELETE_TITLE": "Excluir chave web anterior",
+          "DELETE_DESCRIPTION": "Remover esta chave web anterior invalida todos os tokens que foram assinados com ela. Esta ação não pode ser desfeita."
         }
       },
       "MESSAGE_TEXTS": {
