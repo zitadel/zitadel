@@ -6,7 +6,7 @@ import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/lega
 import { LoginSettings, PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
 import { AuthenticationMethod, AuthenticationMethodRadio, methods } from "./authentication-method-radio";
@@ -47,7 +47,7 @@ export function RegisterForm({
   loginSettings,
   idpCount = 0,
 }: Props) {
-  const { register, handleSubmit, formState } = useForm<Inputs>({
+  const { register, handleSubmit, formState, setValue } = useForm<Inputs>({
     mode: "onChange",
     defaultValues: {
       email: email ?? "",
@@ -55,6 +55,19 @@ export function RegisterForm({
       lastname: lastname ?? "",
     },
   });
+
+  // Going back from the password page restores this page from the router's
+  // cache, rendered without the values. submitAndContinue leaves them in the
+  // URL of this history entry, so prefill from there.
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    for (const field of ["firstname", "lastname", "email"] as const) {
+      const value = query.get(field);
+      if (value) {
+        setValue(field, value, { shouldValidate: true });
+      }
+    }
+  }, [setValue]);
 
   const t = useTranslations("register");
 
@@ -99,7 +112,11 @@ export function RegisterForm({
 
     // redirect user to /register/password if password is chosen
     if (withPassword) {
-      return router.push(`/register/password?` + new URLSearchParams(registerParams));
+      const query = new URLSearchParams(registerParams);
+      // Keep the entered values in the current history entry, so that going
+      // back from the password page prefills the form instead of emptying it.
+      window.history.replaceState(window.history.state, "", `${window.location.pathname}?${query}`);
+      return router.push(`/register/password?` + query);
     } else {
       return submitAndRegister(value);
     }
