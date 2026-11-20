@@ -764,6 +764,9 @@ func (c *Commands) prepareAddInstanceOIDCProvider(a *instance.Aggregate, writeMo
 					provider.Scopes,
 					provider.IsIDTokenMapping,
 					provider.UsePKCE,
+					domain.OIDCTokenEndpointAuthMethodClientSecret,
+					nil,
+					"",
 					provider.IDPOptions,
 				),
 			}, nil
