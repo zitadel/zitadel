@@ -216,7 +216,7 @@ The delay is configured system-wide in the `SystemDefaults.Tarpit` section of th
 | `MaxDuration`       | `ZITADEL_SYSTEMDEFAULTS_TARPIT_MAXDURATION`       | `10s`   | Maximum delay                                                     |
 
 The delay is `(failed attempts - MinFailedAttempts) / StepSize` (rounded down) times `StepDuration`, at most `MaxDuration`.
-Lower values weaken the protection against brute-force attacks.
+Reducing `StepDuration` or `MaxDuration`, or increasing `MinFailedAttempts` or `StepSize`, weakens the protection against brute-force attacks.
 
 A delayed response is recorded as `tarpit` span (with the `tarpit.failed_attempts` and `tarpit.duration` attributes) and logged as `tarpit` on info level,
 so a long request caused by the delay can be told apart from a slow request.
