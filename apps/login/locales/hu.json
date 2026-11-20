@@ -467,6 +467,7 @@
       "title": "A(z) {appName} kapcsolódni szeretne",
       "description": "A(z) {appName} hozzáférést kap a következőkhöz:",
       "disclaimer": "Az Engedélyezés gombra kattintva engedélyezed, hogy a(z) {appName} és a Zitadel a saját felhasználási feltételeik és adatvédelmi irányelveik szerint használja az adataidat. Ezt a hozzáférést bármikor visszavonhatod.",
+      "usercode": "Az eszközödön megjelenő kód:",
       "submit": "Engedélyezés",
       "deny": "Elutasítás"
     },

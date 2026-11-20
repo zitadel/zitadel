@@ -467,6 +467,7 @@
       "title": "{appName} wil verbinding maken",
       "description": "{appName} krijgt toegang tot:",
       "disclaimer": "Door op Toestaan te klikken geeft u {appName} en Zitadel toestemming om jouw informatie te gebruiken overeenkomstig hun respectieve servicevoorwaarden en privacybeleid. U kunt deze toegang op elk moment intrekken.",
+      "usercode": "Code die op jouw apparaat wordt weergegeven:",
       "submit": "Toestaan",
       "deny": "Weigeren"
     },

@@ -467,6 +467,7 @@
       "title": "{appName} desea conectarse:",
       "description": "{appName} tendrá acceso a:",
       "disclaimer": "Al hacer clic en Permitir, autorizas a {appName} y a Zitadel a usar tu información de acuerdo con sus respectivos términos de servicio y políticas de privacidad. Puedes revocar este acceso en cualquier momento.",
+      "usercode": "Código mostrado en tu dispositivo:",
       "submit": "Permitir",
       "deny": "Denegar"
     },
