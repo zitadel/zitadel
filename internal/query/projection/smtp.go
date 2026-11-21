@@ -349,14 +349,18 @@ func (p *smtpConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 	if e.User != nil {
 		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigSMTPColumnUser, *e.User))
 	}
-	if e.Password != nil {
-		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, *e.Password))
-	}
-
+	// PlainAuth and the deprecated Password field map to the same column, and
+	// ChangeSMTPConfigSMTPPassword sets both, so they must never be appended together:
+	// the resulting UPDATE would assign password twice and Postgres rejects the whole
+	// statement with "multiple assignments to same column" (SQLSTATE 42601).
+	// PlainAuth takes precedence, Password remains the fallback for events written
+	// before PlainAuth existed. This mirrors reduceSMTPConfigAdded.
 	if !e.PlainAuth.IsEmpty() {
 		smtpColumns = append(smtpColumns,
 			handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, e.PlainAuth.Password),
 		)
+	} else if e.Password != nil {
+		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigSMTPColumnPlainAuthPassword, *e.Password))
 	}
 
 	if !e.XOAuth2Auth.IsEmpty() {

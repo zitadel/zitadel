@@ -213,6 +213,118 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			// ChangeSMTPConfigSMTPPassword sets the deprecated password field and
+			// plainAuth.password to the same value, so every password-carrying change
+			// event holds both. They map to one column and must be assigned once.
+			name: "reduceSMTPConfigChanged, password and plainAuth password assign the column once",
+			args: args{
+				event: getEvent(
+					testEvent(
+						instance.SMTPConfigChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
+						"instance_id": "instance-id",
+						"resource_owner": "ro-id",
+						"aggregate_id": "agg-id",
+						"id": "config-id",
+						"host": "host",
+						"user": "user",
+						"password": {
+							"cryptoType": 0,
+							"algorithm": "RSA-265",
+							"keyId": "key-id"
+						},
+						"plainAuth": {
+							"password": {
+								"cryptoType": 0,
+								"algorithm": "RSA-265",
+								"keyId": "key-id"
+							}
+						}
+					}`,
+						),
+					), eventstore.GenericEventMapper[instance.SMTPConfigChangedEvent]),
+			},
+			reduce: (&smtpConfigProjection{}).reduceSMTPConfigChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.smtp_configs6 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"config-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.smtp_configs6_smtp SET (host, username, password) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								"host",
+								"user",
+								anyArg{},
+								"config-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			// Events written before plainAuth existed carry only the deprecated field,
+			// and must still reduce to a password assignment when they are replayed.
+			name: "reduceSMTPConfigChanged, deprecated password only",
+			args: args{
+				event: getEvent(
+					testEvent(
+						instance.SMTPConfigChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
+						"instance_id": "instance-id",
+						"resource_owner": "ro-id",
+						"aggregate_id": "agg-id",
+						"id": "config-id",
+						"password": {
+							"cryptoType": 0,
+							"algorithm": "RSA-265",
+							"keyId": "key-id"
+						}
+					}`,
+						),
+					), eventstore.GenericEventMapper[instance.SMTPConfigChangedEvent]),
+			},
+			reduce: (&smtpConfigProjection{}).reduceSMTPConfigChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.smtp_configs6 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"config-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.smtp_configs6_smtp SET password = $1 WHERE (id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								"config-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "reduceSMTPConfigHTTPChanged",
 			args: args{
 				event: getEvent(
