@@ -14,8 +14,14 @@
               <a
                 class="verify cnsl-secondary-text"
                 matTooltip="{{ 'USER.LOGINMETHODS.EMAIL.RESEND' | translate }}"
-                (click)="emitEmailVerification()"
-                >{{ 'USER.LOGINMETHODS.RESENDCODE' | translate }}</a
+                [attr.aria-busy]="emailVerificationPending"
+                [attr.aria-disabled]="emailVerificationPending"
+                (click)="!emailVerificationPending && emitEmailVerification()"
+              >
+                @if (emailVerificationPending) {
+                  <i class="las la-circle-notch la-spin" aria-hidden="true"></i>
+                }
+                {{ 'USER.LOGINMETHODS.RESENDCODE' | translate }}</a
               >
             }
           }
