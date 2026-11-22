@@ -37,6 +37,8 @@ func NewUserNotifierLegacy(
 	channels types.ChannelChains,
 	otpEmailTmpl func(origin *url.URL) string,
 ) *handler.Handler {
+	// Notification reads synchronously trigger projections in the shared pool.
+	config.RunOutsideWorkerPool = true
 	return handler.NewHandler(ctx, &config, &userNotifierLegacy{
 		commands:     commands,
 		queries:      queries,

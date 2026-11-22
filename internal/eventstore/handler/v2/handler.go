@@ -47,6 +47,11 @@ type Config struct {
 
 	TriggerWithoutEvents Reduce
 
+	// RunOutsideWorkerPool executes triggers in the calling goroutine. Handlers
+	// that synchronously trigger other projections must not occupy a shared worker
+	// while waiting for those projections to finish.
+	RunOutsideWorkerPool bool
+
 	ActiveInstancer interface {
 		ActiveInstances() []string
 	}
@@ -72,6 +77,7 @@ type Handler struct {
 
 	triggerWithoutEvents Reduce
 	cacheInvalidations   []func(ctx context.Context, aggregates []*eventstore.Aggregate)
+	runOutsideWorkerPool bool
 
 	queryInstances func() ([]string, error)
 
@@ -190,6 +196,7 @@ func NewHandler(
 		retryFailedAfter:       config.RetryFailedAfter,
 		triggeredInstancesSync: sync.Map{},
 		triggerWithoutEvents:   config.TriggerWithoutEvents,
+		runOutsideWorkerPool:   config.RunOutsideWorkerPool,
 		txDuration:             config.TransactionDuration,
 		queryInstances: func() ([]string, error) {
 			if config.ActiveInstancer != nil {
@@ -460,6 +467,26 @@ func safeProcessEvents(ctx context.Context, config *triggerConfig, processEvents
 	return processEvents(ctx, config)
 }
 
+func (h *Handler) triggerIteration(ctx context.Context, config *triggerConfig, processEvents func(context.Context, *triggerConfig) (bool, error)) (additionalIteration bool, err error) {
+	if h.runOutsideWorkerPool {
+		return safeProcessEvents(ctx, config, processEvents)
+	}
+
+	done := make(chan struct{})
+	select {
+	case queue <- func() {
+		defer close(done)
+		additionalIteration, err = safeProcessEvents(ctx, config, processEvents)
+	}:
+		// Once accepted, wait for processing to finish before releasing the instance
+		// lock, even if the context is canceled while the worker is running.
+		<-done
+		return additionalIteration, err
+	case <-ctx.Done():
+		return false, ctx.Err()
+	}
+}
+
 // recovered converts a recovered panic into an error and logs it at Alert.
 // It must be called from the deferred function that recovered.
 func recovered(ctx context.Context, rec any) error {
@@ -492,16 +519,8 @@ func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Co
 	defer cancel()
 
 	for i := 0; ; i++ {
-		var (
-			additionalIteration bool
-			wg                  sync.WaitGroup
-		)
-		wg.Add(1)
-		queue <- func() {
-			defer wg.Done()
-			additionalIteration, err = safeProcessEvents(ctx, config, h.processEvents)
-		}
-		wg.Wait()
+		var additionalIteration bool
+		additionalIteration, err = h.triggerIteration(ctx, config, h.processEvents)
 		logging.Debug(ctx, "trigger iteration", "iteration", i)
 		if !additionalIteration || err != nil {
 			return call.ResetTimestamp(ctx), err

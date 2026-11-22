@@ -109,6 +109,8 @@ func NewUserNotifier(
 	if workerConfig.LegacyEnabled {
 		return NewUserNotifierLegacy(ctx, config, commands, queries, channels, otpEmailTmpl)
 	}
+	// Session and notification policy reads synchronously trigger projections.
+	config.RunOutsideWorkerPool = true
 	return handler.NewHandler(ctx, &config, &userNotifier{
 		queries:      queries,
 		otpEmailTmpl: otpEmailTmpl,
