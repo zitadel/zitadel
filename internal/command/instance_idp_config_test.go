@@ -334,6 +334,41 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 	}
 }
 
+func TestCommands_RemoveDefaultIDPConfigOwnerDeleteReady(t *testing.T) {
+	c := &Commands{
+		eventstore: eventstoreExpect(t,
+			expectFilter(
+				eventFromEventPusher(
+					instance.NewIDPConfigAddedEvent(context.Background(),
+						&instance.NewAggregate("INSTANCE").Aggregate,
+						"idp1",
+						"name1",
+						domain.IDPConfigTypeOIDC,
+						domain.IDPConfigStylingTypeGoogle,
+						false,
+					),
+				),
+			),
+			expectPush(
+				instance.NewIDPConfigRemovedByOwnerEvent(context.Background(),
+					&instance.NewAggregate("INSTANCE").Aggregate,
+					"idp1",
+					"name1",
+				),
+			),
+		),
+		ownerDeleteReady: func(context.Context) (bool, error) { return true, nil },
+	}
+	assertOwnerOnlyUniqueConstraints(t, instance.NewIDPConfigRemovedByOwnerEvent(context.Background(),
+		&instance.NewAggregate("INSTANCE").Aggregate,
+		"idp1",
+		"name1",
+	), eventstore.UniqueConstraintOwnerIDP, "idp1")
+	got, err := c.RemoveDefaultIDPConfig(context.Background(), "idp1", nil)
+	assert.NoError(t, err)
+	assertObjectDetails(t, &domain.ObjectDetails{ResourceOwner: "INSTANCE"}, got)
+}
+
 func newDefaultIDPConfigChangedEvent(ctx context.Context, configID, oldName, newName string, stylingType domain.IDPConfigStylingType, autoRegister bool) *instance.IDPConfigChangedEvent {
 	event, _ := instance.NewIDPConfigChangedEvent(ctx,
 		&instance.NewAggregate("INSTANCE").Aggregate,

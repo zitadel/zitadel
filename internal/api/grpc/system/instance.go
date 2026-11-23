@@ -12,7 +12,7 @@ import (
 )
 
 func (s *Server) ListInstances(ctx context.Context, req *system_pb.ListInstancesRequest) (*system_pb.ListInstancesResponse, error) {
-	queries, err := ListInstancesRequestToModel(req)
+	queries, err := ListInstancesRequestToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (s *Server) RemoveInstance(ctx context.Context, req *system_pb.RemoveInstan
 }
 
 func (s *Server) ListIAMMembers(ctx context.Context, req *system_pb.ListIAMMembersRequest) (*system_pb.ListIAMMembersResponse, error) {
-	queries, err := ListIAMMembersRequestToQuery(req)
+	queries, err := ListIAMMembersRequestToQuery(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func (s *Server) ExistsDomain(ctx context.Context, req *system_pb.ExistsDomainRe
 }
 
 func (s *Server) ListDomains(ctx context.Context, req *system_pb.ListDomainsRequest) (*system_pb.ListDomainsResponse, error) {
-	queries, err := ListInstanceDomainsRequestToModel(req)
+	queries, err := ListInstanceDomainsRequestToModel(s.systemDefaults, req)
 	if err != nil {
 		return nil, err
 	}

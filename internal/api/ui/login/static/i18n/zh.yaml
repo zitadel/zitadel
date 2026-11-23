@@ -369,6 +369,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: 未找到外部用户
   Description: 未找到外部用户。你想绑定你已存在的用户还是自动注册一个新用户。
+  NoOptionAvailable: 未找到与您的外部用户匹配的账户，并且无法创建新账户。请联系您的管理员或支持人员。
   LinkButtonText: 绑定
   AutoRegisterButtonText: 注册
   TosAndPrivacyLabel: 条款和条款

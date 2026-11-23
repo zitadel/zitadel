@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/go-jose/go-jose/v4"
@@ -74,7 +75,7 @@ type Commands struct {
 	defaultRefreshTokenLifetime     time.Duration
 	defaultRefreshTokenIdleLifetime time.Duration
 	phoneCodeVerifier               func(ctx context.Context, id string) (senders.CodeGenerator, error)
-	tarpit                          func(failedAttempts uint64)
+	tarpit                          func(ctx context.Context, failedAttempts uint64)
 
 	multifactors            domain.MultifactorConfigs
 	webauthnConfig          *webauthn_helper.Config
@@ -109,6 +110,9 @@ type Commands struct {
 	loginPaths       LoginPaths
 	ipLookupFunction internal_net.IPLookupFunc
 	denyList         []denylist.AddressChecker
+
+	ownerDeleteReady       func(context.Context) (bool, error)
+	ownerDeleteReadyCached atomic.Bool
 }
 
 //go:generate mockgen -package command -destination ./mock_login_paths.go . LoginPaths
@@ -238,6 +242,8 @@ func StartCommands(
 		ipLookupFunction: ipLookupFunction,
 		denyList:         denyList,
 	}
+
+	repo.ownerDeleteReady = repo.uniqueConstraintOwnersBackfillFinalized
 
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {
 		repo.newHashedSecret = newHashedSecretWithDefault(secretHasher, defaultSecretGenerators.ClientSecret)

@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-const _TokenReasonName = "unspecifiedauth_requestrefreshjwt_profileclient_credentialsexchangeimpersonation"
+const _TokenReasonName = "unspecifiedauth_requestrefreshjwt_profileclient_credentialsexchangeimpersonationadmin_impersonation"
 
-var _TokenReasonIndex = [...]uint8{0, 11, 23, 30, 41, 59, 67, 80}
+var _TokenReasonIndex = [...]uint8{0, 11, 23, 30, 41, 59, 67, 80, 99}
 
-const _TokenReasonLowerName = "unspecifiedauth_requestrefreshjwt_profileclient_credentialsexchangeimpersonation"
+const _TokenReasonLowerName = "unspecifiedauth_requestrefreshjwt_profileclient_credentialsexchangeimpersonationadmin_impersonation"
 
 func (i TokenReason) String() string {
 	if i < 0 || i >= TokenReason(len(_TokenReasonIndex)-1) {
@@ -32,9 +32,10 @@ func _TokenReasonNoOp() {
 	_ = x[TokenReasonClientCredentials-(4)]
 	_ = x[TokenReasonExchange-(5)]
 	_ = x[TokenReasonImpersonation-(6)]
+	_ = x[TokenReasonAdminImpersonation-(7)]
 }
 
-var _TokenReasonValues = []TokenReason{TokenReasonUnspecified, TokenReasonAuthRequest, TokenReasonRefresh, TokenReasonJWTProfile, TokenReasonClientCredentials, TokenReasonExchange, TokenReasonImpersonation}
+var _TokenReasonValues = []TokenReason{TokenReasonUnspecified, TokenReasonAuthRequest, TokenReasonRefresh, TokenReasonJWTProfile, TokenReasonClientCredentials, TokenReasonExchange, TokenReasonImpersonation, TokenReasonAdminImpersonation}
 
 var _TokenReasonNameToValueMap = map[string]TokenReason{
 	_TokenReasonName[0:11]:       TokenReasonUnspecified,
@@ -51,6 +52,8 @@ var _TokenReasonNameToValueMap = map[string]TokenReason{
 	_TokenReasonLowerName[59:67]: TokenReasonExchange,
 	_TokenReasonName[67:80]:      TokenReasonImpersonation,
 	_TokenReasonLowerName[67:80]: TokenReasonImpersonation,
+	_TokenReasonName[80:99]:      TokenReasonAdminImpersonation,
+	_TokenReasonLowerName[80:99]: TokenReasonAdminImpersonation,
 }
 
 var _TokenReasonNames = []string{
@@ -61,6 +64,7 @@ var _TokenReasonNames = []string{
 	_TokenReasonName[41:59],
 	_TokenReasonName[59:67],
 	_TokenReasonName[67:80],
+	_TokenReasonName[80:99],
 }
 
 // TokenReasonString retrieves an enum value from the enum constants string name.

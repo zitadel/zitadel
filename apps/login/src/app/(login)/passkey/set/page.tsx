@@ -3,9 +3,10 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterPasskey } from "@/components/register-passkey";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getServiceConfig } from "@/lib/service-url";
-import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, getUserByID } from "@/lib/zitadel";
+import { getSetupAuthorizationError, setupErrorTranslationKey } from "@/lib/server/enrollment-guard";
+import { getServiceConfig } from "@/lib/server/service-url";
+import { loadMostRecentSession } from "@/lib/server/session";
+import { getBrandingSettings, getUserByID } from "@/lib/server/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { Metadata } from "next";
@@ -39,6 +40,22 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
   const branding = await getBrandingSettings({ serviceConfig, organization });
 
+  // Defense in depth alongside registerPasskeyLink: don't offer the registration form for a
+  // session that may not set up a passkey (unauthorized session or passkeys not allowed).
+  // In the emailed code flow (userId + code) the code itself authorizes the registration, and
+  // RegisterPasskey uses it even if a session is in the browser; otherwise registerPasskeyLink
+  // applies the same check.
+  const isCodeFlow = !!(userId && code && codeId);
+  let setupError: string | null = null;
+  if (session?.factors?.user?.id && !isCodeFlow) {
+    setupError = await getSetupAuthorizationError({
+      serviceConfig,
+      session,
+      userId: session.factors.user.id,
+      method: "passkey",
+    });
+  }
+
   let user: User | undefined;
   let displayName: string | undefined;
   if (userId) {
@@ -49,6 +66,10 @@ export default async function Page(props: { searchParams: Promise<Record<string 
       displayName = (user.type.value as HumanUser).profile?.displayName;
     }
   }
+
+  // in the code flow the passkey is registered for the code's user, so show that user even if a
+  // session (possibly of another user) is in the browser
+  const showCodeUser = isCodeFlow && !!user;
 
   return (
     <DynamicTheme branding={branding}>
@@ -61,7 +82,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           <Translated i18nKey="set.description" namespace="passkey" />
         </p>
 
-        {session ? (
+        {session && !showCodeUser ? (
           <UserAvatar
             loginName={loginName ?? session.factors?.user?.loginName}
             displayName={session.factors?.user?.displayName}
@@ -95,12 +116,21 @@ export default async function Page(props: { searchParams: Promise<Record<string 
         {!session && !user && (
           <div className="py-4">
             <Alert>
-              <Translated i18nKey="unknownContext" namespace="error" />
+              {/* context was provided but the session could not be resolved (cookie missing, invalid or expired) */}
+              <Translated i18nKey={loginName || userId ? "sessionExpired" : "unknownContext"} namespace="error" />
             </Alert>
           </div>
         )}
 
-        {(session?.id || userId) && (
+        {setupError && (
+          <div className="py-4">
+            <Alert>
+              <Translated i18nKey={setupErrorTranslationKey(setupError)} namespace="error" />
+            </Alert>
+          </div>
+        )}
+
+        {!setupError && (session?.id || userId) && (
           <RegisterPasskey
             sessionId={session?.id}
             userId={userId}
@@ -109,7 +139,11 @@ export default async function Page(props: { searchParams: Promise<Record<string 
             requestId={requestId}
             code={code}
             codeId={codeId}
-            loginName={loginName ?? session?.factors?.user?.loginName ?? user?.preferredLoginName}
+            loginName={
+              showCodeUser
+                ? user?.preferredLoginName
+                : (loginName ?? session?.factors?.user?.loginName ?? user?.preferredLoginName)
+            }
           />
         )}
       </div>

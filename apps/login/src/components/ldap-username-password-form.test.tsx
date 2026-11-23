@@ -10,7 +10,7 @@ vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
 }));
 
-vi.mock("@/lib/server/idp", () => ({
+vi.mock("@/lib/actions/idp", () => ({
   createNewSessionForLDAP: vi.fn(),
 }));
 

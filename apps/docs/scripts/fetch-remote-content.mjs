@@ -434,6 +434,9 @@ async function fixRelativeImports(versionDir, tagOrBranch) {
     let match;
     while ((match = importRegexForDownload.exec(content)) !== null) {
       const relPath = match[1];
+      // Imports into public/ were already rewritten to the versioned public folder above,
+      // so they resolve from the versioned file and must not be treated as external.
+      if (resolve(dirname(filePath), relPath).startsWith(PUBLIC_DIR)) continue;
       const versionFolder = path.basename(versionDir);
       const relativePathInContent = filePath.split(join('content', versionFolder))[1];
       const originalFilePath = join(CONTENT_LATEST_DIR, relativePathInContent);

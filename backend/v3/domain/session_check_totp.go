@@ -158,7 +158,7 @@ func (t *TOTPCheckCommand) Execute(ctx context.Context, opts *InvokeOpts) (err e
 		return err
 	}
 
-	t.TarpitFunc(uint64(t.FetchedUser.Human.TOTP.FailedAttempts) + 1)
+	t.TarpitFunc(ctx, uint64(t.FetchedUser.Human.TOTP.FailedAttempts)+1)
 
 	// TODO(IAM-Marco): This error is a functional error and needs to be returned BUT
 	// the transaction needs to NOT be rollbacked.

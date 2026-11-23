@@ -577,6 +577,7 @@ func TestCommands_updateSession(t *testing.T) {
 			"set user, invalid password",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset position
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
@@ -610,6 +611,9 @@ func TestCommands_updateSession(t *testing.T) {
 							nil
 					},
 					hasher: mockPasswordHasher("x"),
+					getLoginPolicy: func(context.Context, string) (*domain.LoginPolicy, error) {
+						return &domain.LoginPolicy{AllowUsernamePassword: true}, nil
+					},
 					now: func() time.Time {
 						return testNow
 					},
@@ -626,6 +630,7 @@ func TestCommands_updateSession(t *testing.T) {
 			"set user, password, metadata and token",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(), // password check reset position
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
@@ -668,6 +673,9 @@ func TestCommands_updateSession(t *testing.T) {
 							nil
 					},
 					hasher: mockPasswordHasher("x"),
+					getLoginPolicy: func(context.Context, string) (*domain.LoginPolicy, error) {
+						return &domain.LoginPolicy{AllowUsernamePassword: true}, nil
+					},
 					now: func() time.Time {
 						return testNow
 					},
@@ -684,6 +692,80 @@ func TestCommands_updateSession(t *testing.T) {
 					ID:       "sessionID",
 					NewToken: "token",
 				},
+			},
+		},
+		{
+			"set user, password not allowed by login policy",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.NewMockContext("instance1", "", ""),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
+					sessionCommands: []SessionCommand{
+						CheckUser("userID", "org1", &language.Afrikaans),
+						CheckPassword("password"),
+					},
+					getLoginPolicy: func(context.Context, string) (*domain.LoginPolicy, error) {
+						return &domain.LoginPolicy{AllowUsernamePassword: false}, nil
+					},
+					now: func() time.Time {
+						return testNow
+					},
+				},
+			},
+			res{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Dft32", "Errors.Org.LoginPolicy.UsernamePasswordNotAllowed"),
+			},
+		},
+		{
+			"set user, password, login policy load fails",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.NewMockContext("instance1", "", ""),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
+					sessionCommands: []SessionCommand{
+						CheckUser("userID", "org1", &language.Afrikaans),
+						CheckPassword("password"),
+					},
+					getLoginPolicy: func(context.Context, string) (*domain.LoginPolicy, error) {
+						return nil, zerrors.ThrowInternal(nil, "id", "policy error")
+					},
+					now: func() time.Time {
+						return testNow
+					},
+				},
+			},
+			res{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Edf3g", "Errors.Org.LoginPolicy.NotFound"),
+			},
+		},
+		{
+			"password without user resource owner",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.NewMockContext("instance1", "", ""),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
+					sessionCommands: []SessionCommand{
+						CheckPassword("password"),
+					},
+					getLoginPolicy: func(context.Context, string) (*domain.LoginPolicy, error) {
+						return &domain.LoginPolicy{AllowUsernamePassword: true}, nil
+					},
+					now: func() time.Time {
+						return testNow
+					},
+				},
+			},
+			res{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Vz4tb", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -1087,6 +1169,55 @@ func assertTOTPCodeHash(t *testing.T, cmds []eventstore.Command, code string) {
 			assert.True(t, event.CodeHash.Equal(code), "the code hash must match the checked code")
 		}
 		event.CodeHash = nil
+	}
+}
+
+func TestCheckPassword_tarpit(t *testing.T) {
+	ctx := authz.NewMockContext("instance1", "", "")
+	userAgg := &user.NewAggregate("userID", "org1").Aggregate
+	tests := []struct {
+		name                   string
+		ignoreUnknownUsernames bool
+		tarpit                 Tarpit
+	}{
+		{"tarpit on wrong password", false, expectTarpit(1)},
+		{"no tarpit when unknown usernames are ignored", true, expectTarpit(0)},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := &SessionCommands{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:            "userID",
+					UserResourceOwner: "org1",
+					aggregate:         &session.NewAggregate("sessionID", "instance1").Aggregate,
+				},
+				eventstore: expectEventstore(
+					expectFilter(), // password check reset
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(ctx, userAgg,
+								"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
+						),
+						eventFromEventPusher(
+							user.NewHumanPasswordChangedEvent(ctx, userAgg, "$plain$x$password", false, ""),
+						),
+					),
+					expectFilter(), // recheck
+					expectFilter(
+						org.NewLockoutPolicyAddedEvent(ctx, &org.NewAggregate("org1").Aggregate, 0, 0, false),
+					),
+				)(t),
+				hasher: mockPasswordHasher("x"),
+				getLoginPolicy: func(context.Context, string) (*domain.LoginPolicy, error) {
+					return &domain.LoginPolicy{AllowUsernamePassword: true, IgnoreUnknownUsernames: tt.ignoreUnknownUsernames}, nil
+				},
+				tarpit: tt.tarpit.tarpit,
+				now:    func() time.Time { return testNow },
+			}
+			_, err := CheckPassword("invalid password")(ctx, cmd)
+			require.ErrorIs(t, err, zerrors.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.User.Password.Invalid"))
+			tt.tarpit.metExpectedCalls(t)
+		})
 	}
 }
 

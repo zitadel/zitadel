@@ -5,10 +5,10 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getSessionCookieById } from "@/lib/cookies";
-import { getServiceConfig } from "@/lib/service-url";
-import { loadMostRecentSession } from "@/lib/session";
-import { checkUserVerification } from "@/lib/verify-helper";
+import { getSessionCookieById } from "@/lib/server/cookies";
+import { getServiceConfig } from "@/lib/server/service-url";
+import { loadMostRecentSession } from "@/lib/server/session";
+import { checkUserVerification } from "@/lib/server/verify-helper";
 import {
   getActiveIdentityProviders,
   getBrandingSettings,
@@ -16,7 +16,7 @@ import {
   getSession,
   getUserByID,
   listAuthenticationMethodTypes,
-} from "@/lib/zitadel";
+} from "@/lib/server/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 // import { getLocale } from "next-intl/server";
 import { Metadata } from "next";
@@ -89,7 +89,8 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   if (!sessionWithData || !sessionWithData.factors || !sessionWithData.factors.user) {
     return (
       <Alert>
-        <Translated i18nKey="unknownContext" namespace="error" />
+        {/* context was provided but the session could not be resolved (cookie missing, invalid or expired) */}
+        <Translated i18nKey={loginName || sessionId ? "sessionExpired" : "unknownContext"} namespace="error" />
       </Alert>
     );
   }
@@ -186,6 +187,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
               requestId={requestId}
               organization={sessionWithData.factors?.user?.organizationId}
               sessionId={sessionWithData.id} // tell the callback function to link the IDP
+              loginHint={sessionWithData.factors?.user?.loginName}
             ></SignInWithIdp>
           </>
         )}

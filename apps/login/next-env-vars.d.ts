@@ -25,6 +25,21 @@ declare namespace NodeJS {
     ZITADEL_SERVICE_USER_TOKEN: string;
 
     /**
+     * Secret used to sign LoginV2 `sessions` cookie entries, the `verificationCheck` cookie and the
+     * `flowFingerprint` of external IdP flows (purpose-bound signing keys are derived via HKDF).
+     * Recommended configuration; will become required in a future major release.
+     * Every value must be at least 32 characters long (e.g. `openssl rand -base64 32`); a shorter value
+     * disables signing and makes /ready fail instead of falling back to the API credential.
+     * Deprecated fallback if unset: the configured API credential is used (ZITADEL_SERVICE_USER_TOKEN,
+     * SYSTEM_USER_PRIVATE_KEY(_FILE) or ZITADEL_LOGINCLIENT_KEYFILE) and a warning is logged at startup.
+     * A comma-separated list is supported for rotation: the first value signs, all values verify.
+     * Unsigned or tampered cookie entries are ignored so a client cannot patch an arbitrary session
+     * or claim a user verification (email / invite code) that never happened.
+     * All replicas of a deployment must resolve the same secret.
+     */
+    ZITADEL_SESSION_COOKIE_SECRET?: string;
+
+    /**
      * Path to a private key file for login client JWT authentication.
      * When set, the login service reads this key and signs JWTs with a
      * hardcoded subject of "login-client".
@@ -77,6 +92,13 @@ declare namespace NodeJS {
      * which is safer for environments with enterprise email link scanners.
      */
     NEXT_PUBLIC_AUTO_SUBMIT_CODE?: string;
+
+    /**
+     * Optional: Minimum number of seconds between two OTP SMS codes sent for the same session.
+     * Enforced by the Login UI's server action and shown as a countdown on the "Resend code" button,
+     * it keeps users from requesting codes in a loop. Defaults to 30, set to "0" to disable.
+     */
+    OTP_SMS_RESEND_COOLDOWN_SECONDS?: string;
 
     /**
      * Optional: Enable the SWR in-memory cache for API requests globally.

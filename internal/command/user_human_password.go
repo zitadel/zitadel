@@ -153,7 +153,7 @@ type HumanPasswordCheckWriteModel interface {
 func (c *Commands) checkCurrentPassword(
 	newPassword, newEncodedPassword, currentPassword string,
 	wm HumanPasswordCheckWriteModel,
-	tarpit func(failedAttempts uint64),
+	tarpit func(ctx context.Context, failedAttempts uint64),
 ) setPasswordVerification {
 	return func(ctx context.Context) (_ string, err error) {
 		verify := func(hash, password string) (string, error) {
@@ -368,14 +368,11 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-3n8fs", "Errors.User.Password.Empty")
 	}
 
-	loginPolicy, err := c.getOrgLoginPolicy(ctx, orgID)
+	loginPolicy, err := passwordAllowedLoginPolicy(ctx, c.getOrgLoginPolicy, orgID)
 	if err != nil {
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-Edf3g", "Errors.Org.LoginPolicy.NotFound")
+		return err
 	}
-	if !loginPolicy.AllowUsernamePassword {
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-Dft32", "Errors.Org.LoginPolicy.UsernamePasswordNotAllowed")
-	}
-	var tarpit func(failedAttempts uint64)
+	var tarpit func(ctx context.Context, failedAttempts uint64)
 	if !loginPolicy.IgnoreUnknownUsernames {
 		tarpit = c.tarpit
 	}
@@ -388,12 +385,24 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 	return err
 }
 
-func checkPassword(ctx context.Context, userID, password string, es *eventstore.Eventstore, hasher *crypto.Hasher, optionalAuthRequestInfo *user.AuthRequestInfo, tarpit func(failedAttempts uint64)) ([]eventstore.Command, error) {
+// passwordAllowedLoginPolicy returns the login policy of the org,
+// or an error if it cannot be loaded or does not allow username / password login.
+func passwordAllowedLoginPolicy(ctx context.Context, getPolicy func(context.Context, string) (*domain.LoginPolicy, error), orgID string) (*domain.LoginPolicy, error) {
+	loginPolicy, err := getPolicy(ctx, orgID)
+	if err != nil {
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-Edf3g", "Errors.Org.LoginPolicy.NotFound")
+	}
+	if !loginPolicy.AllowUsernamePassword {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Dft32", "Errors.Org.LoginPolicy.UsernamePasswordNotAllowed")
+	}
+	return loginPolicy, nil
+}
+
+func checkPassword(ctx context.Context, userID, password string, es *eventstore.Eventstore, hasher *crypto.Hasher, optionalAuthRequestInfo *user.AuthRequestInfo, tarpit func(ctx context.Context, failedAttempts uint64)) ([]eventstore.Command, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sfw3f", "Errors.User.UserIDMissing")
 	}
-	wm := NewHumanPasswordWriteModel(userID, "")
-	err := es.FilterToQueryReducer(ctx, wm)
+	wm, err := loadHumanPasswordWriteModel(ctx, es, userID, "")
 	if err != nil {
 		return nil, err
 	}
@@ -408,7 +417,7 @@ func verifyPasswordWithLockoutPolicy(
 	es *eventstore.Eventstore,
 	verify func(hash string, password string) (newHash string, err error),
 	optionalAuthRequestInfo *user.AuthRequestInfo,
-	tarpit func(failedAttempts uint64),
+	tarpit func(ctx context.Context, failedAttempts uint64),
 ) ([]eventstore.Command, string, error) {
 	if !wm.GetUserState().Exists() {
 		return nil, "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-3n77z", "Errors.User.NotFound")
@@ -461,7 +470,7 @@ func verifyPasswordWithLockoutPolicy(
 	// we do not slow down the response time with a tarpit
 	// since this would leak the user existence
 	if tarpit != nil {
-		tarpit(wm.GetPasswordCheckFailedCount() + 1)
+		tarpit(ctx, wm.GetPasswordCheckFailedCount()+1)
 	}
 	return commands, "", err
 }
@@ -470,12 +479,7 @@ func (c *Commands) passwordWriteModel(ctx context.Context, userID, resourceOwner
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewHumanPasswordWriteModel(userID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
-	if err != nil {
-		return nil, err
-	}
-	return writeModel, nil
+	return loadHumanPasswordWriteModel(ctx, c.eventstore, userID, resourceOwner)
 }
 
 func convertLoginPasswapErr(passwordCheckFailedCount uint64, err error) error {

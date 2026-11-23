@@ -8,6 +8,7 @@ import (
 	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -88,8 +89,11 @@ func updateJWTConfigToDomain(req *admin_pb.UpdateIDPJWTConfigRequest) *domain.JW
 	}
 }
 
-func listIDPsToModel(instanceID string, req *admin_pb.ListIDPsRequest) (*query.IDPSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func listIDPsToModel(defaults systemdefaults.SystemDefaults, instanceID string, req *admin_pb.ListIDPsRequest) (*query.IDPSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := idpQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
@@ -163,8 +167,11 @@ func idpUserLinksToDomain(idps []*query.IDPUserLink) []*domain.UserIDPLink {
 	return externalIDPs
 }
 
-func listProvidersToQuery(instanceID string, req *admin_pb.ListProvidersRequest) (*query.IDPTemplateSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+func listProvidersToQuery(defaults systemdefaults.SystemDefaults, instanceID string, req *admin_pb.ListProvidersRequest) (*query.IDPTemplateSearchQueries, error) {
+	offset, limit, asc, err := object.ListQueryToModel(defaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := providerQueriesToQuery(req.Queries)
 	if err != nil {
 		return nil, err

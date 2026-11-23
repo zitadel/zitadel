@@ -85,6 +85,27 @@ const (
 // IDRecover is the error ID used for errors created after recovery from panics.
 const IDRecover = "RECOVER"
 
+// ThrowRecovered converts a value returned by recover() into an internal error with ID [IDRecover].
+// It must be called in the deferred function that recovered: only there does the
+// goroutine stack still contain the frames of the panic.
+// The stack trace is attached regardless of [EnableStackTrace]: it is the only clue to a panic's cause.
+func ThrowRecovered(rec any) error {
+	parent, ok := rec.(error)
+	if !ok {
+		parent = fmt.Errorf("%v", rec)
+	}
+	err := CreateZitadelError(KindInternal, parent, IDRecover, "Errors.Internal", 1)
+	err.stackTrace = debug.Stack()
+	err.hasStackTrace = true
+	return err
+}
+
+// IsRecovered reports whether err is, or wraps, an error created by [ThrowRecovered].
+func IsRecovered(err error) bool {
+	zerr, ok := AsZitadelError(err)
+	return ok && zerr.ID == IDRecover
+}
+
 // Because errors are created through singletons, config is global.
 var (
 	enableReportLocation atomic.Bool

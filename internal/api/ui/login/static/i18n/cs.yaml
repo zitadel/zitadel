@@ -369,6 +369,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Externí uživatel nenalezen
   Description: Externí uživatel nebyl nalezen. Chcete propojit svého uživatele nebo automaticky zaregistrovat nového?
+  NoOptionAvailable: Nebyl nalezen žádný účet odpovídající vašemu externímu uživateli a nový účet nelze vytvořit. Obraťte se prosím na svého administrátora nebo na podporu.
   LinkButtonText: Propojit
   AutoRegisterButtonText: Registrovat
   TosAndPrivacyLabel: Obchodní podmínky

@@ -36,7 +36,7 @@ func (c *Commands) AddProjectMember(ctx context.Context, member *AddProjectMembe
 	if err := member.IsValid(c.zitadelRoles); err != nil {
 		return nil, err
 	}
-	_, err = c.checkUserExists(ctx, member.UserID, "")
+	userResourceOwner, err := c.checkUserExists(ctx, member.UserID, "")
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (c *Commands) AddProjectMember(ctx context.Context, member *AddProjectMembe
 			ProjectAggregateFromWriteModelWithCTX(ctx, &addedMember.WriteModel),
 			member.UserID,
 			member.Roles...,
-		),
+		).WithUserResourceOwner(userResourceOwner),
 	)
 	if err != nil {
 		return nil, err

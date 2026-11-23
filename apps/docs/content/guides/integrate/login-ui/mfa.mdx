@@ -18,6 +18,12 @@ ZITADEL supports different Methods:
 - OTP sent as Email
 - Universal Second Factor (U2F), which is authentication with your device like Windows Hello, Apple FaceID, Fingerprint, FIDO2 keys, Yubikey, etc.
 
+<Callout>
+If a TOTP, SMS or email code is wrong, ZITADEL delays the response depending on the number of failed attempts of the user, up to 10 seconds by default.
+Make sure your timeouts allow for that.
+See [Response delay after failed attempts](/guides/manage/console/default-settings#response-delay-after-failed-attempts) for details.
+</Callout>
+
 ## TOTP Registration
 
 ### Flow
