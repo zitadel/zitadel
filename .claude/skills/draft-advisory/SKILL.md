@@ -49,10 +49,10 @@ GitHub assigns at most one CVE per advisory and, as a CNA, follows the CVE Progr
 ```markdown
 Systems running one of the following versions are affected:
 
-* **4.x:** `4.0.0` through `4.16.2` (including RC versions)
+* **4.x:** `4.0.0` through `4.16.2`
 ```
 
-One bullet per listed release line; upper bound is the last vulnerable version (patch − 1), backticked. Lower bound is the line’s `x.0.0` when the whole line is affected; use the actual introduction version only if the flaw landed partway through a line. A flaw first introduced in an end-of-life version still starts at the lowest listed line’s `x.0.0` — EOL lines are never named.
+One bullet per listed release line; upper bound is the last release on that line that shipped before the fix (look it up in the release tags, e.g. `4.20.5` when the fix lands in `4.21.0`), backticked. Never derive it by subtracting from the patch version. Lower bound is the line’s `x.0.0` when the whole line is affected; use the actual introduction version only if the flaw landed partway through a line. A flaw first introduced in an end-of-life version still starts at the lowest listed line’s `x.0.0` — EOL lines are never named.
 
 Release-line policy:
 - **v4.x** is the only supported line — it is checked, listed under Affected Versions, and patched.
@@ -66,7 +66,10 @@ Release-line policy:
 
 `$\ge$` is intentional — GitHub renders the LaTeX. Link each version to its release tag. One `$\ge$` upgrade bullet per supported release line; end-of-life lines get neither a bullet nor an EOL note.
 
-**Workarounds** — standard wording: “The recommended solution is to upgrade to a patched version. There is no configuration that fully closes this gap on unpatched versions.” If a partial mitigation exists, add it after this sentence, clearly labeled as partial.
+**Workarounds** — open with “The recommended solution is to upgrade to a patched version.” Then, only after checking the code for this vulnerability:
+- if no setting closes the gap: “There is no configuration that fully closes this gap on unpatched versions.” Add any partial mitigation after it, clearly labeled as partial;
+- if a setting or disabling a feature verifiably closes every vector (e.g. turning off the affected login surface), describe that as a full workaround and name its cost;
+- if you could not verify either, write `<PLACEHOLDER>` and flag it.
 
 **Questions** — exactly:
 “If you have any questions or comments about this advisory, please email us at security@zitadel.com”
