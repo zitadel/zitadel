@@ -112,7 +112,7 @@ func TestServer_DeviceAuth(t *testing.T) {
 			var req *oidc_pb.GetDeviceAuthorizationRequestResponse
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 			assert.EventuallyWithT(t, func(collectT *assert.CollectT) {
-				req, err = Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTX, &oidc_pb.GetDeviceAuthorizationRequestRequest{
+				req, err = Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTXLOGIN, &oidc_pb.GetDeviceAuthorizationRequestRequest{
 					UserCode: deviceAuthorization.UserCode,
 				})
 				assert.NoError(collectT, err)
@@ -149,7 +149,7 @@ func TestServer_DeviceAuth_invalid_client(t *testing.T) {
 		var req *oidc_pb.GetDeviceAuthorizationRequestResponse
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(collectT *assert.CollectT) {
-			req, err = Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTX, &oidc_pb.GetDeviceAuthorizationRequestRequest{
+			req, err = Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTXLOGIN, &oidc_pb.GetDeviceAuthorizationRequestRequest{
 				UserCode: deviceAuthorization.UserCode,
 			})
 			assert.NoError(collectT, err)

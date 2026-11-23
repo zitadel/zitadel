@@ -14,7 +14,7 @@ type verifierFn func(encoded, password string) (updated string, err error)
 // tarpitFn represents a tarpit function
 //
 // The input is the number of failed attempts after which the tarpit is started
-type tarpitFn func(failedAttempts uint64)
+type tarpitFn func(ctx context.Context, failedAttempts uint64)
 
 // totpValidateFn represents a function to validate TOTP
 type totpValidateFn func(toValidate, verifier string) bool

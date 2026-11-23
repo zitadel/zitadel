@@ -3,10 +3,10 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterU2f } from "@/components/register-u2f";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
-import { getEnrollmentAuthorizationError } from "@/lib/server/enrollment-guard";
-import { getServiceConfig } from "@/lib/service-url";
-import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings } from "@/lib/zitadel";
+import { getSetupAuthorizationError, setupErrorTranslationKey } from "@/lib/server/enrollment-guard";
+import { getServiceConfig } from "@/lib/server/service-url";
+import { loadMostRecentSession } from "@/lib/server/session";
+import { getBrandingSettings } from "@/lib/server/zitadel";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -38,11 +38,13 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   // authenticator-registration form (defense in depth alongside the addU2F/verifyU2F server
   // actions, GHSA-45f2-5q3r-xgg6).
   let enrollmentAuthorized = false;
+  let enrollmentError: string | null = null;
   if (sessionFactors?.id && sessionFactors.factors?.user?.id) {
-    const enrollmentError = await getEnrollmentAuthorizationError({
+    enrollmentError = await getSetupAuthorizationError({
       serviceConfig,
       session: sessionFactors,
       userId: sessionFactors.factors.user.id,
+      method: "u2f",
     });
     enrollmentAuthorized = !enrollmentError;
   }
@@ -72,8 +74,17 @@ export default async function Page(props: { searchParams: Promise<Record<string 
         {(!sessionFactors || !enrollmentAuthorized) && (
           <div className="py-4">
             <Alert>
-              {/* a loginName was provided but the session could not be resolved (cookie missing, invalid or expired) */}
-              <Translated i18nKey={!sessionFactors && loginName ? "sessionExpired" : "unknownContext"} namespace="error" />
+              {/* the session may not set up U2F, or a loginName was provided but the session could not be resolved (cookie missing, invalid or expired) */}
+              <Translated
+                i18nKey={
+                  enrollmentError
+                    ? setupErrorTranslationKey(enrollmentError)
+                    : !sessionFactors && loginName
+                      ? "sessionExpired"
+                      : "unknownContext"
+                }
+                namespace="error"
+              />
             </Alert>
           </div>
         )}

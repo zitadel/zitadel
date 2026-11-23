@@ -4,8 +4,8 @@ import { SetPasswordForm } from "@/components/set-password-form";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { UNKNOWN_USER_ID } from "@/lib/constants";
-import { getServiceConfig } from "@/lib/service-url";
-import { loadMostRecentSession } from "@/lib/session";
+import { getServiceConfig } from "@/lib/server/service-url";
+import { loadMostRecentSession } from "@/lib/server/session";
 import {
   getBrandingSettings,
   getDefaultOrg,
@@ -13,7 +13,7 @@ import {
   getPasswordComplexitySettings,
   getUserByID,
   searchUsers,
-} from "@/lib/zitadel";
+} from "@/lib/server/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { User } from "@zitadel/proto/zitadel/user/v2/user_pb";

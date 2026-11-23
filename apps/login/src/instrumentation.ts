@@ -44,7 +44,7 @@ export async function register(): Promise<void> {
   // Verify the configured API credentials once at startup (fail fast).
   // Connectivity problems are only logged; reachability is covered by the
   // readiness probe (/ready) and ZITADEL_API_AWAITINITIALCONN.
-  const { verifyApiCredentials, FATAL_CREDENTIAL_CHECK_RESULTS } = await import("./lib/verify-credentials");
+  const { verifyApiCredentials, FATAL_CREDENTIAL_CHECK_RESULTS } = await import("@/lib/server/verify-credentials");
   const result = await verifyApiCredentials();
   if (FATAL_CREDENTIAL_CHECK_RESULTS.has(result)) {
     process.exit(1);
@@ -65,12 +65,12 @@ function isOtelEnabled(): boolean {
  * or cannot be signed at all (see lib/session-cookie-signature.ts).
  */
 async function logSessionCookieSecretNotice(): Promise<void> {
-  const { getSessionCookieSecretStartupNotice } = await import("./lib/session-cookie-signature");
+  const { getSessionCookieSecretStartupNotice } = await import("@/lib/server/session-cookie-signature");
   const notice = getSessionCookieSecretStartupNotice();
   if (!notice) {
     return;
   }
-  const { createLogger } = await import("./lib/logger");
+  const { createLogger } = await import("@/lib/server/logger");
   createLogger("startup")[notice.level](notice.message);
 }
 

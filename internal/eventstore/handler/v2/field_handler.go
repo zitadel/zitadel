@@ -77,8 +77,8 @@ func (h *FieldHandler) Trigger(ctx context.Context, opts ...TriggerOpt) (err err
 		var wg sync.WaitGroup
 		wg.Add(1)
 		queue <- func() {
-			additionalIteration, err = h.processEvents(ctx, config)
-			wg.Done()
+			defer wg.Done()
+			additionalIteration, err = safeProcessEvents(ctx, config, h.processEvents)
 		}
 		wg.Wait()
 		logging.Debug(ctx, "trigger iteration", "iteration", i)
@@ -116,6 +116,9 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		return false, err
 	}
 	defer func() {
+		if rec := recover(); rec != nil {
+			err = recovered(ctx, rec)
+		}
 		if err != nil && !errors.Is(err, &executionError{}) {
 			rollbackErr := tx.Rollback()
 			logging.OnError(ctx, rollbackErr).Error("unable to rollback tx")

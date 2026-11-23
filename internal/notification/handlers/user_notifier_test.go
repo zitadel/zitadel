@@ -30,6 +30,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/notification"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -1035,6 +1036,31 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 				queries.EXPECT().NotificationPolicyByOrg(gomock.Any(), gomock.Any(), orgID, gomock.Any()).Return(&query.NotificationPolicy{
 					PasswordChange: false,
 				}, nil)
+				return fields{
+						queries: queries,
+						queue:   queue,
+						es: eventstore.NewEventstore(&eventstore.Config{
+							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+						}),
+					}, args{
+						event: &user.HumanPasswordChangedEvent{
+							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+								InstanceID:    instanceID,
+								AggregateID:   userID,
+								ResourceOwner: sql.NullString{String: orgID},
+								CreationDate:  time.Now().UTC(),
+								Typ:           user.HumanPasswordChangedType,
+							}),
+						},
+					}, w
+			},
+		}, {
+			name: "notification policy not found",
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
+				queries.EXPECT().NotificationPolicyByOrg(gomock.Any(), gomock.Any(), orgID, gomock.Any()).Return(
+					nil,
+					zerrors.ThrowNotFound(nil, "QUERY-x0so2p", "Errors.NotificationPolicy.NotFound"),
+				)
 				return fields{
 						queries: queries,
 						queue:   queue,

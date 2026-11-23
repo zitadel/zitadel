@@ -1,6 +1,15 @@
 package systemdefaults
 
-import "time"
+import (
+	"context"
+	"time"
+
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
+
+	"github.com/zitadel/zitadel/backend/v3/instrumentation/logging"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+)
 
 type TarpitConfig struct {
 	// After how many failed attempts, the tarpit should start.
@@ -13,9 +22,23 @@ type TarpitConfig struct {
 	MaxDuration time.Duration
 }
 
-func (t *TarpitConfig) Tarpit() func(failedCount uint64) {
-	return func(failedCount uint64) {
-		time.Sleep(t.duration(failedCount))
+// Tarpit returns a function which delays the response after a failed check,
+// depending on the number of failed attempts.
+// A delay is recorded as span and logged, so it's visible in traces and logs.
+func (t *TarpitConfig) Tarpit() func(ctx context.Context, failedCount uint64) {
+	return func(ctx context.Context, failedCount uint64) {
+		duration := t.duration(failedCount)
+		if duration == 0 {
+			return
+		}
+		ctx, span := tracing.NewNamedSpan(ctx, "tarpit")
+		defer span.End()
+		trace.SpanFromContext(ctx).SetAttributes(
+			attribute.Int64("tarpit.failed_attempts", int64(failedCount)),
+			attribute.String("tarpit.duration", duration.String()),
+		)
+		logging.Info(ctx, "tarpit", "failed_attempts", failedCount, "duration", duration)
+		time.Sleep(duration)
 	}
 }
 

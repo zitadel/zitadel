@@ -239,7 +239,7 @@ func (p *Storage) SetUserinfoWithLoginName(ctx context.Context, userinfo models.
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	user, err := p.query.GetUserByLoginName(ctx, true, loginName)
+	user, err := p.query.GetUserByLoginName(ctx, false, loginName)
 	if err != nil {
 		return err
 	}

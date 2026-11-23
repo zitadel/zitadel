@@ -47,22 +47,35 @@ func (h *Handler) eventsToStatements(ctx context.Context, tx *sql.Tx, events []e
 	for _, event := range events {
 		statement, err := h.reduce(event)
 		if err != nil {
-			logging.Error(ctx, "reduce failed", "err", err, "event", failureFromEvent(event, err))
+			logging.Log(ctx, errorLevel(err), "reduce failed", "err", err, "event", failureFromEvent(event, err))
 			if shouldContinue := h.handleFailedStmt(ctx, tx, failureFromEvent(event, err)); !shouldContinue {
 				return statements, &executionError{err}
 			}
+			// count the skipped event as processed, so the cursor moves past it like for a skipped statement
 			statement = NewNoOpStatement(event)
 		}
 		if !h.filterOffsetIsCursor {
 			previousPosition, offset = nextFilterOffset(previousPosition, offset, event.Position())
-			statement.offset = offset
+			// A reducer may return a nil statement without an error; keep it nil so
+			// executeStatement panics and processEvents recovers (#11713).
+			if statement != nil {
+				statement.offset = offset
+			}
 		}
 		statements = append(statements, statement)
 	}
 	return statements, nil
 }
 
-func (h *Handler) reduce(event eventstore.Event) (*Statement, error) {
+// reduce calls the reducer registered for the event.
+// A panic of the reducer is converted into an error,
+// so the event is handled like any other event which failed to reduce.
+func (h *Handler) reduce(event eventstore.Event) (_ *Statement, err error) {
+	defer func() {
+		if rec := recover(); rec != nil {
+			err = zerrors.ThrowRecovered(rec)
+		}
+	}()
 	for _, reducer := range h.projection.Reducers() {
 		if reducer.Aggregate != event.Aggregate().Type {
 			continue

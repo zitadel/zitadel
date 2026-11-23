@@ -2,7 +2,6 @@ package connect_middleware
 
 import (
 	"context"
-	"fmt"
 
 	"connectrpc.com/connect"
 
@@ -23,13 +22,7 @@ func toConnectError(ctx context.Context, req connect.AnyRequest, handler connect
 	ctx, cancel := context.WithCancelCause(ctx)
 	defer func() {
 		if rec := recover(); rec != nil {
-			recErr, ok := rec.(error)
-			if !ok {
-				recErr = fmt.Errorf("%v", rec)
-			}
-			if recErr != nil {
-				err = zerrors.ThrowInternal(recErr, zerrors.IDRecover, "Errors.Internal")
-			}
+			err = zerrors.ThrowRecovered(rec)
 		}
 		cause := err // avoid passing the transport error as cancel cause.
 		err = gerrors.ZITADELToConnectError(ctx, err)

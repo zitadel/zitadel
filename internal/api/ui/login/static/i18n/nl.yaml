@@ -369,6 +369,7 @@ LinkingUsersDone:
 ExternalNotFound:
   Title: Externe Gebruiker Niet Gevonden
   Description: Externe gebruiker niet gevonden. Wilt u uw gebruiker koppelen of automatisch een nieuwe registreren.
+  NoOptionAvailable: Er is geen account gevonden dat overeenkomt met uw externe gebruiker en er kan geen nieuw account worden aangemaakt. Neem contact op met uw beheerder of met de ondersteuning.
   LinkButtonText: Koppelen
   AutoRegisterButtonText: Registreren
   TosAndPrivacyLabel: Algemene voorwaarden

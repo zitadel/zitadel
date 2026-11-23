@@ -1,6 +1,7 @@
 package domain_test
 
 import (
+	"context"
 	"errors"
 	"testing"
 	"time"
@@ -1032,7 +1033,7 @@ func TestPasswordCheckCommand_Execute(t *testing.T) {
 			ctrl := gomock.NewController(t)
 
 			tarpitCalled := false
-			tc.cmd.TarpitFunc = func(_ uint64) {
+			tc.cmd.TarpitFunc = func(_ context.Context, _ uint64) {
 				tarpitCalled = true
 			}
 
