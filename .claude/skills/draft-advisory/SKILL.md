@@ -73,6 +73,7 @@ Release-line policy:
 
 **Credits** — exactly:
 “Thanks to \<First Last\> from \<Company\> ([@handle](https://github.com/handle)) for finding and reporting the vulnerability.”
+Drop “from \<Company\>” when the reporter gave no affiliation, and drop the linked handle when they gave none — never fill either in yourself.
 Credit a reporter only when their report included a PoC **and** they asked to be credited; if either is unclear, use `<PLACEHOLDER>` and flag it. Link only a GitHub handle the reporter gave (in the report or in a past advisory’s credits) — never guess a handle from a name.
 Multiple reporters are joined with “and”, each with their own affiliation and linked handle. For a returning reporter, look up the exact name, affiliation, and handle in past advisories (`gh api "/repos/zitadel/zitadel/security-advisories?per_page=100"`, grep the credit lines) instead of asking. The body’s Credits section names reporters only — maintainers belong in the credits metadata.
 
@@ -89,11 +90,12 @@ Multiple reporters are joined with “and”, each with their own affiliation an
 - The **CVSS 4.0 vector** goes into the advisory metadata (GitHub derives score and severity from it), never into the description. Propose a vector with a one-line justification.
 - Propose **CWEs** as metadata, matched to the actual flaw class — not a fixed default: CWE-862 (Missing Authorization) for missing or mis-scoped permission checks; CWE-287 (Improper Authentication) / CWE-306 (Missing Authentication for Critical Function) for genuine authentication bypass or missing authentication; others only when clearly applicable (e.g. CWE-204 for enumeration oracles). Don’t reflexively reach for 287/306. At most one CWE per vector, and never a parent together with its child (e.g. CWE-287 alongside CWE-306) — that reads as two issues.
 - **Credits metadata**: propose the full credits list, not just the reporter. Take the fix PR’s author and reviewers from the private-fork PR itself (`gh pr view` — commits and reviews): reporters as `reporter`, the PR’s author as `remediation_developer`, its human reviewers as `remediation_reviewer` (skip bots such as Copilot). **`reporter` is the default type** for anyone added to the credits later without a stated role (never `finder`); use another type only when the author names it. A person without a GitHub handle cannot be added to the credits metadata at all — name them in the body’s Credits section only, without a link.
+- **Affected products** use the same format as existing advisories: ecosystem `zitadel`, package `ZITADEL`, affected range like `4.0.0 - 4.16.2`, patched version like `4.16.3` (no `v` prefix). The API rejects the `zitadel` ecosystem on write (422), so the author sets this row in the web UI — propose the values, never send `vulnerabilities` via the API.
 - The advisory’s one-line summary/title is a separate metadata field — don’t restate it in the body.
 
 ## Output
 
 1. The complete advisory body in the format above.
 2. A short list of placeholders the author must fill or confirm (patch versions, affected upper bounds, reporter).
-3. Proposed metadata (CVSS vector + CWEs) as suggestions to confirm — clearly separated from the body.
-4. Do **not** push anything to GitHub (`gh api`) or publish without the author’s explicit confirmation; when authorized, PATCH the description and metadata, then re-fetch to verify what landed. Mechanics: write the body to a scratch file and PATCH with `-F description=@body.md` (never inline shell-escaped text); the `credits` array is replaced wholesale on every PATCH — always resend the complete list, not just the new entry.
+3. Proposed metadata (CVSS vector, CWEs, affected products) as suggestions to confirm — clearly separated from the body.
+4. Do **not** push anything to GitHub (`gh api`) or publish without the author’s explicit confirmation; when authorized, PATCH only what the author approved (the description, and credits/CWEs/CVSS when asked — never affected products, see Metadata), then re-fetch to verify what landed. Mechanics: write the body to a scratch file and PATCH with `-F description=@body.md` (never inline shell-escaped text); the `credits` array is replaced wholesale on every PATCH — always resend the complete list, not just the new entry.
