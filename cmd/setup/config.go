@@ -201,6 +201,7 @@ type Steps struct {
 	s81CommandsToEventsClockTimestamp       *CommandsToEventsClockTimestamp
 	s82CurrentStatesInTxOrder               *CurrentStatesInTxOrder
 	BackfillUniqueConstraintOwners          *BackfillUniqueConstraintOwners
+	ProjectionCursorFinalize                *ProjectionCursorFinalize
 	RelationalTables                        *TransactionalTables
 }
 

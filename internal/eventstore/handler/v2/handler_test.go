@@ -84,7 +84,7 @@ func TestHandler_eventQuery(t *testing.T) {
 		assert.Equal(t, cursor, *builder.GetEventSortKeyAfter())
 	})
 
-	t.Run("77 not stored uses new-column sort key when ordinal set", func(t *testing.T) {
+	t.Run("77 not stored uses OFFSET when ordinal set", func(t *testing.T) {
 		h := &Handler{
 			bulkLimit: 200,
 			eventTypes: map[eventstore.AggregateType][]eventstore.EventType{
@@ -104,10 +104,9 @@ func TestHandler_eventQuery(t *testing.T) {
 			offset:       3,
 			inTxOrderSet: true,
 		}, decimal.Decimal{})
-		assert.Equal(t, uint32(0), builder.GetOffset())
-		assert.True(t, builder.GetPositionAtLeast().IsZero())
-		require.NotNil(t, builder.GetEventSortKeyAfter())
-		assert.Equal(t, cursor, *builder.GetEventSortKeyAfter())
+		assert.Equal(t, uint32(3), builder.GetOffset())
+		assert.True(t, builder.GetPositionAtLeast().Equal(decimal.NewFromInt(1)))
+		assert.Nil(t, builder.GetEventSortKeyAfter())
 	})
 
 	t.Run("77 not stored uses OFFSET when ordinal is null", func(t *testing.T) {
@@ -179,6 +178,7 @@ func TestHandler_eventQuery(t *testing.T) {
 		builder := h.eventQuery(&state{
 			instanceID:   "inst",
 			inTxOrderSet: true,
+			offset:       2,
 			cursor: eventstore.EventSortKey{
 				Position:      decimal.NewFromInt(1),
 				InTxOrder:     0,
@@ -188,12 +188,13 @@ func TestHandler_eventQuery(t *testing.T) {
 			},
 		}, decimal.Decimal{})
 		assert.False(t, builder.GetScanEventTypesSeparately())
-		require.NotNil(t, builder.GetEventSortKeyAfter())
-		assert.Equal(t, uint32(0), builder.GetEventSortKeyAfter().InTxOrder)
+		assert.Equal(t, uint32(2), builder.GetOffset())
+		assert.True(t, builder.GetPositionAtLeast().Equal(decimal.NewFromInt(1)))
+		assert.Nil(t, builder.GetEventSortKeyAfter())
 		require.Len(t, builder.GetQueries(), 1)
 	})
 
-	t.Run("zero in_tx_order resumes after sort key not OFFSET", func(t *testing.T) {
+	t.Run("zero in_tx_order uses OFFSET when 77 not stored", func(t *testing.T) {
 		h := &Handler{
 			bulkLimit: 200,
 			eventTypes: map[eventstore.AggregateType][]eventstore.EventType{
@@ -213,10 +214,9 @@ func TestHandler_eventQuery(t *testing.T) {
 			offset:       3,
 			inTxOrderSet: true,
 		}, decimal.Decimal{})
-		assert.Equal(t, uint32(0), builder.GetOffset())
-		assert.True(t, builder.GetPositionAtLeast().IsZero())
-		require.NotNil(t, builder.GetEventSortKeyAfter())
-		assert.Equal(t, cursor, *builder.GetEventSortKeyAfter())
+		assert.Equal(t, uint32(3), builder.GetOffset())
+		assert.True(t, builder.GetPositionAtLeast().Equal(decimal.NewFromInt(1)))
+		assert.Nil(t, builder.GetEventSortKeyAfter())
 	})
 }
 

@@ -268,6 +268,12 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	}
 	steps.BackfillUniqueConstraintOwners.dbClient = dbClient
 	steps.BackfillUniqueConstraintOwners.Version = build.Version()
+	if steps.ProjectionCursorFinalize == nil {
+		steps.ProjectionCursorFinalize = &ProjectionCursorFinalize{}
+	}
+	steps.ProjectionCursorFinalize.dbClient = dbClient
+	steps.ProjectionCursorFinalize.eventstore = eventstoreClient
+	steps.ProjectionCursorFinalize.Version = build.Version()
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	if err != nil {
@@ -320,6 +326,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 			VacuumThreshold:  config.Eventstore.Autovacuum.VacuumThreshold,
 			AnalyzeThreshold: config.Eventstore.Autovacuum.AnalyzeThreshold,
 		},
+		steps.ProjectionCursorFinalize,
 	}
 	repeatableSteps = append(repeatableSteps, triggerSteps(dbClient)...)
 

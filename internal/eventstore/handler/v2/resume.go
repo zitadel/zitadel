@@ -15,7 +15,7 @@ func (h *Handler) resumeFrom(s *state, minPosition decimal.Decimal) resume {
 	if s.cursor.IsZero() {
 		return resume{}
 	}
-	if h.filterOffsetIsCursor || s.inTxOrderSet {
+	if h.filterOffsetIsCursor {
 		return resume{afterSortKey: true}
 	}
 	r := resume{position: s.cursor.Position}
