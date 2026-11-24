@@ -13,7 +13,9 @@ on:
 jobs:
   lint_test_build:
     name: Lint, Test and Build
-    runs-on: depot-ubuntu-22.04-16
+    # GitHub's 32-core arm64 runner (the 32-arm-linux runner group).
+    runs-on:
+      group: 32-arm-linux
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
