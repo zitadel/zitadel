@@ -688,8 +688,11 @@ func usersPageSubquery(t *testing.T, stmt string) string {
 func splitUsersPageSQL(t *testing.T, stmt string) (inner, outer string) {
 	t.Helper()
 	// The total subquery comes first and can contain "FROM (SELECT" itself.
-	totalIdx := strings.Index(stmt, ") AS total ")
-	fromIdx := strings.Index(stmt[max(totalIdx, 0):], "FROM (SELECT") + max(totalIdx, 0)
+	start := max(strings.Index(stmt, ") AS total "), 0)
+	fromIdx := strings.Index(stmt[start:], "FROM (SELECT")
+	if fromIdx >= 0 {
+		fromIdx += start
+	}
 	pageIdx := strings.Index(stmt, ") AS page")
 	if fromIdx < 0 || pageIdx < 0 || pageIdx <= fromIdx {
 		t.Fatalf("page subquery not found: %s", stmt)
