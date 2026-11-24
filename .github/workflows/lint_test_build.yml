@@ -102,7 +102,9 @@ jobs:
           # go test runs one package per core by default. All integration test packages
           # share one API server and database, which times out at 32 packages at once.
           GOFLAGS: "-p=16"
-        run: pnpm nx ${{ github.event_name == 'pull_request' && 'affected' || 'run-many' }} --nxBail --targets lint test build --exclude @zitadel/docs
+        # Nx runs 3 tasks at once by default, which kept the integration tests waiting
+        # for lint and unit tests on the 32-core runner.
+        run: pnpm nx ${{ github.event_name == 'pull_request' && 'affected' || 'run-many' }} --nxBail --parallel=8 --targets lint test build --exclude @zitadel/docs
       - name: Keep the Nx task cache entries this job used
         if: ${{ !cancelled() && steps.nx.outcome != 'skipped' }}
         run: |
