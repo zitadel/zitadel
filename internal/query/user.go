@@ -1376,7 +1376,7 @@ func (p userSearchPlan) applyConstraints(ctx context.Context, query sq.SelectBui
 		Where(sq.Eq{UserInstanceIDCol.identifier(): p.instanceID})
 
 	if p.loginEqualityExtracted {
-		query = query.JoinClause(joinLoginEqualitySeeks(p.loginEqualitySeeks))
+		query = query.Where(loginEqualitySeeksCondition(p.loginEqualitySeeks))
 	}
 	if p.needsMetadataJoin {
 		query = query.LeftJoin(join(UserMetadataUserIDCol, UserIDCol))

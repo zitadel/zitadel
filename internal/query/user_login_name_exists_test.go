@@ -156,7 +156,7 @@ func TestExtractLoginEqualitySeeks_NestedAndExtractsLoginName(t *testing.T) {
 	assert.Equal(t, orgQuery, remaining[0])
 }
 
-func TestPrepareUsersQuery_LoginNameEqualsUsesIndexedJoin(t *testing.T) {
+func TestPrepareUsersQuery_LoginNameEqualsUsesIndexedSeek(t *testing.T) {
 	ctx := authz.WithInstanceID(t.Context(), "inst-1")
 	loginNameQuery, err := NewUserLoginNameExistsQuery("user165000@org.localhost", TextEqualsIgnoreCase)
 	require.NoError(t, err)
@@ -169,7 +169,10 @@ func TestPrepareUsersQuery_LoginNameEqualsUsesIndexedJoin(t *testing.T) {
 	require.NoError(t, err)
 
 	inner, outer := splitUsersPageSQL(t, sql)
-	assert.Contains(t, inner, "INNER JOIN")
+	// Matching IDs are collected into an array and looked up by primary key,
+	// so the plan cannot walk the whole instance in ID order.
+	assert.Contains(t, inner, UserIDCol.identifier()+" = ANY(ARRAY(SELECT matches.id FROM (")
+	assert.NotContains(t, inner, "INNER JOIN")
 	assert.Contains(t, inner, "login_name_matches")
 	assert.GreaterOrEqual(t, strings.Count(sql, "login_name_matches"), 2)
 	assert.Contains(t, inner, "login_names3_users")
@@ -626,7 +629,7 @@ func TestPrepareUsersCountQuery_MetadataUsesDistinct(t *testing.T) {
 	assert.NotContains(t, sql, "login_names3")
 }
 
-func TestPrepareUsersCountQuery_LoginNameEqualsUsesIndexedJoin(t *testing.T) {
+func TestPrepareUsersCountQuery_LoginNameEqualsUsesIndexedSeek(t *testing.T) {
 	ctx := authz.WithInstanceID(t.Context(), "inst-1")
 	loginNameQuery, err := NewUserLoginNameExistsQuery("user@org.localhost", TextEqualsIgnoreCase)
 	require.NoError(t, err)
@@ -639,6 +642,7 @@ func TestPrepareUsersCountQuery_LoginNameEqualsUsesIndexedJoin(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Contains(t, sql, "SELECT COUNT(*)")
+	assert.Contains(t, sql, UserIDCol.identifier()+" = ANY(ARRAY(SELECT matches.id FROM (")
 	assert.Contains(t, sql, "AS matches")
 	assert.Contains(t, sql, "login_name_matches")
 	assert.Contains(t, sql, "login_names3_users")
@@ -683,7 +687,9 @@ func usersPageSubquery(t *testing.T, stmt string) string {
 
 func splitUsersPageSQL(t *testing.T, stmt string) (inner, outer string) {
 	t.Helper()
-	fromIdx := strings.Index(stmt, "FROM (SELECT")
+	// The total subquery comes first and can contain "FROM (SELECT" itself.
+	totalIdx := strings.Index(stmt, ") AS total ")
+	fromIdx := strings.Index(stmt[max(totalIdx, 0):], "FROM (SELECT") + max(totalIdx, 0)
 	pageIdx := strings.Index(stmt, ") AS page")
 	if fromIdx < 0 || pageIdx < 0 || pageIdx <= fromIdx {
 		t.Fatalf("page subquery not found: %s", stmt)
