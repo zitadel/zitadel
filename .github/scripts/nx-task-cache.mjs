@@ -6,10 +6,8 @@
 // (https://nx.dev/docs/kb/self-hosted-caching).
 //
 // Artifacts are bound to the run that uploaded them, so a job restores only from
-// runs on main of this repository and from earlier runs of its own branch. The
-// Actions cache can't give that guarantee on Depot runners: all of this
-// repository's branches share one Depot cache namespace, so any branch's job
-// can write entries main restores.
+// runs on main of this repository and from earlier runs of its own branch. A re-run
+// doesn't see the artifact of its own earlier attempt, only those of earlier runs.
 //
 //   node nx-task-cache.mjs find <artifact>          write main-run=<id> and branch-run=<id> to $GITHUB_OUTPUT
 //   node nx-task-cache.mjs serve <store>            serve <store> on a free 127.0.0.1 port, written to <store>.url
