@@ -108,7 +108,11 @@ jobs:
         id: nx
         env:
           NX_DAEMON: "false"
-        run: pnpm nx ${{ github.event_name == 'pull_request' && 'affected' || 'run-many' }} --nxBail --targets lint test build --exclude @zitadel/docs
+        # Depot runners route HTTP through a SOCKS proxy that exempts only localhost,
+        # so Nx can't reach the cache server on 127.0.0.1 without this exemption.
+        run: |
+          export NO_PROXY="${NO_PROXY:+$NO_PROXY,}127.0.0.1" no_proxy="${no_proxy:+$no_proxy,}127.0.0.1"
+          pnpm nx ${{ github.event_name == 'pull_request' && 'affected' || 'run-many' }} --nxBail --targets lint test build --exclude @zitadel/docs
       - name: Keep the Nx task cache entries this job used
         if: ${{ !cancelled() && steps.nx.outcome != 'skipped' }}
         run: |
