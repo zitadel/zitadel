@@ -104,7 +104,8 @@ go.work.sum
 CLAUDE.md
 .mcp.json
 .gemini/*
-.claude/
+.claude/*
+!.claude/skills/
 .cursor/
 .codex/
 .windsurf/
