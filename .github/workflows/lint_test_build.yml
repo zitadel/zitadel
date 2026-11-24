@@ -97,9 +97,7 @@ jobs:
           find "$store-branch" -type f -exec mv {} "$store"/ \;
           node .github/scripts/nx-task-cache.mjs serve "$store" > "$store.server.log" 2>&1 &
           for _ in $(seq 100); do [ -s "$store.url" ] && break; sleep 0.1; done
-          if [ -s "$store.url" ]; then
-            echo "NX_SELF_HOSTED_REMOTE_CACHE_SERVER=$(cat "$store.url")" >> "$GITHUB_ENV"
-          else
+          if [ ! -s "$store.url" ]; then
             echo "::warning::The Nx task cache server did not start; running without it"
             cat "$store.server.log"
           fi
@@ -108,9 +106,15 @@ jobs:
         id: nx
         env:
           NX_DAEMON: "false"
-        # Depot runners route HTTP through a SOCKS proxy that exempts only localhost,
-        # so Nx can't reach the cache server on 127.0.0.1 without this exemption.
+        # Depot runners point Nx at Depot Cache in every shell step, so this step sets
+        # the job's own server here, and keeps 127.0.0.1 off Depot's SOCKS proxy, which
+        # exempts only localhost.
         run: |
+          echo "Depot Cache settings in this shell: Nx=${NX_SELF_HOSTED_REMOTE_CACHE_SERVER:-none} GOCACHEPROG=${GOCACHEPROG%% *} BASH_ENV=${BASH_ENV:-none}"
+          unset NX_SELF_HOSTED_REMOTE_CACHE_SERVER NX_SELF_HOSTED_REMOTE_CACHE_ACCESS_TOKEN
+          if [ -s "$RUNNER_TEMP/nx-task-cache.url" ]; then
+            export NX_SELF_HOSTED_REMOTE_CACHE_SERVER="$(cat "$RUNNER_TEMP/nx-task-cache.url")"
+          fi
           export NO_PROXY="${NO_PROXY:+$NO_PROXY,}127.0.0.1" no_proxy="${no_proxy:+$no_proxy,}127.0.0.1"
           pnpm nx ${{ github.event_name == 'pull_request' && 'affected' || 'run-many' }} --nxBail --targets lint test build --exclude @zitadel/docs
       - name: Keep the Nx task cache entries this job used
