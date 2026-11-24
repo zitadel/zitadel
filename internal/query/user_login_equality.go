@@ -210,7 +210,15 @@ func spliceRemainingQuery(queries []SearchQuery, i int, replacement SearchQuery)
 	return remaining
 }
 
-func joinLoginEqualitySeeks(seeks []loginEqualitySeek) sq.Sqlizer {
+// loginEqualitySeeksCondition restricts users to the IDs the seeks find.
+// The IDs are collected once into an array (an InitPlan) and looked up by
+// primary key, so the plan does not depend on the planner's estimate for the
+// seeks. As a joined subquery, an overestimate (for example missing statistics
+// on the LOWER(email) or LOWER(username) index) let Postgres satisfy
+// ORDER BY id LIMIT by walking the whole instance in primary-key order and
+// probing each user against the matches, which never stops early when fewer
+// users match than the limit.
+func loginEqualitySeeksCondition(seeks []loginEqualitySeek) sq.Sqlizer {
 	parts := make([]string, len(seeks))
 	args := make([]interface{}, 0, len(seeks)*2)
 	for i, seek := range seeks {
@@ -218,7 +226,7 @@ func joinLoginEqualitySeeks(seeks []loginEqualitySeek) sq.Sqlizer {
 		args = append(args, seek.args...)
 	}
 	return sq.Expr(
-		"INNER JOIN ("+strings.Join(parts, " UNION ")+") AS matches ON "+UserIDCol.identifier()+" = matches.id",
+		UserIDCol.identifier()+" = ANY(ARRAY(SELECT matches.id FROM ("+strings.Join(parts, " UNION ")+") AS matches))",
 		args...,
 	)
 }
