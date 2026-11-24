@@ -117,6 +117,11 @@ jobs:
           skip=""
           if [ "$GITHUB_EVENT_NAME" = pull_request ]; then skip="$store.main"; fi
           node .github/scripts/nx-task-cache.mjs prune "$store" $skip
+          if [ -s "$store.server.log" ]; then
+            echo "::group::Nx task cache server log"
+            cat "$store.server.log"
+            echo "::endgroup::"
+          fi
       - name: Upload the Nx task cache
         if: ${{ !cancelled() && steps.nx.outcome != 'skipped' }}
         uses: actions/upload-artifact@v4

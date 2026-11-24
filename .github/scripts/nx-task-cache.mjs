@@ -115,12 +115,13 @@ function serve(store) {
         end(res, 405);
       }
     } catch (error) {
+      // The error goes to the server log, which the prune step prints, not to the client.
       console.error(`${req.method} ${hash}: ${error}`);
       rmSync(partial, { force: true });
       if (res.headersSent) {
         res.destroy();
       } else {
-        end(res, 500, String(error));
+        end(res, 500);
       }
     }
   });
