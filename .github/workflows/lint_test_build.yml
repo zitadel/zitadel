@@ -108,6 +108,9 @@ jobs:
         id: nx
         env:
           NX_DAEMON: "false"
+          # go test runs one package per core by default. All integration test packages
+          # share one API server and database, which times out at 32 packages at once.
+          GOFLAGS: "-p=16"
         # Depot runners point Nx at Depot Cache in every shell step, so this step sets
         # the job's own server here, and keeps 127.0.0.1 off Depot's SOCKS proxy, which
         # exempts only localhost.
