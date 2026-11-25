@@ -51,7 +51,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
             return;
           }
 
-          return submitLoginAndContinue(pK)
+          return submitLoginAndContinue(pK, response?.sessionId)
             .catch((error) => {
               setError(error instanceof Error ? error.message : String(error));
               return;
@@ -107,12 +107,15 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
     return sessionResponse;
   }
 
-  async function submitLogin(data: JsonObject) {
+  // challengeSessionId: the session the challenge was requested on. It must also verify the
+  // assertion; looking it up by the typed loginName can miss it, because the session cookie
+  // stores the user's login name, which may differ from what was typed (e.g. an email).
+  async function submitLogin(data: JsonObject, challengeSessionId?: string) {
     setLoading(true);
     try {
       const response = await sendPasskey({
         loginName,
-        sessionId,
+        sessionId: challengeSessionId ?? sessionId,
         organization,
         checks: {
           webAuthN: { credentialAssertionData: data },
@@ -136,7 +139,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
     }
   }
 
-  async function submitLoginAndContinue(publicKey: any): Promise<boolean | void> {
+  async function submitLoginAndContinue(publicKey: any, challengeSessionId?: string): Promise<boolean | void> {
     publicKey.challenge = coerceToArrayBuffer(publicKey.challenge, "publicKey.challenge");
     publicKey.allowCredentials.map((listItem: any) => {
       listItem.id = coerceToArrayBuffer(listItem.id, "publicKey.allowCredentials.id");
@@ -169,7 +172,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
           },
         };
 
-        return submitLogin(data);
+        return submitLogin(data, challengeSessionId);
       })
       .catch((error) => {
         // Handle passkey cancellation or errors
@@ -249,7 +252,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
 
             setLoading(true);
 
-            return submitLoginAndContinue(pK)
+            return submitLoginAndContinue(pK, response?.sessionId)
               .catch((error) => {
                 setError(error instanceof Error ? error.message : String(error));
                 return;

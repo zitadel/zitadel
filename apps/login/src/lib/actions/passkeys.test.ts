@@ -23,6 +23,7 @@ vi.mock("@/lib/server/zitadel", () => ({
   getSession: vi.fn(),
   getUserByID: vi.fn(),
   listUsers: vi.fn(),
+  searchUsers: vi.fn(),
   createPasskeyRegistrationLink: vi.fn(),
   registerPasskey: vi.fn(),
   verifyPasskeyRegistration: vi.fn(),

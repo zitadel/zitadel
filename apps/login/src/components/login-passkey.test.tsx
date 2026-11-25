@@ -198,6 +198,43 @@ describe("LoginPasskey Component", () => {
       });
     });
 
+    test("verifies on the session the challenge was requested on, not one looked up by the typed name", async () => {
+      // Given the challenge was requested on a session created for the user found from a typed
+      // email, so the session cookie holds the user's login name rather than the email
+      mockUpdateSession.mockResolvedValue({
+        sessionId: "challenge-session",
+        challenges: {
+          webAuthN: {
+            publicKeyCredentialRequestOptions: {
+              publicKey: { challenge: new Uint8Array([1]), allowCredentials: [] },
+            },
+          },
+        },
+      } as any);
+      mockCredentialsGet.mockResolvedValue({
+        id: "credential-id",
+        rawId: new ArrayBuffer(8),
+        type: "public-key",
+        response: {
+          authenticatorData: new ArrayBuffer(8),
+          clientDataJSON: new ArrayBuffer(8),
+          signature: new ArrayBuffer(8),
+          userHandle: new ArrayBuffer(8),
+        },
+      });
+      mockSendPasskey.mockResolvedValue({ redirect: "/success" });
+
+      // When the user confirms the passkey
+      renderWithIntl(<LoginPasskey loginName="jane@example.com" organization="org-1" altPassword={false} />);
+
+      // Then the assertion is sent with the challenge's session id
+      await waitFor(() => {
+        expect(mockSendPasskey).toHaveBeenCalledWith(
+          expect.objectContaining({ sessionId: "challenge-session", loginName: "jane@example.com" }),
+        );
+      });
+    });
+
     test("should display error when sendPasskey returns error", async () => {
       setupSuccessfulChallenge();
 
