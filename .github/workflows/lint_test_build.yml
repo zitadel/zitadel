@@ -58,17 +58,19 @@ jobs:
       - name: Find the Nx task cache
         id: nx-cache
         env:
+          # A release branch sets its own name here, so it restores its own runs.
+          BASE_BRANCH: main
           GITHUB_TOKEN: ${{ github.token }}
           HEAD_BRANCH: ${{ github.head_ref || github.ref_name }}
           HEAD_REPOSITORY_ID: ${{ github.event.pull_request.head.repo.id || github.repository_id }}
         run: node .github/scripts/nx-task-cache.mjs find nx-task-cache
       - name: Download the Nx task cache of main
-        if: steps.nx-cache.outputs.main-run
+        if: steps.nx-cache.outputs.base-run
         continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: nx-task-cache
-          run-id: ${{ steps.nx-cache.outputs.main-run }}
+          run-id: ${{ steps.nx-cache.outputs.base-run }}
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/nx-task-cache
       - name: Download the Nx task cache of this branch
@@ -84,7 +86,7 @@ jobs:
         run: |
           store="$RUNNER_TEMP/nx-task-cache"
           mkdir -p "$store" "$store-branch"
-          ls "$store" > "$store.main"
+          ls "$store" > "$store.base"
           find "$store-branch" -type f -exec mv {} "$store"/ \;
           node .github/scripts/nx-task-cache.mjs serve "$store" > "$store.server.log" 2>&1 &
           for _ in $(seq 100); do [ -s "$store.url" ] && break; sleep 0.1; done
@@ -111,7 +113,7 @@ jobs:
           store="$RUNNER_TEMP/nx-task-cache"
           # A pull request uploads only entries main's cache lacks.
           skip=""
-          if [ "$GITHUB_EVENT_NAME" = pull_request ]; then skip="$store.main"; fi
+          if [ "$GITHUB_EVENT_NAME" = pull_request ]; then skip="$store.base"; fi
           node .github/scripts/nx-task-cache.mjs prune "$store" $skip
           if [ -s "$store.server.log" ]; then
             echo "::group::Nx task cache server log"

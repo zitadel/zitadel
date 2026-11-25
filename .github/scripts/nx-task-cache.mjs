@@ -6,10 +6,11 @@
 // (https://nx.dev/docs/kb/self-hosted-caching).
 //
 // Artifacts are bound to the run that uploaded them, so a job restores only from
-// runs on main of this repository and from earlier runs of its own branch. A re-run
-// doesn't see the artifact of its own earlier attempt, only those of earlier runs.
+// runs on the base branch of this repository (BASE_BRANCH, main by default) and from
+// earlier runs of its own branch. A re-run doesn't see the artifact of its own
+// earlier attempt, only those of earlier runs.
 //
-//   node nx-task-cache.mjs find <artifact>          write main-run=<id> and branch-run=<id> to $GITHUB_OUTPUT
+//   node nx-task-cache.mjs find <artifact>          write base-run=<id> and branch-run=<id> to $GITHUB_OUTPUT
 //   node nx-task-cache.mjs serve <store>            serve <store> on a free 127.0.0.1 port, written to <store>.url
 //   node nx-task-cache.mjs prune <store> [<skip>]   delete entries this job did not use, and those listed in <skip>
 //
@@ -44,28 +45,47 @@ if (command === "find" && arg) {
   process.exit(2);
 }
 
-// Finds the newest unexpired artifact from main of this repository, and from the
-// branch this job runs for (HEAD_BRANCH in HEAD_REPOSITORY_ID, which is a fork for
-// pull requests from forks).
+// Finds the newest unexpired artifact from the base branch of this repository, and
+// from the branch this job runs for (HEAD_BRANCH in HEAD_REPOSITORY_ID, which is a
+// fork for pull requests from forks).
 async function find(artifact) {
   const { GITHUB_API_URL, GITHUB_REPOSITORY, GITHUB_REPOSITORY_ID, GITHUB_TOKEN, HEAD_BRANCH, HEAD_REPOSITORY_ID } =
     process.env;
-  const response = await fetch(
-    `${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/actions/artifacts?name=${artifact}&per_page=100`,
-    { headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${GITHUB_TOKEN}` } },
-  );
-  if (!response.ok) {
-    throw new Error(`listing ${artifact} artifacts returned ${response.status}`);
+  const baseBranch = process.env.BASE_BRANCH || "main";
+  const wanted = [["base-run", baseBranch, GITHUB_REPOSITORY_ID]];
+  if (HEAD_BRANCH !== baseBranch || HEAD_REPOSITORY_ID !== GITHUB_REPOSITORY_ID) {
+    wanted.push(["branch-run", HEAD_BRANCH, HEAD_REPOSITORY_ID]);
   }
-  const artifacts = (await response.json()).artifacts
-    .filter((a) => !a.expired && a.workflow_run)
-    .sort((a, b) => b.created_at.localeCompare(a.created_at));
-  const newest = (branch, repositoryId) =>
-    artifacts.find(
-      (a) => a.workflow_run.head_branch === branch && String(a.workflow_run.head_repository_id) === String(repositoryId),
-    )?.workflow_run.id ?? "";
-  const onMain = HEAD_BRANCH === "main" && HEAD_REPOSITORY_ID === GITHUB_REPOSITORY_ID;
-  const outputs = `main-run=${newest("main", GITHUB_REPOSITORY_ID)}\nbranch-run=${onMain ? "" : newest(HEAD_BRANCH, HEAD_REPOSITORY_ID)}\n`;
+  const found = new Map();
+  // Artifacts come newest first, so a branch with few runs can be a few pages in.
+  for (let page = 1; page <= 10 && found.size < wanted.length; page++) {
+    const response = await fetch(
+      `${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/actions/artifacts?name=${artifact}&per_page=100&page=${page}`,
+      { headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${GITHUB_TOKEN}` } },
+    );
+    if (!response.ok) {
+      throw new Error(`listing ${artifact} artifacts returned ${response.status}`);
+    }
+    const { artifacts } = await response.json();
+    for (const a of artifacts.sort((a, b) => b.created_at.localeCompare(a.created_at))) {
+      const match =
+        !a.expired &&
+        a.workflow_run &&
+        wanted.find(
+          ([output, branch, repositoryId]) =>
+            !found.has(output) &&
+            a.workflow_run.head_branch === branch &&
+            String(a.workflow_run.head_repository_id) === String(repositoryId),
+        );
+      if (match) {
+        found.set(match[0], a.workflow_run.id);
+      }
+    }
+    if (artifacts.length < 100) {
+      break;
+    }
+  }
+  const outputs = `base-run=${found.get("base-run") ?? ""}\nbranch-run=${found.get("branch-run") ?? ""}\n`;
   console.log(outputs);
   if (process.env.GITHUB_OUTPUT) {
     appendFileSync(process.env.GITHUB_OUTPUT, outputs);
