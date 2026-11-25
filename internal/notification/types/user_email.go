@@ -129,7 +129,8 @@ func checkEmailLimit(ctx context.Context, channels ChannelChains, limit *smtp.Ru
 }
 
 func countSuppressedEmail(ctx context.Context, recipient string, triggeringEventType eventstore.EventType) {
-	logging.Debug(ctx, "email to reserved recipient domain not sent", "domain", domain.EmailAddress(recipient).Domain(), "eventType", triggeringEventType)
+	// only the domain of the parsed address is logged, any other part of the recipient could contain personal data
+	logging.Debug(ctx, "email to reserved recipient domain not sent", "domain", domain.EmailAddress(recipient).ParsedDomain(), "eventType", triggeringEventType)
 	err := metrics.AddCount(ctx, SuppressedEmailsCounter, 1, map[string]attribute.Value{
 		"triggering_event_type": attribute.StringValue(string(triggeringEventType)),
 	})
