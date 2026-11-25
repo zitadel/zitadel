@@ -1,10 +1,12 @@
 "use server";
 
+import { answerRejection } from "@/lib/server/api-error";
 import { getSessionCookieById } from "@/lib/server/cookies";
 import { addIdpFlowProof } from "@/lib/server/fingerprint";
 import { getPublicHost } from "@/lib/server/host";
 import { getServiceConfig } from "@/lib/server/service-url";
 import { ServiceConfig, startIdentityProviderFlow, startLDAPIdentityProviderFlow } from "@/lib/server/zitadel";
+import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -46,32 +48,32 @@ export async function redirectToIdp(prevState: RedirectToIdpState, formData: For
   // binds the flow to this browser (and the session to link), checked when the callback is processed
   await addIdpFlowProof(params, sessionId);
 
-  const response = await startIDPFlow({
-    serviceConfig,
-    host,
-    idpId,
-    successUrl: `/idp/${provider}/process?` + params.toString(),
-    failureUrl: `/idp/${provider}/failure?` + params.toString(),
-    loginHint: loginHint || undefined,
-  });
+  const t = await getTranslations("idp");
+
+  let response;
+  try {
+    response = await startIDPFlow({
+      serviceConfig,
+      host,
+      idpId,
+      successUrl: `/idp/${provider}/process?` + params.toString(),
+      failureUrl: `/idp/${provider}/failure?` + params.toString(),
+      loginHint: loginHint || undefined,
+    });
+  } catch (error) {
+    // e.g. the IdP was removed or is misconfigured
+    return answerRejection(error, t("errors.couldNotStartIDPFlow"), { context: { idpId } });
+  }
 
   if (!response) {
-    return { error: "Could not start IDP flow" };
+    return { error: t("errors.couldNotStartIDPFlow") };
   }
 
-  if (response && "error" in response && response?.error) {
-    return { error: response.error };
-  }
-
-  if (response && "redirect" in response && response?.redirect) {
+  if ("redirect" in response) {
     redirect(response.redirect);
   }
 
-  if (response && "samlData" in response && response?.samlData) {
-    return { samlData: response.samlData };
-  }
-
-  return { error: "Unexpected response from IDP flow" };
+  return { samlData: response.samlData };
 }
 
 export type StartIDPFlowCommand = {
@@ -83,7 +85,9 @@ export type StartIDPFlowCommand = {
   loginHint?: string;
 };
 
-async function startIDPFlow(command: StartIDPFlowCommand) {
+async function startIDPFlow(
+  command: StartIDPFlowCommand,
+): Promise<{ redirect: string } | { samlData: { url: string; fields: Record<string, string> } } | null> {
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
   const response = await startIdentityProviderFlow({
@@ -97,7 +101,7 @@ async function startIDPFlow(command: StartIDPFlowCommand) {
   });
 
   if (!response || !response.url) {
-    return { error: "Could not start IDP flow" };
+    return null;
   }
 
   if (response.fields) {
@@ -123,8 +127,10 @@ export async function createNewSessionForLDAP(command: createNewSessionForLDAPCo
 
   const { serviceConfig } = getServiceConfig(_headers);
 
+  const t = await getTranslations("ldap");
+
   if (!command.username || !command.password) {
-    return { error: "No username or password provided" };
+    return { error: t("errors.couldNotVerify") };
   }
 
   // the session to link must be one of this browser's sessions, same as redirectToIdp
@@ -135,15 +141,21 @@ export async function createNewSessionForLDAP(command: createNewSessionForLDAPCo
     }
   }
 
-  const response = await startLDAPIdentityProviderFlow({
-    serviceConfig,
-    idpId: command.idpId,
-    username: command.username,
-    password: command.password,
-  });
+  let response;
+  try {
+    response = await startLDAPIdentityProviderFlow({
+      serviceConfig,
+      idpId: command.idpId,
+      username: command.username,
+      password: command.password,
+    });
+  } catch (error) {
+    // wrong credentials are answered with InvalidArgument (COMMAND-nzun2i)
+    return answerRejection(error, t("errors.couldNotVerify"), { context: { idpId: command.idpId } });
+  }
 
   if (!response || response.nextStep.case !== "idpIntent" || !response.nextStep.value) {
-    return { error: "Could not start LDAP identity provider flow" };
+    return { error: t("errors.couldNotVerify") };
   }
 
   const { userId, idpIntentId, idpIntentToken } = response.nextStep.value;

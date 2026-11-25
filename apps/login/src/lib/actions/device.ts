@@ -1,11 +1,12 @@
 "use server";
 
 import { sendLoginname } from "@/lib/actions/loginname";
+import { answerRejection, fallbackOnRejection } from "@/lib/server/api-error";
 import { getSessionCookieById } from "@/lib/server/cookies";
 import { checkDeviceCodeCheckCookie, deleteDeviceCodeCheckCookie } from "@/lib/server/device-code-check";
 import { getServiceConfig } from "@/lib/server/service-url";
 import { isSessionValid, loadSession } from "@/lib/server/session";
-import { authorizeOrDenyDeviceAuthorization, getDeviceAuthorizationRequest } from "@/lib/server/zitadel";
+import { authorizeOrDenyDeviceAuthorization, getDeviceAuthorizationRequest, ServiceConfig } from "@/lib/server/zitadel";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
@@ -14,6 +15,17 @@ type DeviceAuthorizationCommand = {
   sessionId: string;
   organization?: string;
 };
+
+// An unknown or expired user code is the user's input, not a fault: answer with a message.
+async function loadDeviceAuthorizationRequest(serviceConfig: ServiceConfig, userCode: string, notFound: string) {
+  try {
+    const { deviceAuthorizationRequest } = await getDeviceAuthorizationRequest({ serviceConfig, userCode });
+
+    return deviceAuthorizationRequest ? { deviceAuthorizationRequest } : { error: notFound };
+  } catch (error) {
+    return answerRejection(error, notFound);
+  }
+}
 
 // Shared by approve and deny: the user code must have been entered in this browser,
 // and the session must come from this browser's `sessions` cookie and still exist.
@@ -60,8 +72,9 @@ export async function approveDeviceAuthorization(command: DeviceAuthorizationCom
   const { userCode, organization } = command;
   const { serviceConfig, t, cookie, session, user } = consent;
 
-  // Validate the session (including MFA) before handing out a token to the device.
-  const valid = await isSessionValid({ serviceConfig, session });
+  // Validate the session (including MFA) before handing out a token to the device. If the user or org
+  // behind the session was removed meanwhile, ZITADEL rejects the check: re-authenticate as for an invalid one.
+  const valid = await isSessionValid({ serviceConfig, session }).catch(fallbackOnRejection(false, "the session validation"));
 
   if (!valid) {
     // Send the user through the login funnel, the same way continueWithSession does.
@@ -69,7 +82,7 @@ export async function approveDeviceAuthorization(command: DeviceAuthorizationCom
       loginName: user.loginName,
       organization: user.organizationId,
       requestId: `device_${userCode}`,
-    });
+    }).catch(fallbackOnRejection(undefined, "the re-authentication"));
 
     if (res && "redirect" in res && res.redirect) {
       return { redirect: res.redirect };
@@ -78,17 +91,22 @@ export async function approveDeviceAuthorization(command: DeviceAuthorizationCom
     return { error: t("sessionExpired") };
   }
 
-  const { deviceAuthorizationRequest } = await getDeviceAuthorizationRequest({ serviceConfig, userCode });
+  const request = await loadDeviceAuthorizationRequest(serviceConfig, userCode, t("noDeviceRequest"));
 
-  if (!deviceAuthorizationRequest) {
-    return { error: t("noDeviceRequest") };
+  if ("error" in request) {
+    return request;
   }
 
-  await authorizeOrDenyDeviceAuthorization({
-    serviceConfig,
-    deviceAuthorizationId: deviceAuthorizationRequest.id,
-    session: { sessionId: cookie.id, sessionToken: cookie.token },
-  });
+  try {
+    await authorizeOrDenyDeviceAuthorization({
+      serviceConfig,
+      deviceAuthorizationId: request.deviceAuthorizationRequest.id,
+      session: { sessionId: cookie.id, sessionToken: cookie.token },
+    });
+  } catch (error) {
+    // the code was already used or expired while the consent screen was open
+    return answerRejection(error, t("couldNotCompleteDeviceAuthorization"), { sessionToken: true });
+  }
 
   await deleteDeviceCodeCheckCookie();
 
@@ -111,17 +129,22 @@ export async function denyDeviceAuthorization(command: DeviceAuthorizationComman
   const { userCode } = command;
   const { serviceConfig, t } = consent;
 
-  const { deviceAuthorizationRequest } = await getDeviceAuthorizationRequest({ serviceConfig, userCode });
+  const request = await loadDeviceAuthorizationRequest(serviceConfig, userCode, t("noDeviceRequest"));
 
-  if (!deviceAuthorizationRequest) {
-    return { error: t("noDeviceRequest") };
+  if ("error" in request) {
+    return request;
   }
 
-  // without a session, the device auth request is denied
-  const response = await authorizeOrDenyDeviceAuthorization({
-    serviceConfig,
-    deviceAuthorizationId: deviceAuthorizationRequest.id,
-  });
+  let response;
+  try {
+    // without a session, the device auth request is denied
+    response = await authorizeOrDenyDeviceAuthorization({
+      serviceConfig,
+      deviceAuthorizationId: request.deviceAuthorizationRequest.id,
+    });
+  } catch (error) {
+    return answerRejection(error, t("couldNotCompleteDeviceAuthorization"));
+  }
 
   await deleteDeviceCodeCheckCookie();
 

@@ -282,8 +282,17 @@ describe("sendPasskey", () => {
       });
     });
 
+    test("rethrows a server fault from getUserByID", async () => {
+      const error = new ClassifiedConnectError(new ConnectError("Internal error", Code.Internal));
+      mockGetUserByID.mockRejectedValue(error);
+
+      await expect(
+        sendPasskey({ sessionId: "session-123", checks: { webAuthN: { credentialAssertionData: {} } } as any }),
+      ).rejects.toBe(error);
+    });
+
     test("should return error when getUserByID fails", async () => {
-      mockGetUserByID.mockRejectedValue(new Error("User not found"));
+      mockGetUserByID.mockRejectedValue(new ClassifiedConnectError(new ConnectError("User not found", Code.NotFound)));
 
       const result = await sendPasskey({
         sessionId: "session-123",
@@ -540,14 +549,41 @@ describe("registerPasskeyLink", () => {
 
   test("should return error when neither sessionId nor userId is provided", async () => {
     const result = await registerPasskeyLink({});
-    expect(result).toEqual({ error: "Either sessionId or userId must be provided" });
+    expect(result).toEqual({ error: "set.errors.missingContext" });
   });
 
   test("should return error when session cookie is not found", async () => {
     mockGetSessionCookieById.mockResolvedValue(null);
 
     const result = await registerPasskeyLink({ sessionId: "session-123" });
-    expect(result).toEqual({ error: "Could not get session cookie" });
+    expect(result).toEqual({ error: "set.errors.couldNotLoadSession" });
+  });
+
+  test.each([Code.NotFound, Code.PermissionDenied])(
+    "answers a session the server no longer has (code %s) with a message",
+    async (code) => {
+      mockGetSessionCookieById.mockResolvedValue({ id: "session-123", token: "token" });
+      mockGetSession.mockRejectedValue(new ClassifiedConnectError(new ConnectError("Session not found", code)));
+
+      const result = await registerPasskeyLink({ sessionId: "session-123" });
+
+      expect(result).toEqual({ error: "set.errors.couldNotLoadSession" });
+      expect(mockRegisterPasskey).not.toHaveBeenCalled();
+    },
+  );
+
+  test("rethrows a server fault while loading the session", async () => {
+    const error = new ClassifiedConnectError(new ConnectError("Unavailable", Code.Unavailable));
+    mockGetSessionCookieById.mockResolvedValue({ id: "session-123", token: "token" });
+    mockGetSession.mockRejectedValue(error);
+
+    await expect(registerPasskeyLink({ sessionId: "session-123" })).rejects.toBe(error);
+  });
+
+  test("answers a user id without its code with a message", async () => {
+    const result = await registerPasskeyLink({ userId: "user-123" });
+
+    expect(result).toEqual({ error: "set.errors.missingContext" });
   });
 
   describe("IDP-authenticated session", () => {
@@ -874,5 +910,34 @@ describe("verifyPasskeyRegistration", () => {
     expect(result).toMatchObject({ loginName: "max@zitadel.com" });
     expect(zitadel.listAuthenticationMethodTypes).not.toHaveBeenCalled();
     expect(zitadel.verifyPasskeyRegistration).toHaveBeenCalled();
+  });
+
+  const verifyByCode = () =>
+    verifyPasskeyRegistration({ passkeyId: "passkey-1", passkeyName: "key", publicKeyCredential: {}, userId: "user-123" });
+
+  test("answers a rejected attestation with a message instead of failing", async () => {
+    vi.mocked(zitadel.getUserByID).mockResolvedValue({ user: { preferredLoginName: "max@zitadel.com" } });
+    vi.mocked(zitadel.verifyPasskeyRegistration).mockRejectedValue(
+      new ClassifiedConnectError(new ConnectError("Invalid attestation", Code.InvalidArgument)),
+    );
+
+    expect(await verifyByCode()).toEqual({ error: "set.errors.couldNotVerifyPasskey" });
+  });
+
+  test.each([
+    ["a server fault", Code.Internal],
+    ["the API rejecting the login's own credentials", Code.Unauthenticated],
+  ])("rethrows %s", async (_, code) => {
+    const error = new ClassifiedConnectError(new ConnectError("rejected", code));
+    vi.mocked(zitadel.getUserByID).mockResolvedValue({ user: { preferredLoginName: "max@zitadel.com" } });
+    vi.mocked(zitadel.verifyPasskeyRegistration).mockRejectedValue(error);
+
+    await expect(verifyByCode()).rejects.toBe(error);
+  });
+
+  test("answers a request without session and user with a message", async () => {
+    const result = await verifyPasskeyRegistration({ passkeyId: "passkey-1", publicKeyCredential: {} });
+
+    expect(result).toEqual({ error: "set.errors.missingContext" });
   });
 });

@@ -1,17 +1,42 @@
 import "server-only";
 
+import { isRejectedByUser, zitadelErrorId } from "@/lib/server/api-error";
 import { createLogger } from "@/lib/server/logger";
 import { hasVerifiedPrimaryFactor, hasVerifiedSecondFactor, SECOND_FACTOR_METHODS } from "@/lib/server/session";
 import { checkUserVerification } from "@/lib/server/verify-helper";
 import { getLoginSettings, listAuthenticationMethodTypes, ServiceConfig } from "@/lib/server/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { PasskeysType, SecondFactorType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 const logger = createLogger("enrollment-guard");
 
 export const SECOND_FACTOR_REQUIRED_ERROR = "You have to verify your second factor first";
 export const PASSKEYS_NOT_ALLOWED_ERROR = "Passkeys are not allowed";
 export const SECOND_FACTOR_NOT_ALLOWED_ERROR = "This second factor is not allowed";
+const AUTHENTICATION_REQUIRED_ERROR = "You have to authenticate or have a valid User Verification Check";
+
+/**
+ * The user's authentication methods, or `null` when ZITADEL rejects the call (e.g. the user was
+ * deleted mid-flow), so the guard can fail closed. Server faults keep throwing.
+ */
+async function listUserAuthMethods(
+  serviceConfig: ServiceConfig,
+  userId: string,
+): Promise<AuthenticationMethodType[] | null> {
+  try {
+    return (await listAuthenticationMethodTypes({ serviceConfig, userId })).authMethodTypes;
+  } catch (error) {
+    if (!isRejectedByUser(error)) {
+      throw error;
+    }
+    logger.warn("Could not list the authentication methods, refusing the enrollment", {
+      grpcCode: error.code,
+      errorId: zitadelErrorId(error),
+    });
+    return null;
+  }
+}
 
 /**
  * Central authorization gate for credential-enrollment entry points.
@@ -48,10 +73,13 @@ export async function getEnrollmentAuthorizationError({
       return null;
     }
 
-    const authmethods = await listAuthenticationMethodTypes({ serviceConfig, userId });
-    const hasSecondFactor = authmethods.authMethodTypes.some((method) => SECOND_FACTOR_METHODS.includes(method));
+    const authMethods = await listUserAuthMethods(serviceConfig, userId);
+    if (!authMethods) {
+      return AUTHENTICATION_REQUIRED_ERROR;
+    }
+    const hasSecondFactor = authMethods.some((method) => SECOND_FACTOR_METHODS.includes(method));
 
-    if (hasSecondFactor && !hasVerifiedSecondFactor(session, authmethods.authMethodTypes)) {
+    if (hasSecondFactor && !hasVerifiedSecondFactor(session, authMethods)) {
       return SECOND_FACTOR_REQUIRED_ERROR;
     }
 
@@ -59,12 +87,12 @@ export async function getEnrollmentAuthorizationError({
   }
 
   // The session is only "identified", not authenticated.
-  const authmethods = await listAuthenticationMethodTypes({ serviceConfig, userId });
+  const authMethods = await listUserAuthMethods(serviceConfig, userId);
 
-  // If the user already has any auth method configured, enrollment requires a real
-  // authentication (or a valid user-verification check) — reject the identify-only session.
-  if (authmethods.authMethodTypes.length !== 0) {
-    return "You have to authenticate or have a valid User Verification Check";
+  // If the user already has any auth method configured (or they cannot be listed), enrollment
+  // requires a real authentication (or a valid user-verification check) — reject the identify-only session.
+  if (!authMethods || authMethods.length !== 0) {
+    return AUTHENTICATION_REQUIRED_ERROR;
   }
 
   // No auth methods yet: allow only if a prior user-verification check was completed

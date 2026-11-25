@@ -208,7 +208,10 @@
       "userCreationFailed": "Aanmaken van gebruikersaccount mislukt",
       "orgResolutionFailed": "Kon organisatie voor registratie niet bepalen",
       "sessionCreationFailed": "Kon sessie niet aanmaken of omleiding bepalen",
-      "unknownError": "Er is een onbekende fout opgetreden"
+      "unknownError": "Er is een onbekende fout opgetreden",
+      "couldNotStartIDPFlow": "Kon IDP-stroom niet starten",
+      "userNotFound": "Gebruiker niet in het systeem gevonden",
+      "couldNotCreateSession": "Kon sessie niet aanmaken"
     }
   },
   "ldap": {
@@ -222,6 +225,9 @@
     "required": {
       "username": "Dit veld is verplicht",
       "password": "Dit veld is verplicht"
+    },
+    "errors": {
+      "couldNotVerify": "Inloggen mislukt. Controleer uw gebruikersnaam en wachtwoord."
     }
   },
   "mfa": {
@@ -312,7 +318,15 @@
         "link": "Passkey authenticatie"
       },
       "skip": "Overslaan",
-      "submit": "Doorgaan"
+      "submit": "Doorgaan",
+      "errors": {
+        "missingContext": "Sessie- of gebruikersinformatie ontbreekt. Start de installatie opnieuw via de ontvangen link.",
+        "couldNotLoadSession": "Kon sessie niet laden",
+        "couldNotRegisterPasskey": "De passkey kon niet worden ingesteld. Probeer het opnieuw.",
+        "couldNotVerifyPasskey": "De passkey kon niet worden geverifieerd. Probeer het opnieuw.",
+        "userNotFound": "Gebruiker niet in het systeem gevonden",
+        "couldNotCreateSession": "Kon sessie niet aanmaken"
+      }
     }
   },
   "u2f": {
@@ -324,6 +338,11 @@
       "title": "Stel 2-factor in",
       "description": "Stel een apparaat in als tweede factor.",
       "submit": "Doorgaan"
+    },
+    "errors": {
+      "couldNotLoadSession": "Kon sessie niet laden",
+      "couldNotRegister": "De beveiligingssleutel kon niet worden ingesteld. Probeer het opnieuw.",
+      "couldNotVerify": "De beveiligingssleutel kon niet worden geverifieerd. Probeer het opnieuw."
     }
   },
   "register": {
@@ -379,7 +398,8 @@
       "sessionMismatch": "De registratie is in een andere browser gestart. Meld je opnieuw aan bij je identiteitsprovider.",
       "registerNotAllowed": "Registratie is niet toegestaan! Neem contact op met uw beheerder voor meer informatie.",
       "localAuthenticationNotAllowed": "Lokale authenticatie is niet toegestaan! Neem contact op met uw beheerder voor meer informatie.",
-      "couldNotGetLoginSettings": "Kon aanmeldinstellingen niet ophalen"
+      "couldNotGetLoginSettings": "Kon aanmeldinstellingen niet ophalen",
+      "userAlreadyExists": "Er bestaat al een gebruiker met dit e-mailadres. Probeer in plaats daarvan in te loggen."
     }
   },
   "invite": {
@@ -500,6 +520,7 @@
     "couldNotContinueSession": "Kon de sessie niet voortzetten - ontbrekende gebruikersinformatie",
     "couldNotClearSession": "De sessie kon niet worden beëindigd. Probeer het opnieuw.",
     "secondFactorRequired": "Verifieer eerst uw tweede factor om een nieuwe authenticatiemethode in te stellen.",
-    "authenticatorNotAllowed": "Deze authenticatiemethode is niet toegestaan voor uw organisatie."
+    "authenticatorNotAllowed": "Deze authenticatiemethode is niet toegestaan voor uw organisatie.",
+    "couldNotCompleteDeviceAuthorization": "De apparaatautorisatie kon niet worden voltooid. De code is mogelijk al gebruikt of verlopen."
   }
 }

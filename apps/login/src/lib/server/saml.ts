@@ -1,6 +1,7 @@
 import "server-only";
 
 import { isSafeRedirectUri } from "@/lib/client-utils";
+import { fallbackOnRejection } from "@/lib/server/api-error";
 import { Cookie } from "@/lib/server/cookies";
 import { isClassifiedError } from "@/lib/server/grpc/interceptors/error-classification";
 import { reauthenticate } from "@/lib/server/reauthenticate";
@@ -32,12 +33,17 @@ export async function loginWithSAMLAndSession({
   const selectedSession = sessions.find((s) => s.id === sessionId);
 
   if (selectedSession && selectedSession.id) {
-    const isValid = await isSessionValid({ serviceConfig, session: selectedSession });
+    const isValid = await isSessionValid({ serviceConfig, session: selectedSession }).catch(
+      fallbackOnRejection(false, "the session validation"),
+    );
 
     if (!isValid) {
       // An invalid session (e.g. no verified factor, MFA missing or expired) must never be
       // linked to the SAML request. Send the user to re-authenticate, or fail closed.
-      return (await reauthenticate(selectedSession, `saml_${samlRequest}`)) ?? { error: "Session not found or invalid" };
+      const next = await reauthenticate(selectedSession, `saml_${samlRequest}`).catch(
+        fallbackOnRejection(undefined, "the re-authentication"),
+      );
+      return next ?? { error: "Session not found or invalid" };
     }
 
     const cookie = sessionCookies.find((cookie) => cookie.id === selectedSession?.id);
@@ -91,7 +97,7 @@ export async function loginWithSAMLAndSession({
           const loginSettings = await getLoginSettings({
             serviceConfig,
             organization: selectedSession.factors?.user?.organizationId,
-          });
+          }).catch(fallbackOnRejection(undefined, "loading the login settings"));
 
           if (loginSettings?.defaultRedirectUri && isSafeRedirectUri(loginSettings.defaultRedirectUri)) {
             return { redirect: loginSettings.defaultRedirectUri };

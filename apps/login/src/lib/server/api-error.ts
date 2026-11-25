@@ -1,8 +1,11 @@
 import "server-only";
 
 import { ClassifiedConnectError, isClassifiedError } from "@/lib/server/grpc/interceptors/error-classification";
+import { createLogger } from "@/lib/server/logger";
 import { Code } from "@connectrpc/connect";
 import { ErrorDetailSchema } from "@zitadel/proto/zitadel/message_pb";
+
+const logger = createLogger("api-error");
 
 /**
  * Whether ZITADEL rejected a call because of the user's input or state (a wrong code, a locked
@@ -61,4 +64,51 @@ export function zitadelErrorId(error: ClassifiedConnectError): string | undefine
 export function hasZitadelErrorId(error: ClassifiedConnectError, ids: readonly string[]): boolean {
   const id = zitadelErrorId(error);
   return id !== undefined && ids.includes(id);
+}
+
+/**
+ * Answers a call ZITADEL rejected because of the user's input or state with `message`, so a server
+ * action responds with a message for its form instead of failing with a 500 (a server action that
+ * throws fails the whole POST, even when the form catches the rejected promise). Anything else is
+ * rethrown, so outages stay visible.
+ *
+ * Pass `sessionToken` for calls that send the user's session token: NotFound and PermissionDenied
+ * then mean the session is gone or no longer accepts the token, which is the user's state.
+ */
+export function answerRejection(
+  error: unknown,
+  message: string,
+  options: { sessionToken?: boolean; context?: Record<string, unknown> } = {},
+): { error: string } {
+  const sessionRejected =
+    options.sessionToken &&
+    isClassifiedError(error) &&
+    (error.code === Code.NotFound || error.code === Code.PermissionDenied);
+
+  if (!sessionRejected && !isRejectedByUser(error)) {
+    throw error;
+  }
+
+  const rejection = error as ClassifiedConnectError;
+  logger.warn("ZITADEL rejected the call", {
+    grpcCode: rejection.code,
+    errorId: zitadelErrorId(rejection),
+    ...options.context,
+  });
+
+  return { error: message };
+}
+
+/**
+ * A `.catch` handler for a call the caller can do without: a call ZITADEL rejected because of the
+ * user's input or state resolves to `fallback`, anything else is rethrown, so outages stay visible.
+ */
+export function fallbackOnRejection<T>(fallback: T, step: string): (error: unknown) => T {
+  return (error) => {
+    if (!isRejectedByUser(error)) {
+      throw error;
+    }
+    logger.warn(`ZITADEL rejected ${step}`, { grpcCode: error.code, errorId: zitadelErrorId(error) });
+    return fallback;
+  };
 }

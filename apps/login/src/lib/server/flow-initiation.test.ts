@@ -1,5 +1,7 @@
 import type { Cookie } from "@/lib/server/cookies";
+import { ClassifiedConnectError } from "@/lib/server/grpc/interceptors/error-classification";
 import { createIdpFlowProof, isIdpFlowProofValid } from "@/lib/server/idp-flow-proof";
+import { Code, ConnectError } from "@connectrpc/connect";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { FlowInitiationParams, handleOIDCFlowInitiation } from "./flow-initiation";
@@ -1132,5 +1134,54 @@ describe("handleOIDCFlowInitiation — idp scope (urn:zitadel:iam:org:idp:id)", 
     expect(successUrl.searchParams.get("requestId")).toBe("oidc_abc123");
     expect(isIdpFlowProofValid(successUrl.searchParams.get("flowFingerprint") ?? undefined, "fp123")).toBe(true);
     expect(isIdpFlowProofValid(successUrl.searchParams.get("flowFingerprint") ?? undefined, "other-fp")).toBe(false);
+  });
+});
+
+describe("handleOIDCFlowInitiation — prompt=none callback rejections", () => {
+  const session = { id: "session-1", factors: { user: { id: "user1", organizationId: "111111" } } };
+  const apiError = (code: Code, message: string) => new ClassifiedConnectError(new ConnectError(message, code));
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+
+    const { Prompt } = await import("@zitadel/proto/zitadel/oidc/v2/authorization_pb");
+    const zitadel = await import("@/lib/server/zitadel");
+    const sessionLib = await import("@/lib/server/session");
+    const authUtils = await import("@/lib/server/auth-utils");
+
+    vi.mocked(authUtils.getValidLocaleFromUILocales).mockReturnValue(null as any);
+    vi.mocked(zitadel.getAuthRequest).mockResolvedValue({
+      authRequest: { id: "abc123", uiLocales: [], scope: [], prompt: [Prompt.NONE], loginHint: undefined },
+    } as any);
+    vi.mocked(zitadel.getSecuritySettings).mockResolvedValue(undefined);
+    vi.mocked(sessionLib.findValidSession).mockResolvedValue(session as any);
+  });
+
+  const initiate = () =>
+    handleOIDCFlowInitiation(makeBaseParams({ sessions: [session] as any, sessionCookies: [makeCookie("session-1")] }));
+
+  test("answers a rejection with its status and message, with the CSP headers", async () => {
+    const zitadel = await import("@/lib/server/zitadel");
+    vi.mocked(zitadel.createCallback).mockRejectedValue(
+      apiError(Code.FailedPrecondition, "Auth request already handled (OIDC-Sfwe3)"),
+    );
+
+    const res = await initiate();
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: "Auth request already handled (OIDC-Sfwe3)" });
+    expect(res.headers.get("Content-Security-Policy")).toBeTruthy();
+    expect(res.headers.get("X-Frame-Options")).toBe("deny");
+  });
+
+  test.each([
+    ["a server fault", Code.Internal],
+    ["the API rejecting the login's own credentials", Code.Unauthenticated],
+  ])("rethrows %s", async (_, code) => {
+    const zitadel = await import("@/lib/server/zitadel");
+    const error = apiError(code, "failed");
+    vi.mocked(zitadel.createCallback).mockRejectedValue(error);
+
+    await expect(initiate()).rejects.toBe(error);
   });
 });

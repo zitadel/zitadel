@@ -5,6 +5,7 @@ import { getServiceConfig } from "@/lib/server/service-url";
 import { createSessionForIdpAndUpdateCookie } from "@/lib/server/session-cookie";
 import { checkEmailVerification, checkMFAFactors } from "@/lib/server/verify-helper";
 import { getLoginSettings, getUserByID, listAuthenticationMethodTypes } from "@/lib/server/zitadel";
+import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 // Not a server action: the user id comes from the caller, so only the IDP callback handling,
@@ -31,10 +32,14 @@ export async function createNewSessionFromIdpIntent(command: CreateNewSessionCom
     throw new Error("No userId or loginName provided");
   }
 
+  const t = await getTranslations("idp");
+
+  // A call ZITADEL rejects throws on purpose: processIDPCallback turns it into the failure page,
+  // which offers the user's other sign-in methods.
   const userResponse = await getUserByID({ serviceConfig, userId: command.userId });
 
   if (!userResponse || !userResponse.user) {
-    return { error: "User not found in the system" };
+    return { error: t("errors.userNotFound") };
   }
 
   const loginSettings = await getLoginSettings({ serviceConfig, organization: userResponse.user.details?.resourceOwner });
@@ -47,7 +52,7 @@ export async function createNewSessionFromIdpIntent(command: CreateNewSessionCom
   });
 
   if (!session || !session.factors?.user) {
-    return { error: "Could not create session" };
+    return { error: t("errors.couldNotCreateSession") };
   }
 
   const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;

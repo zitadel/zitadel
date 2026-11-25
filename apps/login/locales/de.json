@@ -208,7 +208,10 @@
       "userCreationFailed": "Erstellen des Benutzerkontos fehlgeschlagen",
       "orgResolutionFailed": "Organisation für Registrierung konnte nicht ermittelt werden",
       "sessionCreationFailed": "Sitzung konnte nicht erstellt oder Weiterleitung konnte nicht ermittelt werden",
-      "unknownError": "Ein unbekannter Fehler ist aufgetreten"
+      "unknownError": "Ein unbekannter Fehler ist aufgetreten",
+      "couldNotStartIDPFlow": "IDP-Ablauf konnte nicht gestartet werden",
+      "userNotFound": "Benutzer im System nicht gefunden",
+      "couldNotCreateSession": "Sitzung konnte nicht erstellt werden"
     }
   },
   "ldap": {
@@ -222,6 +225,9 @@
     "required": {
       "username": "Dieses Feld ist erforderlich",
       "password": "Dieses Feld ist erforderlich"
+    },
+    "errors": {
+      "couldNotVerify": "Anmeldung fehlgeschlagen. Bitte überprüfen Sie Benutzername und Passwort."
     }
   },
   "mfa": {
@@ -312,7 +318,15 @@
         "link": "Passkey-Authentifizierung"
       },
       "skip": "Überspringen",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "errors": {
+        "missingContext": "Sitzungs- oder Benutzerinformationen fehlen. Starten Sie die Einrichtung über den erhaltenen Link neu.",
+        "couldNotLoadSession": "Sitzung konnte nicht geladen werden",
+        "couldNotRegisterPasskey": "Der Passkey konnte nicht eingerichtet werden. Bitte versuchen Sie es erneut.",
+        "couldNotVerifyPasskey": "Der Passkey konnte nicht verifiziert werden. Bitte versuchen Sie es erneut.",
+        "userNotFound": "Benutzer im System nicht gefunden",
+        "couldNotCreateSession": "Sitzung konnte nicht erstellt werden"
+      }
     }
   },
   "u2f": {
@@ -324,6 +338,11 @@
       "title": "2-Faktor einrichten",
       "description": "Richten Sie ein Gerät als zweiten Faktor ein.",
       "submit": "Weiter"
+    },
+    "errors": {
+      "couldNotLoadSession": "Sitzung konnte nicht geladen werden",
+      "couldNotRegister": "Der Sicherheitsschlüssel konnte nicht eingerichtet werden. Bitte versuchen Sie es erneut.",
+      "couldNotVerify": "Der Sicherheitsschlüssel konnte nicht verifiziert werden. Bitte versuchen Sie es erneut."
     }
   },
   "register": {
@@ -379,7 +398,8 @@
       "sessionMismatch": "Die Registrierung wurde in einem anderen Browser gestartet. Bitte melden Sie sich erneut bei Ihrem Identitätsanbieter an.",
       "registerNotAllowed": "Registrierung ist nicht erlaubt! Kontaktieren Sie Ihren Administrator für weitere Informationen.",
       "localAuthenticationNotAllowed": "Lokale Authentifizierung nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator.",
-      "couldNotGetLoginSettings": "Anmeldeeinstellungen konnten nicht abgerufen werden"
+      "couldNotGetLoginSettings": "Anmeldeeinstellungen konnten nicht abgerufen werden",
+      "userAlreadyExists": "Ein Benutzer mit dieser E-Mail-Adresse existiert bereits. Versuchen Sie sich stattdessen anzumelden."
     }
   },
   "invite": {
@@ -500,6 +520,7 @@
     "couldNotContinueSession": "Sitzung konnte nicht fortgesetzt werden - fehlende Benutzerinformationen",
     "couldNotClearSession": "Die Sitzung konnte nicht beendet werden. Bitte versuchen Sie es erneut.",
     "secondFactorRequired": "Bestätigen Sie zuerst Ihren zweiten Faktor, um eine neue Authentifizierungsmethode einzurichten.",
-    "authenticatorNotAllowed": "Diese Authentifizierungsmethode ist für Ihre Organisation nicht erlaubt."
+    "authenticatorNotAllowed": "Diese Authentifizierungsmethode ist für Ihre Organisation nicht erlaubt.",
+    "couldNotCompleteDeviceAuthorization": "Die Geräteautorisierung konnte nicht abgeschlossen werden. Der Code wurde möglicherweise bereits verwendet oder ist abgelaufen."
   }
 }

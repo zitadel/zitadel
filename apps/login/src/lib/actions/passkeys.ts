@@ -2,10 +2,10 @@
 
 import { completeFlowOrGetUrl } from "@/lib/actions/flow";
 import { updateOrCreateSession } from "@/lib/actions/session";
+import { answerRejection, fallbackOnRejection } from "@/lib/server/api-error";
 import { getSessionCookieById } from "@/lib/server/cookies";
 import { getSetupAuthorizationError } from "@/lib/server/enrollment-guard";
 import { getPublicHost } from "@/lib/server/host";
-import { createLogger } from "@/lib/server/logger";
 import { getServiceConfig } from "@/lib/server/service-url";
 import { createSessionAndUpdateCookie } from "@/lib/server/session-cookie";
 import { checkEmailVerification } from "@/lib/server/verify-helper";
@@ -28,8 +28,6 @@ import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
 
-const logger = createLogger("passkeys");
-
 type VerifyPasskeyCommand = {
   passkeyId: string;
   passkeyName?: string;
@@ -48,8 +46,10 @@ type RegisterPasskeyCommand = {
 export async function registerPasskeyLink(
   command: RegisterPasskeyCommand,
 ): Promise<RegisterPasskeyResponse | { error: string }> {
+  const t = await getTranslations("passkey");
+
   if (!command.sessionId && !command.userId) {
-    return { error: "Either sessionId or userId must be provided" };
+    return { error: t("set.errors.missingContext") };
   }
 
   const _headers = await headers();
@@ -66,13 +66,18 @@ export async function registerPasskeyLink(
     const sessionCookie = await getSessionCookieById({ sessionId: command.sessionId });
 
     if (!sessionCookie) {
-      return { error: "Could not get session cookie" };
+      return { error: t("set.errors.couldNotLoadSession") };
     }
 
-    session = await getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token });
+    try {
+      session = await getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token });
+    } catch (error) {
+      // the cookie can outlive the session on the server
+      return answerRejection(error, t("set.errors.couldNotLoadSession"), { sessionToken: true });
+    }
 
     if (!session?.session?.factors?.user?.id) {
-      return { error: "Could not determine user from session" };
+      return { error: t("set.errors.couldNotLoadSession") };
     }
 
     currentUserId = session.session.factors.user.id;
@@ -95,10 +100,15 @@ export async function registerPasskeyLink(
         code: command.code,
       };
     } else {
-      const codeResponse = await createPasskeyRegistrationLink({ serviceConfig, userId: currentUserId });
+      let codeResponse;
+      try {
+        codeResponse = await createPasskeyRegistrationLink({ serviceConfig, userId: currentUserId });
+      } catch (error) {
+        return answerRejection(error, t("set.errors.couldNotRegisterPasskey"));
+      }
 
       if (!codeResponse?.code?.code) {
-        return { error: "Could not create registration link" };
+        return { error: t("set.errors.couldNotRegisterPasskey") };
       }
 
       registerCode = codeResponse.code;
@@ -111,10 +121,15 @@ export async function registerPasskeyLink(
     };
 
     // Check if user exists
-    const userResponse = await getUserByID({ serviceConfig, userId: currentUserId });
+    let userResponse;
+    try {
+      userResponse = await getUserByID({ serviceConfig, userId: currentUserId });
+    } catch (error) {
+      return answerRejection(error, t("set.errors.userNotFound"));
+    }
 
     if (!userResponse || !userResponse.user) {
-      return { error: "User not found" };
+      return { error: t("set.errors.userNotFound") };
     }
 
     // Create a session for the user to continue the flow after passkey registration
@@ -127,19 +142,25 @@ export async function registerPasskeyLink(
       },
     });
 
-    const result = await createSessionAndUpdateCookie({
-      checks,
-      requestId: undefined, // No requestId in passkey registration context, TODO: consider if needed
-    });
+    let result;
+    try {
+      result = await createSessionAndUpdateCookie({
+        checks,
+        requestId: undefined, // No requestId in passkey registration context, TODO: consider if needed
+      });
+    } catch (error) {
+      return answerRejection(error, t("set.errors.couldNotCreateSession"));
+    }
     createdSession = result.session;
 
     if (!createdSession) {
-      return { error: "Could not create session" };
+      return { error: t("set.errors.couldNotCreateSession") };
     }
   }
 
+  // a user id without its code and code id, from the link the user followed
   if (!registerCode) {
-    throw new Error("Missing code in response");
+    return { error: t("set.errors.missingContext") };
   }
 
   const [hostname] = host.split(":");
@@ -149,18 +170,21 @@ export async function registerPasskeyLink(
   }
 
   if (!currentUserId) {
-    throw new Error("Could not determine user");
+    return { error: t("set.errors.missingContext") };
   }
 
-  return registerPasskey({ serviceConfig, userId: currentUserId, code: registerCode, domain: hostname });
+  return registerPasskey({ serviceConfig, userId: currentUserId, code: registerCode, domain: hostname }).catch((error) =>
+    answerRejection(error, t("set.errors.couldNotRegisterPasskey")),
+  );
 }
 
 export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
+  const t = await getTranslations("passkey");
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
   if (!command.sessionId && !command.userId) {
-    throw new Error("Either sessionId or userId must be provided");
+    return { error: t("set.errors.missingContext") };
   }
 
   // if no name is provided, try to generate one from the user agent
@@ -185,14 +209,19 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
     });
 
     if (!sessionCookie) {
-      throw new Error("Could not get session cookie");
+      return { error: t("set.errors.couldNotLoadSession") };
     }
 
-    const session = await getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token });
+    let session;
+    try {
+      session = await getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token });
+    } catch (error) {
+      return answerRejection(error, t("set.errors.couldNotLoadSession"), { sessionToken: true });
+    }
     const userId = session?.session?.factors?.user?.id;
 
     if (!userId) {
-      throw new Error("Could not get session");
+      return { error: t("set.errors.couldNotLoadSession") };
     }
 
     // Same check as registerPasskeyLink: completing the registration must not be possible from a
@@ -215,24 +244,35 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
     currentUserId = command.userId!;
 
     // Verify user exists
-    const userResponse = await getUserByID({ serviceConfig, userId: currentUserId });
+    let userResponse;
+    try {
+      userResponse = await getUserByID({ serviceConfig, userId: currentUserId });
+    } catch (error) {
+      return answerRejection(error, t("set.errors.userNotFound"));
+    }
 
     if (!userResponse || !userResponse.user) {
-      throw new Error("User not found");
+      return { error: t("set.errors.userNotFound") };
     }
 
     loginName = userResponse.user.preferredLoginName;
   }
 
-  const response = await zitadelVerifyPasskeyRegistration({
-    serviceConfig,
-    request: create(VerifyPasskeyRegistrationRequestSchema, {
-      passkeyId: command.passkeyId,
-      publicKeyCredential: command.publicKeyCredential,
-      passkeyName,
-      userId: currentUserId,
-    }),
-  });
+  let response;
+  try {
+    response = await zitadelVerifyPasskeyRegistration({
+      serviceConfig,
+      request: create(VerifyPasskeyRegistrationRequestSchema, {
+        passkeyId: command.passkeyId,
+        publicKeyCredential: command.publicKeyCredential,
+        passkeyName,
+        userId: currentUserId,
+      }),
+    });
+  } catch (error) {
+    // a rejected attestation comes from the browser or authenticator, not from a fault on the server
+    return answerRejection(error, t("set.errors.couldNotVerifyPasskey"));
+  }
 
   return { ...response, loginName };
 }
@@ -274,7 +314,10 @@ export async function sendPasskey(command: SendPasskeyCommand) {
 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
-  const loginSettings = await getLoginSettings({ serviceConfig, organization });
+  // the organization comes from the URL; an unknown one only loses its default redirect
+  const loginSettings = await getLoginSettings({ serviceConfig, organization }).catch(
+    fallbackOnRejection(undefined, "loading the login settings"),
+  );
 
   const userId = session?.factors?.user?.id;
   if (!userId) {
@@ -285,8 +328,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
   try {
     userResponse = await getUserByID({ serviceConfig, userId });
   } catch (error) {
-    logger.error("Error fetching user by ID:", { error });
-    return { error: t("verify.errors.couldNotGetUser") };
+    return answerRejection(error, t("verify.errors.couldNotGetUser"));
   }
 
   if (!userResponse.user) {

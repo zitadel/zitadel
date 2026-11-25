@@ -2,6 +2,7 @@ import * as loginnameModule from "@/lib/actions/loginname";
 import { loginWithOIDCAndSession } from "@/lib/server/oidc";
 import * as sessionModule from "@/lib/server/session";
 import * as zitadelModule from "@/lib/server/zitadel";
+import { Code } from "@connectrpc/connect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/server/session");
@@ -287,5 +288,86 @@ describe("loginWithOIDCAndSession", () => {
       expect(result.redirect).not.toContain("data:");
       expect(result.redirect).toContain("/signedin");
     }
+  });
+
+  describe("rejections of the API", () => {
+    // fits the isClassifiedError mock above
+    const apiError = (code: Code, isUserError: boolean) =>
+      Object.assign(new Error("rejected"), {
+        code,
+        isUserError,
+        httpStatus: 0,
+        rawMessage: "rejected",
+        findDetails: () => [],
+      });
+    const userRejection = apiError(Code.NotFound, true);
+    const rethrown: [string, ReturnType<typeof apiError>][] = [
+      ["a server fault", apiError(Code.Internal, false)],
+      ["the API rejecting the login's own credentials", apiError(Code.Unauthenticated, true)],
+    ];
+
+    const login = () =>
+      loginWithOIDCAndSession({
+        serviceConfig: { baseUrl: "https://zitadel.example.com" } as any,
+        authRequest: mockAuthRequest,
+        sessionId: mockSessionId,
+        sessions: mockSessions,
+        sessionCookies: mockCookies,
+      });
+
+    it("should re-authenticate when the session validation is rejected, e.g. the user was removed", async () => {
+      vi.mocked(sessionModule.isSessionValid).mockRejectedValue(userRejection);
+      vi.mocked(loginnameModule.sendLoginname).mockResolvedValue({ redirect: "/password" });
+
+      const result = await login();
+
+      expect(result).toEqual({ redirect: "/password" });
+      expect(loginnameModule.sendLoginname).toHaveBeenCalledWith(
+        expect.objectContaining({ requestId: expect.stringMatching(/^oidc_/) }),
+      );
+      expect(zitadelModule.createCallback).not.toHaveBeenCalled();
+    });
+
+    it("should fail closed when re-authentication is rejected", async () => {
+      vi.mocked(sessionModule.isSessionValid).mockResolvedValue(false);
+      vi.mocked(loginnameModule.sendLoginname).mockRejectedValue(userRejection);
+
+      const result = await login();
+
+      expect(result).toEqual({ error: "Session not found or invalid" });
+      expect(zitadelModule.createCallback).not.toHaveBeenCalled();
+    });
+
+    it("should redirect to /signedin when loading the login settings is rejected for an already handled request", async () => {
+      vi.mocked(sessionModule.isSessionValid).mockResolvedValue(true);
+      vi.mocked(zitadelModule.createCallback).mockRejectedValue(apiError(9 as Code, true));
+      vi.mocked(zitadelModule.getLoginSettings).mockRejectedValue(userRejection);
+
+      const result = await login();
+
+      expect(result).toEqual({ redirect: "/signedin?loginName=test%40example.com&organization=org-123" });
+    });
+
+    it.each(rethrown)("should rethrow %s while validating the session", async (_, error) => {
+      vi.mocked(sessionModule.isSessionValid).mockRejectedValue(error);
+
+      await expect(login()).rejects.toBe(error);
+      expect(zitadelModule.createCallback).not.toHaveBeenCalled();
+    });
+
+    it.each(rethrown)("should rethrow %s while re-authenticating", async (_, error) => {
+      vi.mocked(sessionModule.isSessionValid).mockResolvedValue(false);
+      vi.mocked(loginnameModule.sendLoginname).mockRejectedValue(error);
+
+      await expect(login()).rejects.toBe(error);
+    });
+
+    it.each(rethrown)("should rethrow %s while loading the login settings", async (_, error) => {
+      vi.mocked(sessionModule.isSessionValid).mockResolvedValue(true);
+      vi.mocked(zitadelModule.createCallback).mockRejectedValue(apiError(9 as Code, true));
+      vi.mocked(zitadelModule.getLoginSettings).mockRejectedValue(error);
+
+      await expect(login()).rejects.toBe(error);
+    });
   });
 });

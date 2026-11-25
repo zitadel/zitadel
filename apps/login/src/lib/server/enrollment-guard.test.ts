@@ -1,3 +1,5 @@
+import { ClassifiedConnectError } from "@/lib/server/grpc/interceptors/error-classification";
+import { Code, ConnectError } from "@connectrpc/connect";
 import { PasskeysType, SecondFactorType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -18,6 +20,8 @@ vi.mock("@/lib/server/verify-helper", () => ({
 }));
 
 const serviceConfig = { baseUrl: "https://example.com" } as any;
+
+const apiError = (code: Code, message: string) => new ClassifiedConnectError(new ConnectError(message, code));
 
 // A timestamp far in the future / past, expressed the way the proto client shapes them.
 const future = { seconds: BigInt(Math.floor(Date.now() / 1000) + 3600), nanos: 0 };
@@ -219,6 +223,38 @@ describe("getEnrollmentAuthorizationError", () => {
     });
 
     expect(result).toBeNull();
+  });
+
+  describe("when the authentication methods cannot be listed", () => {
+    const sessions = [
+      ["an identify-only session", { factors: { user: { id: "user-1" } } }],
+      ["an authenticated session", { factors: { user: { id: "user-1" }, password: { verifiedAt: future } } }],
+    ] as const;
+
+    test.each(sessions)("fails closed for %s when ZITADEL rejects the call", async (_, session) => {
+      // e.g. the user was deleted mid-flow
+      mockListAuthenticationMethodTypes.mockRejectedValue(apiError(Code.NotFound, "User not found (QUERY-Dfbg2)"));
+      // would allow the onboarding path, if the guard failed open
+      mockCheckUserVerification.mockResolvedValue(true);
+
+      const result = await getEnrollmentAuthorizationError({ serviceConfig, userId: "user-1", session: session as any });
+
+      expect(result).toBe("You have to authenticate or have a valid User Verification Check");
+      expect(mockCheckUserVerification).not.toHaveBeenCalled();
+    });
+
+    test.each([
+      ["a server fault", apiError(Code.Internal, "Internal error")],
+      ["the API rejecting the login's own credentials", apiError(Code.Unauthenticated, "Token invalid")],
+    ])("rethrows %s", async (_, error) => {
+      mockListAuthenticationMethodTypes.mockRejectedValue(error);
+
+      for (const [, session] of sessions) {
+        await expect(
+          getEnrollmentAuthorizationError({ serviceConfig, userId: "user-1", session: session as any }),
+        ).rejects.toBe(error);
+      }
+    });
   });
 });
 
