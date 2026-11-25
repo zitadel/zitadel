@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "Could not set password",
         "couldNotResetPassword": "Could not reset password",
-        "couldNotVerifyPassword": "Could not verify password"
+        "couldNotVerifyPassword": "Could not verify password",
+        "codeInvalidOrExpired": "The code is wrong or has expired. Check it or request a new one."
       }
     },
     "change": {
@@ -433,7 +434,13 @@
       "couldNotResendInvite": "Could not resend invite",
       "inviteSendFailed": "Failed to send invitation email",
       "emailSendFailed": "Failed to send verification email",
-      "contextMissing": "An error occurred. Please try again."
+      "contextMissing": "An error occurred. Please try again.",
+      "couldNotFindSession": "Could not find session",
+      "couldNotUpdateSession": "Could not update session",
+      "invalidCode": "Invalid code. Please try again.",
+      "codeExpired": "This code has expired or was already used. Request a new one.",
+      "codeReused": "This code was already used. Wait for the next code in your authenticator app.",
+      "accountLocked": "Your account is locked after too many failed attempts. Contact your administrator to unlock your account."
     }
   },
   "authenticator": {

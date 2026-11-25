@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "无法设置密码",
         "couldNotResetPassword": "无法重置密码",
-        "couldNotVerifyPassword": "无法验证密码"
+        "couldNotVerifyPassword": "无法验证密码",
+        "codeInvalidOrExpired": "验证码错误或已过期。请检查后重试，或重新获取验证码。"
       }
     },
     "change": {
@@ -433,7 +434,13 @@
       "couldNotResendInvite": "无法重新发送邀请",
       "inviteSendFailed": "发送邀请邮件失败",
       "emailSendFailed": "发送验证邮件失败",
-      "contextMissing": "发生错误。请重试。"
+      "contextMissing": "发生错误。请重试。",
+      "couldNotFindSession": "找不到会话",
+      "couldNotUpdateSession": "无法更新会话",
+      "invalidCode": "验证码无效。请重试。",
+      "codeExpired": "此验证码已过期或已被使用。请重新获取验证码。",
+      "codeReused": "此验证码已被使用。请等待身份验证器应用中的下一个验证码。",
+      "accountLocked": "由于失败次数过多，您的账户已被锁定。请联系管理员以解锁您的账户。"
     }
   },
   "authenticator": {

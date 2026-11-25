@@ -1,6 +1,7 @@
 "use server";
 
 import { completeFlowOrGetUrl } from "@/lib/actions/flow";
+import { hasZitadelErrorId, isRejectedByUser, zitadelErrorId, ZitadelErrorIds } from "@/lib/server/api-error";
 import { getOTPSMSResendCooldownSeconds, getOTPSMSRetryAfterSeconds, SessionUpdatedError } from "@/lib/server/challenges";
 import {
   getMostRecentSessionCookie,
@@ -314,6 +315,39 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
     } as Duration;
   }
 
+  const hasCodeCheck = !!(checks?.totp || checks?.otpSms || checks?.otpEmail);
+
+  // A rejected check (most often a mistyped code) is answered with a message for the form: a throw
+  // would fail the whole action with a 500 although nothing is wrong on the server. Server faults,
+  // and the API rejecting the login's own credentials, are rethrown so they stay visible.
+  const rejectedCheckError = (error: unknown): { error: string } => {
+    if (!isRejectedByUser(error)) {
+      throw error;
+    }
+
+    logger.warn("Session check rejected", { grpcCode: error.code, errorId: zitadelErrorId(error) });
+
+    if (hasZitadelErrorId(error, ZitadelErrorIds.userLocked)) {
+      return { error: t("accountLocked") };
+    }
+
+    if (hasCodeCheck) {
+      if (hasZitadelErrorId(error, ZitadelErrorIds.totpReused)) {
+        return { error: t("codeReused") };
+      }
+
+      if (hasZitadelErrorId(error, ZitadelErrorIds.codeExpired)) {
+        return { error: t("codeExpired") };
+      }
+
+      if (error.code === Code.InvalidArgument) {
+        return { error: t("invalidCode") };
+      }
+    }
+
+    return { error: t("couldNotUpdateSession") };
+  };
+
   let session;
   try {
     session = await setSessionAndUpdateCookie({
@@ -330,11 +364,20 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       throw error;
     }
 
+    // A new session only helps when this one is gone: deleted or expired server-side while the
+    // cookie survived (NotFound), or its token is no longer accepted (PermissionDenied). Any other
+    // failure means the check was rejected, and a new session would run the same check again.
+    const sessionGone = isClassifiedError(error) && (error.code === Code.NotFound || error.code === Code.PermissionDenied);
+
+    if (!sessionGone) {
+      return rejectedCheckError(error);
+    }
+
     const loginNameForCreation = options.loginName || recentSession?.loginName;
     const orgForCreation = options.organization || recentSession?.organization;
 
     if (!loginNameForCreation) {
-      throw error;
+      return { error: t("couldNotFindSession") };
     }
 
     const users = await listUsers({
@@ -343,13 +386,24 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       organizationId: orgForCreation,
     });
 
-    if (users.details?.totalResult === BigInt(1) && users.result[0].userId) {
-      const user = users.result[0];
-      const newChecks = create(ChecksSchema, {
-        ...(checks || {}),
-        user: { search: { case: "userId", value: user.userId } } as any,
-      });
+    const userId = users.details?.totalResult === BigInt(1) ? users.result[0]?.userId : undefined;
 
+    if (!userId) {
+      return { error: t("couldNotFindSession") };
+    }
+
+    // List the fields instead of spreading `checks`: it is already a message, and create() returns
+    // a message unchanged, so a plain `user` object spread into it would never be converted and
+    // fails to serialize ("cannot use field zitadel.session.v2.CheckUser.user_id").
+    const newChecks = create(ChecksSchema, {
+      user: { search: { case: "userId", value: userId } },
+      webAuthN: checks?.webAuthN,
+      totp: checks?.totp,
+      otpSms: checks?.otpSms,
+      otpEmail: checks?.otpEmail,
+    });
+
+    try {
       const result = await createSessionAndUpdateCookie({
         checks: newChecks,
         requestId,
@@ -358,8 +412,8 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       });
       // @ts-ignore
       session = { ...result.session, challenges: result.challenges };
-    } else {
-      throw error;
+    } catch (createError) {
+      return rejectedCheckError(createError);
     }
   }
 

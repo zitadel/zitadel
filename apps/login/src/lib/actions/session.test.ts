@@ -5,7 +5,8 @@ import {
   updateOrCreateSession,
 } from "@/lib/actions/session";
 import { SessionUpdatedError } from "@/lib/server/challenges";
-import { Code } from "@connectrpc/connect";
+import { Code, ConnectError } from "@connectrpc/connect";
+import { create } from "@zitadel/client";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 vi.mock("@zitadel/client", async () => {
@@ -397,5 +398,125 @@ describe("updateOrCreateSession OTP SMS resend cooldown", () => {
 
     expect(setSessionAndUpdateCookie).toHaveBeenCalledTimes(1);
     expect(res).toEqual(expect.objectContaining({ sessionId: "session-1", retryAfterSeconds: undefined }));
+  });
+});
+
+describe("updateOrCreateSession when ZITADEL rejects the update", () => {
+  let zitadel: any;
+  let cookieHelpers: any;
+
+  // what the classifying transport throws: a ConnectError with isUserError, the error id ends the message
+  const apiError = (code: Code, rawMessage: string, isUserError = true) =>
+    Object.assign(new ConnectError(rawMessage, code), { isUserError });
+
+  const totpCheck = { sessionId: "session-1", checks: { totp: { code: "123456" } } } as any;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    zitadel = vi.mocked(await import("@/lib/server/zitadel"));
+    cookieHelpers = vi.mocked(await import("@/lib/server/session-cookie"));
+    const cookies = vi.mocked(await import("@/lib/server/cookies"));
+
+    cookies.getSessionCookieById.mockResolvedValue(cookie as any);
+    zitadel.getLoginSettings.mockResolvedValue({});
+    zitadel.listUsers.mockResolvedValue({ details: { totalResult: BigInt(1) }, result: [{ userId: "user-1" }] });
+  });
+
+  test.each([
+    ["a wrong code", apiError(Code.InvalidArgument, "Invalid code (EVENT-8isk2)"), "invalidCode"],
+    ["a reused TOTP code", apiError(Code.InvalidArgument, "Code was already used (TOTP-Auw0a)"), "codeReused"],
+    ["an expired code", apiError(Code.FailedPrecondition, "Code is expired (CODE-QvUQ4P)"), "codeExpired"],
+    ["a locked user", apiError(Code.FailedPrecondition, "User is locked (COMMAND-SF3fg)"), "accountLocked"],
+    ["a rate limit", apiError(Code.ResourceExhausted, "Too many requests"), "couldNotUpdateSession"],
+  ])("answers %s with a message instead of retrying on a new session", async (_, error, message) => {
+    cookieHelpers.setSessionAndUpdateCookie.mockRejectedValue(error);
+
+    const res = await updateOrCreateSession(totpCheck);
+
+    expect(res).toEqual({ error: message });
+    expect(zitadel.listUsers).not.toHaveBeenCalled();
+    expect(cookieHelpers.createSessionAndUpdateCookie).not.toHaveBeenCalled();
+  });
+
+  test("does not claim a wrong code for a rejected check without a code", async () => {
+    cookieHelpers.setSessionAndUpdateCookie.mockRejectedValue(apiError(Code.InvalidArgument, "Invalid assertion"));
+
+    const res = await updateOrCreateSession({ sessionId: "session-1", checks: { webAuthN: {} } } as any);
+
+    expect(res).toEqual({ error: "couldNotUpdateSession" });
+  });
+
+  test.each([
+    ["a server fault", apiError(Code.Internal, "Internal error", false)],
+    ["the API rejecting the login's own credentials", apiError(Code.Unauthenticated, "Token invalid")],
+  ])("rethrows %s so it surfaces as a 500", async (_, error) => {
+    cookieHelpers.setSessionAndUpdateCookie.mockRejectedValue(error);
+
+    await expect(updateOrCreateSession(totpCheck)).rejects.toBe(error);
+    expect(cookieHelpers.createSessionAndUpdateCookie).not.toHaveBeenCalled();
+  });
+
+  test("does not check the same code again on a new session after the session was already updated", async () => {
+    const error = new SessionUpdatedError(new Error("could not get session"));
+    cookieHelpers.setSessionAndUpdateCookie.mockRejectedValue(error);
+
+    await expect(updateOrCreateSession(totpCheck)).rejects.toBe(error);
+    expect(cookieHelpers.createSessionAndUpdateCookie).not.toHaveBeenCalled();
+  });
+
+  test.each([
+    ["was deleted", Code.NotFound],
+    ["no longer accepts the cookie's token", Code.PermissionDenied],
+  ])("checks the code on a new session when the session %s", async (_, code) => {
+    cookieHelpers.setSessionAndUpdateCookie.mockRejectedValue(apiError(code, "Session not found"));
+    cookieHelpers.createSessionAndUpdateCookie.mockResolvedValue({ session: { id: "session-2", factors: {} } });
+
+    const res = await updateOrCreateSession(totpCheck);
+
+    expect(zitadel.listUsers).toHaveBeenCalledWith(expect.objectContaining({ loginName: cookie.loginName }));
+    const [command] = cookieHelpers.createSessionAndUpdateCookie.mock.calls[0];
+    expect(command.checks).toEqual(
+      expect.objectContaining({ user: { search: { case: "userId", value: "user-1" } }, totp: { code: "123456" } }),
+    );
+    expect(res).toEqual(expect.objectContaining({ sessionId: "session-2" }));
+  });
+
+  test("builds checks for the new session that serialize", async () => {
+    // the real create(): spreading a message into it used to leave the user check a plain object
+    const actual = await vi.importActual<typeof import("@zitadel/client")>("@zitadel/client");
+    const { ChecksSchema } = await import("@zitadel/proto/zitadel/session/v2/session_service_pb");
+    vi.mocked(create).mockImplementation(actual.create as any);
+    try {
+      cookieHelpers.setSessionAndUpdateCookie.mockRejectedValue(apiError(Code.NotFound, "Session not found"));
+      cookieHelpers.createSessionAndUpdateCookie.mockResolvedValue({ session: { id: "session-2", factors: {} } });
+
+      await updateOrCreateSession(totpCheck);
+
+      const [command] = cookieHelpers.createSessionAndUpdateCookie.mock.calls[0];
+      expect(actual.toJson(ChecksSchema, command.checks)).toEqual({ user: { userId: "user-1" }, totp: { code: "123456" } });
+    } finally {
+      vi.mocked(create).mockImplementation((_schema: unknown, data: unknown) => data as any);
+    }
+  });
+
+  test("answers a wrong code on the new session with a message", async () => {
+    cookieHelpers.setSessionAndUpdateCookie.mockRejectedValue(apiError(Code.NotFound, "Session not found"));
+    cookieHelpers.createSessionAndUpdateCookie.mockRejectedValue(
+      apiError(Code.InvalidArgument, "Invalid code (EVENT-8isk2)"),
+    );
+
+    const res = await updateOrCreateSession(totpCheck);
+
+    expect(res).toEqual({ error: "invalidCode" });
+  });
+
+  test("answers a gone session whose user cannot be found with a message", async () => {
+    cookieHelpers.setSessionAndUpdateCookie.mockRejectedValue(apiError(Code.NotFound, "Session not found"));
+    zitadel.listUsers.mockResolvedValue({ details: { totalResult: BigInt(0) }, result: [] });
+
+    const res = await updateOrCreateSession(totpCheck);
+
+    expect(res).toEqual({ error: "couldNotFindSession" });
+    expect(cookieHelpers.createSessionAndUpdateCookie).not.toHaveBeenCalled();
   });
 });

@@ -93,7 +93,8 @@
       "errors": {
         "couldNotSetPassword": "パスワードを設定できませんでした",
         "couldNotResetPassword": "パスワードをリセットできませんでした",
-        "couldNotVerifyPassword": "パスワードを確認できませんでした"
+        "couldNotVerifyPassword": "パスワードを確認できませんでした",
+        "codeInvalidOrExpired": "コードが正しくないか、有効期限が切れています。確認するか、新しいコードをリクエストしてください。"
       }
     },
     "change": {
@@ -426,7 +427,13 @@
       "couldNotResendInvite": "招待を再送信できませんでした",
       "inviteSendFailed": "招待メールの送信に失敗しました",
       "emailSendFailed": "確認メールの送信に失敗しました",
-      "contextMissing": "エラーが発生しました。もう一度お試しください。"
+      "contextMissing": "エラーが発生しました。もう一度お試しください。",
+      "couldNotFindSession": "セッションが見つかりませんでした",
+      "couldNotUpdateSession": "セッションを更新できませんでした",
+      "invalidCode": "コードが無効です。もう一度お試しください。",
+      "codeExpired": "このコードは有効期限が切れているか、すでに使用されています。新しいコードをリクエストしてください。",
+      "codeReused": "このコードはすでに使用されています。認証アプリに次のコードが表示されるまでお待ちください。",
+      "accountLocked": "失敗した試行が多すぎるため、アカウントがロックされました。アカウントのロックを解除するには管理者に連絡してください。"
     }
   },
   "authenticator": {

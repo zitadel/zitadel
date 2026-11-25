@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "تعذر تعيين كلمة المرور",
         "couldNotResetPassword": "تعذر إعادة تعيين كلمة المرور",
-        "couldNotVerifyPassword": "تعذر التحقق من كلمة المرور"
+        "couldNotVerifyPassword": "تعذر التحقق من كلمة المرور",
+        "codeInvalidOrExpired": "الرمز غير صحيح أو انتهت صلاحيته. تحقق منه أو اطلب رمزًا جديدًا."
       }
     },
     "change": {
@@ -433,7 +434,13 @@
       "couldNotResendInvite": "تعذر إعادة إرسال الدعوة",
       "inviteSendFailed": "فشل إرسال بريد الدعوة الإلكتروني",
       "emailSendFailed": "فشل إرسال بريد التحقق الإلكتروني",
-      "contextMissing": "حدث خطأ. يرجى المحاولة مرة أخرى."
+      "contextMissing": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+      "couldNotFindSession": "تعذر العثور على الجلسة",
+      "couldNotUpdateSession": "تعذر تحديث الجلسة",
+      "invalidCode": "الرمز غير صالح. حاول مرة أخرى.",
+      "codeExpired": "انتهت صلاحية هذا الرمز أو تم استخدامه بالفعل. اطلب رمزًا جديدًا.",
+      "codeReused": "تم استخدام هذا الرمز بالفعل. انتظر الرمز التالي في تطبيق المصادقة.",
+      "accountLocked": "تم قفل حسابك بعد عدد كبير جدًا من المحاولات الفاشلة. اتصل بالمسؤول لفتح قفل حسابك."
     }
   },
   "authenticator": {

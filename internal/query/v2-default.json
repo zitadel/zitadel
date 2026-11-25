@@ -101,7 +101,8 @@
         "errors": {
           "couldNotSetPassword": "Passwort konnte nicht gesetzt werden",
           "couldNotResetPassword": "Passwort konnte nicht zurückgesetzt werden",
-          "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden"
+          "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden",
+          "codeInvalidOrExpired": "Der Code ist falsch oder abgelaufen. Prüfen Sie ihn oder fordern Sie einen neuen an."
         }
       },
       "change": {
@@ -431,7 +432,13 @@
         "couldNotResendInvite": "Einladung konnte nicht erneut gesendet werden",
         "inviteSendFailed": "Einladungs-E-Mail konnte nicht gesendet werden",
         "emailSendFailed": "Verifizierungs-E-Mail konnte nicht gesendet werden",
-        "contextMissing": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+        "contextMissing": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+        "couldNotFindSession": "Sitzung konnte nicht gefunden werden",
+        "couldNotUpdateSession": "Sitzung konnte nicht aktualisiert werden",
+        "invalidCode": "Ungültiger Code. Bitte versuchen Sie es erneut.",
+        "codeExpired": "Dieser Code ist abgelaufen oder wurde bereits verwendet. Fordern Sie einen neuen an.",
+        "codeReused": "Dieser Code wurde bereits verwendet. Warten Sie auf den nächsten Code in Ihrer Authenticator-App.",
+        "accountLocked": "Ihr Konto wurde nach zu vielen fehlgeschlagenen Versuchen gesperrt. Kontaktieren Sie Ihren Administrator, um Ihr Konto zu entsperren."
       }
     },
     "authenticator": {
@@ -587,7 +594,8 @@
         "errors": {
           "couldNotSetPassword": "Could not set password",
           "couldNotResetPassword": "Could not reset password",
-          "couldNotVerifyPassword": "Could not verify password"
+          "couldNotVerifyPassword": "Could not verify password",
+          "codeInvalidOrExpired": "The code is wrong or has expired. Check it or request a new one."
         }
       },
       "change": {
@@ -917,7 +925,13 @@
         "couldNotResendInvite": "Could not resend invite",
         "inviteSendFailed": "Failed to send invitation email",
         "emailSendFailed": "Failed to send verification email",
-        "contextMissing": "An error occurred. Please try again."
+        "contextMissing": "An error occurred. Please try again.",
+        "couldNotFindSession": "Could not find session",
+        "couldNotUpdateSession": "Could not update session",
+        "invalidCode": "Invalid code. Please try again.",
+        "codeExpired": "This code has expired or was already used. Request a new one.",
+        "codeReused": "This code was already used. Wait for the next code in your authenticator app.",
+        "accountLocked": "Your account is locked after too many failed attempts. Contact your administrator to unlock your account."
       }
     },
     "authenticator": {
@@ -1073,7 +1087,8 @@
         "errors": {
           "couldNotSetPassword": "No se pudo establecer la contraseña",
           "couldNotResetPassword": "No se pudo restablecer la contraseña",
-          "couldNotVerifyPassword": "No se pudo verificar la contraseña"
+          "couldNotVerifyPassword": "No se pudo verificar la contraseña",
+          "codeInvalidOrExpired": "El código es incorrecto o ha caducado. Revíselo o solicite uno nuevo."
         }
       },
       "change": {
@@ -1403,7 +1418,13 @@
         "couldNotResendInvite": "No se pudo reenviar la invitación",
         "inviteSendFailed": "No se pudo enviar el correo de invitación",
         "emailSendFailed": "No se pudo enviar el correo electrónico de verificación",
-        "contextMissing": "Ocurrió un error. Por favor inténtelo de nuevo."
+        "contextMissing": "Ocurrió un error. Por favor inténtelo de nuevo.",
+        "couldNotFindSession": "No se pudo encontrar la sesión",
+        "couldNotUpdateSession": "No se pudo actualizar la sesión",
+        "invalidCode": "Código no válido. Inténtalo de nuevo.",
+        "codeExpired": "Este código ha caducado o ya se ha utilizado. Solicite uno nuevo.",
+        "codeReused": "Este código ya se ha utilizado. Espere el siguiente código en su aplicación de autenticación.",
+        "accountLocked": "Su cuenta se ha bloqueado tras demasiados intentos fallidos. Comuníquese con su administrador para desbloquear su cuenta."
       }
     },
     "authenticator": {
@@ -1559,7 +1580,8 @@
         "errors": {
           "couldNotSetPassword": "Impossibile impostare la password",
           "couldNotResetPassword": "Impossibile reimpostare la password",
-          "couldNotVerifyPassword": "Impossibile verificare la password"
+          "couldNotVerifyPassword": "Impossibile verificare la password",
+          "codeInvalidOrExpired": "Il codice è errato o scaduto. Controllalo o richiedine uno nuovo."
         }
       },
       "change": {
@@ -1889,7 +1911,13 @@
         "couldNotResendInvite": "Impossibile reinviare l'invito",
         "inviteSendFailed": "Impossibile inviare l'email di invito",
         "emailSendFailed": "Impossibile inviare l'email di verifica",
-        "contextMissing": "Si è verificato un errore. Riprova."
+        "contextMissing": "Si è verificato un errore. Riprova.",
+        "couldNotFindSession": "Impossibile trovare la sessione",
+        "couldNotUpdateSession": "Impossibile aggiornare la sessione",
+        "invalidCode": "Codice non valido. Riprova.",
+        "codeExpired": "Questo codice è scaduto o è già stato utilizzato. Richiedine uno nuovo.",
+        "codeReused": "Questo codice è già stato utilizzato. Attendi il codice successivo nella tua app di autenticazione.",
+        "accountLocked": "Il tuo account è stato bloccato dopo troppi tentativi non riusciti. Contatta l'amministratore per sbloccare il tuo account."
       }
     },
     "authenticator": {
@@ -2045,7 +2073,8 @@
         "errors": {
           "couldNotSetPassword": "Kon wachtwoord niet instellen",
           "couldNotResetPassword": "Kon wachtwoord niet resetten",
-          "couldNotVerifyPassword": "Kon wachtwoord niet verifiëren"
+          "couldNotVerifyPassword": "Kon wachtwoord niet verifiëren",
+          "codeInvalidOrExpired": "De code is onjuist of verlopen. Controleer de code of vraag een nieuwe aan."
         }
       },
       "change": {
@@ -2375,7 +2404,13 @@
         "couldNotResendInvite": "Kon uitnodiging niet opnieuw versturen",
         "inviteSendFailed": "Versturen van uitnodigingsmail mislukt",
         "emailSendFailed": "Versturen van verificatie-e-mail mislukt",
-        "contextMissing": "Er is een fout opgetreden. Probeer het opnieuw."
+        "contextMissing": "Er is een fout opgetreden. Probeer het opnieuw.",
+        "couldNotFindSession": "Sessie kon niet worden gevonden",
+        "couldNotUpdateSession": "Sessie kon niet worden bijgewerkt",
+        "invalidCode": "Ongeldige code. Probeer het opnieuw.",
+        "codeExpired": "Deze code is verlopen of al gebruikt. Vraag een nieuwe aan.",
+        "codeReused": "Deze code is al gebruikt. Wacht op de volgende code in je authenticator-app.",
+        "accountLocked": "Je account is vergrendeld na te veel mislukte pogingen. Neem contact op met jouw beheerder om jouw account te ontgrendelen."
       }
     },
     "authenticator": {
@@ -2531,7 +2566,8 @@
         "errors": {
           "couldNotSetPassword": "Nie można ustawić hasła",
           "couldNotResetPassword": "Nie można zresetować hasła",
-          "couldNotVerifyPassword": "Nie można zweryfikować hasła"
+          "couldNotVerifyPassword": "Nie można zweryfikować hasła",
+          "codeInvalidOrExpired": "Kod jest nieprawidłowy lub wygasł. Sprawdź go lub poproś o nowy."
         }
       },
       "change": {
@@ -2861,7 +2897,13 @@
         "couldNotResendInvite": "Nie udało się ponownie wysłać zaproszenia",
         "inviteSendFailed": "Nie udało się wysłać wiadomości e-mail z zaproszeniem",
         "emailSendFailed": "Nie udało się wysłać wiadomości e-mail weryfikacyjnej",
-        "contextMissing": "Wystąpił błąd. Spróbuj ponownie."
+        "contextMissing": "Wystąpił błąd. Spróbuj ponownie.",
+        "couldNotFindSession": "Nie można znaleźć sesji",
+        "couldNotUpdateSession": "Nie można zaktualizować sesji",
+        "invalidCode": "Nieprawidłowy kod. Spróbuj ponownie.",
+        "codeExpired": "Ten kod wygasł lub został już użyty. Poproś o nowy.",
+        "codeReused": "Ten kod został już użyty. Poczekaj na następny kod w aplikacji uwierzytelniającej.",
+        "accountLocked": "Twoje konto zostało zablokowane po zbyt wielu nieudanych próbach. Skontaktuj się z administratorem, aby odblokować konto."
       }
     },
     "authenticator": {
@@ -3017,7 +3059,8 @@
         "errors": {
           "couldNotSetPassword": "Не удалось установить пароль",
           "couldNotResetPassword": "Не удалось сбросить пароль",
-          "couldNotVerifyPassword": "Не удалось проверить пароль"
+          "couldNotVerifyPassword": "Не удалось проверить пароль",
+          "codeInvalidOrExpired": "Код неверный или срок его действия истёк. Проверьте его или запросите новый."
         }
       },
       "change": {
@@ -3347,7 +3390,13 @@
         "couldNotResendInvite": "Не удалось повторно отправить приглашение",
         "inviteSendFailed": "Не удалось отправить письмо с приглашением",
         "emailSendFailed": "Не удалось отправить письмо с подтверждением",
-        "contextMissing": "Произошла ошибка. Пожалуйста, попробуйте еще раз."
+        "contextMissing": "Произошла ошибка. Пожалуйста, попробуйте еще раз.",
+        "couldNotFindSession": "Не удалось найти сеанс",
+        "couldNotUpdateSession": "Не удалось обновить сеанс",
+        "invalidCode": "Неверный код. Попробуйте ещё раз.",
+        "codeExpired": "Срок действия этого кода истёк, или он уже был использован. Запросите новый код.",
+        "codeReused": "Этот код уже был использован. Дождитесь следующего кода в приложении-аутентификаторе.",
+        "accountLocked": "Ваша учетная запись заблокирована после слишком большого числа неудачных попыток. Свяжитесь с администратором, чтобы разблокировать вашу учетную запись."
       }
     },
     "authenticator": {
@@ -3503,7 +3552,8 @@
         "errors": {
           "couldNotSetPassword": "无法设置密码",
           "couldNotResetPassword": "无法重置密码",
-          "couldNotVerifyPassword": "无法验证密码"
+          "couldNotVerifyPassword": "无法验证密码",
+          "codeInvalidOrExpired": "验证码错误或已过期。请检查后重试，或重新获取验证码。"
         }
       },
       "change": {
@@ -3833,7 +3883,13 @@
         "couldNotResendInvite": "无法重新发送邀请",
         "inviteSendFailed": "发送邀请邮件失败",
         "emailSendFailed": "发送验证邮件失败",
-        "contextMissing": "发生错误。请重试。"
+        "contextMissing": "发生错误。请重试。",
+        "couldNotFindSession": "找不到会话",
+        "couldNotUpdateSession": "无法更新会话",
+        "invalidCode": "验证码无效。请重试。",
+        "codeExpired": "此验证码已过期或已被使用。请重新获取验证码。",
+        "codeReused": "此验证码已被使用。请等待身份验证器应用中的下一个验证码。",
+        "accountLocked": "由于失败次数过多，您的账户已被锁定。请联系管理员以解锁您的账户。"
       }
     },
     "authenticator": {
@@ -3989,7 +4045,8 @@
         "errors": {
           "couldNotSetPassword": "Şifre belirlenemedi",
           "couldNotResetPassword": "Şifre sıfırlanamadı",
-          "couldNotVerifyPassword": "Şifre doğrulanamadı"
+          "couldNotVerifyPassword": "Şifre doğrulanamadı",
+          "codeInvalidOrExpired": "Kod yanlış veya süresi dolmuş. Kodu kontrol edin veya yeni bir kod isteyin."
         }
       },
       "change": {
@@ -4319,7 +4376,13 @@
         "couldNotResendInvite": "Davet yeniden gönderilemedi",
         "inviteSendFailed": "Davet e-postası gönderilemedi",
         "emailSendFailed": "Doğrulama e-postası gönderilemedi",
-        "contextMissing": "Bir hata oluştu. Lütfen tekrar deneyin."
+        "contextMissing": "Bir hata oluştu. Lütfen tekrar deneyin.",
+        "couldNotFindSession": "Oturum bulunamadı",
+        "couldNotUpdateSession": "Oturum güncellenemedi",
+        "invalidCode": "Geçersiz kod. Lütfen tekrar deneyin.",
+        "codeExpired": "Bu kodun süresi doldu veya kod zaten kullanıldı. Yeni bir kod isteyin.",
+        "codeReused": "Bu kod zaten kullanıldı. Kimlik doğrulama uygulamanızdaki bir sonraki kodu bekleyin.",
+        "accountLocked": "Çok fazla başarısız denemeden sonra hesabınız kilitlendi. Hesabınızın kilidini açmak için yöneticinizle iletişime geçin."
       }
     },
     "authenticator": {
@@ -4475,7 +4538,8 @@
         "errors": {
           "couldNotSetPassword": "Не вдалося встановити пароль",
           "couldNotResetPassword": "Не вдалося скинути пароль",
-          "couldNotVerifyPassword": "Не вдалося перевірити пароль"
+          "couldNotVerifyPassword": "Не вдалося перевірити пароль",
+          "codeInvalidOrExpired": "Код неправильний або термін його дії минув. Перевірте його або запросіть новий."
         }
       },
       "change": {
@@ -4805,7 +4869,13 @@
         "couldNotResendInvite": "Не вдалося повторно надіслати запрошення",
         "inviteSendFailed": "Не вдалося надіслати лист-запрошення",
         "emailSendFailed": "Не вдалося надіслати лист підтвердження",
-        "contextMissing": "Сталася помилка. Будь ласка, спробуйте ще раз."
+        "contextMissing": "Сталася помилка. Будь ласка, спробуйте ще раз.",
+        "couldNotFindSession": "Не вдалося знайти сеанс",
+        "couldNotUpdateSession": "Не вдалося оновити сеанс",
+        "invalidCode": "Невірний код. Спробуйте ще раз.",
+        "codeExpired": "Термін дії цього коду минув, або його вже використано. Запросіть новий код.",
+        "codeReused": "Цей код уже використано. Дочекайтеся наступного коду в застосунку автентифікації.",
+        "accountLocked": "Ваш обліковий запис заблоковано після забагатьох невдалих спроб. Зверніться до адміністратора, щоб розблокувати свій обліковий запис."
       }
     },
     "authenticator": {
@@ -4961,7 +5031,8 @@
         "errors": {
           "couldNotSetPassword": "تعذر تعيين كلمة المرور",
           "couldNotResetPassword": "تعذر إعادة تعيين كلمة المرور",
-          "couldNotVerifyPassword": "تعذر التحقق من كلمة المرور"
+          "couldNotVerifyPassword": "تعذر التحقق من كلمة المرور",
+          "codeInvalidOrExpired": "الرمز غير صحيح أو انتهت صلاحيته. تحقق منه أو اطلب رمزًا جديدًا."
         }
       },
       "change": {
@@ -5291,7 +5362,13 @@
         "couldNotResendInvite": "تعذر إعادة إرسال الدعوة",
         "inviteSendFailed": "فشل إرسال بريد الدعوة الإلكتروني",
         "emailSendFailed": "فشل إرسال بريد التحقق الإلكتروني",
-        "contextMissing": "حدث خطأ. يرجى المحاولة مرة أخرى."
+        "contextMissing": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+        "couldNotFindSession": "تعذر العثور على الجلسة",
+        "couldNotUpdateSession": "تعذر تحديث الجلسة",
+        "invalidCode": "الرمز غير صالح. حاول مرة أخرى.",
+        "codeExpired": "انتهت صلاحية هذا الرمز أو تم استخدامه بالفعل. اطلب رمزًا جديدًا.",
+        "codeReused": "تم استخدام هذا الرمز بالفعل. انتظر الرمز التالي في تطبيق المصادقة.",
+        "accountLocked": "تم قفل حسابك بعد عدد كبير جدًا من المحاولات الفاشلة. اتصل بالمسؤول لفتح قفل حسابك."
       }
     },
     "authenticator": {
@@ -5447,7 +5524,8 @@
         "errors": {
           "couldNotSetPassword": "Nem sikerült beállítani a jelszót",
           "couldNotResetPassword": "Nem sikerült visszaállítani a jelszót",
-          "couldNotVerifyPassword": "Nem sikerült ellenőrizni a jelszót"
+          "couldNotVerifyPassword": "Nem sikerült ellenőrizni a jelszót",
+          "codeInvalidOrExpired": "A kód hibás vagy lejárt. Ellenőrizd, vagy kérj egy újat."
         }
       },
       "change": {
@@ -5777,7 +5855,13 @@
         "couldNotResendInvite": "Nem sikerült újraküldeni a meghívást",
         "inviteSendFailed": "Nem sikerült elküldeni a meghívó e-mailt",
         "emailSendFailed": "Nem sikerült elküldeni az ellenőrző e-mailt",
-        "contextMissing": "Hiba történt. Kérjük, próbáld újra."
+        "contextMissing": "Hiba történt. Kérjük, próbáld újra.",
+        "couldNotFindSession": "A munkamenet nem található",
+        "couldNotUpdateSession": "A munkamenet frissítése nem sikerült",
+        "invalidCode": "Érvénytelen kód. Kérjük, próbálja újra.",
+        "codeExpired": "Ez a kód lejárt, vagy már felhasználták. Kérj egy újat.",
+        "codeReused": "Ezt a kódot már felhasználták. Várd meg a következő kódot a hitelesítő alkalmazásodban.",
+        "accountLocked": "A fiókod túl sok sikertelen próbálkozás miatt zárolva lett. A fiókod feloldásához fordulj a rendszergazdához."
       }
     },
     "authenticator": {
@@ -5933,7 +6017,8 @@
         "errors": {
           "couldNotSetPassword": "Impossible de définir le mot de passe",
           "couldNotResetPassword": "Impossible de réinitialiser le mot de passe",
-          "couldNotVerifyPassword": "Impossible de vérifier le mot de passe"
+          "couldNotVerifyPassword": "Impossible de vérifier le mot de passe",
+          "codeInvalidOrExpired": "Le code est incorrect ou a expiré. Vérifiez-le ou demandez-en un nouveau."
         }
       },
       "change": {
@@ -6263,7 +6348,13 @@
         "couldNotResendInvite": "Impossible de renvoyer l'invitation",
         "inviteSendFailed": "Échec de l'envoi de l'e-mail d'invitation",
         "emailSendFailed": "Échec de l'envoi de l'e-mail de vérification",
-        "contextMissing": "Une erreur s'est produite. Veuillez réessayer."
+        "contextMissing": "Une erreur s'est produite. Veuillez réessayer.",
+        "couldNotFindSession": "Impossible de trouver la session",
+        "couldNotUpdateSession": "Impossible de mettre à jour la session",
+        "invalidCode": "Code invalide. Veuillez réessayer.",
+        "codeExpired": "Ce code a expiré ou a déjà été utilisé. Demandez-en un nouveau.",
+        "codeReused": "Ce code a déjà été utilisé. Attendez le code suivant dans votre application d'authentification.",
+        "accountLocked": "Votre compte a été verrouillé après trop de tentatives échouées. Contactez votre administrateur pour déverrouiller votre compte."
       }
     },
     "authenticator": {
@@ -6419,7 +6510,8 @@
         "errors": {
           "couldNotSetPassword": "パスワードを設定できませんでした",
           "couldNotResetPassword": "パスワードをリセットできませんでした",
-          "couldNotVerifyPassword": "パスワードを確認できませんでした"
+          "couldNotVerifyPassword": "パスワードを確認できませんでした",
+          "codeInvalidOrExpired": "コードが正しくないか、有効期限が切れています。確認するか、新しいコードをリクエストしてください。"
         }
       },
       "change": {
@@ -6749,7 +6841,13 @@
         "couldNotResendInvite": "招待を再送信できませんでした",
         "inviteSendFailed": "招待メールの送信に失敗しました",
         "emailSendFailed": "確認メールの送信に失敗しました",
-        "contextMissing": "エラーが発生しました。もう一度お試しください。"
+        "contextMissing": "エラーが発生しました。もう一度お試しください。",
+        "couldNotFindSession": "セッションが見つかりませんでした",
+        "couldNotUpdateSession": "セッションを更新できませんでした",
+        "invalidCode": "コードが無効です。もう一度お試しください。",
+        "codeExpired": "このコードは有効期限が切れているか、すでに使用されています。新しいコードをリクエストしてください。",
+        "codeReused": "このコードはすでに使用されています。認証アプリに次のコードが表示されるまでお待ちください。",
+        "accountLocked": "失敗した試行が多すぎるため、アカウントがロックされました。アカウントのロックを解除するには管理者に連絡してください。"
       }
     },
     "authenticator": {
@@ -6905,7 +7003,8 @@
         "errors": {
           "couldNotSetPassword": "Não foi possível definir a senha",
           "couldNotResetPassword": "Não foi possível redefinir a senha",
-          "couldNotVerifyPassword": "Não foi possível verificar a senha"
+          "couldNotVerifyPassword": "Não foi possível verificar a senha",
+          "codeInvalidOrExpired": "O código está incorreto ou expirou. Verifique-o ou solicite um novo."
         }
       },
       "change": {
@@ -7235,7 +7334,13 @@
         "couldNotResendInvite": "Não foi possível reenviar o convite",
         "inviteSendFailed": "Falha ao enviar e-mail de convite",
         "emailSendFailed": "Falha ao enviar e-mail de verificação",
-        "contextMissing": "Ocorreu um erro. Por favor, tente novamente."
+        "contextMissing": "Ocorreu um erro. Por favor, tente novamente.",
+        "couldNotFindSession": "Não foi possível encontrar a sessão",
+        "couldNotUpdateSession": "Não foi possível atualizar a sessão",
+        "invalidCode": "Código inválido. Tente novamente.",
+        "codeExpired": "Este código expirou ou já foi usado. Solicite um novo.",
+        "codeReused": "Este código já foi usado. Aguarde o próximo código no seu aplicativo autenticador.",
+        "accountLocked": "Sua conta foi bloqueada após muitas tentativas malsucedidas. Entre em contato com o administrador para desbloquear sua conta."
       }
     },
     "authenticator": {

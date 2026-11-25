@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "Impossibile impostare la password",
         "couldNotResetPassword": "Impossibile reimpostare la password",
-        "couldNotVerifyPassword": "Impossibile verificare la password"
+        "couldNotVerifyPassword": "Impossibile verificare la password",
+        "codeInvalidOrExpired": "Il codice è errato o scaduto. Controllalo o richiedine uno nuovo."
       }
     },
     "change": {
@@ -433,7 +434,13 @@
       "couldNotResendInvite": "Impossibile reinviare l'invito",
       "inviteSendFailed": "Impossibile inviare l'email di invito",
       "emailSendFailed": "Impossibile inviare l'email di verifica",
-      "contextMissing": "Si è verificato un errore. Riprova."
+      "contextMissing": "Si è verificato un errore. Riprova.",
+      "couldNotFindSession": "Impossibile trovare la sessione",
+      "couldNotUpdateSession": "Impossibile aggiornare la sessione",
+      "invalidCode": "Codice non valido. Riprova.",
+      "codeExpired": "Questo codice è scaduto o è già stato utilizzato. Richiedine uno nuovo.",
+      "codeReused": "Questo codice è già stato utilizzato. Attendi il codice successivo nella tua app di autenticazione.",
+      "accountLocked": "Il tuo account è stato bloccato dopo troppi tentativi non riusciti. Contatta l'amministratore per sbloccare il tuo account."
     }
   },
   "authenticator": {

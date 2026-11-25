@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "Şifre belirlenemedi",
         "couldNotResetPassword": "Şifre sıfırlanamadı",
-        "couldNotVerifyPassword": "Şifre doğrulanamadı"
+        "couldNotVerifyPassword": "Şifre doğrulanamadı",
+        "codeInvalidOrExpired": "Kod yanlış veya süresi dolmuş. Kodu kontrol edin veya yeni bir kod isteyin."
       }
     },
     "change": {
@@ -433,7 +434,13 @@
       "couldNotResendInvite": "Davet yeniden gönderilemedi",
       "contextMissing": "Bir hata oluştu. Lütfen tekrar deneyin.",
       "inviteSendFailed": "Davet e-postası gönderilemedi",
-      "emailSendFailed": "Doğrulama e-postası gönderilemedi"
+      "emailSendFailed": "Doğrulama e-postası gönderilemedi",
+      "couldNotFindSession": "Oturum bulunamadı",
+      "couldNotUpdateSession": "Oturum güncellenemedi",
+      "invalidCode": "Geçersiz kod. Lütfen tekrar deneyin.",
+      "codeExpired": "Bu kodun süresi doldu veya kod zaten kullanıldı. Yeni bir kod isteyin.",
+      "codeReused": "Bu kod zaten kullanıldı. Kimlik doğrulama uygulamanızdaki bir sonraki kodu bekleyin.",
+      "accountLocked": "Çok fazla başarısız denemeden sonra hesabınız kilitlendi. Hesabınızın kilidini açmak için yöneticinizle iletişime geçin."
     }
   },
   "authenticator": {

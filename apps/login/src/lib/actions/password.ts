@@ -1,6 +1,7 @@
 "use server";
 
 import { completeFlowOrGetUrl } from "@/lib/actions/flow";
+import { hasZitadelErrorId, isRejectedByUser, zitadelErrorId, ZitadelErrorIds } from "@/lib/server/api-error";
 import { equalsIgnoreCase } from "@/lib/server/auth-utils";
 import { getSessionCookieById, getSessionCookieByLoginName } from "@/lib/server/cookies";
 import { isClassifiedError } from "@/lib/server/grpc/interceptors/error-classification";
@@ -527,7 +528,23 @@ export async function changePassword(command: { code?: string; userId: string; p
     }
   }
 
-  return setUserPassword({ serviceConfig, userId, password: command.password, code: command.code });
+  try {
+    return await setUserPassword({ serviceConfig, userId, password: command.password, code: command.code });
+  } catch (error) {
+    // A wrong or expired reset code is the routine failure here: answer it with a message for the
+    // form instead of failing the action with a 500. Server faults keep throwing.
+    if (!isRejectedByUser(error)) {
+      throw error;
+    }
+
+    logger.warn("Setting the password was rejected", { grpcCode: error.code, errorId: zitadelErrorId(error) });
+
+    if (command.code && hasZitadelErrorId(error, [...ZitadelErrorIds.codeInvalid, ...ZitadelErrorIds.codeExpired])) {
+      return { error: t("set.errors.codeInvalidOrExpired") };
+    }
+
+    return { error: t("set.errors.couldNotSetPassword") };
+  }
 }
 
 type CheckSessionAndSetPasswordCommand = {

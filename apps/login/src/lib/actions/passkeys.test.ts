@@ -1,4 +1,6 @@
 import { registerPasskeyLink, sendPasskey, verifyPasskeyRegistration } from "@/lib/actions/passkeys";
+import { ClassifiedConnectError } from "@/lib/server/grpc/interceptors/error-classification";
+import { Code, ConnectError } from "@connectrpc/connect";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -7,7 +9,8 @@ vi.mock("next/headers", () => ({
   headers: vi.fn(),
 }));
 
-vi.mock("@zitadel/client", () => ({
+vi.mock("@zitadel/client", async () => ({
+  Code: (await import("@connectrpc/connect")).Code,
   create: vi.fn((_schema: unknown, data: unknown) => data),
   Duration: vi.fn(),
   Timestamp: vi.fn(),
@@ -208,8 +211,10 @@ describe("sendPasskey", () => {
       });
     });
 
-    test("should fallback to createSessionAndUpdateCookie when setSessionAndUpdateCookie fails and checks are present", async () => {
-      mockSetSessionAndUpdateCookie.mockRejectedValue(new Error("session already terminated"));
+    test("should fallback to createSessionAndUpdateCookie when the session was terminated and checks are present", async () => {
+      mockSetSessionAndUpdateCookie.mockRejectedValue(
+        new ClassifiedConnectError(new ConnectError("Session not found (QUERY-Sf3d2)", Code.NotFound)),
+      );
 
       mockCreateSessionAndUpdateCookie.mockResolvedValue({
         session: {

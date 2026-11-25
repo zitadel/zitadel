@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "Impossible de définir le mot de passe",
         "couldNotResetPassword": "Impossible de réinitialiser le mot de passe",
-        "couldNotVerifyPassword": "Impossible de vérifier le mot de passe"
+        "couldNotVerifyPassword": "Impossible de vérifier le mot de passe",
+        "codeInvalidOrExpired": "Le code est incorrect ou a expiré. Vérifiez-le ou demandez-en un nouveau."
       }
     },
     "change": {
@@ -433,7 +434,13 @@
       "couldNotResendInvite": "Impossible de renvoyer l'invitation",
       "inviteSendFailed": "Échec de l'envoi de l'e-mail d'invitation",
       "emailSendFailed": "Échec de l'envoi de l'e-mail de vérification",
-      "contextMissing": "Une erreur s'est produite. Veuillez réessayer."
+      "contextMissing": "Une erreur s'est produite. Veuillez réessayer.",
+      "couldNotFindSession": "Impossible de trouver la session",
+      "couldNotUpdateSession": "Impossible de mettre à jour la session",
+      "invalidCode": "Code invalide. Veuillez réessayer.",
+      "codeExpired": "Ce code a expiré ou a déjà été utilisé. Demandez-en un nouveau.",
+      "codeReused": "Ce code a déjà été utilisé. Attendez le code suivant dans votre application d'authentification.",
+      "accountLocked": "Votre compte a été verrouillé après trop de tentatives échouées. Contactez votre administrateur pour déverrouiller votre compte."
     }
   },
   "authenticator": {
