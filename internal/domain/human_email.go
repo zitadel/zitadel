@@ -45,6 +45,17 @@ func (e EmailAddress) Domain() string {
 	return address[index+1:]
 }
 
+// ParsedDomain returns the domain of the address, which can be written in any valid form,
+// like <user@example.com> or with a comment. Nothing but the domain is returned.
+// It returns an empty string if the address is not valid.
+func (e EmailAddress) ParsedDomain() string {
+	parsed, err := mail.ParseAddress(string(e))
+	if err != nil {
+		return ""
+	}
+	return EmailAddress(parsed.Address).Domain()
+}
+
 type Email struct {
 	es_models.ObjectRoot
 

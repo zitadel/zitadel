@@ -8,6 +8,7 @@ import (
 )
 
 func TestCompileRules(t *testing.T) {
+	match := RuleMatch{Hosts: []string{"smtp.example.com"}}
 	tests := []struct {
 		name    string
 		configs []RuleConfig
@@ -27,6 +28,7 @@ func TestCompileRules(t *testing.T) {
 		{
 			name: "text and placeholders",
 			configs: []RuleConfig{{
+				Match: match,
 				Headers: map[string]string{
 					"X-Header": "prefix-{{.InstanceID}}-{{.OrgID}}-suffix",
 					"X-Empty":  "",
@@ -37,6 +39,7 @@ func TestCompileRules(t *testing.T) {
 		{
 			name: "invalid header name",
 			configs: []RuleConfig{{
+				Match:   match,
 				Headers: map[string]string{"X Invalid": "value"},
 			}},
 			wantErr: `smtp rule 0: header "X Invalid": invalid name`,
@@ -44,13 +47,15 @@ func TestCompileRules(t *testing.T) {
 		{
 			name: "header name with line break",
 			configs: []RuleConfig{{
+				Match:   match,
 				Headers: map[string]string{"X-Header\r\nBcc": "value"},
 			}},
 			wantErr: "invalid name",
 		},
 		{
 			name: "reserved header name, case insensitive",
-			configs: []RuleConfig{{}, {
+			configs: []RuleConfig{{Match: match}, {
+				Match:   match,
 				Headers: map[string]string{"reply-to": "value"},
 			}},
 			wantErr: `smtp rule 1: header "reply-to": reserved name`,
@@ -58,9 +63,23 @@ func TestCompileRules(t *testing.T) {
 		{
 			name: "header value with line break",
 			configs: []RuleConfig{{
+				Match:   match,
 				Headers: map[string]string{"X-Header": "value\r\nBcc: attacker@example.com"},
 			}},
 			wantErr: "value must not contain line breaks",
+		},
+		{
+			name:    "no match criterion",
+			configs: []RuleConfig{{RestrictCustomHTML: true}},
+			wantErr: "smtp rule 0: match: at least one of Hosts, Users or SenderDomains must be defined",
+		},
+		{
+			name: "match without entries",
+			configs: []RuleConfig{{Match: match}, {
+				Match:              RuleMatch{Hosts: []string{}, Users: []string{}, SenderDomains: []string{}},
+				RestrictCustomHTML: true,
+			}},
+			wantErr: "smtp rule 1: match: at least one of Hosts, Users or SenderDomains must be defined",
 		},
 		{
 			name: "empty host",
@@ -86,6 +105,7 @@ func TestCompileRules(t *testing.T) {
 		{
 			name: "header name with non token characters",
 			configs: []RuleConfig{{
+				Match:   match,
 				Headers: map[string]string{"X-(Meta)": "value"},
 			}},
 			wantErr: `smtp rule 0: header "X-(Meta)": invalid name`,
@@ -93,6 +113,7 @@ func TestCompileRules(t *testing.T) {
 		{
 			name: "header names differing in case only",
 			configs: []RuleConfig{{
+				Match:   match,
 				Headers: map[string]string{"X-Header": "first", "x-header": "second"},
 			}},
 			wantErr: `smtp rule 0: header "x-header": duplicate name`,
@@ -124,6 +145,7 @@ func TestCompileRules(t *testing.T) {
 		}{
 			name: "unsupported value, " + u.name,
 			configs: []RuleConfig{{
+				Match:   match,
 				Headers: map[string]string{"X-Header": u.value},
 			}},
 			wantErr: `header "X-Header": value must only contain text and the placeholders {{.InstanceID}} and {{.OrgID}}`,
@@ -151,6 +173,7 @@ func TestRules_Match(t *testing.T) {
 		}
 	}
 	defaultProvider := provider("smtp.example.com:587", "token", "noreply@example.com")
+	match := RuleMatch{Hosts: []string{"smtp.example.com"}}
 
 	tests := []struct {
 		name    string
@@ -165,15 +188,9 @@ func TestRules_Match(t *testing.T) {
 		},
 		{
 			name:    "no provider",
-			configs: []RuleConfig{{RestrictCustomHTML: true}},
+			configs: []RuleConfig{{Match: match, RestrictCustomHTML: true}},
 			config:  nil,
 			want:    Rule{},
-		},
-		{
-			name:    "empty match applies to all providers",
-			configs: []RuleConfig{{RestrictCustomHTML: true}},
-			config:  defaultProvider,
-			want:    Rule{RestrictCustomHTML: true},
 		},
 		// hosts
 		{
@@ -321,6 +338,33 @@ func TestRules_Match(t *testing.T) {
 			want:   Rule{RestrictCustomHTML: true},
 		},
 		{
+			name: "sender in angle brackets matches",
+			configs: []RuleConfig{{
+				Match:              RuleMatch{SenderDomains: []string{"example.com"}},
+				RestrictCustomHTML: true,
+			}},
+			config: provider("smtp.example.com:587", "token", "<noreply@example.com>"),
+			want:   Rule{RestrictCustomHTML: true},
+		},
+		{
+			name: "sender with comment matches",
+			configs: []RuleConfig{{
+				Match:              RuleMatch{SenderDomains: []string{"example.com"}},
+				RestrictCustomHTML: true,
+			}},
+			config: provider("smtp.example.com:587", "token", "noreply@example.com (no reply)"),
+			want:   Rule{RestrictCustomHTML: true},
+		},
+		{
+			name: "sender domain with the trailing dot of the DNS root matches",
+			configs: []RuleConfig{{
+				Match:              RuleMatch{SenderDomains: []string{"example.com"}},
+				RestrictCustomHTML: true,
+			}},
+			config: provider("smtp.example.com:587", "token", "noreply@example.com."),
+			want:   Rule{RestrictCustomHTML: true},
+		},
+		{
 			name: "subdomain of sender domain does not match",
 			configs: []RuleConfig{{
 				Match:              RuleMatch{SenderDomains: []string{"example.com"}},
@@ -375,6 +419,7 @@ func TestRules_Match(t *testing.T) {
 					Headers: map[string]string{"X-Rule": "second"},
 				},
 				{
+					Match:   match,
 					Headers: map[string]string{"X-Rule": "third"},
 				},
 			},
@@ -411,6 +456,7 @@ func TestRules_Match(t *testing.T) {
 		{
 			name: "header names are canonicalized",
 			configs: []RuleConfig{{
+				Match: match,
 				Headers: map[string]string{
 					"x-pm-metadata-instance-id": "{{.InstanceID}}",
 					"X-PM-METADATA-ORG_ID":      "{{.OrgID}}",

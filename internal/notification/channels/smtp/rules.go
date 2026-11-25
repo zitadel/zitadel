@@ -28,7 +28,7 @@ type RuleConfig struct {
 }
 
 // RuleMatch defines the criteria a SMTP provider must fulfill for the rule to be applied.
-// Every defined criterion must match. If none is defined, the rule matches all SMTP providers.
+// Every defined criterion must match. At least one criterion must be defined.
 // Empty entries are rejected, as a criterion without entries would match all providers.
 type RuleMatch struct {
 	// Hosts of the SMTP provider. An entry without port matches any port.
@@ -106,6 +106,11 @@ func compileRule(config RuleConfig) (*compiledRule, error) {
 	senderDomains, err := normalizeDomains(config.Match.SenderDomains)
 	if err != nil {
 		return nil, err
+	}
+	if len(hosts) == 0 && len(users) == 0 && len(senderDomains) == 0 {
+		// A rule must name the providers it restricts.
+		// Otherwise a misspelled criterion would silently apply it to every SMTP provider.
+		return nil, errNoMatchCriterion
 	}
 	headers, err := compileHeaders(config.Headers)
 	if err != nil {
@@ -229,8 +234,13 @@ func matchesSenderDomain(domains []string, sender string) bool {
 	if len(domains) == 0 {
 		return true
 	}
-	senderDomain := domain.EmailAddress(sender).Domain()
-	return senderDomain != "" && slices.Contains(domains, strings.ToLower(senderDomain))
+	// the sender is not validated when the provider is configured, it can be written in any form
+	senderDomain := domain.EmailAddress(sender).ParsedDomain()
+	if senderDomain == "" {
+		senderDomain = domain.EmailAddress(sender).Domain()
+	}
+	senderDomain = strings.ToLower(strings.TrimSuffix(senderDomain, "."))
+	return senderDomain != "" && slices.Contains(domains, senderDomain)
 }
 
 // parseHostPort splits a host with an optional port. Brackets of IPv6 addresses are removed.
@@ -244,7 +254,10 @@ func parseHostPort(value string) hostPort {
 	return hostPort{host: strings.TrimSuffix(host, "."), port: port}
 }
 
-var errEmptyMatchEntry = errors.New("must not be empty")
+var (
+	errEmptyMatchEntry  = errors.New("must not be empty")
+	errNoMatchCriterion = errors.New("match: at least one of Hosts, Users or SenderDomains must be defined")
+)
 
 func normalizeHosts(values []string) ([]hostPort, error) {
 	hosts := make([]hostPort, len(values))
