@@ -165,6 +165,7 @@
       "title": "ログイン失敗",
       "description": "ログインの際にエラーが発生しました。"
     },
+    "chooseAlternativeMethod": "代わりに別の方法でサインインしてください：",
     "linkingError": {
       "title": "アカウント連携失敗",
       "description": "アカウント連携の際にエラーが発生しました。"
@@ -292,6 +293,7 @@
         "couldNotFindSession": "セッションが見つかりませんでした",
         "couldNotUpdateSession": "セッションを更新できませんでした",
         "userNotFound": "ユーザーがシステムに見つかりません",
+        "couldNotGetUser": "ユーザーを取得できませんでした",
         "couldNotDetermineRedirect": "パスキー確認後のリダイレクトURLを決定できませんでした"
       }
     },
@@ -367,7 +369,10 @@
       "userNotFound": "ユーザーがシステムに見つかりません",
       "couldNotLinkIDP": "IDPをユーザーにリンクできませんでした",
       "couldNotRegisterUser": "ユーザーを登録できませんでした",
-      "sessionMismatch": "登録は別のブラウザで開始されました。IDプロバイダーでもう一度サインインしてください。"
+      "sessionMismatch": "登録は別のブラウザで開始されました。IDプロバイダーでもう一度サインインしてください。",
+      "registerNotAllowed": "登録は許可されていません。詳細については管理者にお問い合わせください。",
+      "localAuthenticationNotAllowed": "ローカル認証は許可されていません！ 詳細については管理者に問い合わせてください。",
+      "couldNotGetLoginSettings": "ログイン設定を取得できませんでした"
     }
   },
   "invite": {
@@ -467,6 +472,7 @@
       "title": "{appName}が接続を要求しています",
       "description": "{appName}は以下にアクセスします：",
       "disclaimer": "「許可」をクリックすることで、{appName}とZitadelがそれぞれの利用規約およびプライバシーポリシーに従ってあなたの情報を使用することを許可します。このアクセスはいつでも取り消すことができます。",
+      "usercode": "デバイスに表示されているコード：",
       "submit": "許可",
       "deny": "拒否"
     },

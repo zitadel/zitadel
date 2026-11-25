@@ -172,6 +172,7 @@
       "title": "Accesso fallito",
       "description": "Si è verificato un errore durante il tentativo di accesso."
     },
+    "chooseAlternativeMethod": "Accedi invece con un altro metodo:",
     "linkingError": {
       "title": "Collegamento account fallito",
       "description": "Si è verificato un errore durante il tentativo di collegare il tuo account."
@@ -299,6 +300,7 @@
         "couldNotFindSession": "Impossibile trovare la sessione",
         "couldNotUpdateSession": "Impossibile aggiornare la sessione",
         "userNotFound": "Utente non trovato nel sistema",
+        "couldNotGetUser": "Impossibile recuperare l'utente",
         "couldNotDetermineRedirect": "Impossibile determinare l'URL di reindirizzamento dopo la verifica passkey"
       }
     },
@@ -374,7 +376,10 @@
       "userNotFound": "Utente non trovato nel sistema",
       "couldNotLinkIDP": "Impossibile collegare l'IDP all'utente",
       "couldNotRegisterUser": "Impossibile registrare l'utente",
-      "sessionMismatch": "La registrazione è stata avviata in un altro browser. Accedi di nuovo con il tuo provider di identità."
+      "sessionMismatch": "La registrazione è stata avviata in un altro browser. Accedi di nuovo con il tuo provider di identità.",
+      "registerNotAllowed": "La registrazione non è consentita! Contatta il tuo amministratore per maggiori informazioni.",
+      "localAuthenticationNotAllowed": "L'autenticazione locale non è consentita! Contatta il tuo amministratore per ulteriori informazioni.",
+      "couldNotGetLoginSettings": "Impossibile ottenere le impostazioni di accesso"
     }
   },
   "invite": {
@@ -474,6 +479,7 @@
       "title": "{appName} desidera connettersi:",
       "description": "{appName} avrà accesso a:",
       "disclaimer": "Cliccando su Consenti, autorizzi {appName} e Zitadel a utilizzare le tue informazioni in conformità con i rispettivi termini di servizio e politiche sulla privacy. Puoi revocare questo accesso in qualsiasi momento.",
+      "usercode": "Codice visualizzato sul tuo dispositivo:",
       "submit": "Consenti",
       "deny": "Nega"
     },

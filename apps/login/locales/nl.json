@@ -172,6 +172,7 @@
       "title": "Inloggen mislukt",
       "description": "Er is een fout opgetreden tijdens het inloggen."
     },
+    "chooseAlternativeMethod": "Meld u in plaats daarvan aan met een andere methode:",
     "linkingError": {
       "title": "Koppelen van account mislukt",
       "description": "Er is een fout opgetreden tijdens het koppelen van jouw account."
@@ -299,6 +300,7 @@
         "couldNotFindSession": "Kon sessie niet vinden",
         "couldNotUpdateSession": "Kon sessie niet bijwerken",
         "userNotFound": "Gebruiker niet in het systeem gevonden",
+        "couldNotGetUser": "Gebruiker kon niet worden opgehaald",
         "couldNotDetermineRedirect": "Kon omleidings-URL na passkey-verificatie niet bepalen"
       }
     },
@@ -374,7 +376,10 @@
       "userNotFound": "Gebruiker niet in het systeem gevonden",
       "couldNotLinkIDP": "Kon IDP niet aan gebruiker koppelen",
       "couldNotRegisterUser": "Kon gebruiker niet registreren",
-      "sessionMismatch": "De registratie is in een andere browser gestart. Meld je opnieuw aan bij je identiteitsprovider."
+      "sessionMismatch": "De registratie is in een andere browser gestart. Meld je opnieuw aan bij je identiteitsprovider.",
+      "registerNotAllowed": "Registratie is niet toegestaan! Neem contact op met uw beheerder voor meer informatie.",
+      "localAuthenticationNotAllowed": "Lokale authenticatie is niet toegestaan! Neem contact op met uw beheerder voor meer informatie.",
+      "couldNotGetLoginSettings": "Kon aanmeldinstellingen niet ophalen"
     }
   },
   "invite": {
@@ -474,6 +479,7 @@
       "title": "{appName} wil verbinding maken",
       "description": "{appName} krijgt toegang tot:",
       "disclaimer": "Door op Toestaan te klikken geeft u {appName} en Zitadel toestemming om jouw informatie te gebruiken overeenkomstig hun respectieve servicevoorwaarden en privacybeleid. U kunt deze toegang op elk moment intrekken.",
+      "usercode": "Code die op uw apparaat wordt weergegeven:",
       "submit": "Toestaan",
       "deny": "Weigeren"
     },

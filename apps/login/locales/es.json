@@ -172,6 +172,7 @@
       "title": "Error de inicio de sesión",
       "description": "Ocurrió un error al intentar iniciar sesión."
     },
+    "chooseAlternativeMethod": "Inicia sesión con otro método:",
     "linkingError": {
       "title": "Error al vincular la cuenta",
       "description": "Ocurrió un error al intentar vincular tu cuenta."
@@ -299,6 +300,7 @@
         "couldNotFindSession": "No se pudo encontrar la sesión",
         "couldNotUpdateSession": "No se pudo actualizar la sesión",
         "userNotFound": "Usuario no encontrado en el sistema",
+        "couldNotGetUser": "No se pudo obtener el usuario",
         "couldNotDetermineRedirect": "No se pudo determinar la URL de redirección después de la verificación de clave de acceso"
       }
     },
@@ -374,7 +376,10 @@
       "userNotFound": "Usuario no encontrado en el sistema",
       "couldNotLinkIDP": "No se pudo vincular el IdP al usuario",
       "couldNotRegisterUser": "No se pudo registrar el usuario",
-      "sessionMismatch": "El registro se inició en otro navegador. Vuelve a iniciar sesión con tu proveedor de identidad."
+      "sessionMismatch": "El registro se inició en otro navegador. Vuelve a iniciar sesión con tu proveedor de identidad.",
+      "registerNotAllowed": "¡El registro no está permitido! Contacta a tu administrador para más información.",
+      "localAuthenticationNotAllowed": "¡La autenticación local no está permitida! Contacte con su administrador para más información.",
+      "couldNotGetLoginSettings": "No se pudieron obtener los ajustes de inicio de sesión"
     }
   },
   "invite": {
@@ -474,6 +479,7 @@
       "title": "{appName} desea conectarse:",
       "description": "{appName} tendrá acceso a:",
       "disclaimer": "Al hacer clic en Permitir, autorizas a {appName} y a Zitadel a usar tu información de acuerdo con sus respectivos términos de servicio y políticas de privacidad. Puedes revocar este acceso en cualquier momento.",
+      "usercode": "Código que se muestra en tu dispositivo:",
       "submit": "Permitir",
       "deny": "Denegar"
     },

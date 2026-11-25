@@ -172,6 +172,7 @@
       "title": "Giriş başarısız",
       "description": "Giriş yapılmaya çalışılırken bir hata oluştu."
     },
+    "chooseAlternativeMethod": "Bunun yerine başka bir yöntemle oturum açın:",
     "linkingError": {
       "title": "Hesap bağlama başarısız",
       "description": "Hesabınız bağlanmaya çalışılırken bir hata oluştu."
@@ -299,6 +300,7 @@
         "couldNotFindSession": "Oturum bulunamadı",
         "couldNotUpdateSession": "Oturum güncellenemedi",
         "userNotFound": "Kullanıcı sistemde bulunamadı",
+        "couldNotGetUser": "Kullanıcı alınamadı",
         "couldNotDetermineRedirect": "Passkey doğrulamasından sonra yönlendirme URL'si belirlenemedi"
       }
     },
@@ -374,7 +376,10 @@
       "userNotFound": "Kullanıcı sistemde bulunamadı",
       "couldNotLinkIDP": "IDP kullanıcıya bağlanamadı",
       "couldNotRegisterUser": "Kullanıcı kayıt edilemedi",
-      "sessionMismatch": "Kayıt başka bir tarayıcıda başlatıldı. Lütfen kimlik sağlayıcınızla yeniden oturum açın."
+      "sessionMismatch": "Kayıt başka bir tarayıcıda başlatıldı. Lütfen kimlik sağlayıcınızla yeniden oturum açın.",
+      "registerNotAllowed": "Kayıt olmaya izin verilmiyor! Daha fazla bilgi için yöneticinizle iletişime geçin.",
+      "localAuthenticationNotAllowed": "Yerel kimlik doğrulamasına izin verilmiyor! Daha fazla bilgi için yöneticinize başvurun.",
+      "couldNotGetLoginSettings": "Giriş ayarları alınamadı"
     }
   },
   "invite": {
@@ -474,6 +479,7 @@
       "title": "{appName} bağlanmak istiyor",
       "description": "{appName} şunlara erişim sahibi olacak:",
       "disclaimer": "İzin Ver'e tıklayarak, {appName} ve Zitadel'in bilgilerinizi kendi hizmet şartları ve gizlilik politikalarına uygun olarak kullanmasına izin vermiş olursunuz. Bu erişimi istediğiniz zaman iptal edebilirsiniz.",
+      "usercode": "Cihazınızda görüntülenen kod:",
       "submit": "İzin Ver",
       "deny": "Reddet"
     },

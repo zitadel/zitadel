@@ -155,7 +155,8 @@
         "sessionNotValid": "Sitzung ist nicht gültig",
         "passwordVerificationMissing": "Passwort-Verifizierung fehlt.",
         "passwordVerificationTooOld": "Passwort-Verifizierung ist zu alt. Bitte verifizieren Sie Ihr Passwort erneut.",
-        "passwordResetNotAllowed": "Das Zurücksetzen des Passworts ist nicht zulässig. Wenden Sie sich für weitere Informationen an Ihren Administrator."
+        "passwordResetNotAllowed": "Das Zurücksetzen des Passworts ist nicht zulässig. Wenden Sie sich für weitere Informationen an Ihren Administrator.",
+        "localAuthenticationNotAllowed": "Lokale Authentifizierung nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator."
       }
     },
     "idp": {
@@ -167,10 +168,12 @@
       "signInWithAzureAD": "Mit AzureAD anmelden",
       "signInWithGithub": "Mit GitHub anmelden",
       "signInWithGitlab": "Mit GitLab anmelden",
+      "signInWithZitadel": "Mit Zitadel anmelden",
       "loginError": {
         "title": "Anmeldung fehlgeschlagen",
         "description": "Beim Anmelden ist ein Fehler aufgetreten."
       },
+      "chooseAlternativeMethod": "Melden Sie sich stattdessen mit einer anderen Methode an:",
       "linkingError": {
         "title": "Konto-Verknüpfung fehlgeschlagen",
         "description": "Beim Verknüpfen Ihres Kontos ist ein Fehler aufgetreten."
@@ -298,6 +301,7 @@
           "couldNotFindSession": "Sitzung konnte nicht gefunden werden",
           "couldNotUpdateSession": "Sitzung konnte nicht aktualisiert werden",
           "userNotFound": "Benutzer nicht im System gefunden",
+          "couldNotGetUser": "Benutzer konnte nicht geladen werden",
           "couldNotDetermineRedirect": "Weiterleitungs-URL nach Passkey-Verifizierung konnte nicht ermittelt werden"
         }
       },
@@ -372,7 +376,11 @@
         "couldNotCreateSession": "Sitzung konnte nicht erstellt werden",
         "userNotFound": "Benutzer nicht im System gefunden",
         "couldNotLinkIDP": "IDP konnte nicht mit dem Benutzer verknüpft werden",
-        "couldNotRegisterUser": "Benutzer konnte nicht registriert werden"
+        "couldNotRegisterUser": "Benutzer konnte nicht registriert werden",
+        "sessionMismatch": "Die Registrierung wurde in einem anderen Browser gestartet. Bitte melden Sie sich erneut bei Ihrem Identitätsanbieter an.",
+        "registerNotAllowed": "Registrierung ist nicht erlaubt! Kontaktieren Sie Ihren Administrator für weitere Informationen.",
+        "localAuthenticationNotAllowed": "Lokale Authentifizierung nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator.",
+        "couldNotGetLoginSettings": "Anmeldeeinstellungen konnten nicht abgerufen werden"
       }
     },
     "invite": {
@@ -470,8 +478,9 @@
       },
       "request": {
         "title": "{appName} möchte eine Verbindung herstellen:",
-        "description": "Durch Klicken auf Zulassen erlauben Sie {appName} und Zitadel, Ihre Informationen gemäß ihren jeweiligen Nutzungsbedingungen und Datenschutzrichtlinien zu verwenden. Sie können diesen Zugriff jederzeit widerrufen.",
-        "disclaimer": "{appName} hat Zugriff auf:",
+        "description": "{appName} hat Zugriff auf:",
+        "disclaimer": "Durch Klicken auf Zulassen erlauben Sie {appName} und Zitadel, Ihre Informationen gemäß ihren jeweiligen Nutzungsbedingungen und Datenschutzrichtlinien zu verwenden. Sie können diesen Zugriff jederzeit widerrufen.",
+        "usercode": "Auf Ihrem Gerät angezeigter Code:",
         "submit": "Zulassen",
         "deny": "Ablehnen"
       },
@@ -486,10 +495,13 @@
       "noUserCode": "Kein Benutzercode angegeben!",
       "noDeviceRequest": " Es wurde keine Geräteanforderung gefunden. Bitte überprüfen Sie die URL.",
       "unknownContext": "Der Kontext des Benutzers konnte nicht ermittelt werden. Stellen Sie sicher, dass Sie zuerst den Benutzernamen eingeben oder einen loginName als Suchparameter angeben.",
-      "sessionExpired": "Ihre aktuelle Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
+      "sessionExpired": "Ihre Sitzung ist abgelaufen oder erfordert eine erneute Authentifizierung. Bitte melden Sie sich erneut an.",
       "failedLoading": "Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
       "tryagain": "Erneut versuchen",
-      "couldNotContinueSession": "Sitzung konnte nicht fortgesetzt werden - fehlende Benutzerinformationen"
+      "couldNotContinueSession": "Sitzung konnte nicht fortgesetzt werden - fehlende Benutzerinformationen",
+      "couldNotClearSession": "Die Sitzung konnte nicht beendet werden. Bitte versuchen Sie es erneut.",
+      "secondFactorRequired": "Bestätigen Sie zuerst Ihren zweiten Faktor, um eine neue Authentifizierungsmethode einzurichten.",
+      "authenticatorNotAllowed": "Diese Authentifizierungsmethode ist für Ihre Organisation nicht erlaubt."
     }
   },
   "en": {
@@ -648,7 +660,8 @@
         "sessionNotValid": "Session is not valid",
         "passwordVerificationMissing": "Password verification is missing.",
         "passwordVerificationTooOld": "Password verification is too old. Please verify your password again.",
-        "passwordResetNotAllowed": "Password reset is not allowed. Contact your administrator for more information."
+        "passwordResetNotAllowed": "Password reset is not allowed. Contact your administrator for more information.",
+        "localAuthenticationNotAllowed": "Local authentication is not allowed! Contact your administrator for more information."
       }
     },
     "idp": {
@@ -660,10 +673,12 @@
       "signInWithAzureAD": "Sign in with AzureAD",
       "signInWithGithub": "Sign in with GitHub",
       "signInWithGitlab": "Sign in with GitLab",
+      "signInWithZitadel": "Sign in with Zitadel",
       "loginError": {
         "title": "Login failed",
         "description": "An error occurred while trying to login."
       },
+      "chooseAlternativeMethod": "Sign in with another method instead:",
       "linkingError": {
         "title": "Account linking failed",
         "description": "An error occurred while trying to link your account."
@@ -791,6 +806,7 @@
           "couldNotFindSession": "Could not find session",
           "couldNotUpdateSession": "Could not update session",
           "userNotFound": "User not found in the system",
+          "couldNotGetUser": "Could not get user",
           "couldNotDetermineRedirect": "Could not determine redirect URL after passkey verification"
         }
       },
@@ -865,7 +881,11 @@
         "couldNotCreateSession": "Could not create session",
         "userNotFound": "User not found in the system",
         "couldNotLinkIDP": "Could not link IDP to user",
-        "couldNotRegisterUser": "Could not register user"
+        "couldNotRegisterUser": "Could not register user",
+        "sessionMismatch": "The registration was started in another browser. Please sign in with your identity provider again.",
+        "registerNotAllowed": "Registration is not allowed! Contact your administrator for more information.",
+        "localAuthenticationNotAllowed": "Local authentication is not allowed! Contact your administrator for more information.",
+        "couldNotGetLoginSettings": "Could not get login settings"
       }
     },
     "invite": {
@@ -965,6 +985,7 @@
         "title": "{appName} would like to connect",
         "description": "{appName} will have access to:",
         "disclaimer": "By clicking Allow, you allow {appName} and Zitadel to use your information in accordance with their respective terms of service and privacy policies. You can revoke this access at any time.",
+        "usercode": "Code displayed on your device:",
         "submit": "Allow",
         "deny": "Deny"
       },
@@ -979,10 +1000,13 @@
       "noUserCode": "No user code provided!",
       "noDeviceRequest": "No device request found.",
       "unknownContext": "Could not get the context of the user. Make sure to enter the username first or provide a loginName as searchParam.",
-      "sessionExpired": "Your current session has expired. Please login again.",
+      "sessionExpired": "Your session has expired or requires re-authentication. Please sign in again.",
       "failedLoading": "Failed to load data. Please try again.",
       "tryagain": "Try Again",
-      "couldNotContinueSession": "Could not continue with session - missing user information"
+      "couldNotContinueSession": "Could not continue with session - missing user information",
+      "couldNotClearSession": "Could not end the session. Please try again.",
+      "secondFactorRequired": "Verify your second factor first to set up a new authentication method.",
+      "authenticatorNotAllowed": "This authentication method is not allowed for your organization."
     }
   },
   "es": {
@@ -1141,7 +1165,8 @@
         "sessionNotValid": "La sesión no es válida",
         "passwordVerificationMissing": "Falta la verificación de la contraseña.",
         "passwordVerificationTooOld": "La verificación de la contraseña es demasiado antigua. Por favor, verifique su contraseña de nuevo.",
-        "passwordResetNotAllowed": "El restablecimiento de contraseña no está permitido. Contacte con su administrador para más información."
+        "passwordResetNotAllowed": "El restablecimiento de contraseña no está permitido. Contacte con su administrador para más información.",
+        "localAuthenticationNotAllowed": "¡La autenticación local no está permitida! Contacte con su administrador para más información."
       }
     },
     "idp": {
@@ -1153,10 +1178,12 @@
       "signInWithAzureAD": "Iniciar sesión con AzureAD",
       "signInWithGithub": "Iniciar sesión con GitHub",
       "signInWithGitlab": "Iniciar sesión con GitLab",
+      "signInWithZitadel": "Iniciar sesión con Zitadel",
       "loginError": {
         "title": "Error de inicio de sesión",
         "description": "Ocurrió un error al intentar iniciar sesión."
       },
+      "chooseAlternativeMethod": "Inicia sesión con otro método:",
       "linkingError": {
         "title": "Error al vincular la cuenta",
         "description": "Ocurrió un error al intentar vincular tu cuenta."
@@ -1284,6 +1311,7 @@
           "couldNotFindSession": "No se pudo encontrar la sesión",
           "couldNotUpdateSession": "No se pudo actualizar la sesión",
           "userNotFound": "Usuario no encontrado en el sistema",
+          "couldNotGetUser": "No se pudo obtener el usuario",
           "couldNotDetermineRedirect": "No se pudo determinar la URL de redirección después de la verificación de clave de acceso"
         }
       },
@@ -1358,7 +1386,11 @@
         "couldNotCreateSession": "No se pudo crear la sesión",
         "userNotFound": "Usuario no encontrado en el sistema",
         "couldNotLinkIDP": "No se pudo vincular el IdP al usuario",
-        "couldNotRegisterUser": "No se pudo registrar el usuario"
+        "couldNotRegisterUser": "No se pudo registrar el usuario",
+        "sessionMismatch": "El registro se inició en otro navegador. Vuelve a iniciar sesión con tu proveedor de identidad.",
+        "registerNotAllowed": "¡El registro no está permitido! Contacta a tu administrador para más información.",
+        "localAuthenticationNotAllowed": "¡La autenticación local no está permitida! Contacte con su administrador para más información.",
+        "couldNotGetLoginSettings": "No se pudieron obtener los ajustes de inicio de sesión"
       }
     },
     "invite": {
@@ -1458,6 +1490,7 @@
         "title": "{appName} desea conectarse:",
         "description": "{appName} tendrá acceso a:",
         "disclaimer": "Al hacer clic en Permitir, autorizas a {appName} y a Zitadel a usar tu información de acuerdo con sus respectivos términos de servicio y políticas de privacidad. Puedes revocar este acceso en cualquier momento.",
+        "usercode": "Código que se muestra en tu dispositivo:",
         "submit": "Permitir",
         "deny": "Denegar"
       },
@@ -1472,10 +1505,13 @@
       "noUserCode": "¡No se proporcionó código de usuario!",
       "noDeviceRequest": "No se encontró ninguna solicitud de dispositivo.",
       "unknownContext": "No se pudo obtener el contexto del usuario. Asegúrate de ingresar primero el nombre de usuario o proporcionar un loginName como parámetro de búsqueda.",
-      "sessionExpired": "Tu sesión actual ha expirado. Por favor, inicia sesión de nuevo.",
+      "sessionExpired": "Tu sesión ha expirado o requiere una nueva autenticación. Por favor, inicia sesión de nuevo.",
       "failedLoading": "No se pudieron cargar los datos. Por favor, inténtalo de nuevo.",
       "tryagain": "Intentar de nuevo",
-      "couldNotContinueSession": "No se pudo continuar con la sesión - falta información del usuario"
+      "couldNotContinueSession": "No se pudo continuar con la sesión - falta información del usuario",
+      "couldNotClearSession": "No se pudo cerrar la sesión. Inténtelo de nuevo.",
+      "secondFactorRequired": "Verifica primero tu segundo factor para configurar un nuevo método de autenticación.",
+      "authenticatorNotAllowed": "Este método de autenticación no está permitido para tu organización."
     }
   },
   "it": {
@@ -1634,7 +1670,8 @@
         "sessionNotValid": "La sessione non è valida",
         "passwordVerificationMissing": "Manca la verifica della password.",
         "passwordVerificationTooOld": "La verifica della password è troppo vecchia. Si prega di verificare nuovamente la password.",
-        "passwordResetNotAllowed": "Il ripristino della password non è consentito. Contatta il tuo amministratore per ulteriori informazioni."
+        "passwordResetNotAllowed": "Il ripristino della password non è consentito. Contatta il tuo amministratore per ulteriori informazioni.",
+        "localAuthenticationNotAllowed": "L'autenticazione locale non è consentita! Contatta il tuo amministratore per ulteriori informazioni."
       }
     },
     "idp": {
@@ -1646,10 +1683,12 @@
       "signInWithAzureAD": "Accedi con AzureAD",
       "signInWithGithub": "Accedi con GitHub",
       "signInWithGitlab": "Accedi con GitLab",
+      "signInWithZitadel": "Accedi con Zitadel",
       "loginError": {
         "title": "Accesso fallito",
         "description": "Si è verificato un errore durante il tentativo di accesso."
       },
+      "chooseAlternativeMethod": "Accedi invece con un altro metodo:",
       "linkingError": {
         "title": "Collegamento account fallito",
         "description": "Si è verificato un errore durante il tentativo di collegare il tuo account."
@@ -1777,6 +1816,7 @@
           "couldNotFindSession": "Impossibile trovare la sessione",
           "couldNotUpdateSession": "Impossibile aggiornare la sessione",
           "userNotFound": "Utente non trovato nel sistema",
+          "couldNotGetUser": "Impossibile recuperare l'utente",
           "couldNotDetermineRedirect": "Impossibile determinare l'URL di reindirizzamento dopo la verifica passkey"
         }
       },
@@ -1851,7 +1891,11 @@
         "couldNotCreateSession": "Impossibile creare la sessione",
         "userNotFound": "Utente non trovato nel sistema",
         "couldNotLinkIDP": "Impossibile collegare l'IDP all'utente",
-        "couldNotRegisterUser": "Impossibile registrare l'utente"
+        "couldNotRegisterUser": "Impossibile registrare l'utente",
+        "sessionMismatch": "La registrazione è stata avviata in un altro browser. Accedi di nuovo con il tuo provider di identità.",
+        "registerNotAllowed": "La registrazione non è consentita! Contatta il tuo amministratore per maggiori informazioni.",
+        "localAuthenticationNotAllowed": "L'autenticazione locale non è consentita! Contatta il tuo amministratore per ulteriori informazioni.",
+        "couldNotGetLoginSettings": "Impossibile ottenere le impostazioni di accesso"
       }
     },
     "invite": {
@@ -1951,6 +1995,7 @@
         "title": "{appName} desidera connettersi:",
         "description": "{appName} avrà accesso a:",
         "disclaimer": "Cliccando su Consenti, autorizzi {appName} e Zitadel a utilizzare le tue informazioni in conformità con i rispettivi termini di servizio e politiche sulla privacy. Puoi revocare questo accesso in qualsiasi momento.",
+        "usercode": "Codice visualizzato sul tuo dispositivo:",
         "submit": "Consenti",
         "deny": "Nega"
       },
@@ -1965,10 +2010,13 @@
       "noUserCode": "Nessun codice utente fornito!",
       "noDeviceRequest": "Nessuna richiesta di dispositivo trovata.",
       "unknownContext": "Impossibile ottenere il contesto dell'utente. Assicurati di inserire prima il nome utente o di fornire un loginName come parametro di ricerca.",
-      "sessionExpired": "La tua sessione attuale è scaduta. Effettua nuovamente l'accesso.",
+      "sessionExpired": "La tua sessione è scaduta o richiede una nuova autenticazione. Effettua nuovamente l'accesso.",
       "failedLoading": "Impossibile caricare i dati. Riprova.",
       "tryagain": "Riprova",
-      "couldNotContinueSession": "Impossibile continuare con la sessione - informazioni utente mancanti"
+      "couldNotContinueSession": "Impossibile continuare con la sessione - informazioni utente mancanti",
+      "couldNotClearSession": "Impossibile terminare la sessione. Riprova.",
+      "secondFactorRequired": "Verifica prima il tuo secondo fattore per configurare un nuovo metodo di autenticazione.",
+      "authenticatorNotAllowed": "Questo metodo di autenticazione non è consentito per la tua organizzazione."
     }
   },
   "nl": {
@@ -2127,7 +2175,8 @@
         "sessionNotValid": "Sessie is niet geldig",
         "passwordVerificationMissing": "Wachtwoordverificatie ontbreekt.",
         "passwordVerificationTooOld": "Wachtwoordverificatie is te oud. Verifieer je wachtwoord opnieuw.",
-        "passwordResetNotAllowed": "Wachtwoord resetten is niet toegestaan. Neem contact op met uw beheerder voor meer informatie."
+        "passwordResetNotAllowed": "Wachtwoord resetten is niet toegestaan. Neem contact op met uw beheerder voor meer informatie.",
+        "localAuthenticationNotAllowed": "Lokale authenticatie is niet toegestaan! Neem contact op met uw beheerder voor meer informatie."
       }
     },
     "idp": {
@@ -2139,10 +2188,12 @@
       "signInWithAzureAD": "Aanmelden met AzureAD",
       "signInWithGithub": "Aanmelden met GitHub",
       "signInWithGitlab": "Aanmelden met GitLab",
+      "signInWithZitadel": "Aanmelden met Zitadel",
       "loginError": {
         "title": "Inloggen mislukt",
         "description": "Er is een fout opgetreden tijdens het inloggen."
       },
+      "chooseAlternativeMethod": "Meld u in plaats daarvan aan met een andere methode:",
       "linkingError": {
         "title": "Koppelen van account mislukt",
         "description": "Er is een fout opgetreden tijdens het koppelen van jouw account."
@@ -2270,6 +2321,7 @@
           "couldNotFindSession": "Kon sessie niet vinden",
           "couldNotUpdateSession": "Kon sessie niet bijwerken",
           "userNotFound": "Gebruiker niet in het systeem gevonden",
+          "couldNotGetUser": "Gebruiker kon niet worden opgehaald",
           "couldNotDetermineRedirect": "Kon omleidings-URL na passkey-verificatie niet bepalen"
         }
       },
@@ -2344,7 +2396,11 @@
         "couldNotCreateSession": "Kon sessie niet aanmaken",
         "userNotFound": "Gebruiker niet in het systeem gevonden",
         "couldNotLinkIDP": "Kon IDP niet aan gebruiker koppelen",
-        "couldNotRegisterUser": "Kon gebruiker niet registreren"
+        "couldNotRegisterUser": "Kon gebruiker niet registreren",
+        "sessionMismatch": "De registratie is in een andere browser gestart. Meld je opnieuw aan bij je identiteitsprovider.",
+        "registerNotAllowed": "Registratie is niet toegestaan! Neem contact op met uw beheerder voor meer informatie.",
+        "localAuthenticationNotAllowed": "Lokale authenticatie is niet toegestaan! Neem contact op met uw beheerder voor meer informatie.",
+        "couldNotGetLoginSettings": "Kon aanmeldinstellingen niet ophalen"
       }
     },
     "invite": {
@@ -2444,6 +2500,7 @@
         "title": "{appName} wil verbinding maken",
         "description": "{appName} krijgt toegang tot:",
         "disclaimer": "Door op Toestaan te klikken geeft u {appName} en Zitadel toestemming om jouw informatie te gebruiken overeenkomstig hun respectieve servicevoorwaarden en privacybeleid. U kunt deze toegang op elk moment intrekken.",
+        "usercode": "Code die op uw apparaat wordt weergegeven:",
         "submit": "Toestaan",
         "deny": "Weigeren"
       },
@@ -2458,10 +2515,13 @@
       "noUserCode": "Geen gebruikerscode opgegeven!",
       "noDeviceRequest": "Geen apparaatverzoek gevonden.",
       "unknownContext": "Kon de context van de gebruiker niet ophalen. Zorg ervoor dat u eerst de gebruikersnaam invoert of een loginName als zoekparameter opgeeft.",
-      "sessionExpired": "Uw huidige sessie is verlopen. Log opnieuw in.",
+      "sessionExpired": "Uw sessie is verlopen of vereist opnieuw authenticatie. Log opnieuw in.",
       "failedLoading": "Gegevens laden mislukt. Probeer het opnieuw.",
       "tryagain": "Opnieuw proberen",
-      "couldNotContinueSession": "Kon de sessie niet voortzetten - ontbrekende gebruikersinformatie"
+      "couldNotContinueSession": "Kon de sessie niet voortzetten - ontbrekende gebruikersinformatie",
+      "couldNotClearSession": "De sessie kon niet worden beëindigd. Probeer het opnieuw.",
+      "secondFactorRequired": "Verifieer eerst uw tweede factor om een nieuwe authenticatiemethode in te stellen.",
+      "authenticatorNotAllowed": "Deze authenticatiemethode is niet toegestaan voor uw organisatie."
     }
   },
   "pl": {
@@ -2620,7 +2680,8 @@
         "sessionNotValid": "Sesja jest nieważna",
         "passwordVerificationMissing": "Brak weryfikacji hasła.",
         "passwordVerificationTooOld": "Weryfikacja hasła jest przestarzała. Proszę zweryfikować hasło ponownie.",
-        "passwordResetNotAllowed": "Resetowanie hasła jest niedozwolone. Skontaktuj się z administratorem, aby uzyskać więcej informacji."
+        "passwordResetNotAllowed": "Resetowanie hasła jest niedozwolone. Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+        "localAuthenticationNotAllowed": "Uwierzytelnianie lokalne nie jest dozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji."
       }
     },
     "idp": {
@@ -2632,10 +2693,12 @@
       "signInWithAzureAD": "Zaloguj się przez AzureAD",
       "signInWithGithub": "Zaloguj się przez GitHub",
       "signInWithGitlab": "Zaloguj się przez GitLab",
+      "signInWithZitadel": "Zaloguj się przez Zitadel",
       "loginError": {
         "title": "Logowanie nieudane",
         "description": "Wystąpił błąd podczas próby logowania."
       },
+      "chooseAlternativeMethod": "Zamiast tego zaloguj się inną metodą:",
       "linkingError": {
         "title": "Powiązanie konta nie powiodło się",
         "description": "Wystąpił błąd podczas próby powiązania konta."
@@ -2763,6 +2826,7 @@
           "couldNotFindSession": "Nie można znaleźć sesji",
           "couldNotUpdateSession": "Nie można zaktualizować sesji",
           "userNotFound": "Użytkownik nie znaleziony w systemie",
+          "couldNotGetUser": "Nie można pobrać użytkownika",
           "couldNotDetermineRedirect": "Nie można określić adresu URL przekierowania po weryfikacji klucza dostępu"
         }
       },
@@ -2837,7 +2901,11 @@
         "couldNotCreateSession": "Nie udało się utworzyć sesji",
         "userNotFound": "Nie znaleziono użytkownika w systemie",
         "couldNotLinkIDP": "Nie udało się powiązać IDP z użytkownikiem",
-        "couldNotRegisterUser": "Nie udało się zarejestrować użytkownika"
+        "couldNotRegisterUser": "Nie udało się zarejestrować użytkownika",
+        "sessionMismatch": "Rejestracja została rozpoczęta w innej przeglądarce. Zaloguj się ponownie u swojego dostawcy tożsamości.",
+        "registerNotAllowed": "Rejestracja jest niedozwolona! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+        "localAuthenticationNotAllowed": "Uwierzytelnianie lokalne nie jest dozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+        "couldNotGetLoginSettings": "Nie udało się pobrać ustawień logowania"
       }
     },
     "invite": {
@@ -2937,6 +3005,7 @@
         "title": "{appName} chce się połączyć:",
         "description": "{appName} będzie miało dostęp do:",
         "disclaimer": "Klikając Zezwól, pozwalasz tej aplikacji i Zitadel na korzystanie z Twoich informacji zgodnie z ich odpowiednimi warunkami użytkowania i politykami prywatności. Możesz cofnąć ten dostęp w dowolnym momencie.",
+        "usercode": "Kod wyświetlany na Twoim urządzeniu:",
         "submit": "Zezwól",
         "deny": "Odmów"
       },
@@ -2951,10 +3020,13 @@
       "noUserCode": "Nie podano kodu użytkownika!",
       "noDeviceRequest": "Nie znaleziono żądania urządzenia.",
       "unknownContext": "Nie udało się pobrać kontekstu użytkownika. Upewnij się, że najpierw wprowadziłeś nazwę użytkownika lub podałeś login jako parametr wyszukiwania.",
-      "sessionExpired": "Twoja sesja wygasła. Zaloguj się ponownie.",
+      "sessionExpired": "Twoja sesja wygasła lub wymaga ponownego uwierzytelnienia. Zaloguj się ponownie.",
       "failedLoading": "Nie udało się załadować danych. Spróbuj ponownie.",
       "tryagain": "Spróbuj ponownie",
-      "couldNotContinueSession": "Nie udało się kontynuować sesji - brak informacji o użytkowniku"
+      "couldNotContinueSession": "Nie udało się kontynuować sesji - brak informacji o użytkowniku",
+      "couldNotClearSession": "Nie udało się zakończyć sesji. Spróbuj ponownie.",
+      "secondFactorRequired": "Najpierw zweryfikuj drugi składnik, aby skonfigurować nową metodę uwierzytelniania.",
+      "authenticatorNotAllowed": "Ta metoda uwierzytelniania nie jest dozwolona w Twojej organizacji."
     }
   },
   "ru": {
@@ -3113,7 +3185,8 @@
         "sessionNotValid": "Сессия недействительна",
         "passwordVerificationMissing": "Отсутствует проверка пароля.",
         "passwordVerificationTooOld": "Проверка пароля устарела. Пожалуйста, подтвердите пароль еще раз.",
-        "passwordResetNotAllowed": "Сброс пароля запрещен. Обратитесь к администратору за дополнительной информацией."
+        "passwordResetNotAllowed": "Сброс пароля запрещен. Обратитесь к администратору за дополнительной информацией.",
+        "localAuthenticationNotAllowed": "Локальная аутентификация запрещена! Обратитесь к администратору за дополнительной информацией."
       }
     },
     "idp": {
@@ -3125,10 +3198,12 @@
       "signInWithAzureAD": "Войти через AzureAD",
       "signInWithGithub": "Войти через GitHub",
       "signInWithGitlab": "Войти через GitLab",
+      "signInWithZitadel": "Войти через Zitadel",
       "loginError": {
         "title": "Ошибка входа",
         "description": "Произошла ошибка при попытке входа."
       },
+      "chooseAlternativeMethod": "Вместо этого войдите другим способом:",
       "linkingError": {
         "title": "Ошибка привязки аккаунта",
         "description": "Произошла ошибка при попытке привязать аккаунт."
@@ -3256,6 +3331,7 @@
           "couldNotFindSession": "Не удалось найти сеанс",
           "couldNotUpdateSession": "Не удалось обновить сеанс",
           "userNotFound": "Пользователь не найден в системе",
+          "couldNotGetUser": "Не удалось получить пользователя",
           "couldNotDetermineRedirect": "Не удалось определить URL перенаправления после проверки пасскей"
         }
       },
@@ -3330,7 +3406,11 @@
         "couldNotCreateSession": "Не удалось создать сессию",
         "userNotFound": "Пользователь не найден в системе",
         "couldNotLinkIDP": "Не удалось привязать IDP к пользователю",
-        "couldNotRegisterUser": "Не удалось зарегистрировать пользователя"
+        "couldNotRegisterUser": "Не удалось зарегистрировать пользователя",
+        "sessionMismatch": "Регистрация была начата в другом браузере. Войдите снова через вашего поставщика удостоверений.",
+        "registerNotAllowed": "Регистрация не разрешена! Обратитесь к администратору для получения дополнительной информации.",
+        "localAuthenticationNotAllowed": "Локальная аутентификация запрещена! Обратитесь к администратору за дополнительной информацией.",
+        "couldNotGetLoginSettings": "Не удалось получить настройки входа"
       }
     },
     "invite": {
@@ -3430,6 +3510,7 @@
         "title": "{appName} хочет подключиться:",
         "description": "{appName} получит доступ к:",
         "disclaimer": "Нажимая «Разрешить», вы разрешаете этому приложению и Zitadel использовать вашу информацию в соответствии с их условиями использования и политиками конфиденциальности. Вы можете отозвать этот доступ в любое время.",
+        "usercode": "Код, отображаемый на вашем устройстве:",
         "submit": "Разрешить",
         "deny": "Запретить"
       },
@@ -3444,10 +3525,13 @@
       "noUserCode": "Не указан код пользователя!",
       "noDeviceRequest": "Не найдена ни одна заявка на устройство.",
       "unknownContext": "Не удалось получить контекст пользователя. Укажите имя пользователя или loginName в параметрах поиска.",
-      "sessionExpired": "Ваша сессия истекла. Войдите снова.",
+      "sessionExpired": "Ваша сессия истекла или требует повторной аутентификации. Войдите снова.",
       "failedLoading": "Ошибка загрузки данных. Попробуйте ещё раз.",
       "tryagain": "Попробовать снова",
-      "couldNotContinueSession": "Не удалось продолжить сеанс - отсутствует информация о пользователе"
+      "couldNotContinueSession": "Не удалось продолжить сеанс - отсутствует информация о пользователе",
+      "couldNotClearSession": "Не удалось завершить сеанс. Пожалуйста, попробуйте ещё раз.",
+      "secondFactorRequired": "Сначала подтвердите второй фактор, чтобы настроить новый способ аутентификации.",
+      "authenticatorNotAllowed": "Этот способ аутентификации не разрешён для вашей организации."
     }
   },
   "zh": {
@@ -3606,7 +3690,8 @@
         "sessionNotValid": "会话无效",
         "passwordVerificationMissing": "缺少密码验证。",
         "passwordVerificationTooOld": "密码验证已过期。请重新通过验证。",
-        "passwordResetNotAllowed": "不允许重置密码。请联系您的管理员以获取更多信息。"
+        "passwordResetNotAllowed": "不允许重置密码。请联系您的管理员以获取更多信息。",
+        "localAuthenticationNotAllowed": "不允许本地身份验证！请联系您的管理员以获取更多信息。"
       }
     },
     "idp": {
@@ -3618,10 +3703,12 @@
       "signInWithAzureAD": "用 AzureAD 登录",
       "signInWithGithub": "用 GitHub 登录",
       "signInWithGitlab": "用 GitLab 登录",
+      "signInWithZitadel": "用 Zitadel 登录",
       "loginError": {
         "title": "登录失败",
         "description": "登录时发生错误。"
       },
+      "chooseAlternativeMethod": "请改用其他方式登录：",
       "linkingError": {
         "title": "账户链接失败",
         "description": "链接账户时发生错误。"
@@ -3749,6 +3836,7 @@
           "couldNotFindSession": "找不到会话",
           "couldNotUpdateSession": "无法更新会话",
           "userNotFound": "系统中未找到用户",
+          "couldNotGetUser": "无法获取用户",
           "couldNotDetermineRedirect": "密钥验证后无法确定重定向URL"
         }
       },
@@ -3823,7 +3911,11 @@
         "couldNotCreateSession": "无法创建会话",
         "userNotFound": "系统中未找到用户",
         "couldNotLinkIDP": "无法将 IDP 关联到用户",
-        "couldNotRegisterUser": "无法注册用户"
+        "couldNotRegisterUser": "无法注册用户",
+        "sessionMismatch": "注册是在另一个浏览器中开始的。请使用您的身份提供商重新登录。",
+        "registerNotAllowed": "不允许注册！请联系您的管理员了解更多信息。",
+        "localAuthenticationNotAllowed": "不允许本地身份验证！请联系您的管理员以获取更多信息。",
+        "couldNotGetLoginSettings": "无法获取登录设置"
       }
     },
     "invite": {
@@ -3923,6 +4015,7 @@
         "title": "{appName} 想要连接：",
         "description": "{appName} 将访问：",
         "disclaimer": "点击“允许”即表示您允许此应用程序和 Zitadel 根据其各自的服务条款和隐私政策使用您的信息。您可以随时撤销此访问权限。",
+        "usercode": "您设备上显示的代码：",
         "submit": "允许",
         "deny": "拒绝"
       },
@@ -3937,10 +4030,13 @@
       "noUserCode": "未提供用户代码！",
       "noDeviceRequest": "没有找到设备请求。",
       "unknownContext": "无法获取用户的上下文。请先输入用户名或提供 loginName 作为搜索参数。",
-      "sessionExpired": "当前会话已过期，请重新登录。",
+      "sessionExpired": "会话已过期或需要重新验证身份，请重新登录。",
       "failedLoading": "加载数据失败，请再试一次。",
       "tryagain": "重试",
-      "couldNotContinueSession": "无法继续会话 - 缺少用户信息"
+      "couldNotContinueSession": "无法继续会话 - 缺少用户信息",
+      "couldNotClearSession": "无法结束会话。请重试。",
+      "secondFactorRequired": "请先验证您的第二因素，然后再设置新的身份验证方式。",
+      "authenticatorNotAllowed": "您的组织不允许使用此身份验证方式。"
     }
   },
   "tr": {
@@ -4099,7 +4195,8 @@
         "sessionNotValid": "Oturum geçerli değil",
         "passwordVerificationMissing": "Şifre doğrulaması eksik.",
         "passwordVerificationTooOld": "Şifre doğrulaması çok eski. Lütfen şifrenizi tekrar doğrulayın.",
-        "passwordResetNotAllowed": "Şifre sıfırlamaya izin verilmiyor. Daha fazla bilgi için yöneticinizle iletişime geçin."
+        "passwordResetNotAllowed": "Şifre sıfırlamaya izin verilmiyor. Daha fazla bilgi için yöneticinizle iletişime geçin.",
+        "localAuthenticationNotAllowed": "Yerel kimlik doğrulamasına izin verilmiyor! Daha fazla bilgi için yöneticinize başvurun."
       }
     },
     "idp": {
@@ -4111,10 +4208,12 @@
       "signInWithAzureAD": "AzureAD ile Giriş",
       "signInWithGithub": "GitHub ile Giriş",
       "signInWithGitlab": "GitLab ile Giriş",
+      "signInWithZitadel": "Zitadel ile Giriş",
       "loginError": {
         "title": "Giriş başarısız",
         "description": "Giriş yapılmaya çalışılırken bir hata oluştu."
       },
+      "chooseAlternativeMethod": "Bunun yerine başka bir yöntemle oturum açın:",
       "linkingError": {
         "title": "Hesap bağlama başarısız",
         "description": "Hesabınız bağlanmaya çalışılırken bir hata oluştu."
@@ -4242,6 +4341,7 @@
           "couldNotFindSession": "Oturum bulunamadı",
           "couldNotUpdateSession": "Oturum güncellenemedi",
           "userNotFound": "Kullanıcı sistemde bulunamadı",
+          "couldNotGetUser": "Kullanıcı alınamadı",
           "couldNotDetermineRedirect": "Passkey doğrulamasından sonra yönlendirme URL'si belirlenemedi"
         }
       },
@@ -4316,7 +4416,11 @@
         "couldNotCreateSession": "Oturum oluşturulamadı",
         "userNotFound": "Kullanıcı sistemde bulunamadı",
         "couldNotLinkIDP": "IDP kullanıcıya bağlanamadı",
-        "couldNotRegisterUser": "Kullanıcı kayıt edilemedi"
+        "couldNotRegisterUser": "Kullanıcı kayıt edilemedi",
+        "sessionMismatch": "Kayıt başka bir tarayıcıda başlatıldı. Lütfen kimlik sağlayıcınızla yeniden oturum açın.",
+        "registerNotAllowed": "Kayıt olmaya izin verilmiyor! Daha fazla bilgi için yöneticinizle iletişime geçin.",
+        "localAuthenticationNotAllowed": "Yerel kimlik doğrulamasına izin verilmiyor! Daha fazla bilgi için yöneticinize başvurun.",
+        "couldNotGetLoginSettings": "Giriş ayarları alınamadı"
       }
     },
     "invite": {
@@ -4416,6 +4520,7 @@
         "title": "{appName} bağlanmak istiyor",
         "description": "{appName} şunlara erişim sahibi olacak:",
         "disclaimer": "İzin Ver'e tıklayarak, {appName} ve Zitadel'in bilgilerinizi kendi hizmet şartları ve gizlilik politikalarına uygun olarak kullanmasına izin vermiş olursunuz. Bu erişimi istediğiniz zaman iptal edebilirsiniz.",
+        "usercode": "Cihazınızda görüntülenen kod:",
         "submit": "İzin Ver",
         "deny": "Reddet"
       },
@@ -4430,10 +4535,13 @@
       "noUserCode": "Kullanıcı kodu sağlanmadı!",
       "noDeviceRequest": "Cihaz isteği bulunamadı.",
       "unknownContext": "Kullanıcının bağlamı alınamadı. Önce kullanıcı adını girdiğinizden emin olun veya searchParam olarak bir loginName sağlayın.",
-      "sessionExpired": "Mevcut oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.",
+      "sessionExpired": "Oturumunuzun süresi doldu veya yeniden kimlik doğrulaması gerekiyor. Lütfen tekrar giriş yapın.",
       "failedLoading": "Veri yüklenemedi. Lütfen tekrar deneyin.",
       "tryagain": "Tekrar Dene",
-      "couldNotContinueSession": "Oturuma devam edilemedi - kullanıcı bilgileri eksik"
+      "couldNotContinueSession": "Oturuma devam edilemedi - kullanıcı bilgileri eksik",
+      "couldNotClearSession": "Oturum sonlandırılamadı. Lütfen tekrar deneyin.",
+      "secondFactorRequired": "Yeni bir kimlik doğrulama yöntemi ayarlamak için önce ikinci faktörünüzü doğrulayın.",
+      "authenticatorNotAllowed": "Bu kimlik doğrulama yöntemine kuruluşunuz için izin verilmiyor."
     }
   },
   "uk": {
@@ -4592,7 +4700,8 @@
         "sessionNotValid": "Сеанс недійсний",
         "passwordVerificationMissing": "Відсутня перевірка пароля.",
         "passwordVerificationTooOld": "Перевірка пароля застаріла. Будь ласка, перевірте пароль ще раз.",
-        "passwordResetNotAllowed": "Скидання пароля заборонено. Зверніться до адміністратора за додатковою інформацією."
+        "passwordResetNotAllowed": "Скидання пароля заборонено. Зверніться до адміністратора за додатковою інформацією.",
+        "localAuthenticationNotAllowed": "Локальна аутентифікація заборонена! Зверніться до адміністратора за додатковою інформацією."
       }
     },
     "idp": {
@@ -4604,10 +4713,12 @@
       "signInWithAzureAD": "Увійти через AzureAD",
       "signInWithGithub": "Увійти через GitHub",
       "signInWithGitlab": "Увійти через GitLab",
+      "signInWithZitadel": "Увійти через Zitadel",
       "loginError": {
         "title": "Помилка входу",
         "description": "Сталася помилка під час спроби входу."
       },
+      "chooseAlternativeMethod": "Натомість увійдіть іншим способом:",
       "linkingError": {
         "title": "Помилка прив'язки облікового запису",
         "description": "Сталася помилка під час спроби прив'язати ваш обліковий запис."
@@ -4735,6 +4846,7 @@
           "couldNotFindSession": "Не вдалося знайти сеанс",
           "couldNotUpdateSession": "Не вдалося оновити сеанс",
           "userNotFound": "Користувача не знайдено в системі",
+          "couldNotGetUser": "Не вдалося отримати користувача",
           "couldNotDetermineRedirect": "Не вдалося визначити URL перенаправлення після перевірки ключа доступу"
         }
       },
@@ -4809,7 +4921,11 @@
         "couldNotCreateSession": "Не вдалося створити сеанс",
         "userNotFound": "Користувача не знайдено в системі",
         "couldNotLinkIDP": "Не вдалося прив'язати IDP до користувача",
-        "couldNotRegisterUser": "Не вдалося зареєструвати користувача"
+        "couldNotRegisterUser": "Не вдалося зареєструвати користувача",
+        "sessionMismatch": "Реєстрацію було розпочато в іншому браузері. Увійдіть знову через вашого постачальника ідентифікації.",
+        "registerNotAllowed": "Реєстрація не дозволена! Зверніться до адміністратора для отримання додаткової інформації.",
+        "localAuthenticationNotAllowed": "Локальна аутентифікація заборонена! Зверніться до адміністратора за додатковою інформацією.",
+        "couldNotGetLoginSettings": "Не вдалося отримати налаштування входу"
       }
     },
     "invite": {
@@ -4909,6 +5025,7 @@
         "title": "{appName} хоче підключитися",
         "description": "{appName} матиме доступ до:",
         "disclaimer": "Натискаючи Дозволити, ви дозволяєте {appName} та Zitadel використовувати вашу інформацію відповідно до їхніх умов надання послуг та політик конфіденційності. Ви можете скасувати цей доступ у будь-який час.",
+        "usercode": "Код, що відображається на вашому пристрої:",
         "submit": "Дозволити",
         "deny": "Відхилити"
       },
@@ -4923,10 +5040,13 @@
       "noUserCode": "Код користувача не надано!",
       "noDeviceRequest": "Запит пристрою не знайдено.",
       "unknownContext": "Не вдалося отримати контекст користувача. Переконайтеся, що спочатку ввели ім'я користувача або вкажіть loginName як параметр пошуку.",
-      "sessionExpired": "Ваш поточний сеанс закінчився. Будь ласка, увійдіть знову.",
+      "sessionExpired": "Ваш сеанс закінчився або потребує повторної автентифікації. Будь ласка, увійдіть знову.",
       "failedLoading": "Не вдалося завантажити дані. Будь ласка, спробуйте ще раз.",
       "tryagain": "Спробувати ще раз",
-      "couldNotContinueSession": "Не вдалося продовжити сеанс - відсутня інформація про користувача"
+      "couldNotContinueSession": "Не вдалося продовжити сеанс - відсутня інформація про користувача",
+      "couldNotClearSession": "Не вдалося завершити сеанс. Будь ласка, спробуйте ще раз.",
+      "secondFactorRequired": "Спершу підтвердіть другий фактор, щоб налаштувати новий спосіб автентифікації.",
+      "authenticatorNotAllowed": "Цей спосіб автентифікації не дозволений для вашої організації."
     }
   },
   "ar": {
@@ -5085,7 +5205,8 @@
         "sessionNotValid": "الجلسة غير صالحة",
         "passwordVerificationMissing": "التحقق من كلمة المرور مفقود.",
         "passwordVerificationTooOld": "التحقق من كلمة المرور قديم جدًا. يرجى التحقق من كلمة المرور مرة أخرى.",
-        "passwordResetNotAllowed": "إعادة تعيين كلمة المرور غير مسموح بها. اتصل بالمسؤول لمزيد من المعلومات."
+        "passwordResetNotAllowed": "إعادة تعيين كلمة المرور غير مسموح بها. اتصل بالمسؤول لمزيد من المعلومات.",
+        "localAuthenticationNotAllowed": "المصادقة المحلية غير مسموح بها! اتصل بالمسؤول لمزيد من المعلومات."
       }
     },
     "idp": {
@@ -5097,10 +5218,12 @@
       "signInWithAzureAD": "تسجيل الدخول باستخدام AzureAD",
       "signInWithGithub": "تسجيل الدخول باستخدام GitHub",
       "signInWithGitlab": "تسجيل الدخول باستخدام GitLab",
+      "signInWithZitadel": "تسجيل الدخول باستخدام Zitadel",
       "loginError": {
         "title": "فشل تسجيل الدخول",
         "description": "حدث خطأ أثناء محاولة تسجيل الدخول."
       },
+      "chooseAlternativeMethod": "سجّل الدخول بطريقة أخرى بدلاً من ذلك:",
       "linkingError": {
         "title": "فشل ربط الحساب",
         "description": "حدث خطأ أثناء محاولة ربط حسابك."
@@ -5228,6 +5351,7 @@
           "couldNotFindSession": "تعذر العثور على الجلسة",
           "couldNotUpdateSession": "تعذر تحديث الجلسة",
           "userNotFound": "المستخدم غير موجود في النظام",
+          "couldNotGetUser": "تعذر الحصول على المستخدم",
           "couldNotDetermineRedirect": "تعذر تحديد عنوان URL لإعادة التوجيه بعد التحقق من مفتاح المرور"
         }
       },
@@ -5302,7 +5426,11 @@
         "couldNotCreateSession": "تعذر إنشاء الجلسة",
         "userNotFound": "المستخدم غير موجود في النظام",
         "couldNotLinkIDP": "تعذر ربط IDP بالمستخدم",
-        "couldNotRegisterUser": "تعذر تسجيل المستخدم"
+        "couldNotRegisterUser": "تعذر تسجيل المستخدم",
+        "sessionMismatch": "بدأ التسجيل في متصفح آخر. يرجى تسجيل الدخول مرة أخرى باستخدام موفر الهوية الخاص بك.",
+        "registerNotAllowed": "التسجيل غير مسموح به! اتصل بالمسؤول لمزيد من المعلومات.",
+        "localAuthenticationNotAllowed": "المصادقة المحلية غير مسموح بها! اتصل بالمسؤول لمزيد من المعلومات.",
+        "couldNotGetLoginSettings": "تعذر الحصول على إعدادات تسجيل الدخول"
       }
     },
     "invite": {
@@ -5402,6 +5530,7 @@
         "title": "{appName} يود الاتصال",
         "description": "{appName} سيكون لديه حق الوصول إلى:",
         "disclaimer": "بالنقر فوق سماح، فإنك تسمح لـ {appName} و Zitadel استخدام معلوماتك وفقاً لشروط الخدمة وسياسات الخصوصية الخاصة بكل منهما. يمكنك إلغاء هذا الوصول في أي وقت.",
+        "usercode": "الرمز المعروض على جهازك:",
         "submit": "سماح",
         "deny": "رفض"
       },
@@ -5416,10 +5545,13 @@
       "noUserCode": "لم يتم تقديم رمز مستخدم!",
       "noDeviceRequest": "لم يتم العثور على طلب جهاز.",
       "unknownContext": "تعذر الحصول على سياق المستخدم. تأكد من إدخال اسم المستخدم أولاً أو تقديم loginName كمعلمة بحث.",
-      "sessionExpired": "انتهت صلاحية جلستك الحالية. يرجى تسجيل الدخول مرة أخرى.",
+      "sessionExpired": "انتهت صلاحية جلستك أو تتطلب إعادة المصادقة. يرجى تسجيل الدخول مرة أخرى.",
       "failedLoading": "فشل تحميل البيانات. يرجى المحاولة مرة أخرى.",
       "tryagain": "حاول مرة أخرى",
-      "couldNotContinueSession": "تعذر المتابعة مع الجلسة - معلومات المستخدم مفقودة"
+      "couldNotContinueSession": "تعذر المتابعة مع الجلسة - معلومات المستخدم مفقودة",
+      "couldNotClearSession": "تعذر إنهاء الجلسة. يرجى المحاولة مرة أخرى.",
+      "secondFactorRequired": "قم بتأكيد العامل الثاني أولاً لإعداد طريقة مصادقة جديدة.",
+      "authenticatorNotAllowed": "طريقة المصادقة هذه غير مسموح بها لمؤسستك."
     }
   },
   "hu": {
@@ -5578,7 +5710,8 @@
         "sessionNotValid": "A munkamenet nem érvényes",
         "passwordVerificationMissing": "A jelszó hitelesítés hiányzik.",
         "passwordVerificationTooOld": "A jelszó hitelesítés túl régi. Kérjük, erősítsd meg újra a jelszavadat.",
-        "passwordResetNotAllowed": "A jelszó-visszaállítás nem engedélyezett. További információért fordulj a rendszergazdához."
+        "passwordResetNotAllowed": "A jelszó-visszaállítás nem engedélyezett. További információért fordulj a rendszergazdához.",
+        "localAuthenticationNotAllowed": "A helyi hitelesítés nem engedélyezett! További információért fordulj a rendszergazdához."
       }
     },
     "idp": {
@@ -5590,10 +5723,12 @@
       "signInWithAzureAD": "Bejelentkezés AzureAD-vel",
       "signInWithGithub": "Bejelentkezés GitHubbal",
       "signInWithGitlab": "Bejelentkezés GitLabbal",
+      "signInWithZitadel": "Bejelentkezés Zitadel-lel",
       "loginError": {
         "title": "Sikertelen bejelentkezés",
         "description": "Hiba történt a bejelentkezés során."
       },
+      "chooseAlternativeMethod": "Jelentkezz be inkább egy másik módszerrel:",
       "linkingError": {
         "title": "Sikertelen fiókösszekapcsolás",
         "description": "Hiba történt a fiókod összekapcsolása során."
@@ -5721,6 +5856,7 @@
           "couldNotFindSession": "Nem található munkamenet",
           "couldNotUpdateSession": "Nem sikerült frissíteni a munkamenetet",
           "userNotFound": "A felhasználó nem található a rendszerben",
+          "couldNotGetUser": "A felhasználó lekérése nem sikerült",
           "couldNotDetermineRedirect": "Nem sikerült meghatározni az átirányítási címet a jelkulcs ellenőrzése után"
         }
       },
@@ -5795,7 +5931,11 @@
         "couldNotCreateSession": "Nem sikerült létrehozni a munkamenetet",
         "userNotFound": "A felhasználó nem található a rendszerben",
         "couldNotLinkIDP": "Nem sikerült összekapcsolni az azonosítószolgáltatót a felhasználóval",
-        "couldNotRegisterUser": "Nem sikerült regisztrálni a felhasználót"
+        "couldNotRegisterUser": "Nem sikerült regisztrálni a felhasználót",
+        "sessionMismatch": "A regisztráció egy másik böngészőben indult. Jelentkezz be újra az azonosítószolgáltatódnál.",
+        "registerNotAllowed": "A regisztráció nem engedélyezett! További információért forduljon a rendszergazdához.",
+        "localAuthenticationNotAllowed": "A helyi hitelesítés nem engedélyezett! További információért fordulj a rendszergazdához.",
+        "couldNotGetLoginSettings": "Nem sikerült lekérni a bejelentkezési beállításokat"
       }
     },
     "invite": {
@@ -5895,6 +6035,7 @@
         "title": "A(z) {appName} kapcsolódni szeretne",
         "description": "A(z) {appName} hozzáférést kap a következőkhöz:",
         "disclaimer": "Az Engedélyezés gombra kattintva engedélyezed, hogy a(z) {appName} és a Zitadel a saját felhasználási feltételeik és adatvédelmi irányelveik szerint használja az adataidat. Ezt a hozzáférést bármikor visszavonhatod.",
+        "usercode": "Az eszközödön megjelenő kód:",
         "submit": "Engedélyezés",
         "deny": "Elutasítás"
       },
@@ -5909,10 +6050,13 @@
       "noUserCode": "Nincs megadva felhasználói kód!",
       "noDeviceRequest": "Nem található eszközkérés.",
       "unknownContext": "Nem sikerült meghatározni a felhasználó kontextusát. Győződj meg róla, hogy előbb megadtad a felhasználónevet, vagy add meg a bejelentkezési nevet keresési paraméterként.",
-      "sessionExpired": "A munkameneted lejárt. Kérjük, jelentkezz be újra.",
+      "sessionExpired": "A munkameneted lejárt, vagy újbóli hitelesítést igényel. Kérjük, jelentkezz be újra.",
       "failedLoading": "Nem sikerült betölteni az adatokat. Kérjük, próbáld újra.",
       "tryagain": "Próbáld újra",
-      "couldNotContinueSession": "Nem sikerült folytatni a munkamenetet - hiányzó felhasználói információk"
+      "couldNotContinueSession": "Nem sikerült folytatni a munkamenetet - hiányzó felhasználói információk",
+      "couldNotClearSession": "A munkamenetet nem sikerült befejezni. Kérjük, próbálja újra.",
+      "secondFactorRequired": "Új hitelesítési mód beállításához először erősítsd meg a második faktort.",
+      "authenticatorNotAllowed": "Ez a hitelesítési mód nem engedélyezett a szervezeted számára."
     }
   },
   "fr": {
@@ -6071,7 +6215,8 @@
         "sessionNotValid": "La session n'est pas valide",
         "passwordVerificationMissing": "La vérification du mot de passe est manquante.",
         "passwordVerificationTooOld": "La vérification du mot de passe est trop ancienne. Veuillez vérifier à nouveau votre mot de passe.",
-        "passwordResetNotAllowed": "La réinitialisation du mot de passe n'est pas autorisée. Contactez votre administrateur pour plus d'informations."
+        "passwordResetNotAllowed": "La réinitialisation du mot de passe n'est pas autorisée. Contactez votre administrateur pour plus d'informations.",
+        "localAuthenticationNotAllowed": "L'authentification locale n'est pas autorisée ! Contactez votre administrateur pour plus d'informations."
       }
     },
     "idp": {
@@ -6083,10 +6228,12 @@
       "signInWithAzureAD": "Se connecter avec AzureAD",
       "signInWithGithub": "Se connecter avec GitHub",
       "signInWithGitlab": "Se connecter avec GitLab",
+      "signInWithZitadel": "Se connecter avec Zitadel",
       "loginError": {
         "title": "Échec de la connexion",
         "description": "Une erreur est survenue lors de la tentative de connexion."
       },
+      "chooseAlternativeMethod": "Connectez-vous plutôt avec une autre méthode :",
       "linkingError": {
         "title": "Échec de la liaison du compte",
         "description": "Une erreur est survenue lors de la tentative de lier votre compte."
@@ -6214,6 +6361,7 @@
           "couldNotFindSession": "Session introuvable",
           "couldNotUpdateSession": "Impossible de mettre à jour la session",
           "userNotFound": "Utilisateur introuvable dans le système",
+          "couldNotGetUser": "Impossible de récupérer l'utilisateur",
           "couldNotDetermineRedirect": "Impossible de déterminer l'URL de redirection après la vérification de la clé d'accès"
         }
       },
@@ -6288,7 +6436,11 @@
         "couldNotCreateSession": "Impossible de créer la session",
         "userNotFound": "Utilisateur non trouvé dans le système",
         "couldNotLinkIDP": "Impossible de lier le fournisseur d'identité à l'utilisateur",
-        "couldNotRegisterUser": "Impossible d'inscrire l'utilisateur"
+        "couldNotRegisterUser": "Impossible d'inscrire l'utilisateur",
+        "sessionMismatch": "L'inscription a été commencée dans un autre navigateur. Veuillez vous reconnecter avec votre fournisseur d'identité.",
+        "registerNotAllowed": "L'inscription n'est pas autorisée ! Contactez votre administrateur pour plus d'informations.",
+        "localAuthenticationNotAllowed": "L'authentification locale n'est pas autorisée ! Contactez votre administrateur pour plus d'informations.",
+        "couldNotGetLoginSettings": "Impossible d'obtenir les paramètres de connexion"
       }
     },
     "invite": {
@@ -6388,6 +6540,7 @@
         "title": "{appName} souhaite se connecter",
         "description": "{appName} aura accès à :",
         "disclaimer": "En cliquant sur Autoriser, vous permettez à {appName} et à Zitadel d'utiliser vos informations conformément à leurs conditions d'utilisation et politiques de confidentialité respectives. Vous pouvez révoquer cet accès à tout moment.",
+        "usercode": "Code affiché sur votre appareil :",
         "submit": "Autoriser",
         "deny": "Refuser"
       },
@@ -6402,10 +6555,13 @@
       "noUserCode": "Aucun code utilisateur fourni !",
       "noDeviceRequest": "Aucune demande d'appareil trouvée.",
       "unknownContext": "Impossible d'obtenir le contexte de l'utilisateur. Assurez-vous d'abord de saisir le nom d'utilisateur ou de fournir un loginName comme paramètre de recherche.",
-      "sessionExpired": "Votre session actuelle a expiré. Veuillez vous reconnecter.",
+      "sessionExpired": "Votre session a expiré ou nécessite une nouvelle authentification. Veuillez vous reconnecter.",
       "failedLoading": "Échec du chargement des données. Veuillez réessayer.",
       "tryagain": "Réessayer",
-      "couldNotContinueSession": "Impossible de continuer la session - informations utilisateur manquantes"
+      "couldNotContinueSession": "Impossible de continuer la session - informations utilisateur manquantes",
+      "couldNotClearSession": "La session n'a pas pu être terminée. Veuillez réessayer.",
+      "secondFactorRequired": "Vérifiez d'abord votre second facteur pour configurer une nouvelle méthode d'authentification.",
+      "authenticatorNotAllowed": "Cette méthode d'authentification n'est pas autorisée pour votre organisation."
     }
   },
   "ja": {
@@ -6564,7 +6720,8 @@
         "sessionNotValid": "セッションが無効です",
         "passwordVerificationMissing": "パスワード確認がありません。",
         "passwordVerificationTooOld": "パスワード確認が古すぎます。もう一度パスワードを確認してください。",
-        "passwordResetNotAllowed": "パスワードのリセットは許可されていません。詳細については管理者に問い合わせてください。"
+        "passwordResetNotAllowed": "パスワードのリセットは許可されていません。詳細については管理者に問い合わせてください。",
+        "localAuthenticationNotAllowed": "ローカル認証は許可されていません！ 詳細については管理者に問い合わせてください。"
       }
     },
     "idp": {
@@ -6576,10 +6733,12 @@
       "signInWithAzureAD": "AzureADでサインイン",
       "signInWithGithub": "GitHubでサインイン",
       "signInWithGitlab": "GitLabでサインイン",
+      "signInWithZitadel": "Zitadelでサインイン",
       "loginError": {
         "title": "ログイン失敗",
         "description": "ログインの際にエラーが発生しました。"
       },
+      "chooseAlternativeMethod": "代わりに別の方法でサインインしてください：",
       "linkingError": {
         "title": "アカウント連携失敗",
         "description": "アカウント連携の際にエラーが発生しました。"
@@ -6707,6 +6866,7 @@
           "couldNotFindSession": "セッションが見つかりませんでした",
           "couldNotUpdateSession": "セッションを更新できませんでした",
           "userNotFound": "ユーザーがシステムに見つかりません",
+          "couldNotGetUser": "ユーザーを取得できませんでした",
           "couldNotDetermineRedirect": "パスキー確認後のリダイレクトURLを決定できませんでした"
         }
       },
@@ -6781,7 +6941,11 @@
         "couldNotCreateSession": "セッションを作成できませんでした",
         "userNotFound": "ユーザーがシステムに見つかりません",
         "couldNotLinkIDP": "IDPをユーザーにリンクできませんでした",
-        "couldNotRegisterUser": "ユーザーを登録できませんでした"
+        "couldNotRegisterUser": "ユーザーを登録できませんでした",
+        "sessionMismatch": "登録は別のブラウザで開始されました。IDプロバイダーでもう一度サインインしてください。",
+        "registerNotAllowed": "登録は許可されていません。詳細については管理者にお問い合わせください。",
+        "localAuthenticationNotAllowed": "ローカル認証は許可されていません！ 詳細については管理者に問い合わせてください。",
+        "couldNotGetLoginSettings": "ログイン設定を取得できませんでした"
       }
     },
     "invite": {
@@ -6881,6 +7045,7 @@
         "title": "{appName}が接続を要求しています",
         "description": "{appName}は以下にアクセスします：",
         "disclaimer": "「許可」をクリックすることで、{appName}とZitadelがそれぞれの利用規約およびプライバシーポリシーに従ってあなたの情報を使用することを許可します。このアクセスはいつでも取り消すことができます。",
+        "usercode": "デバイスに表示されているコード：",
         "submit": "許可",
         "deny": "拒否"
       },
@@ -6895,10 +7060,13 @@
       "noUserCode": "ユーザーコードが指定されていません！",
       "noDeviceRequest": "デバイスリクエストが見つかりません。",
       "unknownContext": "ユーザーのコンテキストを取得できませんでした。最初にユーザー名を入力するか、検索パラメータとしてloginNameを指定してください。",
-      "sessionExpired": "現在のセッションが期限切れです。再度ログインしてください。",
+      "sessionExpired": "セッションが期限切れか、再認証が必要です。再度ログインしてください。",
       "failedLoading": "データの読み込みに失敗しました。再試行してください。",
       "tryagain": "再試行",
-      "couldNotContinueSession": "セッションを継続できませんでした - ユーザー情報が不足しています"
+      "couldNotContinueSession": "セッションを継続できませんでした - ユーザー情報が不足しています",
+      "couldNotClearSession": "セッションを終了できませんでした。もう一度お試しください。",
+      "secondFactorRequired": "新しい認証方法を設定するには、まず2要素目を確認してください。",
+      "authenticatorNotAllowed": "この認証方法は組織で許可されていません。"
     }
   },
   "pt": {
@@ -7057,7 +7225,8 @@
         "sessionNotValid": "A sessão não é válida",
         "passwordVerificationMissing": "A verificação de senha está ausente.",
         "passwordVerificationTooOld": "A verificação de senha expirou. Por favor, verifique sua senha novamente.",
-        "passwordResetNotAllowed": "A redefinição de senha não é permitida. Entre em contato com o administrador para mais informações."
+        "passwordResetNotAllowed": "A redefinição de senha não é permitida. Entre em contato com o administrador para mais informações.",
+        "localAuthenticationNotAllowed": "A autenticação local não é permitida! Entre em contato com o administrador para mais informações."
       }
     },
     "idp": {
@@ -7069,10 +7238,12 @@
       "signInWithAzureAD": "Entrar com AzureAD",
       "signInWithGithub": "Entrar com GitHub",
       "signInWithGitlab": "Entrar com GitLab",
+      "signInWithZitadel": "Entrar com Zitadel",
       "loginError": {
         "title": "Falha no login",
         "description": "Ocorreu um erro ao tentar fazer login."
       },
+      "chooseAlternativeMethod": "Em vez disso, entre com outro método:",
       "linkingError": {
         "title": "Falha na vinculação de conta",
         "description": "Ocorreu um erro ao tentar vincular sua conta."
@@ -7200,6 +7371,7 @@
           "couldNotFindSession": "Não foi possível encontrar a sessão",
           "couldNotUpdateSession": "Não foi possível atualizar a sessão",
           "userNotFound": "Usuário não encontrado no sistema",
+          "couldNotGetUser": "Não foi possível obter o usuário",
           "couldNotDetermineRedirect": "Não foi possível determinar a URL de redirecionamento após verificação da chave de acesso"
         }
       },
@@ -7274,7 +7446,11 @@
         "couldNotCreateSession": "Não foi possível criar a sessão",
         "userNotFound": "Usuário não encontrado no sistema",
         "couldNotLinkIDP": "Não foi possível vincular o provedor de identidade ao usuário",
-        "couldNotRegisterUser": "Não foi possível cadastrar o usuário"
+        "couldNotRegisterUser": "Não foi possível cadastrar o usuário",
+        "sessionMismatch": "O cadastro foi iniciado em outro navegador. Entre novamente com seu provedor de identidade.",
+        "registerNotAllowed": "O registro não é permitido! Contate seu administrador para mais informações.",
+        "localAuthenticationNotAllowed": "A autenticação local não é permitida! Entre em contato com o administrador para mais informações.",
+        "couldNotGetLoginSettings": "Não foi possível obter as configurações de login"
       }
     },
     "invite": {
@@ -7374,6 +7550,7 @@
         "title": "{appName} deseja se conectar",
         "description": "{appName} terá acesso a:",
         "disclaimer": "Ao clicar em Permitir, você autoriza {appName} e Zitadel a usar suas informações de acordo com seus respectivos termos de serviço e políticas de privacidade. Você pode revogar este acesso a qualquer momento.",
+        "usercode": "Código exibido no seu dispositivo:",
         "submit": "Permitir",
         "deny": "Negar"
       },
@@ -7388,10 +7565,13 @@
       "noUserCode": "Nenhum código de usuário fornecido!",
       "noDeviceRequest": "Nenhuma solicitação de dispositivo encontrada.",
       "unknownContext": "Não foi possível obter o contexto do usuário. Certifique-se de inserir o nome de usuário primeiro ou forneça um loginName como parâmetro de busca.",
-      "sessionExpired": "Sua sessão atual expirou. Por favor, faça login novamente.",
+      "sessionExpired": "Sua sessão expirou ou requer uma nova autenticação. Por favor, faça login novamente.",
       "failedLoading": "Falha ao carregar dados. Por favor, tente novamente.",
       "tryagain": "Tentar Novamente",
-      "couldNotContinueSession": "Não foi possível continuar a sessão — informações do usuário ausentes"
+      "couldNotContinueSession": "Não foi possível continuar a sessão — informações do usuário ausentes",
+      "couldNotClearSession": "Não foi possível terminar a sessão. Tente novamente.",
+      "secondFactorRequired": "Verifique primeiro o seu segundo fator para configurar um novo método de autenticação.",
+      "authenticatorNotAllowed": "Este método de autenticação não é permitido para a sua organização."
     }
   }
 }
