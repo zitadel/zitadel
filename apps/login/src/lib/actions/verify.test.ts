@@ -1,5 +1,7 @@
-import { sendVerification, verifyTOTP } from "@/lib/actions/verify";
+import { resendVerification, sendVerification, verifyTOTP } from "@/lib/actions/verify";
+import { ClassifiedConnectError } from "@/lib/server/grpc/interceptors/error-classification";
 import { trySendVerification } from "@/lib/server/verification-email";
+import { Code, ConnectError } from "@connectrpc/connect";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { getSessionCookieByLoginName } from "@/lib/server/cookies";
@@ -13,6 +15,8 @@ import {
   sendEmailCode as zitadelSendEmailCode,
 } from "@/lib/server/zitadel";
 import { cookies } from "next/headers";
+
+const apiError = (code: Code, message: string) => new ClassifiedConnectError(new ConnectError(message, code));
 
 // Mock dependencies
 vi.mock("@/lib/server/zitadel", () => ({
@@ -413,10 +417,81 @@ describe("verifyTOTP", () => {
     expect(result).toEqual({ done: true });
   });
 
-  test("throws when the session has no user id", async () => {
+  test("answers a session without a user with a message", async () => {
     mockLoadMostRecentSession.mockResolvedValue({ id: "session-1", factors: {} });
 
-    await expect(verifyTOTP("123456")).rejects.toThrow("No user id found in session.");
+    expect(await verifyTOTP("123456")).toEqual({ error: "errors.couldNotVerify" });
     expect(mockVerifyTOTPRegistration).not.toHaveBeenCalled();
+  });
+
+  test.each([
+    ["a wrong code", apiError(Code.InvalidArgument, "Invalid code (EVENT-8isk2)"), "errors.invalidCode"],
+    ["a missing TOTP setup", apiError(Code.FailedPrecondition, "TOTP not ready (COMMAND-3Mif9s)"), "errors.couldNotVerify"],
+  ])("answers %s with a message instead of failing", async (_, error, message) => {
+    mockGetEnrollmentAuthorizationError.mockResolvedValue(null);
+    mockVerifyTOTPRegistration.mockRejectedValue(error);
+
+    expect(await verifyTOTP("123456", "victim@example.com", "org-1")).toEqual({ error: message });
+  });
+
+  test.each([
+    ["a server fault", apiError(Code.Internal, "Internal error")],
+    ["the API rejecting the login's own credentials", apiError(Code.Unauthenticated, "Token invalid")],
+  ])("rethrows %s", async (_, error) => {
+    mockGetEnrollmentAuthorizationError.mockResolvedValue(null);
+    mockVerifyTOTPRegistration.mockRejectedValue(error);
+
+    await expect(verifyTOTP("123456", "victim@example.com", "org-1")).rejects.toBe(error);
+  });
+});
+
+describe("resendVerification", () => {
+  let mockSendEmailCode: any;
+  let mockCreateInviteCode: any;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockSendEmailCode = vi.mocked(zitadelSendEmailCode);
+    mockCreateInviteCode = vi.mocked(createInviteCode);
+  });
+
+  test.each([
+    ["email", false, "errors.couldNotResendEmail"],
+    ["invite", true, "errors.couldNotResendInvite"],
+  ])("answers a rejected %s resend with a message", async (_, isInvite, message) => {
+    const error = apiError(Code.NotFound, "User not found (QUERY-Dfbg2)");
+    mockSendEmailCode.mockRejectedValue(error);
+    mockCreateInviteCode.mockRejectedValue(error);
+
+    expect(await resendVerification({ userId: "user-1", isInvite })).toEqual({ error: message });
+  });
+
+  test.each([
+    ["email", false],
+    ["invite", true],
+  ])("tells that the user is already verified when the %s resend fails its precondition", async (_, isInvite) => {
+    const error = apiError(Code.FailedPrecondition, "Already verified (COMMAND-5d8a2)");
+    mockSendEmailCode.mockRejectedValue(error);
+    mockCreateInviteCode.mockRejectedValue(error);
+
+    expect(await resendVerification({ userId: "user-1", isInvite })).toEqual({ error: "errors.userAlreadyVerified" });
+  });
+
+  test.each([
+    ["a server fault", "email", false, apiError(Code.Internal, "Internal error")],
+    ["a server fault", "invite", true, apiError(Code.Internal, "Internal error")],
+    ["the API rejecting the login's own credentials", "email", false, apiError(Code.Unauthenticated, "Token invalid")],
+    ["the API rejecting the login's own credentials", "invite", true, apiError(Code.Unauthenticated, "Token invalid")],
+  ])("rethrows %s on the %s resend", async (_, __, isInvite, error) => {
+    mockSendEmailCode.mockRejectedValue(error);
+    mockCreateInviteCode.mockRejectedValue(error);
+
+    await expect(resendVerification({ userId: "user-1", isInvite })).rejects.toBe(error);
+  });
+
+  test("returns the response of a sent email code", async () => {
+    mockSendEmailCode.mockResolvedValue({ details: {} });
+
+    expect(await resendVerification({ userId: "user-1", isInvite: false })).toEqual({ details: {} });
   });
 });

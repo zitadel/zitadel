@@ -208,7 +208,10 @@
       "userCreationFailed": "فشل إنشاء حساب المستخدم",
       "orgResolutionFailed": "تعذر تحديد المنظمة للتسجيل",
       "sessionCreationFailed": "تعذر إنشاء الجلسة أو تحديد إعادة التوجيه",
-      "unknownError": "حدث خطأ غير معروف"
+      "unknownError": "حدث خطأ غير معروف",
+      "couldNotStartIDPFlow": "تعذر بدء تدفق مزود الهوية (IDP)",
+      "userNotFound": "المستخدم غير موجود في النظام",
+      "couldNotCreateSession": "تعذر إنشاء الجلسة"
     }
   },
   "ldap": {
@@ -222,6 +225,9 @@
     "required": {
       "username": "هذا الحقل مطلوب",
       "password": "هذا الحقل مطلوب"
+    },
+    "errors": {
+      "couldNotVerify": "تعذر تسجيل الدخول. يرجى التحقق من اسم المستخدم وكلمة المرور."
     }
   },
   "mfa": {
@@ -312,7 +318,15 @@
         "link": "المصادقة بدون كلمة مرور"
       },
       "skip": "تخطي",
-      "submit": "متابعة"
+      "submit": "متابعة",
+      "errors": {
+        "missingContext": "معلومات الجلسة أو المستخدم مفقودة. أعد بدء الإعداد من الرابط الذي تلقيته.",
+        "couldNotLoadSession": "تعذر تحميل الجلسة",
+        "couldNotRegisterPasskey": "تعذر إعداد مفتاح المرور. حاول مرة أخرى.",
+        "couldNotVerifyPasskey": "تعذر التحقق من مفتاح المرور. حاول مرة أخرى.",
+        "userNotFound": "المستخدم غير موجود في النظام",
+        "couldNotCreateSession": "تعذر إنشاء الجلسة"
+      }
     }
   },
   "u2f": {
@@ -324,6 +338,11 @@
       "title": "إعداد المصادقة الثنائية",
       "description": "إعداد جهاز كعامل ثانٍ.",
       "submit": "متابعة"
+    },
+    "errors": {
+      "couldNotLoadSession": "تعذر تحميل الجلسة",
+      "couldNotRegister": "تعذر إعداد مفتاح الأمان. حاول مرة أخرى.",
+      "couldNotVerify": "تعذر التحقق من مفتاح الأمان. حاول مرة أخرى."
     }
   },
   "register": {
@@ -379,7 +398,8 @@
       "sessionMismatch": "بدأ التسجيل في متصفح آخر. يرجى تسجيل الدخول مرة أخرى باستخدام موفر الهوية الخاص بك.",
       "registerNotAllowed": "التسجيل غير مسموح به! اتصل بالمسؤول لمزيد من المعلومات.",
       "localAuthenticationNotAllowed": "المصادقة المحلية غير مسموح بها! اتصل بالمسؤول لمزيد من المعلومات.",
-      "couldNotGetLoginSettings": "تعذر الحصول على إعدادات تسجيل الدخول"
+      "couldNotGetLoginSettings": "تعذر الحصول على إعدادات تسجيل الدخول",
+      "userAlreadyExists": "يوجد مستخدم بهذا البريد الإلكتروني بالفعل. حاول تسجيل الدخول بدلاً من ذلك."
     }
   },
   "invite": {
@@ -500,6 +520,7 @@
     "couldNotContinueSession": "تعذر المتابعة مع الجلسة - معلومات المستخدم مفقودة",
     "couldNotClearSession": "تعذر إنهاء الجلسة. يرجى المحاولة مرة أخرى.",
     "secondFactorRequired": "قم بتأكيد العامل الثاني أولاً لإعداد طريقة مصادقة جديدة.",
-    "authenticatorNotAllowed": "طريقة المصادقة هذه غير مسموح بها لمؤسستك."
+    "authenticatorNotAllowed": "طريقة المصادقة هذه غير مسموح بها لمؤسستك.",
+    "couldNotCompleteDeviceAuthorization": "تعذر إكمال تفويض الجهاز. ربما تم استخدام الرمز بالفعل أو انتهت صلاحيته."
   }
 }

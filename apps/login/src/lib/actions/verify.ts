@@ -1,5 +1,7 @@
 "use server";
 
+import { answerRejection } from "@/lib/server/api-error";
+import { isClassifiedError } from "@/lib/server/grpc/interceptors/error-classification";
 import { createLogger } from "@/lib/server/logger";
 import {
   createInviteCode,
@@ -23,7 +25,7 @@ import { loadMostRecentSession } from "@/lib/server/session";
 import { createSessionAndUpdateCookie } from "@/lib/server/session-cookie";
 import { setUserVerificationCheckCookie } from "@/lib/server/verification-check";
 import { buildVerificationUrlTemplate } from "@/lib/server/verification-email";
-import { create } from "@zitadel/client";
+import { Code, create } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
@@ -35,32 +37,41 @@ const logger = createLogger("verify");
 export async function verifyTOTP(code: string, loginName?: string, organization?: string) {
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
+  const t = await getTranslations("verify");
 
-  return loadMostRecentSession({
+  const session = await loadMostRecentSession({
     serviceConfig,
     sessionParams: {
       loginName,
       organization,
     },
-  }).then(async (session) => {
-    if (session?.factors?.user?.id) {
-      // Enrollment must be authorized: a bare identify-only session must not be able to
-      // activate a TOTP factor on the account (GHSA-45f2-5q3r-xgg6).
-      const enrollmentError = await getSetupAuthorizationError({
-        serviceConfig,
-        session,
-        userId: session.factors.user.id,
-        method: "totp",
-      });
-      if (enrollmentError) {
-        return { error: enrollmentError };
-      }
-
-      return verifyTOTPRegistration({ serviceConfig, code, userId: session.factors.user.id });
-    } else {
-      throw Error("No user id found in session.");
-    }
   });
+
+  const userId = session?.factors?.user?.id;
+  if (!session || !userId) {
+    return { error: t("errors.couldNotVerify") };
+  }
+
+  // Enrollment must be authorized: a bare identify-only session must not be able to
+  // activate a TOTP factor on the account (GHSA-45f2-5q3r-xgg6).
+  const enrollmentError = await getSetupAuthorizationError({
+    serviceConfig,
+    session,
+    userId,
+    method: "totp",
+  });
+  if (enrollmentError) {
+    return { error: enrollmentError };
+  }
+
+  try {
+    return await verifyTOTPRegistration({ serviceConfig, code, userId });
+  } catch (error) {
+    // A wrong code (InvalidArgument) is the routine failure here: answer it instead of failing the
+    // action with a 500. Server faults keep throwing.
+    const wrongCode = isClassifiedError(error) && error.code === Code.InvalidArgument;
+    return answerRejection(error, t(wrongCode ? "errors.invalidCode" : "errors.couldNotVerify"));
+  }
 }
 
 type VerifyUserByEmailCommand = {
@@ -258,20 +269,17 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
   const urlTemplate = buildVerificationUrlTemplate(hostWithProtocol, basePath, command.isInvite, command.requestId);
 
-  return command.isInvite
-    ? createInviteCode({
-        serviceConfig,
-        userId: command.userId,
-        urlTemplate,
-      }).catch((error) => {
-        if (error.code === 9) {
-          return { error: t("errors.userAlreadyVerified") };
-        }
-        return { error: t("errors.couldNotResendInvite") };
-      })
-    : zitadelSendEmailCode({
-        serviceConfig,
-        userId: command.userId,
-        urlTemplate,
-      });
+  // FailedPrecondition: the user is already verified, so there is nothing to resend.
+  // Other rejections get a message too; server faults keep throwing.
+  const alreadyVerified = (error: unknown) => isClassifiedError(error) && error.code === Code.FailedPrecondition;
+
+  if (command.isInvite) {
+    return createInviteCode({ serviceConfig, userId: command.userId, urlTemplate }).catch((error: unknown) =>
+      answerRejection(error, t(alreadyVerified(error) ? "errors.userAlreadyVerified" : "errors.couldNotResendInvite")),
+    );
+  }
+
+  return zitadelSendEmailCode({ serviceConfig, userId: command.userId, urlTemplate }).catch((error: unknown) =>
+    answerRejection(error, t(alreadyVerified(error) ? "errors.userAlreadyVerified" : "errors.couldNotResendEmail")),
+  );
 }

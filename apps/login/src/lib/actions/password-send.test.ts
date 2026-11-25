@@ -1,4 +1,6 @@
 import { sendPassword } from "@/lib/actions/password";
+import { ClassifiedConnectError } from "@/lib/server/grpc/interceptors/error-classification";
+import { Code, ConnectError } from "@connectrpc/connect";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
@@ -10,8 +12,9 @@ vi.mock("next/headers", () => ({
   headers: vi.fn(),
 }));
 
-vi.mock("@zitadel/client", () => ({
+vi.mock("@zitadel/client", async () => ({
   create: vi.fn((schema, data) => data),
+  Code: (await vi.importActual<typeof import("@connectrpc/connect")>("@connectrpc/connect")).Code,
   ConnectError: class extends Error {
     code: number;
     constructor(msg: string, code: number) {
@@ -73,6 +76,8 @@ vi.mock("@/lib/server/metrics", () => ({
   recordAuthSuccess: vi.fn(),
 }));
 
+const apiError = (code: Code, message: string) => new ClassifiedConnectError(new ConnectError(message, code));
+
 describe("sendPassword", () => {
   let mockHeaders: any;
   let mockGetServiceConfig: any;
@@ -85,6 +90,7 @@ describe("sendPassword", () => {
   let mockCheckMFAFactors: any;
   let mockSetSessionAndUpdateCookie: any;
   let mockGetUserByID: any;
+  let mockGetLockoutSettings: any;
   let mockRecordAuthFailure: any;
 
   beforeEach(async () => {
@@ -93,7 +99,7 @@ describe("sendPassword", () => {
     const { headers } = await import("next/headers");
     const { getServiceConfig } = await import("@/lib/server/service-url");
     const { getSessionCookieByLoginName } = await import("@/lib/server/cookies");
-    const { getLoginSettings, listAuthenticationMethodTypes, searchUsers, getUserByID } =
+    const { getLoginSettings, getLockoutSettings, listAuthenticationMethodTypes, searchUsers, getUserByID } =
       await import("@/lib/server/zitadel");
     const { createSessionAndUpdateCookie, setSessionAndUpdateCookie } = await import("@/lib/server/session-cookie");
     const { completeFlowOrGetUrl } = await import("@/lib/actions/flow");
@@ -110,6 +116,7 @@ describe("sendPassword", () => {
     mockCheckMFAFactors = vi.mocked(checkMFAFactors);
     mockSetSessionAndUpdateCookie = vi.mocked(setSessionAndUpdateCookie);
     mockGetUserByID = vi.mocked(getUserByID);
+    mockGetLockoutSettings = vi.mocked(getLockoutSettings);
     mockRecordAuthFailure = vi.mocked((await import("@/lib/server/metrics")).recordAuthFailure);
 
     mockHeaders.mockResolvedValue({});
@@ -341,5 +348,103 @@ describe("sendPassword", () => {
       "orgA",
       undefined,
     );
+  });
+  test("omits the attempt limit when the lockout settings cannot be loaded after a wrong password", async () => {
+    mockNoSessionUserInOrgB({ allowLocalAuthentication: true }, { allowLocalAuthentication: true });
+    mockCreateSessionAndUpdateCookie.mockRejectedValue({ failedAttempts: 2 });
+    mockGetLockoutSettings.mockRejectedValue(apiError(Code.Internal, "Internal error"));
+
+    const result = await sendPassword({
+      loginName: "testuser",
+      checks: create(ChecksSchema, { password: { password: "wrong" } }),
+    });
+
+    expect(result).toEqual({ error: "errors.failedToAuthenticateNoLimit" });
+    expect(mockRecordAuthFailure).toHaveBeenCalledWith("password", "invalid_password", undefined);
+  });
+
+  describe("with an existing session", () => {
+    const sendWithSession = () =>
+      sendPassword({
+        loginName: "testuser",
+        checks: create(ChecksSchema, { password: { password: "password123" } }),
+      });
+
+    beforeEach(() => {
+      mockGetSessionCookieByLoginName.mockResolvedValue(existingCookie);
+      mockGetLoginSettings.mockResolvedValue({
+        passwordCheckLifetime: { seconds: BigInt(86400) },
+        allowLocalAuthentication: true,
+      });
+      mockSetSessionAndUpdateCookie.mockResolvedValue({
+        id: "session-id",
+        factors: {
+          user: { id: "user123", loginName: "testuser", organizationId: "orgB" },
+          password: { verifiedAt: { seconds: 100 } },
+        },
+      });
+      mockGetUserByID.mockResolvedValue({
+        user: { userId: "user123", type: { case: "human", value: {} }, state: UserState.ACTIVE },
+      });
+      mockListAuthenticationMethodTypes.mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.PASSWORD],
+      });
+      mockCheckMFAFactors.mockResolvedValue(null);
+      mockCompleteFlowOrGetUrl.mockResolvedValue({ redirect: "/next-page" });
+    });
+
+    test.each([
+      ["a terminated session", apiError(Code.FailedPrecondition, "Session terminated (COMMAND-Hewfq)")],
+      ["a session token that is no longer valid", apiError(Code.PermissionDenied, "Token invalid (COMMAND-sGr42)")],
+      ["an error of the login itself", new Error("Could not load login settings")],
+    ])("falls back to a new session after %s", async (_, error) => {
+      mockSetSessionAndUpdateCookie.mockRejectedValue(error);
+      mockSearchUsers.mockResolvedValue({
+        result: [{ userId: "user123", preferredLoginName: "testuser", type: { case: "human", value: {} } }],
+      });
+      mockCreateSessionAndUpdateCookie.mockResolvedValue({
+        session: { id: "new-session-id", factors: { user: { id: "user123", loginName: "testuser" } } },
+        sessionCookie: { id: "new-session-id", token: "token456" },
+      });
+
+      expect(await sendWithSession()).toEqual({ redirect: "/next-page" });
+      expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
+    });
+
+    test.each([
+      ["a server fault", apiError(Code.Internal, "Internal error")],
+      ["the API rejecting the login's own credentials", apiError(Code.Unauthenticated, "Token invalid")],
+    ])("rethrows %s while updating the session instead of starting over", async (_, error) => {
+      mockSetSessionAndUpdateCookie.mockRejectedValue(error);
+
+      await expect(sendWithSession()).rejects.toBe(error);
+      expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    test("answers a user that is gone after the password check with a message", async () => {
+      mockGetUserByID.mockRejectedValue(apiError(Code.NotFound, "User not found (QUERY-Dfbg2)"));
+
+      expect(await sendWithSession()).toEqual({ error: "errors.userNotFound" });
+      expect(mockRecordAuthFailure).toHaveBeenCalledWith("password", "user_not_found", undefined);
+    });
+
+    test("answers refused authentication methods with a message", async () => {
+      mockListAuthenticationMethodTypes.mockRejectedValue(apiError(Code.NotFound, "User not found (QUERY-Dfbg2)"));
+
+      expect(await sendWithSession()).toEqual({ error: "errors.couldNotLoadAuthMethods" });
+      expect(mockRecordAuthFailure).toHaveBeenCalledWith("password", "auth_methods_unavailable", undefined);
+      expect(mockCompleteFlowOrGetUrl).not.toHaveBeenCalled();
+    });
+
+    test.each([
+      ["a server fault", apiError(Code.Internal, "Internal error")],
+      ["the API rejecting the login's own credentials", apiError(Code.Unauthenticated, "Token invalid")],
+    ])("rethrows %s loading the user or the authentication methods", async (_, error) => {
+      mockGetUserByID.mockRejectedValueOnce(error);
+      await expect(sendWithSession()).rejects.toBe(error);
+
+      mockListAuthenticationMethodTypes.mockRejectedValueOnce(error);
+      await expect(sendWithSession()).rejects.toBe(error);
+    });
   });
 });

@@ -208,7 +208,10 @@
       "userCreationFailed": "Échec de la création du compte utilisateur",
       "orgResolutionFailed": "Impossible de déterminer l'organisation pour l'inscription",
       "sessionCreationFailed": "Impossible de créer la session ou de déterminer la redirection",
-      "unknownError": "Une erreur inconnue s'est produite"
+      "unknownError": "Une erreur inconnue s'est produite",
+      "couldNotStartIDPFlow": "Impossible de démarrer le flux IDP",
+      "userNotFound": "Utilisateur non trouvé dans le système",
+      "couldNotCreateSession": "Impossible de créer la session"
     }
   },
   "ldap": {
@@ -222,6 +225,9 @@
     "required": {
       "username": "Ce champ est requis",
       "password": "Ce champ est requis"
+    },
+    "errors": {
+      "couldNotVerify": "Connexion impossible. Veuillez vérifier votre nom d'utilisateur et votre mot de passe."
     }
   },
   "mfa": {
@@ -312,7 +318,15 @@
         "link": "Authentification par clé d'accès"
       },
       "skip": "Ignorer",
-      "submit": "Continuer"
+      "submit": "Continuer",
+      "errors": {
+        "missingContext": "Informations de session ou d'utilisateur manquantes. Relancez la configuration depuis le lien reçu.",
+        "couldNotLoadSession": "Impossible de charger la session",
+        "couldNotRegisterPasskey": "Impossible de configurer la clé d'accès. Veuillez réessayer.",
+        "couldNotVerifyPasskey": "Impossible de vérifier la clé d'accès. Veuillez réessayer.",
+        "userNotFound": "Utilisateur non trouvé dans le système",
+        "couldNotCreateSession": "Impossible de créer la session"
+      }
     }
   },
   "u2f": {
@@ -324,6 +338,11 @@
       "title": "Configurer la double authentification",
       "description": "Configurez un appareil comme second facteur.",
       "submit": "Continuer"
+    },
+    "errors": {
+      "couldNotLoadSession": "Impossible de charger la session",
+      "couldNotRegister": "Impossible de configurer la clé de sécurité. Veuillez réessayer.",
+      "couldNotVerify": "Impossible de vérifier la clé de sécurité. Veuillez réessayer."
     }
   },
   "register": {
@@ -379,7 +398,8 @@
       "sessionMismatch": "L'inscription a été commencée dans un autre navigateur. Veuillez vous reconnecter avec votre fournisseur d'identité.",
       "registerNotAllowed": "L'inscription n'est pas autorisée ! Contactez votre administrateur pour plus d'informations.",
       "localAuthenticationNotAllowed": "L'authentification locale n'est pas autorisée ! Contactez votre administrateur pour plus d'informations.",
-      "couldNotGetLoginSettings": "Impossible d'obtenir les paramètres de connexion"
+      "couldNotGetLoginSettings": "Impossible d'obtenir les paramètres de connexion",
+      "userAlreadyExists": "Un utilisateur avec cette adresse e-mail existe déjà. Essayez plutôt de vous connecter."
     }
   },
   "invite": {
@@ -500,6 +520,7 @@
     "couldNotContinueSession": "Impossible de continuer la session - informations utilisateur manquantes",
     "couldNotClearSession": "La session n'a pas pu être terminée. Veuillez réessayer.",
     "secondFactorRequired": "Vérifiez d'abord votre second facteur pour configurer une nouvelle méthode d'authentification.",
-    "authenticatorNotAllowed": "Cette méthode d'authentification n'est pas autorisée pour votre organisation."
+    "authenticatorNotAllowed": "Cette méthode d'authentification n'est pas autorisée pour votre organisation.",
+    "couldNotCompleteDeviceAuthorization": "Impossible de terminer l'autorisation de l'appareil. Le code a peut-être déjà été utilisé ou a expiré."
   }
 }

@@ -1,5 +1,6 @@
 "use server";
 
+import { isRejectedByUser } from "@/lib/server/api-error";
 import { getSessionCookieById } from "@/lib/server/cookies";
 import { getEnrollmentAuthorizationError } from "@/lib/server/enrollment-guard";
 import { getBindingIdCookie } from "@/lib/server/fingerprint";
@@ -219,6 +220,23 @@ async function resolveOrganizationForUser({
   return defaultOrg?.id;
 }
 
+/**
+ * The `error` of a failure page URL. Only a rejection caused by the user may name itself there:
+ * other errors can carry internal details, such as hosts, into a URL the user sees.
+ */
+function failureReason(error: unknown, t: (key: string) => string): string {
+  return isRejectedByUser(error) ? error.rawMessage : t("errors.unknownError");
+}
+
+/** Logs a failed step, at warn level when the user's input or state caused it. */
+function logFailure(message: string, error: unknown) {
+  if (isRejectedByUser(error)) {
+    logger.warn(message, { error });
+  } else {
+    logger.error(message, { error });
+  }
+}
+
 type IDPConfig = Awaited<ReturnType<typeof getIDPByID>>;
 
 interface IDPHandlerContext {
@@ -398,12 +416,10 @@ async function handleExplicitLinking(ctx: IDPHandlerContext): Promise<IDPHandler
 
       return { error: t("errors.sessionCreationFailed") };
     } catch (error) {
-      logger.error("Error linking IDP", { error });
-      const errorMessage = error instanceof Error ? error.message : t("errors.unknownError");
-      let params = buildRedirectParams({ error: errorMessage });
-      if (isClassifiedError(error) && error.code === Code.AlreadyExists) {
-        params = buildRedirectParams({ error: "external_idp_taken" });
-      }
+      logFailure("Error linking IDP", error);
+      const reason =
+        isClassifiedError(error) && error.code === Code.AlreadyExists ? "external_idp_taken" : failureReason(error, t);
+      const params = buildRedirectParams({ error: reason });
       return { redirect: `/idp/${provider}/linking-failed?${params}` };
     }
   }
@@ -578,9 +594,8 @@ async function handleAutoLinking(ctx: IDPHandlerContext): Promise<IDPHandlerResu
 
         return { error: t("errors.sessionCreationFailed") };
       } catch (error) {
-        logger.error("Error auto-linking user", { error });
-        const errorMessage = error instanceof Error ? error.message : t("errors.unknownError");
-        const params = buildRedirectParams({ error: errorMessage });
+        logFailure("Error auto-linking user", error);
+        const params = buildRedirectParams({ error: failureReason(error, t) });
         return { redirect: `/idp/${provider}/linking-failed?${params}` };
       }
     }
@@ -886,9 +901,9 @@ export async function processIDPCallback({
     // Should theoretically be unreachable if handleNoUserFound covers the rest
     return { error: t("errors.unknownError") };
   } catch (error: unknown) {
-    logger.error("Error processing intent", { error });
+    logFailure("Error processing intent", error);
 
-    errorParams.set("error", error instanceof Error ? error.message : t("errors.unknownError"));
+    errorParams.set("error", failureReason(error, t));
 
     return { redirect: `/idp/${provider}/failure?${errorParams.toString()}` };
   }

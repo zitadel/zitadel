@@ -208,7 +208,10 @@
       "userCreationFailed": "Falha ao criar conta de usuário",
       "orgResolutionFailed": "Não foi possível determinar a organização para o cadastro",
       "sessionCreationFailed": "Não foi possível criar sessão ou determinar redirecionamento",
-      "unknownError": "Ocorreu um erro desconhecido"
+      "unknownError": "Ocorreu um erro desconhecido",
+      "couldNotStartIDPFlow": "Não foi possível iniciar o fluxo do provedor de identidade",
+      "userNotFound": "Usuário não encontrado no sistema",
+      "couldNotCreateSession": "Não foi possível criar a sessão"
     }
   },
   "ldap": {
@@ -222,6 +225,9 @@
     "required": {
       "username": "Este campo é obrigatório",
       "password": "Este campo é obrigatório"
+    },
+    "errors": {
+      "couldNotVerify": "Não foi possível entrar. Verifique seu nome de usuário e senha."
     }
   },
   "mfa": {
@@ -312,7 +318,15 @@
         "link": "Autenticação por Chave de Acesso"
       },
       "skip": "Pular",
-      "submit": "Continuar"
+      "submit": "Continuar",
+      "errors": {
+        "missingContext": "Informações de sessão ou de usuário ausentes. Reinicie a configuração a partir do link recebido.",
+        "couldNotLoadSession": "Não foi possível carregar a sessão",
+        "couldNotRegisterPasskey": "Não foi possível configurar a chave de acesso. Tente novamente.",
+        "couldNotVerifyPasskey": "Não foi possível verificar a chave de acesso. Tente novamente.",
+        "userNotFound": "Usuário não encontrado no sistema",
+        "couldNotCreateSession": "Não foi possível criar a sessão"
+      }
     }
   },
   "u2f": {
@@ -324,6 +338,11 @@
       "title": "Configurar 2º Fator",
       "description": "Configure um dispositivo como segundo fator.",
       "submit": "Continuar"
+    },
+    "errors": {
+      "couldNotLoadSession": "Não foi possível carregar a sessão",
+      "couldNotRegister": "Não foi possível configurar a chave de segurança. Tente novamente.",
+      "couldNotVerify": "Não foi possível verificar a chave de segurança. Tente novamente."
     }
   },
   "register": {
@@ -379,7 +398,8 @@
       "sessionMismatch": "O cadastro foi iniciado em outro navegador. Entre novamente com seu provedor de identidade.",
       "registerNotAllowed": "O registro não é permitido! Contate seu administrador para mais informações.",
       "localAuthenticationNotAllowed": "A autenticação local não é permitida! Entre em contato com o administrador para mais informações.",
-      "couldNotGetLoginSettings": "Não foi possível obter as configurações de login"
+      "couldNotGetLoginSettings": "Não foi possível obter as configurações de login",
+      "userAlreadyExists": "Já existe um usuário com este endereço de e-mail. Tente fazer login."
     }
   },
   "invite": {
@@ -500,6 +520,7 @@
     "couldNotContinueSession": "Não foi possível continuar a sessão — informações do usuário ausentes",
     "couldNotClearSession": "Não foi possível terminar a sessão. Tente novamente.",
     "secondFactorRequired": "Verifique primeiro o seu segundo fator para configurar um novo método de autenticação.",
-    "authenticatorNotAllowed": "Este método de autenticação não é permitido para a sua organização."
+    "authenticatorNotAllowed": "Este método de autenticação não é permitido para a sua organização.",
+    "couldNotCompleteDeviceAuthorization": "Não foi possível concluir a autorização do dispositivo. O código pode já ter sido usado ou expirado."
   }
 }

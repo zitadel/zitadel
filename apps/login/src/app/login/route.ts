@@ -1,3 +1,4 @@
+import { isRejectedByUser } from "@/lib/server/api-error";
 import { isRSCRequest, validateAuthRequest } from "@/lib/server/auth-utils";
 import { getAllSessions } from "@/lib/server/cookies";
 import { FlowInitiationParams, handleOIDCFlowInitiation, handleSAMLFlowInitiation } from "@/lib/server/flow-initiation";
@@ -66,6 +67,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Invalid request ID format" }, { status: 400 });
     }
   } catch (error: unknown) {
+    // The API rejecting the request (auth request already handled, user grant required, ...) is
+    // caused by the request, not a server fault, so answer with its status instead of a 500.
+    if (isRejectedByUser(error)) {
+      logger.warn("Flow initiation rejected", { requestId, grpcCode: error.code, httpStatus: error.httpStatus });
+      return NextResponse.json({ error: error.rawMessage }, { status: error.httpStatus });
+    }
+
     logger.error("Flow initiation failed", { requestId, error });
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

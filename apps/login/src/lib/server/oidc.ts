@@ -1,6 +1,7 @@
 import "server-only";
 
 import { isSafeRedirectUri } from "@/lib/client-utils";
+import { fallbackOnRejection } from "@/lib/server/api-error";
 import { Cookie } from "@/lib/server/cookies";
 import { isClassifiedError } from "@/lib/server/grpc/interceptors/error-classification";
 import { reauthenticate } from "@/lib/server/reauthenticate";
@@ -29,14 +30,19 @@ export async function loginWithOIDCAndSession({
   const selectedSession = sessions.find((s) => s.id === sessionId);
 
   if (selectedSession && selectedSession.id) {
-    const isValid = await isSessionValid({ serviceConfig, session: selectedSession });
+    const isValid = await isSessionValid({ serviceConfig, session: selectedSession }).catch(
+      fallbackOnRejection(false, "the session validation"),
+    );
 
     console.log("Session is valid:", isValid);
 
     if (!isValid) {
       // An invalid session (e.g. no verified factor, MFA missing or expired) must never be
       // linked to the auth request. Send the user to re-authenticate, or fail closed.
-      return (await reauthenticate(selectedSession, `oidc_${authRequest}`)) ?? { error: "Session not found or invalid" };
+      const next = await reauthenticate(selectedSession, `oidc_${authRequest}`).catch(
+        fallbackOnRejection(undefined, "the re-authentication"),
+      );
+      return next ?? { error: "Session not found or invalid" };
     }
 
     const cookie = sessionCookies.find((cookie) => cookie.id === selectedSession?.id);
@@ -74,7 +80,7 @@ export async function loginWithOIDCAndSession({
           const loginSettings = await getLoginSettings({
             serviceConfig,
             organization: selectedSession.factors?.user?.organizationId,
-          });
+          }).catch(fallbackOnRejection(undefined, "loading the login settings"));
 
           if (loginSettings?.defaultRedirectUri && isSafeRedirectUri(loginSettings.defaultRedirectUri)) {
             return { redirect: loginSettings.defaultRedirectUri };

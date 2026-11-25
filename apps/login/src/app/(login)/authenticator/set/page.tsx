@@ -44,8 +44,9 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   async function getAuthMethodsAndUser(session?: Session) {
     const userId = session?.factors?.user?.id;
 
+    // the session is gone (logged out, expired or removed): the page renders its fallback alert
     if (!userId) {
-      throw Error("Could not get user id from session");
+      return undefined;
     }
 
     const methods = await listAuthenticationMethodTypes({ serviceConfig, userId });

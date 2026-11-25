@@ -1,5 +1,7 @@
 import { processIDPCallback } from "@/lib/actions/idp-intent";
+import { ClassifiedConnectError } from "@/lib/server/grpc/interceptors/error-classification";
 import { createIdpFlowProof } from "@/lib/server/idp-flow-proof";
+import { Code as ConnectCode, ConnectError as RealConnectError } from "@connectrpc/connect";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import crypto from "crypto";
@@ -68,6 +70,9 @@ vi.mock("next-intl/server", () => ({
 vi.mock("@/lib/server/fingerprint", () => ({
   getBindingIdCookie: vi.fn(),
 }));
+
+// @zitadel/client is mocked above, so API errors are built from @connectrpc/connect directly
+const apiError = (code: ConnectCode, message: string) => new ClassifiedConnectError(new RealConnectError(message, code));
 
 describe("processIDPCallback", () => {
   // Mock modules
@@ -372,14 +377,28 @@ describe("processIDPCallback", () => {
       expect(result.error).toBe("errors.idpNotFound");
     });
 
-    test("should handle retrieval errors gracefully", async () => {
-      mockRetrieveIDPIntent.mockRejectedValue(new Error("Network error"));
+    test.each([
+      ["an error that did not come from the API", new Error("connect ECONNREFUSED 10.0.0.7:8080")],
+      ["a server fault", apiError(ConnectCode.Internal, "connect ECONNREFUSED 10.0.0.7:8080")],
+      ["the API rejecting the login's own credentials", apiError(ConnectCode.Unauthenticated, "Token invalid")],
+    ])("should keep the text of %s out of the failure URL", async (_, error) => {
+      mockRetrieveIDPIntent.mockRejectedValue(error);
 
       const result = await processIDPCallback(defaultParams);
 
+      const params = new URLSearchParams(result.redirect!.split("?")[1]);
       expect(result.redirect).toContain("/idp/google/failure");
-      expect(result.redirect).toContain("error=Network+error");
-      expect(result.redirect).toContain("requestId=req123");
+      expect(params.get("error")).toBe("errors.unknownError");
+      expect(params.get("requestId")).toBe("req123");
+    });
+
+    test("should name a rejection caused by the user in the failure URL", async () => {
+      mockRetrieveIDPIntent.mockRejectedValue(apiError(ConnectCode.FailedPrecondition, "Intent has expired (IDP-SAf42)"));
+
+      const result = await processIDPCallback(defaultParams);
+
+      const params = new URLSearchParams(result.redirect!.split("?")[1]);
+      expect(params.get("error")).toBe("Intent has expired (IDP-SAf42)");
     });
   });
 
@@ -858,6 +877,20 @@ describe("processIDPCallback", () => {
       const result = await processIDPCallback(linkParams);
 
       expect(result.redirect).toContain("/idp/google/linking-failed");
+      expect(new URLSearchParams(result.redirect!.split("?")[1]).get("error")).toBe("errors.unknownError");
+    });
+
+    test("should say the external identity is taken when it is linked to another user", async () => {
+      mockGetIDPByID.mockResolvedValue({
+        ...defaultIdp,
+        config: { options: { ...defaultIdp.config.options, isLinkingAllowed: true } },
+      });
+      mockAddIDPLink.mockRejectedValue(apiError(ConnectCode.AlreadyExists, "Errors.User.ExternalIDP.AlreadyExists"));
+
+      const result = await processIDPCallback(linkParams);
+
+      expect(result.redirect).toContain("/idp/google/linking-failed");
+      expect(new URLSearchParams(result.redirect!.split("?")[1]).get("error")).toBe("external_idp_taken");
     });
 
     test("should return error when session creation fails after linking", async () => {
@@ -957,6 +990,19 @@ describe("processIDPCallback", () => {
       const result = await processIDPCallback(defaultParams);
 
       expect(result.redirect).toContain("/idp/google/linking-failed");
+    });
+
+    test("should keep the text of a server fault out of the linking-failed URL", async () => {
+      mockListUsers.mockResolvedValue({
+        result: [{ userId: "found123", details: { resourceOwner: "org123" } }],
+      });
+      mockAddIDPLink.mockRejectedValue(apiError(ConnectCode.Internal, "connect ECONNREFUSED 10.0.0.7:8080"));
+
+      const result = await processIDPCallback(defaultParams);
+
+      expect(mockAddIDPLink).toHaveBeenCalled();
+      expect(result.redirect).toContain("/idp/google/linking-failed");
+      expect(new URLSearchParams(result.redirect!.split("?")[1]).get("error")).toBe("errors.unknownError");
     });
   });
 

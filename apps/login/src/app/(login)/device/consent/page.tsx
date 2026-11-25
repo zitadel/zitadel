@@ -2,6 +2,7 @@ import { ConsentScreen } from "@/components/consent";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
+import { fallbackOnRejection } from "@/lib/server/api-error";
 import { checkDeviceCodeCheckCookie } from "@/lib/server/device-code-check";
 import { getServiceConfig } from "@/lib/server/service-url";
 import { loadMostRecentSession, loadSessionById } from "@/lib/server/session";
@@ -36,7 +37,11 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
 
-  const { deviceAuthorizationRequest } = await getDeviceAuthorizationRequest({ serviceConfig, userCode });
+  // an unknown or expired user code from the URL renders the fallback below instead of a 500
+  const deviceAuthorizationRequest = await getDeviceAuthorizationRequest({ serviceConfig, userCode }).then(
+    (response) => response.deviceAuthorizationRequest,
+    fallbackOnRejection(undefined, "the user code"),
+  );
 
   if (!deviceAuthorizationRequest) {
     return (

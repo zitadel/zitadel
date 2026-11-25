@@ -1,6 +1,7 @@
 "use server";
 
 import { completeFlowOrGetUrl } from "@/lib/actions/flow";
+import { answerRejection, isRejectedByUser } from "@/lib/server/api-error";
 import { getBindingIdCookie } from "@/lib/server/fingerprint";
 import { isIdpFlowProofValid } from "@/lib/server/idp-flow-proof";
 import { createLogger } from "@/lib/server/logger";
@@ -53,6 +54,12 @@ async function createSessionWithRetry(command: { checks: Checks; requestId: stri
   throw lastError;
 }
 
+/** Answers a rejected addHumanUser call: the user name is the email address, so AlreadyExists means it is taken. */
+function answerAddHumanUserRejection(error: unknown, t: (key: string) => string) {
+  const taken = isRejectedByUser(error) && error.code === Code.AlreadyExists;
+  return answerRejection(error, taken ? t("errors.userAlreadyExists") : t("errors.couldNotCreateUser"));
+}
+
 type RegisterUserCommand = {
   email: string;
   firstName: string;
@@ -88,20 +95,18 @@ export async function registerUser(
     return { error: t("errors.localAuthenticationNotAllowed") };
   }
 
-  const addResponse = await addHumanUser({
-    serviceConfig,
-    email: command.email,
-    firstName: command.firstName,
-    lastName: command.lastName,
-    password: command.password ? command.password : undefined,
-    organization: command.organization,
-  }).catch((error) => {
-    logger.error("Failed to create user", { error });
-    return null;
-  });
-
-  if (!addResponse) {
-    return { error: t("errors.couldNotCreateUser") };
+  let addResponse;
+  try {
+    addResponse = await addHumanUser({
+      serviceConfig,
+      email: command.email,
+      firstName: command.firstName,
+      lastName: command.lastName,
+      password: command.password ? command.password : undefined,
+      organization: command.organization,
+    });
+  } catch (error) {
+    return answerAddHumanUserRejection(error, t);
   }
 
   let checkPayload: any = {
@@ -117,14 +122,16 @@ export async function registerUser(
 
   const checks = create(ChecksSchema, checkPayload);
 
-  const result = await createSessionWithRetry({
-    checks,
-    requestId: command.requestId,
-    lifetime: command.password ? loginSettings?.passwordCheckLifetime : undefined,
-  }).catch((error) => {
-    logger.error("Failed to create session after user creation", { error });
-    return null;
-  });
+  let result;
+  try {
+    result = await createSessionWithRetry({
+      checks,
+      requestId: command.requestId,
+      lifetime: command.password ? loginSettings?.passwordCheckLifetime : undefined,
+    });
+  } catch (error) {
+    return answerRejection(error, t("errors.couldNotCreateSession"), { context: { userId: addResponse.userId } });
+  }
 
   const session = result?.session;
 
@@ -148,10 +155,12 @@ export async function registerUser(
 
     return { redirect: "/passkey/set?" + params };
   } else {
-    const userResponse = await getUserByID({ serviceConfig, userId: session?.factors?.user?.id }).catch((error) => {
-      logger.error("Failed to get user after session creation", { error });
-      return null;
-    });
+    let userResponse;
+    try {
+      userResponse = await getUserByID({ serviceConfig, userId: session.factors.user.id });
+    } catch (error) {
+      return answerRejection(error, t("errors.userNotFound"));
+    }
 
     if (!userResponse?.user) {
       return { error: t("errors.userNotFound") };
@@ -248,34 +257,51 @@ export async function registerUserAndLinkToIDP(
     return { error: t("errors.couldNotLinkIDP") };
   }
 
-  const addUserResponse = await addHumanUser({
-    serviceConfig,
-    email: command.email,
-    firstName: command.firstName,
-    lastName: command.lastName,
-    organization: command.organization,
-  });
+  let addUserResponse;
+  try {
+    addUserResponse = await addHumanUser({
+      serviceConfig,
+      email: command.email,
+      firstName: command.firstName,
+      lastName: command.lastName,
+      organization: command.organization,
+    });
+  } catch (error) {
+    return answerAddHumanUserRejection(error, t);
+  }
 
-  const idpLink = await addIDPLink({
-    serviceConfig,
-    idp: {
-      id: idpInformation.idpId,
-      userId: idpInformation.userId,
-      userName: idpInformation.userName || command.idpUserName,
-    },
-    userId: addUserResponse.userId,
-  });
+  let idpLink;
+  try {
+    idpLink = await addIDPLink({
+      serviceConfig,
+      idp: {
+        id: idpInformation.idpId,
+        userId: idpInformation.userId,
+        userName: idpInformation.userName || command.idpUserName,
+      },
+      userId: addUserResponse.userId,
+    });
+  } catch (error) {
+    // e.g. the external identity is already linked to another user
+    return answerRejection(error, t("errors.couldNotLinkIDP"), { context: { userId: addUserResponse.userId } });
+  }
 
   if (!idpLink) {
     return { error: t("errors.couldNotLinkIDP") };
   }
 
-  const session = await createSessionForIdpAndUpdateCookie({
-    requestId: command.requestId,
-    userId: addUserResponse.userId, // the user we just created
-    idpIntent: command.idpIntent,
-    lifetime: loginSettings?.externalLoginCheckLifetime,
-  });
+  let session;
+  try {
+    session = await createSessionForIdpAndUpdateCookie({
+      requestId: command.requestId,
+      userId: addUserResponse.userId, // the user we just created
+      idpIntent: command.idpIntent,
+      lifetime: loginSettings?.externalLoginCheckLifetime,
+    });
+  } catch (error) {
+    // e.g. the intent expired or was already used
+    return answerRejection(error, t("errors.couldNotCreateSession"), { context: { userId: addUserResponse.userId } });
+  }
 
   if (!session || !session.factors?.user) {
     return { error: t("errors.couldNotCreateSession") };
@@ -302,7 +328,12 @@ export async function registerUserAndLinkToIDP(
   // check if user has MFA methods
   let authMethods;
   if (session.factors?.user?.id) {
-    const response = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id });
+    let response;
+    try {
+      response = await listAuthenticationMethodTypes({ serviceConfig, userId: session.factors.user.id });
+    } catch (error) {
+      return answerRejection(error, t("errors.couldNotRegisterUser"));
+    }
     if (response.authMethodTypes && response.authMethodTypes.length) {
       authMethods = response.authMethodTypes;
     }

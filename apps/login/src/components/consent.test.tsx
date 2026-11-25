@@ -70,4 +70,19 @@ describe("ConsentScreen", () => {
     await waitFor(() => expect(push).toHaveBeenCalledWith("/device"));
     expect(approveDeviceAuthorization).not.toHaveBeenCalled();
   });
+
+  test.each([
+    ["approving", "submit-button"],
+    ["denying", "deny-button"],
+  ])("shows the error of %s instead of navigating", async (_, button) => {
+    approveDeviceAuthorization.mockResolvedValue({ error: "Could not complete the device authorization." });
+    denyDeviceAuthorization.mockResolvedValue({ error: "Could not complete the device authorization." });
+
+    const { getByTestId, findByText } = render(<ConsentScreen userCode="ABCD-1234" sessionId="session-1" />);
+
+    fireEvent.click(getByTestId(button));
+
+    expect(await findByText("Could not complete the device authorization.")).toBeInTheDocument();
+    expect(push).not.toHaveBeenCalled();
+  });
 });

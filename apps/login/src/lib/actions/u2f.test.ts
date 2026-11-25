@@ -1,4 +1,6 @@
 import { addU2F, verifyU2F } from "@/lib/actions/u2f";
+import { ClassifiedConnectError } from "@/lib/server/grpc/interceptors/error-classification";
+import { Code, ConnectError } from "@connectrpc/connect";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 vi.mock("@zitadel/client", () => ({
@@ -26,6 +28,10 @@ vi.mock("@/lib/server/cookies", () => ({
 
 vi.mock("@/lib/server/enrollment-guard", () => ({
   getSetupAuthorizationError: vi.fn(),
+}));
+
+vi.mock("next-intl/server", () => ({
+  getTranslations: vi.fn(async () => (key: string) => key),
 }));
 
 vi.mock("next/headers", () => ({
@@ -91,7 +97,7 @@ describe("addU2F", () => {
 
     const result = await addU2F({ sessionId: "missing" });
 
-    expect(result).toEqual({ error: "Could not get session" });
+    expect(result).toEqual({ error: "errors.couldNotLoadSession" });
     expect(getSetupAuthorizationError).not.toHaveBeenCalled();
     expect(registerU2F).not.toHaveBeenCalled();
   });
@@ -141,5 +147,56 @@ describe("verifyU2F", () => {
 
     expect(verifyU2FRegistration).toHaveBeenCalledTimes(1);
     expect(result).toEqual({ done: true });
+  });
+});
+
+describe("U2F calls ZITADEL rejects", () => {
+  const apiError = (code: Code) => new ClassifiedConnectError(new ConnectError("rejected", code));
+  let zitadel: any;
+  let getSetupAuthorizationError: any;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.mocked((await import("@/lib/server/cookies")).getSessionCookieById).mockResolvedValue({
+      id: "session-1",
+      token: "token-1",
+    } as any);
+    zitadel = vi.mocked(await import("@/lib/server/zitadel"));
+    getSetupAuthorizationError = vi.mocked((await import("@/lib/server/enrollment-guard")).getSetupAuthorizationError);
+    zitadel.getSession.mockResolvedValue(userOnlySession);
+    getSetupAuthorizationError.mockResolvedValue(undefined);
+  });
+
+  test.each([Code.NotFound, Code.PermissionDenied])(
+    "answers a session the server no longer has (code %s) with a message",
+    async (code) => {
+      zitadel.getSession.mockRejectedValue(apiError(code));
+
+      expect(await addU2F({ sessionId: "session-1" })).toEqual({ error: "errors.couldNotLoadSession" });
+      expect(await verifyU2F({ u2fId: "u2f-1", publicKeyCredential: {}, sessionId: "session-1" })).toEqual({
+        error: "errors.couldNotLoadSession",
+      });
+    },
+  );
+
+  test("answers a rejected registration with a message", async () => {
+    zitadel.registerU2F.mockRejectedValue(apiError(Code.FailedPrecondition));
+
+    expect(await addU2F({ sessionId: "session-1" })).toEqual({ error: "errors.couldNotRegister" });
+  });
+
+  test("answers a rejected attestation with a message", async () => {
+    zitadel.verifyU2FRegistration.mockRejectedValue(apiError(Code.InvalidArgument));
+
+    expect(await verifyU2F({ u2fId: "u2f-1", publicKeyCredential: {}, sessionId: "session-1" })).toEqual({
+      error: "errors.couldNotVerify",
+    });
+  });
+
+  test.each([Code.Internal, Code.Unauthenticated])("rethrows code %s", async (code) => {
+    const error = apiError(code);
+    zitadel.verifyU2FRegistration.mockRejectedValue(error);
+
+    await expect(verifyU2F({ u2fId: "u2f-1", publicKeyCredential: {}, sessionId: "session-1" })).rejects.toBe(error);
   });
 });

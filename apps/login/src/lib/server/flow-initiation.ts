@@ -3,6 +3,7 @@ import "server-only";
 import { addIdpFlowProof } from "@/lib/server/fingerprint";
 
 import { isExternalUrl, isSafeRedirectUri } from "@/lib/client-utils";
+import { isRejectedByUser } from "@/lib/server/api-error";
 import { getValidLocaleFromUILocales } from "@/lib/server/auth-utils";
 import { getLanguageCookie, setLanguageCookie, type Cookie } from "@/lib/server/cookies";
 
@@ -453,16 +454,34 @@ export async function handleOIDCFlowInitiation(params: FlowInitiationParams): Pr
         sessionToken: cookie.token,
       };
 
-      const { callbackUrl } = await createCallback({
-        serviceConfig,
-        req: create(CreateCallbackRequestSchema, {
-          authRequestId: requestId.replace("oidc_", ""),
-          callbackKind: {
-            case: "session",
-            value: create(SessionSchema, session),
-          },
-        }),
-      });
+      let callbackUrl: string;
+      try {
+        ({ callbackUrl } = await createCallback({
+          serviceConfig,
+          req: create(CreateCallbackRequestSchema, {
+            authRequestId: requestId.replace("oidc_", ""),
+            callbackKind: {
+              case: "session",
+              value: create(SessionSchema, session),
+            },
+          }),
+        }));
+      } catch (error) {
+        // The API rejecting the request (already handled, user grant required, ...) is caused by
+        // the request, not a server fault: answer with its status, with the same CSP as the others.
+        if (!isRejectedByUser(error)) {
+          throw error;
+        }
+
+        logger.warn("Could not create callback (prompt=none)", {
+          requestId,
+          grpcCode: error.code,
+          httpStatus: error.httpStatus,
+        });
+        const rejectedResponse = NextResponse.json({ error: error.rawMessage }, { status: error.httpStatus });
+        setCSPHeaders(rejectedResponse, serviceConfig, securitySettings);
+        return rejectedResponse;
+      }
 
       if (!isSafeRedirectUri(callbackUrl)) {
         logger.warn("Blocked unsafe OIDC callback URL (prompt=none)", { callbackUrl });

@@ -1,5 +1,6 @@
 "use server";
 
+import { answerRejection } from "@/lib/server/api-error";
 import { getSessionCookieById } from "@/lib/server/cookies";
 import { getSetupAuthorizationError } from "@/lib/server/enrollment-guard";
 import { getPublicHost } from "@/lib/server/host";
@@ -7,6 +8,7 @@ import { getServiceConfig } from "@/lib/server/service-url";
 import { getSession, registerU2F, verifyU2FRegistration } from "@/lib/server/zitadel";
 import { create } from "@zitadel/client";
 import { VerifyU2FRegistrationRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
 
@@ -22,6 +24,7 @@ type VerifyU2FCommand = {
 };
 
 export async function addU2F(command: RegisterU2FCommand) {
+  const t = await getTranslations("u2f");
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
   const host = getPublicHost(_headers);
@@ -31,10 +34,16 @@ export async function addU2F(command: RegisterU2FCommand) {
   });
 
   if (!sessionCookie) {
-    return { error: "Could not get session" };
+    return { error: t("errors.couldNotLoadSession") };
   }
 
-  const session = await getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token });
+  let session;
+  try {
+    session = await getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token });
+  } catch (error) {
+    // the cookie can outlive the session on the server
+    return answerRejection(error, t("errors.couldNotLoadSession"), { sessionToken: true });
+  }
 
   const [hostname] = host.split(":");
 
@@ -45,7 +54,7 @@ export async function addU2F(command: RegisterU2FCommand) {
   const userId = session?.session?.factors?.user?.id;
 
   if (!session || !userId) {
-    return { error: "Could not get session" };
+    return { error: t("errors.couldNotLoadSession") };
   }
 
   // Enrollment must be authorized: a bare identify-only session (only the user factor set)
@@ -60,10 +69,13 @@ export async function addU2F(command: RegisterU2FCommand) {
     return { error: enrollmentError };
   }
 
-  return registerU2F({ serviceConfig, userId, domain: hostname });
+  return registerU2F({ serviceConfig, userId, domain: hostname }).catch((error) =>
+    answerRejection(error, t("errors.couldNotRegister")),
+  );
 }
 
 export async function verifyU2F(command: VerifyU2FCommand) {
+  const t = await getTranslations("u2f");
   const _headers = await headers();
   const { serviceConfig } = getServiceConfig(_headers);
   let passkeyName = command.passkeyName;
@@ -81,15 +93,20 @@ export async function verifyU2F(command: VerifyU2FCommand) {
   });
 
   if (!sessionCookie) {
-    return { error: "Could not get session cookie" };
+    return { error: t("errors.couldNotLoadSession") };
   }
 
-  const session = await getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token });
+  let session;
+  try {
+    session = await getSession({ serviceConfig, sessionId: sessionCookie.id, sessionToken: sessionCookie.token });
+  } catch (error) {
+    return answerRejection(error, t("errors.couldNotLoadSession"), { sessionToken: true });
+  }
 
   const userId = session?.session?.factors?.user?.id;
 
   if (!userId) {
-    return { error: "Could not get session" };
+    return { error: t("errors.couldNotLoadSession") };
   }
 
   // Enrollment must be authorized: only an authenticated session (or a valid onboarding
@@ -111,5 +128,8 @@ export async function verifyU2F(command: VerifyU2FCommand) {
     userId,
   });
 
-  return verifyU2FRegistration({ serviceConfig, request });
+  // a rejected attestation comes from the browser or security key, not from a fault on the server
+  return verifyU2FRegistration({ serviceConfig, request }).catch((error) =>
+    answerRejection(error, t("errors.couldNotVerify")),
+  );
 }

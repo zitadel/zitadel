@@ -10,9 +10,9 @@ vi.mock("next/headers", () => ({
   headers: vi.fn(),
 }));
 
-vi.mock("@zitadel/client", () => ({
+vi.mock("@zitadel/client", async () => ({
   create: vi.fn(),
-  Code: { FailedPrecondition: 9 },
+  Code: (await vi.importActual<typeof import("@connectrpc/connect")>("@connectrpc/connect")).Code,
   ConnectError: class extends Error {
     code: number;
     constructor(msg: string, code: number) {
@@ -65,6 +65,8 @@ vi.mock("@/lib/server/verify-helper", () => ({
 vi.mock("@/lib/actions/flow", () => ({
   completeFlowOrGetUrl: vi.fn(),
 }));
+
+const apiError = (code: Code, message: string) => new ClassifiedConnectError(new ConnectError(message, code));
 
 describe("checkSessionAndSetPassword", () => {
   let mockHeaders: any;
@@ -227,6 +229,20 @@ describe("checkSessionAndSetPassword", () => {
 
     expect(result).toEqual({ error: "errors.failedToAuthenticate" });
     expect(mockGetLockoutSettings).toHaveBeenCalled();
+    expect(mockSetPassword).not.toHaveBeenCalled();
+  });
+
+  test("should omit the attempt limit when the lockout settings cannot be loaded", async () => {
+    mockSetSessionAndUpdateCookie.mockRejectedValue({ failedAttempts: 3 });
+    mockGetLockoutSettings.mockRejectedValue(apiError(Code.Internal, "Internal error"));
+
+    const result = await checkSessionAndSetPassword({
+      sessionId: "session123",
+      currentPassword: "wrongpassword",
+      password: "newpassword",
+    });
+
+    expect(result).toEqual({ error: "errors.failedToAuthenticateNoLimit" });
     expect(mockSetPassword).not.toHaveBeenCalled();
   });
 
@@ -734,6 +750,49 @@ describe("resetPassword", () => {
     expect(result).toEqual({ error: "errors.couldNotSendResetLink" });
     expect(mockPasswordReset).not.toHaveBeenCalled();
   });
+
+  describe("when ZITADEL refuses the reset", () => {
+    beforeEach(() => {
+      mockSearchUsers.mockResolvedValue({
+        result: [{ userId: "user123", preferredLoginName: "user@example.com", type: { case: "human", value: {} } }],
+      });
+    });
+
+    test.each([
+      ["a user state that allows no reset", apiError(Code.FailedPrecondition, "User is not initialised (COMMAND-Sfe4g)")],
+      ["a rate limit", apiError(Code.ResourceExhausted, "Too many requests")],
+    ])("answers %s with a message instead of failing", async (_, error) => {
+      mockGetLoginSettings.mockResolvedValue({});
+      mockPasswordReset.mockRejectedValue(error);
+
+      expect(await resetPassword({ loginName: "user@example.com" })).toEqual({ error: "errors.couldNotSendResetLink" });
+    });
+
+    test("answers like for an unknown user when ignoreUnknownUsernames is true", async () => {
+      vi.useFakeTimers();
+      try {
+        mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true });
+        mockPasswordReset.mockRejectedValue(apiError(Code.FailedPrecondition, "User is not initialised (COMMAND-Sfe4g)"));
+
+        const result = resetPassword({ loginName: "user@example.com" });
+        await vi.runAllTimersAsync();
+
+        expect(await result).toEqual({});
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    test.each([
+      ["a server fault", apiError(Code.Internal, "Internal error")],
+      ["the API rejecting the login's own credentials", apiError(Code.Unauthenticated, "Token invalid")],
+    ])("rethrows %s, even when ignoreUnknownUsernames is true", async (_, error) => {
+      mockGetLoginSettings.mockResolvedValue({ ignoreUnknownUsernames: true });
+      mockPasswordReset.mockRejectedValue(error);
+
+      await expect(resetPassword({ loginName: "user@example.com" })).rejects.toBe(error);
+    });
+  });
 });
 
 describe("changePassword", () => {
@@ -788,7 +847,6 @@ describe("changePassword", () => {
 
   describe("with a reset code", () => {
     const resetWithCode = () => changePassword({ userId: "user-1", password: "newpassword", code: "ABC123" });
-    const apiError = (code: Code, message: string) => new ClassifiedConnectError(new ConnectError(message, code));
 
     beforeEach(() => {
       mockGetUserByID.mockResolvedValue({ user: { userId: "user-1", state: UserState.ACTIVE } });

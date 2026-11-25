@@ -1,5 +1,7 @@
 import { createNewSessionForLDAP, redirectToIdp } from "@/lib/actions/idp";
+import { ClassifiedConnectError } from "@/lib/server/grpc/interceptors/error-classification";
 import { createIdpFlowProof, isIdpFlowProofValid } from "@/lib/server/idp-flow-proof";
+import { Code, ConnectError } from "@connectrpc/connect";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 // Mock all the dependencies
@@ -35,6 +37,12 @@ vi.mock("@/lib/server/fingerprint", () => ({
   getBindingIdCookie: vi.fn(),
   addIdpFlowProof: vi.fn(),
 }));
+
+vi.mock("next-intl/server", () => ({
+  getTranslations: vi.fn(async () => (key: string) => key),
+}));
+
+const apiError = (code: Code, message: string) => new ClassifiedConnectError(new ConnectError(message, code));
 
 // the real helper reads the binding id cookie, here the browser binding id is "fp123"
 async function mockAddIdpFlowProof() {
@@ -334,7 +342,35 @@ describe("redirectToIdp", () => {
 
       const result = await redirectToIdp(undefined, formData);
 
-      expect(result).toEqual({ error: "Could not start IDP flow" });
+      expect(result).toEqual({ error: "errors.couldNotStartIDPFlow" });
+    });
+
+    test.each([
+      ["the IdP was removed", apiError(Code.NotFound, "IDP not found (QUERY-8sn32)")],
+      ["the IdP is misconfigured", apiError(Code.FailedPrecondition, "IDP not active (COMMAND-3k0sd)")],
+    ])("should answer with a message when %s", async (_, error) => {
+      const formData = new FormData();
+      formData.append("id", "idp123");
+      formData.append("provider", "google");
+
+      mockStartIdentityProviderFlow.mockRejectedValue(error);
+
+      const result = await redirectToIdp(undefined, formData);
+
+      expect(result).toEqual({ error: "errors.couldNotStartIDPFlow" });
+    });
+
+    test.each([
+      ["a server fault", apiError(Code.Internal, "boom")],
+      ["the API rejecting the login's own credentials", apiError(Code.Unauthenticated, "Token invalid")],
+    ])("should rethrow %s", async (_, error) => {
+      const formData = new FormData();
+      formData.append("id", "idp123");
+      formData.append("provider", "google");
+
+      mockStartIdentityProviderFlow.mockRejectedValue(error);
+
+      await expect(redirectToIdp(undefined, formData)).rejects.toBe(error);
     });
 
     test("should redirect when IDP flow returns a valid URL", async () => {
@@ -486,5 +522,28 @@ describe("createNewSessionForLDAP", () => {
 
     expect(result).toEqual({ error: "Invalid session for linking" });
     expect(startLDAPIdentityProviderFlow).not.toHaveBeenCalled();
+  });
+
+  test("should answer wrong credentials with a message", async () => {
+    const { startLDAPIdentityProviderFlow } = await import("@/lib/server/zitadel");
+    vi.mocked(startLDAPIdentityProviderFlow).mockRejectedValue(
+      apiError(Code.InvalidArgument, "Login failed (COMMAND-nzun2i)"),
+    );
+
+    const result = await createNewSessionForLDAP({ username: "user", password: "wrong", idpId: "idp123", link: false });
+
+    expect(result).toEqual({ error: "errors.couldNotVerify" });
+  });
+
+  test.each([
+    ["a server fault", apiError(Code.Internal, "boom")],
+    ["the API rejecting the login's own credentials", apiError(Code.Unauthenticated, "Token invalid")],
+  ])("should rethrow %s", async (_, error) => {
+    const { startLDAPIdentityProviderFlow } = await import("@/lib/server/zitadel");
+    vi.mocked(startLDAPIdentityProviderFlow).mockRejectedValue(error);
+
+    await expect(
+      createNewSessionForLDAP({ username: "user", password: "secret", idpId: "idp123", link: false }),
+    ).rejects.toBe(error);
   });
 });

@@ -208,7 +208,10 @@
       "userCreationFailed": "Kullanıcı hesabı oluşturulamadı",
       "orgResolutionFailed": "Kayıt için organizasyon belirlenemedi",
       "sessionCreationFailed": "Oturum oluşturulamadı veya yönlendirme belirlenemedi",
-      "unknownError": "Bilinmeyen bir hata oluştu"
+      "unknownError": "Bilinmeyen bir hata oluştu",
+      "couldNotStartIDPFlow": "IDP akışı başlatılamadı",
+      "userNotFound": "Kullanıcı sistemde bulunamadı",
+      "couldNotCreateSession": "Oturum oluşturulamadı"
     }
   },
   "ldap": {
@@ -222,6 +225,9 @@
     "required": {
       "username": "Bu alan zorunludur",
       "password": "Bu alan zorunludur"
+    },
+    "errors": {
+      "couldNotVerify": "Oturum açılamadı. Lütfen kullanıcı adınızı ve parolanızı kontrol edin."
     }
   },
   "mfa": {
@@ -312,7 +318,15 @@
         "link": "Passkey ile Kimlik Doğrulama"
       },
       "skip": "Atla",
-      "submit": "Devam"
+      "submit": "Devam",
+      "errors": {
+        "missingContext": "Oturum veya kullanıcı bilgisi eksik. Kurulumu aldığınız bağlantıdan yeniden başlatın.",
+        "couldNotLoadSession": "Oturum yüklenemedi",
+        "couldNotRegisterPasskey": "Geçiş anahtarı kurulamadı. Lütfen tekrar deneyin.",
+        "couldNotVerifyPasskey": "Geçiş anahtarı doğrulanamadı. Lütfen tekrar deneyin.",
+        "userNotFound": "Kullanıcı sistemde bulunamadı",
+        "couldNotCreateSession": "Oturum oluşturulamadı"
+      }
     }
   },
   "u2f": {
@@ -324,6 +338,11 @@
       "title": "2 Faktörlü Doğrulama Kur",
       "description": "İkinci faktör olarak bir cihaz kurun.",
       "submit": "Devam"
+    },
+    "errors": {
+      "couldNotLoadSession": "Oturum yüklenemedi",
+      "couldNotRegister": "Güvenlik anahtarı kurulamadı. Lütfen tekrar deneyin.",
+      "couldNotVerify": "Güvenlik anahtarı doğrulanamadı. Lütfen tekrar deneyin."
     }
   },
   "register": {
@@ -379,7 +398,8 @@
       "sessionMismatch": "Kayıt başka bir tarayıcıda başlatıldı. Lütfen kimlik sağlayıcınızla yeniden oturum açın.",
       "registerNotAllowed": "Kayıt olmaya izin verilmiyor! Daha fazla bilgi için yöneticinizle iletişime geçin.",
       "localAuthenticationNotAllowed": "Yerel kimlik doğrulamasına izin verilmiyor! Daha fazla bilgi için yöneticinize başvurun.",
-      "couldNotGetLoginSettings": "Giriş ayarları alınamadı"
+      "couldNotGetLoginSettings": "Giriş ayarları alınamadı",
+      "userAlreadyExists": "Bu e-posta adresine sahip bir kullanıcı zaten mevcut. Bunun yerine giriş yapmayı deneyin."
     }
   },
   "invite": {
@@ -500,6 +520,7 @@
     "couldNotContinueSession": "Oturuma devam edilemedi - kullanıcı bilgileri eksik",
     "couldNotClearSession": "Oturum sonlandırılamadı. Lütfen tekrar deneyin.",
     "secondFactorRequired": "Yeni bir kimlik doğrulama yöntemi ayarlamak için önce ikinci faktörünüzü doğrulayın.",
-    "authenticatorNotAllowed": "Bu kimlik doğrulama yöntemine kuruluşunuz için izin verilmiyor."
+    "authenticatorNotAllowed": "Bu kimlik doğrulama yöntemine kuruluşunuz için izin verilmiyor.",
+    "couldNotCompleteDeviceAuthorization": "Cihaz yetkilendirmesi tamamlanamadı. Kod zaten kullanılmış veya süresi dolmuş olabilir."
   }
 }

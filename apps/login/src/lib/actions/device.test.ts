@@ -1,4 +1,6 @@
 import { approveDeviceAuthorization, denyDeviceAuthorization } from "@/lib/actions/device";
+import { ClassifiedConnectError } from "@/lib/server/grpc/interceptors/error-classification";
+import { Code, ConnectError } from "@connectrpc/connect";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 vi.mock("@/lib/server/zitadel", () => ({
@@ -35,6 +37,8 @@ vi.mock("next-intl/server", () => ({
 vi.mock("next/headers", () => ({
   headers: vi.fn(() => new Headers()),
 }));
+
+const apiError = (code: Code, message: string) => new ClassifiedConnectError(new ConnectError(message, code));
 
 const cookie = {
   id: "session-1",
@@ -164,6 +168,68 @@ describe("device authorization actions", () => {
       expect(res).toEqual({ redirect: "/password?loginName=user%40example.com" });
       expect(authorizeOrDenyDeviceAuthorization).not.toHaveBeenCalled();
     });
+
+    test("sends the user into the login funnel when the session check is rejected, e.g. the user was removed", async () => {
+      isSessionValid.mockRejectedValue(apiError(Code.NotFound, "User not found"));
+      sendLoginname.mockResolvedValue({ redirect: "/loginname" });
+
+      const res = await approveDeviceAuthorization({ userCode: "ABCD-1234", sessionId: "session-1" });
+
+      expect(res).toEqual({ redirect: "/loginname" });
+      expect(authorizeOrDenyDeviceAuthorization).not.toHaveBeenCalled();
+    });
+
+    test("returns an error when sending the user into the login funnel is rejected", async () => {
+      isSessionValid.mockResolvedValue(false);
+      sendLoginname.mockRejectedValue(apiError(Code.NotFound, "User not found"));
+
+      const res = await approveDeviceAuthorization({ userCode: "ABCD-1234", sessionId: "session-1" });
+
+      expect(res).toEqual({ error: "sessionExpired" });
+      expect(authorizeOrDenyDeviceAuthorization).not.toHaveBeenCalled();
+    });
+
+    test("rethrows a server fault of the session check", async () => {
+      const error = apiError(Code.Unavailable, "down");
+      isSessionValid.mockRejectedValue(error);
+
+      await expect(approveDeviceAuthorization({ userCode: "ABCD-1234", sessionId: "session-1" })).rejects.toBe(error);
+    });
+
+    test("returns an error and does not approve when the user code is unknown or expired", async () => {
+      getDeviceAuthorizationRequest.mockRejectedValue(apiError(Code.NotFound, "Device request not found (OIDC-x)"));
+
+      const res = await approveDeviceAuthorization({ userCode: "ABCD-1234", sessionId: "session-1" });
+
+      expect(res).toEqual({ error: "noDeviceRequest" });
+      expect(authorizeOrDenyDeviceAuthorization).not.toHaveBeenCalled();
+    });
+
+    test.each([
+      ["the code was already used or expired", Code.FailedPrecondition],
+      ["the session token is no longer accepted", Code.PermissionDenied],
+    ])("returns an error and keeps the device code check when %s", async (_, code) => {
+      authorizeOrDenyDeviceAuthorization.mockRejectedValue(apiError(code, "rejected"));
+
+      const res = await approveDeviceAuthorization({ userCode: "ABCD-1234", sessionId: "session-1" });
+
+      expect(res).toEqual({ error: "couldNotCompleteDeviceAuthorization" });
+      expect(deleteDeviceCodeCheckCookie).not.toHaveBeenCalled();
+    });
+
+    test.each([
+      ["a server fault", Code.Internal],
+      ["the API rejecting the login's own credentials", Code.Unauthenticated],
+    ])("rethrows %s", async (_, code) => {
+      const error = apiError(code, "failed");
+      getDeviceAuthorizationRequest.mockRejectedValueOnce(error);
+
+      await expect(approveDeviceAuthorization({ userCode: "ABCD-1234", sessionId: "session-1" })).rejects.toBe(error);
+
+      authorizeOrDenyDeviceAuthorization.mockRejectedValueOnce(error);
+
+      await expect(approveDeviceAuthorization({ userCode: "ABCD-1234", sessionId: "session-1" })).rejects.toBe(error);
+    });
   });
 
   describe("denyDeviceAuthorization", () => {
@@ -208,6 +274,39 @@ describe("device authorization actions", () => {
 
       expect(res).toEqual({ error: "sessionExpired" });
       expect(authorizeOrDenyDeviceAuthorization).not.toHaveBeenCalled();
+    });
+
+    test("returns an error and does not deny when the user code is unknown or expired", async () => {
+      getDeviceAuthorizationRequest.mockRejectedValue(apiError(Code.NotFound, "Device request not found (OIDC-x)"));
+
+      const res = await denyDeviceAuthorization({ userCode: "ABCD-1234", sessionId: "session-1" });
+
+      expect(res).toEqual({ error: "noDeviceRequest" });
+      expect(authorizeOrDenyDeviceAuthorization).not.toHaveBeenCalled();
+    });
+
+    test("returns an error and keeps the device code check when the code was already used or expired", async () => {
+      authorizeOrDenyDeviceAuthorization.mockRejectedValue(apiError(Code.FailedPrecondition, "already handled"));
+
+      const res = await denyDeviceAuthorization({ userCode: "ABCD-1234", sessionId: "session-1" });
+
+      expect(res).toEqual({ error: "couldNotCompleteDeviceAuthorization" });
+      expect(deleteDeviceCodeCheckCookie).not.toHaveBeenCalled();
+    });
+
+    test.each([
+      ["a server fault", Code.Internal],
+      ["the API rejecting the login's own credentials", Code.Unauthenticated],
+      ["a missing permission of the login", Code.PermissionDenied],
+    ])("rethrows %s", async (_, code) => {
+      const error = apiError(code, "failed");
+      getDeviceAuthorizationRequest.mockRejectedValueOnce(error);
+
+      await expect(denyDeviceAuthorization({ userCode: "ABCD-1234", sessionId: "session-1" })).rejects.toBe(error);
+
+      authorizeOrDenyDeviceAuthorization.mockRejectedValueOnce(error);
+
+      await expect(denyDeviceAuthorization({ userCode: "ABCD-1234", sessionId: "session-1" })).rejects.toBe(error);
     });
   });
 });

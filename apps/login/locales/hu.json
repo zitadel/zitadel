@@ -208,7 +208,10 @@
       "userCreationFailed": "Nem sikerült létrehozni a felhasználói fiókot",
       "orgResolutionFailed": "Nem sikerült meghatározni a szervezetet a regisztrációhoz",
       "sessionCreationFailed": "Nem sikerült létrehozni a munkamenetet vagy meghatározni az átirányítási címet",
-      "unknownError": "Ismeretlen hiba történt"
+      "unknownError": "Ismeretlen hiba történt",
+      "couldNotStartIDPFlow": "Nem sikerült elindítani az IDP folyamatát",
+      "userNotFound": "A felhasználó nem található a rendszerben",
+      "couldNotCreateSession": "Nem sikerült létrehozni a munkamenetet"
     }
   },
   "ldap": {
@@ -222,6 +225,9 @@
     "required": {
       "username": "Ez a mező kötelező",
       "password": "Ez a mező kötelező"
+    },
+    "errors": {
+      "couldNotVerify": "A bejelentkezés nem sikerült. Ellenőrizze a felhasználónevet és a jelszót."
     }
   },
   "mfa": {
@@ -312,7 +318,15 @@
         "link": "Jelkulcsos hitelesítés"
       },
       "skip": "Kihagyás",
-      "submit": "Tovább"
+      "submit": "Tovább",
+      "errors": {
+        "missingContext": "Hiányzó munkamenet- vagy felhasználói adatok. Indítsa újra a beállítást a kapott hivatkozásból.",
+        "couldNotLoadSession": "Nem sikerült betölteni a munkamenetet",
+        "couldNotRegisterPasskey": "A jelszókulcs beállítása nem sikerült. Kérjük, próbálja újra.",
+        "couldNotVerifyPasskey": "A jelszókulcs ellenőrzése nem sikerült. Kérjük, próbálja újra.",
+        "userNotFound": "A felhasználó nem található a rendszerben",
+        "couldNotCreateSession": "Nem sikerült létrehozni a munkamenetet"
+      }
     }
   },
   "u2f": {
@@ -324,6 +338,11 @@
       "title": "Kétlépcsős azonosítás beállítása",
       "description": "Állíts be egy készüléket második hitelesítési módként.",
       "submit": "Tovább"
+    },
+    "errors": {
+      "couldNotLoadSession": "Nem sikerült betölteni a munkamenetet",
+      "couldNotRegister": "A biztonsági kulcs beállítása nem sikerült. Kérjük, próbálja újra.",
+      "couldNotVerify": "A biztonsági kulcs ellenőrzése nem sikerült. Kérjük, próbálja újra."
     }
   },
   "register": {
@@ -379,7 +398,8 @@
       "sessionMismatch": "A regisztráció egy másik böngészőben indult. Jelentkezz be újra az azonosítószolgáltatódnál.",
       "registerNotAllowed": "A regisztráció nem engedélyezett! További információért forduljon a rendszergazdához.",
       "localAuthenticationNotAllowed": "A helyi hitelesítés nem engedélyezett! További információért fordulj a rendszergazdához.",
-      "couldNotGetLoginSettings": "Nem sikerült lekérni a bejelentkezési beállításokat"
+      "couldNotGetLoginSettings": "Nem sikerült lekérni a bejelentkezési beállításokat",
+      "userAlreadyExists": "Ezzel az e-mail-címmel már létezik felhasználó. Próbáljon meg inkább bejelentkezni."
     }
   },
   "invite": {
@@ -500,6 +520,7 @@
     "couldNotContinueSession": "Nem sikerült folytatni a munkamenetet - hiányzó felhasználói információk",
     "couldNotClearSession": "A munkamenetet nem sikerült befejezni. Kérjük, próbálja újra.",
     "secondFactorRequired": "Új hitelesítési mód beállításához először erősítsd meg a második faktort.",
-    "authenticatorNotAllowed": "Ez a hitelesítési mód nem engedélyezett a szervezeted számára."
+    "authenticatorNotAllowed": "Ez a hitelesítési mód nem engedélyezett a szervezeted számára.",
+    "couldNotCompleteDeviceAuthorization": "Az eszköz engedélyezése nem fejeződött be. Lehet, hogy a kódot már felhasználták, vagy lejárt."
   }
 }

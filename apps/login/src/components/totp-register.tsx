@@ -48,9 +48,16 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
   const t = useTranslations("otp");
 
   async function continueWithCode(values: Inputs) {
+    setError("");
     setLoading(true);
     return verifyTOTP(values.code, loginName, organization)
-      .then(async () => {
+      .then(async (response) => {
+        // a wrong code or a refused setup comes back as a message, not as a rejected promise
+        if (response && "error" in response && response.error) {
+          setError(response.error);
+          return;
+        }
+
         // if attribute is set, validate MFA after it is setup, otherwise proceed as usual (when mfa is enforced to login)
         if (checkAfter) {
           const params = new URLSearchParams({});
