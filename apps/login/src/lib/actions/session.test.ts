@@ -322,6 +322,56 @@ describe("server actions resolve the session from the caller's cookie", () => {
         /^https:\/\/test\.com\/ui\/v2\/login\/otp\/email\?/,
       );
     });
+
+    const userError = (code: Code) => Object.assign(new Error("rejected"), { code, httpStatus: 400, isUserError: true });
+
+    test("returns an error for a wrong code instead of recreating the session", async () => {
+      cookieHelpers.setSessionAndUpdateCookie.mockRejectedValue(userError(Code.InvalidArgument));
+
+      const res = await updateOrCreateSession({ sessionId: "session-1", checks: { totp: { code: "000000" } } } as any);
+
+      expect(res).toEqual({ error: "couldNotVerify" });
+      expect(zitadel.listUsers).not.toHaveBeenCalled();
+      expect(cookieHelpers.createSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    test.each([["otpEmail"], ["otpSms"]])("does not verify a session bound %s code against a new session", async (check) => {
+      // e.g. "Code not found", "Code is expired", "User is locked" or "Session has expired"
+      cookieHelpers.setSessionAndUpdateCookie.mockRejectedValue(userError(Code.FailedPrecondition));
+
+      const res = await updateOrCreateSession({ sessionId: "session-1", checks: { [check]: { code: "1" } } } as any);
+
+      expect(res).toEqual({ error: "couldNotVerify" });
+      expect(zitadel.listUsers).not.toHaveBeenCalled();
+      expect(cookieHelpers.createSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    test("rethrows a server error on an OTP code check", async () => {
+      const serverError = Object.assign(new Error("boom"), { code: Code.Internal, httpStatus: 500, isUserError: false });
+      cookieHelpers.setSessionAndUpdateCookie.mockRejectedValue(serverError);
+
+      await expect(
+        updateOrCreateSession({ sessionId: "session-1", checks: { otpEmail: { code: "1" } } } as any),
+      ).rejects.toBe(serverError);
+      expect(cookieHelpers.createSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    test("recreates an expired session for a TOTP check with a CheckUser message", async () => {
+      const { create } = vi.mocked(await import("@zitadel/client"));
+      cookieHelpers.setSessionAndUpdateCookie.mockRejectedValue(userError(Code.FailedPrecondition));
+      zitadel.listUsers.mockResolvedValue({ details: { totalResult: BigInt(1) }, result: [{ userId: "user-1" }] });
+      cookieHelpers.createSessionAndUpdateCookie.mockResolvedValue({ session: authenticatedSession, challenges: {} });
+
+      const res = await updateOrCreateSession({ sessionId: "session-1", checks: { totp: { code: "123456" } } } as any);
+
+      // the user check is built as its own message, not as a plain object inside the spread checks
+      expect(create).toHaveBeenCalledWith(expect.anything(), { search: { case: "userId", value: "user-1" } });
+      const [command] = cookieHelpers.createSessionAndUpdateCookie.mock.calls[0];
+      expect(command.checks).toEqual(
+        expect.objectContaining({ totp: { code: "123456" }, user: { search: { case: "userId", value: "user-1" } } }),
+      );
+      expect(res).toEqual(expect.objectContaining({ sessionId: "session-1" }));
+    });
   });
 });
 
