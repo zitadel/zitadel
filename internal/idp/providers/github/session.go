@@ -98,7 +98,7 @@ func (s *Session) getPrivateMail() (email string, err error) {
 	if err != nil {
 		return "", err
 	}
-	req.Header.Set("authorization", s.oauth().Tokens.TokenType+" "+s.oauth().Tokens.AccessToken)
+	s.oauth().Tokens.SetAuthHeader(req)
 
 	emailList := make([]Email, 0)
 	if err := httphelper.HttpRequest(s.Provider.HttpClient(), req, &emailList); err != nil {

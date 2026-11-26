@@ -62,7 +62,7 @@ func (s *Session) FetchUser(ctx context.Context) (_ idp.User, err error) {
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("authorization", s.Tokens.TokenType+" "+s.Tokens.AccessToken)
+	s.Tokens.SetAuthHeader(req)
 	user := s.Provider.User()
 	if err := httphelper.HttpRequest(s.Provider.RelyingParty.HttpClient(), req, &user); err != nil {
 		return nil, err

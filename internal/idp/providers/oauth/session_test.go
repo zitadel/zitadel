@@ -168,6 +168,51 @@ func TestProvider_FetchUser(t *testing.T) {
 			},
 		},
 		{
+			name: "successful fetch, lowercase token type sent as Bearer",
+			fields: fields{
+				config: &oauth2.Config{
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+					Endpoint: oauth2.Endpoint{
+						AuthURL:  "https://oauth2.com/authorize",
+						TokenURL: "https://oauth2.com/token",
+					},
+					RedirectURL: "redirectURI",
+					Scopes:      []string{"user"},
+				},
+				userEndpoint: "https://oauth2.com/user",
+				httpMock: func(issuer string) {
+					gock.New(issuer).
+						Get("/user").
+						MatchHeader("Authorization", "^Bearer accessToken$").
+						Reply(200).
+						JSON(map[string]interface{}{
+							"userID": "id",
+						})
+				},
+				userMapper: func() idp.User {
+					return NewUserMapper("userID")
+				},
+				authURL: "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=user&state=testState",
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+					Token: &oauth2.Token{
+						AccessToken: "accessToken",
+						TokenType:   "bearer",
+					},
+				},
+			},
+			want: want{
+				user: &UserMapper{
+					idAttribute: "userID",
+					RawInfo: map[string]interface{}{
+						"userID": "id",
+					},
+				},
+				id:                "id",
+				preferredLanguage: language.Und,
+			},
+		},
+		{
 			name: "successful fetch with code exchange",
 			fields: fields{
 				config: &oauth2.Config{
