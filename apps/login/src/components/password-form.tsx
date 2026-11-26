@@ -2,6 +2,7 @@
 
 import { resetPassword, sendPassword } from "@/lib/actions/password";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useSettledAction } from "@/lib/settled-action";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
@@ -43,21 +44,24 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
   const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter();
+  const runAction = useSettledAction();
 
   async function submitPassword(values: Inputs) {
     setError("");
     setLoading(true);
 
     try {
-      const response = await sendPassword({
-        loginName,
-        organization,
-        defaultOrganization,
-        checks: create(ChecksSchema, {
-          password: { password: values.password },
+      const response = await runAction(() =>
+        sendPassword({
+          loginName,
+          organization,
+          defaultOrganization,
+          checks: create(ChecksSchema, {
+            password: { password: values.password },
+          }),
+          requestId,
         }),
-        requestId,
-      });
+      );
 
       handleServerActionResponse(response, router, setSamlData, setError);
     } catch {

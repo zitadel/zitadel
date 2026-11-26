@@ -3,9 +3,10 @@
 import { completeFlowOrGetUrl } from "@/lib/actions/flow";
 import { updateOrCreateSession } from "@/lib/actions/session";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useSettledAction } from "@/lib/settled-action";
 import { create } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
-import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -45,6 +46,7 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
   const resendAvailableAt = useRef<number>(0);
 
   const router = useRouter();
+  const runAction = useSettledAction();
 
   const initialized = useRef(false);
 
@@ -141,7 +143,7 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
       body.requestId = requestId;
     }
 
-    let checks;
+    let checks: Checks | undefined;
 
     if (method === "sms") {
       checks = create(ChecksSchema, {
@@ -159,13 +161,15 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
       });
     }
 
-    const response = await updateOrCreateSession({
-      loginName,
-      sessionId,
-      organization,
-      checks,
-      requestId,
-    })
+    const response = await runAction(() =>
+      updateOrCreateSession({
+        loginName,
+        sessionId,
+        organization,
+        checks,
+        requestId,
+      }),
+    )
       .catch(() => {
         setError(t("errors.couldNotVerifyCode"));
         return;
@@ -191,7 +195,7 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
 
         // Use unified approach that handles both OIDC/SAML and regular flows
         if (response.factors?.user) {
-          const callbackResponse = await completeFlowOrGetUrl(
+          const command =
             requestId && response.sessionId
               ? {
                   sessionId: response.sessionId,
@@ -201,9 +205,8 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
               : {
                   loginName: response.factors.user.loginName,
                   organization: response.factors?.user?.organizationId,
-                },
-            loginSettings?.defaultRedirectUri,
-          );
+                };
+          const callbackResponse = await runAction(() => completeFlowOrGetUrl(command, loginSettings?.defaultRedirectUri));
           setLoading(false);
 
           handleServerActionResponse(callbackResponse, router, setSamlData, setError);

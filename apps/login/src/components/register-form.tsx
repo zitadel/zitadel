@@ -2,6 +2,7 @@
 
 import { registerUser } from "@/lib/actions/register";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useSettledAction } from "@/lib/settled-action";
 import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
 import { LoginSettings, PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
@@ -64,17 +65,20 @@ export function RegisterForm({
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const router = useRouter();
+  const runAction = useSettledAction();
 
   async function submitAndRegister(values: Inputs) {
     setLoading(true);
     try {
-      const response = await registerUser({
-        email: values.email,
-        firstName: values.firstname,
-        lastName: values.lastname,
-        organization: organization,
-        requestId: requestId,
-      });
+      const response = await runAction(() =>
+        registerUser({
+          email: values.email,
+          firstName: values.firstname,
+          lastName: values.lastname,
+          organization: organization,
+          requestId: requestId,
+        }),
+      );
 
       handleServerActionResponse(response, router, setSamlData, setError);
 

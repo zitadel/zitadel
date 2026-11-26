@@ -2,6 +2,7 @@
 
 import { skipMFAAndContinueWithNextUrl } from "@/lib/actions/session";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useSettledAction } from "@/lib/settled-action";
 import { LoginSettings, SecondFactorType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useRouter } from "next/navigation";
@@ -37,6 +38,7 @@ export function ChooseSecondFactorToSetup({
   force,
 }: Props) {
   const router = useRouter();
+  const runAction = useSettledAction();
   const params = new URLSearchParams({});
 
   const [error, setError] = useState<string>("");
@@ -83,12 +85,14 @@ export function ChooseSecondFactorToSetup({
         <button
           className="hover:text-primary-light-500 dark:hover:text-primary-dark-500 text-sm transition-all"
           onClick={async () => {
-            const skipResponse = await skipMFAAndContinueWithNextUrl({
-              loginName,
-              sessionId,
-              organization,
-              requestId,
-            });
+            const skipResponse = await runAction(() =>
+              skipMFAAndContinueWithNextUrl({
+                loginName,
+                sessionId,
+                organization,
+                requestId,
+              }),
+            );
 
             handleServerActionResponse(skipResponse, router, setSamlData, setError);
           }}

@@ -2,6 +2,7 @@
 
 import { registerUserAndLinkToIDP } from "@/lib/actions/register";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useSettledAction } from "@/lib/settled-action";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -58,6 +59,7 @@ export function RegisterFormIDPIncomplete({
 
   const t = useTranslations("register");
   const router = useRouter();
+  const runAction = useSettledAction();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -66,16 +68,18 @@ export function RegisterFormIDPIncomplete({
   async function submitAndRegister(values: Inputs) {
     setLoading(true);
     try {
-      const response = await registerUserAndLinkToIDP({
-        idpUserName: idpUserName ? idpUserName : values.username,
-        email: values.email,
-        firstName: values.firstname,
-        lastName: values.lastname,
-        organization: organization,
-        requestId: requestId,
-        idpIntent: idpIntent,
-        flowFingerprint: flowFingerprint,
-      });
+      const response = await runAction(() =>
+        registerUserAndLinkToIDP({
+          idpUserName: idpUserName ? idpUserName : values.username,
+          email: values.email,
+          firstName: values.firstname,
+          lastName: values.lastname,
+          organization: organization,
+          requestId: requestId,
+          idpIntent: idpIntent,
+          flowFingerprint: flowFingerprint,
+        }),
+      );
 
       handleServerActionResponse(response, router, setSamlData, setError);
     } catch {

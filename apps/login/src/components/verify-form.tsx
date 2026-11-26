@@ -4,6 +4,7 @@ import { Alert, AlertType } from "@/components/alert";
 import { resendVerification, sendVerification } from "@/lib/actions/verify";
 import { handleServerActionResponse } from "@/lib/client-utils";
 import { UNKNOWN_USER_ID } from "@/lib/constants";
+import { useSettledAction } from "@/lib/settled-action";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -31,6 +32,7 @@ type Props = {
 
 export function VerifyForm({ userId, loginName, organization, requestId, code, isInvite, submit }: Props) {
   const router = useRouter();
+  const runAction = useSettledAction();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const codeSent = searchParams.get("codeSent") === "true";
@@ -94,14 +96,16 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
       setLoading(true);
 
       try {
-        const response = await sendVerification({
-          code: value.code,
-          userId,
-          isInvite: isInvite,
-          loginName: loginName,
-          organization: organization,
-          requestId: requestId,
-        });
+        const response = await runAction(() =>
+          sendVerification({
+            code: value.code,
+            userId,
+            isInvite: isInvite,
+            loginName: loginName,
+            organization: organization,
+            requestId: requestId,
+          }),
+        );
 
         handleServerActionResponse(response, router, setSamlData, setError);
       } catch {
@@ -110,7 +114,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
         setLoading(false);
       }
     },
-    [isInvite, userId, loginName, organization, requestId, router, t],
+    [isInvite, userId, loginName, organization, requestId, router, runAction, t],
   );
 
   useEffect(() => {

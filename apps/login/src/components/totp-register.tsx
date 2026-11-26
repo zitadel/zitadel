@@ -3,6 +3,7 @@
 import { completeFlowOrGetUrl } from "@/lib/actions/flow";
 import { verifyTOTP } from "@/lib/actions/verify";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useSettledAction } from "@/lib/settled-action";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -37,6 +38,7 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
   const [loading, setLoading] = useState<boolean>(false);
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
   const router = useRouter();
+  const runAction = useSettledAction();
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onChange",
@@ -49,7 +51,7 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
 
   async function continueWithCode(values: Inputs) {
     setLoading(true);
-    return verifyTOTP(values.code, loginName, organization)
+    return runAction(() => verifyTOTP(values.code, loginName, organization))
       .then(async () => {
         // if attribute is set, validate MFA after it is setup, otherwise proceed as usual (when mfa is enforced to login)
         if (checkAfter) {
@@ -68,23 +70,27 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
           return router.push(`/otp/time-based?` + params);
         } else {
           if (requestId && sessionId) {
-            const callbackResponse = await completeFlowOrGetUrl(
-              {
-                sessionId: sessionId,
-                requestId: requestId,
-                organization: organization,
-              },
-              loginSettings?.defaultRedirectUri,
+            const callbackResponse = await runAction(() =>
+              completeFlowOrGetUrl(
+                {
+                  sessionId: sessionId,
+                  requestId: requestId,
+                  organization: organization,
+                },
+                loginSettings?.defaultRedirectUri,
+              ),
             );
 
             handleServerActionResponse(callbackResponse, router, setSamlData, setError);
           } else if (loginName) {
-            const callbackResponse = await completeFlowOrGetUrl(
-              {
-                loginName: loginName,
-                organization: organization,
-              },
-              loginSettings?.defaultRedirectUri,
+            const callbackResponse = await runAction(() =>
+              completeFlowOrGetUrl(
+                {
+                  loginName: loginName,
+                  organization: organization,
+                },
+                loginSettings?.defaultRedirectUri,
+              ),
             );
 
             handleServerActionResponse(callbackResponse, router, setSamlData, setError);

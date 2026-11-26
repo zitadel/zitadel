@@ -3,6 +3,7 @@
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from "@/helpers/validators";
 import { registerUser } from "@/lib/actions/register";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useSettledAction } from "@/lib/settled-action";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -57,18 +58,21 @@ export function SetRegisterPasswordForm({
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const router = useRouter();
+  const runAction = useSettledAction();
 
   async function submitRegister(values: Inputs) {
     setLoading(true);
     try {
-      const response = await registerUser({
-        email: email,
-        firstName: firstname,
-        lastName: lastname,
-        organization: organization,
-        requestId: requestId,
-        password: values.password,
-      });
+      const response = await runAction(() =>
+        registerUser({
+          email: email,
+          firstName: firstname,
+          lastName: lastname,
+          organization: organization,
+          requestId: requestId,
+          password: values.password,
+        }),
+      );
 
       handleServerActionResponse(response, router, setSamlData, setError);
     } catch {

@@ -3,6 +3,7 @@
 import { sendLoginname } from "@/lib/actions/loginname";
 import { clearSession, continueWithSession, ContinueWithSessionCommand } from "@/lib/actions/session";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useSettledAction } from "@/lib/settled-action";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { Timestamp, timestampDate } from "@zitadel/client";
@@ -67,6 +68,7 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
+  const runAction = useSettledAction();
 
   return (
     <>
@@ -78,17 +80,18 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
               if (valid && session?.factors?.user) {
                 const command: ContinueWithSessionCommand = { sessionId: session.id, requestId };
 
-                const callbackResponse = await continueWithSession(command);
+                const callbackResponse = await runAction(() => continueWithSession(command));
 
                 handleServerActionResponse(callbackResponse, router, setSamlData, (e) => setError(e));
               } else if (session.factors?.user) {
                 setLoading(true);
                 try {
-                  const res = await sendLoginname({
+                  const command = {
                     loginName: session.factors?.user?.loginName,
                     organization: session.factors.user.organizationId,
                     requestId: requestId,
-                  });
+                  };
+                  const res = await runAction(() => sendLoginname(command));
 
                   handleServerActionResponse(res, router, setSamlData, (e) => setError(e));
                 } catch {

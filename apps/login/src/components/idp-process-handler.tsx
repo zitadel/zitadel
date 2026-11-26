@@ -1,6 +1,7 @@
 "use client";
 
 import { processIDPCallback } from "@/lib/actions/idp-intent";
+import { useSettledAction } from "@/lib/settled-action";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -41,6 +42,7 @@ export function IdpProcessHandler({
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
   const executedRef = useRef(false);
   const router = useRouter();
+  const runAction = useSettledAction();
 
   useEffect(() => {
     // Prevent double execution in React Strict Mode
@@ -52,16 +54,18 @@ export function IdpProcessHandler({
 
     console.log("[IDP Process Handler] Starting IDP callback processing from client");
 
-    processIDPCallback({
-      provider,
-      id,
-      token,
-      requestId,
-      organization,
-      sessionId,
-      flowFingerprint,
-      postErrorRedirectUrl,
-    })
+    runAction(() =>
+      processIDPCallback({
+        provider,
+        id,
+        token,
+        requestId,
+        organization,
+        sessionId,
+        flowFingerprint,
+        postErrorRedirectUrl,
+      }),
+    )
       .then((result) => {
         if (result.error) {
           console.error("[IDP Process Handler] Error:", result.error);
@@ -91,7 +95,20 @@ export function IdpProcessHandler({
         setError(err instanceof Error ? err.message : t("processing.unexpectedError"));
         setLoading(false);
       });
-  }, [provider, id, token, requestId, organization, link, sessionId, flowFingerprint, postErrorRedirectUrl, router, t]);
+  }, [
+    provider,
+    id,
+    token,
+    requestId,
+    organization,
+    link,
+    sessionId,
+    flowFingerprint,
+    postErrorRedirectUrl,
+    router,
+    runAction,
+    t,
+  ]);
 
   return (
     <div className="flex items-center justify-center">

@@ -4,6 +4,7 @@ import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
 import { sendPasskey } from "@/lib/actions/passkeys";
 import { updateOrCreateSession } from "@/lib/actions/session";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useSettledAction } from "@/lib/settled-action";
 import { create, JsonObject } from "@zitadel/client";
 import { RequestChallengesSchema, UserVerificationRequirement } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -34,6 +35,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
 
   const t = useTranslations("passkey");
   const router = useRouter();
+  const runAction = useSettledAction();
 
   const initialized = useRef(false);
 
@@ -78,18 +80,20 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
   ) {
     setError("");
     setLoading(true);
-    const sessionResponse = await updateOrCreateSession({
-      loginName,
-      sessionId,
-      organization,
-      challenges: create(RequestChallengesSchema, {
-        webAuthN: {
-          domain: "",
-          userVerificationRequirement,
-        },
+    const sessionResponse = await runAction(() =>
+      updateOrCreateSession({
+        loginName,
+        sessionId,
+        organization,
+        challenges: create(RequestChallengesSchema, {
+          webAuthN: {
+            domain: "",
+            userVerificationRequirement,
+          },
+        }),
+        requestId,
       }),
-      requestId,
-    })
+    )
       .catch((error) => {
         console.error(error);
         setError(t("verify.errors.couldNotRequestChallenge"));
@@ -110,15 +114,17 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
   async function submitLogin(data: JsonObject) {
     setLoading(true);
     try {
-      const response = await sendPasskey({
-        loginName,
-        sessionId,
-        organization,
-        checks: {
-          webAuthN: { credentialAssertionData: data },
-        } as Checks,
-        requestId,
-      });
+      const response = await runAction(() =>
+        sendPasskey({
+          loginName,
+          sessionId,
+          organization,
+          checks: {
+            webAuthN: { credentialAssertionData: data },
+          } as Checks,
+          requestId,
+        }),
+      );
 
       const handled = handleServerActionResponse(response, router, setSamlData, setError);
 

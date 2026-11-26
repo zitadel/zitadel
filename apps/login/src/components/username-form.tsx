@@ -2,6 +2,7 @@
 
 import { sendLoginname } from "@/lib/actions/loginname";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useSettledAction } from "@/lib/settled-action";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -52,6 +53,7 @@ export function UsernameForm({
   const t = useTranslations("loginname");
 
   const router = useRouter();
+  const runAction = useSettledAction();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -62,13 +64,15 @@ export function UsernameForm({
       setLoading(true);
 
       try {
-        const res = await sendLoginname({
-          loginName: values.loginName,
-          organization,
-          defaultOrganization,
-          requestId,
-          suffix,
-        });
+        const res = await runAction(() =>
+          sendLoginname({
+            loginName: values.loginName,
+            organization,
+            defaultOrganization,
+            requestId,
+            suffix,
+          }),
+        );
 
         handleServerActionResponse(res, router, setSamlData, setError);
         return res;
@@ -78,7 +82,7 @@ export function UsernameForm({
         setLoading(false);
       }
     },
-    [defaultOrganization, requestId, suffix, router, t],
+    [defaultOrganization, requestId, suffix, router, runAction, t],
   );
 
   useEffect(() => {
