@@ -3,8 +3,7 @@ import { test as base } from "@playwright/test";
 import dotenv from "dotenv";
 import path from "path";
 import { loginScreenExpect, loginWithPassword, startLogin } from "./login";
-import { loginname } from "./loginname";
-import { loginnameScreenExpect } from "./loginname-screen";
+import { loginnameScreen, loginnameScreenExpect } from "./loginname-screen";
 import { password } from "./password";
 import { passwordScreenExpect } from "./password-screen";
 import { PasswordUser } from "./user";
@@ -39,13 +38,14 @@ test("username and password login", async ({ user, page }) => {
 test("username and password login, unknown username", async ({ page }) => {
   const username = "unknown";
   await startLogin(page);
-  await loginname(page, username);
+  await loginnameScreen(page, username);
+  await password(page, "Password1!");
   await loginnameScreenExpect(page, username);
 });
 
 test("username and password login, wrong password", async ({ user, page }) => {
   await startLogin(page);
-  await loginname(page, user.getUsername());
+  await loginnameScreen(page, user.getUsername());
   await password(page, "wrong");
   await passwordScreenExpect(page, "wrong");
 });

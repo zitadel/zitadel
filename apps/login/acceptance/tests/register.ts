@@ -1,7 +1,7 @@
 import { Page } from "@playwright/test";
 import { emailVerify } from "./email-verify";
 import { passkeyRegister } from "./passkey";
-import { registerPasswordScreen, registerUserScreenPasskey, registerUserScreenPassword } from "./register-screen";
+import { registerUserScreen } from "./register-screen";
 import { getCodeFromSink } from "./sink";
 
 export async function registerWithPassword(
@@ -13,24 +13,25 @@ export async function registerWithPassword(
   password2: string,
 ) {
   await page.goto("./register");
-  await registerUserScreenPassword(page, firstname, lastname, email);
-  await page.getByTestId("submit-button").click();
-  await registerPasswordScreen(page, password1, password2);
+  await registerUserScreen(page, firstname, lastname, email, password1, password2);
   await page.getByTestId("submit-button").click();
   await verifyEmail(page, email);
 }
 
-export async function registerWithPasskey(page: Page, firstname: string, lastname: string, email: string): Promise<string> {
-  await page.goto("./register");
-  await registerUserScreenPasskey(page, firstname, lastname, email);
-  await page.getByTestId("submit-button").click();
+// The registration always sets a password, the passkey is added with the signed in session afterwards.
+export async function registerWithPasswordAndPasskey(
+  page: Page,
+  firstname: string,
+  lastname: string,
+  email: string,
+  password: string,
+): Promise<string> {
+  await registerWithPassword(page, firstname, lastname, email, password, password);
 
   // wait for projection of user
   await page.waitForTimeout(10000);
-  const authId = await passkeyRegister(page);
-
-  await verifyEmail(page, email);
-  return authId;
+  await page.goto("./passkey/set?" + new URLSearchParams({ loginName: email }));
+  return passkeyRegister(page);
 }
 
 async function verifyEmail(page: Page, email: string) {

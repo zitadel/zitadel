@@ -100,18 +100,21 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           </Alert>
         )}
 
-        {legal && passwordComplexitySettings && organization && loginSettings.allowLocalAuthentication && (
-          <RegisterForm
-            idpCount={!loginSettings?.allowExternalIdp ? 0 : identityProviders.length}
-            legal={legal}
-            organization={organization}
-            firstname={firstname}
-            lastname={lastname}
-            email={email}
-            requestId={requestId}
-            loginSettings={loginSettings}
-          ></RegisterForm>
-        )}
+        {legal &&
+          passwordComplexitySettings &&
+          organization &&
+          loginSettings.allowRegister &&
+          loginSettings.allowLocalAuthentication && (
+            <RegisterForm
+              legal={legal}
+              passwordComplexitySettings={passwordComplexitySettings}
+              organization={organization}
+              firstname={firstname}
+              lastname={lastname}
+              email={email}
+              requestId={requestId}
+            ></RegisterForm>
+          )}
 
         {loginSettings?.allowExternalIdp && !!identityProviders.length && (
           <>

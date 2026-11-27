@@ -169,3 +169,24 @@ describe("startIdentityProviderFlow", () => {
     expect(value).not.toHaveProperty("loginHint");
   });
 });
+
+describe("getHostedLoginTranslation", () => {
+  test("asks only for the texts stored on the level, without the API defaults", async () => {
+    const { createServiceForHost } = await import("@/lib/server/service");
+    const getHostedLoginTranslationMock = vi.fn().mockResolvedValue({ translations: { loginname: { title: "Hi" } } });
+    vi.mocked(createServiceForHost).mockResolvedValue({ getHostedLoginTranslation: getHostedLoginTranslationMock } as any);
+
+    const { getHostedLoginTranslation } = await import("./zitadel");
+    const result = await getHostedLoginTranslation({
+      serviceConfig: { baseUrl: "https://api.example.com", instanceHost: "inherit-test" } as any,
+      organization: "org-1",
+      locale: "de",
+    });
+
+    expect(getHostedLoginTranslationMock).toHaveBeenCalledWith(
+      { level: { case: "organizationId", value: "org-1" }, locale: "de", ignoreInheritance: true },
+      {},
+    );
+    expect(result).toEqual({ loginname: { title: "Hi" } });
+  });
+});

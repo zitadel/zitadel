@@ -25,9 +25,12 @@
   "loginname": {
     "title": "Welcome back!",
     "description": "Enter your login details.",
-    "register": "Register new user",
+    "noAccountYet": "Don't have an account yet?",
+    "register": "Create an account",
+    "passkey": "Sign in with a passkey",
     "submit": "Continue",
     "labels": {
+      "email": "E-mail",
       "loginname": "Loginname",
       "username": "Username",
       "usernameOrPhoneNumber": "Username or phone number",
