@@ -11,6 +11,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { Framework } from 'src/app/components/quickstart/quickstart.component';
 import frameworkDefinition from '../../../../../apps/docs/frameworks.json';
 import { NavigationService } from 'src/app/services/navigation.service';
+import { OIDC_CONFIGURATIONS } from 'src/app/utils/framework';
 import { Location } from '@angular/common';
 
 @Component({
@@ -35,14 +36,20 @@ export class AppCreateComponent implements OnDestroy {
   public initialParam = signal<string>('');
   public destroy$: Subject<void> = new Subject();
 
-  public frameworks: Framework[] = frameworkDefinition.map((f) => {
-    return {
-      ...f,
-      fragment: '',
-      imgSrcDark: `assets${f.imgSrcDark}`,
-      imgSrcLight: `assets${f.imgSrcLight ? f.imgSrcLight : f.imgSrcDark}`,
-    };
-  });
+  // Only frameworks with an OIDC configuration can be integrated: the
+  // integrate page builds its app request from OIDC_CONFIGURATIONS, so
+  // offering any other framework here leads the user to a dead end.
+  // QuickstartComponent filters the same way.
+  public frameworks: Framework[] = frameworkDefinition
+    .filter((f) => f.id && OIDC_CONFIGURATIONS[f.id])
+    .map((f) => {
+      return {
+        ...f,
+        fragment: '',
+        imgSrcDark: `assets${f.imgSrcDark}`,
+        imgSrcLight: `assets${f.imgSrcLight ? f.imgSrcLight : f.imgSrcDark}`,
+      };
+    });
   constructor(
     private router: Router,
     private mgmtService: ManagementService,
