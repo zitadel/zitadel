@@ -1693,3 +1693,52 @@ func TestAddProject(t *testing.T) {
 		})
 	}
 }
+
+type recordingSearcher struct {
+	conditions []map[eventstore.FieldType]any
+}
+
+func (s *recordingSearcher) Search(_ context.Context, conditions ...map[eventstore.FieldType]any) ([]*eventstore.SearchResult, error) {
+	s.conditions = append(s.conditions, conditions...)
+	return nil, nil
+}
+
+func (s *recordingSearcher) FillFields(context.Context, ...eventstore.FillFieldsEvent) error {
+	return nil
+}
+
+func TestCommands_projectState_resourceOwner(t *testing.T) {
+	tests := []struct {
+		name          string
+		resourceOwner string
+		wantOwner     bool
+	}{
+		{
+			name:          "empty resource owner is not used as filter",
+			resourceOwner: "",
+			wantOwner:     false,
+		},
+		{
+			name:          "resource owner is used as filter",
+			resourceOwner: "org1",
+			wantOwner:     true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			searcher := new(recordingSearcher)
+			c := &Commands{
+				eventstore: eventstore.NewEventstore(&eventstore.Config{Searcher: searcher}),
+			}
+			_, err := c.projectState(context.Background(), "project1", tt.resourceOwner)
+			require.NoError(t, err)
+			require.Len(t, searcher.conditions, 1)
+			owner, ok := searcher.conditions[0][eventstore.FieldTypeResourceOwner]
+			assert.Equal(t, tt.wantOwner, ok)
+			if tt.wantOwner {
+				assert.Equal(t, tt.resourceOwner, owner)
+			}
+			assert.Equal(t, "project1", searcher.conditions[0][eventstore.FieldTypeObjectID])
+		})
+	}
+}
