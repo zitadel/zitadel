@@ -1,6 +1,13 @@
 import "server-only";
 
-import { getMostRecentCookieWithLoginname, getSessionCookieById } from "@/lib/server/cookies";
+import {
+  explainSessionCookieMiss,
+  getMostRecentCookieWithLoginname,
+  getSessionCookieById,
+  SessionCookieLookup,
+  SessionCookieMiss,
+} from "@/lib/server/cookies";
+import { createLogger } from "@/lib/server/logger";
 import { shouldEnforceMFA } from "@/lib/server/verify-helper";
 import {
   getLoginSettings,
@@ -13,8 +20,128 @@ import { Timestamp, timestampDate } from "@zitadel/client";
 import { AuthRequest } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import { SAMLRequest } from "@zitadel/proto/zitadel/saml/v2/authorization_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { GetSessionResponse } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+
+const logger = createLogger("session");
+
+/**
+ * Why a session that a flow expected could not be resolved from the browser's `sessions` cookie.
+ *
+ * The cookie reasons (`cookie_missing`, `cookie_invalid`, `session_entry_not_found`) come from
+ * `explainSessionCookieMiss`. The others are answers of the API for an entry the cookie holds:
+ *
+ * - `server_session_not_found`: the API no longer knows the session
+ * - `session_token_rejected`: the session exists, the API rejects the token of the cookie entry
+ * - `session_lookup_failed`: the API call failed for another reason
+ */
+type SessionResolutionFailure =
+  SessionCookieMiss["reason"] | "server_session_not_found" | "session_token_rejected" | "session_lookup_failed";
+
+type SessionResolution =
+  { session: Session; reason?: undefined } | { session?: undefined; reason: SessionResolutionFailure };
+
+// Stable codes to search the logs for, one per failure reason.
+const SESSION_RESOLUTION_LOG_CODES: Record<SessionResolutionFailure, string> = {
+  cookie_missing: "LOGIN_SESSION_COOKIE_MISSING",
+  cookie_invalid: "LOGIN_SESSION_COOKIE_INVALID",
+  session_entry_not_found: "LOGIN_SESSION_ENTRY_NOT_FOUND",
+  server_session_not_found: "LOGIN_SESSION_NOT_FOUND",
+  session_token_rejected: "LOGIN_SESSION_TOKEN_REJECTED",
+  session_lookup_failed: "LOGIN_SESSION_LOOKUP_FAILED",
+};
+
+/**
+ * Keys in the `error` namespace. An invalid signature and a rejected token share one generic
+ * message, the log code tells them apart.
+ */
+export const SESSION_RESOLUTION_MESSAGE_KEYS: Record<SessionResolutionFailure, string> = {
+  cookie_missing: "sessionResolution.cookieMissing",
+  cookie_invalid: "sessionResolution.cookieInvalid",
+  session_entry_not_found: "sessionResolution.entryNotFound",
+  server_session_not_found: "sessionResolution.sessionNotFound",
+  session_token_rejected: "sessionResolution.cookieInvalid",
+  session_lookup_failed: "sessionResolution.lookupFailed",
+};
+
+type SessionResolutionFailureDetails = {
+  reason: SessionResolutionFailure;
+  context: Record<string, unknown>;
+  error?: unknown;
+};
+
+function logSessionResolutionFailure(source: string, { reason, context, error }: SessionResolutionFailureDetails) {
+  const code = SESSION_RESOLUTION_LOG_CODES[reason];
+  const meta = { code, reason, source, ...context };
+
+  if (reason === "session_lookup_failed") {
+    logger.error(`${code}: could not resolve the session`, { ...meta, error });
+  } else {
+    logger.warn(`${code}: could not resolve the session`, meta);
+  }
+}
+
+/**
+ * Classifies and logs why the `sessions` cookie holds no entry for the lookup. For callers that
+ * need a session to continue: pass the lookup of the cookie getter that returned nothing.
+ */
+export async function reportMissingSessionCookie(
+  source: string,
+  lookup: SessionCookieLookup,
+): Promise<SessionCookieMiss["reason"]> {
+  const miss = await explainSessionCookieMiss(lookup);
+  logSessionResolutionFailure(source, miss);
+  return miss.reason;
+}
+
+async function fetchSession(
+  serviceConfig: ServiceConfig,
+  cookie: { id: string; token: string },
+): Promise<{ session: Session } | SessionResolutionFailureDetails> {
+  try {
+    const { session } = await getSession({ serviceConfig, sessionId: cookie.id, sessionToken: cookie.token });
+    if (session) {
+      return { session };
+    }
+    return { reason: "server_session_not_found", context: { sessionId: cookie.id } };
+  } catch (error) {
+    const { Code, ConnectError } = await import("@connectrpc/connect");
+    const grpcCode = error instanceof ConnectError ? error.code : undefined;
+    const context = { sessionId: cookie.id, grpcCode: grpcCode !== undefined ? Code[grpcCode] : undefined };
+
+    // The `sessions` cookie has no maxAge, so it can outlive the server-side session
+    // and reference one the session projection no longer holds, e.g. the user logged out, an
+    // admin/API terminated the session, or the user/org/instance was removed. In that
+    // case getSession throws `not_found`.
+    if (grpcCode === Code.NotFound) {
+      return { reason: "server_session_not_found", context };
+    }
+    // The session still exists but the cookie's token no longer matches it (e.g. the token was
+    // rotated by a later session update whose cookie never reached the browser): getSession
+    // throws `permission_denied` (QUERY-dsfr3).
+    if (grpcCode === Code.PermissionDenied) {
+      return { reason: "session_token_rejected", context };
+    }
+    return { reason: "session_lookup_failed", context, error };
+  }
+}
+
+/**
+ * Resolves the session of a cookie entry. Never throws: every failure is logged with its code
+ * and returned as a reason.
+ */
+export async function resolveSession(
+  serviceConfig: ServiceConfig,
+  cookie: { id: string; token: string },
+  source: string,
+): Promise<SessionResolution> {
+  const result = await fetchSession(serviceConfig, cookie);
+  if ("session" in result) {
+    return { session: result.session };
+  }
+
+  logSessionResolutionFailure(source, result);
+  return { reason: result.reason };
+}
 
 type LoadMostRecentSessionParams = {
   serviceConfig: ServiceConfig;
@@ -23,6 +150,42 @@ type LoadMostRecentSessionParams = {
     organization?: string;
   };
 };
+
+/**
+ * Like `loadMostRecentSession`, for pages that cannot continue without the session:
+ * it keeps the reason why the session could not be resolved and logs it.
+ */
+export async function resolveMostRecentSession(
+  { serviceConfig, sessionParams }: LoadMostRecentSessionParams,
+  source: string,
+): Promise<SessionResolution> {
+  const recent = await getMostRecentCookieWithLoginname(sessionParams);
+
+  if (!recent) {
+    return { reason: await reportMissingSessionCookie(source, { by: "mostRecent", ...sessionParams }) };
+  }
+
+  return resolveSession(serviceConfig, recent, source);
+}
+
+/**
+ * Like `loadSessionById`, for pages that cannot continue without the session:
+ * it keeps the reason why the session could not be resolved and logs it.
+ */
+export async function resolveSessionById(
+  serviceConfig: ServiceConfig,
+  sessionId: string,
+  organization: string | undefined,
+  source: string,
+): Promise<SessionResolution> {
+  const recent = await getSessionCookieById({ sessionId, organization });
+
+  if (!recent) {
+    return { reason: await reportMissingSessionCookie(source, { by: "id", sessionId, organization }) };
+  }
+
+  return resolveSession(serviceConfig, recent, source);
+}
 
 export async function loadMostRecentSession({
   serviceConfig,
@@ -54,33 +217,27 @@ export async function loadSessionById(
   return loadSession(serviceConfig, recent);
 }
 
+/**
+ * Returns undefined when the API no longer knows the session or rejects the cookie's token,
+ * instead of letting the error crash the caller's render. Every call site handles an undefined
+ * session, either with a graceful fallback or by throwing its own explicit "no session" error.
+ * Any other failure is thrown.
+ */
 export async function loadSession(
   serviceConfig: ServiceConfig,
   cookie: { id: string; token: string },
 ): Promise<Session | undefined> {
-  return getSession({ serviceConfig, sessionId: cookie.id, sessionToken: cookie.token })
-    .then((resp: GetSessionResponse) => resp.session)
-    .catch(async (error) => {
-      const { Code, ConnectError } = await import("@connectrpc/connect");
-      const isSessionRejected =
-        error instanceof ConnectError && (error.code === Code.NotFound || error.code === Code.PermissionDenied);
+  const result = await fetchSession(serviceConfig, cookie);
+  if ("session" in result) {
+    return result.session;
+  }
 
-      // The `sessions` cookie has no maxAge, so it can outlive the server-side session
-      // and reference one the session projection no longer holds, e.g. the user logged out, an
-      // admin/API terminated the session, or the user/org/instance was removed. In that
-      // case getSession throws `not_found`. If the session still exists but the cookie's token
-      // no longer matches it (e.g. the token was rotated by a later session update), getSession
-      // throws `permission_denied` (QUERY-dsfr3). Treat both like the no-cookie case and
-      // return undefined instead of letting the error crash the caller's render.
-      // Every call site already handles an undefined session, either with a graceful fallback
-      // or by throwing its own explicit "no session" error.
-      if (isSessionRejected) {
-        console.warn("[Session] Could not load session", error);
-        return undefined;
-      }
+  if (result.reason === "session_lookup_failed") {
+    throw result.error;
+  }
 
-      throw error;
-    });
+  logSessionResolutionFailure("load_session", result);
+  return undefined;
 }
 
 /**

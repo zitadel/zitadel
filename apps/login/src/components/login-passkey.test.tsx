@@ -1,6 +1,6 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { LoginPasskey } from "./login-passkey";
 
 // Mock next/navigation
@@ -34,6 +34,11 @@ describe("LoginPasskey Component", () => {
   let mockUpdateSession: any;
 
   const messages = {
+    error: {
+      sessionResolution: {
+        restart: "Restart sign-in",
+      },
+    },
     passkey: {
       verify: {
         title: "Authenticate with a passkey",
@@ -73,8 +78,11 @@ describe("LoginPasskey Component", () => {
     mockUpdateSession = vi.mocked(updateOrCreateSession);
   });
 
+  // without it the renders of earlier tests stay in the document and their elements match later queries
+  afterEach(cleanup);
+
   describe("Initialization and Challenge Request", () => {
-    test("should display error when challenge request fails", async () => {
+    test("should display the error of the challenge request", async () => {
       mockUpdateSession.mockResolvedValue({
         error: "Challenge failed",
       });
@@ -82,8 +90,47 @@ describe("LoginPasskey Component", () => {
       renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
 
       await waitFor(() => {
+        expect(screen.getByText("Challenge failed")).toBeInTheDocument();
+      });
+      expect(screen.queryByText("Could not request passkey challenge")).toBeNull();
+      expect(screen.queryByTestId("restart-sign-in")).toBeNull();
+    });
+
+    test("should display translated error when the challenge request rejects", async () => {
+      mockUpdateSession.mockRejectedValue(new Error("network down"));
+
+      renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
+
+      await waitFor(() => {
         expect(screen.getByText("Could not request passkey challenge")).toBeInTheDocument();
       });
+      expect(screen.queryByTestId("restart-sign-in")).toBeNull();
+    });
+
+    // U2F and passkey steps cannot continue without their session, the user has to start over
+    test("should offer to restart the sign-in when the session of the step is lost", async () => {
+      mockUpdateSession.mockResolvedValue({
+        error: "The login session for this account is no longer available.",
+        sessionLost: true,
+      });
+
+      renderWithIntl(
+        <LoginPasskey
+          loginName="test@example.com"
+          organization="org-1"
+          requestId="oidc_123"
+          altPassword={false}
+          login={false}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText("The login session for this account is no longer available.")).toBeInTheDocument();
+      });
+      expect(screen.getByTestId("restart-sign-in")).toHaveAttribute(
+        "href",
+        "/loginname?loginName=test%40example.com&organization=org-1&requestId=oidc_123",
+      );
     });
 
     test("should display translated error when no public key is returned", async () => {
@@ -222,6 +269,38 @@ describe("LoginPasskey Component", () => {
       await waitFor(() => {
         expect(screen.getByText("Verification failed")).toBeInTheDocument();
       });
+      expect(screen.queryByTestId("restart-sign-in")).toBeNull();
+    });
+
+    test("should offer to restart the sign-in when sendPasskey reports the session as lost", async () => {
+      setupSuccessfulChallenge();
+
+      mockCredentialsGet.mockResolvedValue({
+        id: "credential-id",
+        rawId: new ArrayBuffer(8),
+        type: "public-key",
+        response: {
+          authenticatorData: new ArrayBuffer(8),
+          clientDataJSON: new ArrayBuffer(8),
+          signature: new ArrayBuffer(8),
+          userHandle: new ArrayBuffer(8),
+        },
+      });
+
+      mockSendPasskey.mockResolvedValue({
+        error: "This login session has ended or expired.",
+        sessionLost: true,
+      });
+
+      renderWithIntl(<LoginPasskey loginName="test@example.com" requestId="oidc_123" altPassword={false} />);
+
+      await waitFor(() => {
+        expect(screen.getByText("This login session has ended or expired.")).toBeInTheDocument();
+      });
+      expect(screen.getByTestId("restart-sign-in")).toHaveAttribute(
+        "href",
+        "/loginname?loginName=test%40example.com&requestId=oidc_123",
+      );
     });
 
     test("should display error when sendPasskey returns undefined", async () => {
