@@ -1344,6 +1344,8 @@ func TestQueries_SearchUsers(t *testing.T) {
 
 	loginNameQuery, err := NewUserLoginNameExistsQuery("user@org.localhost", TextEqualsIgnoreCase)
 	require.NoError(t, err)
+	loginNameContainsQuery, err := NewUserLoginNameExistsQuery("user", TextContainsIgnoreCase)
+	require.NoError(t, err)
 	orgQuery, err := NewUserResourceOwnerSearchQuery("org1", TextEquals)
 	require.NoError(t, err)
 
@@ -1409,6 +1411,19 @@ func TestQueries_SearchUsers(t *testing.T) {
 			wantCount: 1,
 			wantUsers: []*User{expectedHumanUser()},
 		},
+		{
+			name: "login-name pattern matched once per statement",
+			args: args{
+				ctx: ctx,
+				queries: &UserSearchQueries{
+					SearchRequest: SearchRequest{Limit: 20},
+					Queries:       []SearchQuery{loginNameContainsQuery, orgQuery},
+				},
+			},
+			pageRows:  [][]driver.Value{humanUsersQueryRow(1)},
+			wantCount: 1,
+			wantUsers: []*User{expectedHumanUser()},
+		},
 	}
 
 	for _, tt := range tests {
@@ -1431,6 +1446,14 @@ func TestQueries_SearchUsers(t *testing.T) {
 			if len(tt.args.queries.Queries) == 1 && tt.args.queries.Queries[0] == loginNameQuery {
 				assert.Contains(t, inner, "login_name_matches")
 				assert.GreaterOrEqual(t, strings.Count(pageStmt, "login_name_matches"), 2)
+			}
+			if len(tt.args.queries.Queries) > 0 && tt.args.queries.Queries[0] == loginNameContainsQuery {
+				matches := " = ANY(ARRAY(SELECT projections.login_names3.user_id FROM projections.login_names3" +
+					" WHERE projections.login_names3.instance_id = $%d AND projections.login_names3.resource_owner = $%d" +
+					" AND LOWER(projections.login_names3.login_name) LIKE $%d))"
+				assert.Contains(t, pageStmt, "(SELECT COUNT(*) FROM projections.users14 WHERE projections.users14.instance_id = $1 AND projections.users14.id"+fmt.Sprintf(matches, 2, 3, 4))
+				assert.Contains(t, inner, "projections.users14.instance_id = $6 AND projections.users14.id"+fmt.Sprintf(matches, 7, 8, 9))
+				assert.NotContains(t, pageStmt, "projections.login_names3.user_id = projections.users14.id")
 			}
 
 			client, mock, err := sqlmock.New(
@@ -1486,6 +1509,43 @@ func TestQueries_CountUsers_AppliesFilters(t *testing.T) {
 	got, err := q.CountUsers(ctx, queries)
 	require.NoError(t, err)
 	assert.Equal(t, uint64(7), got)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestQueries_CountUsers_LoginNamePatternIsUncorrelated(t *testing.T) {
+	ctx := authz.WithInstanceID(t.Context(), "inst-1")
+	loginNameQuery, err := NewUserLoginNameExistsQuery("User", TextContainsIgnoreCase)
+	require.NoError(t, err)
+	orgQuery, err := NewUserResourceOwnerSearchQuery("org1", TextEquals)
+	require.NoError(t, err)
+	queries := &UserSearchQueries{Queries: []SearchQuery{loginNameQuery, orgQuery}}
+
+	client, mock, err := sqlmock.New(
+		sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual),
+		sqlmock.ValueConverterOption(new(db_mock.TypeConverter)),
+	)
+	require.NoError(t, err)
+	defer client.Close()
+
+	// The matching user IDs are read once per statement, for the
+	// organization only, instead of once per user.
+	mock.ExpectQuery(
+		"SELECT COUNT(*) FROM projections.users14"+
+			" WHERE projections.users14.instance_id = $1"+
+			" AND projections.users14.id = ANY(ARRAY("+
+			"SELECT projections.login_names3.user_id FROM projections.login_names3"+
+			" WHERE projections.login_names3.instance_id = $2"+
+			" AND projections.login_names3.resource_owner = $3"+
+			" AND LOWER(projections.login_names3.login_name) LIKE $4))"+
+			" AND projections.users14.resource_owner = $5",
+	).WithArgs("inst-1", "inst-1", "org1", "%user%", "org1").WillReturnRows(
+		sqlmock.NewRows(countUsersCols).AddRow(uint64(3)),
+	)
+
+	q := &Queries{client: &database.DB{DB: client}}
+	got, err := q.CountUsers(ctx, queries)
+	require.NoError(t, err)
+	assert.Equal(t, uint64(3), got)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
