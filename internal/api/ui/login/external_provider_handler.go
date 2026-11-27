@@ -1795,6 +1795,11 @@ func (e *IdPError) Error() string {
 }
 
 func (e *IdPError) Unwrap() error {
+	// The zero value is used as target for [errors.Is].
+	// Returning the nil pointer would result in a non-nil error, which panics when it is unwrapped further.
+	if e.err == nil {
+		return nil
+	}
 	return e.err
 }
 
