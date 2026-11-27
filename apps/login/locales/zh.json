@@ -172,6 +172,7 @@
       "title": "登录失败",
       "description": "登录时发生错误。"
     },
+    "chooseAlternativeMethod": "请改用其他方式登录：",
     "linkingError": {
       "title": "账户链接失败",
       "description": "链接账户时发生错误。"
@@ -299,6 +300,7 @@
         "couldNotFindSession": "找不到会话",
         "couldNotUpdateSession": "无法更新会话",
         "userNotFound": "系统中未找到用户",
+        "couldNotGetUser": "无法获取用户",
         "couldNotDetermineRedirect": "密钥验证后无法确定重定向URL"
       }
     },
@@ -374,7 +376,10 @@
       "userNotFound": "系统中未找到用户",
       "couldNotLinkIDP": "无法将 IDP 关联到用户",
       "couldNotRegisterUser": "无法注册用户",
-      "sessionMismatch": "注册是在另一个浏览器中开始的。请使用您的身份提供商重新登录。"
+      "sessionMismatch": "注册是在另一个浏览器中开始的。请使用您的身份提供商重新登录。",
+      "registerNotAllowed": "不允许注册！请联系您的管理员了解更多信息。",
+      "localAuthenticationNotAllowed": "不允许本地身份验证！请联系您的管理员以获取更多信息。",
+      "couldNotGetLoginSettings": "无法获取登录设置"
     }
   },
   "invite": {
@@ -474,6 +479,7 @@
       "title": "{appName} 想要连接：",
       "description": "{appName} 将访问：",
       "disclaimer": "点击“允许”即表示您允许此应用程序和 Zitadel 根据其各自的服务条款和隐私政策使用您的信息。您可以随时撤销此访问权限。",
+      "usercode": "您设备上显示的代码：",
       "submit": "允许",
       "deny": "拒绝"
     },

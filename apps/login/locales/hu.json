@@ -172,6 +172,7 @@
       "title": "Sikertelen bejelentkezés",
       "description": "Hiba történt a bejelentkezés során."
     },
+    "chooseAlternativeMethod": "Jelentkezz be inkább egy másik módszerrel:",
     "linkingError": {
       "title": "Sikertelen fiókösszekapcsolás",
       "description": "Hiba történt a fiókod összekapcsolása során."
@@ -299,6 +300,7 @@
         "couldNotFindSession": "Nem található munkamenet",
         "couldNotUpdateSession": "Nem sikerült frissíteni a munkamenetet",
         "userNotFound": "A felhasználó nem található a rendszerben",
+        "couldNotGetUser": "A felhasználó lekérése nem sikerült",
         "couldNotDetermineRedirect": "Nem sikerült meghatározni az átirányítási címet a jelkulcs ellenőrzése után"
       }
     },
@@ -374,7 +376,10 @@
       "userNotFound": "A felhasználó nem található a rendszerben",
       "couldNotLinkIDP": "Nem sikerült összekapcsolni az azonosítószolgáltatót a felhasználóval",
       "couldNotRegisterUser": "Nem sikerült regisztrálni a felhasználót",
-      "sessionMismatch": "A regisztráció egy másik böngészőben indult. Jelentkezz be újra az azonosítószolgáltatódnál."
+      "sessionMismatch": "A regisztráció egy másik böngészőben indult. Jelentkezz be újra az azonosítószolgáltatódnál.",
+      "registerNotAllowed": "A regisztráció nem engedélyezett! További információért forduljon a rendszergazdához.",
+      "localAuthenticationNotAllowed": "A helyi hitelesítés nem engedélyezett! További információért fordulj a rendszergazdához.",
+      "couldNotGetLoginSettings": "Nem sikerült lekérni a bejelentkezési beállításokat"
     }
   },
   "invite": {
@@ -474,6 +479,7 @@
       "title": "A(z) {appName} kapcsolódni szeretne",
       "description": "A(z) {appName} hozzáférést kap a következőkhöz:",
       "disclaimer": "Az Engedélyezés gombra kattintva engedélyezed, hogy a(z) {appName} és a Zitadel a saját felhasználási feltételeik és adatvédelmi irányelveik szerint használja az adataidat. Ezt a hozzáférést bármikor visszavonhatod.",
+      "usercode": "Az eszközödön megjelenő kód:",
       "submit": "Engedélyezés",
       "deny": "Elutasítás"
     },

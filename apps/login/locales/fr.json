@@ -172,6 +172,7 @@
       "title": "Échec de la connexion",
       "description": "Une erreur est survenue lors de la tentative de connexion."
     },
+    "chooseAlternativeMethod": "Connectez-vous plutôt avec une autre méthode :",
     "linkingError": {
       "title": "Échec de la liaison du compte",
       "description": "Une erreur est survenue lors de la tentative de lier votre compte."
@@ -299,6 +300,7 @@
         "couldNotFindSession": "Session introuvable",
         "couldNotUpdateSession": "Impossible de mettre à jour la session",
         "userNotFound": "Utilisateur introuvable dans le système",
+        "couldNotGetUser": "Impossible de récupérer l'utilisateur",
         "couldNotDetermineRedirect": "Impossible de déterminer l'URL de redirection après la vérification de la clé d'accès"
       }
     },
@@ -374,7 +376,10 @@
       "userNotFound": "Utilisateur non trouvé dans le système",
       "couldNotLinkIDP": "Impossible de lier le fournisseur d'identité à l'utilisateur",
       "couldNotRegisterUser": "Impossible d'inscrire l'utilisateur",
-      "sessionMismatch": "L'inscription a été commencée dans un autre navigateur. Veuillez vous reconnecter avec votre fournisseur d'identité."
+      "sessionMismatch": "L'inscription a été commencée dans un autre navigateur. Veuillez vous reconnecter avec votre fournisseur d'identité.",
+      "registerNotAllowed": "L'inscription n'est pas autorisée ! Contactez votre administrateur pour plus d'informations.",
+      "localAuthenticationNotAllowed": "L'authentification locale n'est pas autorisée ! Contactez votre administrateur pour plus d'informations.",
+      "couldNotGetLoginSettings": "Impossible d'obtenir les paramètres de connexion"
     }
   },
   "invite": {
@@ -474,6 +479,7 @@
       "title": "{appName} souhaite se connecter",
       "description": "{appName} aura accès à :",
       "disclaimer": "En cliquant sur Autoriser, vous permettez à {appName} et à Zitadel d'utiliser vos informations conformément à leurs conditions d'utilisation et politiques de confidentialité respectives. Vous pouvez révoquer cet accès à tout moment.",
+      "usercode": "Code affiché sur votre appareil :",
       "submit": "Autoriser",
       "deny": "Refuser"
     },

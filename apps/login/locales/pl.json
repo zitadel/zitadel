@@ -172,6 +172,7 @@
       "title": "Logowanie nieudane",
       "description": "Wystąpił błąd podczas próby logowania."
     },
+    "chooseAlternativeMethod": "Zamiast tego zaloguj się inną metodą:",
     "linkingError": {
       "title": "Powiązanie konta nie powiodło się",
       "description": "Wystąpił błąd podczas próby powiązania konta."
@@ -299,6 +300,7 @@
         "couldNotFindSession": "Nie można znaleźć sesji",
         "couldNotUpdateSession": "Nie można zaktualizować sesji",
         "userNotFound": "Użytkownik nie znaleziony w systemie",
+        "couldNotGetUser": "Nie można pobrać użytkownika",
         "couldNotDetermineRedirect": "Nie można określić adresu URL przekierowania po weryfikacji klucza dostępu"
       }
     },
@@ -374,7 +376,10 @@
       "userNotFound": "Nie znaleziono użytkownika w systemie",
       "couldNotLinkIDP": "Nie udało się powiązać IDP z użytkownikiem",
       "couldNotRegisterUser": "Nie udało się zarejestrować użytkownika",
-      "sessionMismatch": "Rejestracja została rozpoczęta w innej przeglądarce. Zaloguj się ponownie u swojego dostawcy tożsamości."
+      "sessionMismatch": "Rejestracja została rozpoczęta w innej przeglądarce. Zaloguj się ponownie u swojego dostawcy tożsamości.",
+      "registerNotAllowed": "Rejestracja jest niedozwolona! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+      "localAuthenticationNotAllowed": "Uwierzytelnianie lokalne nie jest dozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+      "couldNotGetLoginSettings": "Nie udało się pobrać ustawień logowania"
     }
   },
   "invite": {
@@ -474,6 +479,7 @@
       "title": "{appName} chce się połączyć:",
       "description": "{appName} będzie miało dostęp do:",
       "disclaimer": "Klikając Zezwól, pozwalasz tej aplikacji i Zitadel na korzystanie z Twoich informacji zgodnie z ich odpowiednimi warunkami użytkowania i politykami prywatności. Możesz cofnąć ten dostęp w dowolnym momencie.",
+      "usercode": "Kod wyświetlany na Twoim urządzeniu:",
       "submit": "Zezwól",
       "deny": "Odmów"
     },

@@ -172,6 +172,7 @@
       "title": "Anmeldung fehlgeschlagen",
       "description": "Beim Anmelden ist ein Fehler aufgetreten."
     },
+    "chooseAlternativeMethod": "Melden Sie sich stattdessen mit einer anderen Methode an:",
     "linkingError": {
       "title": "Konto-Verknüpfung fehlgeschlagen",
       "description": "Beim Verknüpfen Ihres Kontos ist ein Fehler aufgetreten."
@@ -299,6 +300,7 @@
         "couldNotFindSession": "Sitzung konnte nicht gefunden werden",
         "couldNotUpdateSession": "Sitzung konnte nicht aktualisiert werden",
         "userNotFound": "Benutzer nicht im System gefunden",
+        "couldNotGetUser": "Benutzer konnte nicht geladen werden",
         "couldNotDetermineRedirect": "Weiterleitungs-URL nach Passkey-Verifizierung konnte nicht ermittelt werden"
       }
     },
@@ -374,7 +376,10 @@
       "userNotFound": "Benutzer nicht im System gefunden",
       "couldNotLinkIDP": "IDP konnte nicht mit dem Benutzer verknüpft werden",
       "couldNotRegisterUser": "Benutzer konnte nicht registriert werden",
-      "sessionMismatch": "Die Registrierung wurde in einem anderen Browser gestartet. Bitte melden Sie sich erneut bei Ihrem Identitätsanbieter an."
+      "sessionMismatch": "Die Registrierung wurde in einem anderen Browser gestartet. Bitte melden Sie sich erneut bei Ihrem Identitätsanbieter an.",
+      "registerNotAllowed": "Registrierung ist nicht erlaubt! Kontaktieren Sie Ihren Administrator für weitere Informationen.",
+      "localAuthenticationNotAllowed": "Lokale Authentifizierung nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator.",
+      "couldNotGetLoginSettings": "Anmeldeeinstellungen konnten nicht abgerufen werden"
     }
   },
   "invite": {
@@ -472,8 +477,9 @@
     },
     "request": {
       "title": "{appName} möchte eine Verbindung herstellen:",
-      "disclaimer": "{appName} hat Zugriff auf:",
-      "description": "Durch Klicken auf Zulassen erlauben Sie {appName} und Zitadel, Ihre Informationen gemäß ihren jeweiligen Nutzungsbedingungen und Datenschutzrichtlinien zu verwenden. Sie können diesen Zugriff jederzeit widerrufen.",
+      "disclaimer": "Durch Klicken auf Zulassen erlauben Sie {appName} und Zitadel, Ihre Informationen gemäß ihren jeweiligen Nutzungsbedingungen und Datenschutzrichtlinien zu verwenden. Sie können diesen Zugriff jederzeit widerrufen.",
+      "usercode": "Auf Ihrem Gerät angezeigter Code:",
+      "description": "{appName} hat Zugriff auf:",
       "submit": "Zulassen",
       "deny": "Ablehnen"
     },
