@@ -30,6 +30,16 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+      # The docs' fumadocs-openapi 10.8 works only with fumadocs-core and
+      # fumadocs-ui up to 16.8, 10.9 and 10.10 only with 16.9, and 16.10 and
+      # later need fumadocs-openapi 11 or 12. They stay where they are until
+      # someone moves all three to the next fumadocs-openapi major.
+      - dependency-name: "fumadocs-openapi"
+        versions: [">=10.9.0 <11.0.0"]
+      - dependency-name: "fumadocs-core"
+        versions: [">=16.9.0 <17.0.0"]
+      - dependency-name: "fumadocs-ui"
+        versions: [">=16.9.0 <17.0.0"]
     groups:
       # Shipped in the login image and the docs site.
       next:
