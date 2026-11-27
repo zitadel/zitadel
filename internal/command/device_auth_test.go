@@ -1050,6 +1050,63 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 	}
 }
 
+func TestCommands_DenyDeviceAuth(t *testing.T) {
+	ctx := authz.WithInstanceID(context.Background(), "instance1")
+	now := time.Now()
+
+	tests := []struct {
+		name        string
+		eventstore  func(*testing.T) *eventstore.Eventstore
+		wantDetails *domain.ObjectDetails
+		wantErr     error
+	}{
+		{
+			name: "not found error",
+			eventstore: expectEventstore(
+				expectFilter(),
+			),
+			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-gee5A", "Errors.DeviceAuth.NotFound"),
+		},
+		{
+			// The hosted login (v1) calls this without an authenticated ctxData,
+			// so it must not depend on the session.link permission.
+			name: "success without session.link permission",
+			eventstore: expectEventstore(
+				expectFilter(eventFromEventPusherWithInstanceID(
+					"instance1",
+					deviceauth.NewAddedEvent(
+						ctx,
+						deviceauth.NewAggregate("123", "instance1"),
+						"client_id", "123", "456", now,
+						[]string{"a", "b", "c"},
+						[]string{"projectID", "clientID"}, true, "",
+					),
+				)),
+				expectPush(
+					deviceauth.NewCanceledEvent(
+						ctx, deviceauth.NewAggregate("123", "instance1"),
+						domain.DeviceAuthCanceledDenied,
+					),
+				),
+			),
+			wantDetails: &domain.ObjectDetails{
+				ResourceOwner: "instance1",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:      tt.eventstore(t),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			}
+			gotDetails, err := c.DenyDeviceAuth(ctx, "123")
+			require.ErrorIs(t, err, tt.wantErr)
+			assertObjectDetails(t, tt.wantDetails, gotDetails)
+		})
+	}
+}
+
 func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 	ctx := authz.WithInstanceID(context.Background(), "instance1")
 
