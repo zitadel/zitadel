@@ -18,7 +18,7 @@ jobs:
       group: 32-arm-linux
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           filter: tree:0
@@ -26,34 +26,34 @@ jobs:
         if: ${{ github.ref != 'refs/heads/main' }}
         run: git fetch origin main:main
       - name: Set up Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           run_install: false
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ inputs.node_version }}
           cache: "pnpm"
       - name: Set up Docker
-        uses: docker/setup-docker-action@v4
+        uses: docker/setup-docker-action@v5
         with:
           version: v28.3.2
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
         with:
           version: v0.28.0
       - name: Set up Docker Compose
-        uses: docker/setup-compose-action@v1
+        uses: docker/setup-compose-action@v2
         with:
           version: v2.38.2
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Set SHAs for nx affected commands
-        uses: nrwl/nx-set-shas@v4
+        uses: nrwl/nx-set-shas@v5
       # The Nx task cache lives in nx-task-cache artifacts; .github/scripts/nx-task-cache.mjs says why.
       - name: Find the Nx task cache
         id: nx-cache
@@ -68,7 +68,7 @@ jobs:
         id: nx-cache-base
         if: steps.nx-cache.outputs.base-run
         continue-on-error: true
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: nx-task-cache
           run-id: ${{ steps.nx-cache.outputs.base-run }}
@@ -78,7 +78,7 @@ jobs:
         id: nx-cache-branch
         if: steps.nx-cache.outputs.branch-run
         continue-on-error: true
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: nx-task-cache
           run-id: ${{ steps.nx-cache.outputs.branch-run }}
@@ -133,7 +133,7 @@ jobs:
           fi
       - name: Upload the Nx task cache
         if: ${{ !cancelled() && steps.nx.outcome != 'skipped' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nx-task-cache
           path: ${{ runner.temp }}/nx-task-cache
@@ -144,14 +144,14 @@ jobs:
       - name: Check for uncommitted changes (Codegen mismatch)
         run: git diff --exit-code
       - name: Publish API Unit Test Coverage
-        uses: codecov/codecov-action@v4.3.0
+        uses: codecov/codecov-action@v7.1.1
         with:
           file: profile.api.test-unit.cov
           name: api-test-unit
           flags: api-test-unit
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Publish API Integration Test Coverage
-        uses: codecov/codecov-action@v4.3.0
+        uses: codecov/codecov-action@v7.1.1
         with:
           file: profile.api.test-integration.cov
           name: api-test-integration
@@ -159,13 +159,13 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Upload API Integration Test Race Logs
         if: failure() || cancelled()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: api-integration-test-race-logs
           path: |
             .artifacts/api-test-integration/race.log.*
       - name: Upload Functional UI Test Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: failure() || cancelled()
         with:
           name: functional-ui-tests
