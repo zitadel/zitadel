@@ -2,7 +2,7 @@ import { test, describe, beforeEach, afterEach, mock } from 'node:test';
 import assert from 'node:assert';
 import fs from 'fs';
 import path from 'path';
-import { getCurrentRef, resetCache, downloadFileContent, isValidRef, safeLog, unwrapHeadingLinks, parseLsRemoteTags } from './fetch-remote-content.mjs';
+import { getCurrentRef, resetCache, downloadFileContent, isValidRef, safeLog, unwrapHeadingLinks, indentFrontmatterContinuations, parseLsRemoteTags } from './fetch-remote-content.mjs';
 
 const TEST_TMP_DIR = path.join(process.cwd(), '.test-tmp');
 const MOCK_REPO_ROOT = path.join(TEST_TMP_DIR, 'mock-repo');
@@ -196,6 +196,45 @@ describe('fetch-remote-content', () => {
         '```',
       ].join('\n');
       assert.strictEqual(unwrapHeadingLinks(input), input);
+    });
+  });
+
+  describe('indentFrontmatterContinuations', () => {
+    test('indents an unindented line that continues a quoted value', () => {
+      const input = [
+        '---',
+        'title: "Onboard Customers and Users"',
+        'description: "One of the first questions is \'How do my customers onboard?\'',
+        'These guides explain onboarding. "',
+        '---',
+        '',
+        'These guides stay unindented in the body.',
+      ].join('\n');
+      const expected = [
+        '---',
+        'title: "Onboard Customers and Users"',
+        'description: "One of the first questions is \'How do my customers onboard?\'',
+        '  These guides explain onboarding. "',
+        '---',
+        '',
+        'These guides stay unindented in the body.',
+      ].join('\n');
+      assert.strictEqual(indentFrontmatterContinuations(input), expected);
+    });
+
+    test('leaves valid front matter and pages without front matter alone', () => {
+      const valid = [
+        '---',
+        'title: Setup',
+        'sidebar_label: "Setup: step 1"',
+        'tags:',
+        '- a',
+        '# comment',
+        '---',
+        'Body',
+      ].join('\n');
+      assert.strictEqual(indentFrontmatterContinuations(valid), valid);
+      assert.strictEqual(indentFrontmatterContinuations('# No front matter\nText'), '# No front matter\nText');
     });
   });
 
