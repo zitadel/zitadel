@@ -92,7 +92,8 @@ type WorkerConfig struct {
 type nowFunc func() time.Time
 
 // Sent is called after a notification was sent to set the corresponding event on the aggregate.
-// deliveryInfo states the provider an email was sent through.
+// deliveryInfo states the provider an email was sent through,
+// or that it was accepted, but intentionally not sent to the provider.
 type Sent func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, deliveryInfo senders.DeliveryInfo, args map[string]any) error
 
 var sentHandlers map[eventstore.EventType]Sent
