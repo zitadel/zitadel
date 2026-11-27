@@ -12,12 +12,6 @@ exclude:
 # has no fixed release yet. Name the pinning parent so the entry can be removed
 # once the parent is updated. See skills/npm-dependency-audit.md.
 overrides:
-  # nx pins axios 1.18.1, brace-expansion 5.0.8 and smol-toml 1.6.1 (latest nx 22.x; nx 23 fixes all three)
-  # and follow-redirects 1.16.0 (latest nx 22.x; nx 24 no longer depends on it)
-  "axios@>=1.0.0 <1.20.0": "^1.20.0"
-  "follow-redirects@<1.16.2": "^1.16.2"
-  "brace-expansion@>=4.0.0 <5.0.12": "^5.0.12"
-  "smol-toml@<1.9.0": "^1.9.0"
   # tsup 8.x (via @zitadel/client) allows esbuild ^0.27 only
   "esbuild@>=0.27.3 <0.28.1": "^0.28.1"
   # @opentelemetry/sdk-node 0.218 and auto-instrumentations-node 0.76 (login) pin older versions
