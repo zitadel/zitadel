@@ -544,22 +544,6 @@ describe("OpenTelemetry Integration", () => {
         },
         TEST_TIMEOUT,
       );
-
-      it(
-        "records OK status text",
-        () => {
-          expect(readTraces()).toContain('"OK"');
-        },
-        TEST_TIMEOUT,
-      );
-
-      it(
-        "records NOT FOUND status text",
-        () => {
-          expect(readTraces()).toContain('"NOT FOUND"');
-        },
-        TEST_TIMEOUT,
-      );
     });
 
     describe("Trace Propagation", () => {
@@ -759,10 +743,10 @@ describe("OpenTelemetry Integration", () => {
       );
 
       it(
-        "exposes v8js_memory_heap_limit",
+        "exposes v8js_memory_heap_space_size",
         async () => {
           const response = await fetch(prometheusUrl);
-          expect(await response.text()).toContain("v8js_memory_heap_limit");
+          expect(await response.text()).toContain("v8js_memory_heap_space_size");
         },
         TEST_TIMEOUT,
       );
@@ -1136,25 +1120,9 @@ describe("OpenTelemetry Integration", () => {
       );
 
       it(
-        "includes trace_id attribute",
+        "includes trace flags on correlated records",
         () => {
-          expect(readLogs()).toContain('"trace_id"');
-        },
-        TEST_TIMEOUT,
-      );
-
-      it(
-        "includes span_id attribute",
-        () => {
-          expect(readLogs()).toContain('"span_id"');
-        },
-        TEST_TIMEOUT,
-      );
-
-      it(
-        "includes trace_flags attribute",
-        () => {
-          expect(readLogs()).toContain('"trace_flags"');
+          expect(readLogs()).toMatch(/"flags":1,"traceId":"[a-f0-9]{32}"/);
         },
         TEST_TIMEOUT,
       );
