@@ -4,6 +4,9 @@ on:
 
 jobs:
   comment:
+    # Pull requests from bots get a read-only token, so the comment would fail
+    # with 403, and the checklist is for people anyway.
+    if: github.event.pull_request.user.type != 'Bot'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/github-script@v7

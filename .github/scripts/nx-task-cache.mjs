@@ -7,8 +7,8 @@
 //
 // Artifacts are bound to the run that uploaded them, so a job restores only from
 // runs on the base branch of this repository (BASE_BRANCH, main by default) and from
-// earlier runs of its own branch. A re-run doesn't see the artifact of its own
-// earlier attempt, only those of earlier runs.
+// earlier runs of its own branch. Re-running failed jobs restores the artifact of
+// the run's earlier attempt; re-running all jobs doesn't see it, only earlier runs.
 //
 //   node nx-task-cache.mjs find <artifact>          write base-run=<id> and branch-run=<id> to $GITHUB_OUTPUT
 //   node nx-task-cache.mjs serve <store>            serve <store> on a free 127.0.0.1 port, written to <store>.url

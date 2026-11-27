@@ -1,5 +1,5 @@
 # Few pull requests, each one worth merging:
-# - one grouped pull request per entry a month, with minor and patch
+# - one pull request per group a month, with minor and patch
 #   releases at least a week old, so a broken release is usually replaced
 #   before it reaches us;
 # - majors stay manual, but still arrive as security updates, which are
@@ -12,15 +12,15 @@
 # node:24-alpine, ubi9/nodejs-24) only change at a major, which stays manual.
 version: 2
 updates:
-  # The pnpm workspace (pnpm-workspace.yaml) without the three apps below:
-  # the root tooling, packages/*, tests/* and deploy/compose. exclude-paths
-  # globs are relative to `directory` and hold for version updates only.
+  # The whole pnpm workspace (pnpm-workspace.yaml): apps/*, console,
+  # packages/*, tests/* and deploy/compose. It has to be one entry at the
+  # root: an entry for a workspace folder such as /apps/login bumps only that
+  # folder's package.json and leaves the root pnpm-lock.yaml behind, so
+  # `pnpm install --frozen-lockfile` fails in CI.
+  # A dependency goes to the first group that matches it, so Next.js, Angular
+  # and OpenTelemetry each get their own pull request and the rest share one.
   - package-ecosystem: npm
     directory: /
-    exclude-paths:
-      - "apps/docs/**"
-      - "apps/login/**"
-      - "console/**"
     schedule:
       interval: monthly
     cooldown:
@@ -31,7 +31,28 @@ updates:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
     groups:
-      workspace:
+      # Shipped in the login image and the docs site.
+      next:
+        patterns:
+          - "next"
+          - "@next/*"
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+        update-types: [minor, patch]
+      # The console.
+      angular:
+        patterns:
+          - "@angular/*"
+          - "@angular-eslint/*"
+        update-types: [minor, patch]
+      # The login's telemetry. Its 0.x packages break in minor releases, so
+      # they must not hold back the rest.
+      opentelemetry:
+        patterns: ["@opentelemetry/*"]
+        update-types: [minor, patch]
+      npm:
         update-types: [minor, patch]
       npm-security:
         applies-to: security-updates
@@ -39,68 +60,6 @@ updates:
     commit-message:
       prefix: chore
       include: scope
-
-  # The login image ships Next.js, so its bumps get their own pull request.
-  - package-ecosystem: npm
-    directory: /apps/login
-    schedule:
-      interval: monthly
-    cooldown:
-      default-days: 7
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
-    groups:
-      login:
-        update-types: [minor, patch]
-      login-security:
-        applies-to: security-updates
-        patterns: ["*"]
-    commit-message:
-      prefix: chore
-      include: scope
-
-  - package-ecosystem: npm
-    directory: /console
-    schedule:
-      interval: monthly
-    cooldown:
-      default-days: 7
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
-    groups:
-      console:
-        update-types: [minor, patch]
-      console-security:
-        applies-to: security-updates
-        patterns: ["*"]
-    commit-message:
-      prefix: chore
-      include: scope
-
-  - package-ecosystem: npm
-    directory: /apps/docs
-    schedule:
-      interval: monthly
-    cooldown:
-      default-days: 7
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
-    groups:
-      docs:
-        update-types: [minor, patch]
-      docs-security:
-        applies-to: security-updates
-        patterns: ["*"]
-    commit-message:
-      prefix: chore
-      include: scope
-    labels:
-      - "javascript"
-      - "dependencies"
-      - "area/docs"
 
   # The k6 benchmark sits outside the workspace with its own lockfile.
   # Security updates only: a limit of 0 turns version updates off.
