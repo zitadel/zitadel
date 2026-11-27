@@ -15,6 +15,7 @@ import (
 const (
 	phoneEventPrefix                 = humanEventPrefix + "phone."
 	HumanPhoneChangedType            = phoneEventPrefix + "changed"
+	HumanPhoneChangeSentType         = phoneEventPrefix + "change.sent"
 	HumanPhoneRemovedType            = phoneEventPrefix + "removed"
 	HumanPhoneVerifiedType           = phoneEventPrefix + "verified"
 	HumanPhoneVerificationFailedType = phoneEventPrefix + "verification.failed"
@@ -25,7 +26,8 @@ const (
 type HumanPhoneChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	PhoneNumber domain.PhoneNumber `json:"phone,omitempty"`
+	PhoneNumber       domain.PhoneNumber `json:"phone,omitempty"`
+	TriggeredAtOrigin string             `json:"triggerOrigin,omitempty"`
 }
 
 func (e *HumanPhoneChangedEvent) Payload() interface{} {
@@ -36,6 +38,10 @@ func (e *HumanPhoneChangedEvent) UniqueConstraints() []*eventstore.UniqueConstra
 	return nil
 }
 
+func (e *HumanPhoneChangedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
+}
+
 func NewHumanPhoneChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, phone domain.PhoneNumber) *HumanPhoneChangedEvent {
 	return &HumanPhoneChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -43,7 +49,8 @@ func NewHumanPhoneChangedEvent(ctx context.Context, aggregate *eventstore.Aggreg
 			aggregate,
 			HumanPhoneChangedType,
 		),
-		PhoneNumber: phone,
+		PhoneNumber:       phone,
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
 }
 
@@ -57,6 +64,34 @@ func HumanPhoneChangedEventMapper(event eventstore.Event) (eventstore.Event, err
 	}
 
 	return phoneChangedEvent, nil
+}
+
+type HumanPhoneChangeSentEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *HumanPhoneChangeSentEvent) Payload() interface{} {
+	return nil
+}
+
+func (e *HumanPhoneChangeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewHumanPhoneChangeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPhoneChangeSentEvent {
+	return &HumanPhoneChangeSentEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanPhoneChangeSentType,
+		),
+	}
+}
+
+func HumanPhoneChangeSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	return &HumanPhoneChangeSentEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
 }
 
 type HumanPhoneRemovedEvent struct {

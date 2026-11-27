@@ -97,26 +97,26 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 					gomock.Any(),
 				).Return(nil)
 				return fields{
-						queries: queries,
-						queue:   q,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries: queries,
+					queue:   q,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanInitialCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanInitialCodeAddedType,
 						}),
-					}, args{
-						event: &user.HumanInitialCodeAddedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           user.HumanInitialCodeAddedType,
-							}),
-							Code:              code,
-							Expiry:            time.Hour,
-							TriggeredAtOrigin: eventOrigin,
-							AuthRequestID:     authRequestID,
-						},
-					}, w
+						Code:              code,
+						Expiry:            time.Hour,
+						TriggeredAtOrigin: eventOrigin,
+						AuthRequestID:     authRequestID,
+					},
+				}, w
 			},
 		},
 		{
@@ -156,25 +156,25 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 					gomock.Any(),
 				).Return(nil)
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanInitialCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanInitialCodeAddedType,
 						}),
-					}, args{
-						event: &user.HumanInitialCodeAddedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           user.HumanInitialCodeAddedType,
-							}),
-							Code:          code,
-							Expiry:        time.Hour,
-							AuthRequestID: authRequestID,
-						},
-					}, w
+						Code:          code,
+						Expiry:        time.Hour,
+						AuthRequestID: authRequestID,
+					},
+				}, w
 			},
 		},
 	}
@@ -236,28 +236,28 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 					gomock.Any(),
 				).Return(nil)
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanEmailCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanEmailCodeAddedType,
 						}),
-					}, args{
-						event: &user.HumanEmailCodeAddedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           user.HumanEmailCodeAddedType,
-							}),
-							Code:              code,
-							Expiry:            time.Hour,
-							URLTemplate:       "",
-							CodeReturned:      false,
-							TriggeredAtOrigin: eventOrigin,
-							AuthRequestID:     authRequestID,
-						},
-					}, w
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTemplate:       "",
+						CodeReturned:      false,
+						TriggeredAtOrigin: eventOrigin,
+						AuthRequestID:     authRequestID,
+					},
+				}, w
 			},
 		},
 		{
@@ -298,27 +298,27 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 					gomock.Any(),
 				).Return(nil)
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanEmailCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanEmailCodeAddedType,
 						}),
-					}, args{
-						event: &user.HumanEmailCodeAddedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           user.HumanEmailCodeAddedType,
-							}),
-							Code:          code,
-							Expiry:        time.Hour,
-							URLTemplate:   "",
-							CodeReturned:  false,
-							AuthRequestID: authRequestID,
-						},
-					}, w
+						Code:          code,
+						Expiry:        time.Hour,
+						URLTemplate:   "",
+						CodeReturned:  false,
+						AuthRequestID: authRequestID,
+					},
+				}, w
 			},
 		},
 		{
@@ -327,28 +327,28 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 				w.noOperation = true
 				_, code := cryptoValue(t, ctrl, "testcode")
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanEmailCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanEmailCodeAddedType,
 						}),
-					}, args{
-						event: &user.HumanEmailCodeAddedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           user.HumanEmailCodeAddedType,
-							}),
-							Code:              code,
-							Expiry:            time.Hour,
-							URLTemplate:       "",
-							CodeReturned:      true,
-							TriggeredAtOrigin: eventOrigin,
-							AuthRequestID:     authRequestID,
-						},
-					}, w
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTemplate:       "",
+						CodeReturned:      true,
+						TriggeredAtOrigin: eventOrigin,
+						AuthRequestID:     authRequestID,
+					},
+				}, w
 			},
 		},
 	}
@@ -414,28 +414,28 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 					gomock.Any(),
 				).Return(nil)
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanPasswordCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanPasswordCodeAddedType,
 						}),
-					}, args{
-						event: &user.HumanPasswordCodeAddedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           user.HumanPasswordCodeAddedType,
-							}),
-							Code:              code,
-							Expiry:            time.Hour,
-							URLTemplate:       "",
-							CodeReturned:      false,
-							TriggeredAtOrigin: eventOrigin,
-							AuthRequestID:     authRequestID,
-						},
-					}, w
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTemplate:       "",
+						CodeReturned:      false,
+						TriggeredAtOrigin: eventOrigin,
+						AuthRequestID:     authRequestID,
+					},
+				}, w
 			},
 		},
 		{
@@ -475,27 +475,27 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 					gomock.Any(),
 				).Return(nil)
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanPasswordCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanPasswordCodeAddedType,
 						}),
-					}, args{
-						event: &user.HumanPasswordCodeAddedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           user.HumanPasswordCodeAddedType,
-							}),
-							Code:          code,
-							Expiry:        time.Hour,
-							URLTemplate:   "",
-							CodeReturned:  false,
-							AuthRequestID: authRequestID,
-						},
-					}, w
+						Code:          code,
+						Expiry:        time.Hour,
+						URLTemplate:   "",
+						CodeReturned:  false,
+						AuthRequestID: authRequestID,
+					},
+				}, w
 			},
 		},
 		{
@@ -528,30 +528,30 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 					gomock.Any(),
 				).Return(nil)
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanPasswordCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanPasswordCodeAddedType,
 						}),
-					}, args{
-						event: &user.HumanPasswordCodeAddedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           user.HumanPasswordCodeAddedType,
-							}),
-							Code:              nil,
-							Expiry:            0,
-							URLTemplate:       "",
-							CodeReturned:      false,
-							NotificationType:  domain.NotificationTypeSms,
-							GeneratorID:       smsProviderID,
-							TriggeredAtOrigin: eventOrigin,
-							AuthRequestID:     authRequestID,
-						},
-					}, w
+						Code:              nil,
+						Expiry:            0,
+						URLTemplate:       "",
+						CodeReturned:      false,
+						NotificationType:  domain.NotificationTypeSms,
+						GeneratorID:       smsProviderID,
+						TriggeredAtOrigin: eventOrigin,
+						AuthRequestID:     authRequestID,
+					},
+				}, w
 			},
 		},
 		{
@@ -560,30 +560,30 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 				w.noOperation = true
 				_, code := cryptoValue(t, ctrl, "testcode")
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanPasswordCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanPasswordCodeAddedType,
 						}),
-					}, args{
-						event: &user.HumanPasswordCodeAddedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           user.HumanPasswordCodeAddedType,
-							}),
-							Code:              code,
-							Expiry:            1 * time.Hour,
-							URLTemplate:       "",
-							CodeReturned:      true,
-							NotificationType:  domain.NotificationTypeSms,
-							GeneratorID:       smsProviderID,
-							TriggeredAtOrigin: eventOrigin,
-							AuthRequestID:     authRequestID,
-						},
-					}, w
+						Code:              code,
+						Expiry:            1 * time.Hour,
+						URLTemplate:       "",
+						CodeReturned:      true,
+						NotificationType:  domain.NotificationTypeSms,
+						GeneratorID:       smsProviderID,
+						TriggeredAtOrigin: eventOrigin,
+						AuthRequestID:     authRequestID,
+					},
+				}, w
 			},
 		},
 	}
@@ -647,24 +647,24 @@ func Test_userNotifier_reduceDomainClaimed(t *testing.T) {
 				gomock.Any(),
 			).Return(nil)
 			return fields{
-					queries: queries,
-					queue:   queue,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries: queries,
+				queue:   queue,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+			}, args{
+				event: &user.DomainClaimedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						InstanceID:    instanceID,
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
+						Typ:           user.UserDomainClaimedType,
 					}),
-				}, args{
-					event: &user.DomainClaimedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							InstanceID:    instanceID,
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-							Typ:           user.UserDomainClaimedType,
-						}),
-						TriggeredAtOrigin: eventOrigin,
-						UserName:          "newUsername",
-					},
-				}, w
+					TriggeredAtOrigin: eventOrigin,
+					UserName:          "newUsername",
+				},
+			}, w
 		},
 	}, {
 		name: "without event trigger",
@@ -702,23 +702,23 @@ func Test_userNotifier_reduceDomainClaimed(t *testing.T) {
 				gomock.Any(),
 			).Return(nil)
 			return fields{
-					queries: queries,
-					queue:   queue,
-					es: eventstore.NewEventstore(&eventstore.Config{
-						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				queries: queries,
+				queue:   queue,
+				es: eventstore.NewEventstore(&eventstore.Config{
+					Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+				}),
+			}, args{
+				event: &user.DomainClaimedEvent{
+					BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+						InstanceID:    instanceID,
+						AggregateID:   userID,
+						ResourceOwner: sql.NullString{String: orgID},
+						CreationDate:  time.Now().UTC(),
+						Typ:           user.UserDomainClaimedType,
 					}),
-				}, args{
-					event: &user.DomainClaimedEvent{
-						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-							InstanceID:    instanceID,
-							AggregateID:   userID,
-							ResourceOwner: sql.NullString{String: orgID},
-							CreationDate:  time.Now().UTC(),
-							Typ:           user.UserDomainClaimedType,
-						}),
-						UserName: "newUsername",
-					},
-				}, w
+					UserName: "newUsername",
+				},
+			}, w
 		},
 	}}
 	for _, tt := range tests {
@@ -778,28 +778,28 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 					gomock.Any(),
 				).Return(nil)
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanPasswordlessInitCodeRequestedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanPasswordlessInitCodeAddedType,
 						}),
-					}, args{
-						event: &user.HumanPasswordlessInitCodeRequestedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           user.HumanPasswordlessInitCodeAddedType,
-							}),
-							ID:                codeID,
-							Code:              code,
-							Expiry:            time.Hour,
-							URLTemplate:       "",
-							CodeReturned:      false,
-							TriggeredAtOrigin: eventOrigin,
-						},
-					}, w
+						ID:                codeID,
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTemplate:       "",
+						CodeReturned:      false,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
 			},
 		},
 		{
@@ -838,27 +838,27 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 					gomock.Any(),
 				).Return(nil)
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanPasswordlessInitCodeRequestedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanPasswordlessInitCodeAddedType,
 						}),
-					}, args{
-						event: &user.HumanPasswordlessInitCodeRequestedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           user.HumanPasswordlessInitCodeAddedType,
-							}),
-							ID:           codeID,
-							Code:         code,
-							Expiry:       time.Hour,
-							URLTemplate:  "",
-							CodeReturned: false,
-						},
-					}, w
+						ID:           codeID,
+						Code:         code,
+						Expiry:       time.Hour,
+						URLTemplate:  "",
+						CodeReturned: false,
+					},
+				}, w
 			},
 		},
 		{
@@ -867,28 +867,28 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 				w.noOperation = true
 				_, code := cryptoValue(t, ctrl, "testcode")
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanPasswordlessInitCodeRequestedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanPasswordlessInitCodeAddedType,
 						}),
-					}, args{
-						event: &user.HumanPasswordlessInitCodeRequestedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           user.HumanPasswordlessInitCodeAddedType,
-							}),
-							ID:                codeID,
-							Code:              code,
-							Expiry:            time.Hour,
-							URLTemplate:       "",
-							CodeReturned:      true,
-							TriggeredAtOrigin: eventOrigin,
-						},
-					}, w
+						ID:                codeID,
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTemplate:       "",
+						CodeReturned:      true,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
 			},
 		},
 	}
@@ -955,23 +955,23 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 					gomock.Any(),
 				).Return(nil)
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanPasswordChangedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanPasswordChangedType,
 						}),
-					}, args{
-						event: &user.HumanPasswordChangedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           user.HumanPasswordChangedType,
-							}),
-							TriggeredAtOrigin: eventOrigin,
-						},
-					}, w
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
 			},
 		},
 		{
@@ -1013,22 +1013,22 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 					gomock.Any(),
 				).Return(nil)
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanPasswordChangedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanPasswordChangedType,
 						}),
-					}, args{
-						event: &user.HumanPasswordChangedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           user.HumanPasswordChangedType,
-							}),
-						},
-					}, w
+					},
+				}, w
 			},
 		}, {
 			name: "no notification",
@@ -1037,22 +1037,22 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 					PasswordChange: false,
 				}, nil)
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanPasswordChangedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanPasswordChangedType,
 						}),
-					}, args{
-						event: &user.HumanPasswordChangedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           user.HumanPasswordChangedType,
-							}),
-						},
-					}, w
+					},
+				}, w
 			},
 		}, {
 			name: "notification policy not found",
@@ -1088,6 +1088,266 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 			queue := mock.NewMockQueue(ctrl)
 			f, a, w := tt.test(ctrl, queries, queue)
 			stmt, err := newUserNotifier(t, ctrl, queries, f).reducePasswordChanged(a.event)
+			if w.err != nil {
+				w.err(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+			err = stmt.Execute(t.Context(), nil, "")
+			if w.err != nil {
+				w.err(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+func Test_userNotifier_reduceEmailChanged(t *testing.T) {
+	tests := []struct {
+		name string
+		test func(*gomock.Controller, *mock.MockQueries, *mock.MockQueue) (fields, args, want)
+	}{
+		{
+			name: "with event trigger",
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						Aggregate: &eventstore.Aggregate{
+							ID:            userID,
+							InstanceID:    instanceID,
+							ResourceOwner: orgID,
+						},
+						UserID:                        userID,
+						UserResourceOwner:             orgID,
+						TriggeredAtOrigin:             eventOrigin,
+						URLTemplate:                   fmt.Sprintf("%s/ui/console?login_hint={{.PreferredLoginName}}", eventOrigin),
+						Code:                          nil,
+						CodeExpiry:                    0,
+						EventType:                     user.HumanEmailChangedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.EmailChangeMessageType,
+						UnverifiedNotificationChannel: false,
+						Args:                          nil,
+						IsOTP:                         false,
+						RequiresPreviousDomain:        false,
+					},
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
+				return fields{
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanEmailChangedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanEmailChangedType,
+						}),
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
+			},
+		},
+		{
+			name: "without event trigger",
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
+				queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
+					Domains: []*query.InstanceDomain{{
+						Domain:    instancePrimaryDomain,
+						IsPrimary: true,
+					}},
+				}, nil)
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						Aggregate: &eventstore.Aggregate{
+							ID:            userID,
+							InstanceID:    instanceID,
+							ResourceOwner: orgID,
+						},
+						UserID:            userID,
+						UserResourceOwner: orgID,
+						TriggeredAtOrigin: fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
+						URLTemplate: fmt.Sprintf("%s://%s:%d/ui/console?login_hint={{.PreferredLoginName}}",
+							externalProtocol, instancePrimaryDomain, externalPort),
+						Code:                          nil,
+						CodeExpiry:                    0,
+						EventType:                     user.HumanEmailChangedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.EmailChangeMessageType,
+						UnverifiedNotificationChannel: false,
+						Args:                          nil,
+						IsOTP:                         false,
+						RequiresPreviousDomain:        false,
+					},
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
+				return fields{
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanEmailChangedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanEmailChangedType,
+						}),
+					},
+				}, w
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			queries := mock.NewMockQueries(ctrl)
+			queue := mock.NewMockQueue(ctrl)
+			f, a, w := tt.test(ctrl, queries, queue)
+			stmt, err := newUserNotifier(t, ctrl, queries, f).reduceEmailChanged(a.event)
+			if w.err != nil {
+				w.err(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+			err = stmt.Execute(t.Context(), nil, "")
+			if w.err != nil {
+				w.err(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+func Test_userNotifier_reducePhoneChanged(t *testing.T) {
+	tests := []struct {
+		name string
+		test func(*gomock.Controller, *mock.MockQueries, *mock.MockQueue) (fields, args, want)
+	}{
+		{
+			name: "with event trigger",
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						Aggregate: &eventstore.Aggregate{
+							ID:            userID,
+							InstanceID:    instanceID,
+							ResourceOwner: orgID,
+						},
+						UserID:                        userID,
+						UserResourceOwner:             orgID,
+						TriggeredAtOrigin:             eventOrigin,
+						URLTemplate:                   fmt.Sprintf("%s/ui/console?login_hint={{.PreferredLoginName}}", eventOrigin),
+						Code:                          nil,
+						CodeExpiry:                    0,
+						EventType:                     user.HumanPhoneChangedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.PhoneChangeMessageType,
+						UnverifiedNotificationChannel: false,
+						Args:                          nil,
+						IsOTP:                         false,
+						RequiresPreviousDomain:        false,
+					},
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
+				return fields{
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanPhoneChangedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanPhoneChangedType,
+						}),
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
+			},
+		},
+		{
+			name: "without event trigger",
+			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, queue *mock.MockQueue) (f fields, a args, w want) {
+				queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
+					Domains: []*query.InstanceDomain{{
+						Domain:    instancePrimaryDomain,
+						IsPrimary: true,
+					}},
+				}, nil)
+				queue.EXPECT().Insert(
+					gomock.Any(),
+					&notification.Request{
+						Aggregate: &eventstore.Aggregate{
+							ID:            userID,
+							InstanceID:    instanceID,
+							ResourceOwner: orgID,
+						},
+						UserID:            userID,
+						UserResourceOwner: orgID,
+						TriggeredAtOrigin: fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
+						URLTemplate: fmt.Sprintf("%s://%s:%d/ui/console?login_hint={{.PreferredLoginName}}",
+							externalProtocol, instancePrimaryDomain, externalPort),
+						Code:                          nil,
+						CodeExpiry:                    0,
+						EventType:                     user.HumanPhoneChangedType,
+						NotificationType:              domain.NotificationTypeEmail,
+						MessageType:                   domain.PhoneChangeMessageType,
+						UnverifiedNotificationChannel: false,
+						Args:                          nil,
+						IsOTP:                         false,
+						RequiresPreviousDomain:        false,
+					},
+					gomock.Any(),
+					gomock.Any(),
+				).Return(nil)
+				return fields{
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanPhoneChangedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanPhoneChangedType,
+						}),
+					},
+				}, w
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			queries := mock.NewMockQueries(ctrl)
+			queue := mock.NewMockQueue(ctrl)
+			f, a, w := tt.test(ctrl, queries, queue)
+			stmt, err := newUserNotifier(t, ctrl, queries, f).reducePhoneChanged(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1151,27 +1411,27 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 					gomock.Any(),
 				).Return(nil)
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &session.OTPEmailChallengedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   sessionID,
+							ResourceOwner: sql.NullString{String: instanceID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           session.OTPEmailChallengedType,
 						}),
-					}, args{
-						event: &session.OTPEmailChallengedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   sessionID,
-								ResourceOwner: sql.NullString{String: instanceID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           session.OTPEmailChallengedType,
-							}),
-							Code:              code,
-							Expiry:            time.Hour,
-							URLTmpl:           "",
-							ReturnCode:        false,
-							TriggeredAtOrigin: eventOrigin,
-						},
-					}, w
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTmpl:           "",
+						ReturnCode:        false,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
 			},
 		},
 		{
@@ -1223,25 +1483,25 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 					gomock.Any(),
 				).Return(nil)
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &session.OTPEmailChallengedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   sessionID,
+							ResourceOwner: sql.NullString{String: instanceID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           session.OTPEmailChallengedType,
 						}),
-					}, args{
-						event: &session.OTPEmailChallengedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   sessionID,
-								ResourceOwner: sql.NullString{String: instanceID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           session.OTPEmailChallengedType,
-							}),
-							Code:       code,
-							Expiry:     time.Hour,
-							ReturnCode: false,
-						},
-					}, w
+						Code:       code,
+						Expiry:     time.Hour,
+						ReturnCode: false,
+					},
+				}, w
 			},
 		},
 		{
@@ -1250,27 +1510,27 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 				w.noOperation = true
 				_, code := cryptoValue(t, ctrl, "testCode")
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).MockQuerier,
+					}),
+				}, args{
+					event: &session.OTPEmailChallengedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   sessionID,
+							ResourceOwner: sql.NullString{String: instanceID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           session.OTPEmailChallengedType,
 						}),
-					}, args{
-						event: &session.OTPEmailChallengedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   sessionID,
-								ResourceOwner: sql.NullString{String: instanceID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           session.OTPEmailChallengedType,
-							}),
-							Code:              code,
-							Expiry:            time.Hour,
-							URLTmpl:           "",
-							ReturnCode:        true,
-							TriggeredAtOrigin: eventOrigin,
-						},
-					}, w
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTmpl:           "",
+						ReturnCode:        true,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
 			},
 		},
 		{
@@ -1316,27 +1576,27 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 					gomock.Any(),
 				).Return(nil)
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &session.OTPEmailChallengedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   sessionID,
+							ResourceOwner: sql.NullString{String: instanceID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           session.OTPEmailChallengedType,
 						}),
-					}, args{
-						event: &session.OTPEmailChallengedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   sessionID,
-								ResourceOwner: sql.NullString{String: instanceID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           session.OTPEmailChallengedType,
-							}),
-							Code:              code,
-							Expiry:            time.Hour,
-							URLTmpl:           "/verify-otp?sessionID={{.SessionID}}",
-							ReturnCode:        false,
-							TriggeredAtOrigin: eventOrigin,
-						},
-					}, w
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTmpl:           "/verify-otp?sessionID={{.SessionID}}",
+						ReturnCode:        false,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
 			},
 		},
 	}
@@ -1412,26 +1672,26 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 				mockQuerier.EXPECT().FilterToReducer(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: mockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: mockQuerier,
+					}),
+				}, args{
+					event: &session.OTPSMSChallengedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   sessionID,
+							ResourceOwner: sql.NullString{String: instanceID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           session.OTPSMSChallengedType,
 						}),
-					}, args{
-						event: &session.OTPSMSChallengedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   sessionID,
-								ResourceOwner: sql.NullString{String: instanceID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           session.OTPSMSChallengedType,
-							}),
-							Code:              code,
-							Expiry:            1 * time.Hour,
-							CodeReturned:      false,
-							TriggeredAtOrigin: eventOrigin,
-						},
-					}, w
+						Code:              code,
+						Expiry:            1 * time.Hour,
+						CodeReturned:      false,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
 			},
 		},
 		{
@@ -1481,25 +1741,25 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 				mockQuerier.EXPECT().FilterToReducer(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: mockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: mockQuerier,
+					}),
+				}, args{
+					event: &session.OTPSMSChallengedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   sessionID,
+							ResourceOwner: sql.NullString{String: instanceID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           session.OTPSMSChallengedType,
 						}),
-					}, args{
-						event: &session.OTPSMSChallengedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   sessionID,
-								ResourceOwner: sql.NullString{String: instanceID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           session.OTPSMSChallengedType,
-							}),
-							Code:         code,
-							Expiry:       1 * time.Hour,
-							CodeReturned: false,
-						},
-					}, w
+						Code:         code,
+						Expiry:       1 * time.Hour,
+						CodeReturned: false,
+					},
+				}, w
 			},
 		},
 		{
@@ -1540,26 +1800,26 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 				mockQuerier.EXPECT().FilterToReducer(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: mockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: mockQuerier,
+					}),
+				}, args{
+					event: &session.OTPSMSChallengedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   sessionID,
+							ResourceOwner: sql.NullString{String: instanceID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           session.OTPSMSChallengedType,
 						}),
-					}, args{
-						event: &session.OTPSMSChallengedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   sessionID,
-								ResourceOwner: sql.NullString{String: instanceID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           session.OTPSMSChallengedType,
-							}),
-							Code:              nil,
-							Expiry:            0,
-							CodeReturned:      false,
-							TriggeredAtOrigin: eventOrigin,
-						},
-					}, w
+						Code:              nil,
+						Expiry:            0,
+						CodeReturned:      false,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
 			},
 		},
 		{
@@ -1568,26 +1828,26 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 				w.noOperation = true
 				_, code := cryptoValue(t, ctrl, "testCode")
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).MockQuerier,
+					}),
+				}, args{
+					event: &session.OTPSMSChallengedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   sessionID,
+							ResourceOwner: sql.NullString{String: instanceID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           session.OTPSMSChallengedType,
 						}),
-					}, args{
-						event: &session.OTPSMSChallengedEvent{
-							BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   sessionID,
-								ResourceOwner: sql.NullString{String: instanceID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           session.OTPSMSChallengedType,
-							}),
-							Code:              code,
-							Expiry:            1 * time.Hour,
-							CodeReturned:      true,
-							TriggeredAtOrigin: eventOrigin,
-						},
-					}, w
+						Code:              code,
+						Expiry:            1 * time.Hour,
+						CodeReturned:      true,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
 			},
 		},
 	}
@@ -1655,28 +1915,28 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 					gomock.Any(),
 				).Return(nil)
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanInviteCodeAddedEvent{
+						BaseEvent: eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanInviteCodeAddedType,
 						}),
-					}, args{
-						event: &user.HumanInviteCodeAddedEvent{
-							BaseEvent: eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           user.HumanInviteCodeAddedType,
-							}),
-							Code:              code,
-							Expiry:            time.Hour,
-							URLTemplate:       "",
-							CodeReturned:      false,
-							TriggeredAtOrigin: eventOrigin,
-							AuthRequestID:     authRequestID,
-						},
-					}, w
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTemplate:       "",
+						CodeReturned:      false,
+						TriggeredAtOrigin: eventOrigin,
+						AuthRequestID:     authRequestID,
+					},
+				}, w
 			},
 		},
 		{
@@ -1718,27 +1978,27 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 					gomock.Any(),
 				).Return(nil)
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanInviteCodeAddedEvent{
+						BaseEvent: eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanInviteCodeAddedType,
 						}),
-					}, args{
-						event: &user.HumanInviteCodeAddedEvent{
-							BaseEvent: eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           user.HumanInviteCodeAddedType,
-							}),
-							Code:          code,
-							Expiry:        time.Hour,
-							URLTemplate:   "",
-							CodeReturned:  false,
-							AuthRequestID: authRequestID,
-						},
-					}, w
+						Code:          code,
+						Expiry:        time.Hour,
+						URLTemplate:   "",
+						CodeReturned:  false,
+						AuthRequestID: authRequestID,
+					},
+				}, w
 			},
 		},
 		{
@@ -1747,28 +2007,28 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 				w.noOperation = true
 				_, code := cryptoValue(t, ctrl, "testcode")
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanInviteCodeAddedEvent{
+						BaseEvent: eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanInviteCodeAddedType,
 						}),
-					}, args{
-						event: &user.HumanInviteCodeAddedEvent{
-							BaseEvent: eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           user.HumanInviteCodeAddedType,
-							}),
-							Code:              code,
-							Expiry:            time.Hour,
-							URLTemplate:       "",
-							CodeReturned:      true,
-							TriggeredAtOrigin: eventOrigin,
-							AuthRequestID:     authRequestID,
-						},
-					}, w
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTemplate:       "",
+						CodeReturned:      true,
+						TriggeredAtOrigin: eventOrigin,
+						AuthRequestID:     authRequestID,
+					},
+				}, w
 			},
 		},
 		{
@@ -1804,28 +2064,28 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 					gomock.Any(),
 				).Return(nil)
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanInviteCodeAddedEvent{
+						BaseEvent: eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanInviteCodeAddedType,
 						}),
-					}, args{
-						event: &user.HumanInviteCodeAddedEvent{
-							BaseEvent: eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           user.HumanInviteCodeAddedType,
-							}),
-							Code:              code,
-							Expiry:            time.Hour,
-							URLTemplate:       "/passwordless-init?userID={{.UserID}}",
-							CodeReturned:      false,
-							TriggeredAtOrigin: eventOrigin,
-							AuthRequestID:     authRequestID,
-						},
-					}, w
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTemplate:       "/passwordless-init?userID={{.UserID}}",
+						CodeReturned:      false,
+						TriggeredAtOrigin: eventOrigin,
+						AuthRequestID:     authRequestID,
+					},
+				}, w
 			},
 		},
 		{
@@ -1861,29 +2121,29 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 					gomock.Any(),
 				).Return(nil)
 				return fields{
-						queries: queries,
-						queue:   queue,
-						es: eventstore.NewEventstore(&eventstore.Config{
-							Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					queries: queries,
+					queue:   queue,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanInviteCodeAddedEvent{
+						BaseEvent: eventstore.BaseEventFromRepo(&repository.Event{
+							InstanceID:    instanceID,
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+							Typ:           user.HumanInviteCodeAddedType,
 						}),
-					}, args{
-						event: &user.HumanInviteCodeAddedEvent{
-							BaseEvent: eventstore.BaseEventFromRepo(&repository.Event{
-								InstanceID:    instanceID,
-								AggregateID:   userID,
-								ResourceOwner: sql.NullString{String: orgID},
-								CreationDate:  time.Now().UTC(),
-								Typ:           user.HumanInviteCodeAddedType,
-							}),
-							Code:              code,
-							Expiry:            time.Hour,
-							URLTemplate:       "",
-							CodeReturned:      false,
-							TriggeredAtOrigin: eventOrigin,
-							AuthRequestID:     authRequestID,
-							ApplicationName:   "APP",
-						},
-					}, w
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTemplate:       "",
+						CodeReturned:      false,
+						TriggeredAtOrigin: eventOrigin,
+						AuthRequestID:     authRequestID,
+						ApplicationName:   "APP",
+					},
+				}, w
 			},
 		},
 	}
