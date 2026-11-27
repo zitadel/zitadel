@@ -201,6 +201,7 @@
     },
     "generate": {
       "executor": "nx:run-commands",
+      "cache": true,
       "options": {
         "command": "echo 'Generation complete'",
         "cwd": "apps/docs"
@@ -253,6 +254,7 @@
     },
     "test": {
       "executor": "nx:run-commands",
+      "cache": true,
       "options": {
         "command": "pnpm test:scripts",
         "cwd": "apps/docs"
