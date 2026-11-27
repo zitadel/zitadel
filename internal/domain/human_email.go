@@ -34,6 +34,28 @@ func (e EmailAddress) Normalize() EmailAddress {
 	return EmailAddress(strings.TrimSpace(string(e)))
 }
 
+// Domain returns the part of the address after the last @.
+// It returns an empty string if the address does not contain an @.
+func (e EmailAddress) Domain() string {
+	address := string(e.Normalize())
+	index := strings.LastIndex(address, "@")
+	if index < 0 {
+		return ""
+	}
+	return address[index+1:]
+}
+
+// ParsedDomain returns the domain of the address, which can be written in any valid form,
+// like <user@example.com> or with a comment. Nothing but the domain is returned.
+// It returns an empty string if the address is not valid.
+func (e EmailAddress) ParsedDomain() string {
+	parsed, err := mail.ParseAddress(string(e))
+	if err != nil {
+		return ""
+	}
+	return EmailAddress(parsed.Address).Domain()
+}
+
 type Email struct {
 	es_models.ObjectRoot
 
