@@ -6,11 +6,28 @@ import {
 } from "@/lib/actions/session";
 import { SessionUpdatedError } from "@/lib/server/challenges";
 import { Code } from "@connectrpc/connect";
+import { UserVerificationRequirement } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+
+const mockLogger = vi.hoisted(() => ({
+  debug: vi.fn(),
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+}));
+
+vi.mock("@/lib/server/logger", () => ({
+  createLogger: () => mockLogger,
+}));
 
 vi.mock("@zitadel/client", async () => {
   const { Code } = await import("@connectrpc/connect");
-  return { Code, create: vi.fn((_schema: unknown, data: unknown) => data), Duration: {} };
+  return {
+    Code,
+    create: vi.fn((_schema: unknown, data: unknown) => data),
+    Duration: {},
+    timestampDate: (timestamp: { seconds: bigint }) => new Date(Number(timestamp.seconds) * 1000),
+  };
 });
 
 vi.mock("@/lib/server/zitadel", () => ({
@@ -41,11 +58,17 @@ vi.mock("@/lib/actions/flow", () => ({
   completeFlowOrGetUrl: vi.fn(),
 }));
 
-vi.mock("@/lib/server/session", () => ({
-  isSessionValid: vi.fn(),
-  loadSession: vi.fn(),
-  hasVerifiedPrimaryFactor: vi.fn((session: any) => ({ valid: !!session?.factors?.password?.verifiedAt })),
-}));
+vi.mock("@/lib/server/session", async () => {
+  const actual = await vi.importActual<typeof import("@/lib/server/session")>("@/lib/server/session");
+  return {
+    isSessionValid: vi.fn(),
+    loadSession: vi.fn(),
+    reportMissingSessionCookie: vi.fn(),
+    resolveSession: vi.fn(),
+    hasVerifiedPrimaryFactor: actual.hasVerifiedPrimaryFactor,
+    SESSION_RESOLUTION_MESSAGE_KEYS: actual.SESSION_RESOLUTION_MESSAGE_KEYS,
+  };
+});
 
 vi.mock("@/lib/server/mfa-helper", () => ({
   shouldEnforceMFA: vi.fn(() => false),
@@ -138,6 +161,254 @@ describe("clearSession", () => {
 
     expect(res).toBeUndefined();
     expect(deleteSession).not.toHaveBeenCalled();
+  });
+});
+
+describe("updateOrCreateSession", () => {
+  const sessionCookie = { id: "session-1", token: "token-1", loginName: "user@example.com", organization: "org-1" };
+  const inFuture = { seconds: BigInt(Math.floor(Date.now() / 1000) + 3600) };
+  const inPast = { seconds: BigInt(Math.floor(Date.now() / 1000) - 3600) };
+  const passwordVerified = {
+    id: "session-1",
+    expirationDate: inFuture,
+    factors: { user: { id: "user-1" }, password: { verifiedAt: inPast } },
+  };
+  const userOnly = { id: "session-1", expirationDate: inFuture, factors: { user: { id: "user-1" } } };
+
+  const totpCheck = { totp: { code: "123456" } } as any;
+  const webAuthNCheck = { webAuthN: { credentialAssertionData: {} } } as any;
+  const smsChallenge = { otpSms: {} } as any;
+  // what LoginPasskey requests: user verification is required for a passkey login and discouraged for U2F
+  const passkeyChallenge = {
+    webAuthN: { domain: "test.com", userVerificationRequirement: UserVerificationRequirement.REQUIRED },
+  } as any;
+  const u2fChallenge = {
+    webAuthN: { domain: "test.com", userVerificationRequirement: UserVerificationRequirement.DISCOURAGED },
+  } as any;
+
+  let getSessionCookieByLoginName: any;
+  let getSessionCookieById: any;
+  let getMostRecentSessionCookie: any;
+  let setSessionAndUpdateCookie: any;
+  let createSessionAndUpdateCookie: any;
+  let listUsers: any;
+  let reportMissingSessionCookie: any;
+  let resolveSession: any;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    const zitadel = await import("@/lib/server/zitadel");
+    const cookies = await import("@/lib/server/cookies");
+    const serverCookie = await import("@/lib/server/session-cookie");
+    const sessionLib = await import("@/lib/server/session");
+
+    getSessionCookieByLoginName = vi.mocked(cookies.getSessionCookieByLoginName);
+    getSessionCookieById = vi.mocked(cookies.getSessionCookieById);
+    getMostRecentSessionCookie = vi.mocked(cookies.getMostRecentSessionCookie);
+    setSessionAndUpdateCookie = vi.mocked(serverCookie.setSessionAndUpdateCookie);
+    createSessionAndUpdateCookie = vi.mocked(serverCookie.createSessionAndUpdateCookie);
+    listUsers = vi.mocked(zitadel.listUsers);
+    reportMissingSessionCookie = vi.mocked(sessionLib.reportMissingSessionCookie);
+    resolveSession = vi.mocked(sessionLib.resolveSession);
+
+    vi.mocked(zitadel.getLoginSettings).mockResolvedValue({} as any);
+    getSessionCookieByLoginName.mockResolvedValue(sessionCookie);
+    listUsers.mockResolvedValue({ details: { totalResult: BigInt(1) }, result: [{ userId: "user-1" }] });
+    createSessionAndUpdateCookie.mockResolvedValue({
+      session: { id: "session-2", factors: { user: { id: "user-1" } } },
+      sessionCookie: { ...sessionCookie, id: "session-2" },
+      challenges: undefined,
+    });
+  });
+
+  describe("no cookie entry for the session", () => {
+    beforeEach(() => {
+      getSessionCookieByLoginName.mockResolvedValue(undefined);
+      getSessionCookieById.mockResolvedValue(undefined);
+      getMostRecentSessionCookie.mockResolvedValue(undefined);
+      reportMissingSessionCookie.mockResolvedValue("cookie_missing");
+    });
+
+    test.each([
+      ["a TOTP check", { checks: totpCheck }],
+      ["an SMS challenge", { challenges: smsChallenge }],
+      // U2F is a second factor too: a new session would end up with the user and U2F, without a first factor
+      ["a U2F challenge", { challenges: u2fChallenge }],
+      ["a WebAuthN challenge without a user verification requirement", { challenges: { webAuthN: {} } as any }],
+      // an assertion answers the challenge of the session that got lost
+      ["a WebAuthN assertion", { checks: webAuthNCheck }],
+    ])("does not create a session for %s and reports the session as lost", async (_name, step) => {
+      const res = await updateOrCreateSession({ loginName: "user@example.com", organization: "org-1", ...step });
+
+      expect(res).toEqual({ error: "sessionResolution.cookieMissing", sessionLost: true });
+      expect(reportMissingSessionCookie).toHaveBeenCalledWith("update_session", {
+        by: "loginName",
+        loginName: "user@example.com",
+        organization: "org-1",
+      });
+      expect(createSessionAndUpdateCookie).not.toHaveBeenCalled();
+      expect(setSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    // The miss is explained for the lookup that was used: by id and for the most recent entry the
+    // organization is not part of it.
+    test("reports the session as lost when neither a login name nor a cookie entry identifies it", async () => {
+      reportMissingSessionCookie.mockResolvedValue("session_entry_not_found");
+
+      const res = await updateOrCreateSession({
+        sessionId: "session-1",
+        organization: "org-1",
+        challenges: passkeyChallenge,
+      });
+
+      expect(res).toEqual({ error: "sessionResolution.entryNotFound", sessionLost: true });
+      expect(getSessionCookieById).toHaveBeenCalledWith({ sessionId: "session-1" });
+      expect(reportMissingSessionCookie).toHaveBeenCalledWith("update_session", { by: "id", sessionId: "session-1" });
+      expect(createSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    test("reports the session as lost when the request names no session and the cookie holds none", async () => {
+      const res = await updateOrCreateSession({ organization: "org-1", challenges: passkeyChallenge });
+
+      expect(res).toEqual({ error: "sessionResolution.cookieMissing", sessionLost: true });
+      expect(getMostRecentSessionCookie).toHaveBeenCalled();
+      expect(reportMissingSessionCookie).toHaveBeenCalledWith("update_session", { by: "mostRecent" });
+      expect(createSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    test("still creates the session that starts a passkey login", async () => {
+      setSessionAndUpdateCookie.mockResolvedValue({ id: "session-2", factors: { user: { id: "user-1" } } });
+
+      const res = await updateOrCreateSession({ loginName: "user@example.com", challenges: passkeyChallenge });
+
+      expect(createSessionAndUpdateCookie).toHaveBeenCalledTimes(1);
+      expect(reportMissingSessionCookie).not.toHaveBeenCalled();
+      expect(res).toMatchObject({ sessionId: "session-2" });
+    });
+  });
+
+  describe("the session update fails", () => {
+    const updateError = { code: Code.InvalidArgument };
+
+    beforeEach(() => {
+      setSessionAndUpdateCookie.mockRejectedValue(updateError);
+    });
+
+    test.each([
+      ["a TOTP check (e.g. a wrong code)", { checks: totpCheck }],
+      ["a U2F challenge", { challenges: u2fChallenge }],
+      ["a WebAuthN assertion", { checks: webAuthNCheck }],
+    ])("rethrows for %s while the session is intact", async (_name, step) => {
+      resolveSession.mockResolvedValue({ session: passwordVerified });
+
+      await expect(updateOrCreateSession({ loginName: "user@example.com", ...step })).rejects.toBe(updateError);
+
+      expect(resolveSession).toHaveBeenCalledWith({ baseUrl: "https://example.com" }, sessionCookie, "update_session");
+      expect(createSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    test.each([
+      ["session_token_rejected", "sessionResolution.cookieInvalid"],
+      ["server_session_not_found", "sessionResolution.sessionNotFound"],
+    ])("returns %s in a second factor step instead of creating a session", async (reason, message) => {
+      resolveSession.mockResolvedValue({ reason });
+
+      const res = await updateOrCreateSession({ loginName: "user@example.com", challenges: smsChallenge });
+
+      expect(res).toEqual({ error: message, sessionLost: true });
+      expect(createSessionAndUpdateCookie).not.toHaveBeenCalled();
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        expect.stringContaining("LOGIN_SESSION_UPDATE_FAILED"),
+        expect.objectContaining({
+          code: "LOGIN_SESSION_UPDATE_FAILED",
+          reason,
+          sessionId: "session-1",
+          expired: false,
+          grpcCode: Code.InvalidArgument,
+        }),
+      );
+    });
+
+    test.each([
+      ["a U2F challenge", { challenges: u2fChallenge }],
+      ["a WebAuthN assertion", { checks: webAuthNCheck }],
+    ])("reports the session as lost for %s when the session is gone", async (_name, step) => {
+      resolveSession.mockResolvedValue({ reason: "server_session_not_found" });
+
+      const res = await updateOrCreateSession({ loginName: "user@example.com", ...step });
+
+      expect(res).toEqual({ error: "sessionResolution.sessionNotFound", sessionLost: true });
+      expect(listUsers).not.toHaveBeenCalled();
+      expect(createSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    // The re-fetch failed for another reason than NotFound or PermissionDenied (e.g. the API is
+    // unavailable): the session may still be valid, so it is neither replaced nor reported as lost.
+    test.each([
+      ["a second factor step", { challenges: smsChallenge }],
+      ["a U2F step", { challenges: u2fChallenge }],
+      ["a step that starts a passkey login", { challenges: passkeyChallenge }],
+    ])("rethrows in %s when it is unknown whether the session still exists", async (_name, step) => {
+      resolveSession.mockResolvedValue({ reason: "session_lookup_failed" });
+
+      await expect(updateOrCreateSession({ loginName: "user@example.com", ...step })).rejects.toBe(updateError);
+
+      expect(listUsers).not.toHaveBeenCalled();
+      expect(createSessionAndUpdateCookie).not.toHaveBeenCalled();
+      expect(mockLogger.warn).not.toHaveBeenCalledWith(
+        expect.stringContaining("LOGIN_SESSION_UPDATE_FAILED"),
+        expect.anything(),
+      );
+    });
+
+    test("reports an expired session in a second factor step as ended", async () => {
+      resolveSession.mockResolvedValue({ session: { ...passwordVerified, expirationDate: inPast } });
+
+      const res = await updateOrCreateSession({ loginName: "user@example.com", checks: totpCheck });
+
+      expect(res).toEqual({ error: "sessionResolution.sessionNotFound", sessionLost: true });
+      expect(createSessionAndUpdateCookie).not.toHaveBeenCalled();
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        expect.stringContaining("LOGIN_SESSION_UPDATE_FAILED"),
+        expect.objectContaining({ expired: true }),
+      );
+    });
+
+    test("does not replace a valid session with a verified first factor outside a second factor step", async () => {
+      resolveSession.mockResolvedValue({ session: passwordVerified });
+
+      await expect(updateOrCreateSession({ loginName: "user@example.com", challenges: passkeyChallenge })).rejects.toBe(
+        updateError,
+      );
+
+      expect(listUsers).not.toHaveBeenCalled();
+      expect(createSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
+
+    test.each([
+      ["only holds the user check", { session: userOnly }],
+      ["can no longer be resolved", { reason: "server_session_not_found" }],
+      // a returning user whose cookie still holds an old session must be able to start a passkey login
+      ["has expired", { session: { ...passwordVerified, expirationDate: inPast } }],
+    ])("creates a new session when the existing one %s and a passkey login starts", async (_name, existing) => {
+      resolveSession.mockResolvedValue(existing);
+
+      const res = await updateOrCreateSession({ loginName: "user@example.com", challenges: passkeyChallenge });
+
+      expect(createSessionAndUpdateCookie).toHaveBeenCalledTimes(1);
+      expect(res).toMatchObject({ sessionId: "session-2" });
+    });
+  });
+
+  test("updates the session of the cookie entry", async () => {
+    setSessionAndUpdateCookie.mockResolvedValue(passwordVerified);
+
+    const res = await updateOrCreateSession({ loginName: "user@example.com", organization: "org-1", checks: totpCheck });
+
+    expect(getSessionCookieByLoginName).toHaveBeenCalledWith({ loginName: "user@example.com", organization: "org-1" });
+    expect(setSessionAndUpdateCookie).toHaveBeenCalledWith(expect.objectContaining({ recentCookie: sessionCookie }));
+    expect(resolveSession).not.toHaveBeenCalled();
+    expect(res).toMatchObject({ sessionId: "session-1" });
   });
 });
 
@@ -307,20 +578,33 @@ describe("server actions resolve the session from the caller's cookie", () => {
       cookieHelpers.createSessionAndUpdateCookie.mockResolvedValue({ sessionCookie: cookie });
       cookieHelpers.setSessionAndUpdateCookie.mockResolvedValue(authenticatedSession);
 
+      // only a step that starts a login (passkey) creates a session
       await updateOrCreateSession({
         loginName: "victim@example.com",
-        challenges: {
-          otpEmail: { deliveryType: { case: "sendCode", value: { urlTemplate: "https://evil.example/?code={{.Code}}" } } },
-        },
+        challenges: { webAuthN: { domain: "evil.example", userVerificationRequirement: 1 } },
       } as any);
 
       // the challenges are only requested once, on the update of the new session
       const [createCommand] = cookieHelpers.createSessionAndUpdateCookie.mock.calls[0];
       expect(createCommand).not.toHaveProperty("challenges");
       const [setCommand] = cookieHelpers.setSessionAndUpdateCookie.mock.calls[0];
-      expect(setCommand.challenges.otpEmail.deliveryType.value.urlTemplate).toMatch(
-        /^https:\/\/test\.com\/ui\/v2\/login\/otp\/email\?/,
-      );
+      expect(setCommand.challenges.webAuthN).toEqual({ domain: "test.com", userVerificationRequirement: 1 });
+    });
+
+    test("does not create a session to send an OTP email to a login name without a cookie entry", async () => {
+      cookies.getSessionCookieByLoginName.mockResolvedValue(undefined);
+      sessionLib.reportMissingSessionCookie.mockResolvedValue("session_entry_not_found");
+
+      const res = await updateOrCreateSession({
+        loginName: "victim@example.com",
+        challenges: {
+          otpEmail: { deliveryType: { case: "sendCode", value: { urlTemplate: "https://evil.example/?code={{.Code}}" } } },
+        },
+      } as any);
+
+      expect(res).toEqual({ error: "sessionResolution.entryNotFound", sessionLost: true });
+      expect(cookieHelpers.createSessionAndUpdateCookie).not.toHaveBeenCalled();
+      expect(cookieHelpers.setSessionAndUpdateCookie).not.toHaveBeenCalled();
     });
   });
 });
@@ -368,15 +652,19 @@ describe("updateOrCreateSession OTP SMS resend cooldown", () => {
     expect(res).toEqual(expect.objectContaining({ sessionId: "session-1", retryAfterSeconds: 30 }));
   });
 
-  test("requests the OTP SMS only once when it has to create the session first", async () => {
+  // A code is only ever requested on the session the cookie holds: without a cookie entry no session
+  // is created for it, so there is no path that could request the code twice.
+  test("does not create a session to request an OTP SMS for a login name without a cookie entry", async () => {
     const cookies = vi.mocked(await import("@/lib/server/cookies"));
+    const sessionLib = vi.mocked(await import("@/lib/server/session"));
     cookies.getSessionCookieByLoginName.mockResolvedValue(undefined);
-    createSessionAndUpdateCookie.mockResolvedValue({ sessionCookie: cookie });
+    sessionLib.reportMissingSessionCookie.mockResolvedValue("session_entry_not_found");
 
-    await updateOrCreateSession({ loginName: "user@example.com", challenges: { otpSms: {} } as any });
+    const res = await updateOrCreateSession({ loginName: "user@example.com", challenges: { otpSms: {} } as any });
 
-    expect(createSessionAndUpdateCookie.mock.calls[0][0]).not.toHaveProperty("challenges");
-    expect(setSessionAndUpdateCookie).toHaveBeenCalledWith(expect.objectContaining({ challenges: { otpSms: {} } }));
+    expect(res).toEqual({ error: "sessionResolution.entryNotFound", sessionLost: true });
+    expect(createSessionAndUpdateCookie).not.toHaveBeenCalled();
+    expect(setSessionAndUpdateCookie).not.toHaveBeenCalled();
   });
 
   test("does not send a second OTP SMS on a new session when the update failed after the code was sent", async () => {
