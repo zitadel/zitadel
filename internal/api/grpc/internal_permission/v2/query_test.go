@@ -91,6 +91,56 @@ func Test_administratorFilterToQuery(t *testing.T) {
 			},
 			wantErr: zerrors.ThrowInvalidArgument(nil, "PERM-vR9nC", "List.Query.Invalid"),
 		},
+		{
+			name: "user preferred login name, default method",
+			args: args{
+				filter: &internal_permission.AdministratorSearchFilter{
+					Filter: &internal_permission.AdministratorSearchFilter_UserPreferredLoginName{
+						UserPreferredLoginName: &internal_permission.UserPreferredLoginNameFilter{
+							PreferredLoginName: "admin@example.com",
+						},
+					},
+				},
+			},
+			want: func() query.SearchQuery {
+				q, _ := query.NewAdministratorUserLoginNameSearchQuery("admin@example.com", query.TextEquals)
+				return q
+			}(),
+		},
+		{
+			name: "user preferred login name, contains",
+			args: args{
+				filter: &internal_permission.AdministratorSearchFilter{
+					Filter: &internal_permission.AdministratorSearchFilter_UserPreferredLoginName{
+						UserPreferredLoginName: &internal_permission.UserPreferredLoginNameFilter{
+							PreferredLoginName: "admin",
+							Method:             filter.TextFilterMethod_TEXT_FILTER_METHOD_CONTAINS,
+						},
+					},
+				},
+			},
+			want: func() query.SearchQuery {
+				q, _ := query.NewAdministratorUserLoginNameSearchQuery("admin", query.TextContains)
+				return q
+			}(),
+		},
+		{
+			name: "user display name, contains ignore case",
+			args: args{
+				filter: &internal_permission.AdministratorSearchFilter{
+					Filter: &internal_permission.AdministratorSearchFilter_UserDisplayName{
+						UserDisplayName: &internal_permission.UserDisplayNameFilter{
+							DisplayName: "admin",
+							Method:      filter.TextFilterMethod_TEXT_FILTER_METHOD_CONTAINS_IGNORE_CASE,
+						},
+					},
+				},
+			},
+			want: func() query.SearchQuery {
+				q, _ := query.NewAdministratorUserDisplayNameSearchQuery("admin", query.TextContainsIgnoreCase)
+				return q
+			}(),
+		},
 		// rest is tested in integration tests
 	}
 	for _, tt := range tests {
