@@ -95,6 +95,7 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
 
     const params = new URLSearchParams({
       loginName: loginName,
+      codeSent: "true",
     });
 
     if (organization) {

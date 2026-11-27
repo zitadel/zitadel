@@ -86,6 +86,7 @@
       "codeSent": "Um código foi enviado para o seu e-mail.",
       "noCodeReceived": "Não recebeu o código?",
       "resend": "Reenviar código",
+      "resendIn": "Reenviar código ({seconds}s)",
       "submit": "Continuar",
       "labels": {
         "code": "Código",
@@ -410,6 +411,7 @@
       "description": "Insira o código fornecido no e-mail de verificação.",
       "noCodeReceived": "Não recebeu o código?",
       "resendCode": "Reenviar código",
+      "resendCodeIn": "Reenviar código ({seconds}s)",
       "codeSent": "Um código foi enviado para o seu endereço de e-mail.",
       "submit": "Continuar",
       "labels": {

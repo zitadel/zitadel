@@ -86,6 +86,7 @@
       "codeSent": "Un nuovo codice è stato inviato al tuo indirizzo email.",
       "noCodeReceived": "Non hai ricevuto un codice?",
       "resend": "Invia di nuovo",
+      "resendIn": "Invia di nuovo ({seconds}s)",
       "submit": "Continua",
       "labels": {
         "code": "Codice",
@@ -410,6 +411,7 @@
       "description": "Inserisci il codice fornito nell'email di verifica.",
       "noCodeReceived": "Non hai ricevuto un codice?",
       "resendCode": "Invia di nuovo il codice",
+      "resendCodeIn": "Invia di nuovo il codice ({seconds}s)",
       "codeSent": "Un codice è stato appena inviato al tuo indirizzo email.",
       "submit": "Continua",
       "labels": {

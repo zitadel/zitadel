@@ -9,7 +9,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string) => key,
+  useTranslations: () => (key: string, data?: Record<string, unknown>) => (data ? `${key} ${JSON.stringify(data)}` : key),
 }));
 
 vi.mock("@/lib/actions/password", () => ({
@@ -43,6 +43,34 @@ describe("SetPasswordForm", () => {
       />,
     );
     expect(getByTestId("code-text-input")).toHaveFocus();
+  });
+
+  test("should start the resend cooldown on arrival when a code was just sent", () => {
+    render(
+      <SetPasswordForm
+        passwordComplexitySettings={defaultComplexitySettings}
+        loginName="test@example.com"
+        userId="user-1"
+        codeRequired={true}
+        codeSent={true}
+      />,
+    );
+
+    const button = screen.getByRole("button", { name: /^set\.resendIn \{"seconds":\d+\}$/ });
+    expect(button).toBeDisabled();
+  });
+
+  test("should not start the resend cooldown on arrival without codeSent", () => {
+    render(
+      <SetPasswordForm
+        passwordComplexitySettings={defaultComplexitySettings}
+        loginName="test@example.com"
+        userId="user-1"
+        codeRequired={true}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "set.resend" })).not.toBeDisabled();
   });
 
   test("should use translated resend accessible name when codeRequired is true", () => {

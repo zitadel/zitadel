@@ -87,6 +87,7 @@
         "codeSent": "Ein neuer Code wurde an Ihre E-Mail-Adresse gesendet.",
         "noCodeReceived": "Keinen Code erhalten?",
         "resend": "Erneut senden",
+        "resendIn": "Erneut senden ({seconds}s)",
         "submit": "Weiter",
         "labels": {
           "code": "Code",
@@ -408,6 +409,7 @@
         "description": "Geben Sie den Code ein, der in der Bestätigungs-E-Mail angegeben ist.",
         "noCodeReceived": "Keinen Code erhalten?",
         "resendCode": "Code erneut senden",
+        "resendCodeIn": "Code erneut senden ({seconds}s)",
         "codeSent": "Ein Code wurde gerade an Ihre E-Mail-Adresse gesendet.",
         "submit": "Weiter",
         "labels": {
@@ -573,6 +575,7 @@
         "codeSent": "A new code has been sent to your email address.",
         "noCodeReceived": "Didn't receive a code?",
         "resend": "Resend code",
+        "resendIn": "Resend code ({seconds}s)",
         "submit": "Continue",
         "labels": {
           "code": "Code",
@@ -894,6 +897,7 @@
         "description": "Enter the Code provided in the verification email.",
         "noCodeReceived": "Didn't receive a code?",
         "resendCode": "Resend code",
+        "resendCodeIn": "Resend code ({seconds}s)",
         "codeSent": "A new code has just been sent to your email address.",
         "submit": "Continue",
         "labels": {
@@ -1059,6 +1063,7 @@
         "codeSent": "Se ha enviado un nuevo código a su dirección de correo electrónico.",
         "noCodeReceived": "¿No recibiste un código?",
         "resend": "Reenviar código",
+        "resendIn": "Reenviar código ({seconds}s)",
         "submit": "Continuar",
         "labels": {
           "code": "Código",
@@ -1380,6 +1385,7 @@
         "description": "Introduce el código proporcionado en el correo electrónico de verificación.",
         "noCodeReceived": "¿No recibiste un código?",
         "resendCode": "Reenviar código",
+        "resendCodeIn": "Reenviar código ({seconds}s)",
         "codeSent": "Se ha enviado un código a tu dirección de correo electrónico.",
         "submit": "Continuar",
         "labels": {
@@ -1545,6 +1551,7 @@
         "codeSent": "Un nuovo codice è stato inviato al tuo indirizzo email.",
         "noCodeReceived": "Non hai ricevuto un codice?",
         "resend": "Invia di nuovo",
+        "resendIn": "Invia di nuovo ({seconds}s)",
         "submit": "Continua",
         "labels": {
           "code": "Codice",
@@ -1866,6 +1873,7 @@
         "description": "Inserisci il codice fornito nell'email di verifica.",
         "noCodeReceived": "Non hai ricevuto un codice?",
         "resendCode": "Invia di nuovo il codice",
+        "resendCodeIn": "Invia di nuovo il codice ({seconds}s)",
         "codeSent": "Un codice è stato appena inviato al tuo indirizzo email.",
         "submit": "Continua",
         "labels": {
@@ -2031,6 +2039,7 @@
         "codeSent": "Er is een nieuwe code naar uw e-mailadres verzonden.",
         "noCodeReceived": "Geen code ontvangen?",
         "resend": "Code opnieuw versturen",
+        "resendIn": "Code opnieuw versturen ({seconds}s)",
         "submit": "Verder",
         "labels": {
           "code": "Code",
@@ -2352,6 +2361,7 @@
         "description": "Voer de code in uit de verificatie-e-mail.",
         "noCodeReceived": "Geen code ontvangen?",
         "resendCode": "Code opnieuw versturen",
+        "resendCodeIn": "Code opnieuw versturen ({seconds}s)",
         "codeSent": "Er is zojuist een code naar jouw e-mailadres gestuurd.",
         "submit": "Doorgaan",
         "labels": {
@@ -2517,6 +2527,7 @@
         "codeSent": "Nowy kod został wysłany na Twój adres e-mail.",
         "noCodeReceived": "Nie otrzymałeś kodu?",
         "resend": "Wyślij kod ponownie",
+        "resendIn": "Wyślij kod ponownie ({seconds}s)",
         "submit": "Kontynuuj",
         "labels": {
           "code": "Kod",
@@ -2838,6 +2849,7 @@
         "description": "Wprowadź kod z wiadomości weryfikacyjnej.",
         "noCodeReceived": "Nie otrzymałeś kodu?",
         "resendCode": "Wyślij kod ponownie",
+        "resendCodeIn": "Wyślij kod ponownie ({seconds}s)",
         "codeSent": "Kod został właśnie wysłany na twój adres e-mail.",
         "submit": "Kontynuuj",
         "labels": {
@@ -3003,6 +3015,7 @@
         "codeSent": "Новый код был отправлен на ваш адрес электронной почты.",
         "noCodeReceived": "Не получили код?",
         "resend": "Отправить код повторно",
+        "resendIn": "Отправить код повторно ({seconds} с)",
         "submit": "Продолжить",
         "labels": {
           "code": "Код",
@@ -3324,6 +3337,7 @@
         "description": "Введите код из письма подтверждения.",
         "noCodeReceived": "Не получили код?",
         "resendCode": "Отправить код повторно",
+        "resendCodeIn": "Отправить код повторно ({seconds} с)",
         "codeSent": "Код отправлен на ваш email.",
         "submit": "Продолжить",
         "labels": {
@@ -3489,6 +3503,7 @@
         "codeSent": "新代码已发送到您的电子邮件地址。",
         "noCodeReceived": "没有收到验证码？",
         "resend": "重发验证码",
+        "resendIn": "重发验证码 ({seconds}秒)",
         "submit": "继续",
         "labels": {
           "code": "验证码",
@@ -3810,6 +3825,7 @@
         "description": "输入验证邮件中的验证码。",
         "noCodeReceived": "没有收到验证码？",
         "resendCode": "重发验证码",
+        "resendCodeIn": "重发验证码 ({seconds}秒)",
         "codeSent": "刚刚发送了一封包含验证码的电子邮件。",
         "submit": "继续",
         "labels": {
@@ -3975,6 +3991,7 @@
         "codeSent": "E-posta adresinize yeni bir kod gönderildi.",
         "noCodeReceived": "Kod almadınız mı?",
         "resend": "Kodu tekrar gönder",
+        "resendIn": "Kodu tekrar gönder ({seconds} sn)",
         "submit": "Devam",
         "labels": {
           "code": "Kod",
@@ -4296,6 +4313,7 @@
         "description": "Doğrulama e-postasında sağlanan Kodu girin.",
         "noCodeReceived": "Kod almadınız mı?",
         "resendCode": "Kodu tekrar gönder",
+        "resendCodeIn": "Kodu tekrar gönder ({seconds} sn)",
         "codeSent": "E-posta adresinize bir kod gönderildi.",
         "submit": "Devam",
         "labels": {
@@ -4461,6 +4479,7 @@
         "codeSent": "Новий код надіслано на вашу електронну адресу.",
         "noCodeReceived": "Не отримали код?",
         "resend": "Надіслати код повторно",
+        "resendIn": "Надіслати код повторно ({seconds} с)",
         "submit": "Продовжити",
         "labels": {
           "code": "Код",
@@ -4782,6 +4801,7 @@
         "description": "Введіть код, наданий у листі підтвердження.",
         "noCodeReceived": "Не отримали код?",
         "resendCode": "Надіслати код повторно",
+        "resendCodeIn": "Надіслати код повторно ({seconds} с)",
         "codeSent": "Код щойно надіслано на вашу електронну адресу.",
         "submit": "Продовжити",
         "labels": {
@@ -4947,6 +4967,7 @@
         "codeSent": "تم إرسال رمز جديد إلى عنوان بريدك الإلكتروني.",
         "noCodeReceived": "لم تستلم رمزاً؟",
         "resend": "إعادة إرسال الرمز",
+        "resendIn": "إعادة إرسال الرمز ({seconds} ث)",
         "submit": "متابعة",
         "labels": {
           "code": "الرمز",
@@ -5268,6 +5289,7 @@
         "description": "أدخل الرمز المقدم في البريد الإلكتروني للتحقق.",
         "noCodeReceived": "لم تستلم رمزاً؟",
         "resendCode": "إعادة إرسال الرمز",
+        "resendCodeIn": "إعادة إرسال الرمز ({seconds} ث)",
         "codeSent": "تم إرسال رمز للتو إلى عنوان بريدك الإلكتروني.",
         "submit": "متابعة",
         "labels": {
@@ -5433,6 +5455,7 @@
         "codeSent": "Az új kódot elküldtük az e-mail címedre.",
         "noCodeReceived": "Nem kaptál kódot?",
         "resend": "Kód újraküldése",
+        "resendIn": "Kód újraküldése ({seconds} mp)",
         "submit": "Tovább",
         "labels": {
           "code": "Kód",
@@ -5754,6 +5777,7 @@
         "description": "Add meg az ellenőrző e-mailben kapott kódot.",
         "noCodeReceived": "Nem kaptál kódot?",
         "resendCode": "Kód újraküldése",
+        "resendCodeIn": "Kód újraküldése ({seconds} mp)",
         "codeSent": "Új kódot küldtünk az e-mail címedre.",
         "submit": "Tovább",
         "labels": {
@@ -5919,6 +5943,7 @@
         "codeSent": "Un nouveau code a été envoyé à votre adresse e-mail.",
         "noCodeReceived": "Vous n'avez pas reçu de code ?",
         "resend": "Renvoyer le code",
+        "resendIn": "Renvoyer le code ({seconds}s)",
         "submit": "Continuer",
         "labels": {
           "code": "Code",
@@ -6240,6 +6265,7 @@
         "description": "Entrez le code fourni dans l'e-mail de vérification.",
         "noCodeReceived": "Vous n'avez pas reçu de code ?",
         "resendCode": "Renvoyer le code",
+        "resendCodeIn": "Renvoyer le code ({seconds}s)",
         "codeSent": "Un code vient d'être envoyé à votre adresse e-mail.",
         "submit": "Continuer",
         "labels": {
@@ -6405,6 +6431,7 @@
         "codeSent": "新しいコードがメールアドレスに送信されました。",
         "noCodeReceived": "コードが届きませんか？",
         "resend": "コードを再送信",
+        "resendIn": "コードを再送信 ({seconds}秒)",
         "submit": "続行",
         "labels": {
           "code": "コード",
@@ -6726,6 +6753,7 @@
         "description": "確認メールに記載されたコードを入力してください。",
         "noCodeReceived": "コードが届きませんか？",
         "resendCode": "コードを再送信",
+        "resendCodeIn": "コードを再送信 ({seconds}秒)",
         "codeSent": "確認コードをメールアドレスに送信しました。",
         "submit": "続行",
         "labels": {
@@ -6891,6 +6919,7 @@
         "codeSent": "Um código foi enviado para o seu e-mail.",
         "noCodeReceived": "Não recebeu o código?",
         "resend": "Reenviar código",
+        "resendIn": "Reenviar código ({seconds}s)",
         "submit": "Continuar",
         "labels": {
           "code": "Código",
@@ -7212,6 +7241,7 @@
         "description": "Insira o código fornecido no e-mail de verificação.",
         "noCodeReceived": "Não recebeu o código?",
         "resendCode": "Reenviar código",
+        "resendCodeIn": "Reenviar código ({seconds}s)",
         "codeSent": "Um código foi enviado para o seu endereço de e-mail.",
         "submit": "Continuar",
         "labels": {
