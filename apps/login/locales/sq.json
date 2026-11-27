@@ -1,0 +1,476 @@
+{
+  "common": {
+    "back": "Mbrapa",
+    "title": "Hyr me Zitadel"
+  },
+  "accounts": {
+    "title": "Llogaritë",
+    "description": "Zgjidhni llogarinë që dëshironi të përdorni.",
+    "addAnother": "Shto një llogari tjetër",
+    "noResults": "Nuk u gjet asnjë llogari",
+    "verified": "verifikuar",
+    "expired": "skaduar"
+  },
+  "logout": {
+    "title": "Dalja",
+    "description": "Klikoni mbi një llogari për të mbyllur sesionin",
+    "noResults": "Nuk u gjet asnjë llogari",
+    "clear": "Mbyll sesionin",
+    "verifiedAt": "Aktiv së fundi: {time}",
+    "success": {
+      "title": "Dalja u krye me sukses",
+      "description": "Keni dalë me sukses."
+    }
+  },
+  "loginname": {
+    "title": "Mirë se u rikthyet!",
+    "description": "Vendosni të dhënat e hyrjes.",
+    "register": "Regjistrohu",
+    "submit": "Vazhdo",
+    "labels": {
+      "loginname": "Emri i hyrjes",
+      "username": "Emri i përdoruesit",
+      "usernameOrPhoneNumber": "Emri i përdoruesit ose numri i telefonit",
+      "usernameOrEmail": "Emri i përdoruesit ose emaili"
+    },
+    "required": {
+      "loginName": "Kjo fushë është e detyrueshme"
+    },
+    "errors": {
+      "internalError": "Ndodhi një gabim i brendshëm",
+      "couldNotGetLoginSettings": "Nuk mund të merren cilësimet e hyrjes",
+      "couldNotSearchUsers": "Nuk mund të kërkohen përdoruesit",
+      "couldNotGetDomain": "Nuk mund të merret domeni",
+      "couldNotGetHost": "Nuk mund të merret hosti",
+      "couldNotStartIDPFlow": "Nuk mund të niset rrjedha e IDP-së",
+      "moreThanOneUserFound": "U gjet më shumë se një përdorues. Jepni një identifikues unik.",
+      "userNotFound": "Përdoruesi nuk u gjet në sistem",
+      "couldNotCreateSession": "Nuk mund të krijohet sesioni për përdoruesin",
+      "initialUserNotSupported": "Përdoruesi fillestar nuk mbështetet",
+      "localAuthenticationNotAllowed": "Vërtetimi lokal nuk lejohet! Kontaktoni administratorin për më shumë informacion.",
+      "passkeysNotAllowed": "Passkey-t nuk lejohen! Kontaktoni administratorin për më shumë informacion.",
+      "couldNotFindIdentityProvider": "Ofruesi i identitetit nuk u gjet.",
+      "userNotActive": "Përdoruesi nuk është aktiv. Kontaktoni administratorin për më shumë informacion."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Ndodhi një gabim",
+      "multipleUsersFound": "U gjetën disa përdorues",
+      "userNotFound": "Përdoruesi nuk u gjet në sistem"
+    }
+  },
+  "password": {
+    "verify": {
+      "title": "Fjalëkalimi",
+      "description": "Vendosni fjalëkalimin.",
+      "resetPassword": "Rivendos fjalëkalimin",
+      "submit": "Vazhdo",
+      "labels": {
+        "password": "Fjalëkalimi"
+      },
+      "required": {
+        "password": "Kjo fushë është e detyrueshme"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "Nuk mund të verifikohet fjalëkalimi",
+        "couldNotResetPassword": "Nuk mund të rivendoset fjalëkalimi"
+      },
+      "info": {
+        "passwordResetSent": "Fjalëkalimi u rivendos. Kontrolloni emailin tuaj"
+      }
+    },
+    "set": {
+      "title": "Vendos fjalëkalimin",
+      "description": "Vendosni fjalëkalimin për llogarinë tuaj",
+      "codeSent": "Një kod i ri u dërgua në adresën tuaj të emailit.",
+      "noCodeReceived": "Nuk e morët kodin?",
+      "resend": "Ridërgo kodin",
+      "submit": "Vazhdo",
+      "labels": {
+        "code": "Kodi",
+        "newPassword": "Fjalëkalimi i ri",
+        "confirmPassword": "Konfirmo fjalëkalimin"
+      },
+      "required": {
+        "code": "Kjo fushë është e detyrueshme",
+        "newPassword": "Duhet të vendosni një fjalëkalim!",
+        "confirmPassword": "Kjo fushë është e detyrueshme"
+      },
+      "errors": {
+        "couldNotSetPassword": "Nuk mund të vendoset fjalëkalimi",
+        "couldNotResetPassword": "Nuk mund të rivendoset fjalëkalimi",
+        "couldNotVerifyPassword": "Nuk mund të verifikohet fjalëkalimi"
+      }
+    },
+    "change": {
+      "title": "Ndrysho fjalëkalimin",
+      "description": "Vendosni fjalëkalimin për llogarinë tuaj",
+      "submit": "Vazhdo",
+      "labels": {
+        "currentPassword": "Fjalëkalimi aktual",
+        "newPassword": "Fjalëkalimi i ri",
+        "confirmPassword": "Konfirmo fjalëkalimin"
+      },
+      "required": {
+        "currentPassword": "Duhet të vendosni fjalëkalimin aktual!",
+        "newPassword": "Duhet të vendosni një fjalëkalim të ri!",
+        "confirmPassword": "Kjo fushë është e detyrueshme"
+      },
+      "errors": {
+        "currentPasswordInvalid": "Fjalëkalimi aktual është i pasaktë.",
+        "couldNotChangePassword": "Nuk mund të ndryshohet fjalëkalimi",
+        "couldNotVerifyPassword": "Nuk mund të verifikohet fjalëkalimi",
+        "unknownError": "Gabim i panjohur"
+      }
+    },
+    "complexity": {
+      "length": "Duhet të ketë të paktën {minLength} karaktere.",
+      "hasSymbol": "Duhet të përmbajë një simbol.",
+      "hasNumber": "Duhet të përmbajë një numër.",
+      "hasUppercase": "Duhet të përmbajë një shkronjë të madhe.",
+      "hasLowercase": "Duhet të përmbajë një shkronjë të vogël.",
+      "equals": "Konfirmimi i fjalëkalimit përputhet.",
+      "matches": "Përputhet",
+      "doesNotMatch": "Nuk përputhet"
+    },
+    "errors": {
+      "noHostFound": "Nuk u gjet asnjë host",
+      "couldNotSendResetLink": "Nuk mund të dërgohet lidhja për rivendosjen e fjalëkalimit",
+      "couldNotCreateSessionForUser": "Nuk mund të krijohet sesioni për përdoruesin",
+      "couldNotVerifyPassword": "Nuk mund të verifikohet fjalëkalimi",
+      "failedToAuthenticate": "Vërtetimi dështoi. Keni përdorur {failedAttempts} nga {maxPasswordAttempts} përpjekje për fjalëkalimin.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Vërtetimi dështoi.",
+      "accountLockedContactAdmin": " Kontaktoni administratorin për të zhbllokuar llogarinë tuaj",
+      "userNotFound": "Përdoruesi nuk u gjet në sistem",
+      "initialUserNotSupported": "Përdoruesi fillestar nuk mbështetet",
+      "userInitialStateNotSupported": "Gjendja fillestare e përdoruesit nuk mbështetet",
+      "codeOrVerificationRequired": "Duhet të jepni një kod ose të keni një kontroll të vlefshëm verifikimi të përdoruesit",
+      "verificationRequired": "Duhet të kryhet kontrolli i verifikimit të përdoruesit",
+      "couldNotLoadSession": "Nuk mund të ngarkohet sesioni",
+      "couldNotLoadAuthMethods": "Nuk mund të ngarkohen metodat e vërtetimit",
+      "failedPrecondition": "Parakusht i paplotësuar",
+      "sessionNotValid": "Sesioni nuk është i vlefshëm",
+      "passwordVerificationMissing": "Mungon verifikimi i fjalëkalimit.",
+      "passwordVerificationTooOld": "Verifikimi i fjalëkalimit është shumë i vjetër. Verifikoni sërish fjalëkalimin.",
+      "passwordResetNotAllowed": "Rivendosja e fjalëkalimit nuk lejohet. Kontaktoni administratorin për më shumë informacion."
+    }
+  },
+  "idp": {
+    "title": "Hyr me SSO",
+    "description": "Zgjidhni një nga ofruesit e mëposhtëm për të hyrë",
+    "orSignInWith": "ose hyni me",
+    "signInWithApple": "Hyr me Apple",
+    "signInWithGoogle": "Hyr me Google",
+    "signInWithAzureAD": "Hyr me AzureAD",
+    "signInWithGithub": "Hyr me GitHub",
+    "signInWithGitlab": "Hyr me GitLab",
+    "signInWithZitadel": "Hyr me Zitadel",
+    "loginError": {
+      "title": "Hyrja dështoi",
+      "description": "Ndodhi një gabim gjatë përpjekjes për të hyrë."
+    },
+    "linkingError": {
+      "title": "Lidhja e llogarisë dështoi",
+      "description": "Ndodhi një gabim gjatë përpjekjes për të lidhur llogarinë tuaj."
+    },
+    "completeRegister": {
+      "title": "Plotësoni të dhënat tuaja",
+      "description": "Duhet ta përfundoni regjistrimin duke dhënë adresën e emailit dhe emrin tuaj."
+    },
+    "accountNotFound": {
+      "title": "Llogaria nuk u gjet",
+      "description": "Nuk gjetëm asnjë llogari të lidhur me kredencialet e ofruesit tuaj të identitetit.",
+      "info": "Nuk u gjet asnjë llogari ekzistuese. Hyni me një llogari ekzistuese ose kontaktoni administratorin për ndihmë.",
+      "backToLogin": "Kthehu te hyrja"
+    },
+    "registrationFailed": {
+      "title": "Regjistrimi nuk është i disponueshëm",
+      "description": "Nuk mundëm ta përfundojmë procesin e regjistrimit.",
+      "info": "Nuk mund të përcaktohet organizata për regjistrimin. Kontaktoni administratorin për ndihmë.",
+      "backToLogin": "Kthehu te hyrja"
+    },
+    "processing": {
+      "message": "Vërtetimi po përpunohet...",
+      "noRedirect": "Serveri nuk ktheu as ridrejtim, as gabim",
+      "unexpectedError": "Ndodhi një gabim i papritur"
+    },
+    "errors": {
+      "missingParameters": "Mungojnë parametrat e detyrueshëm",
+      "missingIdpInfo": "Mungojnë informacionet e IDP-së",
+      "idpNotFound": "Ofruesi i identitetit nuk u gjet",
+      "linkingNotAllowed": "Lidhja nuk lejohet për këtë ofrues identiteti",
+      "linkingFailed": "Lidhja e ofruesit të identitetit me llogarinë dështoi",
+      "autoLinkingFailed": "Lidhja automatike e llogarisë dështoi",
+      "userCreationFailed": "Krijimi i llogarisë së përdoruesit dështoi",
+      "orgResolutionFailed": "Nuk mund të përcaktohet organizata për regjistrimin",
+      "sessionCreationFailed": "Nuk mund të krijohet sesioni ose të përcaktohet ridrejtimi",
+      "unknownError": "Ndodhi një gabim i panjohur"
+    }
+  },
+  "ldap": {
+    "title": "Hyrja me LDAP",
+    "description": "Vendosni kredencialet tuaja LDAP.",
+    "submit": "Vazhdo",
+    "labels": {
+      "username": "Emri i përdoruesit",
+      "password": "Fjalëkalimi"
+    },
+    "required": {
+      "username": "Kjo fushë është e detyrueshme",
+      "password": "Kjo fushë është e detyrueshme"
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "Verifikoni identitetin tuaj",
+      "description": "Zgjidhni një nga faktorët e mëposhtëm.",
+      "noResults": "Nuk ka faktorë të dytë të disponueshëm për konfigurim."
+    },
+    "set": {
+      "title": "Konfiguro faktorin e dytë",
+      "description": "Zgjidhni një nga faktorët e dytë të mëposhtëm.",
+      "skip": "Kapërce"
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "Verifiko faktorin e dytë",
+      "totpDescription": "Vendosni kodin nga aplikacioni i vërtetimit.",
+      "smsDescription": "Vendosni kodin që morët me SMS.",
+      "emailDescription": "Vendosni kodin që morët me email.",
+      "noCodeReceived": "Nuk e morët kodin?",
+      "resendCode": "Ridërgo kodin",
+      "submit": "Vazhdo",
+      "labels": {
+        "code": "Kodi"
+      },
+      "required": {
+        "code": "Kjo fushë është e detyrueshme"
+      }
+    },
+    "set": {
+      "title": "Konfiguro faktorin e dytë",
+      "totpDescription": "Skanoni kodin QR me aplikacionin e vërtetimit.",
+      "smsDescription": "Vendosni numrin e telefonit për të marrë një kod me SMS.",
+      "emailDescription": "Vendosni adresën e emailit për të marrë një kod me email.",
+      "totpRegisterDescription": "Skanoni kodin QR ose hapni URL-në manualisht.",
+      "submit": "Vazhdo",
+      "labels": {
+        "code": "Kodi"
+      },
+      "required": {
+        "code": "Kjo fushë është e detyrueshme"
+      }
+    },
+    "errors": {
+      "couldNotRequestChallenge": "Nuk mund të kërkohet sfida OTP",
+      "couldNotVerifyCode": "Nuk mund të verifikohet kodi OTP"
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "Vërtetohu me një passkey",
+      "description": "Pajisja juaj do t'ju kërkojë shenjën e gishtit, fytyrën ose kyçjen e ekranit",
+      "usePassword": "Përdor fjalëkalimin",
+      "submit": "Vazhdo",
+      "errors": {
+        "couldNotRequestChallenge": "Nuk mund të kërkohet sfida e passkey-t",
+        "couldNotVerifyPasskey": "Nuk mund të verifikohet passkey-i",
+        "noResponseReceived": "Verifikimi i passkey-t dështoi - nuk u mor asnjë përgjigje",
+        "noRedirectProvided": "Verifikimi i passkey-t përfundoi, por nuk u dha asnjë ridrejtim",
+        "couldNotRetrievePasskey": "Ndodhi një gabim gjatë marrjes së passkey-t",
+        "verificationCancelled": "Verifikimi i passkey-t u anulua",
+        "verificationFailed": "Ndodhi një gabim gjatë verifikimit të passkey-t",
+        "couldNotFindSession": "Sesioni nuk u gjet",
+        "couldNotUpdateSession": "Nuk mund të përditësohet sesioni",
+        "userNotFound": "Përdoruesi nuk u gjet në sistem",
+        "couldNotDetermineRedirect": "Nuk mund të përcaktohet URL-ja e ridrejtimit pas verifikimit të passkey-t"
+      }
+    },
+    "set": {
+      "title": "Konfiguro një passkey",
+      "description": "Pajisja juaj do t'ju kërkojë shenjën e gishtit, fytyrën ose kyçjen e ekranit",
+      "info": {
+        "description": "Passkey-i është një metodë vërtetimi në pajisje, si shenja e gishtit, Apple FaceID ose të ngjashme. ",
+        "link": "Vërtetimi me passkey"
+      },
+      "skip": "Kapërce",
+      "submit": "Vazhdo"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "Verifiko faktorin e dytë",
+      "description": "Verifikoni llogarinë me pajisjen tuaj."
+    },
+    "set": {
+      "title": "Konfiguro faktorin e dytë",
+      "description": "Konfiguroni një pajisje si faktor të dytë.",
+      "submit": "Vazhdo"
+    }
+  },
+  "register": {
+    "methods": {
+      "passkey": "Passkey",
+      "password": "Fjalëkalimi"
+    },
+    "disabled": {
+      "title": "Regjistrimi është çaktivizuar",
+      "description": "Regjistrimi është çaktivizuar. Kontaktoni administratorin."
+    },
+    "missingdata": {
+      "title": "Mungojnë të dhënat",
+      "description": "Jepni emailin, emrin dhe mbiemrin për t'u regjistruar."
+    },
+    "title": "Regjistrohu",
+    "description": "Krijoni llogarinë tuaj Zitadel.",
+    "noMethodAvailableWarning": "Nuk ka asnjë metodë vërtetimi të disponueshme. Kontaktoni administratorin.",
+    "selectMethod": "Zgjidhni metodën me të cilën dëshironi të vërtetoheni",
+    "agreeTo": "Për t'u regjistruar duhet të pranoni kushtet dhe afatet",
+    "termsOfService": "Kushtet e shërbimit",
+    "privacyPolicy": "Politika e privatësisë",
+    "submit": "Vazhdo",
+    "password": {
+      "title": "Vendos fjalëkalimin",
+      "description": "Vendosni fjalëkalimin për llogarinë tuaj",
+      "submit": "Vazhdo",
+      "labels": {
+        "password": "Fjalëkalimi",
+        "confirmPassword": "Konfirmo fjalëkalimin"
+      },
+      "required": {
+        "password": "Duhet të vendosni një fjalëkalim!",
+        "confirmPassword": "Kjo fushë është e detyrueshme"
+      }
+    },
+    "labels": {
+      "firstname": "Emri",
+      "lastname": "Mbiemri",
+      "email": "Email"
+    },
+    "required": {
+      "firstname": "Kjo fushë është e detyrueshme",
+      "lastname": "Kjo fushë është e detyrueshme",
+      "email": "Kjo fushë është e detyrueshme"
+    },
+    "errors": {
+      "couldNotCreateUser": "Nuk mund të krijohet përdoruesi",
+      "couldNotCreateSession": "Nuk mund të krijohet sesioni",
+      "userNotFound": "Përdoruesi nuk u gjet në sistem",
+      "couldNotLinkIDP": "Nuk mund të lidhet IDP-ja me përdoruesin",
+      "couldNotRegisterUser": "Nuk mund të regjistrohet përdoruesi"
+    }
+  },
+  "invite": {
+    "title": "Fto përdorues",
+    "description": "Jepni adresën e emailit dhe emrin e përdoruesit që dëshironi të ftoni.",
+    "info": "Përdoruesi do të marrë një email me udhëzime të mëtejshme.",
+    "notAllowed": "Cilësimet tuaja nuk ju lejojnë të ftoni përdorues.",
+    "submit": "Vazhdo",
+    "success": {
+      "title": "Përdoruesi u ftua",
+      "description": "Emaili u dërgua me sukses.",
+      "verified": "Përdoruesi u ftua dhe e ka verifikuar tashmë emailin.",
+      "notVerifiedYet": "Përdoruesi u ftua. Do të marrë një email me udhëzime të mëtejshme.",
+      "submit": "Fto një përdorues tjetër"
+    }
+  },
+  "signedin": {
+    "title": "Mirë se vini, {user}!",
+    "description": "Keni hyrë.",
+    "continue": "Vazhdo",
+    "error": {
+      "title": "Gabim",
+      "description": "Ndodhi një gabim gjatë përpjekjes për të hyrë."
+    }
+  },
+  "verify": {
+    "userIdMissing": "Nuk u dha asnjë userId!",
+    "successTitle": "Përdoruesi u verifikua",
+    "successDescription": "Përdoruesi u verifikua me sukses.",
+    "successContinue": "Vazhdo",
+    "setupAuthenticator": "Konfiguro metodën e vërtetimit",
+    "verify": {
+      "title": "Verifiko përdoruesin",
+      "description": "Vendosni kodin e dhënë në emailin e verifikimit.",
+      "noCodeReceived": "Nuk e morët kodin?",
+      "resendCode": "Ridërgo kodin",
+      "codeSent": "Sapo u dërgua një kod i ri në adresën tuaj të emailit.",
+      "submit": "Vazhdo",
+      "labels": {
+        "code": "Kodi"
+      },
+      "required": {
+        "code": "Kjo fushë është e detyrueshme"
+      }
+    },
+    "errors": {
+      "couldNotResendEmail": "Nuk mund të ridërgohet emaili",
+      "couldNotVerifyUser": "Nuk mund të verifikohet përdoruesi",
+      "couldNotVerifyInvite": "Nuk mund të verifikohet ftesa",
+      "couldNotVerifyEmail": "Nuk mund të verifikohet emaili",
+      "couldNotVerify": "Nuk mund të kryhet verifikimi",
+      "couldNotLoadUser": "Nuk mund të ngarkohet përdoruesi",
+      "couldNotLoadAuthenticators": "Nuk mund të ngarkohen metodat e mundshme të vërtetimit",
+      "couldNotCreateSession": "Nuk mund të krijohet sesioni",
+      "noHostFound": "Nuk u gjet asnjë host",
+      "userAlreadyVerified": "Përdoruesi është verifikuar tashmë!",
+      "couldNotResendInvite": "Nuk mund të ridërgohet ftesa",
+      "inviteSendFailed": "Dërgimi i emailit të ftesës dështoi",
+      "emailSendFailed": "Dërgimi i emailit të verifikimit dështoi",
+      "contextMissing": "Ndodhi një gabim. Provoni sërish."
+    }
+  },
+  "authenticator": {
+    "title": "Zgjidh metodën e vërtetimit",
+    "description": "Zgjidhni metodën me të cilën dëshironi të vërtetoheni",
+    "noMethodsAvailable": "Nuk ka metoda vërtetimi të disponueshme",
+    "allSetup": "Keni konfiguruar tashmë një metodë vërtetimi!",
+    "linkWithIDP": "ose lidhuni me një ofrues identiteti",
+    "methods": {
+      "totp": "Aplikacioni i vërtetimit",
+      "u2f": "Universal Second Factor",
+      "otpEmail": "Kod me email",
+      "otpSms": "Kod me SMS",
+      "passkey": "Passkey-t",
+      "password": "Fjalëkalimi"
+    }
+  },
+  "device": {
+    "usercode": {
+      "title": "Kodi i pajisjes",
+      "description": "Vendosni kodin që shfaqet në aplikacionin ose pajisjen tuaj.",
+      "submit": "Vazhdo",
+      "labels": {
+        "code": "Kodi"
+      },
+      "required": {
+        "code": "Kjo fushë është e detyrueshme"
+      }
+    },
+    "request": {
+      "title": "{appName} dëshiron të lidhet",
+      "description": "{appName} do të ketë akses në:",
+      "disclaimer": "Duke klikuar Lejo, ju i lejoni {appName} dhe Zitadel të përdorin informacionin tuaj në përputhje me kushtet përkatëse të shërbimit dhe politikat e privatësisë. Mund ta anuloni këtë akses në çdo kohë.",
+      "submit": "Lejo",
+      "deny": "Refuzo"
+    },
+    "scope": {
+      "openid": "Verifikimi i identitetit tuaj.",
+      "email": "Shikimi i adresës suaj të emailit.",
+      "profile": "Shikimi i të gjitha informacioneve të profilit tuaj.",
+      "offline_access": "Akses në llogarinë tuaj edhe kur nuk jeni të lidhur."
+    }
+  },
+  "error": {
+    "noUserCode": "Nuk u dha asnjë kod përdoruesi!",
+    "noDeviceRequest": "Nuk u gjet asnjë kërkesë pajisjeje.",
+    "unknownContext": "Nuk mund të merret konteksti i përdoruesit. Sigurohuni që të vendosni fillimisht emrin e përdoruesit ose të jepni loginName si searchParam.",
+    "sessionExpired": "Sesioni juaj ka skaduar ose kërkon vërtetim të ri. Hyni sërish.",
+    "failedLoading": "Ngarkimi i të dhënave dështoi. Provoni sërish.",
+    "tryagain": "Provo sërish",
+    "couldNotContinueSession": "Nuk mund të vazhdohet me sesionin - mungojnë informacionet e përdoruesit",
+    "couldNotClearSession": "Nuk mund të mbyllet sesioni. Provoni sërish."
+  }
+}
