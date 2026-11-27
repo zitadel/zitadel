@@ -96,14 +96,6 @@ type UserGrantsQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *UserGrantsQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
-	query = q.SearchRequest.toQuery(query)
-	for _, q := range q.Queries {
-		query = q.toQuery(query)
-	}
-	return query
-}
-
 func userGrantPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *UserGrantsQueries) sq.SelectBuilder {
 	if !enabled {
 		return query
@@ -366,10 +358,8 @@ func (q *Queries) userGrants(ctx context.Context, queries *UserGrantsQueries, sh
 		traceSpan.EndWithError(err)
 	}
 
-	query, scan := prepareUserGrantsQuery()
-	query = userGrantPermissionCheckV2(ctx, query, permissionCheckV2, queries)
-	eq := sq.Eq{UserGrantInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
-	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
+	query, scan := queries.prepareUserGrantsQuery(ctx, permissionCheckV2)
+	stmt, args, err := query.ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-wXnQR", "Errors.Query.SQLStatement")
 	}
@@ -539,169 +529,360 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 		}
 }
 
-func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, error)) {
-	return sq.Select(
-			UserGrantID.identifier(),
-			UserGrantCreationDate.identifier(),
-			UserGrantChangeDate.identifier(),
-			UserGrantSequence.identifier(),
-			UserGrantGrantID.identifier(),
-			UserGrantRoles.identifier(),
-			"roles.role_information",
-			UserGrantState.identifier(),
+// userGrantJoins tracks which joins of the user grants list query a statement needs.
+type userGrantJoins struct {
+	users         bool
+	humans        bool
+	orgs          bool
+	projects      bool
+	userOrgs      bool
+	projectGrants bool
+	grantedOrgs   bool
+	loginNames    bool
+}
 
-			UserGrantUserID.identifier(),
-			UserUsernameCol.identifier(),
-			UserTypeCol.identifier(),
-			UserOrgColumnId.identifier(),
-			UserOrgColumnName.identifier(),
-			UserOrgColumnDomain.identifier(),
-			HumanFirstNameCol.identifier(),
-			HumanLastNameCol.identifier(),
-			HumanEmailCol.identifier(),
-			HumanDisplayNameCol.identifier(),
-			HumanAvatarURLCol.identifier(),
-			LoginNameNameCol.identifier(),
+func allUserGrantJoins() userGrantJoins {
+	return userGrantJoins{
+		users:         true,
+		humans:        true,
+		orgs:          true,
+		projects:      true,
+		userOrgs:      true,
+		projectGrants: true,
+		grantedOrgs:   true,
+		loginNames:    true,
+	}
+}
 
-			UserGrantResourceOwner.identifier(),
-			OrgColumnName.identifier(),
-			OrgColumnDomain.identifier(),
+// add marks the joins needed to reference col. It returns false if col
+// belongs to a table the list query does not join.
+func (j *userGrantJoins) add(col Column) bool {
+	switch col.table {
+	case userGrantTable:
+	case userTable:
+		j.users = true
+	case humanTable:
+		j.humans = true
+	case orgsTable:
+		j.orgs = true
+	case projectsTable:
+		j.projects = true
+	case UserOrgsTable:
+		j.users, j.userOrgs = true, true
+	case projectGrantsTable:
+		j.projectGrants = true
+	case GrantedOrgsTable:
+		j.projectGrants, j.grantedOrgs = true, true
+	case loginNameTable:
+		j.loginNames = true
+	default:
+		return false
+	}
+	return true
+}
 
-			UserGrantProjectID.identifier(),
-			ProjectColumnName.identifier(),
-			ProjectColumnResourceOwner.identifier(),
+// apply adds the marked joins in the order of the full list query.
+// Grants match if their user has a login name row (see userGrantHasLoginName).
+// login_names3 is joined on its primary row only, so it never removes grants.
+func (j userGrantJoins) apply(query sq.SelectBuilder) sq.SelectBuilder {
+	if j.users {
+		query = query.LeftJoin(join(UserIDCol, UserGrantUserID))
+	}
+	if j.humans {
+		query = query.LeftJoin(join(HumanUserIDCol, UserGrantUserID))
+	}
+	if j.orgs {
+		query = query.LeftJoin(join(OrgColumnID, UserGrantResourceOwner))
+	}
+	if j.projects {
+		query = query.LeftJoin(join(ProjectColumnID, UserGrantProjectID))
+	}
+	if j.userOrgs {
+		query = query.LeftJoin(join(UserOrgColumnId, UserResourceOwnerCol))
+	}
+	if j.projectGrants {
+		query = query.LeftJoin(userGrantProjectGrantJoin)
+	}
+	if j.grantedOrgs {
+		query = query.LeftJoin(join(GrantedOrgColumnId, ProjectGrantColumnGrantedOrgID))
+	}
+	if j.loginNames {
+		query = query.LeftJoin(userGrantPrimaryLoginNameJoin, true)
+	}
+	return query.Where(userGrantHasLoginName)
+}
 
-			GrantedOrgColumnId.identifier(),
-			GrantedOrgColumnName.identifier(),
-			GrantedOrgColumnDomain.identifier(),
+var (
+	userGrantProjectGrantJoin = join(ProjectGrantColumnGrantID, UserGrantGrantID) + " AND " + ProjectGrantColumnProjectID.identifier() + " = " + UserGrantProjectID.identifier()
+	// userGrantPrimaryLoginNameJoin joins the primary login name of the user, if there is one.
+	userGrantPrimaryLoginNameJoin = join(LoginNameUserIDCol, UserGrantUserID) + " AND " + LoginNameIsPrimaryCol.identifier() + " = ?"
 
-			countColumn.identifier(),
-		).
-			From(userGrantTable.identifier()).
-			LeftJoin(join(UserIDCol, UserGrantUserID)).
-			LeftJoin(join(HumanUserIDCol, UserGrantUserID)).
-			LeftJoin(join(OrgColumnID, UserGrantResourceOwner)).
-			LeftJoin(join(ProjectColumnID, UserGrantProjectID)).
-			LeftJoin(join(UserOrgColumnId, UserResourceOwnerCol)).
-			LeftJoin(join(ProjectGrantColumnGrantID, UserGrantGrantID) + " AND " + ProjectGrantColumnProjectID.identifier() + " = " + UserGrantProjectID.identifier()).
-			LeftJoin(join(GrantedOrgColumnId, ProjectGrantColumnGrantedOrgID)).
-			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID)).
-			LeftJoin("LATERAL (" + rolesInfoQuery + ") as roles ON true").
-			Where(
-				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
-			).PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*UserGrants, error) {
-			userGrants := make([]*UserGrant, 0)
-			var count uint64
-			for rows.Next() {
-				g := new(UserGrant)
+	// userGrantHasLoginName decides which grants match, in the count, the page and the
+	// returned rows alike. It replaces the former login_names3 join with is_primary = true
+	// in the WHERE clause: login_names3 returns one primary row for every user in
+	// login_names3_users as long as every org with domains has exactly one primary domain,
+	// but this check is a primary key lookup instead of expanding the view for every grant.
+	userGrantHasLoginName = sq.Expr("EXISTS (SELECT 1 FROM " + projection.LoginNameUserProjectionTable +
+		" WHERE " + projection.LoginNameUserProjectionTable + "." + projection.LoginNameUserInstanceIDCol + " = " + UserGrantInstanceID.identifier() +
+		" AND " + projection.LoginNameUserProjectionTable + "." + projection.LoginNameUserIDCol + " = " + UserGrantUserID.identifier() + ")")
+)
 
-				var (
-					roles []byte
-
-					username           sql.NullString
-					userType           sql.NullInt32
-					userOwner          sql.NullString
-					userOwnerName      sql.NullString
-					userOwnerDomain    sql.NullString
-					firstName          sql.NullString
-					lastName           sql.NullString
-					email              sql.NullString
-					displayName        sql.NullString
-					avatarURL          sql.NullString
-					preferredLoginName sql.NullString
-
-					orgName   sql.NullString
-					orgDomain sql.NullString
-
-					grantedOrgID     sql.NullString
-					grantedOrgName   sql.NullString
-					grantedOrgDomain sql.NullString
-
-					projectName          sql.NullString
-					projectResourceOwner sql.NullString
-				)
-
-				err := rows.Scan(
-					&g.ID,
-					&g.CreationDate,
-					&g.ChangeDate,
-					&g.Sequence,
-					&g.GrantID,
-					&g.Roles,
-					&roles,
-					&g.State,
-
-					&g.UserID,
-					&username,
-					&userType,
-					&userOwner,
-					&userOwnerName,
-					&userOwnerDomain,
-					&firstName,
-					&lastName,
-					&email,
-					&displayName,
-					&avatarURL,
-					&preferredLoginName,
-
-					&g.ResourceOwner,
-					&orgName,
-					&orgDomain,
-
-					&g.ProjectID,
-					&projectName,
-					&projectResourceOwner,
-
-					&grantedOrgID,
-					&grantedOrgName,
-					&grantedOrgDomain,
-
-					&count,
-				)
-				if err != nil {
-					return nil, err
-				}
-				if len(roles) > 0 {
-					err = json.Unmarshal(roles, &g.RoleInformation)
-					if err != nil {
-						return nil, err
-					}
-				}
-
-				g.Username = username.String
-				g.UserType = domain.UserType(userType.Int32)
-				g.UserResourceOwner = userOwner.String
-				g.UserResourceOwnerName = userOwnerName.String
-				g.UserResourceOwnerDomain = userOwnerDomain.String
-				g.FirstName = firstName.String
-				g.LastName = lastName.String
-				g.Email = email.String
-				g.DisplayName = displayName.String
-				g.AvatarURL = avatarURL.String
-				g.PreferredLoginName = preferredLoginName.String
-				g.OrgName = orgName.String
-				g.OrgPrimaryDomain = orgDomain.String
-				g.ProjectName = projectName.String
-				g.ProjectResourceOwner = projectResourceOwner.String
-				g.GrantedOrgID = grantedOrgID.String
-				g.GrantedOrgName = grantedOrgName.String
-				g.GrantedOrgDomain = grantedOrgDomain.String
-
-				userGrants = append(userGrants, g)
-			}
-
-			if err := rows.Close(); err != nil {
-				return nil, zerrors.ThrowInternal(err, "QUERY-iGvmP", "Errors.Query.CloseRows")
-			}
-
-			return &UserGrants{
-				UserGrants: userGrants,
-				SearchResponse: SearchResponse{
-					Count: count,
-				},
-			}, nil
+// filterJoins returns the joins needed by the search queries, or all joins if a
+// query references a column the list query does not join itself.
+func (q *UserGrantsQueries) filterJoins() userGrantJoins {
+	var joins userGrantJoins
+	unknown := false
+	// the match func never reports a match, so every column of every query is visited
+	searchQueriesUse(q.Queries, func(col Column) bool {
+		if !joins.add(col) {
+			unknown = true
 		}
+		return false
+	})
+	if unknown {
+		return allUserGrantJoins()
+	}
+	return joins
+}
+
+// matchingGrants selects columns of the grants matching the instance, permission
+// check and search queries, joining only joins.
+func (q *UserGrantsQueries) matchingGrants(ctx context.Context, permissionCheckV2 bool, joins userGrantJoins, columns ...string) sq.SelectBuilder {
+	query := joins.apply(sq.Select(columns...).From(userGrantTable.identifier()))
+	query = userGrantPermissionCheckV2(ctx, query, permissionCheckV2, q)
+	for _, filter := range q.Queries {
+		query = filter.toQuery(query)
+	}
+	return query.Where(sq.Eq{UserGrantInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()})
+}
+
+func (q *UserGrantsQueries) pageOrderClause(sortExpr, idExpr string) string {
+	dir := ""
+	if !q.Asc {
+		dir = " DESC"
+	}
+	clause := sortExpr + dir
+	if q.SortingColumn.identifier() != UserGrantID.identifier() {
+		clause += ", " + idExpr + dir
+	}
+	return clause
+}
+
+// userGrantsColumns are the columns scanned by prepareUserGrantsQuery, without the total.
+var userGrantsColumns = []string{
+	UserGrantID.identifier(),
+	UserGrantCreationDate.identifier(),
+	UserGrantChangeDate.identifier(),
+	UserGrantSequence.identifier(),
+	UserGrantGrantID.identifier(),
+	UserGrantRoles.identifier(),
+	"roles.role_information",
+	UserGrantState.identifier(),
+
+	UserGrantUserID.identifier(),
+	UserUsernameCol.identifier(),
+	UserTypeCol.identifier(),
+	UserOrgColumnId.identifier(),
+	UserOrgColumnName.identifier(),
+	UserOrgColumnDomain.identifier(),
+	HumanFirstNameCol.identifier(),
+	HumanLastNameCol.identifier(),
+	HumanEmailCol.identifier(),
+	HumanDisplayNameCol.identifier(),
+	HumanAvatarURLCol.identifier(),
+	LoginNameNameCol.identifier(),
+
+	UserGrantResourceOwner.identifier(),
+	OrgColumnName.identifier(),
+	OrgColumnDomain.identifier(),
+
+	UserGrantProjectID.identifier(),
+	ProjectColumnName.identifier(),
+	ProjectColumnResourceOwner.identifier(),
+
+	GrantedOrgColumnId.identifier(),
+	GrantedOrgColumnName.identifier(),
+	GrantedOrgColumnDomain.identifier(),
+}
+
+// prepareUserGrantsQuery creates the statement listing user grants and returns a matching scan function.
+// The total is a scalar COUNT(*) over the filters, joining only what they reference.
+// For a page (limit or offset), the IDs of the page are selected first, joining only what the
+// filters and the sorting need, so OFFSET skips narrow rows. Users, orgs, projects, login names
+// and role information are joined for the returned page only.
+// Without limit and offset nothing is skipped, so the grants are joined in a single pass.
+// Pages are always ordered: by the sorting column with the grant id as tie-break, or
+// by the grant id if no sorting column is set, so pages neither overlap nor skip grants.
+func (q *UserGrantsQueries) prepareUserGrantsQuery(ctx context.Context, permissionCheckV2 bool) (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, error)) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	filterJoins := q.filterJoins()
+	total := sq.ConcatExpr("(", q.matchingGrants(ctx, permissionCheckV2, filterJoins, "COUNT(*)"), ") AS total")
+	rolesJoin := "LATERAL (" + rolesInfoQuery + ") as roles ON true"
+	sorting := !q.SortingColumn.isZero()
+
+	if q.Limit == 0 && q.Offset == 0 {
+		query := q.matchingGrants(ctx, permissionCheckV2, allUserGrantJoins(), userGrantsColumns...).
+			Column(total).
+			LeftJoin(rolesJoin)
+		if sorting {
+			query = query.OrderByClause(q.pageOrderClause(q.SortingColumn.orderBy(), UserGrantID.identifier()))
+		}
+		return query.PlaceholderFormat(sq.Dollar), scanUserGrants
+	}
+
+	pageJoins := filterJoins
+	pageColumns := []string{UserGrantID.identifier()}
+	if sorting {
+		if !pageJoins.add(q.SortingColumn) {
+			pageJoins = allUserGrantJoins()
+		}
+		pageColumns = append(pageColumns, q.SortingColumn.orderBy()+" AS sort_col")
+	}
+	page := q.matchingGrants(ctx, permissionCheckV2, pageJoins, pageColumns...)
+	if sorting {
+		page = page.OrderByClause(q.pageOrderClause("sort_col", UserGrantID.identifier()))
+	} else {
+		page = page.OrderBy(UserGrantID.identifier())
+	}
+	if q.Offset > 0 {
+		page = page.Offset(q.Offset)
+	}
+	if q.Limit > 0 {
+		page = page.Limit(q.Limit)
+	}
+
+	query := sq.Select(userGrantsColumns...).
+		Column(total).
+		FromSelect(page, "page").
+		Join(userGrantTable.identifier()+" ON "+UserGrantID.identifier()+" = page.id AND "+UserGrantInstanceID.identifier()+" = ?", instanceID).
+		LeftJoin(join(UserIDCol, UserGrantUserID)).
+		LeftJoin(join(HumanUserIDCol, UserGrantUserID)).
+		LeftJoin(join(OrgColumnID, UserGrantResourceOwner)).
+		LeftJoin(join(ProjectColumnID, UserGrantProjectID)).
+		LeftJoin(join(UserOrgColumnId, UserResourceOwnerCol)).
+		LeftJoin(userGrantProjectGrantJoin).
+		LeftJoin(join(GrantedOrgColumnId, ProjectGrantColumnGrantedOrgID)).
+		LeftJoin(userGrantPrimaryLoginNameJoin, true).
+		LeftJoin(rolesJoin)
+	if sorting {
+		query = query.OrderByClause(q.pageOrderClause("page.sort_col", "page.id"))
+	} else {
+		query = query.OrderBy("page.id")
+	}
+	return query.PlaceholderFormat(sq.Dollar), scanUserGrants
+}
+
+func scanUserGrants(rows *sql.Rows) (*UserGrants, error) {
+	userGrants := make([]*UserGrant, 0)
+	var count uint64
+	for rows.Next() {
+		g := new(UserGrant)
+
+		var (
+			roles []byte
+
+			username           sql.NullString
+			userType           sql.NullInt32
+			userOwner          sql.NullString
+			userOwnerName      sql.NullString
+			userOwnerDomain    sql.NullString
+			firstName          sql.NullString
+			lastName           sql.NullString
+			email              sql.NullString
+			displayName        sql.NullString
+			avatarURL          sql.NullString
+			preferredLoginName sql.NullString
+
+			orgName   sql.NullString
+			orgDomain sql.NullString
+
+			grantedOrgID     sql.NullString
+			grantedOrgName   sql.NullString
+			grantedOrgDomain sql.NullString
+
+			projectName          sql.NullString
+			projectResourceOwner sql.NullString
+		)
+
+		err := rows.Scan(
+			&g.ID,
+			&g.CreationDate,
+			&g.ChangeDate,
+			&g.Sequence,
+			&g.GrantID,
+			&g.Roles,
+			&roles,
+			&g.State,
+
+			&g.UserID,
+			&username,
+			&userType,
+			&userOwner,
+			&userOwnerName,
+			&userOwnerDomain,
+			&firstName,
+			&lastName,
+			&email,
+			&displayName,
+			&avatarURL,
+			&preferredLoginName,
+
+			&g.ResourceOwner,
+			&orgName,
+			&orgDomain,
+
+			&g.ProjectID,
+			&projectName,
+			&projectResourceOwner,
+
+			&grantedOrgID,
+			&grantedOrgName,
+			&grantedOrgDomain,
+
+			&count,
+		)
+		if err != nil {
+			return nil, err
+		}
+		if len(roles) > 0 {
+			err = json.Unmarshal(roles, &g.RoleInformation)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		g.Username = username.String
+		g.UserType = domain.UserType(userType.Int32)
+		g.UserResourceOwner = userOwner.String
+		g.UserResourceOwnerName = userOwnerName.String
+		g.UserResourceOwnerDomain = userOwnerDomain.String
+		g.FirstName = firstName.String
+		g.LastName = lastName.String
+		g.Email = email.String
+		g.DisplayName = displayName.String
+		g.AvatarURL = avatarURL.String
+		g.PreferredLoginName = preferredLoginName.String
+		g.OrgName = orgName.String
+		g.OrgPrimaryDomain = orgDomain.String
+		g.ProjectName = projectName.String
+		g.ProjectResourceOwner = projectResourceOwner.String
+		g.GrantedOrgID = grantedOrgID.String
+		g.GrantedOrgName = grantedOrgName.String
+		g.GrantedOrgDomain = grantedOrgDomain.String
+
+		userGrants = append(userGrants, g)
+	}
+
+	if err := rows.Close(); err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-iGvmP", "Errors.Query.CloseRows")
+	}
+
+	return &UserGrants{
+		UserGrants: userGrants,
+		SearchResponse: SearchResponse{
+			Count: count,
+		},
+	}, nil
 }
 
 var rolesInfoQuery = fmt.Sprintf(
