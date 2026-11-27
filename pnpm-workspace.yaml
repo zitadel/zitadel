@@ -12,8 +12,5 @@ exclude:
 # has no fixed release yet. Name the pinning parent so the entry can be removed
 # once the parent is updated. See skills/npm-dependency-audit.md.
 overrides:
-  # tsup 8.x (via @zitadel/client) allows esbuild ^0.27 only
+  # tsup 8.x (via @zitadel/client) allows esbuild ^0.27 only; tsup 9 allows ^0.28.2
   "esbuild@>=0.27.3 <0.28.1": "^0.28.1"
-  # @opentelemetry/sdk-node 0.218 and auto-instrumentations-node 0.76 (login) pin older versions
-  "@opentelemetry/core@<2.8.0": "^2.8.0"
-  "@opentelemetry/propagator-jaeger@<2.9.0": "^2.9.0"
