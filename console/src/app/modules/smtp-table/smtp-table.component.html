@@ -23,7 +23,12 @@
         <th class="availability" mat-header-cell *matHeaderCellDef>
           <span>{{ 'SMTP.LIST.ACTIVATED' | translate }}</span>
         </th>
-        <td class="availability" [ngClass]="{ pointer: config.senderAddress }" mat-cell *matCellDef="let config">
+        <td
+          class="availability"
+          [ngClass]="{ pointer: config.smtp?.senderAddress || config.http }"
+          mat-cell
+          *matCellDef="let config"
+        >
           @if (isActive(config.state)) {
             <i
               matTooltip="{{ 'SMTP.LIST.ACTIVATED' | translate }}"
@@ -36,8 +41,15 @@
 
       <ng-container matColumnDef="description">
         <th mat-header-cell *matHeaderCellDef>{{ 'SETTING.SMTP.DESCRIPTION' | translate }}</th>
-        <td [ngClass]="{ pointer: config.senderAddress }" mat-cell *matCellDef="let config">
+        <td [ngClass]="{ pointer: config.smtp?.senderAddress || config.http }" mat-cell *matCellDef="let config">
           <span>{{ config?.description }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef>{{ 'SMTP.LIST.TYPE' | translate }}</th>
+        <td [ngClass]="{ pointer: config.smtp?.senderAddress || config.http }" mat-cell *matCellDef="let config">
+          <span data-e2e="provider-type">{{ config.http ? 'HTTP' : 'SMTP' }}</span>
         </td>
       </ng-container>
 
@@ -45,27 +57,34 @@
         <th class="availability" mat-header-cell *matHeaderCellDef>
           <span>TLS</span>
         </th>
-        <td class="availability" [ngClass]="{ pointer: config.senderAddress }" mat-cell *matCellDef="let config">
-          @if (config.tls) {
+        <td
+          class="availability"
+          [ngClass]="{ pointer: config.smtp?.senderAddress || config.http }"
+          mat-cell
+          *matCellDef="let config"
+        >
+          @if (config.smtp?.tls) {
             <i class="las la-lock"></i>
           }
-          @if (config.senderAddress && !config.tls) {
+          @if (config.smtp?.senderAddress && !config.smtp?.tls) {
             <i class="las la-unlock"></i>
           }
         </td>
       </ng-container>
 
       <ng-container matColumnDef="host">
-        <th mat-header-cell *matHeaderCellDef>{{ 'SETTING.SMTP.HOSTANDPORT' | translate }}</th>
-        <td [ngClass]="{ pointer: config.senderAddress }" mat-cell *matCellDef="let config">
-          <span>{{ config?.host }}</span>
+        <th mat-header-cell *matHeaderCellDef>
+          {{ 'SETTING.SMTP.HOSTANDPORT' | translate }} / {{ 'SETTING.HTTPPROVIDER.ENDPOINT' | translate }}
+        </th>
+        <td [ngClass]="{ pointer: config.smtp?.senderAddress || config.http }" mat-cell *matCellDef="let config">
+          <span>{{ config.smtp?.host || config.http?.endpoint }}</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="senderAddress">
         <th mat-header-cell *matHeaderCellDef>{{ 'SETTING.SMTP.SENDERADDRESS' | translate }}</th>
-        <td [ngClass]="{ pointer: config.senderAddress }" mat-cell *matCellDef="let config">
-          <span>{{ config?.senderAddress }}</span>
+        <td [ngClass]="{ pointer: config.smtp?.senderAddress || config.http }" mat-cell *matCellDef="let config">
+          <span>{{ config.smtp?.senderAddress }}</span>
         </td>
       </ng-container>
 
@@ -101,7 +120,7 @@
 
             <button
               actions
-              [disabled]="(['iam.write'] | hasRole | async) === false || !config?.senderAddress"
+              [disabled]="(['iam.write'] | hasRole | async) === false || !config.smtp?.senderAddress"
               mat-icon-button
               color="primary"
               matTooltip="{{ 'SMTP.LIST.TEST' | translate }}"
@@ -118,7 +137,7 @@
               color="warn"
               matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
               data-e2e="delete-provider-button"
-              (click)="deleteSMTPConfig(config.id, config.senderName); $event.stopPropagation()"
+              (click)="deleteSMTPConfig(config); $event.stopPropagation()"
             >
               <i class="las la-trash"></i>
             </button>

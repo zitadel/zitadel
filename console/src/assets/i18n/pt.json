@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "Configurações de SMS",
-        "DESCRIPTION": "Para desbloquear todos os recursos do Zitadel, configure o Twilio para enviar mensagens SMS para seus usuários."
+        "DESCRIPTION": "Para desbloquear todos os recursos do Zitadel, configure o Twilio ou o seu próprio endpoint HTTP para enviar mensagens SMS aos seus usuários."
       },
       "IAM_EVENTS": {
         "TITLE": "Eventos",
@@ -1604,6 +1604,25 @@
         "SETTOKEN": "Definir token",
         "TOKENSET": "Token definido com sucesso."
       }
+    },
+    "HTTPPROVIDER": {
+      "ADD_TITLE": "Adicionar provedor HTTP",
+      "EDIT_TITLE": "Editar provedor HTTP",
+      "EMAIL_DESCRIPTION": "Em vez de usar SMTP, o Zitadel envia cada e-mail como uma requisição JSON assinada para o seu endpoint. O seu serviço monta e entrega a mensagem.",
+      "SMS_DESCRIPTION": "O Zitadel envia cada SMS como uma requisição JSON assinada para o seu endpoint. O seu serviço entrega a mensagem.",
+      "ENDPOINT": "Endpoint",
+      "ENDPOINT_INVALID": "Informe uma URL que comece com http:// ou https://.",
+      "DESCRIPTION": "Descrição",
+      "SIGNINGKEY": "Chave de assinatura",
+      "SIGNINGKEY_DESCRIPTION": "Cada requisição traz um cabeçalho ZITADEL-Signature assinado com a chave deste provedor. Verifique-o no seu serviço.",
+      "SIGNINGKEY_STORE": "Copie a chave de assinatura e guarde-a com segurança. O seu serviço precisa dela para verificar o cabeçalho ZITADEL-Signature.",
+      "REGENERATE_SIGNINGKEY": "Gerar uma nova chave de assinatura. A chave atual deixa de funcionar imediatamente.",
+      "ADDED": "Provedor HTTP adicionado.",
+      "UPDATED": "Provedor HTTP atualizado.",
+      "REMOVED": "Provedor HTTP removido.",
+      "DELETE_TITLE": "Excluir provedor HTTP",
+      "DELETE_DESCRIPTION": "Você está prestes a excluir um provedor HTTP. Confirme digitando o endpoint dele.",
+      "DELETE_CONFIRM": "Digite {{value}} para excluir este provedor HTTP."
     },
     "SECRETS": {
       "TYPES": "Tipos de segredos",

@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "Ustawienia SMS",
-        "DESCRIPTION": "Aby odblokować wszystkie funkcje Zitadel, skonfiguruj Twilio do wysyłania wiadomości SMS do użytkowników."
+        "DESCRIPTION": "Aby odblokować wszystkie funkcje Zitadel, skonfiguruj Twilio lub własny endpoint HTTP do wysyłania wiadomości SMS do użytkowników."
       },
       "IAM_EVENTS": {
         "TITLE": "Wydarzenia",
@@ -1602,6 +1602,25 @@
         "SETTOKEN": "Ustaw Token",
         "TOKENSET": "Token pomyślnie ustawiony."
       }
+    },
+    "HTTPPROVIDER": {
+      "ADD_TITLE": "Dodaj dostawcę HTTP",
+      "EDIT_TITLE": "Edytuj dostawcę HTTP",
+      "EMAIL_DESCRIPTION": "Zamiast SMTP Zitadel wysyła każdą wiadomość e-mail jako podpisane żądanie JSON do Twojego endpointu. Twoja usługa tworzy i dostarcza wiadomość.",
+      "SMS_DESCRIPTION": "Zitadel wysyła każdy SMS jako podpisane żądanie JSON do Twojego endpointu. Twoja usługa dostarcza wiadomość.",
+      "ENDPOINT": "Endpoint",
+      "ENDPOINT_INVALID": "Wpisz adres URL zaczynający się od http:// lub https://.",
+      "DESCRIPTION": "Opis",
+      "SIGNINGKEY": "Klucz podpisu",
+      "SIGNINGKEY_DESCRIPTION": "Każde żądanie zawiera nagłówek ZITADEL-Signature podpisany kluczem tego dostawcy. Weryfikuj go w swojej usłudze.",
+      "SIGNINGKEY_STORE": "Skopiuj klucz podpisu i przechowuj go w bezpiecznym miejscu. Twoja usługa potrzebuje go do weryfikacji nagłówka ZITADEL-Signature.",
+      "REGENERATE_SIGNINGKEY": "Wygeneruj nowy klucz podpisu. Obecny klucz natychmiast przestanie działać.",
+      "ADDED": "Dodano dostawcę HTTP.",
+      "UPDATED": "Zaktualizowano dostawcę HTTP.",
+      "REMOVED": "Usunięto dostawcę HTTP.",
+      "DELETE_TITLE": "Usuń dostawcę HTTP",
+      "DELETE_DESCRIPTION": "Zamierzasz usunąć dostawcę HTTP. Potwierdź, wpisując jego endpoint.",
+      "DELETE_CONFIRM": "Wpisz {{value}}, aby usunąć tego dostawcę HTTP."
     },
     "SECRETS": {
       "TYPES": "Typy tajnych",

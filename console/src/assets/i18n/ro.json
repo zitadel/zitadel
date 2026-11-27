@@ -138,7 +138,7 @@
       },
       "SMS_PROVIDER": {
         "TITLE": "Setări SMS",
-        "DESCRIPTION": "Pentru a debloca toate caracteristicile Zitadel, configurați Twilio pentru a trimite mesaje SMS utilizatorilor dvs."
+        "DESCRIPTION": "Pentru a debloca toate funcțiile Zitadel, configurează Twilio sau propriul endpoint HTTP pentru a trimite mesaje SMS utilizatorilor."
       },
       "IAM_EVENTS": {
         "TITLE": "Evenimente",
@@ -1600,6 +1600,25 @@
         "SETTOKEN": "Setați tokenul",
         "TOKENSET": "Token setat cu succes."
       }
+    },
+    "HTTPPROVIDER": {
+      "ADD_TITLE": "Adaugă furnizor HTTP",
+      "EDIT_TITLE": "Editează furnizorul HTTP",
+      "EMAIL_DESCRIPTION": "În loc de SMTP, Zitadel trimite fiecare e-mail ca cerere JSON semnată către endpoint-ul tău. Serviciul tău compune și livrează mesajul.",
+      "SMS_DESCRIPTION": "Zitadel trimite fiecare SMS ca cerere JSON semnată către endpoint-ul tău. Serviciul tău livrează mesajul.",
+      "ENDPOINT": "Endpoint",
+      "ENDPOINT_INVALID": "Introdu un URL care începe cu http:// sau https://.",
+      "DESCRIPTION": "Descriere",
+      "SIGNINGKEY": "Cheie de semnare",
+      "SIGNINGKEY_DESCRIPTION": "Fiecare cerere conține un antet ZITADEL-Signature semnat cu cheia acestui furnizor. Verifică-l în serviciul tău.",
+      "SIGNINGKEY_STORE": "Copiază cheia de semnare și păstreaz-o în siguranță. Serviciul tău are nevoie de ea pentru a verifica antetul ZITADEL-Signature.",
+      "REGENERATE_SIGNINGKEY": "Generează o cheie de semnare nouă. Cheia actuală nu mai funcționează imediat.",
+      "ADDED": "Furnizorul HTTP a fost adăugat.",
+      "UPDATED": "Furnizorul HTTP a fost actualizat.",
+      "REMOVED": "Furnizorul HTTP a fost eliminat.",
+      "DELETE_TITLE": "Șterge furnizorul HTTP",
+      "DELETE_DESCRIPTION": "Urmează să ștergi un furnizor HTTP. Confirmă introducând endpoint-ul său.",
+      "DELETE_CONFIRM": "Introdu {{value}} pentru a șterge acest furnizor HTTP."
     },
     "SECRETS": {
       "TYPES": "Tipuri de secrete",
