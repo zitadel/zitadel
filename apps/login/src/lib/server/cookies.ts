@@ -6,7 +6,7 @@ import { LANGUAGE_COOKIE_NAME } from "@/lib/i18n";
 import { createLogger } from "@/lib/server/logger";
 import { parseAndVerifySessions, signSession } from "@/lib/server/session-cookie-signature";
 import { timestampDate, timestampFromMs } from "@zitadel/client";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 
 const logger = createLogger("cookies");
 
@@ -237,18 +237,119 @@ export async function removeSessionFromCookie<T>({
   }
 }
 
-export async function getMostRecentSessionCookie<T>(): Promise<Cookie | undefined> {
-  const cookiesList = await cookies();
-  const stringifiedCookie = cookiesList.get("sessions");
+/**
+ * Which entry of the `sessions` cookie is meant. Each kind stands for one of the getters below:
+ * `id` for `getSessionCookieById`, `loginName` for `getSessionCookieByLoginName` and `mostRecent`
+ * for `getMostRecentCookieWithLoginname` and `getMostRecentSessionCookie`.
+ */
+export type SessionCookieLookup =
+  | { by: "id"; sessionId: string; organization?: string }
+  | { by: "loginName"; loginName?: string; organization?: string }
+  | { by: "mostRecent"; loginName?: string; organization?: string };
 
-  const sessions = readSessionCookies<T>(stringifiedCookie?.value);
-  if (!sessions.length) {
+/**
+ * The one rule for which entry a lookup means. The getters apply it to the verified entries and
+ * `explainSessionCookieMiss` to the entries as the browser sent them, so the two cannot drift apart.
+ */
+function selectSessionCookie<E extends Partial<Cookie>>(entries: E[], lookup: SessionCookieLookup): E | undefined {
+  const candidates = lookup.organization ? entries.filter((entry) => entry.organization === lookup.organization) : entries;
+
+  switch (lookup.by) {
+    case "id":
+      return candidates.find((entry) => entry.id === lookup.sessionId);
+    case "loginName":
+      return candidates.find((entry) => entry.loginName === lookup.loginName);
+    case "mostRecent": {
+      const matching = lookup.loginName ? candidates.filter((entry) => entry.loginName === lookup.loginName) : candidates;
+      return matching.length
+        ? matching.reduce((prev, current) => ((prev.changeTs ?? "") > (current.changeTs ?? "") ? prev : current))
+        : undefined;
+    }
+  }
+}
+
+async function findSessionCookie<T>(lookup: SessionCookieLookup): Promise<SessionCookie<T> | undefined> {
+  const cookiesList = await cookies();
+  const stringifiedCookie = cookiesList.get(SESSIONS_COOKIE_NAME);
+
+  return selectSessionCookie(readSessionCookies<T>(stringifiedCookie?.value), lookup);
+}
+
+export type SessionCookieMiss = {
+  /**
+   * - `cookie_missing`: the browser sent no `sessions` cookie
+   * - `cookie_invalid`: the cookie is unreadable, or the wanted entry has a missing or invalid signature
+   * - `session_entry_not_found`: the cookie is fine but holds no entry for the lookup
+   */
+  reason: "cookie_missing" | "cookie_invalid" | "session_entry_not_found";
+  context: Record<string, unknown>;
+};
+
+// The entries of the cookie before any signature check, undefined when the value is not a JSON array.
+function readUnverifiedEntries(value: string | undefined): Partial<Cookie>[] | undefined {
+  if (!value) {
+    return [];
+  }
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed.filter((entry) => !!entry && typeof entry === "object") : undefined;
+  } catch {
     return undefined;
   }
+}
 
-  return sessions.reduce((prev, current) => {
-    return prev.changeTs > current.changeTs ? prev : current;
-  });
+/**
+ * Explains why a lookup found no entry in the `sessions` cookie. Call it with the lookup of the
+ * getter that returned nothing. It reads the cookie again, so it is only meant for that failure
+ * path. The context holds counts and sizes only: no token, signature or login name.
+ */
+export async function explainSessionCookieMiss(lookup: SessionCookieLookup): Promise<SessionCookieMiss> {
+  const value = (await cookies()).get(SESSIONS_COOKIE_NAME)?.value;
+  const cookieHeader = (await headers()).get("cookie") ?? "";
+
+  const unverified = readUnverifiedEntries(value);
+  const entries = unverified ?? [];
+  const verified = parseAndVerifySessions<Cookie>(value);
+
+  const context: Record<string, unknown> = {
+    lookupBy: lookup.by,
+    hasLoginName: lookup.by !== "id" && !!lookup.loginName,
+    hasOrganization: !!lookup.organization,
+    hasSessionId: lookup.by === "id",
+    sessionId: lookup.by === "id" ? lookup.sessionId : undefined,
+    cookieEntries: entries.length,
+    cookieEntriesDropped: entries.length - verified.length,
+    // as the browser sent it (URL-encoded), browsers cap a single cookie at ~4096 bytes
+    cookieSize: value ? encodedCookieSize(value) : 0,
+    cookieHeaderSize: cookieHeader.length,
+    // more than one means cookies with different domain or path attributes shadow each other
+    sessionsCookieCount: cookieHeader.match(/(?:^|;\s*)sessions=/g)?.length ?? 0,
+  };
+
+  if (lookup.by !== "id" && lookup.loginName) {
+    const loginName = lookup.loginName;
+    // an entry exists for the login name but not for the organization, or only with different casing
+    context.entriesMatchingLoginName = verified.filter((entry) => entry.loginName === loginName).length;
+    context.entriesMatchingLoginNameIgnoringCase = verified.filter(
+      (entry) => entry.loginName?.toLowerCase() === loginName.toLowerCase(),
+    ).length;
+  }
+
+  if (!value) {
+    return { reason: "cookie_missing", context };
+  }
+
+  // the wanted entry is in the cookie, but it was dropped for its missing or invalid signature
+  const wantedEntryDropped = !!selectSessionCookie(entries, lookup) && !selectSessionCookie(verified, lookup);
+  if (!unverified || wantedEntryDropped) {
+    return { reason: "cookie_invalid", context };
+  }
+
+  return { reason: "session_entry_not_found", context };
+}
+
+export async function getMostRecentSessionCookie<T>(): Promise<Cookie | undefined> {
+  return findSessionCookie<T>({ by: "mostRecent" });
 }
 
 export async function getSessionCookieById<T>({
@@ -258,11 +359,7 @@ export async function getSessionCookieById<T>({
   sessionId: string;
   organization?: string;
 }): Promise<SessionCookie<T> | undefined> {
-  const cookiesList = await cookies();
-  const stringifiedCookie = cookiesList.get("sessions");
-
-  const sessions = readSessionCookies<T>(stringifiedCookie?.value);
-  return sessions.find((s) => (organization ? s.organization === organization && s.id === sessionId : s.id === sessionId));
+  return findSessionCookie<T>({ by: "id", sessionId, organization });
 }
 
 export async function getSessionCookieByLoginName<T>({
@@ -272,13 +369,7 @@ export async function getSessionCookieByLoginName<T>({
   loginName?: string;
   organization?: string;
 }): Promise<SessionCookie<T> | undefined> {
-  const cookiesList = await cookies();
-  const stringifiedCookie = cookiesList.get("sessions");
-
-  const sessions = readSessionCookies<T>(stringifiedCookie?.value);
-  return sessions.find((s) =>
-    organization ? s.organization === organization && s.loginName === loginName : s.loginName === loginName,
-  );
+  return findSessionCookie<T>({ by: "loginName", loginName, organization });
 }
 
 /**
@@ -328,30 +419,5 @@ export async function getMostRecentCookieWithLoginname<T>({
   loginName?: string;
   organization?: string;
 }): Promise<any> {
-  const cookiesList = await cookies();
-  const stringifiedCookie = cookiesList.get("sessions");
-
-  const sessions = readSessionCookies<T>(stringifiedCookie?.value);
-
-  if (!sessions.length) {
-    return undefined;
-  }
-
-  let filtered = sessions;
-
-  if (loginName) {
-    filtered = filtered.filter((cookie) => cookie.loginName === loginName);
-  }
-
-  if (organization) {
-    filtered = filtered.filter((cookie) => cookie.organization === organization);
-  }
-
-  if (!filtered || !filtered.length) {
-    return undefined;
-  }
-
-  return filtered.reduce((prev, current) => {
-    return prev.changeTs > current.changeTs ? prev : current;
-  });
+  return findSessionCookie<T>({ by: "mostRecent", loginName, organization });
 }

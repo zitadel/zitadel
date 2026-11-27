@@ -1,6 +1,7 @@
 import { Alert } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterU2f } from "@/components/register-u2f";
+import { RestartSignIn } from "@/components/restart-sign-in";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSetupAuthorizationError, setupErrorTranslationKey } from "@/lib/server/enrollment-guard";
@@ -86,6 +87,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
                 namespace="error"
               />
             </Alert>
+            <RestartSignIn loginName={loginName} organization={organization} requestId={requestId} />
           </div>
         )}
 

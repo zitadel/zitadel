@@ -261,7 +261,8 @@ export async function sendPasskey(command: SendPasskeyCommand) {
   if (result.error) {
     // try to interpret validation errors as translation keys if possible, or fallback to generic
     // For now returning the error string directly as key or default
-    return { error: result.error };
+    // a lost session cannot be retried, the caller offers to restart the sign-in
+    return "sessionLost" in result ? { error: result.error, sessionLost: true } : { error: result.error };
   }
 
   // transformation to partial session for compatibility
