@@ -1,4 +1,4 @@
-import { generateFiles } from 'fumadocs-openapi';
+import { generateFiles, type OutputEntry, type OutputFile } from 'fumadocs-openapi';
 import { createOpenAPI } from 'fumadocs-openapi/server';
 import { writeFileSync, mkdirSync, readdirSync, lstatSync, readFileSync, existsSync } from 'fs';
 import path, { join, dirname, basename } from 'path';
@@ -22,6 +22,27 @@ const CONTENT_VERSIONS_ROOT = join(ROOT_DIR, 'content');
 const serviceRenameMap: Record<string, string> = {
   'Authorization': 'Role Assignment',
 };
+
+// fumadocs-openapi renders operation descriptions from the OpenAPI document (`showDescription`).
+// Write them into the page body instead, so `fixAllGeneratedLinks` rewrites their links and
+// check-links validates them. The generated page renders its body above the operation.
+function inlineOperationDescriptions(files: OutputFile[], generatedEntries: Record<string, OutputEntry[]>) {
+  const descriptions = new Map<string, string>();
+  const collect = (entry: OutputEntry) => {
+    if (entry.type === 'group') {
+      entry.entries.forEach(collect);
+    } else if ((entry.type === 'operation' || entry.type === 'webhook') && entry.info.description) {
+      descriptions.set(entry.path, entry.info.description);
+    }
+  };
+  Object.values(generatedEntries).flat().forEach(collect);
+
+  for (const file of files) {
+    const description = descriptions.get(file.path);
+    if (!description) continue;
+    file.content = `${file.content.replace(' showDescription />', ' />')}\n\n${description}\n`;
+  }
+}
 
 async function generateVersionApiDocs(version: string) {
   const sourceRoot = join(OPENAPI_ROOT, version);
@@ -68,6 +89,9 @@ async function generateVersionApiDocs(version: string) {
       input: api,
       output: outputDir,
       includeDescription: true,
+      beforeWrite(files) {
+        inlineOperationDescriptions(files, this.generatedEntries);
+      },
     });
 
     const indexPath = join(outputDir, 'index.mdx');
