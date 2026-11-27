@@ -503,29 +503,6 @@ export function unwrapHeadingLinks(content) {
     .join('\n');
 }
 
-/**
- * Older pages continue a quoted front matter value on an unindented line. The
- * yaml parser fumadocs uses rejects that as an unclosed quote and fails the
- * build. Indenting the line keeps the same folded value. Latest content is fixed
- * at the source; versioned content is downloaded from git tags, so it is
- * indented here instead.
- */
-export function indentFrontmatterContinuations(content) {
-  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
-  if (!match) return content;
-  const frontmatter = match[1];
-  const fixed = frontmatter
-    .split('\n')
-    .map((line) =>
-      // keep blank, indented, comment and list lines and `key:` lines as they are
-      /^(\s|#|-|$)/.test(line) || /^["']?[\w-]+["']?\s*:/.test(line) ? line : `  ${line}`,
-    )
-    .join('\n');
-  if (fixed === frontmatter) return content;
-  const start = match[0].indexOf(frontmatter);
-  return content.slice(0, start) + fixed + content.slice(start + frontmatter.length);
-}
-
 function fixHeadingLinks(versionDir) {
   if (!fs.existsSync(versionDir)) return;
   for (const file of fs.readdirSync(versionDir, { recursive: true })) {
@@ -534,11 +511,11 @@ function fixHeadingLinks(versionDir) {
     if (!fs.statSync(filePath).isFile()) continue;
 
     const content = fs.readFileSync(filePath, 'utf8');
-    const unwrapped = unwrapHeadingLinks(content);
-    if (unwrapped !== content) console.log(`[fix-headings] Unwrapped link in heading: ${file}`);
-    const fixed = indentFrontmatterContinuations(unwrapped);
-    if (fixed !== unwrapped) console.log(`[fix-frontmatter] Indented a continued value: ${file}`);
-    if (fixed !== content) fs.writeFileSync(filePath, fixed);
+    const fixed = unwrapHeadingLinks(content);
+    if (fixed !== content) {
+      console.log(`[fix-headings] Unwrapped link in heading: ${file}`);
+      fs.writeFileSync(filePath, fixed);
+    }
   }
 }
 
