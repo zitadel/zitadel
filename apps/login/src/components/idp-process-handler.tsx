@@ -1,11 +1,12 @@
 "use client";
 
 import { processIDPCallback } from "@/lib/actions/idp-intent";
+import { submitSamlForm } from "@/lib/client-utils";
+import { useSettledAction } from "@/lib/settled-action";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Alert } from "./alert";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { Spinner } from "./spinner";
 
 type Props = {
@@ -38,9 +39,9 @@ export function IdpProcessHandler({
   const t = useTranslations("idp");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
   const executedRef = useRef(false);
   const router = useRouter();
+  const runAction = useSettledAction();
 
   useEffect(() => {
     // Prevent double execution in React Strict Mode
@@ -52,16 +53,18 @@ export function IdpProcessHandler({
 
     console.log("[IDP Process Handler] Starting IDP callback processing from client");
 
-    processIDPCallback({
-      provider,
-      id,
-      token,
-      requestId,
-      organization,
-      sessionId,
-      flowFingerprint,
-      postErrorRedirectUrl,
-    })
+    runAction(() =>
+      processIDPCallback({
+        provider,
+        id,
+        token,
+        requestId,
+        organization,
+        sessionId,
+        flowFingerprint,
+        postErrorRedirectUrl,
+      }),
+    )
       .then((result) => {
         if (result.error) {
           console.error("[IDP Process Handler] Error:", result.error);
@@ -77,8 +80,8 @@ export function IdpProcessHandler({
         }
 
         if (result.samlData) {
-          console.log("[IDP Process Handler] Received samlData, rendering AutoSubmitForm");
-          setSamlData(result.samlData);
+          console.log("[IDP Process Handler] Received samlData, posting it to the service provider");
+          submitSamlForm(result.samlData);
           setLoading(false);
           return;
         }
@@ -91,11 +94,23 @@ export function IdpProcessHandler({
         setError(err instanceof Error ? err.message : t("processing.unexpectedError"));
         setLoading(false);
       });
-  }, [provider, id, token, requestId, organization, link, sessionId, flowFingerprint, postErrorRedirectUrl, router, t]);
+  }, [
+    provider,
+    id,
+    token,
+    requestId,
+    organization,
+    link,
+    sessionId,
+    flowFingerprint,
+    postErrorRedirectUrl,
+    router,
+    runAction,
+    t,
+  ]);
 
   return (
     <div className="flex items-center justify-center">
-      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       {loading && (
         <div className="flex flex-col items-center space-y-4">
           <Spinner className="h-8 w-8" />

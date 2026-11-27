@@ -4,6 +4,7 @@ import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
 import { sendPasskey } from "@/lib/actions/passkeys";
 import { updateOrCreateSession } from "@/lib/actions/session";
 import { handleServerActionResponse, isExternalUrl } from "@/lib/client-utils";
+import { useSettledAction } from "@/lib/settled-action";
 import { create, JsonObject } from "@zitadel/client";
 import { RequestChallengesSchema, UserVerificationRequirement } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -11,7 +12,6 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Alert } from "./alert";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { RestartSignIn } from "./restart-sign-in";
@@ -40,10 +40,10 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
   const [sessionLost, setSessionLost] = useState<boolean>(false);
   // The page starts the passkey ceremony on mount, so Continue starts disabled.
   const [loading, setLoading] = useState<boolean>(true);
-  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const t = useTranslations("passkey");
   const router = useRouter();
+  const runAction = useSettledAction();
 
   // The running ceremony (challenge, navigator.credentials.get, verification), or null.
   // At most one runs at a time; a ceremony whose controller is no longer current drops
@@ -130,6 +130,8 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
   }
 
   async function requestChallenge(report: ReportError): Promise<any> {
+    // Called directly, without waiting for the page update: no navigation follows, and the
+    // passkey prompt that does must open while the user's activation (Continue) still holds.
     const sessionResponse = await updateOrCreateSession({
       loginName,
       sessionId,
@@ -211,15 +213,17 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
   // Returns true when the page is navigating away (redirect or SAML post).
   async function submitLogin(data: JsonObject, isCurrent: () => boolean, report: ReportError): Promise<boolean> {
     try {
-      const response = await sendPasskey({
-        loginName,
-        sessionId,
-        organization,
-        checks: {
-          webAuthN: { credentialAssertionData: data },
-        } as Checks,
-        requestId,
-      });
+      const response = await runAction(() =>
+        sendPasskey({
+          loginName,
+          sessionId,
+          organization,
+          checks: {
+            webAuthN: { credentialAssertionData: data },
+          } as Checks,
+          requestId,
+        }),
+      );
 
       // The user left for another step while the assertion was being verified.
       if (!isCurrent()) {
@@ -227,7 +231,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
       }
 
       let failed = false;
-      const handled = handleServerActionResponse(response, router, setSamlData, (message) => {
+      const handled = handleServerActionResponse(response, router, (message) => {
         failed = true;
         report(message, !!response && "sessionLost" in response);
       });
@@ -256,7 +260,6 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
 
   return (
     <div className="w-full">
-      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       {error && (
         <div className="py-4">
           <Alert>{error}</Alert>

@@ -3,16 +3,16 @@
 import { completeFlowOrGetUrl } from "@/lib/actions/flow";
 import { updateOrCreateSession } from "@/lib/actions/session";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useSettledAction } from "@/lib/settled-action";
 import { create } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
-import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
@@ -42,12 +42,12 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
   // the session of this step is gone, retrying cannot succeed
   const [sessionLost, setSessionLost] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
   // seconds until the server accepts another OTP SMS request
   const [resendCooldown, setResendCooldown] = useState<number>(0);
   const resendAvailableAt = useRef<number>(0);
 
   const router = useRouter();
+  const runAction = useSettledAction();
 
   const initialized = useRef(false);
 
@@ -149,7 +149,7 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
       body.requestId = requestId;
     }
 
-    let checks;
+    let checks: Checks | undefined;
 
     if (method === "sms") {
       checks = create(ChecksSchema, {
@@ -167,13 +167,15 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
       });
     }
 
-    const response = await updateOrCreateSession({
-      loginName,
-      sessionId,
-      organization,
-      checks,
-      requestId,
-    })
+    const response = await runAction(() =>
+      updateOrCreateSession({
+        loginName,
+        sessionId,
+        organization,
+        checks,
+        requestId,
+      }),
+    )
       .catch(() => {
         setError(t("errors.couldNotVerifyCode"));
         return;
@@ -200,7 +202,7 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
 
         // Use unified approach that handles both OIDC/SAML and regular flows
         if (response.factors?.user) {
-          const callbackResponse = await completeFlowOrGetUrl(
+          const command =
             requestId && response.sessionId
               ? {
                   sessionId: response.sessionId,
@@ -210,12 +212,11 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
               : {
                   loginName: response.factors.user.loginName,
                   organization: response.factors?.user?.organizationId,
-                },
-            loginSettings?.defaultRedirectUri,
-          );
+                };
+          const callbackResponse = await runAction(() => completeFlowOrGetUrl(command, loginSettings?.defaultRedirectUri));
           setLoading(false);
 
-          handleServerActionResponse(callbackResponse, router, setSamlData, setError);
+          handleServerActionResponse(callbackResponse, router, setError);
         } else {
           setLoading(false);
         }
@@ -225,7 +226,6 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
 
   return (
     <>
-      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <form className="w-full">
         {["email", "sms"].includes(method) && (
           <Alert type={AlertType.INFO}>

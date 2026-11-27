@@ -2,13 +2,13 @@
 
 import { sendLoginname } from "@/lib/actions/loginname";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useSettledAction } from "@/lib/settled-action";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert } from "./alert";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
@@ -52,25 +52,27 @@ export function UsernameForm({
   const t = useTranslations("loginname");
 
   const router = useRouter();
+  const runAction = useSettledAction();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const submitLoginName = useCallback(
     async (values: Inputs, organization?: string) => {
       setLoading(true);
 
       try {
-        const res = await sendLoginname({
-          loginName: values.loginName,
-          organization,
-          defaultOrganization,
-          requestId,
-          suffix,
-        });
+        const res = await runAction(() =>
+          sendLoginname({
+            loginName: values.loginName,
+            organization,
+            defaultOrganization,
+            requestId,
+            suffix,
+          }),
+        );
 
-        handleServerActionResponse(res, router, setSamlData, setError);
+        handleServerActionResponse(res, router, setError);
         return res;
       } catch {
         setError(t("errors.internalError"));
@@ -78,7 +80,7 @@ export function UsernameForm({
         setLoading(false);
       }
     },
-    [defaultOrganization, requestId, suffix, router, t],
+    [defaultOrganization, requestId, suffix, router, runAction, t],
   );
 
   useEffect(() => {
@@ -99,7 +101,6 @@ export function UsernameForm({
 
   return (
     <>
-      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <form className="w-full">
         <div className="">
           <TextInput

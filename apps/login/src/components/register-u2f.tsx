@@ -4,12 +4,12 @@ import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
 import { completeFlowOrGetUrl } from "@/lib/actions/flow";
 import { addU2F, verifyU2F } from "@/lib/actions/u2f";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useSettledAction } from "@/lib/settled-action";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Alert } from "./alert";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { Spinner } from "./spinner";
@@ -26,21 +26,23 @@ type Props = {
 
 export function RegisterU2f({ loginName, sessionId, organization, requestId, checkAfter, loginSettings }: Props) {
   const [error, setError] = useState<string>("");
-  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter();
+  const runAction = useSettledAction();
 
   async function submitVerify(u2fId: string, passkeyName: string, publicKeyCredential: any, sessionId: string) {
     setError("");
     setLoading(true);
-    const response = await verifyU2F({
-      u2fId,
-      passkeyName,
-      publicKeyCredential,
-      sessionId,
-    })
+    const response = await runAction(() =>
+      verifyU2F({
+        u2fId,
+        passkeyName,
+        publicKeyCredential,
+        sessionId,
+      }),
+    )
       .catch(() => {
         setError("An error on verifying passkey occurred");
         return;
@@ -149,26 +151,30 @@ export function RegisterU2f({ loginName, sessionId, organization, requestId, che
         return router.push(`/u2f?` + paramsToContinue);
       } else {
         if (requestId && sessionId) {
-          const callbackResponse = await completeFlowOrGetUrl(
-            {
-              sessionId: sessionId,
-              requestId: requestId,
-              organization: organization,
-            },
-            loginSettings?.defaultRedirectUri,
+          const callbackResponse = await runAction(() =>
+            completeFlowOrGetUrl(
+              {
+                sessionId: sessionId,
+                requestId: requestId,
+                organization: organization,
+              },
+              loginSettings?.defaultRedirectUri,
+            ),
           );
 
-          handleServerActionResponse(callbackResponse, router, setSamlData, setError);
+          handleServerActionResponse(callbackResponse, router, setError);
         } else if (loginName) {
-          const callbackResponse = await completeFlowOrGetUrl(
-            {
-              loginName: loginName,
-              organization: organization,
-            },
-            loginSettings?.defaultRedirectUri,
+          const callbackResponse = await runAction(() =>
+            completeFlowOrGetUrl(
+              {
+                loginName: loginName,
+                organization: organization,
+              },
+              loginSettings?.defaultRedirectUri,
+            ),
           );
 
-          handleServerActionResponse(callbackResponse, router, setSamlData, setError);
+          handleServerActionResponse(callbackResponse, router, setError);
         }
       }
     }
@@ -176,7 +182,6 @@ export function RegisterU2f({ loginName, sessionId, organization, requestId, che
 
   return (
     <>
-      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <form className="w-full">
         {error && (
           <div className="py-4">

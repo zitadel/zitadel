@@ -2,6 +2,7 @@
 
 import { resetPassword, sendPassword } from "@/lib/actions/password";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useSettledAction } from "@/lib/settled-action";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
@@ -10,7 +11,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
@@ -38,28 +38,30 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
 
   const [info, setInfo] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter();
+  const runAction = useSettledAction();
 
   async function submitPassword(values: Inputs) {
     setError("");
     setLoading(true);
 
     try {
-      const response = await sendPassword({
-        loginName,
-        organization,
-        defaultOrganization,
-        checks: create(ChecksSchema, {
-          password: { password: values.password },
+      const response = await runAction(() =>
+        sendPassword({
+          loginName,
+          organization,
+          defaultOrganization,
+          checks: create(ChecksSchema, {
+            password: { password: values.password },
+          }),
+          requestId,
         }),
-        requestId,
-      });
+      );
 
-      handleServerActionResponse(response, router, setSamlData, setError);
+      handleServerActionResponse(response, router, setError);
     } catch {
       setError(t("verify.errors.couldNotVerifyPassword"));
     } finally {
@@ -110,7 +112,6 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
 
   return (
     <>
-      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <form className="w-full">
         <div className={`${error && "animate-shake transform-gpu"}`}>
           <TextInput

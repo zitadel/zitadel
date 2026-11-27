@@ -3,6 +3,7 @@
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from "@/helpers/validators";
 import { checkSessionAndSetPassword, sendPassword } from "@/lib/actions/password";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useSettledAction } from "@/lib/settled-action";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
@@ -11,7 +12,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert } from "./alert";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
@@ -37,6 +37,7 @@ type Props = {
 
 export function ChangePasswordForm({ passwordComplexitySettings, sessionId, loginName, requestId, organization }: Props) {
   const router = useRouter();
+  const runAction = useSettledAction();
 
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onChange",
@@ -51,16 +52,17 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   async function submitChange(values: Inputs) {
     setLoading(true);
 
-    const changeResponse = await checkSessionAndSetPassword({
-      sessionId,
-      currentPassword: values.currentPassword,
-      password: values.password,
-    }).catch(() => {
+    const changeResponse = await runAction(() =>
+      checkSessionAndSetPassword({
+        sessionId,
+        currentPassword: values.currentPassword,
+        password: values.password,
+      }),
+    ).catch(() => {
       setError(t("change.errors.couldNotChangePassword"));
       setLoading(false);
       return;
@@ -80,14 +82,16 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
 
     await new Promise((resolve) => setTimeout(resolve, 1000)); // wait for a second, to prevent eventual consistency issues
 
-    const passwordResponse = await sendPassword({
-      loginName,
-      organization,
-      checks: create(ChecksSchema, {
-        password: { password: values.password },
+    const passwordResponse = await runAction(() =>
+      sendPassword({
+        loginName,
+        organization,
+        checks: create(ChecksSchema, {
+          password: { password: values.password },
+        }),
+        requestId,
       }),
-      requestId,
-    })
+    )
       .catch(() => {
         setError(t("change.errors.couldNotVerifyPassword"));
         return;
@@ -96,7 +100,7 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
         setLoading(false);
       });
 
-    handleServerActionResponse(passwordResponse as any, router, setSamlData, setError);
+    handleServerActionResponse(passwordResponse as any, router, setError);
 
     return;
   }
@@ -122,7 +126,6 @@ export function ChangePasswordForm({ passwordComplexitySettings, sessionId, logi
 
   return (
     <>
-      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <form className="w-full">
         <div className="mb-4 grid grid-cols-1 gap-4 pt-4">
           <input

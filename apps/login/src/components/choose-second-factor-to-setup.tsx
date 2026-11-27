@@ -2,13 +2,13 @@
 
 import { skipMFAAndContinueWithNextUrl } from "@/lib/actions/session";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useSettledAction } from "@/lib/settled-action";
 import { LoginSettings, SecondFactorType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Alert } from "./alert";
 import { EMAIL, SMS, TOTP, U2F } from "./auth-methods";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { Translated } from "./translated";
 
 type Props = {
@@ -37,10 +37,10 @@ export function ChooseSecondFactorToSetup({
   force,
 }: Props) {
   const router = useRouter();
+  const runAction = useSettledAction();
   const params = new URLSearchParams({});
 
   const [error, setError] = useState<string>("");
-  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   if (loginName) {
     params.append("loginName", loginName);
@@ -60,7 +60,6 @@ export function ChooseSecondFactorToSetup({
 
   return (
     <>
-      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <div className="grid w-full grid-cols-1 gap-5 pt-4">
         {loginSettings.secondFactors.map((factor) => {
           switch (factor) {
@@ -83,14 +82,16 @@ export function ChooseSecondFactorToSetup({
         <button
           className="hover:text-primary-light-500 dark:hover:text-primary-dark-500 text-sm transition-all"
           onClick={async () => {
-            const skipResponse = await skipMFAAndContinueWithNextUrl({
-              loginName,
-              sessionId,
-              organization,
-              requestId,
-            });
+            const skipResponse = await runAction(() =>
+              skipMFAAndContinueWithNextUrl({
+                loginName,
+                sessionId,
+                organization,
+                requestId,
+              }),
+            );
 
-            handleServerActionResponse(skipResponse, router, setSamlData, setError);
+            handleServerActionResponse(skipResponse, router, setError);
           }}
           type="button"
           data-testid="reset-button"

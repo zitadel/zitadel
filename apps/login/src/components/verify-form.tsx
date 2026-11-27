@@ -4,11 +4,11 @@ import { Alert, AlertType } from "@/components/alert";
 import { resendVerification, sendVerification } from "@/lib/actions/verify";
 import { handleServerActionResponse } from "@/lib/client-utils";
 import { UNKNOWN_USER_ID } from "@/lib/constants";
+import { useSettledAction } from "@/lib/settled-action";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
@@ -31,6 +31,7 @@ type Props = {
 
 export function VerifyForm({ userId, loginName, organization, requestId, code, isInvite, submit }: Props) {
   const router = useRouter();
+  const runAction = useSettledAction();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const codeSent = searchParams.get("codeSent") === "true";
@@ -45,7 +46,6 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
   const t = useTranslations("verify");
 
   const [error, setError] = useState<string>("");
-  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -94,23 +94,25 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
       setLoading(true);
 
       try {
-        const response = await sendVerification({
-          code: value.code,
-          userId,
-          isInvite: isInvite,
-          loginName: loginName,
-          organization: organization,
-          requestId: requestId,
-        });
+        const response = await runAction(() =>
+          sendVerification({
+            code: value.code,
+            userId,
+            isInvite: isInvite,
+            loginName: loginName,
+            organization: organization,
+            requestId: requestId,
+          }),
+        );
 
-        handleServerActionResponse(response, router, setSamlData, setError);
+        handleServerActionResponse(response, router, setError);
       } catch {
         setError(t("errors.couldNotVerifyUser"));
       } finally {
         setLoading(false);
       }
     },
-    [isInvite, userId, loginName, organization, requestId, router, t],
+    [isInvite, userId, loginName, organization, requestId, router, runAction, t],
   );
 
   useEffect(() => {
@@ -122,7 +124,6 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
 
   return (
     <>
-      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       {codeSent && (
         <div className="w-full py-4">
           <Alert type={AlertType.INFO}>

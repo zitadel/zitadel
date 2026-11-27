@@ -2,6 +2,7 @@
 
 import { registerUser } from "@/lib/actions/register";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useSettledAction } from "@/lib/settled-action";
 import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
 import { LoginSettings, PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
@@ -10,7 +11,6 @@ import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
 import { AuthenticationMethod, AuthenticationMethodRadio, methods } from "./authentication-method-radio";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
@@ -61,22 +61,24 @@ export function RegisterForm({
   const [loading, setLoading] = useState<boolean>(false);
   const [selected, setSelected] = useState<AuthenticationMethod>(methods[0]);
   const [error, setError] = useState<string>("");
-  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const router = useRouter();
+  const runAction = useSettledAction();
 
   async function submitAndRegister(values: Inputs) {
     setLoading(true);
     try {
-      const response = await registerUser({
-        email: values.email,
-        firstName: values.firstname,
-        lastName: values.lastname,
-        organization: organization,
-        requestId: requestId,
-      });
+      const response = await runAction(() =>
+        registerUser({
+          email: values.email,
+          firstName: values.firstname,
+          lastName: values.lastname,
+          organization: organization,
+          requestId: requestId,
+        }),
+      );
 
-      handleServerActionResponse(response, router, setSamlData, setError);
+      handleServerActionResponse(response, router, setError);
 
       return response;
     } catch {
@@ -115,7 +117,6 @@ export function RegisterForm({
 
   return (
     <>
-      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <form className="w-full">
         <div className="mb-4 grid grid-cols-2 gap-4">
           <div className="">

@@ -1,6 +1,7 @@
 "use client";
 
 import { clearSession } from "@/lib/actions/session";
+import { useSettledAction } from "@/lib/settled-action";
 import { timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import moment from "moment";
@@ -18,6 +19,8 @@ export function SessionClearItem({ session, reload }: { session: Session; reload
   const t = useTranslations("error");
 
   const [_loading, setLoading] = useState<boolean>(false);
+  // the list leaves for the post logout redirect URI right after the session is cleared
+  const runAction = useSettledAction();
 
   /**
    * Returns true when the session was removed (server-side and from the cookie).
@@ -27,7 +30,7 @@ export function SessionClearItem({ session, reload }: { session: Session; reload
     setLoading(true);
     setError(null);
     try {
-      const response = await clearSession({ sessionId: id });
+      const response = await runAction(() => clearSession({ sessionId: id }));
       if (response && "error" in response && response.error) {
         setError(response.error);
         return false;

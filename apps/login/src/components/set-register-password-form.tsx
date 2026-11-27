@@ -3,13 +3,13 @@
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from "@/helpers/validators";
 import { registerUser } from "@/lib/actions/register";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useSettledAction } from "@/lib/settled-action";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert } from "./alert";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
@@ -54,23 +54,25 @@ export function SetRegisterPasswordForm({
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const router = useRouter();
+  const runAction = useSettledAction();
 
   async function submitRegister(values: Inputs) {
     setLoading(true);
     try {
-      const response = await registerUser({
-        email: email,
-        firstName: firstname,
-        lastName: lastname,
-        organization: organization,
-        requestId: requestId,
-        password: values.password,
-      });
+      const response = await runAction(() =>
+        registerUser({
+          email: email,
+          firstName: firstname,
+          lastName: lastname,
+          organization: organization,
+          requestId: requestId,
+          password: values.password,
+        }),
+      );
 
-      handleServerActionResponse(response, router, setSamlData, setError);
+      handleServerActionResponse(response, router, setError);
     } catch {
       setError(t("errors.couldNotRegisterUser"));
     } finally {
@@ -99,7 +101,6 @@ export function SetRegisterPasswordForm({
 
   return (
     <>
-      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <form className="w-full">
         <div className="mb-4 grid grid-cols-1 gap-4 pt-4">
           <input

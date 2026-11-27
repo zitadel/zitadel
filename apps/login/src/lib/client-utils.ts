@@ -10,7 +10,6 @@ export type ServerActionResponse =
 export function handleServerActionResponse(
   response: ServerActionResponse,
   router: { push: (url: string) => void },
-  setSamlData: (data: { url: string; fields: Record<string, string> }) => void,
   setError: (error: string) => void,
 ): boolean {
   if (!response) {
@@ -39,7 +38,7 @@ export function handleServerActionResponse(
 
   if ("samlData" in response && response.samlData) {
     if (isSafeRedirectUri(response.samlData.url)) {
-      setSamlData(response.samlData);
+      submitSamlForm(response.samlData);
       return true;
     } else {
       console.warn("handleServerActionResponse: Blocked unsafe SAML post URL:", response.samlData.url);
@@ -54,6 +53,31 @@ export function handleServerActionResponse(
   }
 
   return false;
+}
+
+/**
+ * Posts a SAML response to the service provider (POST binding) and leaves the page.
+ *
+ * The form is built on the document, not rendered by a component: the form that started
+ * the login can be gone by the time the response is handled (the page re-rendered into
+ * something else), and a state update on an unmounted component would post nothing.
+ */
+export function submitSamlForm({ url, fields }: { url: string; fields: Record<string, string> }): void {
+  const form = document.createElement("form");
+  form.method = "post";
+  form.action = url;
+  form.hidden = true;
+
+  for (const [name, value] of Object.entries(fields)) {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = value;
+    form.appendChild(input);
+  }
+
+  document.body.appendChild(form);
+  form.submit();
 }
 
 /**

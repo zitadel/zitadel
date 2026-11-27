@@ -1,6 +1,7 @@
 "use client";
 
 import { clearSession } from "@/lib/actions/session";
+import { useSettledAction } from "@/lib/settled-action";
 import { timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { useTranslations } from "next-intl";
@@ -21,6 +22,7 @@ export function SessionsClearList({ sessions, logoutHint, postLogoutRedirectUri,
   const [list, setList] = useState<Session[]>(sessions);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const runAction = useSettledAction();
   const t = useTranslations("error");
 
   const clearHintedSession = useCallback(async () => {
@@ -33,7 +35,7 @@ export function SessionsClearList({ sessions, logoutHint, postLogoutRedirectUri,
     if (sessionIdToBeCleared) {
       let clearError: string | undefined;
       try {
-        const clearSessionResponse = await clearSession({ sessionId: sessionIdToBeCleared });
+        const clearSessionResponse = await runAction(() => clearSession({ sessionId: sessionIdToBeCleared }));
         if (clearSessionResponse && "error" in clearSessionResponse) {
           clearError = clearSessionResponse.error;
         }
@@ -63,7 +65,7 @@ export function SessionsClearList({ sessions, logoutHint, postLogoutRedirectUri,
     } else {
       console.warn(`No session found for login hint: ${logoutHint}`);
     }
-  }, [logoutHint, sessions, postLogoutRedirectUri, organization, router, t]);
+  }, [logoutHint, sessions, postLogoutRedirectUri, organization, router, runAction, t]);
 
   useEffect(() => {
     if (logoutHint) {

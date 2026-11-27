@@ -3,6 +3,7 @@
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from "@/helpers/validators";
 import { changePassword, resetPassword, sendPassword } from "@/lib/actions/password";
 import { handleServerActionResponse } from "@/lib/client-utils";
+import { useSettledAction } from "@/lib/settled-action";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
@@ -11,7 +12,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
@@ -59,9 +59,9 @@ export function SetPasswordForm({
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const router = useRouter();
+  const runAction = useSettledAction();
 
   async function resendCode() {
     setError("");
@@ -101,7 +101,7 @@ export function SetPasswordForm({
       payload = { ...payload, code: values.code };
     }
 
-    const changeResponse = await changePassword(payload).catch(() => {
+    const changeResponse = await runAction(() => changePassword(payload)).catch(() => {
       setError(t("set.errors.couldNotSetPassword"));
       setLoading(false);
       return;
@@ -130,21 +130,23 @@ export function SetPasswordForm({
 
     await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait for a second to avoid eventual consistency issues with an initial password being set
 
-    const passwordResponse = await sendPassword({
-      loginName,
-      organization,
-      checks: create(ChecksSchema, {
-        password: { password: values.password },
+    const passwordResponse = await runAction(() =>
+      sendPassword({
+        loginName,
+        organization,
+        checks: create(ChecksSchema, {
+          password: { password: values.password },
+        }),
+        requestId,
       }),
-      requestId,
-    }).catch(() => {
+    ).catch(() => {
       setError(t("set.errors.couldNotVerifyPassword"));
       setLoading(false);
       return;
     });
 
     setLoading(false);
-    handleServerActionResponse(passwordResponse as any, router, setSamlData, setError);
+    handleServerActionResponse(passwordResponse as any, router, setError);
 
     return;
   }
@@ -170,7 +172,6 @@ export function SetPasswordForm({
 
   return (
     <>
-      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <form className="w-full">
         <div className="mb-4 grid grid-cols-1 gap-4 pt-4">
           <input

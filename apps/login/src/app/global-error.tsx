@@ -3,12 +3,14 @@
 import { Boundary } from "@/components/boundary";
 import { Button } from "@/components/button";
 import { ThemeWrapper } from "@/components/theme-wrapper";
-import { Translated } from "@/components/translated";
 
+// global-error replaces the root layout, so nothing the layout provides is available here:
+// no NextIntlClientProvider (useTranslations and <Translated> would throw and hide the
+// original error behind the built-in Next.js error page) and no language. Keep it static.
 export default function GlobalError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
     // global-error must include html and body tags
-    <html>
+    <html lang="en">
       <body>
         <ThemeWrapper branding={undefined}>
           <Boundary labels={["Login Error"]} color="red">
@@ -17,9 +19,7 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
                 <span className="font-bold">Error:</span> {error?.message}
               </div>
               <div>
-                <Button data-i18n-key="error.tryagain" onClick={() => reset()}>
-                  <Translated i18nKey="tryagain" namespace="error" />
-                </Button>
+                <Button onClick={() => reset()}>Try Again</Button>
               </div>
             </div>
           </Boundary>
