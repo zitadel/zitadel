@@ -313,6 +313,10 @@ func Test_instanceInterceptor_HandlerFunc_statusCodes(t *testing.T) {
 			rr := httptest.NewRecorder()
 			a.HandlerFunc(&testHandler{}).ServeHTTP(rr, r)
 			assert.Equal(t, tc.wantStatusCode, rr.Code)
+			assert.Contains(t, rr.Body.String(), tc.err.(*zerrors.ZitadelError).GetID())
+			assert.Contains(t, rr.Body.String(), tc.err.(*zerrors.ZitadelError).GetMessage())
+			assert.NotContains(t, rr.Body.String(), "Parent=(")
+			assert.NotContains(t, rr.Body.String(), "SQLSTATE")
 		})
 	}
 }
