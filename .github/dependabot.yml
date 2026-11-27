@@ -30,6 +30,11 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+      # 10.9 and 10.10 import exports only fumadocs-core and fumadocs-ui 16.9
+      # have, so the docs build fails with any newer fumadocs. Moving past
+      # 10.8 means the next major.
+      - dependency-name: "fumadocs-openapi"
+        versions: [">=10.9.0 <11.0.0"]
     groups:
       # Shipped in the login image and the docs site.
       next:
