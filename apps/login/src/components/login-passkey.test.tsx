@@ -1,5 +1,6 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
+import { StrictMode } from "react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { LoginPasskey } from "./login-passkey";
 
@@ -491,6 +492,285 @@ describe("LoginPasskey Component", () => {
           }),
         );
       });
+    });
+  });
+
+  describe("Single passkey ceremony", () => {
+    const challengeResponse = () => ({
+      challenges: {
+        webAuthN: {
+          publicKeyCredentialRequestOptions: {
+            publicKey: {
+              challenge: new Uint8Array([1, 2, 3]),
+              allowCredentials: [{ id: new Uint8Array([4, 5, 6]), type: "public-key" }],
+            },
+          },
+        },
+      },
+    });
+
+    const assertion = {
+      id: "credential-id",
+      rawId: new ArrayBuffer(8),
+      type: "public-key",
+      response: {
+        authenticatorData: new ArrayBuffer(8),
+        clientDataJSON: new ArrayBuffer(8),
+        signature: new ArrayBuffer(8),
+        userHandle: new ArrayBuffer(8),
+      },
+    };
+
+    // Keeps navigator.credentials.get pending, as while the browser's passkey prompt is open.
+    const holdPrompt = () => {
+      const prompt: {
+        signal?: AbortSignal;
+        resolve: (value: unknown) => void;
+        reject: (reason: unknown) => void;
+      } = { resolve: () => {}, reject: () => {} };
+      mockCredentialsGet.mockImplementation(
+        (options: CredentialRequestOptions) =>
+          new Promise((resolve, reject) => {
+            prompt.signal = options.signal ?? undefined;
+            prompt.resolve = resolve;
+            prompt.reject = reject;
+          }),
+      );
+      return prompt;
+    };
+
+    const notAllowed = () => Object.assign(new Error("cancelled"), { name: "NotAllowedError" });
+
+    test("keeps Continue disabled and starts no second ceremony while the automatic prompt is open", async () => {
+      mockUpdateSession.mockResolvedValue(challengeResponse());
+      const prompt = holdPrompt();
+
+      const { container } = renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
+      const continueButton = within(container).getByTestId("submit-button");
+
+      await waitFor(() => {
+        expect(mockCredentialsGet).toHaveBeenCalledTimes(1);
+      });
+      expect(continueButton).toBeDisabled();
+
+      fireEvent.click(continueButton);
+      fireEvent.click(continueButton);
+
+      expect(mockUpdateSession).toHaveBeenCalledTimes(1);
+      expect(mockCredentialsGet).toHaveBeenCalledTimes(1);
+
+      prompt.reject(notAllowed());
+
+      await waitFor(() => {
+        expect(continueButton).not.toBeDisabled();
+      });
+      expect(within(container).getByText("Passkey verification was cancelled")).toBeInTheDocument();
+    });
+
+    test("keeps Continue disabled while a ceremony started by Continue is open", async () => {
+      mockUpdateSession.mockResolvedValue(challengeResponse());
+      mockCredentialsGet.mockRejectedValueOnce(notAllowed());
+
+      const { container } = renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
+      const continueButton = within(container).getByTestId("submit-button");
+
+      await waitFor(() => {
+        expect(continueButton).not.toBeDisabled();
+      });
+
+      const prompt = holdPrompt();
+      fireEvent.click(continueButton);
+
+      await waitFor(() => {
+        expect(mockCredentialsGet).toHaveBeenCalledTimes(2);
+      });
+      expect(continueButton).toBeDisabled();
+
+      fireEvent.click(continueButton);
+      expect(mockUpdateSession).toHaveBeenCalledTimes(2);
+
+      prompt.reject(notAllowed());
+
+      await waitFor(() => {
+        expect(continueButton).not.toBeDisabled();
+      });
+    });
+
+    test("aborts the open prompt when switching to password", async () => {
+      mockUpdateSession.mockResolvedValue(challengeResponse());
+      const prompt = holdPrompt();
+
+      const { container } = renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={true} />);
+
+      await waitFor(() => {
+        expect(mockCredentialsGet).toHaveBeenCalledTimes(1);
+      });
+      expect(prompt.signal?.aborted).toBe(false);
+
+      fireEvent.click(within(container).getByTestId("password-button"));
+
+      expect(prompt.signal?.aborted).toBe(true);
+      expect(mockPush).toHaveBeenCalledWith(expect.stringMatching(/^\/password\?/));
+
+      // A late result of the aborted prompt is ignored.
+      await act(async () => {
+        prompt.resolve(assertion);
+      });
+      expect(mockSendPasskey).not.toHaveBeenCalled();
+      expect(within(container).queryByRole("alert")).not.toBeInTheDocument();
+    });
+
+    test("aborts the open prompt when the page is left another way", async () => {
+      mockUpdateSession.mockResolvedValue(challengeResponse());
+      const prompt = holdPrompt();
+
+      const { unmount } = renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
+
+      await waitFor(() => {
+        expect(mockCredentialsGet).toHaveBeenCalledTimes(1);
+      });
+
+      // Back, or any other navigation, unmounts the component.
+      unmount();
+      expect(prompt.signal?.aborted).toBe(true);
+
+      await act(async () => {
+        prompt.resolve(assertion);
+      });
+      expect(mockSendPasskey).not.toHaveBeenCalled();
+    });
+
+    test("opens a single prompt under strict mode", async () => {
+      mockUpdateSession.mockResolvedValue(challengeResponse());
+      const prompt = holdPrompt();
+
+      render(
+        <StrictMode>
+          <NextIntlClientProvider locale="en" messages={messages}>
+            <LoginPasskey loginName="test@example.com" altPassword={false} />
+          </NextIntlClientProvider>
+        </StrictMode>,
+      );
+
+      await waitFor(() => {
+        expect(mockCredentialsGet).toHaveBeenCalledTimes(1);
+      });
+      expect(prompt.signal?.aborted).toBe(false);
+    });
+
+    test("ignores the verification result when switching to password during verification", async () => {
+      mockUpdateSession.mockResolvedValue(challengeResponse());
+      mockCredentialsGet.mockResolvedValue(assertion);
+      let finishVerification: (value: unknown) => void = () => {};
+      mockSendPasskey.mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            finishVerification = resolve;
+          }),
+      );
+
+      const { container } = renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={true} />);
+
+      await waitFor(() => {
+        expect(mockSendPasskey).toHaveBeenCalledTimes(1);
+      });
+
+      fireEvent.click(within(container).getByTestId("password-button"));
+      await act(async () => {
+        finishVerification({ redirect: "/success" });
+      });
+
+      expect(mockPush).toHaveBeenCalledTimes(1);
+      expect(mockPush).toHaveBeenCalledWith(expect.stringMatching(/^\/password\?/));
+    });
+
+    test("re-enables Continue when the page is restored from the back/forward cache", async () => {
+      mockUpdateSession.mockResolvedValue(challengeResponse());
+      mockCredentialsGet.mockResolvedValue(assertion);
+      mockSendPasskey.mockResolvedValue({ redirect: "/success" });
+
+      const { container } = renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
+      const continueButton = within(container).getByTestId("submit-button");
+
+      await waitFor(() => {
+        expect(mockPush).toHaveBeenCalledWith("/success");
+      });
+      expect(continueButton).toBeDisabled();
+
+      const pageShow = new Event("pageshow");
+      Object.defineProperty(pageShow, "persisted", { value: true });
+      act(() => {
+        window.dispatchEvent(pageShow);
+      });
+
+      expect(continueButton).not.toBeDisabled();
+    });
+
+    test("re-enables Continue some time after an external redirect", async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      const location = window.location;
+      try {
+        mockUpdateSession.mockResolvedValue(challengeResponse());
+        mockCredentialsGet.mockResolvedValue(assertion);
+        // A native app's custom-scheme callback opens the app and leaves this page in place.
+        mockSendPasskey.mockResolvedValue({ redirect: "myapp://callback" });
+        const hrefSetter = vi.fn();
+        Object.defineProperty(window, "location", {
+          configurable: true,
+          value: {
+            ...location,
+            set href(value: string) {
+              hrefSetter(value);
+            },
+          },
+        });
+
+        const { container } = renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
+        const continueButton = within(container).getByTestId("submit-button");
+
+        await waitFor(() => {
+          expect(hrefSetter).toHaveBeenCalledWith("myapp://callback");
+        });
+        expect(continueButton).toBeDisabled();
+
+        act(() => {
+          vi.advanceTimersByTime(5000);
+        });
+        expect(continueButton).not.toBeDisabled();
+      } finally {
+        Object.defineProperty(window, "location", { configurable: true, value: location });
+        vi.useRealTimers();
+      }
+    });
+
+    test("keeps Continue disabled while redirecting after a successful verification", async () => {
+      mockUpdateSession.mockResolvedValue(challengeResponse());
+      mockCredentialsGet.mockResolvedValue(assertion);
+      mockSendPasskey.mockResolvedValue({ redirect: "/success" });
+
+      const { container } = renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
+      const continueButton = within(container).getByTestId("submit-button");
+
+      await waitFor(() => {
+        expect(mockPush).toHaveBeenCalledWith("/success");
+      });
+      expect(continueButton).toBeDisabled();
+
+      fireEvent.click(continueButton);
+      expect(mockUpdateSession).toHaveBeenCalledTimes(1);
+    });
+
+    test("re-enables Continue when verification fails", async () => {
+      mockUpdateSession.mockResolvedValue(challengeResponse());
+      mockCredentialsGet.mockResolvedValue(assertion);
+      mockSendPasskey.mockResolvedValue({ error: "Verification failed" });
+
+      const { container } = renderWithIntl(<LoginPasskey loginName="test@example.com" altPassword={false} />);
+
+      await waitFor(() => {
+        expect(within(container).getByText("Verification failed")).toBeInTheDocument();
+      });
+      expect(within(container).getByTestId("submit-button")).not.toBeDisabled();
     });
   });
 
