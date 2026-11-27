@@ -9,6 +9,7 @@ import { useState } from "react";
 import { Alert } from "./alert";
 import { EMAIL, SMS, TOTP, U2F } from "./auth-methods";
 import { AutoSubmitForm } from "./auto-submit-form";
+import { TextButton } from "./text-button";
 import { Translated } from "./translated";
 
 type Props = {
@@ -80,8 +81,7 @@ export function ChooseSecondFactorToSetup({
         })}
       </div>
       {!force && (
-        <button
-          className="hover:text-primary-light-500 dark:hover:text-primary-dark-500 text-sm transition-all"
+        <TextButton
           onClick={async () => {
             const skipResponse = await skipMFAAndContinueWithNextUrl({
               loginName,
@@ -92,11 +92,10 @@ export function ChooseSecondFactorToSetup({
 
             handleServerActionResponse(skipResponse, router, setSamlData, setError);
           }}
-          type="button"
           data-testid="reset-button"
         >
           <Translated i18nKey="set.skip" namespace="mfa" />
-        </button>
+        </TextButton>
       )}
       {error && (
         <div className="py-4" data-testid="error">

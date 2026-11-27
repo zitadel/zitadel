@@ -1,6 +1,7 @@
 import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterPasskey } from "@/components/register-passkey";
+import { textLinkClasses } from "@/components/text-button";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSetupAuthorizationError, setupErrorTranslationKey } from "@/lib/server/enrollment-guard";
@@ -104,7 +105,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
           <span>
             <Translated i18nKey="set.info.description" namespace="passkey" />
             <a
-              className="text-primary-light-500 hover:text-primary-light-300 dark:text-primary-dark-500 hover:dark:text-primary-dark-300"
+              className={textLinkClasses}
               target="_blank"
               href="https://zitadel.com/docs/guides/manage/user/reg-create-user#with-passwordless"
             >

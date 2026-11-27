@@ -17,6 +17,7 @@ import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
+import { TextButton } from "./text-button";
 import { Translated } from "./translated";
 
 // either loginName or sessionId must be provided
@@ -224,10 +225,9 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
               <span className="mr-auto flex-1 text-left">
                 <Translated i18nKey="verify.noCodeReceived" namespace="otp" />
               </span>
-              <button
+              <TextButton
                 disabled={loading || resendCooldown > 0}
-                type="button"
-                className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
+                className="ml-4"
                 onClick={async () => {
                   setLoading(true);
                   const challengeError = await updateSessionForOTPChallenge();
@@ -243,7 +243,7 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
                 ) : (
                   <Translated i18nKey="verify.resendCode" namespace="otp" />
                 )}
-              </button>
+              </TextButton>
             </div>
           </Alert>
         )}
