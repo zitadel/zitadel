@@ -124,7 +124,7 @@ func (s *Server) userInfo(
 			Claims:          maps.Clone(rawUserInfo.Claims),
 		}
 		assertRoles(projectID, qu, roleAudience, requestedRoles, roleAssertion, userInfo)
-		return userInfo, s.userinfoFlows(ctx, qu, userInfo, triggerType, clientID, actor)
+		return userInfo, s.userinfoFlows(ctx, qu, userInfo, triggerType, clientID, scope, actor)
 	}
 }
 
@@ -317,6 +317,7 @@ func (s *Server) userinfoFlows(
 	userInfo *oidc.UserInfo,
 	triggerType domain.TriggerType,
 	clientID string,
+	scope []string,
 	actor *domain.TokenActor,
 ) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
@@ -542,6 +543,7 @@ func (s *Server) runUserinfoExecutionTargets(ctx context.Context, qu *query.OIDC
 		Org:          qu.Org,
 		Application:  &ContextInfoApplication{ClientID: clientID},
 		UserGrants:   qu.UserGrants,
+		Request:      &ContextInfoRequest{Scope: scope},
 		Actor:        actor,
 	}
 
@@ -583,12 +585,17 @@ type ContextInfo struct {
 	Org          *query.UserInfoOrg      `json:"org,omitempty"`
 	UserGrants   []query.UserGrant       `json:"user_grants,omitempty"`
 	Application  *ContextInfoApplication `json:"application,omitempty"`
+	Request      *ContextInfoRequest     `json:"request,omitempty"`
 	// Actor is only set when the token was obtained through token exchange / impersonation.
 	Actor    *domain.TokenActor   `json:"actor,omitempty"`
 	Response *ContextInfoResponse `json:"response,omitempty"`
 }
 type ContextInfoApplication struct {
 	ClientID string `json:"client_id,omitempty"`
+}
+
+type ContextInfoRequest struct {
+	Scope []string `json:"scope,omitempty"`
 }
 
 type ContextInfoResponse struct {
