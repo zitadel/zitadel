@@ -67,5 +67,8 @@
       ],
       "cache": true
     }
+  },
+  "affected": {
+    "legacy": true
   }
 }
