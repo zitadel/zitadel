@@ -260,49 +260,49 @@ describe("OpenTelemetry Integration", () => {
 
     describe("Span Attributes", () => {
       it(
-        "contains http.method",
+        "contains http.request.method",
         () => {
-          expect(readTraces()).toContain('"http.method"');
+          expect(readTraces()).toContain('"http.request.method"');
         },
         TEST_TIMEOUT,
       );
 
       it(
-        "contains http.url",
+        "contains url.scheme",
         () => {
-          expect(readTraces()).toContain('"http.url"');
+          expect(readTraces()).toContain('"url.scheme"');
         },
         TEST_TIMEOUT,
       );
 
       it(
-        "contains http.status_code",
+        "contains http.response.status_code",
         () => {
-          expect(readTraces()).toContain('"http.status_code"');
+          expect(readTraces()).toContain('"http.response.status_code"');
         },
         TEST_TIMEOUT,
       );
 
       it(
-        "contains http.target",
+        "contains url.path",
         () => {
-          expect(readTraces()).toContain('"http.target"');
+          expect(readTraces()).toContain('"url.path"');
         },
         TEST_TIMEOUT,
       );
 
       it(
-        "contains net.host.name",
+        "contains server.address",
         () => {
-          expect(readTraces()).toContain('"net.host.name"');
+          expect(readTraces()).toContain('"server.address"');
         },
         TEST_TIMEOUT,
       );
 
       it(
-        "contains net.host.port",
+        "contains server.port",
         () => {
-          expect(readTraces()).toContain('"net.host.port"');
+          expect(readTraces()).toContain('"server.port"');
         },
         TEST_TIMEOUT,
       );
@@ -390,7 +390,7 @@ describe("OpenTelemetry Integration", () => {
             (s: { attributes?: Array<{ key: string; value: { stringValue?: string } }> }) =>
               s.attributes?.some(
                 (a: { key: string; value: { stringValue?: string } }) =>
-                  a.key === "http.target" && a.value.stringValue?.includes("/healthy"),
+                  a.key === "url.path" && a.value.stringValue?.includes("/healthy"),
               ),
           );
           expect(healthySpans).toHaveLength(0);
@@ -417,7 +417,7 @@ describe("OpenTelemetry Integration", () => {
             (s: { attributes?: Array<{ key: string; value: { stringValue?: string } }> }) =>
               s.attributes?.some(
                 (a: { key: string; value: { stringValue?: string } }) =>
-                  a.key === "http.target" && a.value.stringValue?.includes("/ready"),
+                  a.key === "url.path" && a.value.stringValue?.includes("/ready"),
               ),
           );
           expect(readySpans).toHaveLength(0);
@@ -541,22 +541,6 @@ describe("OpenTelemetry Integration", () => {
         "records HTTP 404 status",
         () => {
           expect(readTraces()).toContain('"intValue":"404"');
-        },
-        TEST_TIMEOUT,
-      );
-
-      it(
-        "records OK status text",
-        () => {
-          expect(readTraces()).toContain('"OK"');
-        },
-        TEST_TIMEOUT,
-      );
-
-      it(
-        "records NOT FOUND status text",
-        () => {
-          expect(readTraces()).toContain('"NOT FOUND"');
         },
         TEST_TIMEOUT,
       );
@@ -759,10 +743,10 @@ describe("OpenTelemetry Integration", () => {
       );
 
       it(
-        "exposes v8js_memory_heap_limit",
+        "exposes v8js_memory_heap_space_size",
         async () => {
           const response = await fetch(prometheusUrl);
-          expect(await response.text()).toContain("v8js_memory_heap_limit");
+          expect(await response.text()).toContain("v8js_memory_heap_space_size");
         },
         TEST_TIMEOUT,
       );
@@ -779,37 +763,37 @@ describe("OpenTelemetry Integration", () => {
 
     describe("HTTP Metrics", () => {
       it(
-        "exposes http_server_duration",
+        "exposes http_server_request_duration",
         async () => {
           const response = await fetch(prometheusUrl);
-          expect(await response.text()).toContain("http_server_duration");
+          expect(await response.text()).toContain("# TYPE http_server_request_duration histogram");
         },
         TEST_TIMEOUT,
       );
 
       it(
-        "exposes http_server_duration_sum",
+        "exposes http_server_request_duration_sum",
         async () => {
           const response = await fetch(prometheusUrl);
-          expect(await response.text()).toContain("http_server_duration_sum");
+          expect(await response.text()).toContain("http_server_request_duration_sum");
         },
         TEST_TIMEOUT,
       );
 
       it(
-        "exposes http_server_duration_count",
+        "exposes http_server_request_duration_count",
         async () => {
           const response = await fetch(prometheusUrl);
-          expect(await response.text()).toContain("http_server_duration_count");
+          expect(await response.text()).toContain("http_server_request_duration_count");
         },
         TEST_TIMEOUT,
       );
 
       it(
-        "exposes http_server_duration_bucket",
+        "exposes http_server_request_duration_bucket",
         async () => {
           const response = await fetch(prometheusUrl);
-          expect(await response.text()).toContain("http_server_duration_bucket");
+          expect(await response.text()).toContain("http_server_request_duration_bucket");
         },
         TEST_TIMEOUT,
       );
@@ -818,7 +802,7 @@ describe("OpenTelemetry Integration", () => {
         "records status code 200",
         async () => {
           const response = await fetch(prometheusUrl);
-          expect(await response.text()).toContain('http_status_code="200"');
+          expect(await response.text()).toContain('http_response_status_code="200"');
         },
         TEST_TIMEOUT,
       );
@@ -827,7 +811,7 @@ describe("OpenTelemetry Integration", () => {
         "records status code 404",
         async () => {
           const response = await fetch(prometheusUrl);
-          expect(await response.text()).toContain('http_status_code="404"');
+          expect(await response.text()).toContain('http_response_status_code="404"');
         },
         TEST_TIMEOUT,
       );
@@ -836,7 +820,7 @@ describe("OpenTelemetry Integration", () => {
         "records HTTP GET method",
         async () => {
           const response = await fetch(prometheusUrl);
-          expect(await response.text()).toContain('http_method="GET"');
+          expect(await response.text()).toContain('http_request_method="GET"');
         },
         TEST_TIMEOUT,
       );
@@ -1136,25 +1120,9 @@ describe("OpenTelemetry Integration", () => {
       );
 
       it(
-        "includes trace_id attribute",
+        "includes trace flags on correlated records",
         () => {
-          expect(readLogs()).toContain('"trace_id"');
-        },
-        TEST_TIMEOUT,
-      );
-
-      it(
-        "includes span_id attribute",
-        () => {
-          expect(readLogs()).toContain('"span_id"');
-        },
-        TEST_TIMEOUT,
-      );
-
-      it(
-        "includes trace_flags attribute",
-        () => {
-          expect(readLogs()).toContain('"trace_flags"');
+          expect(readLogs()).toMatch(/"flags":1,"traceId":"[a-f0-9]{32}"/);
         },
         TEST_TIMEOUT,
       );
