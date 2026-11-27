@@ -160,16 +160,17 @@ func (c *Commands) projectAggregateByID(ctx context.Context, projectID, resource
 }
 
 func (c *Commands) projectState(ctx context.Context, projectID, resourceOwner string) ([]*eventstore.SearchResult, error) {
-	return c.eventstore.Search(
-		ctx,
-		map[eventstore.FieldType]any{
-			eventstore.FieldTypeObjectType:     project.ProjectSearchType,
-			eventstore.FieldTypeObjectID:       projectID,
-			eventstore.FieldTypeObjectRevision: project.ProjectObjectRevision,
-			eventstore.FieldTypeFieldName:      project.ProjectStateSearchField,
-			eventstore.FieldTypeResourceOwner:  resourceOwner,
-		},
-	)
+	condition := map[eventstore.FieldType]any{
+		eventstore.FieldTypeObjectType:     project.ProjectSearchType,
+		eventstore.FieldTypeObjectID:       projectID,
+		eventstore.FieldTypeObjectRevision: project.ProjectObjectRevision,
+		eventstore.FieldTypeFieldName:      project.ProjectStateSearchField,
+	}
+	// the resource owner is not always provided, e.g. when creating an application
+	if resourceOwner != "" {
+		condition[eventstore.FieldTypeResourceOwner] = resourceOwner
+	}
+	return c.eventstore.Search(ctx, condition)
 }
 
 func (c *Commands) checkProjectExists(ctx context.Context, projectID, resourceOwner string) (_ string, err error) {
