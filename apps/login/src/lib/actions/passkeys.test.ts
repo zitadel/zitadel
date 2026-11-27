@@ -1,5 +1,4 @@
 import { registerPasskeyLink, sendPasskey, verifyPasskeyRegistration } from "@/lib/actions/passkeys";
-import { ClassifiedConnectError } from "@/lib/server/grpc/interceptors/error-classification";
 import { Code, ConnectError } from "@connectrpc/connect";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -41,6 +40,12 @@ vi.mock("@/lib/server/cookies", () => ({
   getSessionCookieById: vi.fn(),
   getSessionCookieByLoginName: vi.fn(),
   getMostRecentSessionCookie: vi.fn(),
+}));
+
+// the browser's cookie is not part of these tests, only what sendPasskey does without an entry
+vi.mock("@/lib/server/session", async () => ({
+  ...(await vi.importActual<typeof import("@/lib/server/session")>("@/lib/server/session")),
+  reportMissingSessionCookie: vi.fn(async () => "cookie_missing"),
 }));
 
 vi.mock("@/lib/server/verify-helper", () => ({
@@ -134,16 +139,17 @@ describe("sendPasskey", () => {
       });
 
       expect(result).toEqual({
-        error: "couldNotFindSession",
+        error: "sessionResolution.cookieMissing",
+        sessionLost: true,
       });
       expect(mockGetSessionCookieById).toHaveBeenCalledWith({
         sessionId: "test-session-id",
       });
     });
 
-    test("should return error when session cookie is not found by loginName", async () => {
+    // an assertion answers the challenge of one session, so it is never checked against a new one
+    test("should report the session as lost when the cookie has no entry for the loginName", async () => {
       mockGetSessionCookieByLoginName.mockResolvedValue(null); // Not found
-      mockCreateSessionAndUpdateCookie.mockRejectedValue(new Error("Creation failed")); // Force creation failure
 
       const result = await sendPasskey({
         loginName: "test@example.com",
@@ -152,12 +158,14 @@ describe("sendPasskey", () => {
       });
 
       expect(result).toEqual({
-        error: "couldNotFindSession",
+        error: "sessionResolution.cookieMissing",
+        sessionLost: true,
       });
       expect(mockGetSessionCookieByLoginName).toHaveBeenCalledWith({
         loginName: "test@example.com",
         organization: "org-123",
       });
+      expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
     });
 
     test("should return error when no session cookie found (most recent fallback)", async () => {
@@ -168,7 +176,8 @@ describe("sendPasskey", () => {
       });
 
       expect(result).toEqual({
-        error: "couldNotFindSession",
+        error: "sessionResolution.cookieMissing",
+        sessionLost: true,
       });
       expect(mockGetMostRecentSessionCookie).toHaveBeenCalled();
     });
@@ -211,56 +220,40 @@ describe("sendPasskey", () => {
       });
     });
 
-    test("should fallback to createSessionAndUpdateCookie when the session was terminated and checks are present", async () => {
-      mockSetSessionAndUpdateCookie.mockRejectedValue(
-        new ClassifiedConnectError(new ConnectError("Session not found (QUERY-Sf3d2)", Code.NotFound)),
-      );
-
-      mockCreateSessionAndUpdateCookie.mockResolvedValue({
-        session: {
-          id: "new-session-123",
-          factors: {
-            user: {
-              id: "user-123",
-              loginName: "test@example.com",
-            },
-          },
-        },
-        sessionCookie: {
-          id: "new-session-123",
-          token: "new-token",
-        },
-      });
-
-      mockListUsers.mockResolvedValue({
-        details: { totalResult: BigInt(1) },
-        result: [{ userId: "user-123" }],
-      });
-
-      mockGetUserByID.mockResolvedValue({
-        user: {
-          id: "user-123",
-          type: {
-            case: "human",
-            value: { email: { isVerified: true } },
-          },
-        },
-      });
-
-      mockCheckEmailVerification.mockResolvedValue(true);
-      mockCompleteFlowOrGetUrl.mockResolvedValue({ redirect: "/dashboard" });
+    // The assertion answers the challenge of the session that is gone. A new session has no
+    // challenge to verify it against, so the caller learns that the sign-in has to be restarted.
+    test("should report the session as lost when the update fails and the session no longer exists", async () => {
+      const { getSession } = await import("@/lib/server/zitadel");
+      mockSetSessionAndUpdateCookie.mockRejectedValue(new Error("session already terminated"));
+      vi.mocked(getSession).mockRejectedValue(new ConnectError("session not found", Code.NotFound));
 
       const result = await sendPasskey({
         sessionId: "session-123",
         checks: { webAuthN: { credentialAssertionData: {} } } as any,
       });
 
-      // It should succeed with the new session
       expect(result).toEqual({
-        redirect: "/dashboard",
+        error: "sessionResolution.sessionNotFound",
+        sessionLost: true,
       });
+      expect(mockListUsers).not.toHaveBeenCalled();
+      expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
+    });
 
-      expect(mockCreateSessionAndUpdateCookie).toHaveBeenCalled();
+    test("should rethrow the update error when it is unknown whether the session still exists", async () => {
+      const { getSession } = await import("@/lib/server/zitadel");
+      const updateError = new Error("update failed");
+      mockSetSessionAndUpdateCookie.mockRejectedValue(updateError);
+      vi.mocked(getSession).mockRejectedValue(new ConnectError("backend unavailable", Code.Unavailable));
+
+      await expect(
+        sendPasskey({
+          sessionId: "session-123",
+          checks: { webAuthN: { credentialAssertionData: {} } } as any,
+        }),
+      ).rejects.toBe(updateError);
+
+      expect(mockCreateSessionAndUpdateCookie).not.toHaveBeenCalled();
     });
   });
 

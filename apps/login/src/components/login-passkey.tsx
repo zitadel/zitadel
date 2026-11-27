@@ -14,6 +14,7 @@ import { Alert } from "./alert";
 import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
+import { RestartSignIn } from "./restart-sign-in";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 
@@ -29,6 +30,8 @@ type Props = {
 
 export function LoginPasskey({ loginName, sessionId, requestId, altPassword, organization, login = true }: Props) {
   const [error, setError] = useState<string>("");
+  // the session of this step is gone, retrying cannot succeed
+  const [sessionLost, setSessionLost] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
@@ -43,7 +46,12 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
       setLoading(true);
       updateOrCreateSessionForChallenge()
         .then((response) => {
-          const pK = response?.challenges?.webAuthN?.publicKeyCredentialRequestOptions?.publicKey;
+          if (!response) {
+            // the request failed and its error is already shown
+            return;
+          }
+
+          const pK = response.challenges?.webAuthN?.publicKeyCredentialRequestOptions?.publicKey;
 
           if (!pK) {
             setError(t("verify.errors.couldNotRequestChallenge"));
@@ -77,6 +85,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
       : UserVerificationRequirement.DISCOURAGED,
   ) {
     setError("");
+    setSessionLost(false);
     setLoading(true);
     const sessionResponse = await updateOrCreateSession({
       loginName,
@@ -100,6 +109,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
       });
 
     if (sessionResponse && "error" in sessionResponse && sessionResponse.error) {
+      setSessionLost("sessionLost" in sessionResponse);
       setError(sessionResponse.error);
       return;
     }
@@ -109,6 +119,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
 
   async function submitLogin(data: JsonObject) {
     setLoading(true);
+    setSessionLost(false);
     try {
       const response = await sendPasskey({
         loginName,
@@ -120,6 +131,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
         requestId,
       });
 
+      setSessionLost(!!response && "sessionLost" in response);
       const handled = handleServerActionResponse(response, router, setSamlData, setError);
 
       if (!handled) {
@@ -191,6 +203,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
       {error && (
         <div className="py-4">
           <Alert>{error}</Alert>
+          {sessionLost && <RestartSignIn loginName={loginName} organization={organization} requestId={requestId} />}
         </div>
       )}
       <div className="mt-8 flex w-full flex-row items-center">
@@ -240,7 +253,12 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
               setLoading(false);
             });
 
-            const pK = response?.challenges?.webAuthN?.publicKeyCredentialRequestOptions?.publicKey;
+            if (!response) {
+              // the request failed and its error is already shown
+              return;
+            }
+
+            const pK = response.challenges?.webAuthN?.publicKeyCredentialRequestOptions?.publicKey;
 
             if (!pK) {
               setError(t("verify.errors.couldNotRequestChallenge"));

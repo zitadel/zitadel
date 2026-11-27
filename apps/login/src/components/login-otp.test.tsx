@@ -67,6 +67,64 @@ describe("LoginOTP", () => {
     });
   });
 
+  test("should offer to restart the sign-in when the session of the step is lost", async () => {
+    mockUpdateOrCreateSession.mockResolvedValueOnce({
+      error: "sessionResolution.cookieMissing",
+      sessionLost: true,
+    });
+
+    render(<LoginOTP method="sms" loginName="user@example.com" organization="org-1" requestId="oidc_123" />);
+
+    await waitFor(() => {
+      expect(screen.getByText("sessionResolution.cookieMissing")).toBeInTheDocument();
+    });
+    expect(screen.getByTestId("restart-sign-in")).toHaveAttribute(
+      "href",
+      "/loginname?loginName=user%40example.com&organization=org-1&requestId=oidc_123",
+    );
+  });
+
+  test("should not offer to restart the sign-in for an error the user can retry", async () => {
+    mockUpdateOrCreateSession.mockResolvedValueOnce({ error: "couldNotUpdateSession" });
+
+    render(<LoginOTP method="sms" loginName="user@example.com" />);
+
+    await waitFor(() => {
+      expect(screen.getByText("couldNotUpdateSession")).toBeInTheDocument();
+    });
+    expect(screen.queryByTestId("restart-sign-in")).toBeNull();
+  });
+
+  // the restart link belongs to the answer that reported the lost session, not to a later error
+  test.each([
+    ["rejects", () => Promise.reject(new Error("network down")), "errors.couldNotVerifyCode"],
+    [
+      "returns an error the user can retry",
+      () => Promise.resolve({ error: "couldNotUpdateSession" }),
+      "couldNotUpdateSession",
+    ],
+  ])("should drop the restart link when a later request %s", async (_name, laterRequest, expectedError) => {
+    mockUpdateOrCreateSession.mockResolvedValueOnce({ error: "sessionResolution.cookieMissing", sessionLost: true });
+
+    render(<LoginOTP method="sms" loginName="user@example.com" />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("restart-sign-in")).toBeInTheDocument();
+    });
+
+    mockUpdateOrCreateSession.mockImplementationOnce(laterRequest);
+    fireEvent.change(screen.getByTestId("code-text-input"), { target: { value: "123456" } });
+    await waitFor(() => {
+      expect(screen.getByTestId("submit-button")).not.toBeDisabled();
+    });
+    fireEvent.click(screen.getByTestId("submit-button"));
+
+    await waitFor(() => {
+      expect(screen.getByText(expectedError)).toBeInTheDocument();
+    });
+    expect(screen.queryByTestId("restart-sign-in")).toBeNull();
+  });
+
   describe("SMS resend cooldown", () => {
     afterEach(() => {
       vi.useRealTimers();

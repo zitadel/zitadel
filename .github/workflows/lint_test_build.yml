@@ -9,14 +9,13 @@ on:
     secrets:
       CODECOV_TOKEN:
         required: true
-      NX_CLOUD_ACCESS_TOKEN_READONLY:
-        required: true
 
 jobs:
   lint_test_build:
     name: Lint, Test and Build
-    runs-on: depot-ubuntu-22.04-16
-    environment: ${{ github.ref_protected == 'true' && 'Protected' || null }}
+    # GitHub's 32-core arm64 runner (the 32-arm-linux runner group).
+    runs-on:
+      group: 32-arm-linux
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -55,30 +54,95 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Set SHAs for nx affected commands
         uses: nrwl/nx-set-shas@v4
-      # The Depot runner image points /etc/resolv.conf directly at public DNS (8.8.8.8),
-      # bypassing the systemd-resolved stub, so *.integration.localhost (synthesized by
-      # systemd-resolved) no longer resolves and all API integration tests hang.
-      # Route DNS back through the stub until the image is fixed or the tests stop
-      # depending on wildcard localhost DNS.
-      - name: Restore systemd-resolved stub for *.localhost resolution
-        run: |
-          set -ex
-          test -e /run/systemd/resolve/stub-resolv.conf
-          sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
-          getent hosts foo.integration.localhost
-      - name: Lint, Test and Build
+      # The Nx task cache lives in nx-task-cache artifacts; .github/scripts/nx-task-cache.mjs says why.
+      - name: Find the Nx task cache
+        id: nx-cache
         env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
+          # A release branch sets its own name here, so it restores its own runs.
+          BASE_BRANCH: main
+          GITHUB_TOKEN: ${{ github.token }}
+          HEAD_BRANCH: ${{ github.head_ref || github.ref_name }}
+          HEAD_REPOSITORY_ID: ${{ github.event.pull_request.head.repo.id || github.repository_id }}
+        run: node .github/scripts/nx-task-cache.mjs find nx-task-cache
+      - name: Download the Nx task cache of main
+        id: nx-cache-base
+        if: steps.nx-cache.outputs.base-run
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: nx-task-cache
+          run-id: ${{ steps.nx-cache.outputs.base-run }}
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/nx-task-cache
+      - name: Download the Nx task cache of this branch
+        id: nx-cache-branch
+        if: steps.nx-cache.outputs.branch-run
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: nx-task-cache
+          run-id: ${{ steps.nx-cache.outputs.branch-run }}
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/nx-task-cache-branch
+      - name: Serve the Nx task cache
+        env:
+          BASE_DOWNLOAD: ${{ steps.nx-cache-base.outcome }}
+          BRANCH_DOWNLOAD: ${{ steps.nx-cache-branch.outcome }}
+        run: |
+          store="$RUNNER_TEMP/nx-task-cache"
+          # A download that failed partway can leave a truncated entry, which fails the task instead of missing.
+          if [ "$BASE_DOWNLOAD" = failure ]; then rm -rf "$store"; fi
+          if [ "$BRANCH_DOWNLOAD" = failure ]; then rm -rf "$store-branch"; fi
+          mkdir -p "$store" "$store-branch"
+          ls "$store" > "$store.base"
+          find "$store-branch" -type f -exec mv {} "$store"/ \;
+          node .github/scripts/nx-task-cache.mjs serve "$store" > "$store.server.log" 2>&1 &
+          for _ in $(seq 100); do [ -s "$store.url" ] && break; sleep 0.1; done
+          if [ -s "$store.url" ]; then
+            echo "NX_SELF_HOSTED_REMOTE_CACHE_SERVER=$(cat "$store.url")" >> "$GITHUB_ENV"
+          else
+            echo "::warning::The Nx task cache server did not start; running without it"
+            cat "$store.server.log"
+          fi
+      # Outside pull requests, Nx runs every task so the uploaded cache holds them all.
+      - name: Lint, Test and Build
+        id: nx
+        env:
           NX_DAEMON: "false"
-          NX_DISABLE_DB: "true"
-        run: pnpm nx affected --nxBail --targets lint test build --exclude @zitadel/docs
+          # go test runs one package per core by default. All integration test packages
+          # share one API server and database, which times out at 32 packages at once.
+          GOFLAGS: "-p=16"
+        # Nx runs 3 tasks at once by default, which kept the integration tests waiting
+        # for lint and unit tests on the 32-core runner.
+        run: pnpm nx ${{ github.event_name == 'pull_request' && 'affected' || 'run-many' }} --nxBail --parallel=8 --targets lint test build --exclude @zitadel/docs
+      - name: Keep the Nx task cache entries this job used
+        if: ${{ !cancelled() && steps.nx.outcome != 'skipped' }}
+        env:
+          # Otherwise a failed push to main would upload a smaller cache that pull requests then restore.
+          NX_TASK_CACHE_KEEP_UNUSED: ${{ steps.nx.outcome == 'failure' }}
+        run: |
+          store="$RUNNER_TEMP/nx-task-cache"
+          # A pull request uploads only entries main's cache lacks.
+          skip=""
+          if [ "$GITHUB_EVENT_NAME" = pull_request ]; then skip="$store.base"; fi
+          node .github/scripts/nx-task-cache.mjs prune "$store" $skip
+          if [ -s "$store.server.log" ]; then
+            echo "::group::Nx task cache server log"
+            cat "$store.server.log"
+            echo "::endgroup::"
+          fi
+      - name: Upload the Nx task cache
+        if: ${{ !cancelled() && steps.nx.outcome != 'skipped' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: nx-task-cache
+          path: ${{ runner.temp }}/nx-task-cache
+          retention-days: ${{ github.event_name == 'pull_request' && 3 || 14 }}
+          compression-level: 0
+          if-no-files-found: ignore
+          overwrite: true
       - name: Check for uncommitted changes (Codegen mismatch)
         run: git diff --exit-code
-      - name: Suggest Pipeline Fix By Nx Cloud AI
-        if: failure() || cancelled()
-        env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN || secrets.NX_CLOUD_ACCESS_TOKEN_READONLY }}
-        run: pnpm nx fix-ci
       - name: Publish API Unit Test Coverage
         uses: codecov/codecov-action@v4.3.0
         with:

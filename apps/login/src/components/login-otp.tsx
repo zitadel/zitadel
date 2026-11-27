@@ -16,6 +16,7 @@ import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
+import { RestartSignIn } from "./restart-sign-in";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
 
@@ -38,6 +39,8 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
   const t = useTranslations("otp");
 
   const [error, setError] = useState<string>("");
+  // the session of this step is gone, retrying cannot succeed
+  const [sessionLost, setSessionLost] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
   // seconds until the server accepts another OTP SMS request
@@ -72,6 +75,9 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
       });
     }
 
+    // only the answer to this request says whether the session is lost
+    setSessionLost(false);
+
     let response;
     try {
       response = await updateOrCreateSession({
@@ -93,6 +99,7 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
     }
 
     if (response && "error" in response) {
+      setSessionLost("sessionLost" in response);
       return response.error;
     }
   }, [method, requestId, loginName, sessionId, organization, t]);
@@ -127,6 +134,7 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
 
   async function submitCode(values: Inputs, organization?: string) {
     setLoading(true);
+    setSessionLost(false);
 
     let body: any = {
       code: values.code,
@@ -175,6 +183,7 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
       });
 
     if (response && "error" in response && response.error) {
+      setSessionLost("sessionLost" in response);
       setError(response.error);
       return;
     }
@@ -261,6 +270,7 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
         {error && (
           <div className="py-4" data-testid="error">
             <Alert>{error}</Alert>
+            {sessionLost && <RestartSignIn loginName={loginName} organization={organization} requestId={requestId} />}
           </div>
         )}
 

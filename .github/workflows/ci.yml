@@ -10,8 +10,9 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  # A push to main runs to the end, so it uploads the Nx task cache pull requests restore.
+  cancel-in-progress: ${{ github.event_name != 'push' }}
 
 permissions:
   contents: write
@@ -22,14 +23,14 @@ permissions:
 jobs:
   lint_test_build:
     uses: ./.github/workflows/lint_test_build.yml
-    if: ${{ github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
     permissions:
+      # actions: read lists and downloads the Nx task cache artifacts of earlier runs.
+      actions: read
       contents: read
     with:
       node_version: "22"
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      NX_CLOUD_ACCESS_TOKEN_READONLY: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
 
   pack:
     uses: ./.github/workflows/pack.yml

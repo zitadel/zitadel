@@ -8,6 +8,7 @@ import {
   getSessionCookieById,
   getSessionCookieByLoginName,
   removeSessionFromCookie,
+  SessionCookieLookup,
 } from "@/lib/server/cookies";
 import { isClassifiedError } from "@/lib/server/grpc/interceptors/error-classification";
 import { getPublicHost, getPublicHostWithProtocol } from "@/lib/server/host";
@@ -15,7 +16,14 @@ import { createLogger } from "@/lib/server/logger";
 import { shouldEnforceMFA } from "@/lib/server/mfa-helper";
 import { reauthenticate } from "@/lib/server/reauthenticate";
 import { getServiceConfig } from "@/lib/server/service-url";
-import { hasVerifiedPrimaryFactor, isSessionValid, loadSession } from "@/lib/server/session";
+import {
+  hasVerifiedPrimaryFactor,
+  isSessionValid,
+  loadSession,
+  reportMissingSessionCookie,
+  resolveSession,
+  SESSION_RESOLUTION_MESSAGE_KEYS,
+} from "@/lib/server/session";
 import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "@/lib/server/session-cookie";
 import {
   deleteSession,
@@ -25,11 +33,12 @@ import {
   listUsers,
   ServiceConfig,
 } from "@/lib/server/zitadel";
-import { Code, create, Duration } from "@zitadel/client";
+import { Code, create, Duration, timestampDate } from "@zitadel/client";
 import {
   Challenges,
   RequestChallenges,
   RequestChallenges_OTPEmail_SendCodeSchema,
+  UserVerificationRequirement,
 } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -179,6 +188,29 @@ export type UpdateSessionCommand = {
 };
 
 /**
+ * Steps that only work on the session they were started on. A second factor completes a session
+ * that already holds a verified first factor, and a WebAuthN assertion answers the challenge of one
+ * session. A new session has neither, so these steps never create one.
+ *
+ * U2F is a WebAuthN challenge that does not require user verification. Only the challenge of a
+ * passkey login (user verification required) may start on a new session.
+ */
+function needsExistingSession(checks?: Checks, challenges?: RequestChallenges): boolean {
+  const u2fChallenge =
+    !!challenges?.webAuthN && challenges.webAuthN.userVerificationRequirement !== UserVerificationRequirement.REQUIRED;
+
+  return !!(
+    checks?.totp ||
+    checks?.otpSms ||
+    checks?.otpEmail ||
+    checks?.webAuthN ||
+    challenges?.otpSms ||
+    challenges?.otpEmail ||
+    u2fChallenge
+  );
+}
+
+/**
  * This action only completes second factors and passkeys. The primary checks (user, password,
  * IDP intent) run through their own actions, which enforce the login policy first, so they are
  * dropped here instead of being forwarded to the session API.
@@ -243,6 +275,7 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
   const host = getPublicHost(_headers);
 
   const t = await getTranslations("verify.errors");
+  const tError = await getTranslations("error");
 
   if (!host) {
     return { error: "Could not get host" }; // Technical error, maybe leave or translate if key exists
@@ -256,9 +289,21 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       ? await getSessionCookieByLoginName({ loginName, organization })
       : await getMostRecentSessionCookie();
 
+  const stepNeedsSession = needsExistingSession(checks, challenges);
+
   if (!recentSession) {
-    if (!loginName) {
-      return { error: t("couldNotFindSession") };
+    // A new session only holds the user check. That starts a passkey login, but it can never complete
+    // a step that was started on the session that got lost.
+    if (!loginName || stepNeedsSession) {
+      // exactly the lookup of the getter above, so the miss is explained for what was looked up
+      const lookup: SessionCookieLookup = sessionId
+        ? { by: "id", sessionId }
+        : loginName
+          ? { by: "loginName", loginName, organization }
+          : { by: "mostRecent" };
+      const reason = await reportMissingSessionCookie("update_session", lookup);
+      // the reason stays in the logs, the caller only learns that retrying cannot succeed
+      return { error: tError(SESSION_RESOLUTION_MESSAGE_KEYS[reason]), sessionLost: true };
     }
 
     const checks = create(ChecksSchema, {
@@ -364,13 +409,37 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       throw error;
     }
 
-    // A new session only helps when this one is gone: deleted or expired server-side while the
-    // cookie survived (NotFound), or its token is no longer accepted (PermissionDenied). Any other
-    // failure means the check was rejected, and a new session would run the same check again.
-    const sessionGone = isClassifiedError(error) && (error.code === Code.NotFound || error.code === Code.PermissionDenied);
+    // Creating a new session below replaces the cookie entry and drops the factors of the existing session.
+    const existing = await resolveSession(serviceConfig, recentSession, "update_session");
 
-    if (!sessionGone) {
+    // Whether the session still exists is unknown (e.g. the API is unavailable), so it is neither
+    // replaced nor reported as lost: the caller reports the failed update and the user can retry.
+    if (existing.reason === "session_lookup_failed") {
+      throw error;
+    }
+
+    const expired = existing.session?.expirationDate ? timestampDate(existing.session.expirationDate) < new Date() : false;
+
+    // The session is still usable, so the update itself was rejected (e.g. a wrong code), and a
+    // session with a verified first factor is never replaced by one without. A rejected check gets a
+    // message for the form; server faults are rethrown.
+    const usable = existing.session && (stepNeedsSession ? !expired : hasVerifiedPrimaryFactor(existing.session).valid);
+    if (usable) {
       return rejectedCheckError(error);
+    }
+
+    // The session is gone or expired. A step that was started on it cannot continue on a new session,
+    // so only the steps that start a login do.
+    if (stepNeedsSession) {
+      const reason = existing.reason ?? "server_session_not_found";
+      logger.warn("LOGIN_SESSION_UPDATE_FAILED: could not update the session and did not replace it with a new one", {
+        code: "LOGIN_SESSION_UPDATE_FAILED",
+        reason,
+        sessionId: recentSession.id,
+        expired,
+        grpcCode: isClassifiedError(error) ? error.code : undefined,
+      });
+      return { error: tError(SESSION_RESOLUTION_MESSAGE_KEYS[reason]), sessionLost: true };
     }
 
     const loginNameForCreation = options.loginName || recentSession?.loginName;
