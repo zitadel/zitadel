@@ -53,6 +53,7 @@ func NewFieldHandler(config *Config, name string, eventTypes map[eventstore.Aggr
 			retryFailedAfter:       config.RetryFailedAfter,
 			triggeredInstancesSync: sync.Map{},
 			triggerWithoutEvents:   config.TriggerWithoutEvents,
+			runOutsideWorkerPool:   config.RunOutsideWorkerPool,
 			txDuration:             config.TransactionDuration,
 		},
 	}
@@ -73,13 +74,7 @@ func (h *FieldHandler) Trigger(ctx context.Context, opts ...TriggerOpt) (err err
 
 	for i := 0; ; i++ {
 		var additionalIteration bool
-		var wg sync.WaitGroup
-		wg.Add(1)
-		queue <- func() {
-			defer wg.Done()
-			additionalIteration, err = safeProcessEvents(ctx, config, h.processEvents)
-		}
-		wg.Wait()
+		additionalIteration, err = h.triggerIteration(ctx, config, h.processEvents)
 		logging.Debug(ctx, "trigger iteration", "iteration", i)
 		if !additionalIteration || err != nil {
 			return err
