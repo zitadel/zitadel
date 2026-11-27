@@ -31,8 +31,8 @@
   ],
   "dependencies": {
     "@braintree/sanitize-url": "^7.1.2",
-    "@connectrpc/connect": "^2.1.1",
-    "@connectrpc/connect-node": "^2.1.1",
+    "@connectrpc/connect": "^2.3.0",
+    "@connectrpc/connect-node": "^2.3.0",
     "@headlessui/react": "^2.2.10",
     "@heroicons/react": "^2.2.0",
     "@opentelemetry/api": "^1.9.1",
