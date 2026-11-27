@@ -1,4 +1,6 @@
+import { clsx } from "clsx";
 import Link from "next/link";
+import { textLinkClasses } from "./text-button";
 import { Translated } from "./translated";
 
 type Props = {
@@ -25,11 +27,7 @@ export function RestartSignIn({ loginName, organization, requestId }: Props) {
   }
 
   return (
-    <Link
-      href={`/loginname?${params}`}
-      className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 mt-4 inline-block text-sm"
-      data-testid="restart-sign-in"
-    >
+    <Link href={`/loginname?${params}`} className={clsx(textLinkClasses, "mt-4 inline-block")} data-testid="restart-sign-in">
       <Translated i18nKey="sessionResolution.restart" namespace="error" />
     </Link>
   );
