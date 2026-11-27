@@ -42,12 +42,7 @@ describe("PasswordForm", () => {
     fireEvent.click(getByTestId("submit-button"));
 
     await waitFor(() =>
-      expect(handleServerActionResponse).toHaveBeenCalledWith(
-        response,
-        expect.anything(),
-        expect.any(Function),
-        expect.any(Function),
-      ),
+      expect(handleServerActionResponse).toHaveBeenCalledWith(response, expect.anything(), expect.any(Function)),
     );
     expect(sendPassword).toHaveBeenCalledWith(
       expect.objectContaining({ loginName: "test@example.com", requestId: "oidc_123" }),

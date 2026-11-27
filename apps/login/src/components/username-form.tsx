@@ -9,7 +9,6 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert } from "./alert";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
@@ -57,7 +56,6 @@ export function UsernameForm({
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const submitLoginName = useCallback(
     async (values: Inputs, organization?: string) => {
@@ -74,7 +72,7 @@ export function UsernameForm({
           }),
         );
 
-        handleServerActionResponse(res, router, setSamlData, setError);
+        handleServerActionResponse(res, router, setError);
         return res;
       } catch {
         setError(t("errors.internalError"));
@@ -103,7 +101,6 @@ export function UsernameForm({
 
   return (
     <>
-      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <form className="w-full">
         <div className="">
           <TextInput

@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
-import { isAllowedPostErrorRedirectUrl, isExternalUrl, isSafeRedirectUri } from "./client-utils";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { handleServerActionResponse, isAllowedPostErrorRedirectUrl, isExternalUrl, isSafeRedirectUri } from "./client-utils";
 
 describe("isSafeRedirectUri", () => {
   beforeEach(() => {
@@ -95,5 +95,48 @@ describe("isAllowedPostErrorRedirectUrl", () => {
     "/LOGINNAME",
   ])("rejects %s", (url) => {
     expect(isAllowedPostErrorRedirectUrl(url)).toBe(false);
+  });
+});
+
+describe("handleServerActionResponse with a SAML response", () => {
+  const samlData = {
+    url: "https://sp.example.com/acs",
+    fields: { SAMLResponse: "PHNhbWxwOlJlc3BvbnNlPg==", RelayState: "state-1" },
+  };
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    document.body.innerHTML = "";
+  });
+
+  // No component is involved: the form that started the login may already be unmounted.
+  test("posts the fields to the service provider with a form on the document", () => {
+    const submit = vi.spyOn(HTMLFormElement.prototype, "submit").mockImplementation(() => {});
+    const router = { push: vi.fn() };
+    const setError = vi.fn();
+
+    expect(handleServerActionResponse({ samlData }, router, setError)).toBe(true);
+
+    expect(submit).toHaveBeenCalledTimes(1);
+    const form = submit.mock.contexts[0] as HTMLFormElement;
+    expect(form.isConnected).toBe(true);
+    expect(form.method).toBe("post");
+    expect(form.action).toBe("https://sp.example.com/acs");
+    expect(Object.fromEntries(new FormData(form))).toEqual(samlData.fields);
+    expect(router.push).not.toHaveBeenCalled();
+    expect(setError).not.toHaveBeenCalled();
+  });
+
+  test("does not post to an unsafe URL", () => {
+    const submit = vi.spyOn(HTMLFormElement.prototype, "submit").mockImplementation(() => {});
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const setError = vi.fn();
+
+    expect(
+      handleServerActionResponse({ samlData: { ...samlData, url: "javascript:alert(1)" } }, { push: vi.fn() }, setError),
+    ).toBe(true);
+
+    expect(submit).not.toHaveBeenCalled();
+    expect(setError).toHaveBeenCalled();
   });
 });

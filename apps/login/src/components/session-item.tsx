@@ -11,9 +11,8 @@ import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import moment from "moment";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Alert } from "./alert";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { Avatar } from "./avatar";
 import { Translated } from "./translated";
 
@@ -63,29 +62,34 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
   }
 
   const { valid, verifiedAt } = isSessionPrimaryFactorAndLifetimeValid(session);
-  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
   const runAction = useSettledAction();
+  const continuing = useRef(false);
 
   return (
     <>
       <Tooltip.Root delayDuration={300}>
-        {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
         <Tooltip.Trigger asChild>
           <button
             onClick={async () => {
-              if (valid && session?.factors?.user) {
-                const command: ContinueWithSessionCommand = { sessionId: session.id, requestId };
+              // one request per card at a time: a second click while the first one waits
+              // would complete the same auth request twice
+              if (continuing.current) {
+                return;
+              }
+              continuing.current = true;
+              setLoading(true);
+              try {
+                if (valid && session?.factors?.user) {
+                  const command: ContinueWithSessionCommand = { sessionId: session.id, requestId };
 
-                const callbackResponse = await runAction(() => continueWithSession(command));
+                  const callbackResponse = await runAction(() => continueWithSession(command));
 
-                handleServerActionResponse(callbackResponse, router, setSamlData, (e) => setError(e));
-              } else if (session.factors?.user) {
-                setLoading(true);
-                try {
+                  handleServerActionResponse(callbackResponse, router, (e) => setError(e));
+                } else if (session.factors?.user) {
                   const command = {
                     loginName: session.factors?.user?.loginName,
                     organization: session.factors.user.organizationId,
@@ -93,12 +97,13 @@ export function SessionItem({ session, reload, requestId }: { session: Session; 
                   };
                   const res = await runAction(() => sendLoginname(command));
 
-                  handleServerActionResponse(res, router, setSamlData, (e) => setError(e));
-                } catch {
-                  setError("An internal error occurred");
-                } finally {
-                  setLoading(false);
+                  handleServerActionResponse(res, router, (e) => setError(e));
                 }
+              } catch {
+                setError("An internal error occurred");
+              } finally {
+                continuing.current = false;
+                setLoading(false);
               }
             }}
             className="group border-divider-light bg-background-light-400 dark:bg-background-dark-400 flex flex-row items-center rounded-md border px-4 py-2 transition-all hover:shadow-lg dark:hover:bg-white/10"

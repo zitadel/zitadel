@@ -9,7 +9,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Alert } from "./alert";
 import { EMAIL, SMS, TOTP, U2F } from "./auth-methods";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { Translated } from "./translated";
 
 type Props = {
@@ -42,7 +41,6 @@ export function ChooseSecondFactorToSetup({
   const params = new URLSearchParams({});
 
   const [error, setError] = useState<string>("");
-  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   if (loginName) {
     params.append("loginName", loginName);
@@ -62,7 +60,6 @@ export function ChooseSecondFactorToSetup({
 
   return (
     <>
-      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <div className="grid w-full grid-cols-1 gap-5 pt-4">
         {loginSettings.secondFactors.map((factor) => {
           switch (factor) {
@@ -94,7 +91,7 @@ export function ChooseSecondFactorToSetup({
               }),
             );
 
-            handleServerActionResponse(skipResponse, router, setSamlData, setError);
+            handleServerActionResponse(skipResponse, router, setError);
           }}
           type="button"
           data-testid="reset-button"

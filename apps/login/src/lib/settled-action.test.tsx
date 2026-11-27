@@ -1,7 +1,7 @@
 import { act, cleanup, render } from "@testing-library/react";
 import { startTransition, StrictMode, Suspense, use, useState } from "react";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { useSettledAction } from "./settled-action";
+import { SETTLE_TIMEOUT_MS, useSettledAction } from "./settled-action";
 
 type Run = ReturnType<typeof useSettledAction>;
 
@@ -33,7 +33,10 @@ function setup() {
 }
 
 describe("useSettledAction", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    cleanup();
+    vi.useRealTimers();
+  });
 
   test("resolves with the result of the action", async () => {
     const { api } = setup();
@@ -153,6 +156,48 @@ describe("useSettledAction", () => {
     });
 
     expect(settled).toHaveBeenCalledWith("result");
+  });
+
+  test("stops waiting after the timeout when the page update never arrives", async () => {
+    vi.useFakeTimers();
+    const { api, getByTestId } = setup();
+    const { settled } = await runActionWithPendingPage(api);
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(SETTLE_TIMEOUT_MS - 1);
+    });
+    expect(settled).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1);
+    });
+
+    expect(settled).toHaveBeenCalledWith("result");
+    expect(getByTestId("page").textContent).toBe("initial");
+  });
+
+  test("an earlier action does not release a later one that is still waiting for its page update", async () => {
+    vi.useFakeTimers();
+    const { api } = setup();
+    const { settled: first } = await runActionWithPendingPage(api);
+
+    // the first one gives up waiting, the second one started later and keeps waiting
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(SETTLE_TIMEOUT_MS - 1);
+    });
+    const { page, settled: second } = await runActionWithPendingPage(api);
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1);
+    });
+
+    expect(first).toHaveBeenCalledWith("result");
+    expect(second).not.toHaveBeenCalled();
+
+    await act(async () => {
+      page.resolve("re-rendered");
+    });
+
+    expect(second).toHaveBeenCalledWith("result");
   });
 
   test("still waits for the page update under strict mode", async () => {

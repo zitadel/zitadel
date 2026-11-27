@@ -13,7 +13,6 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
@@ -43,7 +42,6 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
   // the session of this step is gone, retrying cannot succeed
   const [sessionLost, setSessionLost] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
   // seconds until the server accepts another OTP SMS request
   const [resendCooldown, setResendCooldown] = useState<number>(0);
   const resendAvailableAt = useRef<number>(0);
@@ -218,7 +216,7 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
           const callbackResponse = await runAction(() => completeFlowOrGetUrl(command, loginSettings?.defaultRedirectUri));
           setLoading(false);
 
-          handleServerActionResponse(callbackResponse, router, setSamlData, setError);
+          handleServerActionResponse(callbackResponse, router, setError);
         } else {
           setLoading(false);
         }
@@ -228,7 +226,6 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
 
   return (
     <>
-      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <form className="w-full">
         {["email", "sms"].includes(method) && (
           <Alert type={AlertType.INFO}>

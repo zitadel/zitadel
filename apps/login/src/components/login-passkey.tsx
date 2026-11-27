@@ -12,7 +12,6 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Alert } from "./alert";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { RestartSignIn } from "./restart-sign-in";
@@ -41,7 +40,6 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
   const [sessionLost, setSessionLost] = useState<boolean>(false);
   // The page starts the passkey ceremony on mount, so Continue starts disabled.
   const [loading, setLoading] = useState<boolean>(true);
-  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const t = useTranslations("passkey");
   const router = useRouter();
@@ -132,22 +130,22 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
   }
 
   async function requestChallenge(report: ReportError): Promise<any> {
-    const sessionResponse = await runAction(() =>
-      updateOrCreateSession({
-        loginName,
-        sessionId,
-        organization,
-        challenges: create(RequestChallengesSchema, {
-          webAuthN: {
-            domain: "",
-            userVerificationRequirement: login
-              ? UserVerificationRequirement.REQUIRED
-              : UserVerificationRequirement.DISCOURAGED,
-          },
-        }),
-        requestId,
+    // Called directly, without waiting for the page update: no navigation follows, and the
+    // passkey prompt that does must open while the user's activation (Continue) still holds.
+    const sessionResponse = await updateOrCreateSession({
+      loginName,
+      sessionId,
+      organization,
+      challenges: create(RequestChallengesSchema, {
+        webAuthN: {
+          domain: "",
+          userVerificationRequirement: login
+            ? UserVerificationRequirement.REQUIRED
+            : UserVerificationRequirement.DISCOURAGED,
+        },
       }),
-    ).catch((error) => {
+      requestId,
+    }).catch((error) => {
       console.error(error);
       return undefined;
     });
@@ -233,7 +231,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
       }
 
       let failed = false;
-      const handled = handleServerActionResponse(response, router, setSamlData, (message) => {
+      const handled = handleServerActionResponse(response, router, (message) => {
         failed = true;
         report(message, !!response && "sessionLost" in response);
       });
@@ -262,7 +260,6 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
 
   return (
     <div className="w-full">
-      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       {error && (
         <div className="py-4">
           <Alert>{error}</Alert>

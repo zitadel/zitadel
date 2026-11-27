@@ -11,7 +11,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
@@ -39,7 +38,6 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
 
   const [info, setInfo] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -63,7 +61,7 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
         }),
       );
 
-      handleServerActionResponse(response, router, setSamlData, setError);
+      handleServerActionResponse(response, router, setError);
     } catch {
       setError(t("verify.errors.couldNotVerifyPassword"));
     } finally {
@@ -114,7 +112,6 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
 
   return (
     <>
-      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <form className="w-full">
         <div className={`${error && "animate-shake transform-gpu"}`}>
           <TextInput

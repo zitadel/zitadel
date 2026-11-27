@@ -10,7 +10,6 @@ import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Alert } from "./alert";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { Spinner } from "./spinner";
@@ -27,7 +26,6 @@ type Props = {
 
 export function RegisterU2f({ loginName, sessionId, organization, requestId, checkAfter, loginSettings }: Props) {
   const [error, setError] = useState<string>("");
-  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -164,7 +162,7 @@ export function RegisterU2f({ loginName, sessionId, organization, requestId, che
             ),
           );
 
-          handleServerActionResponse(callbackResponse, router, setSamlData, setError);
+          handleServerActionResponse(callbackResponse, router, setError);
         } else if (loginName) {
           const callbackResponse = await runAction(() =>
             completeFlowOrGetUrl(
@@ -176,7 +174,7 @@ export function RegisterU2f({ loginName, sessionId, organization, requestId, che
             ),
           );
 
-          handleServerActionResponse(callbackResponse, router, setSamlData, setError);
+          handleServerActionResponse(callbackResponse, router, setError);
         }
       }
     }
@@ -184,7 +182,6 @@ export function RegisterU2f({ loginName, sessionId, organization, requestId, che
 
   return (
     <>
-      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       <form className="w-full">
         {error && (
           <div className="py-4">

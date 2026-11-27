@@ -12,7 +12,6 @@ import { QRCodeSVG } from "qrcode.react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert } from "./alert";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { Button, ButtonVariants } from "./button";
 import { CopyToClipboard } from "./copy-to-clipboard";
 import { TextInput } from "./input";
@@ -36,7 +35,6 @@ type Props = {
 export function TotpRegister({ uri, loginName, sessionId, requestId, organization, checkAfter, loginSettings }: Props) {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
   const router = useRouter();
   const runAction = useSettledAction();
 
@@ -81,7 +79,7 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
               ),
             );
 
-            handleServerActionResponse(callbackResponse, router, setSamlData, setError);
+            handleServerActionResponse(callbackResponse, router, setError);
           } else if (loginName) {
             const callbackResponse = await runAction(() =>
               completeFlowOrGetUrl(
@@ -93,7 +91,7 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
               ),
             );
 
-            handleServerActionResponse(callbackResponse, router, setSamlData, setError);
+            handleServerActionResponse(callbackResponse, router, setError);
           }
         }
       })
@@ -108,7 +106,6 @@ export function TotpRegister({ uri, loginName, sessionId, requestId, organizatio
 
   return (
     <div className="flex flex-col items-center">
-      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       {uri && (
         <>
           <QRCodeSVG className="my-4 h-40 w-40 rounded-md bg-white p-2" value={uri} />

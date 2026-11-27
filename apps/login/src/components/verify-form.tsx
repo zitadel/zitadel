@@ -9,7 +9,6 @@ import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
@@ -47,7 +46,6 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
   const t = useTranslations("verify");
 
   const [error, setError] = useState<string>("");
-  const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -107,7 +105,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
           }),
         );
 
-        handleServerActionResponse(response, router, setSamlData, setError);
+        handleServerActionResponse(response, router, setError);
       } catch {
         setError(t("errors.couldNotVerifyUser"));
       } finally {
@@ -126,7 +124,6 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
 
   return (
     <>
-      {samlData && <AutoSubmitForm url={samlData.url} fields={samlData.fields} />}
       {codeSent && (
         <div className="w-full py-4">
           <Alert type={AlertType.INFO}>
