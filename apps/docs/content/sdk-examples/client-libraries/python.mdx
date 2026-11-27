@@ -10,7 +10,7 @@ sidebar_label: 'Python Client'
 			<img width="100px" src="/docs/img/tech/python.svg" alt="python logo"/>
 		</td>
 		<td>
-			This guide covers the official Zitadel Management API Client for Python (3.9+), which allows you to programmatically manage resources in your Zitadel instance.
+			This guide covers the official Zitadel Management API Client for Python (3.10+), which allows you to programmatically manage resources in your Zitadel instance.
 		</td>
 	</tr>
 </table>
@@ -32,7 +32,7 @@ breaking changes in future updates. We advise caution when considering it for pr
 You can add the client library to your project using pip:
 
 ```bash
-pip install --pre zitadel-client
+pip install zitadel-client
 ```
 
 ### Using the SDK
@@ -54,13 +54,13 @@ JSON file. This process creates a secure token.
 **How do you use it?**
 
 1. Save your private key in a JSON file.
-2. Use the provided method to load this key and create a JWT-based
-authenticator.
+2. Create the client with `Zitadel.with_private_key`, which loads the key
+and signs the JWT for you.
 
 **Example:**
 
 ```python
-import zitadel_client as zitadel
+from zitadel_client import Zitadel
 from zitadel_client.exceptions import ApiError
 from zitadel_client.models import (
     UserServiceAddHumanUserRequest,
@@ -68,14 +68,14 @@ from zitadel_client.models import (
     UserServiceSetHumanProfile,
 )
 
-zitadel = zitadel.Zitadel.with_private_key("https://example.us1.zitadel.cloud", "path/to/jwt-key.json")
+zitadel = Zitadel.with_private_key("https://example.us1.zitadel.cloud", "path/to/jwt-key.json")
 
 try:
     request = UserServiceAddHumanUserRequest(
         username="john.doe",
         profile=UserServiceSetHumanProfile(
-            givenName="John",
-            familyName="Doe"
+            given_name="John",
+            family_name="Doe",
         ),
         email=UserServiceSetHumanEmail(
             email="john@doe.com"
@@ -101,12 +101,12 @@ which is then used to authenticate.
 **How do you use it?**
 
 1. Provide your client ID and client secret.
-2. Build the authenticator
+2. Create the client with `Zitadel.with_client_credentials`.
 
 **Example:**
 
 ```python
-import zitadel_client as zitadel
+from zitadel_client import Zitadel
 from zitadel_client.exceptions import ApiError
 from zitadel_client.models import (
     UserServiceAddHumanUserRequest,
@@ -114,14 +114,14 @@ from zitadel_client.models import (
     UserServiceSetHumanProfile,
 )
 
-zitadel = zitadel.Zitadel.with_client_credentials("https://example.us1.zitadel.cloud", "id", "secret")
+zitadel = Zitadel.with_client_credentials("https://example.us1.zitadel.cloud", "id", "secret")
 
 try:
     request = UserServiceAddHumanUserRequest(
         username="john.doe",
         profile=UserServiceSetHumanProfile(
-            givenName="John",
-            familyName="Doe"
+            given_name="John",
+            family_name="Doe",
         ),
         email=UserServiceSetHumanEmail(
             email="john@doe.com"
@@ -147,12 +147,12 @@ authenticate without exchanging credentials every time.
 **How do you use it?**
 
 1. Obtain a valid personal access token from your account.
-2. Create the authenticator with: `PersonalAccessTokenAuthenticator`
+2. Create the client with `Zitadel.with_access_token`.
 
 **Example:**
 
 ```python
-import zitadel_client as zitadel
+from zitadel_client import Zitadel
 from zitadel_client.exceptions import ApiError
 from zitadel_client.models import (
     UserServiceAddHumanUserRequest,
@@ -160,14 +160,14 @@ from zitadel_client.models import (
     UserServiceSetHumanProfile,
 )
 
-zitadel = zitadel.Zitadel.with_access_token("https://example.us1.zitadel.cloud", "token")
+zitadel = Zitadel.with_access_token("https://example.us1.zitadel.cloud", "token")
 
 try:
     request = UserServiceAddHumanUserRequest(
         username="john.doe",
         profile=UserServiceSetHumanProfile(
-            givenName="John",
-            familyName="Doe"
+            given_name="John",
+            family_name="Doe",
         ),
         email=UserServiceSetHumanEmail(
             email="john@doe.com"
@@ -189,7 +189,7 @@ environment and security requirements. For more details, please refer to the
 
 The client library's versioning is aligned with the Zitadel core project. The major version of the
 client corresponds to the major version of Zitadel it is designed to work with. For example,
-v2.x.x of the client is built for and tested against Zitadel v2, ensuring a predictable and stable integration.
+v4.x.x of the client is built for and tested against Zitadel v4, ensuring a predictable and stable integration.
 
 ### Resources
 
