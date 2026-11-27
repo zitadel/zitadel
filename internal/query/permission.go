@@ -30,9 +30,10 @@ type permissionClauseBuilder struct {
 	permission        string
 
 	// optional fields
-	orgID           *string
-	projectIDColumn *Column
-	connections     []sq.Eq
+	orgID                *string
+	projectIDColumn      *Column
+	projectGrantIDColumn *Column
+	connections          []sq.Eq
 }
 
 func (b *permissionClauseBuilder) appendConnection(column string, value any) {
@@ -42,7 +43,7 @@ func (b *permissionClauseBuilder) appendConnection(column string, value any) {
 // joinFunction picks the correct SQL function and return the required arguments for that function.
 func (b *permissionClauseBuilder) joinFunction() (sql string, args []any) {
 	sql = joinPermittedOrgsFunction
-	if b.projectIDColumn != nil {
+	if b.projectIDColumn != nil || b.projectGrantIDColumn != nil {
 		sql = joinPermittedProjectsFunction
 	}
 	return sql, []any{
@@ -57,12 +58,23 @@ func (b *permissionClauseBuilder) joinFunction() (sql string, args []any) {
 // joinConditions returns the conditions for the join,
 // which are dynamic based on the provided options.
 func (b *permissionClauseBuilder) joinConditions() sq.Or {
-	conditions := make(sq.Or, 2, len(b.connections)+3)
+	conditions := make(sq.Or, 2, len(b.connections)+4)
 	conditions[0] = sq.Expr("permissions.instance_permitted")
 	conditions[1] = sq.Expr(b.orgIDColumn.identifier() + " = ANY(permissions.org_ids)")
 	if b.projectIDColumn != nil {
+		projectCondition := sq.Expr(b.projectIDColumn.identifier() + " = ANY(permissions.project_ids)")
+		if b.projectGrantIDColumn != nil {
+			// the rows of a project grant are permitted thru the grant only
+			projectCondition = sq.And{
+				sq.Expr(b.projectGrantIDColumn.identifier() + " = ''"),
+				projectCondition,
+			}
+		}
+		conditions = append(conditions, projectCondition)
+	}
+	if b.projectGrantIDColumn != nil {
 		conditions = append(conditions,
-			sq.Expr(b.projectIDColumn.identifier()+" = ANY(permissions.project_ids)"),
+			sq.Expr(b.projectGrantIDColumn.identifier()+" = ANY(permissions.project_grant_ids)"),
 		)
 	}
 	for _, c := range b.connections {
@@ -114,12 +126,21 @@ func WithProjectsPermissionOption(projectIDColumn Column) PermissionOption {
 	}
 }
 
+// WithProjectGrantsPermissionOption sets an additional filter against the project grant ID column,
+// allowing for project grant specific permissions. Rows that do not belong to a project grant have an empty grant ID.
+// Combined with [WithProjectsPermissionOption], the rows of a project grant are permitted thru the grant only:
+// a member of the project is permitted the rows of the project without a grant, but not those of its grants.
+func WithProjectGrantsPermissionOption(projectGrantIDColumn Column) PermissionOption {
+	return func(b *permissionClauseBuilder) {
+		b.projectGrantIDColumn = &projectGrantIDColumn
+	}
+}
+
 // PermissionClause builds a `INNER JOIN` clause which can be applied to a query builder.
 // It filters returned rows the current authenticated user has the requested permission to.
 // See permission_example_test.go for examples.
 //
-// Experimental: Work in progress. Currently only organization and project permissions are supported
-// TODO: Add support for project grants.
+// Experimental: Work in progress. Organization, project and project grant permissions are supported.
 func PermissionClause(ctx context.Context, orgIDCol Column, permission string, options ...PermissionOption) (string, []any) {
 	ctxData := authz.GetCtxData(ctx)
 	b := &permissionClauseBuilder{
@@ -140,6 +161,7 @@ func PermissionClause(ctx context.Context, orgIDCol Column, permission string, o
 		"permission", b.permission,
 		"org_id", b.orgID,
 		"project_id_column", b.projectIDColumn,
+		"project_grant_id_column", b.projectGrantIDColumn,
 		"connections", b.connections,
 	).Debug("permitted orgs check used")
 

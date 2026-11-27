@@ -471,6 +471,7 @@ func (e *GrantRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 
 func (e *GrantRemovedEvent) Fields() []*eventstore.FieldOperation {
 	return []*eventstore.FieldOperation{
+		removeGrantMembersRoleFields(e.Aggregate(), e.GrantID),
 		eventstore.SetField(
 			e.Aggregate(),
 			grantSearchObject(e.GrantID),

@@ -15,6 +15,7 @@ const (
 	fieldsInstanceDomain    = "instance_domain_fields"
 	fieldsMemberships       = "membership_fields"
 	fieldsPermission        = "permission_fields"
+	fieldsGrantMemberships  = "project_grant_membership_fields"
 )
 
 func newFillProjectGrantFields(config handler.Config) *handler.FieldHandler {
@@ -80,6 +81,25 @@ func newFillMembershipFields(config handler.Config) *handler.FieldHandler {
 				project.MemberChangedEventType,
 				project.MemberRemovedEventType,
 				project.MemberCascadeRemovedEventType,
+				project.ProjectRemovedType,
+			},
+		},
+	)
+}
+
+// newFillProjectGrantMembershipFields fills the roles of project grant members,
+// which are not part of the membership fields filled by [newFillMembershipFields].
+func newFillProjectGrantMembershipFields(config handler.Config) *handler.FieldHandler {
+	return handler.NewFieldHandler(
+		&config,
+		fieldsGrantMemberships,
+		map[eventstore.AggregateType][]eventstore.EventType{
+			project.AggregateType: {
+				project.GrantMemberAddedType,
+				project.GrantMemberChangedType,
+				project.GrantMemberRemovedType,
+				project.GrantMemberCascadeRemovedType,
+				project.GrantRemovedType,
 				project.ProjectRemovedType,
 			},
 		},

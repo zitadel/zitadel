@@ -262,6 +262,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s77StampEventPositionAtInsert = &StampEventPositionAtInsert{dbClient: dbClient}
 	steps.s78UniqueConstraintOwners = &UniqueConstraintOwners{dbClient: dbClient}
 	steps.s80Users14InstanceResourceOwnerIndex = &Users14InstanceResourceOwnerIndex{dbClient: dbClient}
+	steps.s82ProjectGrantMemberPermissions = &ProjectGrantMemberPermissions{dbClient: dbClient, eventstore: eventstoreClient}
 	if steps.BackfillUniqueConstraintOwners == nil {
 		steps.BackfillUniqueConstraintOwners = &BackfillUniqueConstraintOwners{}
 	}
@@ -329,6 +330,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s77StampEventPositionAtInsert,
 		steps.s78UniqueConstraintOwners,
 		steps.s80Users14InstanceResourceOwnerIndex,
+		steps.s82ProjectGrantMemberPermissions,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {

@@ -164,6 +164,51 @@ func TestPermissionClause(t *testing.T) {
 				gu.Ptr("orgID"),
 			},
 		},
+		{
+			name: "project grant",
+			args: args{
+				ctx:        ctx,
+				orgIDCol:   ProjectGrantColumnGrantedOrgID,
+				permission: "permission1",
+				options: []PermissionOption{
+					WithProjectGrantsPermissionOption(ProjectGrantColumnGrantID),
+				},
+			},
+			wantSql: "INNER JOIN eventstore.permitted_projects(?, ?, ?, ?, ?) permissions ON (permissions.instance_permitted OR projections.project_grants4.granted_org_id = ANY(permissions.org_ids) OR projections.project_grants4.grant_id = ANY(permissions.project_grant_ids))",
+			wantArgs: []any{
+				"instanceID",
+				"userID",
+				database.NewJSONArray(permissions),
+				"permission1",
+				(*string)(nil),
+			},
+		},
+		{
+			name: "project and project grant, owned rows",
+			args: args{
+				ctx:        ctx,
+				orgIDCol:   UserGrantResourceOwner,
+				permission: "permission1",
+				options: []PermissionOption{
+					WithProjectsPermissionOption(UserGrantProjectID),
+					WithProjectGrantsPermissionOption(UserGrantGrantID),
+					OwnedRowsPermissionOption(UserGrantUserID),
+				},
+			},
+			wantSql: "INNER JOIN eventstore.permitted_projects(?, ?, ?, ?, ?) permissions ON (permissions.instance_permitted" +
+				" OR projections.user_grants5.resource_owner = ANY(permissions.org_ids)" +
+				" OR (projections.user_grants5.grant_id = '' AND projections.user_grants5.project_id = ANY(permissions.project_ids))" +
+				" OR projections.user_grants5.grant_id = ANY(permissions.project_grant_ids)" +
+				" OR projections.user_grants5.user_id = ?)",
+			wantArgs: []any{
+				"instanceID",
+				"userID",
+				database.NewJSONArray(permissions),
+				"permission1",
+				(*string)(nil),
+				"userID",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

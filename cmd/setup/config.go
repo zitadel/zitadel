@@ -199,6 +199,7 @@ type Steps struct {
 	s77StampEventPositionAtInsert           *StampEventPositionAtInsert
 	s78UniqueConstraintOwners               *UniqueConstraintOwners
 	s80Users14InstanceResourceOwnerIndex    *Users14InstanceResourceOwnerIndex
+	s82ProjectGrantMemberPermissions        *ProjectGrantMemberPermissions
 	BackfillUniqueConstraintOwners          *BackfillUniqueConstraintOwners
 	RelationalTables                        *TransactionalTables
 }
