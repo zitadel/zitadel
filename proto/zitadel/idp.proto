@@ -195,11 +195,14 @@ message JWTConfig {
             description: "the name of the header where the JWT is sent in, default is authorization";
         }
     ];
+    // The expected audience in the JWT.
+    // If not provided, the aud claim is not validated at all and any valid token from this issuer is accepted,
+    // regardless of which application it was issued for. Setting an audience is strongly recommended.
     string audience = 5 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"my-audience\"";
-            description: "the expected audience in the JWT, if not provided the audience is not validated";
+            description: "the expected audience in the JWT. If not provided, the aud claim is not validated at all and any valid token from this issuer is accepted, regardless of which application it was issued for. Setting an audience is strongly recommended";
         }
     ];
 }
