@@ -34,6 +34,10 @@ VerifyEmailOTP:
   Text: Please use the OTP {{.OTP}} to authenticate within the next five minutes or click the "Authenticate" button.
   ButtonText: Authenticate
 VerifySMSOTP:
+  Title: Verify OTP
+  PreHeader: Verify OTP
+  Subject: Verify OTP
+  Greeting: Hello {{.DisplayName}},
   Text: >-
     {{.OTP}} is your OTP for {{ .Domain }}. Use it within the next {{.Expiry}}.
     

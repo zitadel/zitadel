@@ -34,6 +34,10 @@ VerifyEmailOTP:
   Text: "Ве молам, користи го копчето 'Автентицирај' или копирај ја OTP {{.OTP}} и стави ја на екранот за автентикација за да се автентицираш на Zitadel во следните пет минути."
   ButtonText: "Автентицирај"
 VerifySMSOTP:
+  Title: "Zitadel - Потврди OTP"
+  PreHeader: "Потврди OTP"
+  Subject: "Потврди OTP"
+  Greeting: "Здраво {{.DisplayName}},"
   Text: |-
     {{.OTP}} е вашата OTP за {{ .Domain }}. Користете го во следниот {{.Expiry}}.
     @{{.Domain}} #{{.OTP}}
