@@ -1,106 +1,156 @@
+# Few pull requests, each one worth merging:
+# - one grouped pull request per entry a month, with minor and patch
+#   releases at least a week old, so a broken release is usually replaced
+#   before it reaches us;
+# - majors stay manual, but still arrive as security updates, which are
+#   grouped into one pull request per entry;
+# - merge or close what Dependabot opens. It pauses itself, security updates
+#   included, once one of its pull requests has been open 90 days with no one
+#   acting on any of them.
+#
+# The Dockerfiles have no entry: their floating tags (debian:latest,
+# node:24-alpine, ubi9/nodejs-24) only change at a major, which stays manual.
 version: 2
 updates:
-- package-ecosystem: npm
-  groups:
-    console:
-      applies-to: version-updates
-      patterns:
-        - "*"
-      update-types:
-        - "minor"
-        - "patch"
-  directories:
-    - "/console"
-    - "/e2e"
-  schedule:
-    interval: weekly
-    time: "02:00"
-  labels:
-   - "javascript"
-   - "dependencies"
-  open-pull-requests-limit: 10
-  commit-message:
-    prefix: chore
-    include: scope
-- package-ecosystem: npm
-  directory: '/login'
-  open-pull-requests-limit: 3
-  schedule:
-    interval: daily
-  groups:
-    prod:
-      dependency-type: production
-    dev:
-      dependency-type: development
-  ignore:
-    - dependency-name: "eslint"
-      versions: [ "9.x" ]
-- package-ecosystem: gomod
-  groups:
-    go:
-      applies-to: version-updates
-      patterns:
-        - "*"
-      update-types:
-        - "minor"
-        - "patch"
-  directory: "/"
-  schedule:
-    interval: weekly
-    time: "02:00"
-  labels:
-   - "go"
-   - "dependencies"
-  open-pull-requests-limit: 10
-  commit-message:
-    prefix: chore
-    include: scope
-- package-ecosystem: "docker"
-  groups:
-    docker:
-      applies-to: version-updates
-      patterns:
-        - "*"
-      update-types:
-        - "minor"
-        - "patch"
-  directory: "/build"
-  schedule:
-    interval: "weekly"
-    time: "02:00"
-  open-pull-requests-limit: 10
-  commit-message:
-    prefix: chore
-    include: scope
-- package-ecosystem: "github-actions"
-  groups:
-    actions:
-      applies-to: version-updates
-      patterns:
-        - "*"
-  directory: "/"
-  schedule:
-    interval: weekly
-    time: "02:00"
-  open-pull-requests-limit: 10
-  commit-message:
-    prefix: chore
-    include: scope
-- package-ecosystem: npm
-  directory: '/apps/docs'
-  open-pull-requests-limit: 10
-  schedule:
-    interval: weekly
-    time: "02:00"
-  groups:
-    prod:
-      dependency-type: production
-    dev:
-      dependency-type: development
-  commit-message:
-    prefix: chore
-    include: scope
-  labels:
-    - "javascript"
-    - "dependencies"
-    - "area/docs"
+  # The pnpm workspace (pnpm-workspace.yaml) without the three apps below:
+  # the root tooling, packages/*, tests/* and deploy/compose. exclude-paths
+  # globs are relative to `directory` and hold for version updates only.
+  - package-ecosystem: npm
+    directory: /
+    exclude-paths:
+      - "apps/docs/**"
+      - "apps/login/**"
+      - "console/**"
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    # update-types affects version updates only, so majors still arrive as
+    # security updates.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      workspace:
+        update-types: [minor, patch]
+      npm-security:
+        applies-to: security-updates
+        patterns: ["*"]
+    commit-message:
+      prefix: chore
+      include: scope
+
+  # The login image ships Next.js, so its bumps get their own pull request.
+  - package-ecosystem: npm
+    directory: /apps/login
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      login:
+        update-types: [minor, patch]
+      login-security:
+        applies-to: security-updates
+        patterns: ["*"]
+    commit-message:
+      prefix: chore
+      include: scope
+
+  - package-ecosystem: npm
+    directory: /console
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      console:
+        update-types: [minor, patch]
+      console-security:
+        applies-to: security-updates
+        patterns: ["*"]
+    commit-message:
+      prefix: chore
+      include: scope
+
+  - package-ecosystem: npm
+    directory: /apps/docs
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      docs:
+        update-types: [minor, patch]
+      docs-security:
+        applies-to: security-updates
+        patterns: ["*"]
+    commit-message:
+      prefix: chore
+      include: scope
+    labels:
+      - "javascript"
+      - "dependencies"
+      - "area/docs"
+
+  # The k6 benchmark sits outside the workspace with its own lockfile.
+  # Security updates only: a limit of 0 turns version updates off.
+  - package-ecosystem: npm
+    directory: /benchmark
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 0
+    groups:
+      benchmark-security:
+        applies-to: security-updates
+        patterns: ["*"]
+    commit-message:
+      prefix: chore
+      include: scope
+
+  # The server module and the login's acceptance-test modules.
+  - package-ecosystem: gomod
+    directories:
+      - /
+      - /apps/login/acceptance/*
+      - /apps/login/acceptance/idp/*
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      go:
+        update-types: [minor, patch]
+      go-security:
+        applies-to: security-updates
+        patterns: ["*"]
+    commit-message:
+      prefix: chore
+      include: scope
+
+  # The actions the workflows use, majors included: they are pinned by major
+  # tag, so nothing else proposes a new one.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: chore
+      include: scope
