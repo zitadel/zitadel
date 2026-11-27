@@ -2,6 +2,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { SessionsList } from "@/components/sessions-list";
 import { Translated } from "@/components/translated";
 import { getAllSessions } from "@/lib/server/cookies";
+import { getShownLoginName } from "@/lib/server/login-name";
 import { getServiceConfig } from "@/lib/server/service-url";
 import { getBrandingSettings, getDefaultOrg, listSessions, ServiceConfig } from "@/lib/server/zitadel";
 import { UserPlusIcon } from "@heroicons/react/24/outline";
@@ -68,6 +69,40 @@ async function loadSessions({ serviceConfig, organization }: { serviceConfig: Se
   return sessions;
 }
 
+// The login name each account is shown with: without the organization domain suffix where that
+// organization's branding hides it. Keyed by session id; branding and domain are cached per organization.
+async function loadShownLoginNames({
+  serviceConfig,
+  sessions,
+}: {
+  serviceConfig: ServiceConfig;
+  sessions: Session[];
+}): Promise<Record<string, string>> {
+  const entries = await Promise.all(
+    sessions.map(async (session) => {
+      const loginName = session.factors?.user?.loginName;
+      const organizationId = session.factors?.user?.organizationId || undefined;
+      if (!loginName) {
+        return undefined;
+      }
+
+      const sessionBranding = organizationId
+        ? await getBrandingSettings({ serviceConfig, organization: organizationId }).catch(() => undefined)
+        : undefined;
+      const shown = await getShownLoginName({
+        serviceConfig,
+        loginName,
+        organizationId,
+        hideLoginNameSuffix: sessionBranding?.hideLoginNameSuffix,
+      });
+
+      return [session.id, shown ?? loginName] as const;
+    }),
+  );
+
+  return Object.fromEntries(entries.filter((entry) => entry !== undefined));
+}
+
 export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
@@ -89,6 +124,8 @@ export default async function Page(props: { searchParams: Promise<Record<string 
   let sessions = await loadSessions({ serviceConfig, organization });
 
   const branding = await getBrandingSettings({ serviceConfig, organization: organization ?? defaultOrganization });
+
+  const shownLoginNames = await loadShownLoginNames({ serviceConfig, sessions });
 
   const params = new URLSearchParams();
 
@@ -117,7 +154,7 @@ export default async function Page(props: { searchParams: Promise<Record<string 
 
       <div className="w-full">
         <div className="flex w-full flex-col space-y-2">
-          <SessionsList sessions={sessions} requestId={requestId} />
+          <SessionsList sessions={sessions} requestId={requestId} shownLoginNames={shownLoginNames} />
           <Link href={`/loginname?` + params}>
             <div className="flex flex-row items-center rounded-md px-4 py-3 transition-all hover:bg-black/10 dark:hover:bg-white/10">
               <div className="mr-4 flex h-8 w-8 flex-row items-center justify-center rounded-full bg-black/5 dark:bg-white/5">
