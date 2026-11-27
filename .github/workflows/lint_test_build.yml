@@ -65,6 +65,7 @@ jobs:
           HEAD_REPOSITORY_ID: ${{ github.event.pull_request.head.repo.id || github.repository_id }}
         run: node .github/scripts/nx-task-cache.mjs find nx-task-cache
       - name: Download the Nx task cache of main
+        id: nx-cache-base
         if: steps.nx-cache.outputs.base-run
         continue-on-error: true
         uses: actions/download-artifact@v4
@@ -74,6 +75,7 @@ jobs:
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/nx-task-cache
       - name: Download the Nx task cache of this branch
+        id: nx-cache-branch
         if: steps.nx-cache.outputs.branch-run
         continue-on-error: true
         uses: actions/download-artifact@v4
@@ -83,8 +85,14 @@ jobs:
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/nx-task-cache-branch
       - name: Serve the Nx task cache
+        env:
+          BASE_DOWNLOAD: ${{ steps.nx-cache-base.outcome }}
+          BRANCH_DOWNLOAD: ${{ steps.nx-cache-branch.outcome }}
         run: |
           store="$RUNNER_TEMP/nx-task-cache"
+          # A download that failed partway can leave a truncated entry, which fails the task instead of missing.
+          if [ "$BASE_DOWNLOAD" = failure ]; then rm -rf "$store"; fi
+          if [ "$BRANCH_DOWNLOAD" = failure ]; then rm -rf "$store-branch"; fi
           mkdir -p "$store" "$store-branch"
           ls "$store" > "$store.base"
           find "$store-branch" -type f -exec mv {} "$store"/ \;
@@ -109,6 +117,9 @@ jobs:
         run: pnpm nx ${{ github.event_name == 'pull_request' && 'affected' || 'run-many' }} --nxBail --parallel=8 --targets lint test build --exclude @zitadel/docs
       - name: Keep the Nx task cache entries this job used
         if: ${{ !cancelled() && steps.nx.outcome != 'skipped' }}
+        env:
+          # Otherwise a failed push to main would upload a smaller cache that pull requests then restore.
+          NX_TASK_CACHE_KEEP_UNUSED: ${{ steps.nx.outcome == 'failure' }}
         run: |
           store="$RUNNER_TEMP/nx-task-cache"
           # A pull request uploads only entries main's cache lacks.
