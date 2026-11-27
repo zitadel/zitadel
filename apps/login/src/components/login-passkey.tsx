@@ -3,7 +3,7 @@
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
 import { sendPasskey } from "@/lib/actions/passkeys";
 import { updateOrCreateSession } from "@/lib/actions/session";
-import { handleServerActionResponse } from "@/lib/client-utils";
+import { handleServerActionResponse, isExternalUrl } from "@/lib/client-utils";
 import { create, JsonObject } from "@zitadel/client";
 import { RequestChallengesSchema, UserVerificationRequirement } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -17,6 +17,12 @@ import { Button, ButtonVariants } from "./button";
 import { RestartSignIn } from "./restart-sign-in";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
+
+// How long Continue stays disabled after an external redirect that may not unload the page.
+const EXTERNAL_REDIRECT_RELEASE_MS = 5000;
+
+// Shows an error of the running ceremony; sessionLost offers to restart the sign-in.
+type ReportError = (message: string, sessionLost?: boolean) => void;
 
 // either loginName or sessionId must be provided
 type Props = {
@@ -39,69 +45,91 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
   const t = useTranslations("passkey");
   const router = useRouter();
 
-  const initialized = useRef(false);
-  // At most one ceremony (challenge, navigator.credentials.get, verification) runs at a time.
-  // A ref, not state: two taps can land before React commits loading=true.
-  const ceremonyInFlight = useRef(false);
-  // Aborts the pending navigator.credentials.get; also identifies the current attempt,
-  // so results of an aborted attempt are ignored.
-  const ceremonyController = useRef<AbortController | null>(null);
+  // The running ceremony (challenge, navigator.credentials.get, verification), or null.
+  // At most one runs at a time; a ceremony whose controller is no longer current drops
+  // its results. A ref, not state: two taps can land before React commits loading=true.
+  const ceremony = useRef<AbortController | null>(null);
+  const releaseTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
-    if (!initialized.current) {
-      initialized.current = true;
-      runCeremony();
-    }
+    runCeremony();
+
+    // Safari can restore the page from the back/forward cache after it navigated away,
+    // for example when going back from an app's callback; make Continue usable again.
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        releaseCeremony();
+      }
+    };
+    window.addEventListener("pageshow", onPageShow);
+
+    // Leaving the page any way (Use Password, Back, navigation) aborts the ceremony.
+    // Under strict mode the first run is aborted here before it reaches the prompt.
+    return () => {
+      window.removeEventListener("pageshow", onPageShow);
+      abortCeremony();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function runCeremony() {
-    if (ceremonyInFlight.current) {
+  function runCeremony() {
+    if (ceremony.current) {
       return;
     }
-    ceremonyInFlight.current = true;
     const controller = new AbortController();
-    ceremonyController.current = controller;
+    ceremony.current = controller;
+    clearTimeout(releaseTimer.current);
     setError("");
     setSessionLost(false);
     setLoading(true);
 
-    let navigating = false;
-    try {
-      const publicKey = await requestChallenge();
-      if (!publicKey || controller.signal.aborted) {
-        return;
+    const isCurrent = () => ceremony.current === controller;
+    // Ignored once this ceremony was aborted or replaced.
+    const report: ReportError = (message, sessionLost = false) => {
+      if (isCurrent()) {
+        setError(message);
+        setSessionLost(sessionLost);
       }
+    };
 
-      const credential = await getCredential(publicKey, controller.signal);
-      if (!credential || controller.signal.aborted) {
-        return;
-      }
+    void (async () => {
+      let navigating = false;
+      try {
+        const publicKey = await requestChallenge(report);
+        if (!publicKey || !isCurrent()) {
+          return;
+        }
 
-      navigating = await submitLogin(credential);
-    } finally {
-      if (ceremonyController.current === controller) {
-        ceremonyController.current = null;
+        const credential = await getCredential(publicKey, controller.signal, report);
+        if (!credential || !isCurrent()) {
+          return;
+        }
+
+        navigating = await submitLogin(credential, isCurrent, report);
+      } finally {
+        // While the page navigates away after a successful verification, keep Continue
+        // disabled and the ceremony current, so no new challenge replaces the verified one.
+        if (isCurrent() && !navigating) {
+          ceremony.current = null;
+          setLoading(false);
+        }
       }
-      // While the page navigates away after a successful verification, keep Continue
-      // disabled and the guard set, so no new challenge replaces the verified one.
-      if (!navigating) {
-        ceremonyInFlight.current = false;
-        setLoading(false);
-      }
-    }
+    })();
   }
 
   function abortCeremony() {
-    ceremonyController.current?.abort();
-    ceremonyController.current = null;
+    clearTimeout(releaseTimer.current);
+    ceremony.current?.abort();
+    ceremony.current = null;
   }
 
-  async function requestChallenge(
-    userVerificationRequirement: number = login
-      ? UserVerificationRequirement.REQUIRED
-      : UserVerificationRequirement.DISCOURAGED,
-  ): Promise<any | undefined> {
+  function releaseCeremony() {
+    clearTimeout(releaseTimer.current);
+    ceremony.current = null;
+    setLoading(false);
+  }
+
+  async function requestChallenge(report: ReportError): Promise<any> {
     const sessionResponse = await updateOrCreateSession({
       loginName,
       sessionId,
@@ -109,7 +137,9 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
       challenges: create(RequestChallengesSchema, {
         webAuthN: {
           domain: "",
-          userVerificationRequirement,
+          userVerificationRequirement: login
+            ? UserVerificationRequirement.REQUIRED
+            : UserVerificationRequirement.DISCOURAGED,
         },
       }),
       requestId,
@@ -119,22 +149,21 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
     });
 
     if (sessionResponse && "error" in sessionResponse && sessionResponse.error) {
-      setSessionLost("sessionLost" in sessionResponse);
-      setError(sessionResponse.error);
+      report(sessionResponse.error, "sessionLost" in sessionResponse);
       return undefined;
     }
 
     const publicKey = sessionResponse?.challenges?.webAuthN?.publicKeyCredentialRequestOptions?.publicKey;
 
     if (!publicKey) {
-      setError(t("verify.errors.couldNotRequestChallenge"));
+      report(t("verify.errors.couldNotRequestChallenge"));
       return undefined;
     }
 
     return publicKey;
   }
 
-  async function getCredential(publicKey: any, signal: AbortSignal): Promise<JsonObject | undefined> {
+  async function getCredential(publicKey: any, signal: AbortSignal, report: ReportError): Promise<JsonObject | undefined> {
     try {
       publicKey.challenge = coerceToArrayBuffer(publicKey.challenge, "publicKey.challenge");
       publicKey.allowCredentials.map((listItem: any) => {
@@ -146,12 +175,8 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
         signal,
       });
 
-      if (signal.aborted) {
-        return undefined;
-      }
-
       if (!assertedCredential) {
-        setError(t("verify.errors.couldNotRetrievePasskey"));
+        report(t("verify.errors.couldNotRetrievePasskey"));
         return undefined;
       }
 
@@ -172,14 +197,11 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
         },
       };
     } catch (error: any) {
-      if (signal.aborted) {
-        return undefined;
-      }
       // Handle passkey cancellation or errors
       if (error?.name === "NotAllowedError") {
-        setError(t("verify.errors.verificationCancelled"));
+        report(t("verify.errors.verificationCancelled"));
       } else {
-        setError(t("verify.errors.verificationFailed"));
+        report(t("verify.errors.verificationFailed"));
       }
       console.error("Passkey verification error:", error);
       return undefined;
@@ -187,7 +209,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
   }
 
   // Returns true when the page is navigating away (redirect or SAML post).
-  async function submitLogin(data: JsonObject): Promise<boolean> {
+  async function submitLogin(data: JsonObject, isCurrent: () => boolean, report: ReportError): Promise<boolean> {
     try {
       const response = await sendPasskey({
         loginName,
@@ -199,25 +221,35 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
         requestId,
       });
 
-      setSessionLost(!!response && "sessionLost" in response);
-      let failed = false;
-      const handled = handleServerActionResponse(response, router, setSamlData, (message) => {
-        failed = true;
-        setError(message);
-      });
-
-      if (!handled) {
-        if (!response) {
-          setError(t("verify.errors.noResponseReceived"));
-        } else {
-          setError(t("verify.errors.noRedirectProvided"));
-        }
+      // The user left for another step while the assertion was being verified.
+      if (!isCurrent()) {
         return false;
       }
 
-      return !failed;
+      let failed = false;
+      const handled = handleServerActionResponse(response, router, setSamlData, (message) => {
+        failed = true;
+        report(message, !!response && "sessionLost" in response);
+      });
+
+      if (!handled) {
+        report(t(response ? "verify.errors.noRedirectProvided" : "verify.errors.noResponseReceived"));
+        return false;
+      }
+
+      if (failed) {
+        return false;
+      }
+
+      // A custom-scheme or other external redirect (a native app's callback) may open
+      // another app and leave this page in place, so make Continue usable again later.
+      if (response && "redirect" in response && response.redirect && isExternalUrl(response.redirect)) {
+        releaseTimer.current = setTimeout(releaseCeremony, EXTERNAL_REDIRECT_RELEASE_MS);
+      }
+
+      return true;
     } catch {
-      setError(t("verify.errors.couldNotVerifyPasskey"));
+      report(t("verify.errors.couldNotVerifyPasskey"));
       return false;
     }
   }
@@ -237,7 +269,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
             type="button"
             variant={ButtonVariants.Secondary}
             onClick={() => {
-              // Cancel the open passkey prompt before switching to the password step.
+              // Close the open passkey prompt now, not only once the next page unmounts this one.
               abortCeremony();
               const params = new URLSearchParams();
 
