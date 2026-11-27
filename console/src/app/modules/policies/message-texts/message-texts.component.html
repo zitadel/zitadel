@@ -1,5 +1,6 @@
 <h2>{{ 'DESCRIPTIONS.SETTINGS.MESSAGE_TEXTS.TITLE' | translate }}</h2>
 <p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.MESSAGE_TEXTS.DESCRIPTION' | translate }}</p>
+<cnsl-email-provider-restrictions mode="texts" />
 @if (langSvc.isNotAllowed(language) | async) {
   <cnsl-info-section class="locked" [type]="InfoSectionType.WARN">
     {{ 'POLICY.LOGIN_TEXTS.ACTIVE_LANGUAGE_NOT_ALLOWED' | translate }}</cnsl-info-section
