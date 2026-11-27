@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 const (
@@ -114,7 +115,27 @@ func TestPrepareUsersQuery_LoginNamePatternWithOrg(t *testing.T) {
 	assert.Equal(t, []any{"inst-1", "inst-1", "org1", "%user%", "org1"}, args)
 }
 
-func TestPrepareUsersQuery_LoginNamePatternOrgOnlyFromTopLevelEquals(t *testing.T) {
+func TestPrepareUsersQuery_LoginNamePatternWithOrgInAnd(t *testing.T) {
+	ctx := authz.WithInstanceID(t.Context(), "inst-1")
+	loginNameQuery, err := NewUserLoginNameExistsQuery("User", TextContainsIgnoreCase)
+	require.NoError(t, err)
+	orgQuery, err := NewUserResourceOwnerSearchQuery("org1", TextEquals)
+	require.NoError(t, err)
+	stateQuery, err := NewUserStateSearchQuery(domain.UserStateActive)
+	require.NoError(t, err)
+	andQuery, err := NewAndQuery(stateQuery, orgQuery)
+	require.NoError(t, err)
+
+	q := &UserSearchQueries{Queries: []SearchQuery{loginNameQuery, andQuery}}
+	builder, _ := q.prepareUsersCountQuery(ctx, false)
+	stmt, args, err := builder.ToSql()
+	require.NoError(t, err)
+
+	assert.Contains(t, stmt, " = ANY(ARRAY("+fmt.Sprintf(loginNamePatternMatchesInOrg+loginNamePatternLikeIgnoreCase, 2, 3, 4)+"))")
+	assert.Equal(t, 2, countArg(args, "org1"), "the organization in the pattern and in the AND")
+}
+
+func TestPrepareUsersQuery_LoginNamePatternOrgOnlyFromConjunctEquals(t *testing.T) {
 	ctx := authz.WithInstanceID(t.Context(), "inst-1")
 	loginNameQuery, err := NewUserLoginNameExistsQuery("user", TextContainsIgnoreCase)
 	require.NoError(t, err)

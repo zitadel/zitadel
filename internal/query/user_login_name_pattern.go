@@ -9,15 +9,14 @@ import (
 // IGNORE_CASE. The login_names3 view computes login names, so a pattern cannot
 // use an index.
 //
-// planUserSearch binds the filter to the instance, and to the organization of a
-// top-level organization filter. Bound, it reads the matching user IDs from
+// planUserSearch binds the filter to the instance, and to the organization of an
+// organization filter that all users must match (see findConjunctTextEquals). Bound, it reads the matching user IDs from
 // login_names3 once per statement. Unbound, it falls back to the view query
 // correlated to the outer user, whose plan Postgres can turn into one
 // evaluation of the view per user.
 type loginNamePatternFilter struct {
-	value      string
-	comparison TextComparison
 	match      *textQuery
+	correlated SearchQuery
 
 	binding *loginNamePatternBinding
 }
@@ -38,10 +37,13 @@ func newLoginNamePatternFilter(value string, comparison TextComparison) (*loginN
 	if err != nil {
 		return nil, err
 	}
+	correlated, err := newLoginNameExistsViewQuery(value, comparison)
+	if err != nil {
+		return nil, err
+	}
 	return &loginNamePatternFilter{
-		value:      value,
-		comparison: comparison,
 		match:      match,
+		correlated: correlated,
 	}, nil
 }
 
@@ -55,11 +57,7 @@ func (q *loginNamePatternFilter) Col() Column {
 
 func (q *loginNamePatternFilter) comp() sq.Sqlizer {
 	if q.binding == nil {
-		fallback, err := newLoginNameExistsViewQuery(q.value, q.comparison)
-		if err != nil {
-			return sq.Expr("FALSE")
-		}
-		return fallback.comp()
+		return q.correlated.comp()
 	}
 	matches := sq.Select(LoginNameUserIDCol.identifier()).
 		From(loginNameTable.identifier()).
@@ -142,4 +140,21 @@ func bindLoginNamePattern(qry SearchQuery, binding loginNamePatternBinding) (Sea
 	default:
 		return qry, false
 	}
+}
+
+// findConjunctTextEquals returns the value of an EQUALS filter on column that
+// every result must match: one in queries or, recursively, in an AND among
+// them. Filters under OR or NOT do not count.
+func findConjunctTextEquals(column Column, queries []SearchQuery) (string, bool) {
+	if text, ok := findTextEqualsQuery(column, queries); ok {
+		return text, true
+	}
+	for _, qry := range queries {
+		if and, ok := qry.(*AndQuery); ok {
+			if text, ok := findConjunctTextEquals(column, and.queries); ok {
+				return text, true
+			}
+		}
+	}
+	return "", false
 }

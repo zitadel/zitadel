@@ -1350,7 +1350,7 @@ func (q *UserSearchQueries) planUserSearch(ctx context.Context, permissionCheckV
 
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	seeks, filters, extracted := extractLoginEqualitySeeks(instanceID, q.Queries)
-	orgID, _ := findTextEqualsQuery(UserResourceOwnerCol, filters)
+	orgID, _ := findConjunctTextEquals(UserResourceOwnerCol, filters)
 	filters = bindLoginNamePatterns(filters, instanceID, orgID)
 	return userSearchPlan{
 		instanceID:             instanceID,
