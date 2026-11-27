@@ -536,5 +536,6 @@ Errors:
       RegistrationNotAllowed: Registratie is niet toegestaan
   DeviceAuth:
     NotExisting: Gebruikerscode bestaat niet
+    NotFound: Apparaatautorisatieverzoek bestaat niet
 
 optional: (optioneel)

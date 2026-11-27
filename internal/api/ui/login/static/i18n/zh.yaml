@@ -536,5 +536,6 @@ Errors:
       RegistrationNotAllowed: 不允许注册
   DeviceAuth:
     NotExisting: 用户代码不存在
+    NotFound: 设备授权请求不存在
 
 optional: (可选)

@@ -536,5 +536,6 @@ Errors:
       RegistrationNotAllowed: Registrering är inte tillåten
   DeviceAuth:
     NotExisting: Användarkoden finns inte
+    NotFound: Begäran om enhetsauktorisering finns inte
 
 optional: (frivilligt)

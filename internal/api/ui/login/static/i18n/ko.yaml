@@ -536,5 +536,6 @@ Errors:
       RegistrationNotAllowed: 등록이 허용되지 않습니다
   DeviceAuth:
     NotExisting: 사용자 코드가 존재하지 않습니다
+    NotFound: 장치 인증 요청이 존재하지 않습니다
 
 optional: (선택 사항)
