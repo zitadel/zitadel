@@ -69,6 +69,8 @@ func (*userGrantProjection) Init() *old_handler.Check {
 			handler.NewPrimaryKey(UserGrantInstanceID, UserGrantID),
 			handler.WithIndex(handler.NewIndex("user_id", []string{UserGrantUserID})),
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{UserGrantResourceOwner})),
+			// pages the grants of an instance ordered by user (cmd/setup step 81 adds it to existing systems)
+			handler.WithIndex(handler.NewIndex("instance_user_id", []string{UserGrantInstanceID, UserGrantUserID, UserGrantID})),
 		),
 	)
 }
