@@ -14,7 +14,7 @@ func (s *Server) GetEmailProvider(ctx context.Context, req *admin_pb.GetEmailPro
 		return nil, err
 	}
 	return &admin_pb.GetEmailProviderResponse{
-		Config: emailProviderToProviderPb(smtp),
+		Config: emailProviderToProviderPb(smtp, s.smtpRules),
 	}, nil
 }
 
@@ -24,7 +24,7 @@ func (s *Server) GetEmailProviderById(ctx context.Context, req *admin_pb.GetEmai
 		return nil, err
 	}
 	return &admin_pb.GetEmailProviderByIdResponse{
-		Config: emailProviderToProviderPb(smtp),
+		Config: emailProviderToProviderPb(smtp, s.smtpRules),
 	}, nil
 }
 
@@ -103,7 +103,7 @@ func (s *Server) ListEmailProviders(ctx context.Context, req *admin_pb.ListEmail
 	}
 	return &admin_pb.ListEmailProvidersResponse{
 		Details: object.ToListDetails(result.Count, result.Sequence, result.LastRun),
-		Result:  emailProvidersToPb(result.Configs),
+		Result:  emailProvidersToPb(result.Configs, s.smtpRules),
 	}, nil
 }
 

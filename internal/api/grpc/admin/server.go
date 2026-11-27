@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
@@ -32,6 +33,8 @@ type Server struct {
 	assetsAPIDomain   func(context.Context) string
 	userCodeAlg       crypto.EncryptionAlgorithm
 	auditLogRetention time.Duration
+	// smtpRules are the rules of the operator, which are stated as restrictions of the email providers
+	smtpRules smtp.Rules
 }
 
 type Config struct {
@@ -45,6 +48,7 @@ func CreateServer(
 	query *query.Queries,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	auditLogRetention time.Duration,
+	smtpRules smtp.Rules,
 ) *Server {
 	return &Server{
 		systemDefaults:    systemDefaults,
@@ -54,6 +58,7 @@ func CreateServer(
 		assetsAPIDomain:   assets.AssetAPI(),
 		userCodeAlg:       userCodeAlg,
 		auditLogRetention: auditLogRetention,
+		smtpRules:         smtpRules,
 	}
 }
 

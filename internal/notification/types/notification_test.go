@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -23,6 +24,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/messages"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestMain(m *testing.M) {
@@ -40,7 +42,12 @@ type testChannels struct {
 	emailConfig *email.Config
 	rule        smtp.Rule
 
-	ruleRequested bool
+	// sentEmails is the amount of emails already sent through the provider
+	sentEmails    uint64
+	sentEmailsErr error
+
+	ruleRequested      bool
+	sentEmailsRequests []sentEmailsRequest
 	// chainsCreated counts the connections to the provider
 	chainsCreated int
 	messages      []zchannels.Message
@@ -80,6 +87,17 @@ func (c *testChannels) SecurityTokenEvent(context.Context, set.Config) (*senders
 	return c.chain(), nil
 }
 
+func (c *testChannels) SentEmails(_ context.Context, providerID string, since time.Time, limit uint64) (uint64, error) {
+	c.sentEmailsRequests = append(c.sentEmailsRequests, sentEmailsRequest{providerID: providerID, window: time.Since(since), limit: limit})
+	return c.sentEmails, c.sentEmailsErr
+}
+
+type sentEmailsRequest struct {
+	providerID string
+	window     time.Duration
+	limit      uint64
+}
+
 func (c *testChannels) SMTPRule(context.Context, *smtp.Config, string) smtp.Rule {
 	c.ruleRequested = true
 	return c.rule
@@ -117,6 +135,9 @@ func TestSendEmail(t *testing.T) {
 		}
 	}
 
+	limit := &smtp.RuleLimit{Count: 3, Window: smtp.RuleDuration(time.Hour)}
+	errCount := errors.New("count failed")
+
 	tests := []struct {
 		name              string
 		channels          *testChannels
@@ -128,6 +149,8 @@ func TestSendEmail(t *testing.T) {
 		wantErr           func(t *testing.T, err error)
 		wantChainsCreated int
 		wantMessage       zchannels.Message
+		// wantSentEmailsCounted states whether the emails sent through the provider are counted for the limit
+		wantSentEmailsCounted bool
 	}{
 		{
 			name:     "no provider, canceled",
@@ -175,7 +198,7 @@ func TestSendEmail(t *testing.T) {
 			name: "HTML disabled, link is removed, arguments are still escaped",
 			channels: &testChannels{
 				emailConfig: smtpConfig,
-				rule:        smtp.Rule{RestrictCustomHTML: true},
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{RestrictCustomHTML: true}},
 			},
 			text:              linkText,
 			displayName:       "O'Brien <b>",
@@ -192,7 +215,7 @@ func TestSendEmail(t *testing.T) {
 			name: "HTML disabled, template action in an argument is not executed",
 			channels: &testChannels{
 				emailConfig: smtpConfig,
-				rule:        smtp.Rule{RestrictCustomHTML: true},
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{RestrictCustomHTML: true}},
 			},
 			subject:           linkText,
 			text:              formattedText,
@@ -212,7 +235,7 @@ func TestSendEmail(t *testing.T) {
 			name: "HTML disabled, template action in a text is not executed",
 			channels: &testChannels{
 				emailConfig: smtpConfig,
-				rule:        smtp.Rule{RestrictCustomHTML: true},
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{RestrictCustomHTML: true}},
 			},
 			subject:           linkText,
 			text:              `Join {{"{{.Subject}}"}} and {{"{{.URL}}"}}`,
@@ -231,7 +254,7 @@ func TestSendEmail(t *testing.T) {
 			name: "HTML disabled, simple formatting is kept",
 			channels: &testChannels{
 				emailConfig: smtpConfig,
-				rule:        smtp.Rule{RestrictCustomHTML: true},
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{RestrictCustomHTML: true}},
 			},
 			text:              formattedText,
 			displayName:       "Bob",
@@ -248,7 +271,7 @@ func TestSendEmail(t *testing.T) {
 			name: "HTML disabled, display name with allowed tag is not rendered",
 			channels: &testChannels{
 				emailConfig: smtpConfig,
-				rule:        smtp.Rule{RestrictCustomHTML: true},
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{RestrictCustomHTML: true}},
 			},
 			text:              formattedText,
 			displayName:       "<b>Bob</b><br>",
@@ -279,7 +302,7 @@ func TestSendEmail(t *testing.T) {
 			name: "HTML disabled, German default text is identical",
 			channels: &testChannels{
 				emailConfig: smtpConfig,
-				rule:        smtp.Rule{RestrictCustomHTML: true},
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{RestrictCustomHTML: true}},
 			},
 			text:              germanText,
 			displayName:       "Bob",
@@ -312,10 +335,74 @@ func TestSendEmail(t *testing.T) {
 			),
 		},
 		{
+			name: "limit not reached, sent",
+			channels: &testChannels{
+				emailConfig: smtpConfig,
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{Limit: limit}},
+				sentEmails:  2,
+			},
+			text:                  linkText,
+			displayName:           "Bob",
+			wantRuleRequested:     true,
+			wantSentEmailsCounted: true,
+		},
+		{
+			name: "limit reached, rejected before connecting to the provider",
+			channels: &testChannels{
+				emailConfig: smtpConfig,
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{Limit: limit}},
+				sentEmails:  3,
+			},
+			text:              linkText,
+			displayName:       "Bob",
+			wantRuleRequested: true,
+			wantErr: func(t *testing.T, err error) {
+				rejected := new(zchannels.RejectedError)
+				require.ErrorAs(t, err, &rejected)
+				assert.Equal(t, zchannels.Rejection{
+					Reason:     zchannels.RejectionReasonLimitExceeded,
+					ProviderID: "smtpProvider",
+				}, rejected.Rejection)
+			},
+			wantSentEmailsCounted: true,
+		},
+		{
+			name: "limit, counting fails, retried",
+			channels: &testChannels{
+				emailConfig:   smtpConfig,
+				rule:          smtp.Rule{RuleOptions: smtp.RuleOptions{Limit: limit}},
+				sentEmailsErr: errCount,
+			},
+			text:              linkText,
+			displayName:       "Bob",
+			wantRuleRequested: true,
+			wantErr: func(t *testing.T, err error) {
+				assert.ErrorIs(t, err, errCount)
+				assert.NotErrorAs(t, err, new(*zchannels.RejectedError))
+				assert.NotErrorIs(t, err, new(zchannels.CancelError))
+			},
+			wantSentEmailsCounted: true,
+		},
+		{
+			name: "limit, provider without ID, not sent",
+			channels: &testChannels{
+				emailConfig: &email.Config{SMTPConfig: smtpConfig.SMTPConfig},
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{Limit: limit}},
+			},
+			text:              linkText,
+			displayName:       "Bob",
+			wantRuleRequested: true,
+			wantErr: func(t *testing.T, err error) {
+				// the limit cannot be applied, so nothing is sent
+				assert.True(t, zerrors.IsInternal(err))
+				assert.NotErrorAs(t, err, new(*zchannels.RejectedError))
+			},
+		},
+		{
 			name: "webhook provider, no rule requested",
 			channels: &testChannels{
 				emailConfig: webhookConfig,
-				rule:        smtp.Rule{RestrictCustomHTML: true},
+				rule:        smtp.Rule{RuleOptions: smtp.RuleOptions{RestrictCustomHTML: true}},
 			},
 			text:              linkText,
 			displayName:       "Bob",
@@ -351,6 +438,15 @@ func TestSendEmail(t *testing.T) {
 			)
 
 			assert.Equal(t, tt.wantRuleRequested, tt.channels.ruleRequested)
+			if tt.wantSentEmailsCounted {
+				require.Len(t, tt.channels.sentEmailsRequests, 1)
+				request := tt.channels.sentEmailsRequests[0]
+				assert.Equal(t, "smtpProvider", request.providerID)
+				assert.Equal(t, limit.Count, request.limit)
+				assert.InDelta(t, time.Duration(limit.Window), request.window, float64(time.Minute))
+			} else {
+				assert.Empty(t, tt.channels.sentEmailsRequests)
+			}
 			if tt.wantErr != nil {
 				tt.wantErr(t, err)
 				assert.Empty(t, tt.channels.messages)
