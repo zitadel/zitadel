@@ -13,6 +13,7 @@ import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
+import { TextButton } from "./text-button";
 import { Translated } from "./translated";
 
 type Inputs = {
@@ -136,18 +137,18 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
             <span className="mr-auto flex-1 text-left">
               <Translated i18nKey="verify.noCodeReceived" namespace="verify" />
             </span>
-            <button
+            <TextButton
               aria-label="Resend Code"
               disabled={loading}
-              type="button"
-              className="text-primary-light-500 hover:text-primary-light-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 ml-4 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
+              inline
+              className="ml-4"
               onClick={() => {
                 resendCode();
               }}
               data-testid="resend-button"
             >
               <Translated i18nKey="verify.resendCode" namespace="verify" />
-            </button>
+            </TextButton>
           </div>
         </Alert>
         <div className="mt-4">

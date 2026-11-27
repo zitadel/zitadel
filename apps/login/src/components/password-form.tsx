@@ -15,6 +15,7 @@ import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
+import { TextButton } from "./text-button";
 import { Translated } from "./translated";
 
 type Inputs = {
@@ -122,15 +123,9 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
             data-testid="password-text-input"
           />
           {!loginSettings?.hidePasswordReset && (
-            <button
-              className="hover:text-primary-light-500 dark:hover:text-primary-dark-500 text-sm transition-all"
-              onClick={() => resetPasswordAndContinue()}
-              type="button"
-              disabled={loading}
-              data-testid="reset-button"
-            >
+            <TextButton onClick={() => resetPasswordAndContinue()} disabled={loading} data-testid="reset-button">
               <Translated i18nKey="verify.resetPassword" namespace="password" />
-            </button>
+            </TextButton>
           )}
 
           {loginName && <input type="hidden" name="loginName" autoComplete="username" value={loginName} />}

@@ -13,6 +13,7 @@ import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
+import { TextButton } from "./text-button";
 import { Translated } from "./translated";
 
 type Inputs = {
@@ -115,8 +116,7 @@ export function UsernameForm({
             suffix={hideSuffix ? undefined : suffix}
           />
           {allowRegister && (
-            <button
-              className="hover:text-primary-light-500 dark:hover:text-primary-dark-500 text-sm transition-all"
+            <TextButton
               onClick={() => {
                 const registerParams = new URLSearchParams();
                 if (organization) {
@@ -128,12 +128,11 @@ export function UsernameForm({
 
                 router.push("/register?" + registerParams);
               }}
-              type="button"
               disabled={loading}
               data-testid="register-button"
             >
               <Translated i18nKey="register" namespace="loginname" />
-            </button>
+            </TextButton>
           )}
         </div>
 
