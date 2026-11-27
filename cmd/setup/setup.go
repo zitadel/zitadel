@@ -650,6 +650,7 @@ func startCommandsQueries(
 		keys.SMS,
 		q,
 		httpClient,
+		config.HTTPClient.DenyList,
 	)
 
 	return commands, queries, adminView, authView

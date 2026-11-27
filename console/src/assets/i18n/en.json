@@ -1669,7 +1669,9 @@
       "LOGINV2_DESCRIPTION": "Enabling this activates the new TypeScript-based login UI with improved security, performance, and customization.",
       "LOGINV2_BASEURI": "Base URI",
       "ENABLERELATIONALTABLES": "Relational Tables",
-      "ENABLERELATIONALTABLES_DESCRIPTION": "Enable this to use relational tables instead of projections for storing data. Currently this toggle does nothing."
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Enable this to use relational tables instead of projections for storing data. Currently this toggle does nothing.",
+      "ORGEMAILPROVIDERS": "Organization Email Providers",
+      "ORGEMAILPROVIDERS_DESCRIPTION": "Enable this to allow organizations to configure their own email providers. If disabled, all emails are sent through the instance email provider."
     },
     "DIALOG": {
       "RESET": {

@@ -8,6 +8,7 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/messages"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -90,8 +91,14 @@ func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err
 		return nil, zerrors.ThrowInternal(err, "EMAIL-spR56", "Errors.SMTP.CouldNotSplit")
 	}
 
+	if smtpConfig.Restrictions != nil {
+		if err = denylist.IsHostBlocked(smtpConfig.Restrictions.DenyList, host); err != nil {
+			return nil, zerrors.ThrowInvalidArgument(err, "EMAIL-Bk7Qd2", "Errors.NotificationProvider.Blocked.Endpoint")
+		}
+	}
+
 	if !tlsRequired {
-		client, err = smtpConfig.getSMTPClient()
+		client, err = smtpConfig.getSMTPClient(host)
 	} else {
 		client, err = smtpConfig.getSMTPClientWithTls(host)
 	}
@@ -106,16 +113,38 @@ func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err
 	return client, nil
 }
 
-func (smtpConfig SMTP) getSMTPClient() (*smtp.Client, error) {
-	client, err := smtp.Dial(smtpConfig.Host)
+// dialer returns the dialer for the connection to the SMTP host.
+// For org owned configs it checks the resolved IPs against the deny list right before connecting.
+func (smtpConfig SMTP) dialer() *net.Dialer {
+	if smtpConfig.Restrictions == nil {
+		return &net.Dialer{}
+	}
+	return denylist.NewDialer(smtpConfig.Restrictions.DenyList)
+}
+
+// dialError wraps an error from dialing. A connection blocked by the deny list is reported as such.
+func dialError(err error, id, message string) error {
+	var denied *denylist.AddressDeniedError
+	if errors.As(err, &denied) {
+		return zerrors.ThrowInvalidArgument(err, "EMAIL-Hn4Vw9", "Errors.NotificationProvider.Blocked.Endpoint")
+	}
+	return zerrors.ThrowInternal(err, id, message)
+}
+
+func (smtpConfig SMTP) getSMTPClient(host string) (*smtp.Client, error) {
+	conn, err := smtpConfig.dialer().Dial("tcp", smtpConfig.Host)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "EMAIL-skwos", "Errors.SMTP.CouldNotDial")
+		return nil, dialError(err, "EMAIL-skwos", "Errors.SMTP.CouldNotDial")
+	}
+	client, err := smtp.NewClient(conn, host)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "EMAIL-Ym5Rc8", "Errors.SMTP.CouldNotDial")
 	}
 	return client, nil
 }
 
 func (smtpConfig SMTP) getSMTPClientWithTls(host string) (*smtp.Client, error) {
-	conn, err := tls.Dial("tcp", smtpConfig.Host, &tls.Config{})
+	conn, err := tls.DialWithDialer(smtpConfig.dialer(), "tcp", smtpConfig.Host, &tls.Config{})
 
 	if errors.As(err, &tls.RecordHeaderError{}) {
 		logging.OnError(err).Warn("could not connect using normal tls. trying starttls instead...")
@@ -123,7 +152,7 @@ func (smtpConfig SMTP) getSMTPClientWithTls(host string) (*smtp.Client, error) {
 	}
 
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "EMAIL-sl39s", "Errors.SMTP.CouldNotDialTLS")
+		return nil, dialError(err, "EMAIL-sl39s", "Errors.SMTP.CouldNotDialTLS")
 	}
 
 	client, err := smtp.NewClient(conn, host)
@@ -134,7 +163,7 @@ func (smtpConfig SMTP) getSMTPClientWithTls(host string) (*smtp.Client, error) {
 }
 
 func (smtpConfig SMTP) getSMTPClientWithStartTls(host string) (*smtp.Client, error) {
-	client, err := smtpConfig.getSMTPClient()
+	client, err := smtpConfig.getSMTPClient(host)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +178,7 @@ func (smtpConfig SMTP) getSMTPClientWithStartTls(host string) (*smtp.Client, err
 
 func (smtpConfig SMTP) smtpAuth(client *smtp.Client, host string) error {
 	if smtpConfig.XOAuth2Auth != nil {
-		err := client.Auth(XOAuth2Auth(*smtpConfig.XOAuth2Auth, host))
+		err := client.Auth(XOAuth2Auth(*smtpConfig.XOAuth2Auth, host, smtpConfig.Restrictions))
 		if err != nil {
 			return zerrors.ThrowInternal(err, "EMAIL-av88SB", "Errors.SMTP.CouldNotXOAuth2")
 		}

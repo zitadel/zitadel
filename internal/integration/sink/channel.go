@@ -6,4 +6,5 @@ type Channel int
 const (
 	ChannelMilestone Channel = iota
 	ChannelQuota
+	ChannelEmail
 )

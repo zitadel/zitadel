@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/denylist"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/id"
@@ -42,6 +43,7 @@ func Register(
 	userEncryption, smtpEncryption, smsEncryption crypto.EncryptionAlgorithm,
 	queue *queue.Queue,
 	httpClient *http.Client,
+	denyList []denylist.AddressChecker,
 ) {
 	if !notificationWorkerConfig.LegacyEnabled {
 		queue.ShouldStart()
@@ -50,7 +52,7 @@ func Register(
 	// make sure the slice does not contain old values
 	projections = nil
 
-	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption, httpClient)
+	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption, httpClient, denyList, notificationWorkerConfig.OrgSMTPFallbackToInstance)
 	c := newChannels(q)
 	projections = append(projections, handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl, notificationWorkerConfig, queue))
 	projections = append(projections, handlers.NewQuotaNotifier(ctx, projection.ApplyCustomConfig(quotaHandlerCustomConfig), commands, q, c))

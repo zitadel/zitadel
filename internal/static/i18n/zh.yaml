@@ -70,8 +70,13 @@ Errors:
     NotFound: "未找到 SMTP 配置"
     AlreadyExists: "SMTP 配置已存在"
     AlreadyDeactivated: "SMTP 配置已停用"
+    OrgProvidersDisabled: "此实例已禁用组织邮件提供商"
+    OrgHTTPSRequired: "组织的电子邮件提供商必须使用 https"
     SenderAdressNotCustomDomain: "发件人地址必须在在实例的域名设置中验证。"
     TestEmailNotFound: "找不到用于测试的电子邮件地址"
+  NotificationProvider:
+    Blocked:
+      Endpoint: "不允许使用此通知提供商的地址"
   Notification:
     NoDomain: "未找到对应的域名"
   User:

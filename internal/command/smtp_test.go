@@ -1728,7 +1728,7 @@ func TestCommands_validateNotificationWebhookEndpoint(t *testing.T) {
 				denyList:         tt.denyList,
 				ipLookupFunction: blockedLookup,
 			}
-			err := r.validateNotificationWebhookEndpoint(tt.endpoint)
+			err := r.validateNotificationWebhookEndpoint(tt.endpoint, false)
 			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}

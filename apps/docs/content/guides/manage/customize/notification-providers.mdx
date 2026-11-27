@@ -32,6 +32,21 @@ A default SMTP provider is configured for ZITADEL Cloud customers.
 This provider meant for development and testing purposes and you must replace this provider with your custom SMTP provider for production use cases to guarantee security and reliability of your service.
 </Callout>
 
+### Providers of organizations
+
+Email providers that are configured for an organization are restricted, because organizations must not be able to reach internal services through the server:
+
+- The SMTP host, the token endpoint of XOAUTH2 and the endpoint of an HTTP provider are checked against the `HTTPClient.DenyList` of the [ZITADEL configuration](/self-hosting/manage/configure). Connections to denied addresses are refused, also when the host name resolves to a denied IP address.
+- The endpoint of an HTTP provider and the token endpoint of XOAUTH2 must use `https`.
+
+These restrictions do not apply to the email providers of the instance, which are managed by instance administrators.
+
+Emails to users with an instance membership (any `IAM_*` role) are always sent through the email provider of the instance, whatever the organization configures.
+This is checked for every delivery and cannot be turned off, so the owner of an organization never receives password resets, one-time passwords or verification links of an instance administrator.
+
+Before you enable the feature `org_email_providers`, add the internal address ranges of your network to `HTTPClient.DenyList`, IPv6 ranges included.
+The default deny list cannot know your network. Internal services often have global IPv6 addresses, which the default list does not cover.
+
 ## Webhook / HTTP provider
 
 Webhook (HTTP Provider) allows you to fully customize the messages and use integrate with any provider or custom solution to deliver the messages to users.

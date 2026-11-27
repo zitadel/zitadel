@@ -306,7 +306,7 @@ func (c *Commands) AddSMTPConfigHTTP(ctx context.Context, config *AddSMTPConfigH
 		}
 	}
 
-	if err := c.validateNotificationWebhookEndpoint(config.Endpoint); err != nil {
+	if err := c.validateNotificationWebhookEndpoint(config.Endpoint, false); err != nil {
 		return err
 	}
 
@@ -355,7 +355,7 @@ func (c *Commands) ChangeSMTPConfigHTTP(ctx context.Context, config *ChangeSMTPC
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-2MHkV8ObWo", "Errors.IDMissing")
 	}
 
-	if err := c.validateNotificationWebhookEndpoint(config.Endpoint); err != nil {
+	if err := c.validateNotificationWebhookEndpoint(config.Endpoint, false); err != nil {
 		return err
 	}
 
@@ -708,13 +708,18 @@ func (c *Commands) prepareAddAndActivateSMTPConfig(a *instance.Aggregate, descri
 	}
 }
 
-func (c *Commands) validateNotificationWebhookEndpoint(endpoint string) error {
-	if endpoint == "" {
-		return nil
-	}
+// validateNotificationWebhookEndpoint checks that the endpoint is not blocked by the deny list.
+// Endpoints of organization owned providers must additionally use https (requireHTTPS).
+func (c *Commands) validateNotificationWebhookEndpoint(endpoint string, requireHTTPS bool) error {
 	uri, err := url.Parse(endpoint)
 	if err != nil {
 		return zerrors.ThrowInvalidArgument(err, "COMMAND-Sz84nFo3aK", "Errors.Invalid.Argument")
+	}
+	if requireHTTPS && !strings.EqualFold(uri.Scheme, "https") {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-Ht4pS7mQ2x", "Errors.SMTPConfig.OrgHTTPSRequired")
+	}
+	if endpoint == "" {
+		return nil
 	}
 	if err := denylist.IsURLBlocked(c.denyList, uri, c.ipLookupFunction); err != nil {
 		return zerrors.ThrowInvalidArgument(err, "COMMAND-Uf0294nKls", "Errors.NotificationProvider.Blocked.Endpoint")

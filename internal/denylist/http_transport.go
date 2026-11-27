@@ -14,7 +14,17 @@ func NewHTTPTransport(denyList []AddressChecker) http.RoundTripper {
 	if len(denyList) == 0 {
 		return base
 	}
-	dialer := &net.Dialer{
+	base.DialContext = NewDialer(denyList).DialContext
+
+	return base
+}
+
+// NewDialer returns a [net.Dialer] that checks the resolved IP against the denylist
+// right before each TCP dial to avoid DNS rebinding TOCTOU gaps.
+// A blocked dial fails with an error wrapping an [AddressDeniedError].
+// For connections that are not HTTP, e.g. SMTP.
+func NewDialer(denyList []AddressChecker) *net.Dialer {
+	return &net.Dialer{
 		Timeout:   5 * time.Second,
 		KeepAlive: 30 * time.Second,
 		Control: func(network, address string, c syscall.RawConn) error {
@@ -31,7 +41,4 @@ func NewHTTPTransport(denyList []AddressChecker) http.RoundTripper {
 			return IsHostBlocked(denyList, host, parsedIP)
 		},
 	}
-	base.DialContext = dialer.DialContext
-
-	return base
 }

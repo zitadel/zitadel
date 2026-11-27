@@ -13,12 +13,109 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-// GetActiveEmailConfig reads the iam SMTP provider config
-func (n *NotificationQueries) GetActiveEmailConfig(ctx context.Context) (*email.Config, error) {
+// GetActiveEmailConfig reads the SMTP provider config for the given org.
+// Uses org-level SMTP when available and the instance feature org_email_providers
+// is enabled. When the feature is disabled, the org config is not looked up
+// and the instance-level SMTP is used. When orgID is empty, uses instance-level
+// SMTP (backward compatibility). When orgID is set but org has no config,
+// behavior depends on OrgSMTPFallbackToInstance: if true, falls back to
+// instance-level; if false, returns an error.
+// Mails to users with an instance membership (IAM_* roles) always use the
+// instance-level SMTP, checked on every delivery. No setting overrides this,
+// so an organization can never receive the mails of an instance administrator.
+// userID is the recipient and is required whenever orgID is set.
+func (n *NotificationQueries) GetActiveEmailConfig(ctx context.Context, orgID, userID string) (*email.Config, error) {
+	orgProviders, err := n.orgEmailProvidersEnabled(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+	if orgProviders {
+		instanceMember, err := n.hasInstanceMembership(ctx, userID)
+		if err != nil {
+			return nil, err
+		}
+		orgProviders = !instanceMember
+	}
+	if orgProviders {
+		config, err := n.OrgSMTPConfigActive(ctx, orgID)
+		if err == nil {
+			return n.orgEmailConfig(config)
+		}
+		// Only fall back on "not found" — propagate real errors (DB failures, etc.)
+		if !zerrors.IsNotFound(err) {
+			return nil, err
+		}
+		if !n.OrgSMTPFallbackToInstance {
+			return nil, err
+		}
+		// fall through to instance-level
+	}
 	config, err := n.SMTPConfigActive(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
+	return n.smtpConfigToEmailConfig(config)
+}
+
+// orgEmailConfig converts the config of an organization.
+// Unlike the instance level config, the SMTP host and the XOAuth2 token endpoint of an organization
+// must not reach hosts on the deny list. HTTP providers use the shared client, which enforces the deny list.
+func (n *NotificationQueries) orgEmailConfig(config *query.SMTPConfig) (*email.Config, error) {
+	emailConfig, err := n.smtpConfigToEmailConfig(config)
+	if err != nil {
+		return nil, err
+	}
+	if emailConfig.SMTPConfig != nil {
+		emailConfig.SMTPConfig.SMTP.Restrictions = &smtp.Restrictions{
+			DenyList:   n.denyList,
+			HTTPClient: n.httpClient,
+		}
+	}
+	return emailConfig, nil
+}
+
+// hasInstanceMembership returns true if the user is a member of the instance (any IAM_* role).
+// The memberships are read for every delivery and never cached, so a granted membership
+// takes effect as soon as the member projection has caught up.
+func (n *NotificationQueries) hasInstanceMembership(ctx context.Context, userID string) (bool, error) {
+	if userID == "" {
+		return false, zerrors.ThrowInvalidArgument(nil, "NOTIF-Ek3Wq", "Errors.User.UserIDMissing")
+	}
+	userQuery, err := query.NewMembershipUserIDQuery(userID)
+	if err != nil {
+		return false, err
+	}
+	instanceQuery, err := query.NewMembershipIsIAMQuery()
+	if err != nil {
+		return false, err
+	}
+	memberships, err := n.Memberships(ctx, &query.MembershipSearchQuery{
+		SearchRequest: query.SearchRequest{Limit: 1},
+		Queries:       []query.SearchQuery{userQuery, instanceQuery},
+	}, false)
+	if err != nil {
+		return false, err
+	}
+	return len(memberships.Memberships) > 0, nil
+}
+
+// orgEmailProvidersEnabled returns true if the org email providers must be considered for the given org.
+// The notification context only carries the instance ID, so the instance features
+// are read through the (cached) instance instead of authz.GetFeatures(ctx).
+func (n *NotificationQueries) orgEmailProvidersEnabled(ctx context.Context, orgID string) (bool, error) {
+	if orgID == "" {
+		return false, nil
+	}
+	instance, err := n.InstanceByID(ctx, authz.GetInstance(ctx).InstanceID())
+	if err != nil {
+		return false, err
+	}
+	return instance.Features().OrgEmailProviders, nil
+}
+
+// smtpConfigToEmailConfig converts a query.SMTPConfig to an email.Config,
+// handling SMTP, HTTP webhook, and crypto decryption.
+func (n *NotificationQueries) smtpConfigToEmailConfig(config *query.SMTPConfig) (*email.Config, error) {
 	provider := &email.Provider{
 		ID:          config.ID,
 		Description: config.Description,
@@ -40,7 +137,7 @@ func (n *NotificationQueries) GetActiveEmailConfig(ctx context.Context) (*email.
 			},
 		}, nil
 	}
-	return nil, zerrors.ThrowNotFound(err, "QUERY-KPQleOckOV", "Errors.SMTPConfig.NotFound")
+	return nil, zerrors.ThrowNotFound(nil, "QUERY-KPQleOckOV", "Errors.SMTPConfig.NotFound")
 }
 
 func smtpToEmailConfig(qs *query.SMTP, provider *email.Provider, passCrypto crypto.EncryptionAlgorithm) (*email.Config, error) {

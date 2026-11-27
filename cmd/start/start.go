@@ -351,6 +351,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.SMS,
 		q,
 		httpClient,
+		config.HTTPClient.DenyList,
 	)
 	notification.Start(ctx)
 

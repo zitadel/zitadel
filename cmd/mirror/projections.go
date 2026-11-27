@@ -251,6 +251,7 @@ func projections(
 		keys.SMS,
 		nil,
 		httpClient,
+		config.HTTPClient.DenyList,
 	)
 
 	config.Auth.Spooler.Client = client

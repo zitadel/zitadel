@@ -1660,7 +1660,9 @@
       "LOGINV2_DESCRIPTION": "Mengaktifkan ini akan mengaktifkan antarmuka login baru berbasis TypeScript dengan keamanan, performa, dan kustomisasi yang lebih baik.",
       "LOGINV2_BASEURI": "URI dasar",
       "ENABLERELATIONALTABLES": "Tabel Relasional",
-      "ENABLERELATIONALTABLES_DESCRIPTION": "Aktifkan ini untuk menggunakan tabel relasional alih-alih proyeksi untuk menyimpan data. Saat ini, toggle ini tidak berfungsi."
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Aktifkan ini untuk menggunakan tabel relasional alih-alih proyeksi untuk menyimpan data. Saat ini, toggle ini tidak berfungsi.",
+      "ORGEMAILPROVIDERS": "Penyedia Email Organisasi",
+      "ORGEMAILPROVIDERS_DESCRIPTION": "Aktifkan ini agar organisasi dapat mengonfigurasi penyedia email mereka sendiri. Jika dinonaktifkan, semua email dikirim melalui penyedia email instans."
     },
     "DIALOG": {
       "RESET": {
