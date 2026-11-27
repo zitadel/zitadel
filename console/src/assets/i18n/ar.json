@@ -2388,7 +2388,14 @@
       "SIGNATUREALGORITHM": "خوارزمية التوقيع",
       "NAMEIDFORMAT": "تنسيق NameID",
       "TRANSIENTMAPPINGATTRIBUTENAME": "اسم سمة التعيين المخصص",
-      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "اسم سمة بديل لتعيين المستخدم في حال كان `nameid-format` المرتجع هو `transient`، مثل `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "اسم سمة بديل لتعيين المستخدم في حال كان `nameid-format` المرتجع هو `transient`، مثل `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`",
+      "CERTIFICATE": "الشهادة",
+      "PRIVATEKEY": "المفتاح الخاص",
+      "UPLOADCERTIFICATE": "رفع الشهادة",
+      "UPLOADPRIVATEKEY": "رفع المفتاح الخاص",
+      "UPDATECERTIFICATE": "استبدال الشهادة",
+      "FILEMAXSIZEEXCEEDED": "تم تجاوز الحد الأقصى لحجم الملف.",
+      "CERTIFICATE_DESC": "يمكنك اختياريًا رفع شهادة مع مفتاحها الخاص (PEM)، مثلًا صادرة عن جهة إصدار شهادات يشترطها مزود الهوية. تُستخدم لتوقيع الطلبات وفك تشفير التأكيدات. إذا لم يتم توفيرها، يتم إنشاء شهادة موقعة ذاتيًا."
     },
     "TOAST": {
       "SAVED": "تم الحفظ بنجاح.",

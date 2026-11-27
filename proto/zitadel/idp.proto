@@ -502,6 +502,29 @@ message SAMLConfig {
     optional zitadel.idp.v1.SAMLSignatureAlgorithm signature_algorithm = 7;
 }
 
+// Certificate and private key used by ZITADEL as service provider towards the SAML identity provider,
+// e.g. a certificate issued by a certificate authority required by the identity provider.
+message SAMLCertificate {
+    // PEM encoded X.509 certificate. Further certificates of the chain can be appended after the certificate.
+    bytes certificate = 1 [
+        (validate.rules).bytes = {min_len: 1, max_len: 20000},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 20000;
+            example: "\"LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1...\"";
+        }
+    ];
+    // PEM encoded RSA private key of the certificate in PKCS#1 or PKCS#8 format.
+    bytes private_key = 2 [
+        (validate.rules).bytes = {min_len: 1, max_len: 10000},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 10000;
+            example: "\"LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1...\"";
+        }
+    ];
+}
+
 message AzureADConfig {
     string client_id = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

@@ -2398,7 +2398,14 @@
       "SIGNATUREALGORITHM": "Алгоритм підпису",
       "NAMEIDFORMAT": "Формат NameID",
       "TRANSIENTMAPPINGATTRIBUTENAME": "Назва атрибута користувацького відображення",
-      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Альтернативна назва атрибута для відображення користувача у випадку, коли повернений `nameid-format` є `transient`, наприклад `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Альтернативна назва атрибута для відображення користувача у випадку, коли повернений `nameid-format` є `transient`, наприклад `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`",
+      "CERTIFICATE": "Сертифікат",
+      "PRIVATEKEY": "Приватний ключ",
+      "UPLOADCERTIFICATE": "Завантажити сертифікат",
+      "UPLOADPRIVATEKEY": "Завантажити приватний ключ",
+      "UPDATECERTIFICATE": "Замінити сертифікат",
+      "FILEMAXSIZEEXCEEDED": "Перевищено максимальний розмір файлу.",
+      "CERTIFICATE_DESC": "За потреби завантажте сертифікат і його приватний ключ (PEM), наприклад виданий центром сертифікації, якого вимагає постачальник ідентичності. Вони використовуються для підпису запитів і розшифрування тверджень. Якщо сертифікат не вказано, створюється самопідписаний сертифікат."
     },
     "TOAST": {
       "SAVED": "Успішно збережено.",
