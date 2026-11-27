@@ -31,7 +31,7 @@ import {
   RequestChallenges_OTPEmail_SendCodeSchema,
 } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { Checks, ChecksSchema, CheckUserSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
@@ -330,6 +330,21 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
       throw error;
     }
 
+    // A rejected check (e.g. a wrong code) is not a stale session: recreating the session would repeat the
+    // same check. OTP email/SMS codes are bound to the session they were sent for, so they can never be
+    // verified against a new one either.
+    const isRejectedCheck = isClassifiedError(error) && error.code === Code.InvalidArgument;
+    if (isRejectedCheck || checks?.otpEmail || checks?.otpSms) {
+      if (isClassifiedError(error) && error.isUserError) {
+        logger.warn("Could not verify session checks (client error)", {
+          grpcCode: error.code,
+          httpStatus: error.httpStatus,
+        });
+        return { error: t("couldNotVerify") };
+      }
+      throw error;
+    }
+
     const loginNameForCreation = options.loginName || recentSession?.loginName;
     const orgForCreation = options.organization || recentSession?.organization;
 
@@ -345,9 +360,11 @@ export async function updateOrCreateSession(options: UpdateSessionCommand) {
 
     if (users.details?.totalResult === BigInt(1) && users.result[0].userId) {
       const user = users.result[0];
+      // `checks` is already a message, so `create` returns the spread object as-is without converting nested
+      // init objects: `user` has to be a CheckUser message itself, otherwise serializing the request fails.
       const newChecks = create(ChecksSchema, {
         ...(checks || {}),
-        user: { search: { case: "userId", value: user.userId } } as any,
+        user: create(CheckUserSchema, { search: { case: "userId", value: user.userId } }),
       });
 
       const result = await createSessionAndUpdateCookie({
