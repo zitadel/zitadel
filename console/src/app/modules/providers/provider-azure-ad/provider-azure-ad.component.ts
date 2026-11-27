@@ -5,6 +5,7 @@ import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, take } from 'rxjs';
+import { providerOptionsFromStored } from 'src/app/modules/provider-options/provider-options';
 import {
   AddAzureADProviderRequest as AdminAddAzureADProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -171,6 +172,7 @@ export class ProviderAzureADComponent {
       .then((resp) => {
         const object = resp.toObject();
         this.provider = object.idp;
+        this.options = providerOptionsFromStored(this.provider?.config?.options);
         this.loading = false;
         if (this.provider?.config?.azureAd) {
           this.form.patchValue(this.provider.config.azureAd);

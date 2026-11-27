@@ -4,6 +4,7 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs/operators';
+import { providerOptionsFromStored } from 'src/app/modules/provider-options/provider-options';
 import {
   AddJWTProviderRequest as AdminAddJWTProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -152,6 +153,7 @@ export class ProviderJWTComponent {
       .getProviderByID(req)
       .then((resp) => {
         this.provider = resp.idp;
+        this.options = providerOptionsFromStored(this.provider?.config?.options);
         this.loading = false;
         if (this.provider?.config?.jwt) {
           this.form.patchValue(this.provider.config.jwt);

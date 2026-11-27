@@ -5,6 +5,7 @@ import { AbstractControl, UntypedFormControl, UntypedFormGroup } from '@angular/
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, take } from 'rxjs';
+import { providerOptionsFromStored } from 'src/app/modules/provider-options/provider-options';
 import {
   AddGitHubEnterpriseServerProviderRequest as AdminAddGitHubEnterpriseServerProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -156,6 +157,7 @@ export class ProviderGithubESComponent {
       .getProviderByID(req)
       .then((resp) => {
         this.provider = resp.idp;
+        this.options = providerOptionsFromStored(this.provider?.config?.options);
         this.loading = false;
         if (this.provider?.config?.githubEs) {
           this.form.patchValue(this.provider.config.githubEs);
