@@ -123,7 +123,11 @@ function getItemIcon(item: any): string {
 // --- GENERATOR ---
 
 function generateContent(title: string, description: string, items: any[], urlPrefix: string) {
+  // One line: a line break would end the quoted front matter value early, and
+  // the yaml parser fumadocs uses rejects the page.
   const safeDescription = description
+    .replace(/\s+/g, ' ')
+    .trim()
     .replace(/\\/g, '\\\\')
     .replace(/"/g, '\\"');
 
