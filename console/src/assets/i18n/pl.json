@@ -209,7 +209,9 @@
         "PREVIOUS_TABLE": {
           "TITLE": "Poprzednie Klucze Internetowe",
           "DESCRIPTION": "To są Twoje poprzednie klucze internetowe, które nie są już aktywne.",
-          "DEACTIVATED_ON": "Dezaktywowany dnia"
+          "DEACTIVATED_ON": "Dezaktywowany dnia",
+          "DELETE_TITLE": "Usuń poprzedni klucz internetowy",
+          "DELETE_DESCRIPTION": "Usunięcie tego poprzedniego klucza internetowego unieważnia wszystkie tokeny, które zostały nim podpisane. Tej akcji nie można cofnąć."
         }
       },
       "MESSAGE_TEXTS": {

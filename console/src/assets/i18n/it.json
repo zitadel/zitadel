@@ -209,7 +209,9 @@
         "PREVIOUS_TABLE": {
           "TITLE": "Chiavi Web Precedenti",
           "DESCRIPTION": "Queste sono le tue chiavi web precedenti che non sono più attive.",
-          "DEACTIVATED_ON": "Disattivata il"
+          "DEACTIVATED_ON": "Disattivata il",
+          "DELETE_TITLE": "Elimina chiave web precedente",
+          "DELETE_DESCRIPTION": "La rimozione di questa chiave web precedente invalida tutti i token firmati con essa. Questa azione non può essere annullata."
         }
       },
       "MESSAGE_TEXTS": {

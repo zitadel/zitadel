@@ -209,7 +209,9 @@
         "PREVIOUS_TABLE": {
           "TITLE": "Frühere Web Keys",
           "DESCRIPTION": "Dies sind deine früheren Web Keys, die nicht mehr aktiv sind.",
-          "DEACTIVATED_ON": "Deaktiviert am"
+          "DEACTIVATED_ON": "Deaktiviert am",
+          "DELETE_TITLE": "Früheren Web Key löschen",
+          "DELETE_DESCRIPTION": "Wenn du diesen früheren Web Key entfernst, werden alle Tokens ungültig, die damit signiert wurden. Diese Aktion kann nicht rückgängig gemacht werden."
         }
       },
       "MESSAGE_TEXTS": {
