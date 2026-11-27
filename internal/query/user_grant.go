@@ -582,8 +582,8 @@ func (j *userGrantJoins) add(col Column) bool {
 }
 
 // apply adds the marked joins in the order of the full list query.
-// Without the login_names3 join, the primary login name filter of the full
-// query is kept as a check that the user has a login name row (see userGrantHasLoginName).
+// Grants match if their user has a login name row (see userGrantHasLoginName).
+// login_names3 is joined on its primary row only, so it never removes grants.
 func (j userGrantJoins) apply(query sq.SelectBuilder) sq.SelectBuilder {
 	if j.users {
 		query = query.LeftJoin(join(UserIDCol, UserGrantUserID))
@@ -607,21 +607,21 @@ func (j userGrantJoins) apply(query sq.SelectBuilder) sq.SelectBuilder {
 		query = query.LeftJoin(join(GrantedOrgColumnId, ProjectGrantColumnGrantedOrgID))
 	}
 	if j.loginNames {
-		return query.LeftJoin(join(LoginNameUserIDCol, UserGrantUserID)).
-			Where(sq.Eq{LoginNameIsPrimaryCol.identifier(): true})
+		query = query.LeftJoin(userGrantPrimaryLoginNameJoin, true)
 	}
 	return query.Where(userGrantHasLoginName)
 }
 
 var (
 	userGrantProjectGrantJoin = join(ProjectGrantColumnGrantID, UserGrantGrantID) + " AND " + ProjectGrantColumnProjectID.identifier() + " = " + UserGrantProjectID.identifier()
+	// userGrantPrimaryLoginNameJoin joins the primary login name of the user, if there is one.
+	userGrantPrimaryLoginNameJoin = join(LoginNameUserIDCol, UserGrantUserID) + " AND " + LoginNameIsPrimaryCol.identifier() + " = ?"
 
-	// userGrantHasLoginName replaces the login_names3 join and its is_primary filter
-	// when only matching grants are counted or paged. login_names3 returns exactly one
-	// primary row for every user in login_names3_users: the user name, or the user name
-	// at the primary domain of the org if the domain policy requires it (every org with
-	// domains has exactly one primary domain). So both keep the same grants, but this
-	// check is a primary key lookup instead of expanding the view for every grant.
+	// userGrantHasLoginName decides which grants match, in the count, the page and the
+	// returned rows alike. It replaces the former login_names3 join with is_primary = true
+	// in the WHERE clause: login_names3 returns one primary row for every user in
+	// login_names3_users as long as every org with domains has exactly one primary domain,
+	// but this check is a primary key lookup instead of expanding the view for every grant.
 	userGrantHasLoginName = sq.Expr("EXISTS (SELECT 1 FROM " + projection.LoginNameUserProjectionTable +
 		" WHERE " + projection.LoginNameUserProjectionTable + "." + projection.LoginNameUserInstanceIDCol + " = " + UserGrantInstanceID.identifier() +
 		" AND " + projection.LoginNameUserProjectionTable + "." + projection.LoginNameUserIDCol + " = " + UserGrantUserID.identifier() + ")")
@@ -711,7 +711,8 @@ var userGrantsColumns = []string{
 // filters and the sorting need, so OFFSET skips narrow rows. Users, orgs, projects, login names
 // and role information are joined for the returned page only.
 // Without limit and offset nothing is skipped, so the grants are joined in a single pass.
-// With a sorting column the grant id breaks ties, so pages are stable.
+// Pages are always ordered: by the sorting column with the grant id as tie-break, or
+// by the grant id if no sorting column is set, so pages neither overlap nor skip grants.
 func (q *UserGrantsQueries) prepareUserGrantsQuery(ctx context.Context, permissionCheckV2 bool) (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, error)) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	filterJoins := q.filterJoins()
@@ -740,6 +741,8 @@ func (q *UserGrantsQueries) prepareUserGrantsQuery(ctx context.Context, permissi
 	page := q.matchingGrants(ctx, permissionCheckV2, pageJoins, pageColumns...)
 	if sorting {
 		page = page.OrderByClause(q.pageOrderClause("sort_col", UserGrantID.identifier()))
+	} else {
+		page = page.OrderBy(UserGrantID.identifier())
 	}
 	if q.Offset > 0 {
 		page = page.Offset(q.Offset)
@@ -759,11 +762,12 @@ func (q *UserGrantsQueries) prepareUserGrantsQuery(ctx context.Context, permissi
 		LeftJoin(join(UserOrgColumnId, UserResourceOwnerCol)).
 		LeftJoin(userGrantProjectGrantJoin).
 		LeftJoin(join(GrantedOrgColumnId, ProjectGrantColumnGrantedOrgID)).
-		LeftJoin(join(LoginNameUserIDCol, UserGrantUserID)).
-		LeftJoin(rolesJoin).
-		Where(sq.Eq{LoginNameIsPrimaryCol.identifier(): true})
+		LeftJoin(userGrantPrimaryLoginNameJoin, true).
+		LeftJoin(rolesJoin)
 	if sorting {
 		query = query.OrderByClause(q.pageOrderClause("page.sort_col", "page.id"))
+	} else {
+		query = query.OrderBy("page.id")
 	}
 	return query.PlaceholderFormat(sq.Dollar), scanUserGrants
 }

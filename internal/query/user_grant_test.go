@@ -127,7 +127,7 @@ var (
 		", granted_orgs.name" +
 		", granted_orgs.primary_domain" +
 		", (SELECT COUNT(*) FROM projections.user_grants5 WHERE " + userGrantsHasLoginName + " AND projections.user_grants5.instance_id = $1) AS total"
-	userGrantsJoins = " LEFT JOIN projections.users14 ON projections.user_grants5.user_id = projections.users14.id AND projections.user_grants5.instance_id = projections.users14.instance_id" +
+	userGrantsJoinsBeforeLoginNames = " LEFT JOIN projections.users14 ON projections.user_grants5.user_id = projections.users14.id AND projections.user_grants5.instance_id = projections.users14.instance_id" +
 		" LEFT JOIN projections.users14_humans ON projections.user_grants5.user_id = projections.users14_humans.user_id AND projections.user_grants5.instance_id = projections.users14_humans.instance_id" +
 		" LEFT JOIN projections.orgs1 ON projections.user_grants5.resource_owner = projections.orgs1.id AND projections.user_grants5.instance_id = projections.orgs1.instance_id" +
 		" LEFT JOIN projections.projects4 ON projections.user_grants5.project_id = projections.projects4.id AND projections.user_grants5.instance_id = projections.projects4.instance_id" +
@@ -135,11 +135,16 @@ var (
 		" LEFT JOIN projections.project_grants4 ON projections.user_grants5.grant_id = projections.project_grants4.grant_id AND projections.user_grants5.instance_id = projections.project_grants4.instance_id AND projections.project_grants4.project_id = projections.user_grants5.project_id" +
 		" LEFT JOIN projections.orgs1 AS granted_orgs ON projections.project_grants4.granted_org_id = granted_orgs.id AND projections.project_grants4.instance_id = granted_orgs.instance_id" +
 		" LEFT JOIN projections.login_names3 ON projections.user_grants5.user_id = projections.login_names3.user_id AND projections.user_grants5.instance_id = projections.login_names3.instance_id" +
-		" LEFT JOIN LATERAL (SELECT JSON_AGG( JSON_BUILD_OBJECT( 'role_key', pr.role_key, 'display_name', pr.display_name, 'group_name', pr.group_name ) ) as role_information FROM projections.project_roles4 pr WHERE pr.instance_id = projections.user_grants5.instance_id AND pr.project_id = projections.user_grants5.project_id AND pr.role_key = ANY(projections.user_grants5.roles)) as roles ON true "
+		" AND projections.login_names3.is_primary = "
+	userGrantsRolesJoin = " LEFT JOIN LATERAL (SELECT JSON_AGG( JSON_BUILD_OBJECT( 'role_key', pr.role_key, 'display_name', pr.display_name, 'group_name', pr.group_name ) ) as role_information FROM projections.project_roles4 pr WHERE pr.instance_id = projections.user_grants5.instance_id AND pr.project_id = projections.user_grants5.project_id AND pr.role_key = ANY(projections.user_grants5.roles)) as roles ON true "
 	// without limit and offset, the grants are joined in a single pass
-	userGrantsStmt = regexp.QuoteMeta(userGrantsSelect +
-		" FROM projections.user_grants5" + userGrantsJoins +
-		" WHERE projections.login_names3.is_primary = $2 AND projections.user_grants5.instance_id = $3")
+	userGrantsUnpagedStmtRaw = userGrantsSelect +
+		" FROM projections.user_grants5" + userGrantsJoins("$2") +
+		" WHERE " + userGrantsHasLoginName + " AND projections.user_grants5.instance_id = $3"
+	userGrantsStmt = regexp.QuoteMeta(userGrantsUnpagedStmtRaw)
+	// unpaged, sorted by creation date descending: the grant id breaks ties
+	userGrantsUnpagedSortedStmt = regexp.QuoteMeta(userGrantsUnpagedStmtRaw +
+		" ORDER BY projections.user_grants5.creation_date DESC, projections.user_grants5.id DESC")
 	// sorted by user id: the page is ordered and cut on the narrow ids, the grant id breaks ties
 	userGrantsSortedByUserIDStmt = userGrantsPageStmt(
 		"SELECT projections.user_grants5.id, projections.user_grants5.user_id AS sort_col FROM projections.user_grants5 WHERE "+userGrantsHasLoginName+" AND projections.user_grants5.instance_id = $2"+
@@ -152,10 +157,11 @@ var (
 			" ORDER BY sort_col DESC LIMIT 100 OFFSET 20000",
 		" ORDER BY page.sort_col DESC",
 	)
-	// no sorting: the page keeps the unordered LIMIT of the previous query
-	userGrantsLimitStmt = userGrantsPageStmt(
-		"SELECT projections.user_grants5.id FROM projections.user_grants5 WHERE "+userGrantsHasLoginName+" AND projections.user_grants5.instance_id = $2 LIMIT 2",
-		"",
+	// no sorting column: the page is ordered by the grant id, so pages neither overlap nor skip grants
+	userGrantsUnsortedPageStmt = userGrantsPageStmt(
+		"SELECT projections.user_grants5.id FROM projections.user_grants5 WHERE "+userGrantsHasLoginName+" AND projections.user_grants5.instance_id = $2"+
+			" ORDER BY projections.user_grants5.id LIMIT 2 OFFSET 4",
+		" ORDER BY page.id",
 	)
 	userGrantsCols = append(
 		userGrantCols,
@@ -568,6 +574,21 @@ func Test_UserGrantPrepares(t *testing.T) {
 				},
 			},
 			object: (*UserGrant)(nil),
+		},
+		{
+			name: "prepareUserGrantsQuery unpaged, sorted by creation date descending",
+			prepare: prepareUserGrantsQueryFor(authz.WithInstanceID(context.Background(), "instance-id"), &UserGrantsQueries{
+				SearchRequest: SearchRequest{SortingColumn: UserGrantCreationDate},
+			}),
+			want: want{
+				sqlExpectations: mockQueries(
+					userGrantsUnpagedSortedStmt,
+					nil,
+					nil,
+					"instance-id", true, "instance-id",
+				),
+			},
+			object: &UserGrants{UserGrants: []*UserGrant{}},
 		},
 		{
 			name:    "prepareUserGrantsQuery no result",
@@ -987,13 +1008,13 @@ func Test_UserGrantPrepares(t *testing.T) {
 			},
 		},
 		{
-			name: "prepareUserGrantsQuery multiple grants, limit without sorting",
+			name: "prepareUserGrantsQuery multiple grants, page without sorting column ordered by id",
 			prepare: prepareUserGrantsQueryFor(context.Background(), &UserGrantsQueries{
-				SearchRequest: SearchRequest{Limit: 2},
+				SearchRequest: SearchRequest{Limit: 2, Offset: 4},
 			}),
 			want: want{
 				sqlExpectations: mockQueries(
-					userGrantsLimitStmt,
+					userGrantsUnsortedPageStmt,
 					userGrantsCols,
 					[][]driver.Value{
 						{
@@ -1417,6 +1438,7 @@ func TestUserGrantsQueries_prepareUserGrantsQuery_narrowJoins(t *testing.T) {
 		loginNamesJoin = "LEFT JOIN projections.login_names3 ON "
 		rolesJoin      = "LEFT JOIN LATERAL"
 		isPrimary      = "projections.login_names3.is_primary = ?"
+		isPrimaryJoin  = "projections.login_names3.instance_id AND " + isPrimary
 	)
 
 	tests := []struct {
@@ -1446,10 +1468,10 @@ func TestUserGrantsQueries_prepareUserGrantsQuery_narrowJoins(t *testing.T) {
 				SearchRequest: SearchRequest{Limit: 10},
 				Queries:       []SearchQuery{loginName},
 			},
-			wantPage:      []string{loginNamesJoin, isPrimary},
-			wantNotInPage: []string{userGrantsHasLoginName, usersJoin, rolesJoin},
-			wantCount:     []string{loginNamesJoin, isPrimary},
-			wantNotCount:  []string{userGrantsHasLoginName},
+			wantPage:      []string{loginNamesJoin, isPrimaryJoin, userGrantsHasLoginName},
+			wantNotInPage: []string{usersJoin, rolesJoin, "WHERE " + isPrimary},
+			wantCount:     []string{loginNamesJoin, isPrimaryJoin, userGrantsHasLoginName},
+			wantNotCount:  []string{"WHERE " + isPrimary},
 			wantArgs:      []any{true, "login", "instance-id", true, "login", "instance-id", "instance-id", true},
 		},
 	}
@@ -1478,6 +1500,7 @@ func TestUserGrantsQueries_prepareUserGrantsQuery_narrowJoins(t *testing.T) {
 			for _, notWant := range tt.wantNotInPage {
 				assert.NotContains(t, page, notWant)
 			}
+			assert.NotContains(t, stmt, "WHERE "+isPrimary, "the outer query must keep every page id")
 			assert.Equal(t, tt.wantArgs, args)
 		})
 	}
@@ -1487,6 +1510,48 @@ func userGrantsPageStmt(page, orderBy string) string {
 	return regexp.QuoteMeta(userGrantsSelect +
 		" FROM (" + page + ") AS page" +
 		" JOIN projections.user_grants5 ON projections.user_grants5.id = page.id AND projections.user_grants5.instance_id = $3" +
-		userGrantsJoins +
-		" WHERE projections.login_names3.is_primary = $4" + orderBy)
+		userGrantsJoins("$4") + orderBy)
+}
+
+// userGrantsJoins returns the display joins, with the login_names3 join restricted to the
+// primary login name in its ON clause, so it never removes grants.
+func userGrantsJoins(isPrimaryPlaceholder string) string {
+	return userGrantsJoinsBeforeLoginNames + isPrimaryPlaceholder + userGrantsRolesJoin
+}
+
+func TestUserGrantsQueries_prepareUserGrantsQuery_permissionCheckV2(t *testing.T) {
+	ctx := authz.NewMockContext("instance-id", "org-id", "user-id")
+	projectID, err := NewUserGrantProjectIDSearchQuery("project-id")
+	require.NoError(t, err)
+	queries := &UserGrantsQueries{
+		SearchRequest: SearchRequest{Limit: 10, Offset: 20, SortingColumn: UserGrantUserID},
+		Queries:       []SearchQuery{projectID},
+	}
+	permissionJoin, permissionArgs := PermissionClause(
+		ctx,
+		UserGrantResourceOwner,
+		domain.PermissionUserGrantRead,
+		SingleOrgPermissionOption(queries.Queries),
+		WithProjectsPermissionOption(UserGrantProjectID),
+		OwnedRowsPermissionOption(UserGrantUserID),
+	)
+	require.NotEmpty(t, permissionArgs)
+
+	query, _ := queries.prepareUserGrantsQuery(ctx, true)
+	stmt, args, err := query.PlaceholderFormat(sq.Question).ToSql()
+	require.NoError(t, err)
+
+	// the permission join restricts both the count and the page, never the display joins
+	assert.Equal(t, 2, strings.Count(stmt, permissionJoin), stmt)
+	countEnd := strings.Index(stmt, ") AS total")
+	pageStart := strings.Index(stmt, "FROM (SELECT ")
+	pageEnd := strings.Index(stmt, ") AS page")
+	require.True(t, countEnd > 0 && pageStart > countEnd && pageEnd > pageStart, stmt)
+	assert.Contains(t, stmt[:countEnd], permissionJoin)
+	assert.Contains(t, stmt[pageStart:pageEnd], permissionJoin)
+
+	// in each of them the permission args come ahead of the WHERE args
+	matchingArgs := append(append([]any{}, permissionArgs...), "project-id", "instance-id")
+	wantArgs := append(append(append([]any{}, matchingArgs...), matchingArgs...), "instance-id", true)
+	assert.Equal(t, wantArgs, args)
 }
