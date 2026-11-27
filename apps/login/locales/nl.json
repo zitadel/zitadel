@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "Kon wachtwoord niet instellen",
         "couldNotResetPassword": "Kon wachtwoord niet resetten",
-        "couldNotVerifyPassword": "Kon wachtwoord niet verifiëren"
+        "couldNotVerifyPassword": "Kon wachtwoord niet verifiëren",
+        "codeInvalidOrExpired": "De code is onjuist of verlopen. Controleer de code of vraag een nieuwe aan."
       }
     },
     "change": {
@@ -433,7 +434,13 @@
       "couldNotResendInvite": "Kon uitnodiging niet opnieuw versturen",
       "inviteSendFailed": "Versturen van uitnodigingsmail mislukt",
       "emailSendFailed": "Versturen van verificatie-e-mail mislukt",
-      "contextMissing": "Er is een fout opgetreden. Probeer het opnieuw."
+      "contextMissing": "Er is een fout opgetreden. Probeer het opnieuw.",
+      "couldNotFindSession": "Sessie kon niet worden gevonden",
+      "couldNotUpdateSession": "Sessie kon niet worden bijgewerkt",
+      "invalidCode": "Ongeldige code. Probeer het opnieuw.",
+      "codeExpired": "Deze code is verlopen of al gebruikt. Vraag een nieuwe aan.",
+      "codeReused": "Deze code is al gebruikt. Wacht op de volgende code in je authenticator-app.",
+      "accountLocked": "Je account is vergrendeld na te veel mislukte pogingen. Neem contact op met jouw beheerder om jouw account te ontgrendelen."
     }
   },
   "authenticator": {

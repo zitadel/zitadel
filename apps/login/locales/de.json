@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "Passwort konnte nicht gesetzt werden",
         "couldNotResetPassword": "Passwort konnte nicht zurückgesetzt werden",
-        "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden"
+        "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden",
+        "codeInvalidOrExpired": "Der Code ist falsch oder abgelaufen. Prüfen Sie ihn oder fordern Sie einen neuen an."
       }
     },
     "change": {
@@ -433,7 +434,13 @@
       "couldNotResendInvite": "Einladung konnte nicht erneut gesendet werden",
       "inviteSendFailed": "Einladungs-E-Mail konnte nicht gesendet werden",
       "emailSendFailed": "Verifizierungs-E-Mail konnte nicht gesendet werden",
-      "contextMissing": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+      "contextMissing": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+      "couldNotFindSession": "Sitzung konnte nicht gefunden werden",
+      "couldNotUpdateSession": "Sitzung konnte nicht aktualisiert werden",
+      "invalidCode": "Ungültiger Code. Bitte versuchen Sie es erneut.",
+      "codeExpired": "Dieser Code ist abgelaufen oder wurde bereits verwendet. Fordern Sie einen neuen an.",
+      "codeReused": "Dieser Code wurde bereits verwendet. Warten Sie auf den nächsten Code in Ihrer Authenticator-App.",
+      "accountLocked": "Ihr Konto wurde nach zu vielen fehlgeschlagenen Versuchen gesperrt. Kontaktieren Sie Ihren Administrator, um Ihr Konto zu entsperren."
     }
   },
   "authenticator": {

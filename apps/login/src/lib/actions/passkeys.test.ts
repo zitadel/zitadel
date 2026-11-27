@@ -8,7 +8,8 @@ vi.mock("next/headers", () => ({
   headers: vi.fn(),
 }));
 
-vi.mock("@zitadel/client", () => ({
+vi.mock("@zitadel/client", async () => ({
+  Code: (await import("@connectrpc/connect")).Code,
   create: vi.fn((_schema: unknown, data: unknown) => data),
   Duration: vi.fn(),
   Timestamp: vi.fn(),

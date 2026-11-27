@@ -1,6 +1,7 @@
 import { changePassword, checkSessionAndSetPassword, resetPassword, sendPassword } from "@/lib/actions/password";
 import { ClassifiedConnectError } from "@/lib/server/grpc/interceptors/error-classification";
 import { Code, ConnectError } from "@connectrpc/connect";
+import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -783,5 +784,48 @@ describe("changePassword", () => {
 
     expect(result).toEqual({ error: "errors.couldNotSendResetLink" });
     expect(mockSetUserPassword).not.toHaveBeenCalled();
+  });
+
+  describe("with a reset code", () => {
+    const resetWithCode = () => changePassword({ userId: "user-1", password: "newpassword", code: "ABC123" });
+    const apiError = (code: Code, message: string) => new ClassifiedConnectError(new ConnectError(message, code));
+
+    beforeEach(() => {
+      mockGetUserByID.mockResolvedValue({ user: { userId: "user-1", state: UserState.ACTIVE } });
+    });
+
+    test("sets the password with the code", async () => {
+      mockSetUserPassword.mockResolvedValue({ details: {} });
+
+      const result = await resetWithCode();
+
+      expect(result).toEqual({ details: {} });
+      expect(mockSetUserPassword).toHaveBeenCalledWith(expect.objectContaining({ userId: "user-1", code: "ABC123" }));
+    });
+
+    test.each([
+      ["wrong", apiError(Code.InvalidArgument, "Code is invalid (CODE-woT0xc)")],
+      ["expired", apiError(Code.FailedPrecondition, "Code is expired (CODE-QvUQ4P)")],
+      ["already used", apiError(Code.FailedPrecondition, "Code not found (COMMAND-2M9fs)")],
+    ])("answers a %s code with a message instead of failing", async (_, error) => {
+      mockSetUserPassword.mockRejectedValue(error);
+
+      expect(await resetWithCode()).toEqual({ error: "set.errors.codeInvalidOrExpired" });
+    });
+
+    test("answers any other rejection with the generic message, not the API's text", async () => {
+      mockSetUserPassword.mockRejectedValue(apiError(Code.FailedPrecondition, "User is not initialised (COMMAND-Sfe4g)"));
+
+      expect(await resetWithCode()).toEqual({ error: "set.errors.couldNotSetPassword" });
+    });
+
+    test.each([
+      ["a server fault", apiError(Code.Internal, "Internal error")],
+      ["the API rejecting the login's own credentials", apiError(Code.Unauthenticated, "Token invalid")],
+    ])("rethrows %s", async (_, error) => {
+      mockSetUserPassword.mockRejectedValue(error);
+
+      await expect(resetWithCode()).rejects.toBe(error);
+    });
   });
 });

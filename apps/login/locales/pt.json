@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "Não foi possível definir a senha",
         "couldNotResetPassword": "Não foi possível redefinir a senha",
-        "couldNotVerifyPassword": "Não foi possível verificar a senha"
+        "couldNotVerifyPassword": "Não foi possível verificar a senha",
+        "codeInvalidOrExpired": "O código está incorreto ou expirou. Verifique-o ou solicite um novo."
       }
     },
     "change": {
@@ -433,7 +434,13 @@
       "couldNotResendInvite": "Não foi possível reenviar o convite",
       "inviteSendFailed": "Falha ao enviar e-mail de convite",
       "emailSendFailed": "Falha ao enviar e-mail de verificação",
-      "contextMissing": "Ocorreu um erro. Por favor, tente novamente."
+      "contextMissing": "Ocorreu um erro. Por favor, tente novamente.",
+      "couldNotFindSession": "Não foi possível encontrar a sessão",
+      "couldNotUpdateSession": "Não foi possível atualizar a sessão",
+      "invalidCode": "Código inválido. Tente novamente.",
+      "codeExpired": "Este código expirou ou já foi usado. Solicite um novo.",
+      "codeReused": "Este código já foi usado. Aguarde o próximo código no seu aplicativo autenticador.",
+      "accountLocked": "Sua conta foi bloqueada após muitas tentativas malsucedidas. Entre em contato com o administrador para desbloquear sua conta."
     }
   },
   "authenticator": {

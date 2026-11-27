@@ -39,11 +39,11 @@ import { getUserAgent } from "@/lib/server/fingerprint";
 
 import { PromiseCache } from "@/lib/server/cache";
 import { applyCustomHeaders } from "@/lib/server/custom-headers";
-import { errorClassificationInterceptor, isClassifiedError } from "@/lib/server/grpc/interceptors/error-classification";
+import { errorClassificationInterceptor } from "@/lib/server/grpc/interceptors/error-classification";
 import { otelGrpcInterceptor } from "@/lib/server/grpc/interceptors/otel";
 import { retryUnavailableInterceptor } from "@/lib/server/grpc/interceptors/retry";
 import { createServiceForHost } from "@/lib/server/service";
-import { Code, Interceptor } from "@connectrpc/connect";
+import { Interceptor } from "@connectrpc/connect";
 
 const useCache = process.env.API_CACHE_ENABLED !== "false";
 
@@ -1223,14 +1223,7 @@ export async function setUserPassword({
 
   const userService: Client<typeof UserService> = await createServiceForHost(UserService, serviceConfig);
 
-  return userService.setPassword(payload, {}).catch((error) => {
-    // throw error if failed precondition (ex. User is not yet initialized)
-    if (isClassifiedError(error) && error.code === Code.FailedPrecondition && error.message) {
-      return { error: error.message };
-    } else {
-      throw error;
-    }
-  });
+  return userService.setPassword(payload, {});
 }
 
 export async function setPassword({

@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "Nie można ustawić hasła",
         "couldNotResetPassword": "Nie można zresetować hasła",
-        "couldNotVerifyPassword": "Nie można zweryfikować hasła"
+        "couldNotVerifyPassword": "Nie można zweryfikować hasła",
+        "codeInvalidOrExpired": "Kod jest nieprawidłowy lub wygasł. Sprawdź go lub poproś o nowy."
       }
     },
     "change": {
@@ -433,7 +434,13 @@
       "couldNotResendInvite": "Nie udało się ponownie wysłać zaproszenia",
       "inviteSendFailed": "Nie udało się wysłać wiadomości e-mail z zaproszeniem",
       "emailSendFailed": "Nie udało się wysłać wiadomości e-mail weryfikacyjnej",
-      "contextMissing": "Wystąpił błąd. Spróbuj ponownie."
+      "contextMissing": "Wystąpił błąd. Spróbuj ponownie.",
+      "couldNotFindSession": "Nie można znaleźć sesji",
+      "couldNotUpdateSession": "Nie można zaktualizować sesji",
+      "invalidCode": "Nieprawidłowy kod. Spróbuj ponownie.",
+      "codeExpired": "Ten kod wygasł lub został już użyty. Poproś o nowy.",
+      "codeReused": "Ten kod został już użyty. Poczekaj na następny kod w aplikacji uwierzytelniającej.",
+      "accountLocked": "Twoje konto zostało zablokowane po zbyt wielu nieudanych próbach. Skontaktuj się z administratorem, aby odblokować konto."
     }
   },
   "authenticator": {

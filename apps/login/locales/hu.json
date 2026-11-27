@@ -100,7 +100,8 @@
       "errors": {
         "couldNotSetPassword": "Nem sikerült beállítani a jelszót",
         "couldNotResetPassword": "Nem sikerült visszaállítani a jelszót",
-        "couldNotVerifyPassword": "Nem sikerült ellenőrizni a jelszót"
+        "couldNotVerifyPassword": "Nem sikerült ellenőrizni a jelszót",
+        "codeInvalidOrExpired": "A kód hibás vagy lejárt. Ellenőrizd, vagy kérj egy újat."
       }
     },
     "change": {
@@ -433,7 +434,13 @@
       "couldNotResendInvite": "Nem sikerült újraküldeni a meghívást",
       "inviteSendFailed": "Nem sikerült elküldeni a meghívó e-mailt",
       "emailSendFailed": "Nem sikerült elküldeni az ellenőrző e-mailt",
-      "contextMissing": "Hiba történt. Kérjük, próbáld újra."
+      "contextMissing": "Hiba történt. Kérjük, próbáld újra.",
+      "couldNotFindSession": "A munkamenet nem található",
+      "couldNotUpdateSession": "A munkamenet frissítése nem sikerült",
+      "invalidCode": "Érvénytelen kód. Kérjük, próbálja újra.",
+      "codeExpired": "Ez a kód lejárt, vagy már felhasználták. Kérj egy újat.",
+      "codeReused": "Ezt a kódot már felhasználták. Várd meg a következő kódot a hitelesítő alkalmazásodban.",
+      "accountLocked": "A fiókod túl sok sikertelen próbálkozás miatt zárolva lett. A fiókod feloldásához fordulj a rendszergazdához."
     }
   },
   "authenticator": {
