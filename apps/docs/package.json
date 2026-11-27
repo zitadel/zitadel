@@ -31,7 +31,7 @@
     "clsx": "^2.1.1",
     "fumadocs-core": "16.19.5",
     "fumadocs-mdx": "14.3.2",
-    "fumadocs-openapi": "10.10.3",
+    "fumadocs-openapi": "10.8.2",
     "fumadocs-ui": "16.19.5",
     "js-yaml": "^4.3.2",
     "lucide-react": "^0.577.0",
