@@ -500,6 +500,8 @@ message SAMLConfig {
     optional bool federated_logout_enabled = 6;
     // Optional value to indicate the configured Signing Algorithm used to sign SAML requests and responses.
     optional zitadel.idp.v1.SAMLSignatureAlgorithm signature_algorithm = 7;
+    // URL from which the SAML identity provider metadata is fetched.
+    optional string metadata_url = 8;
 }
 
 message AzureADConfig {

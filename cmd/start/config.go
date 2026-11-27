@@ -39,6 +39,7 @@ import (
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/samlidpmetadata"
 	"github.com/zitadel/zitadel/internal/serviceping"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
 )
@@ -88,6 +89,7 @@ type Config struct {
 	Quotas              *QuotasConfig
 	Telemetry           *handlers.TelemetryPusherConfig
 	ServicePing         *serviceping.Config
+	SAMLIDPMetadata     *samlidpmetadata.Config
 	HTTPClient          *http.ClientConfig
 }
 
