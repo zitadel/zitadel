@@ -1,6 +1,7 @@
 import {
   Cookie,
   addSessionToCookie,
+  explainSessionCookieMiss,
   getAllSessionCookieIds,
   getAllSessions,
   getLanguageCookie,
@@ -16,7 +17,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { signSession, verifySession } from "@/lib/server/session-cookie-signature";
 import { timestampDate, timestampFromMs } from "@zitadel/client";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 
 // Mock logger - use vi.hoisted to ensure it's defined before vi.mock runs
 const mockLogger = vi.hoisted(() => ({
@@ -29,6 +30,7 @@ const mockLogger = vi.hoisted(() => ({
 // Mock dependencies
 vi.mock("next/headers", () => ({
   cookies: vi.fn(),
+  headers: vi.fn(),
 }));
 
 vi.mock("@/lib/server/logger", () => ({
@@ -1135,6 +1137,148 @@ describe("cookies", () => {
       expect(sessions).toHaveLength(1);
       expect(sessions[0]).toMatchObject(victimSession);
       expect(verifySession(sessions[0])).toBe(true);
+    });
+  });
+
+  describe("explainSessionCookieMiss", () => {
+    const entry: Cookie = {
+      id: "session-id",
+      token: "session-token",
+      loginName: "Test@Example.com",
+      organization: "test-org-id",
+      creationTs: "1700000000000",
+      expirationTs: "1900000000000",
+      changeTs: "1700000000000",
+    };
+    const otherEntry: Cookie = { ...entry, id: "other-session-id", token: "other-token", loginName: "other@example.com" };
+    const byLoginName = { by: "mostRecent", loginName: "Test@Example.com", organization: "test-org-id" } as const;
+
+    // what the browser sent: the raw `sessions` cookie value and the Cookie header around it
+    function browserSends(value: string | undefined, cookieHeader?: string) {
+      mockCookies.get.mockReturnValue(value === undefined ? undefined : { value });
+      const header = cookieHeader ?? (value === undefined ? "" : `sessions=${encodeURIComponent(value)}`);
+      vi.mocked(headers).mockResolvedValue(new Headers(header ? { cookie: header } : {}) as any);
+    }
+
+    it("cookie_missing: the browser sent no sessions cookie", async () => {
+      browserSends(undefined, "fingerprintId=abc; NEXT_LOCALE=en");
+
+      await expect(explainSessionCookieMiss(byLoginName)).resolves.toEqual({
+        reason: "cookie_missing",
+        context: {
+          lookupBy: "mostRecent",
+          hasLoginName: true,
+          hasOrganization: true,
+          hasSessionId: false,
+          sessionId: undefined,
+          cookieEntries: 0,
+          cookieEntriesDropped: 0,
+          cookieSize: 0,
+          cookieHeaderSize: "fingerprintId=abc; NEXT_LOCALE=en".length,
+          sessionsCookieCount: 0,
+          entriesMatchingLoginName: 0,
+          entriesMatchingLoginNameIgnoringCase: 0,
+        },
+      });
+    });
+
+    it("cookie_invalid: the cookie is not readable", async () => {
+      browserSends("not-json");
+
+      await expect(explainSessionCookieMiss(byLoginName)).resolves.toMatchObject({
+        reason: "cookie_invalid",
+        context: { cookieEntries: 0 },
+      });
+    });
+
+    it("cookie_invalid: the wanted entry has no valid signature", async () => {
+      browserSends(JSON.stringify([{ ...entry, sig: "forged" }, signSession(otherEntry)]));
+
+      await expect(getMostRecentCookieWithLoginname(byLoginName)).resolves.toBeUndefined();
+      await expect(explainSessionCookieMiss(byLoginName)).resolves.toMatchObject({
+        reason: "cookie_invalid",
+        context: { cookieEntries: 2, cookieEntriesDropped: 1 },
+      });
+    });
+
+    it("session_entry_not_found: the cookie only holds entries of other accounts", async () => {
+      const { value } = stored(otherEntry);
+      browserSends(value);
+
+      await expect(explainSessionCookieMiss(byLoginName)).resolves.toMatchObject({
+        reason: "session_entry_not_found",
+        context: {
+          cookieEntries: 1,
+          cookieEntriesDropped: 0,
+          cookieSize: `sessions=${encodeURIComponent(value)}`.length,
+          sessionsCookieCount: 1,
+          entriesMatchingLoginName: 0,
+          entriesMatchingLoginNameIgnoringCase: 0,
+        },
+      });
+    });
+
+    it("session_entry_not_found: reports an entry that only differs by organization or casing", async () => {
+      browserSends(
+        stored({ ...entry, organization: "another-org-id" }, { ...otherEntry, loginName: "test@example.com" }).value,
+      );
+
+      await expect(explainSessionCookieMiss(byLoginName)).resolves.toMatchObject({
+        reason: "session_entry_not_found",
+        context: { entriesMatchingLoginName: 1, entriesMatchingLoginNameIgnoringCase: 2 },
+      });
+    });
+
+    it("reports more than one sessions cookie in the Cookie header", async () => {
+      const { value } = stored(otherEntry);
+      browserSends(value, `sessions=${encodeURIComponent(value)}; other=1; sessions=%5B%5D`);
+
+      await expect(explainSessionCookieMiss(byLoginName)).resolves.toMatchObject({ context: { sessionsCookieCount: 2 } });
+    });
+
+    it("never puts tokens, signatures or login names into the context", async () => {
+      const { value } = stored(entry, otherEntry);
+      browserSends(value);
+
+      const miss = await explainSessionCookieMiss({ by: "loginName", loginName: "missing@example.com" });
+
+      const context = JSON.stringify(miss.context);
+      for (const secret of [entry.token, otherEntry.token, entry.loginName, otherEntry.loginName, "missing@example.com"]) {
+        expect(context).not.toContain(secret);
+      }
+      for (const signedEntry of JSON.parse(value)) {
+        expect(context).not.toContain(signedEntry.sig);
+      }
+    });
+
+    // The explanation applies the rule of the getter that found nothing. An entry of another
+    // organization that lost its signature is the wanted one for a lookup by id without organization,
+    // and not for a lookup that asks for the organization.
+    it("explains a miss with the same rule as the getter of the lookup", async () => {
+      browserSends(JSON.stringify([{ ...entry, organization: "another-org-id", sig: "forged" }, signSession(otherEntry)]));
+
+      await expect(getSessionCookieById({ sessionId: "session-id" })).resolves.toBeUndefined();
+      await expect(explainSessionCookieMiss({ by: "id", sessionId: "session-id" })).resolves.toMatchObject({
+        reason: "cookie_invalid",
+        context: {
+          lookupBy: "id",
+          hasSessionId: true,
+          hasLoginName: false,
+          hasOrganization: false,
+          sessionId: "session-id",
+        },
+      });
+
+      await expect(
+        explainSessionCookieMiss({ by: "id", sessionId: "session-id", organization: "test-org-id" }),
+      ).resolves.toMatchObject({ reason: "session_entry_not_found" });
+    });
+
+    it("cookie_invalid: no entry of the cookie has a valid signature for a lookup without a filter", async () => {
+      browserSends(JSON.stringify([{ ...entry, sig: "forged" }]));
+
+      await expect(getMostRecentSessionCookie()).resolves.toBeUndefined();
+      await expect(explainSessionCookieMiss({ by: "mostRecent" })).resolves.toMatchObject({ reason: "cookie_invalid" });
     });
   });
 });

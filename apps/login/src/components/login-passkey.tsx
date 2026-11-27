@@ -3,7 +3,7 @@
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
 import { sendPasskey } from "@/lib/actions/passkeys";
 import { updateOrCreateSession } from "@/lib/actions/session";
-import { handleServerActionResponse } from "@/lib/client-utils";
+import { handleServerActionResponse, isExternalUrl } from "@/lib/client-utils";
 import { useSettledAction } from "@/lib/settled-action";
 import { create, JsonObject } from "@zitadel/client";
 import { RequestChallengesSchema, UserVerificationRequirement } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
@@ -15,8 +15,15 @@ import { Alert } from "./alert";
 import { AutoSubmitForm } from "./auto-submit-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
+import { RestartSignIn } from "./restart-sign-in";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
+
+// How long Continue stays disabled after an external redirect that may not unload the page.
+const EXTERNAL_REDIRECT_RELEASE_MS = 5000;
+
+// Shows an error of the running ceremony; sessionLost offers to restart the sign-in.
+type ReportError = (message: string, sessionLost?: boolean) => void;
 
 // either loginName or sessionId must be provided
 type Props = {
@@ -30,56 +37,101 @@ type Props = {
 
 export function LoginPasskey({ loginName, sessionId, requestId, altPassword, organization, login = true }: Props) {
   const [error, setError] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  // the session of this step is gone, retrying cannot succeed
+  const [sessionLost, setSessionLost] = useState<boolean>(false);
+  // The page starts the passkey ceremony on mount, so Continue starts disabled.
+  const [loading, setLoading] = useState<boolean>(true);
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const t = useTranslations("passkey");
   const router = useRouter();
   const runAction = useSettledAction();
 
-  const initialized = useRef(false);
+  // The running ceremony (challenge, navigator.credentials.get, verification), or null.
+  // At most one runs at a time; a ceremony whose controller is no longer current drops
+  // its results. A ref, not state: two taps can land before React commits loading=true.
+  const ceremony = useRef<AbortController | null>(null);
+  const releaseTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
-    if (!initialized.current) {
-      initialized.current = true;
-      setLoading(true);
-      updateOrCreateSessionForChallenge()
-        .then((response) => {
-          const pK = response?.challenges?.webAuthN?.publicKeyCredentialRequestOptions?.publicKey;
+    runCeremony();
 
-          if (!pK) {
-            setError(t("verify.errors.couldNotRequestChallenge"));
-            setLoading(false);
-            return;
-          }
+    // Safari can restore the page from the back/forward cache after it navigated away,
+    // for example when going back from an app's callback; make Continue usable again.
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        releaseCeremony();
+      }
+    };
+    window.addEventListener("pageshow", onPageShow);
 
-          return submitLoginAndContinue(pK)
-            .catch((error) => {
-              setError(error instanceof Error ? error.message : String(error));
-              return;
-            })
-            .finally(() => {
-              setLoading(false);
-            });
-        })
-        .catch((error) => {
-          setError(error instanceof Error ? error.message : String(error));
-          return;
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
+    // Leaving the page any way (Use Password, Back, navigation) aborts the ceremony.
+    // Under strict mode the first run is aborted here before it reaches the prompt.
+    return () => {
+      window.removeEventListener("pageshow", onPageShow);
+      abortCeremony();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function updateOrCreateSessionForChallenge(
-    userVerificationRequirement: number = login
-      ? UserVerificationRequirement.REQUIRED
-      : UserVerificationRequirement.DISCOURAGED,
-  ) {
+  function runCeremony() {
+    if (ceremony.current) {
+      return;
+    }
+    const controller = new AbortController();
+    ceremony.current = controller;
+    clearTimeout(releaseTimer.current);
     setError("");
+    setSessionLost(false);
     setLoading(true);
+
+    const isCurrent = () => ceremony.current === controller;
+    // Ignored once this ceremony was aborted or replaced.
+    const report: ReportError = (message, sessionLost = false) => {
+      if (isCurrent()) {
+        setError(message);
+        setSessionLost(sessionLost);
+      }
+    };
+
+    void (async () => {
+      let navigating = false;
+      try {
+        const publicKey = await requestChallenge(report);
+        if (!publicKey || !isCurrent()) {
+          return;
+        }
+
+        const credential = await getCredential(publicKey, controller.signal, report);
+        if (!credential || !isCurrent()) {
+          return;
+        }
+
+        navigating = await submitLogin(credential, isCurrent, report);
+      } finally {
+        // While the page navigates away after a successful verification, keep Continue
+        // disabled and the ceremony current, so no new challenge replaces the verified one.
+        if (isCurrent() && !navigating) {
+          ceremony.current = null;
+          setLoading(false);
+        }
+      }
+    })();
+  }
+
+  function abortCeremony() {
+    clearTimeout(releaseTimer.current);
+    ceremony.current?.abort();
+    ceremony.current = null;
+  }
+
+  function releaseCeremony() {
+    clearTimeout(releaseTimer.current);
+    ceremony.current = null;
+    setLoading(false);
+  }
+
+  async function requestChallenge(report: ReportError): Promise<any> {
     const sessionResponse = await runAction(() =>
       updateOrCreateSession({
         loginName,
@@ -88,31 +140,80 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
         challenges: create(RequestChallengesSchema, {
           webAuthN: {
             domain: "",
-            userVerificationRequirement,
+            userVerificationRequirement: login
+              ? UserVerificationRequirement.REQUIRED
+              : UserVerificationRequirement.DISCOURAGED,
           },
         }),
         requestId,
       }),
-    )
-      .catch((error) => {
-        console.error(error);
-        setError(t("verify.errors.couldNotRequestChallenge"));
-        return;
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    ).catch((error) => {
+      console.error(error);
+      return undefined;
+    });
 
     if (sessionResponse && "error" in sessionResponse && sessionResponse.error) {
-      setError(sessionResponse.error);
-      return;
+      report(sessionResponse.error, "sessionLost" in sessionResponse);
+      return undefined;
     }
 
-    return sessionResponse;
+    const publicKey = sessionResponse?.challenges?.webAuthN?.publicKeyCredentialRequestOptions?.publicKey;
+
+    if (!publicKey) {
+      report(t("verify.errors.couldNotRequestChallenge"));
+      return undefined;
+    }
+
+    return publicKey;
   }
 
-  async function submitLogin(data: JsonObject) {
-    setLoading(true);
+  async function getCredential(publicKey: any, signal: AbortSignal, report: ReportError): Promise<JsonObject | undefined> {
+    try {
+      publicKey.challenge = coerceToArrayBuffer(publicKey.challenge, "publicKey.challenge");
+      publicKey.allowCredentials.map((listItem: any) => {
+        listItem.id = coerceToArrayBuffer(listItem.id, "publicKey.allowCredentials.id");
+      });
+
+      const assertedCredential: any = await navigator.credentials.get({
+        publicKey,
+        signal,
+      });
+
+      if (!assertedCredential) {
+        report(t("verify.errors.couldNotRetrievePasskey"));
+        return undefined;
+      }
+
+      const authData = new Uint8Array(assertedCredential.response.authenticatorData);
+      const clientDataJSON = new Uint8Array(assertedCredential.response.clientDataJSON);
+      const rawId = new Uint8Array(assertedCredential.rawId);
+      const sig = new Uint8Array(assertedCredential.response.signature);
+      const userHandle = new Uint8Array(assertedCredential.response.userHandle);
+      return {
+        id: assertedCredential.id,
+        rawId: coerceToBase64Url(rawId, "rawId"),
+        type: assertedCredential.type,
+        response: {
+          authenticatorData: coerceToBase64Url(authData, "authData"),
+          clientDataJSON: coerceToBase64Url(clientDataJSON, "clientDataJSON"),
+          signature: coerceToBase64Url(sig, "sig"),
+          userHandle: coerceToBase64Url(userHandle, "userHandle"),
+        },
+      };
+    } catch (error: any) {
+      // Handle passkey cancellation or errors
+      if (error?.name === "NotAllowedError") {
+        report(t("verify.errors.verificationCancelled"));
+      } else {
+        report(t("verify.errors.verificationFailed"));
+      }
+      console.error("Passkey verification error:", error);
+      return undefined;
+    }
+  }
+
+  // Returns true when the page is navigating away (redirect or SAML post).
+  async function submitLogin(data: JsonObject, isCurrent: () => boolean, report: ReportError): Promise<boolean> {
     try {
       const response = await runAction(() =>
         sendPasskey({
@@ -126,69 +227,37 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
         }),
       );
 
-      const handled = handleServerActionResponse(response, router, setSamlData, setError);
+      // The user left for another step while the assertion was being verified.
+      if (!isCurrent()) {
+        return false;
+      }
+
+      let failed = false;
+      const handled = handleServerActionResponse(response, router, setSamlData, (message) => {
+        failed = true;
+        report(message, !!response && "sessionLost" in response);
+      });
 
       if (!handled) {
-        if (!response) {
-          setError(t("verify.errors.noResponseReceived"));
-        } else {
-          setError(t("verify.errors.noRedirectProvided"));
-        }
+        report(t(response ? "verify.errors.noRedirectProvided" : "verify.errors.noResponseReceived"));
+        return false;
       }
+
+      if (failed) {
+        return false;
+      }
+
+      // A custom-scheme or other external redirect (a native app's callback) may open
+      // another app and leave this page in place, so make Continue usable again later.
+      if (response && "redirect" in response && response.redirect && isExternalUrl(response.redirect)) {
+        releaseTimer.current = setTimeout(releaseCeremony, EXTERNAL_REDIRECT_RELEASE_MS);
+      }
+
+      return true;
     } catch {
-      setError(t("verify.errors.couldNotVerifyPasskey"));
-    } finally {
-      setLoading(false);
+      report(t("verify.errors.couldNotVerifyPasskey"));
+      return false;
     }
-  }
-
-  async function submitLoginAndContinue(publicKey: any): Promise<boolean | void> {
-    publicKey.challenge = coerceToArrayBuffer(publicKey.challenge, "publicKey.challenge");
-    publicKey.allowCredentials.map((listItem: any) => {
-      listItem.id = coerceToArrayBuffer(listItem.id, "publicKey.allowCredentials.id");
-    });
-
-    return navigator.credentials
-      .get({
-        publicKey,
-      })
-      .then((assertedCredential: any) => {
-        if (!assertedCredential) {
-          setError(t("verify.errors.couldNotRetrievePasskey"));
-          return;
-        }
-
-        const authData = new Uint8Array(assertedCredential.response.authenticatorData);
-        const clientDataJSON = new Uint8Array(assertedCredential.response.clientDataJSON);
-        const rawId = new Uint8Array(assertedCredential.rawId);
-        const sig = new Uint8Array(assertedCredential.response.signature);
-        const userHandle = new Uint8Array(assertedCredential.response.userHandle);
-        const data = {
-          id: assertedCredential.id,
-          rawId: coerceToBase64Url(rawId, "rawId"),
-          type: assertedCredential.type,
-          response: {
-            authenticatorData: coerceToBase64Url(authData, "authData"),
-            clientDataJSON: coerceToBase64Url(clientDataJSON, "clientDataJSON"),
-            signature: coerceToBase64Url(sig, "sig"),
-            userHandle: coerceToBase64Url(userHandle, "userHandle"),
-          },
-        };
-
-        return submitLogin(data);
-      })
-      .catch((error) => {
-        // Handle passkey cancellation or errors
-        if (error?.name === "NotAllowedError") {
-          setError(t("verify.errors.verificationCancelled"));
-        } else {
-          setError(t("verify.errors.verificationFailed"));
-        }
-        console.error("Passkey verification error:", error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
   }
 
   return (
@@ -197,6 +266,7 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
       {error && (
         <div className="py-4">
           <Alert>{error}</Alert>
+          {sessionLost && <RestartSignIn loginName={loginName} organization={organization} requestId={requestId} />}
         </div>
       )}
       <div className="mt-8 flex w-full flex-row items-center">
@@ -205,6 +275,8 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
             type="button"
             variant={ButtonVariants.Secondary}
             onClick={() => {
+              // Close the open passkey prompt now, not only once the next page unmounts this one.
+              abortCeremony();
               const params = new URLSearchParams();
 
               if (loginName) {
@@ -241,28 +313,8 @@ export function LoginPasskey({ loginName, sessionId, requestId, altPassword, org
           className="self-end"
           variant={ButtonVariants.Primary}
           disabled={loading}
-          onClick={async () => {
-            const response = await updateOrCreateSessionForChallenge().finally(() => {
-              setLoading(false);
-            });
-
-            const pK = response?.challenges?.webAuthN?.publicKeyCredentialRequestOptions?.publicKey;
-
-            if (!pK) {
-              setError(t("verify.errors.couldNotRequestChallenge"));
-              return;
-            }
-
-            setLoading(true);
-
-            return submitLoginAndContinue(pK)
-              .catch((error) => {
-                setError(error instanceof Error ? error.message : String(error));
-                return;
-              })
-              .finally(() => {
-                setLoading(false);
-              });
+          onClick={() => {
+            runCeremony();
           }}
           data-testid="submit-button"
         >
