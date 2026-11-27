@@ -17,6 +17,64 @@ var (
 	GrantMemberCascadeRemovedType = grantEventTypePrefix + member.CascadeRemovedEventType
 )
 
+const (
+	// ProjectGrantMemberRoleSearchType is the object type of the roles a user holds as member of the grants of a project.
+	// The fields belong to the project aggregate, the object ID is the user ID and the field name is the grant ID.
+	// So the roles of one membership are replaced or removed without touching the memberships of the user in other
+	// grants of the project, removing a grant removes the roles of all its members and removing the project removes all of them.
+	ProjectGrantMemberRoleSearchType     = "project_grant_member_role"
+	ProjectGrantMemberRoleObjectRevision = uint8(1)
+)
+
+func grantMemberSearchObject(userID string) eventstore.Object {
+	return eventstore.Object{
+		Type:     ProjectGrantMemberRoleSearchType,
+		ID:       userID,
+		Revision: ProjectGrantMemberRoleObjectRevision,
+	}
+}
+
+func setGrantMemberRoleFields(aggregate *eventstore.Aggregate, userID, grantID string, roles []string) []*eventstore.FieldOperation {
+	ops := make([]*eventstore.FieldOperation, len(roles))
+	for i, role := range roles {
+		ops[i] = eventstore.SetField(
+			aggregate,
+			grantMemberSearchObject(userID),
+			grantID,
+			&eventstore.Value{
+				Value:       role,
+				ShouldIndex: true,
+			},
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
+			eventstore.FieldTypeValue,
+		)
+	}
+	return ops
+}
+
+func removeGrantMemberRoleFields(aggregate *eventstore.Aggregate, userID, grantID string) *eventstore.FieldOperation {
+	return eventstore.RemoveSearchFieldsByAggregateAndObjectAndField(aggregate, grantMemberSearchObject(userID), grantID)
+}
+
+// removeGrantMembersRoleFields removes the roles of all members of the grant.
+func removeGrantMembersRoleFields(aggregate *eventstore.Aggregate, grantID string) *eventstore.FieldOperation {
+	return eventstore.RemoveSearchFields(map[eventstore.FieldType]any{
+		eventstore.FieldTypeInstanceID:     aggregate.InstanceID,
+		eventstore.FieldTypeResourceOwner:  aggregate.ResourceOwner,
+		eventstore.FieldTypeAggregateType:  aggregate.Type,
+		eventstore.FieldTypeAggregateID:    aggregate.ID,
+		eventstore.FieldTypeObjectType:     ProjectGrantMemberRoleSearchType,
+		eventstore.FieldTypeObjectRevision: ProjectGrantMemberRoleObjectRevision,
+		eventstore.FieldTypeFieldName:      grantID,
+	})
+}
+
 func NewAddProjectGrantMemberUniqueConstraint(projectID, userID, grantID string) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueProjectGrantMemberType,
@@ -59,6 +117,10 @@ func grantMemberOwnerTags(agg *eventstore.Aggregate, userID, userResourceOwner, 
 
 func (e *GrantMemberAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewAddProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID).WithOwners(grantMemberOwnerTags(e.Aggregate(), e.UserID, e.userResourceOwner, e.GrantID, e.grantedOrg)...)}
+}
+
+func (e *GrantMemberAddedEvent) Fields() []*eventstore.FieldOperation {
+	return setGrantMemberRoleFields(e.Aggregate(), e.UserID, e.GrantID, e.Roles)
 }
 
 func (e *GrantMemberAddedEvent) WithOwnerOrgs(userResourceOwner, grantedOrg string) *GrantMemberAddedEvent {
@@ -115,6 +177,14 @@ func (e *GrantMemberChangedEvent) UniqueConstraints() []*eventstore.UniqueConstr
 	return nil
 }
 
+// Fields removes the roles of the membership first and sets the new roles after.
+func (e *GrantMemberChangedEvent) Fields() []*eventstore.FieldOperation {
+	return append(
+		[]*eventstore.FieldOperation{removeGrantMemberRoleFields(e.Aggregate(), e.UserID, e.GrantID)},
+		setGrantMemberRoleFields(e.Aggregate(), e.UserID, e.GrantID, e.Roles)...,
+	)
+}
+
 func NewProjectGrantMemberChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -160,6 +230,10 @@ func (e *GrantMemberRemovedEvent) Payload() interface{} {
 
 func (e *GrantMemberRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewRemoveProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID)}
+}
+
+func (e *GrantMemberRemovedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{removeGrantMemberRoleFields(e.Aggregate(), e.UserID, e.GrantID)}
 }
 
 func NewProjectGrantMemberRemovedEvent(
@@ -209,6 +283,10 @@ func (e *GrantMemberCascadeRemovedEvent) UniqueConstraints() []*eventstore.Uniqu
 		return nil
 	}
 	return []*eventstore.UniqueConstraint{NewRemoveProjectGrantMemberUniqueConstraint(e.Aggregate().ID, e.UserID, e.GrantID)}
+}
+
+func (e *GrantMemberCascadeRemovedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{removeGrantMemberRoleFields(e.Aggregate(), e.UserID, e.GrantID)}
 }
 
 func (e *GrantMemberCascadeRemovedEvent) SkipUniqueConstraints() {

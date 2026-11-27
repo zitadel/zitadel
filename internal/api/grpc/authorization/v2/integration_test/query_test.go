@@ -698,7 +698,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 			},
 			want: &authorization.ListAuthorizationsResponse{
 				Pagination: &filter.PaginationResponse{
-					TotalResult:  1,
+					TotalResult:  0, // the database only counts permitted authorizations
 					AppliedLimit: 100,
 				},
 				Authorizations: nil,
@@ -770,7 +770,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 			},
 			want: &authorization.ListAuthorizationsResponse{
 				Pagination: &filter.PaginationResponse{
-					TotalResult:  2, // count issue with permission check
+					TotalResult:  1, // the database only counts permitted authorizations
 					AppliedLimit: 100,
 				},
 				Authorizations: []*authorization.Authorization{
@@ -796,7 +796,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 			},
 			want: &authorization.ListAuthorizationsResponse{
 				Pagination: &filter.PaginationResponse{
-					TotalResult:  2, // count issue with permission check
+					TotalResult:  1, // the database only counts permitted authorizations
 					AppliedLimit: 100,
 				},
 				Authorizations: []*authorization.Authorization{
@@ -822,7 +822,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 			},
 			want: &authorization.ListAuthorizationsResponse{
 				Pagination: &filter.PaginationResponse{
-					TotalResult:  2, // count issue with permission check
+					TotalResult:  1, // the database only counts permitted authorizations
 					AppliedLimit: 100,
 				},
 				Authorizations: []*authorization.Authorization{

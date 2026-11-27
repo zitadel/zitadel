@@ -96,6 +96,7 @@ var (
 	InstanceDomainFields    *handler.FieldHandler
 	MembershipFields        *handler.FieldHandler
 	PermissionFields        *handler.FieldHandler
+	GrantMembershipFields   *handler.FieldHandler
 
 	GroupProjection      *handler.Handler
 	GroupUsersProjection *handler.Handler
@@ -202,6 +203,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	InstanceDomainFields = newFillInstanceDomainFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsInstanceDomain]))
 	MembershipFields = newFillMembershipFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsMemberships]))
 	PermissionFields = newFillPermissionFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsPermission]))
+	GrantMembershipFields = newFillProjectGrantMembershipFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsGrantMemberships]))
 	// Don't forget to add the new field handler to [ProjectInstanceFields]
 
 	GroupProjection = newGroupProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["groups"]))
@@ -314,6 +316,7 @@ func newFieldsList() {
 		InstanceDomainFields,
 		MembershipFields,
 		PermissionFields,
+		GrantMembershipFields,
 	}
 }
 

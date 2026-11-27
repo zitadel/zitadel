@@ -114,6 +114,7 @@ func userGrantPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, ena
 		domain.PermissionUserGrantRead,
 		SingleOrgPermissionOption(queries.Queries),
 		WithProjectsPermissionOption(UserGrantProjectID),
+		WithProjectGrantsPermissionOption(UserGrantGrantID),
 		OwnedRowsPermissionOption(UserGrantUserID),
 	)
 	return query.JoinClause(join, args...)
@@ -342,14 +343,17 @@ func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, queries
 	return grant, err
 }
 
+// UserGrants lists the user grants matching the queries.
+// With the PermissionCheckV2 feature, the permission check filters the grants in the database,
+// so the pages are complete and the total only counts permitted grants.
+// Otherwise, the grants of a page are filtered after they are read.
 func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, shouldTriggerBulk bool, permissionCheck domain.PermissionCheck) (*UserGrants, error) {
-	// removed as permission v2 is not implemented yet for project grant level permissions
-	// permissionCheckV2 := PermissionV2(ctx, permissionCheck)
-	grants, err := q.userGrants(ctx, queries, shouldTriggerBulk, false)
+	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	grants, err := q.userGrants(ctx, queries, shouldTriggerBulk, permissionCheckV2)
 	if err != nil {
 		return nil, err
 	}
-	if permissionCheck != nil { // && !authz.GetFeatures(ctx).PermissionCheckV2 {
+	if permissionCheck != nil && !permissionCheckV2 {
 		userGrantsCheckPermission(ctx, grants, permissionCheck)
 	}
 	return grants, nil
