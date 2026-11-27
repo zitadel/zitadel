@@ -236,6 +236,7 @@ export function LoginOTP({ loginName, sessionId, requestId, organization, method
               </span>
               <TextButton
                 disabled={loading || resendCooldown > 0}
+                inline
                 className="ml-4"
                 onClick={async () => {
                   setLoading(true);

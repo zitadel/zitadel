@@ -193,6 +193,7 @@ export function SetPasswordForm({
                 <TextButton
                   aria-label={t("set.resend")}
                   disabled={loading}
+                  inline
                   className="ml-4"
                   onClick={() => {
                     resendCode();

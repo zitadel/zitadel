@@ -140,6 +140,7 @@ export function VerifyForm({ userId, loginName, organization, requestId, code, i
             <TextButton
               aria-label="Resend Code"
               disabled={loading}
+              inline
               className="ml-4"
               onClick={() => {
                 resendCode();
