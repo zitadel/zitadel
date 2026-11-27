@@ -14,7 +14,9 @@
 //   node nx-task-cache.mjs serve <store>            serve <store> on a free 127.0.0.1 port, written to <store>.url
 //   node nx-task-cache.mjs prune <store> [<skip>]   delete entries this job did not use, and those listed in <skip>
 //
-// serve logs each request to <store>.log as "<event> <hash> <bytes>".
+// serve logs each request to <store>.log as "<event> <hash> <bytes>". With
+// NX_TASK_CACHE_KEEP_UNUSED=true, prune keeps unused entries: after a failed task,
+// --nxBail stops the rest, so the entries they would have used look unused.
 import { createServer } from "node:http";
 import {
   appendFileSync,
@@ -154,11 +156,12 @@ function prune(store, skipList) {
     ? readFileSync(log, "utf8").split("\n").filter(Boolean).map((line) => line.split(" "))
     : [];
   const used = new Set(events.filter(([event]) => event !== "miss").map(([, hash]) => hash));
+  const keepUnused = process.env.NX_TASK_CACHE_KEEP_UNUSED === "true";
   const skip = new Set(skipList && existsSync(skipList) ? readFileSync(skipList, "utf8").split("\n") : []);
   let kept = 0;
   let bytes = 0;
   for (const name of readdirSync(store)) {
-    if (used.has(name) && !skip.has(name)) {
+    if ((keepUnused || used.has(name)) && !skip.has(name)) {
       kept++;
       bytes += statSync(join(store, name)).size;
     } else {
