@@ -163,6 +163,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
         const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
+        if (provider === "ldap") {
+          params.set("idpId", activeIdps[0].id);
+          return { redirect: `/idp/ldap?${params}` };
+        }
+
         const response = await startIdentityProviderFlow({
           serviceConfig,
           idpId: activeIdps[0].id,
@@ -224,6 +229,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       await addIdpFlowProof(params);
 
       const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
+      if (provider === "ldap") {
+        params.set("idpId", idp.id);
+        return { redirect: `/idp/ldap?${params}` };
+      }
 
       const response = await startIdentityProviderFlow({
         serviceConfig,
