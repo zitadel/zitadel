@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,6 +18,7 @@ import { FilterUserGrantsComponent } from './filter-user-grants.component';
     CommonModule,
     FilterModule,
     InputModule,
+    MatAutocompleteModule,
     MatSelectModule,
     MatCheckboxModule,
     MatButtonModule,
