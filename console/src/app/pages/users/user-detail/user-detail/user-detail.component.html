@@ -134,20 +134,6 @@
                           (resendEmailVerification)="resendEmailVerification(user)"
                           (resendPhoneVerification)="resendPhoneVerification(user)"
                         >
-                          @if (
-                            user.state !== UserState.LOCKED &&
-                            user.state !== UserState.INACTIVE &&
-                            user.state !== UserState.INITIAL
-                          ) {
-                            <button
-                              pwdAction
-                              [disabled]="(canWrite$ | async) === false"
-                              (click)="sendSetPasswordNotification(user)"
-                              mat-stroked-button
-                            >
-                              {{ 'USER.PASSWORD.RESENDNOTIFICATION' | translate }}
-                            </button>
-                          }
                         </cnsl-contact>
                       </cnsl-card>
                     </ng-template>
@@ -198,7 +184,19 @@
                           <div class="left">
                             <span class="label cnsl-secondary-text">{{ 'USER.PASSWORD.LABEL' | translate }}</span>
                             <span>*********</span>
-                            <ng-content select="[pwdAction]"></ng-content>
+                            @if (
+                              user.state !== UserState.LOCKED &&
+                              user.state !== UserState.INACTIVE &&
+                              user.state !== UserState.INITIAL
+                            ) {
+                              <button
+                                [disabled]="(canWrite$ | async) === false"
+                                (click)="sendSetPasswordNotification(user)"
+                                mat-stroked-button
+                              >
+                                {{ 'USER.PASSWORD.RESENDNOTIFICATION' | translate }}
+                              </button>
+                            }
                           </div>
                           <div class="right">
                             <a
