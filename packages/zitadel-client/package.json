@@ -71,10 +71,10 @@
     "clean": "rm -rf node_modules dist"
   },
   "dependencies": {
-    "@bufbuild/protobuf": "^2.12.0",
-    "@connectrpc/connect": "^2.1.1",
-    "@connectrpc/connect-node": "^2.1.1",
-    "@connectrpc/connect-web": "^2.1.1",
+    "@bufbuild/protobuf": "^2.17.0",
+    "@connectrpc/connect": "^2.3.0",
+    "@connectrpc/connect-node": "^2.3.0",
+    "@connectrpc/connect-web": "^2.3.0",
     "@zitadel/proto": "workspace:*",
     "jose": "^5.10.0"
   },
