@@ -2612,7 +2612,7 @@
       "REDIRECTTITLE": "Girişin yönlendirileceği URI'leri belirtin.",
       "POSTREDIRECTTITLE": "Bu çıkış sonrası yönlendirme URI'sidir.",
       "REDIRECTDESCRIPTIONWEB": "Yönlendirme URI'leri https:// ile başlamalıdır. http:// sadece geliştirme modu etkinken geçerlidir.",
-      "REDIRECTDESCRIPTIONNATIVE": "Yönlendirme URI'leri kendi protokolünüz, http://127.0.0.1, http://[::1] veya http://localhost ile başlamalıdır.",
+      "REDIRECTDESCRIPTIONNATIVE": "Yönlendirme URI'leri https://, kendi protokolünüz, http://127.0.0.1, http://[::1] veya http://localhost ile başlamalıdır.",
       "REDIRECTNOTVALID": "Bu yönlendirme URI'si geçerli değil.",
       "COMMAORENTERSEPERATION": "↵ ile ayırın",
       "TYPEREQUIRED": "Tür gereklidir.",

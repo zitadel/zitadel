@@ -2580,7 +2580,7 @@
       "REDIRECTTITLE": "Especifica las URIs a las que redirigirá el inicio de sesión.",
       "POSTREDIRECTTITLE": "Esta es la URI a la que se redirigirá tras cerrar sesión.",
       "REDIRECTDESCRIPTIONWEB": "Las URIs de redirección deben comenzar con https://. http:// solo es válida con el modo de desarrollo activado.",
-      "REDIRECTDESCRIPTIONNATIVE": "Las URIs de redirección deben comenzar con tu propio protocolo, http://127.0.0.1, http://[::1] o http://localhost.",
+      "REDIRECTDESCRIPTIONNATIVE": "Las URIs de redirección deben comenzar con https://, tu propio protocolo, http://127.0.0.1, http://[::1] o http://localhost.",
       "REDIRECTNOTVALID": "Esta URI de redirección no es válida.",
       "COMMAORENTERSEPERATION": "separado con ↵",
       "TYPEREQUIRED": "Se requiere el tipo.",

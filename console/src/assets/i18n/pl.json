@@ -2583,7 +2583,7 @@
       "REDIRECTTITLE": "Określ URI, do których nastąpi przekierowanie po logowaniu.",
       "POSTREDIRECTTITLE": "To jest URI przekierowania po wylogowaniu.",
       "REDIRECTDESCRIPTIONWEB": "URI przekierowania muszą rozpoczynać się od https://. http:// jest tylko ważne w przypadku włączonego trybu deweloperskiego.",
-      "REDIRECTDESCRIPTIONNATIVE": "URI przekierowania muszą rozpoczynać się od własnego protokołu, http://127.0.0.1, http://[::1] lub http://localhost.",
+      "REDIRECTDESCRIPTIONNATIVE": "URI przekierowania muszą rozpoczynać się od https://, własnego protokołu, http://127.0.0.1, http://[::1] lub http://localhost.",
       "REDIRECTNOTVALID": "To URI przekierowania jest nieprawidłowe.",
       "COMMAORENTERSEPERATION": "oddziel przez ↵",
       "TYPEREQUIRED": "Wymagany jest typ.",

@@ -2584,7 +2584,7 @@
       "REDIRECTTITLE": "Indiquez les URIs vers lesquels le login sera redirigé.",
       "POSTREDIRECTTITLE": "Il s'agit de l'URI de redirection après la déconnexion.",
       "REDIRECTDESCRIPTIONWEB": "Les URIs de redirection doivent commencer par https.",
-      "REDIRECTDESCRIPTIONNATIVE": "Les URIs de redirection doivent commencer par votre propre protocole, http://127.0.0.1, http://[::1] ou http://localhost.",
+      "REDIRECTDESCRIPTIONNATIVE": "Les URIs de redirection doivent commencer par https://, votre propre protocole, http://127.0.0.1, http://[::1] ou http://localhost.",
       "REDIRECTNOTVALID": "Cet URI de redirection n'est pas valide.",
       "COMMAORENTERSEPERATION": "séparer par ↵",
       "TYPEREQUIRED": "Le type est obligatoire.",

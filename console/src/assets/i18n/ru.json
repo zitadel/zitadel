@@ -2698,7 +2698,7 @@
       "REDIRECTTITLE": "Укажите URI, на которые будет перенаправлен логин.",
       "POSTREDIRECTTITLE": "Это URI перенаправления после выхода из системы.",
       "REDIRECTDESCRIPTIONWEB": "URI перенаправления должны начинаться с https://. http:// действителен только при включённом режиме разработки.",
-      "REDIRECTDESCRIPTIONNATIVE": "URI перенаправления должны начинаться с вашего собственного протокола, http://127.0.0.1, http://[::1] или http://localhost.",
+      "REDIRECTDESCRIPTIONNATIVE": "URI перенаправления должны начинаться с https://, вашего собственного протокола, http://127.0.0.1, http://[::1] или http://localhost.",
       "REDIRECTNOTVALID": "Данный URI перенаправления недействителен.",
       "COMMAORENTERSEPERATION": "отделить ↵",
       "TYPEREQUIRED": "Тип обязателен.",

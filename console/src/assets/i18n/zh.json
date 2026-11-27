@@ -2616,7 +2616,7 @@
       "REDIRECTTITLE": "指定登录将重定向到的 URL。",
       "POSTREDIRECTTITLE": "这是退出登录后的重定向 URL。",
       "REDIRECTDESCRIPTIONWEB": "重定向 URI 必须以 https:// 开头。 http:// 仅对启用的开发模式有效。",
-      "REDIRECTDESCRIPTIONNATIVE": "重定向 URI 必须以您自己的协议、http://127.0.0.1、http://[::1] 或 http://localhost 开头。",
+      "REDIRECTDESCRIPTIONNATIVE": "重定向 URI 必须以 https://、您自己的协议、http://127.0.0.1、http://[::1] 或 http://localhost 开头。",
       "REDIRECTNOTVALID": "此重定向 URL 无效。",
       "COMMAORENTERSEPERATION": "separate with ↵",
       "TYPEREQUIRED": "类型是必填的。",

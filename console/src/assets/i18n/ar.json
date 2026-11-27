@@ -2602,7 +2602,7 @@
       "REDIRECTTITLE": "حدد عناوين URI حيث سيتم إعادة توجيه تسجيل الدخول إليها.",
       "POSTREDIRECTTITLE": "هذا هو عنوان URI لإعادة التوجيه بعد تسجيل الخروج.",
       "REDIRECTDESCRIPTIONWEB": "يجب أن تبدأ عناوين URI لإعادة التوجيه بـ https://. http:// صالح فقط مع تمكين وضع التطوير.",
-      "REDIRECTDESCRIPTIONNATIVE": "يجب أن تبدأ عناوين URI لإعادة التوجيه بالبروتوكول الخاص بك، http://127.0.0.1، http://[::1] أو http://localhost.",
+      "REDIRECTDESCRIPTIONNATIVE": "يجب أن تبدأ عناوين URI لإعادة التوجيه بـ https://، أو بالبروتوكول الخاص بك، http://127.0.0.1، http://[::1] أو http://localhost.",
       "REDIRECTNOTVALID": "عنوان URI لإعادة التوجيه هذا غير صالح.",
       "COMMAORENTERSEPERATION": "افصل بـ ↵",
       "TYPEREQUIRED": "النوع مطلوب.",

@@ -2602,7 +2602,7 @@
       "REDIRECTTITLE": "Specificeer de URI's waar de login naar zal redirecten.",
       "POSTREDIRECTTITLE": "Dit is de redirect URI na uitloggen.",
       "REDIRECTDESCRIPTIONWEB": "Redirect URI's moeten beginnen met https://. http:// is alleen geldig met ingeschakelde ontwikkelingsmodus.",
-      "REDIRECTDESCRIPTIONNATIVE": "Redirect URI's moeten beginnen met uw eigen protocol, http://127.0.0.1, http://[::1] of http://localhost.",
+      "REDIRECTDESCRIPTIONNATIVE": "Redirect URI's moeten beginnen met https://, uw eigen protocol, http://127.0.0.1, http://[::1] of http://localhost.",
       "REDIRECTNOTVALID": "Deze redirect URI is niet geldig.",
       "COMMAORENTERSEPERATION": "scheiden met ↵",
       "TYPEREQUIRED": "Het type is vereist.",
