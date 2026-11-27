@@ -1407,7 +1407,7 @@ describe("isSessionValid", () => {
       vi.mocked(zitadelModule.getLoginSettings).mockRejectedValue(new Error("API connection failed"));
 
       // Should throw or handle error appropriately
-      await expect(isSessionValid({ serviceUrl: mockServiceUrl, session })).rejects.toThrow();
+      await expect(isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session })).rejects.toThrow();
     });
 
     test("should handle API errors gracefully when listing auth method types", async () => {
@@ -1431,7 +1431,7 @@ describe("isSessionValid", () => {
       vi.mocked(zitadelModule.listAuthenticationMethodTypes).mockRejectedValue(new Error("API connection failed"));
 
       // Should throw or handle error appropriately
-      await expect(isSessionValid({ serviceUrl: mockServiceUrl, session })).rejects.toThrow();
+      await expect(isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session })).rejects.toThrow();
     });
 
     test("should handle malformed timestamp in session", async () => {
@@ -1618,7 +1618,7 @@ describe("isSessionValid", () => {
       // Make multiple concurrent calls
       const promises = Array(5)
         .fill(null)
-        .map(() => isSessionValid({ serviceUrl: mockServiceUrl, session }));
+        .map(() => isSessionValid({ serviceConfig: { baseUrl: mockServiceUrl }, session }));
 
       const results = await Promise.all(promises);
 
