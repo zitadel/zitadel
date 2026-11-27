@@ -30,6 +30,8 @@ func TestGetSystemTranslation(t *testing.T) {
 	require.Nil(t, json.Unmarshal(okTranslation, &parsedOKTranslation))
 
 	hashOK := md5.Sum(fmt.Append(nil, parsedOKTranslation["de"]))
+	require.NotEmpty(t, parsedOKTranslation["ko"])
+	hashKorean := md5.Sum(fmt.Append(nil, parsedOKTranslation["ko"]))
 
 	tt := []struct {
 		testName string
@@ -42,6 +44,24 @@ func TestGetSystemTranslation(t *testing.T) {
 		expectedEtag     string
 		expectedError    error
 	}{
+		{
+			testName:               "when input language is Korean should return Korean translation",
+			systemTranslationToSet: okTranslation,
+			inputLanguage:          language.Korean,
+			inputInstanceLanguage:  language.English,
+
+			expectedLanguage: parsedOKTranslation["ko"],
+			expectedEtag:     hex.EncodeToString(hashKorean[:]),
+		},
+		{
+			testName:               "when input language has no translation should fallback onto Korean instance default",
+			systemTranslationToSet: okTranslation,
+			inputLanguage:          language.Romanian,
+			inputInstanceLanguage:  language.Korean,
+
+			expectedLanguage: parsedOKTranslation["ko"],
+			expectedEtag:     hex.EncodeToString(hashKorean[:]),
+		},
 		{
 			testName:               "when neither input language nor system default language have translation should return not found error",
 			systemTranslationToSet: okTranslation,
@@ -157,6 +177,17 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 	require.NoError(t, err)
 
 	hashDefaultTranslations := md5.Sum(fmt.Append(nil, parsedOKTranslation["en"]))
+	require.NotEmpty(t, parsedOKTranslation["ko"])
+	protoKoreanTranslation, err := structpb.NewStruct(parsedOKTranslation["ko"])
+	require.NoError(t, err)
+	hashKoreanTranslations := md5.Sum(fmt.Append(nil, parsedOKTranslation["ko"]))
+
+	koreanWithDBTranslations := maps.Clone(parsedOKTranslation["ko"])
+	koreanCommon := maps.Clone(parsedOKTranslation["ko"]["common"].(map[string]any))
+	koreanCommon["title"] = "사용자 지정 로그인"
+	koreanWithDBTranslations["common"] = koreanCommon
+	protoKoreanWithDBTranslation, err := structpb.NewStruct(koreanWithDBTranslations)
+	require.NoError(t, err)
 
 	tt := []struct {
 		testName string
@@ -169,6 +200,48 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 		expectedError  error
 		expectedResult *settings.GetHostedLoginTranslationResponse
 	}{
+		{
+			testName: "when requesting ko-KR system translation should return Korean",
+
+			defaultInstanceLanguage: language.English,
+			inputRequest: &settings.GetHostedLoginTranslationRequest{
+				Locale: "ko-KR",
+				Level:  &settings.GetHostedLoginTranslationRequest_System{},
+			},
+
+			expectedResult: &settings.GetHostedLoginTranslationResponse{
+				Translations: protoKoreanTranslation,
+				Etag:         hex.EncodeToString(hashKoreanTranslations[:]),
+			},
+		},
+		{
+			testName: "when instance default is Korean should merge custom login texts with Korean defaults",
+
+			defaultInstanceLanguage: language.Korean,
+			sqlExpectations: []mock.Expectation{
+				mock.ExpectQuery(
+					query,
+					mock.WithQueryArgs("123", "org", "instance-id", "ko-KR", "ko"),
+					mock.WithQueryResult(
+						[]string{"file", "aggregate_type", "etag"},
+						[][]driver.Value{
+							{[]byte(`{"common":{"title":"사용자 지정 로그인"}}`), "org", "etag-ko-org"},
+						},
+					),
+				),
+			},
+			inputRequest: &settings.GetHostedLoginTranslationRequest{
+				Locale: "ko-KR",
+				Level: &settings.GetHostedLoginTranslationRequest_OrganizationId{
+					OrganizationId: "123",
+				},
+			},
+
+			expectedResult: &settings.GetHostedLoginTranslationResponse{
+				Translations: protoKoreanWithDBTranslation,
+				Etag:         "etag-ko-org",
+			},
+		},
 		{
 			testName: "when input language is invalid should return invalid argument error",
 
