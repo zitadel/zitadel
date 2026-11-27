@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"slices"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -30,6 +31,62 @@ type HumanPasswordWriteModel struct {
 	// (see [lastPasswordCheckResetSequence]); 0 loads all password checks.
 	// The sequence is used instead of the position, as historical positions can disagree with the sequence order.
 	checksAfterSequence uint64
+	// passwordChangedSequence limits the password hash events to the ones from this (aggregate) sequence on.
+	// It must be the sequence of the last password change of the user (see [humanPasswordLoadBounds]);
+	// 0 loads all password hash events.
+	passwordChangedSequence uint64
+}
+
+// humanPasswordBoundsLookupLimit is the number of most recent reset events
+// [lastHumanPasswordLoadBounds] looks at to find the last password change.
+// Every successful password check is a reset as well, so the last change is only found if it is among the most recent resets.
+// The limit keeps the lookup short for users who log in often but never change their password:
+// without it, the lookup would scan their whole history to find out there is no change.
+const humanPasswordBoundsLookupLimit = 10
+
+// humanPasswordLoadBounds are the (aggregate) sequences of the last events of a user,
+// which make earlier events irrelevant for the [HumanPasswordWriteModel].
+type humanPasswordLoadBounds struct {
+	events []eventstore.Event
+
+	// lastResetSequence is the sequence of the last event resetting the [HumanPasswordWriteModel.PasswordCheckFailedCount].
+	lastResetSequence uint64
+	// lastPasswordChangedSequence is the sequence of the last password change, if it is one of the looked up resets.
+	lastPasswordChangedSequence uint64
+}
+
+func (b *humanPasswordLoadBounds) AppendEvents(events ...eventstore.Event) {
+	b.events = append(b.events, events...)
+}
+
+func (b *humanPasswordLoadBounds) Reduce() error {
+	for _, event := range b.events {
+		b.lastResetSequence = max(b.lastResetSequence, event.Sequence())
+		if slices.Contains(humanPasswordChangedEventTypes, event.Type()) {
+			b.lastPasswordChangedSequence = max(b.lastPasswordChangedSequence, event.Sequence())
+		}
+	}
+	b.events = b.events[:0]
+	return nil
+}
+
+// lastHumanPasswordLoadBounds returns the sequence of the last reset of the [HumanPasswordWriteModel.PasswordCheckFailedCount]
+// (like [lastPasswordCheckResetSequence]) and of the last password change of the user in a single lookup.
+// A password change is a reset as well. If it is not among the last [humanPasswordBoundsLookupLimit] resets,
+// its sequence is 0 and all password hash events are loaded.
+func lastHumanPasswordLoadBounds(ctx context.Context, es *eventstore.Eventstore, userID string) (*humanPasswordLoadBounds, error) {
+	bounds := new(humanPasswordLoadBounds)
+	err := es.FilterToReducer(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		OrderDesc().
+		Limit(humanPasswordBoundsLookupLimit).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(userID).
+		EventTypes(humanPasswordCheckResetEventTypes...).
+		Builder(),
+		bounds,
+	)
+	return bounds, err
 }
 
 // lastPasswordCheckResetSequence returns the aggregate sequence of the last event of the user,
@@ -51,15 +108,17 @@ func lastPasswordCheckResetSequence(ctx context.Context, es *eventstore.Eventsto
 }
 
 // loadHumanPasswordWriteModel loads the password state of the user,
-// but only the password checks since the last reset of the failed count,
-// so the cost doesn't grow with every login of the user.
+// but only the password checks since the last reset of the failed count
+// and the password hash events since the last password change,
+// so the cost doesn't grow with every login or password change of the user.
 func loadHumanPasswordWriteModel(ctx context.Context, es *eventstore.Eventstore, userID, resourceOwner string) (*HumanPasswordWriteModel, error) {
-	checksAfterSequence, err := lastPasswordCheckResetSequence(ctx, es, userID)
+	bounds, err := lastHumanPasswordLoadBounds(ctx, es, userID)
 	if err != nil {
 		return nil, err
 	}
 	wm := NewHumanPasswordWriteModel(userID, resourceOwner)
-	wm.checksAfterSequence = checksAfterSequence
+	wm.checksAfterSequence = bounds.lastResetSequence
+	wm.passwordChangedSequence = bounds.lastPasswordChangedSequence
 	if err = es.FilterToQueryReducer(ctx, wm); err != nil {
 		return nil, err
 	}
@@ -178,18 +237,17 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 }
 
 // humanPasswordStateEventTypes are the events which define the password state of a user,
-// except for the password checks (see [humanPasswordCheckEventTypes]).
+// except for the password hash changes (see [humanPasswordHashEventTypes])
+// and the password checks (see [humanPasswordCheckEventTypes]).
 var humanPasswordStateEventTypes = []eventstore.EventType{
 	user.HumanAddedType,
 	user.HumanRegisteredType,
 	user.MachineAddedEventType,
 	user.HumanInitialCodeAddedType,
 	user.HumanInitializedCheckSucceededType,
-	user.HumanPasswordChangedType,
 	user.HumanPasswordCodeAddedType,
 	user.HumanPasswordCodeSentType,
 	user.HumanEmailVerifiedType,
-	user.HumanPasswordHashUpdatedType,
 	user.UserRemovedType,
 	user.UserLockedType,
 	user.UserUnlockedType,
@@ -197,11 +255,25 @@ var humanPasswordStateEventTypes = []eventstore.EventType{
 	user.UserV1RegisteredType,
 	user.UserV1InitialCodeAddedType,
 	user.UserV1InitializedCheckSucceededType,
-	user.UserV1PasswordChangedType,
 	user.UserV1PasswordCodeAddedType,
 	user.UserV1PasswordCodeSentType,
 	user.UserV1EmailVerifiedType,
 }
+
+// humanPasswordChangedEventTypes are the password changes.
+// A change overwrites everything the earlier hash events set in [HumanPasswordWriteModel.Reduce]
+// (the hash, whether a change is required, the code and the failed check count).
+var humanPasswordChangedEventTypes = []eventstore.EventType{
+	user.HumanPasswordChangedType,
+	user.UserV1PasswordChangedType,
+}
+
+// humanPasswordHashEventTypes are the events which only set the password hash of a user (and the related state).
+// They can be created on every login (e.g. an application setting the password on every login),
+// so only the ones from the last password change on are loaded.
+var humanPasswordHashEventTypes = append(slices.Clone(humanPasswordChangedEventTypes),
+	user.HumanPasswordHashUpdatedType,
+)
 
 // humanPasswordCheckEventTypes are the password check events.
 // They are created on every password check and therefore grow with every login of a user.
@@ -229,13 +301,21 @@ var humanPasswordCheckResetEventTypes = []eventstore.EventType{
 }
 
 func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
-	// Only the password checks after the last reset of the failed count are relevant.
-	// This prevents loading the whole (constantly growing) login history of the user.
+	// Only the password checks after the last reset of the failed count
+	// and the password hash events from the last password change on are relevant.
+	// This prevents loading the whole (constantly growing) login and password history of the user.
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(humanPasswordStateEventTypes...).
+		Builder().
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(humanPasswordHashEventTypes...).
+		// the last password change itself must be loaded
+		SequenceGreater(max(wm.passwordChangedSequence, 1) - 1).
 		Builder().
 		AddQuery().
 		AggregateTypes(user.AggregateType).
