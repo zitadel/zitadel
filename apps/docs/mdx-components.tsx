@@ -1,6 +1,7 @@
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import type { MDXComponents } from 'mdx/types';
-import { APIPage } from '@/components/api-page';
+import type { GeneratedPageProps } from 'fumadocs-openapi';
+import { OpenAPIPage } from '@/components/api-page';
 import { TerminologyUpdate } from '@/components/terminology-update';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
@@ -18,7 +19,11 @@ export function useMDXComponents(components?: MDXComponents): MDXComponents {
     Tabs,
     Step,
     Steps,
-    APIPage,
+    // Rendered by the generated API reference pages. Documents aren't preloaded,
+    // `OpenAPIPage` loads them by ID (see lib/openapi.ts).
+    OpenAPIPage: (props: GeneratedPageProps) => (
+      <OpenAPIPage {...props} preloaded={{ docs: {} }} />
+    ),
     TerminologyUpdate,
     GithubCodeBlock,
     PreventLockout,

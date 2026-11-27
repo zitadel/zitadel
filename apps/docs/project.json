@@ -116,7 +116,10 @@
       ],
       "cache": true,
       "inputs": [
-        "{projectRoot}/scripts/generate-api-reference.mts",
+        "{projectRoot}/scripts/generate-api-reference.ts",
+        {
+          "externalDependencies": ["fumadocs-openapi"]
+        },
         {
           "dependentTasksOutputFiles": "apps/docs/openapi/**"
         }

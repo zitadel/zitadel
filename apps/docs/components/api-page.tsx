@@ -1,27 +1,23 @@
-import { createOpenAPI } from 'fumadocs-openapi/server';
-import { createAPIPage } from 'fumadocs-openapi/ui';
-import path from 'path';
-import client from './api-page.client';
+'use client';
+import { preload } from 'react-dom';
+import { createOpenAPIPage } from 'fumadocs-openapi/ui';
 
-export function APIPage({ document, operations }: { document: string; operations: any[] }) {
+// The Next.js basePath, see next.config.mjs.
+const documentUrl = (id: string) => `/docs/api/openapi/${id}`;
 
+export const OpenAPIPage = createOpenAPIPage({
+  async loadDocument(id) {
+    if (typeof window === 'undefined') {
+      // the browser starts downloading the document with the page
+      preload(documentUrl(id), { as: 'fetch', crossOrigin: 'anonymous' });
+      const { openapi } = await import('@/lib/openapi');
+      return (await openapi.getSchema(id)).bundled;
+    }
 
-  if (!path.isAbsolute(document) && !document.startsWith('openapi/')) {
-    throw new Error(`APIPage document path MUST start with 'openapi/'. Received: ${document}`);
-  }
-
-  const absoluteDocument = path.isAbsolute(document)
-    ? document
-    : path.join(process.cwd(), 'openapi', document.slice('openapi/'.length));
-
-  const openapi = createOpenAPI({
-    input: [absoluteDocument],
-  });
-
-  const InnerAPIPage = createAPIPage(openapi, {
-    client,
-  });
-
-  return <InnerAPIPage document={absoluteDocument} operations={operations} />;
-}
-
+    const response = await fetch(documentUrl(id));
+    if (!response.ok) {
+      throw new Error(`Failed to load OpenAPI document "${id}": ${response.status}`);
+    }
+    return response.json();
+  },
+});
