@@ -14,7 +14,7 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^21.2.25",
+    "@angular/animations": "^21.2.26",
     "@angular/cdk": "^21.2.14",
     "@angular/common": "^21.2.26",
     "@angular/compiler": "^21.2.26",
@@ -23,7 +23,7 @@
     "@angular/material": "^21.2.14",
     "@angular/material-moment-adapter": "^21.2.14",
     "@angular/platform-browser": "^21.2.26",
-    "@angular/platform-browser-dynamic": "^21.2.25",
+    "@angular/platform-browser-dynamic": "^21.2.26",
     "@angular/router": "^21.2.26",
     "@angular/service-worker": "^21.2.26",
     "@bufbuild/protobuf": "^2.17.0",
