@@ -344,8 +344,9 @@
 }
 
 @layer base {
-    /* HEADINGS */
-    h1, h2, h3, h4, h5, h6 {
+    /* HEADINGS
+       Not inside dialogs: components like the API playground size their headings with utilities. */
+    :is(h1, h2, h3, h4, h5, h6):where(:not([role="dialog"] *)) {
         font-family: var(--font-sans);
         color: hsl(var(--foreground)) !important; 
         margin-bottom: 1rem;
@@ -359,14 +360,14 @@
         text-decoration: none !important;
     }
 
-    h1 { 
+    h1:where(:not([role="dialog"] *)) {
         font-size: 3.5rem !important; 
         font-weight: 700 !important; 
         line-height: 1.1 !important; 
         margin-bottom: 1.5rem !important; 
     }
 
-    h2 { 
+    h2:where(:not([role="dialog"] *)) {
         font-size: 2.25rem !important; 
         font-weight: 600 !important; 
         margin-top: 3rem !important; 
@@ -375,14 +376,14 @@
         border-bottom: 1px solid hsl(var(--border)) !important; 
     }
 
-    h3 { 
+    h3:where(:not([role="dialog"] *)) {
         font-size: 2rem !important; 
         font-weight: 600 !important; 
         margin-top: 2.5rem !important; 
         margin-bottom: 1rem !important; 
     }
 
-    h4 { 
+    h4:where(:not([role="dialog"] *)) {
         font-size: 1.5rem !important; 
         font-weight: 600 !important; 
         margin-top: 2.5rem !important; 
