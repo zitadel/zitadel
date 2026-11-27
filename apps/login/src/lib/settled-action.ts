@@ -24,12 +24,15 @@ import { startTransition, useCallback, useEffect, useRef, useState, useTransitio
  *   handleServerActionResponse(response, router, setSamlData, setError);
  *
  * A rejected action rejects right away. If the component unmounts while waiting (the
- * re-rendered page redirected or failed), the promise resolves at that point.
+ * re-rendered page redirected or failed), the promise resolves at that point. Once the
+ * component is gone there is no commit left to wait for, so a result that arrives later
+ * resolves right away.
  */
 export function useSettledAction(): <T>(action: () => Promise<T>) => Promise<T> {
   const [, startActionTransition] = useTransition();
   const [settled, setSettled] = useState(0);
   const waiting = useRef<(() => void)[]>([]);
+  const mounted = useRef(false);
 
   const flush = useCallback(() => {
     const callbacks = waiting.current;
@@ -43,7 +46,13 @@ export function useSettledAction(): <T>(action: () => Promise<T>) => Promise<T> 
   }, [settled, flush]);
 
   // never leave a caller hanging when the component goes away
-  useEffect(() => flush, [flush]);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      flush();
+    };
+  }, [flush]);
 
   return useCallback(
     <T>(action: () => Promise<T>) =>
@@ -51,6 +60,11 @@ export function useSettledAction(): <T>(action: () => Promise<T>) => Promise<T> 
         startActionTransition(async () => {
           try {
             const result = await action();
+            if (!mounted.current) {
+              // an update of an unmounted component is never committed, so nothing would flush
+              resolve(result);
+              return;
+            }
             waiting.current.push(() => resolve(result));
             // still inside the action's transition, so this commits together with the page update
             startTransition(() => setSettled((count) => count + 1));

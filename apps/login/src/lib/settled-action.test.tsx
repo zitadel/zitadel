@@ -1,5 +1,5 @@
 import { act, cleanup, render } from "@testing-library/react";
-import { startTransition, Suspense, use, useState } from "react";
+import { startTransition, StrictMode, Suspense, use, useState } from "react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { useSettledAction } from "./settled-action";
 
@@ -112,6 +112,64 @@ describe("useSettledAction", () => {
 
     await act(async () => {
       unmount();
+    });
+
+    expect(settled).toHaveBeenCalledWith("result");
+  });
+
+  test("resolves when the action finishes after the component unmounted", async () => {
+    const { api, unmount } = setup();
+    const result = deferred<string>();
+    const settled = vi.fn();
+
+    await act(async () => {
+      api()
+        .run(() => result.promise)
+        .then(settled);
+    });
+    await act(async () => {
+      unmount();
+    });
+    expect(settled).not.toHaveBeenCalled();
+
+    await act(async () => {
+      result.resolve("result");
+    });
+
+    expect(settled).toHaveBeenCalledWith("result");
+  });
+
+  // the second action of a two-step flow, when the page update of the first one removed the form
+  test("resolves when the action is started after the component unmounted", async () => {
+    const { api, unmount } = setup();
+    const run = api().run;
+    const settled = vi.fn();
+
+    await act(async () => {
+      unmount();
+    });
+    await act(async () => {
+      run(async () => "result").then(settled);
+    });
+
+    expect(settled).toHaveBeenCalledWith("result");
+  });
+
+  test("still waits for the page update under strict mode", async () => {
+    let api!: { run: Run; setPage: (page: Promise<string>) => void };
+    render(
+      <StrictMode>
+        <Suspense fallback="loading">
+          <Harness expose={(a) => (api = a)} />
+        </Suspense>
+      </StrictMode>,
+    );
+    const { page, settled } = await runActionWithPendingPage(() => api);
+
+    expect(settled).not.toHaveBeenCalled();
+
+    await act(async () => {
+      page.resolve("re-rendered");
     });
 
     expect(settled).toHaveBeenCalledWith("result");
