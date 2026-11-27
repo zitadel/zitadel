@@ -75,7 +75,7 @@ func NewProvider(
 			middleware.CallDurationHandler,
 			middleware.RequestDetailsHandler(),
 			middleware.MetricsHandler(metricTypes),
-			middleware.TraceHandler(),
+			middleware.TraceHandler(false),
 			middleware.LogHandler("saml"),
 			middleware.NoCacheInterceptor().Handler,
 			instanceHandler,
