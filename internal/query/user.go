@@ -836,7 +836,8 @@ var userLoginNameMatchesCaseSensitiveQuery string
 
 // NewUserLoginNameExistsQuery filters users by login name.
 // Equals / EqualsIgnoreCase are rewritten in prepareUsersQuery into an indexed
-// ID-seek. Other comparisons use the login_names3 view.
+// ID-seek. Other comparisons match the login_names3 view once per statement
+// (see loginNamePatternFilter).
 func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (SearchQuery, error) {
 	// Empty pattern would drop only the LIKE arm and leave correlate-only
 	// login_names3 existence checks that make COUNT(*) very expensive.
@@ -846,7 +847,7 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 	if comparison == TextEquals || comparison == TextEqualsIgnoreCase {
 		return newLoginNameEqualsFilter(value, comparison == TextEqualsIgnoreCase)
 	}
-	return newLoginNameExistsViewQuery(value, comparison)
+	return newLoginNamePatternFilter(value, comparison)
 }
 
 func newLoginNameExistsViewQuery(value string, comparison TextComparison) (SearchQuery, error) {
@@ -1349,6 +1350,8 @@ func (q *UserSearchQueries) planUserSearch(ctx context.Context, permissionCheckV
 
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	seeks, filters, extracted := extractLoginEqualitySeeks(instanceID, q.Queries)
+	orgID, _ := findConjunctTextEquals(UserResourceOwnerCol, filters)
+	filters = bindLoginNamePatterns(filters, instanceID, orgID)
 	return userSearchPlan{
 		instanceID:             instanceID,
 		filters:                filters,
@@ -1437,7 +1440,8 @@ func (p userSearchPlan) matchingCountSelect(ctx context.Context) sq.SelectBuilde
 // is expanded only for the returned page, except when a remaining filter or the
 // sort column needs those joins before LIMIT.
 // Login-equality filters (username, email, phone, login name EQUALS /
-// EQUALS_IGNORE_CASE) become an indexed UNION of ID seeks.
+// EQUALS_IGNORE_CASE) become an indexed UNION of ID seeks. Other login name
+// filters read login_names3 once (see loginNamePatternFilter).
 func (q *UserSearchQueries) prepareUsersQuery(ctx context.Context, permissionCheckV2 bool) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 	plan := q.planUserSearch(ctx, permissionCheckV2)
 	idCols := []string{
