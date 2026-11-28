@@ -39,7 +39,7 @@ func (s *Session) RetrievePreviousID() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	req.Header.Set("authorization", s.oauth().Tokens.TokenType+" "+s.oauth().Tokens.AccessToken)
+	s.oauth().Tokens.SetAuthHeader(req)
 	userinfo := new(oidc.UserInfo)
 	if err := httphelper.HttpRequest(s.Provider.HttpClient(), req, &userinfo); err != nil {
 		return "", err
