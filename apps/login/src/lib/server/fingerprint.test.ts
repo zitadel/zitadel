@@ -245,91 +245,66 @@ describe("fingerprint", () => {
       );
     });
 
-    it("should use x-forwarded-for header for IP if available", async () => {
-      const mockGet = vi.fn().mockReturnValue({
-        value: "test-id",
+    describe("client ip", () => {
+      // the ip getUserAgent sends for the given request headers
+      async function ipFor(requestHeaders: Record<string, string>) {
+        vi.mocked(cookies).mockResolvedValue({
+          get: vi.fn().mockReturnValue({ value: "test-id" }),
+          set: vi.fn(),
+        } as any);
+        vi.mocked(headers).mockResolvedValue({ get: (key: string) => requestHeaders[key] ?? null } as any);
+        vi.mocked(userAgent).mockReturnValue({ device: {}, engine: {}, os: {}, browser: {} } as any);
+
+        await getUserAgent();
+
+        return vi.mocked(create).mock.calls.at(-1)?.[1]?.ip;
+      }
+
+      it.each([
+        ["a single entry written by the trusted proxy", "198.51.100.7", "198.51.100.7"],
+        ["the rightmost entry of a list", "203.0.113.5, 198.51.100.7", "198.51.100.7"],
+        ["a list the client prepended entries to", "9.9.9.9, 1.2.3.4, 198.51.100.7", "198.51.100.7"],
+        ["an entry with surrounding whitespace", "   198.51.100.7   ", "198.51.100.7"],
+        ["an IPv4 entry with a port", "198.51.100.7:4711", "198.51.100.7"],
+        ["a bare IPv6 entry", "2001:db8::1", "2001:db8::1"],
+        ["a bracketed IPv6 entry", "[2001:db8::1]", "2001:db8::1"],
+        ["a bracketed IPv6 entry with a port", "[2001:db8::1]:4711", "2001:db8::1"],
+        ["nothing, for an obfuscated last entry", "198.51.100.7, unknown", ""],
+        ["nothing, for a last entry that is no address", "not-an-ip", ""],
+      ])("should send %s", async (_name, forwardedFor, expected) => {
+        expect(await ipFor({ "x-forwarded-for": forwardedFor })).toBe(expected);
       });
-      vi.mocked(cookies).mockResolvedValue({ get: mockGet, set: vi.fn() } as any);
 
-      const mockHeaders = new Map([
-        ["x-forwarded-for", "203.0.113.1"],
-        ["remoteAddress", "192.168.1.1"],
-      ]);
-      vi.mocked(headers).mockResolvedValue({
-        get: (key: string) => mockHeaders.get(key) ?? null,
-      } as any);
+      it("should skip the configured number of trusted proxy hops", async () => {
+        vi.stubEnv("TRUSTED_PROXY_HOPS", "1");
 
-      vi.mocked(userAgent).mockReturnValue({
-        device: {},
-        engine: {},
-        os: {},
-        browser: {},
-      } as any);
-
-      await getUserAgent();
-
-      expect(create).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.objectContaining({
-          ip: "203.0.113.1",
-        }),
-      );
-    });
-
-    it("should fallback to remoteAddress if x-forwarded-for is not available", async () => {
-      const mockGet = vi.fn().mockReturnValue({
-        value: "test-id",
+        expect(await ipFor({ "x-forwarded-for": "9.9.9.9, 198.51.100.7, 203.0.113.5" })).toBe("198.51.100.7");
       });
-      vi.mocked(cookies).mockResolvedValue({ get: mockGet, set: vi.fn() } as any);
 
-      const mockHeaders = new Map([["remoteAddress", "192.168.1.100"]]);
-      vi.mocked(headers).mockResolvedValue({
-        get: (key: string) => mockHeaders.get(key) ?? null,
-      } as any);
+      it("should send no ip when the list is shorter than the trusted hops", async () => {
+        vi.stubEnv("TRUSTED_PROXY_HOPS", "2");
 
-      vi.mocked(userAgent).mockReturnValue({
-        device: {},
-        engine: {},
-        os: {},
-        browser: {},
-      } as any);
-
-      await getUserAgent();
-
-      expect(create).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.objectContaining({
-          ip: "192.168.1.100",
-        }),
-      );
-    });
-
-    it("should use empty string for IP if no headers available", async () => {
-      const mockGet = vi.fn().mockReturnValue({
-        value: "test-id",
+        expect(await ipFor({ "x-forwarded-for": "198.51.100.7" })).toBe("");
       });
-      vi.mocked(cookies).mockResolvedValue({ get: mockGet, set: vi.fn() } as any);
 
-      const mockHeaders = new Map();
-      vi.mocked(headers).mockResolvedValue({
-        get: (key: string) => mockHeaders.get(key) ?? null,
-      } as any);
+      it("should fall back to the default hops for an invalid TRUSTED_PROXY_HOPS", async () => {
+        vi.stubEnv("TRUSTED_PROXY_HOPS", "not-a-number");
 
-      vi.mocked(userAgent).mockReturnValue({
-        device: {},
-        engine: {},
-        os: {},
-        browser: {},
-      } as any);
+        expect(await ipFor({ "x-forwarded-for": "9.9.9.9, 198.51.100.7" })).toBe("198.51.100.7");
+      });
 
-      await getUserAgent();
+      it("should prefer the forwarded header over the direct connection address", async () => {
+        expect(await ipFor({ "x-forwarded-for": "198.51.100.7", remoteAddress: "192.0.2.1" })).toBe("198.51.100.7");
+      });
 
-      expect(create).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.objectContaining({
-          ip: "",
-        }),
-      );
+      it("should use the direct connection address when no proxy set the header", async () => {
+        expect(await ipFor({ remoteAddress: "198.51.100.7:4711" })).toBe("198.51.100.7");
+        expect(await ipFor({ "x-forwarded-for": "", remoteAddress: "198.51.100.7" })).toBe("198.51.100.7");
+      });
+
+      it("should send no ip when neither header is set", async () => {
+        expect(await ipFor({})).toBe("");
+      });
     });
 
     it("should parse user agent header values", async () => {
