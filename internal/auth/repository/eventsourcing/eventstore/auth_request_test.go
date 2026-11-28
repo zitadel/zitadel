@@ -61,6 +61,7 @@ func (m *mockViewErrUserSession) GetLatestUserSessionSequence(ctx context.Contex
 }
 
 type mockViewUserSession struct {
+	UserAgentID               string
 	ExternalLoginVerification time.Time
 	PasswordlessVerification  time.Time
 	PasswordVerification      time.Time
@@ -78,6 +79,7 @@ type mockUser struct {
 
 func (m *mockViewUserSession) UserSessionByIDs(context.Context, string, string, string) (*user_view_model.UserSessionView, error) {
 	return &user_view_model.UserSessionView{
+		UserAgentID:               m.UserAgentID,
 		ExternalLoginVerification: sql.NullTime{Time: m.ExternalLoginVerification},
 		PasswordlessVerification:  sql.NullTime{Time: m.PasswordlessVerification},
 		PasswordVerification:      sql.NullTime{Time: m.PasswordVerification},
@@ -2973,6 +2975,67 @@ func Test_userSessionByIDs(t *testing.T) {
 				PasswordVerification:     testNow,
 				SecondFactorVerification: testNow,
 				ChangeDate:               testNow,
+			},
+			nil,
+		},
+		{
+			"new otp email check of same agentID, second factor verified",
+			args{
+				userProvider: &mockViewUserSession{
+					UserAgentID:          "agentID",
+					PasswordVerification: testNow,
+				},
+				agentID: "agentID",
+				userID:  "id",
+				eventProvider: &mockEventUser{
+					Events: []eventstore.Event{
+						&es_models.Event{
+							AggregateType: user_repo.AggregateType,
+							Typ:           user_repo.HumanOTPEmailCheckSucceededType,
+							CreationDate:  testNow,
+							Data: func() []byte {
+								data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "agentID"})
+								return data
+							}(),
+						},
+					},
+				},
+			},
+			&user_model.UserSessionView{
+				UserAgentID:                  "agentID",
+				PasswordVerification:         testNow,
+				SecondFactorVerification:     testNow,
+				SecondFactorVerificationType: domain.MFATypeOTPEmail,
+				ChangeDate:                   testNow,
+			},
+			nil,
+		},
+		{
+			"failed otp sms check of other agentID, second factor kept",
+			args{
+				userProvider: &mockViewUserSession{
+					PasswordVerification:     testNow,
+					SecondFactorVerification: testNow,
+				},
+				agentID: "agentID",
+				userID:  "id",
+				eventProvider: &mockEventUser{
+					Events: []eventstore.Event{
+						&es_models.Event{
+							AggregateType: user_repo.AggregateType,
+							Typ:           user_repo.HumanOTPSMSCheckFailedType,
+							CreationDate:  testNow,
+							Data: func() []byte {
+								data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "otherID"})
+								return data
+							}(),
+						},
+					},
+				},
+			},
+			&user_model.UserSessionView{
+				PasswordVerification:     testNow,
+				SecondFactorVerification: testNow,
 			},
 			nil,
 		},

@@ -104,6 +104,22 @@ func (s *UserSession) Reducers() []handler.AggregateReducer {
 					Reduce: s.Reduce,
 				},
 				{
+					Event:  user.HumanOTPSMSCheckSucceededType,
+					Reduce: s.Reduce,
+				},
+				{
+					Event:  user.HumanOTPSMSCheckFailedType,
+					Reduce: s.Reduce,
+				},
+				{
+					Event:  user.HumanOTPEmailCheckSucceededType,
+					Reduce: s.Reduce,
+				},
+				{
+					Event:  user.HumanOTPEmailCheckFailedType,
+					Reduce: s.Reduce,
+				},
+				{
 					Event:  user.HumanRecoveryCodeCheckSucceededType,
 					Reduce: s.Reduce,
 				},
@@ -286,8 +302,24 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 			return nil, err
 		}
 		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
+	case user.HumanOTPSMSCheckSucceededType,
+		user.HumanOTPEmailCheckSucceededType:
+		mfaType := domain.MFATypeOTPSMS
+		if event.Type() == user.HumanOTPEmailCheckSucceededType {
+			mfaType = domain.MFATypeOTPEmail
+		}
+		columns, err := u.sessionColumnsActivate(event,
+			handler.NewCol(view_model.UserSessionKeySecondFactorVerification, event.CreatedAt()),
+			handler.NewCol(view_model.UserSessionKeySecondFactorVerificationType, mfaType),
+		)
+		if err != nil {
+			return nil, err
+		}
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
 	case user.UserV1MFAOTPCheckFailedType,
 		user.HumanMFAOTPCheckFailedType,
+		user.HumanOTPSMSCheckFailedType,
+		user.HumanOTPEmailCheckFailedType,
 		user.HumanU2FTokenCheckFailedType:
 		columns, err := u.sessionColumnsActivate(event,
 			handler.NewCol(view_model.UserSessionKeySecondFactorVerification, time.Time{}),
