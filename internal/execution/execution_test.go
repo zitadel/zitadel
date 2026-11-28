@@ -823,6 +823,34 @@ func Test_handleResponse(t *testing.T) {
 				}},
 		},
 		{
+			"response, statuscode = 503, target unavailable",
+			args{
+				resp: &http.Response{
+					StatusCode: http.StatusServiceUnavailable,
+					Body:       io.NopCloser(bytes.NewReader([]byte(""))),
+				},
+			},
+			res{
+				wantErr: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowUnavailable(nil, "EXEC-ohT1ieZ3ye", "Errors.Execution.Failed"))
+				},
+			},
+		},
+		{
+			"response, statuscode = 500, target failed",
+			args{
+				resp: &http.Response{
+					StatusCode: http.StatusInternalServerError,
+					Body:       io.NopCloser(bytes.NewReader([]byte("body"))),
+				},
+			},
+			res{
+				wantErr: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowUnavailable(nil, "EXEC-ohT1ieZ3ye", "Errors.Execution.Failed"))
+				},
+			},
+		},
+		{
 			"response, statuscode = 200 and body",
 			args{
 				resp: &http.Response{
@@ -872,7 +900,7 @@ func Test_handleResponse(t *testing.T) {
 			},
 			res{
 				wantErr: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "EXEC-bmhNhpcqpF", "internal"))
+					return errors.Is(err, zerrors.ThrowUnavailable(nil, "EXEC-Uu9aiCee4j", "internal"))
 				},
 			},
 		},
