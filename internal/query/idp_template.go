@@ -68,13 +68,16 @@ type OAuthIDPTemplate struct {
 }
 
 type OIDCIDPTemplate struct {
-	IDPID            string
-	ClientID         string
-	ClientSecret     *crypto.CryptoValue
-	Issuer           string
-	Scopes           database.TextArray[string]
-	IsIDTokenMapping bool
-	UsePKCE          bool
+	IDPID                   string
+	ClientID                string
+	ClientSecret            *crypto.CryptoValue
+	Issuer                  string
+	Scopes                  database.TextArray[string]
+	IsIDTokenMapping        bool
+	UsePKCE                 bool
+	TokenEndpointAuthMethod domain.OIDCTokenEndpointAuthMethod
+	PrivateKey              *crypto.CryptoValue
+	KeyID                   string
 }
 
 type JWTIDPTemplate struct {
@@ -333,6 +336,18 @@ var (
 	}
 	OIDCUsePKCECol = Column{
 		name:  projection.OIDCUsePKCECol,
+		table: oidcIdpTemplateTable,
+	}
+	OIDCTokenEndpointAuthMethodCol = Column{
+		name:  projection.OIDCTokenEndpointAuthMethodCol,
+		table: oidcIdpTemplateTable,
+	}
+	OIDCPrivateKeyCol = Column{
+		name:  projection.OIDCPrivateKeyCol,
+		table: oidcIdpTemplateTable,
+	}
+	OIDCKeyIDCol = Column{
+		name:  projection.OIDCKeyIDCol,
 		table: oidcIdpTemplateTable,
 	}
 )
@@ -957,6 +972,9 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			OIDCScopesCol.identifier(),
 			OIDCIDTokenMappingCol.identifier(),
 			OIDCUsePKCECol.identifier(),
+			OIDCTokenEndpointAuthMethodCol.identifier(),
+			OIDCPrivateKeyCol.identifier(),
+			OIDCKeyIDCol.identifier(),
 			// jwt
 			JWTIDCol.identifier(),
 			JWTIssuerCol.identifier(),
@@ -1087,6 +1105,9 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			oidcScopes := database.TextArray[string]{}
 			oidcIDTokenMapping := sql.NullBool{}
 			oidcUserPKCE := sql.NullBool{}
+			oidcTokenEndpointAuthMethod := sql.NullInt16{}
+			oidcPrivateKey := new(crypto.CryptoValue)
+			oidcKeyID := sql.NullString{}
 
 			jwtID := sql.NullString{}
 			jwtIssuer := sql.NullString{}
@@ -1214,6 +1235,9 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 				&oidcScopes,
 				&oidcIDTokenMapping,
 				&oidcUserPKCE,
+				&oidcTokenEndpointAuthMethod,
+				&oidcPrivateKey,
+				&oidcKeyID,
 				// jwt
 				&jwtID,
 				&jwtIssuer,
@@ -1332,13 +1356,16 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			}
 			if oidcID.Valid {
 				idpTemplate.OIDCIDPTemplate = &OIDCIDPTemplate{
-					IDPID:            oidcID.String,
-					ClientID:         oidcClientID.String,
-					ClientSecret:     oidcClientSecret,
-					Issuer:           oidcIssuer.String,
-					Scopes:           oidcScopes,
-					IsIDTokenMapping: oidcIDTokenMapping.Bool,
-					UsePKCE:          oidcUserPKCE.Bool,
+					IDPID:                   oidcID.String,
+					ClientID:                oidcClientID.String,
+					ClientSecret:            oidcClientSecret,
+					Issuer:                  oidcIssuer.String,
+					Scopes:                  oidcScopes,
+					IsIDTokenMapping:        oidcIDTokenMapping.Bool,
+					UsePKCE:                 oidcUserPKCE.Bool,
+					TokenEndpointAuthMethod: domain.OIDCTokenEndpointAuthMethod(oidcTokenEndpointAuthMethod.Int16),
+					PrivateKey:              oidcPrivateKey,
+					KeyID:                   oidcKeyID.String,
 				}
 			}
 			if jwtID.Valid {
@@ -1508,6 +1535,9 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			OIDCScopesCol.identifier(),
 			OIDCIDTokenMappingCol.identifier(),
 			OIDCUsePKCECol.identifier(),
+			OIDCTokenEndpointAuthMethodCol.identifier(),
+			OIDCPrivateKeyCol.identifier(),
+			OIDCKeyIDCol.identifier(),
 			// jwt
 			JWTIDCol.identifier(),
 			JWTIssuerCol.identifier(),
@@ -1643,6 +1673,9 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 				oidcScopes := database.TextArray[string]{}
 				oidcIDTokenMapping := sql.NullBool{}
 				oidcUserPKCE := sql.NullBool{}
+				oidcTokenEndpointAuthMethod := sql.NullInt16{}
+				oidcPrivateKey := new(crypto.CryptoValue)
+				oidcKeyID := sql.NullString{}
 
 				jwtID := sql.NullString{}
 				jwtIssuer := sql.NullString{}
@@ -1770,6 +1803,9 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 					&oidcScopes,
 					&oidcIDTokenMapping,
 					&oidcUserPKCE,
+					&oidcTokenEndpointAuthMethod,
+					&oidcPrivateKey,
+					&oidcKeyID,
 					// jwt
 					&jwtID,
 					&jwtIssuer,
@@ -1887,13 +1923,16 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 				}
 				if oidcID.Valid {
 					idpTemplate.OIDCIDPTemplate = &OIDCIDPTemplate{
-						IDPID:            oidcID.String,
-						ClientID:         oidcClientID.String,
-						ClientSecret:     oidcClientSecret,
-						Issuer:           oidcIssuer.String,
-						Scopes:           oidcScopes,
-						IsIDTokenMapping: oidcIDTokenMapping.Bool,
-						UsePKCE:          oidcUserPKCE.Bool,
+						IDPID:                   oidcID.String,
+						ClientID:                oidcClientID.String,
+						ClientSecret:            oidcClientSecret,
+						Issuer:                  oidcIssuer.String,
+						Scopes:                  oidcScopes,
+						IsIDTokenMapping:        oidcIDTokenMapping.Bool,
+						UsePKCE:                 oidcUserPKCE.Bool,
+						TokenEndpointAuthMethod: domain.OIDCTokenEndpointAuthMethod(oidcTokenEndpointAuthMethod.Int16),
+						PrivateKey:              oidcPrivateKey,
+						KeyID:                   oidcKeyID.String,
 					}
 				}
 				if jwtID.Valid {

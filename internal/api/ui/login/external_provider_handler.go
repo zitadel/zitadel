@@ -1221,12 +1221,17 @@ func (l *Login) googleProvider(ctx context.Context, identityProvider *query.IDPT
 }
 
 func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*openid.Provider, error) {
-	secret, err := crypto.DecryptString(identityProvider.OIDCIDPTemplate.ClientSecret, l.idpConfigAlg)
+	secret, opts, err := openid.ClientAuth(
+		identityProvider.OIDCIDPTemplate.TokenEndpointAuthMethod,
+		identityProvider.OIDCIDPTemplate.ClientSecret,
+		identityProvider.OIDCIDPTemplate.PrivateKey,
+		identityProvider.OIDCIDPTemplate.KeyID,
+		l.idpConfigAlg,
+	)
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]openid.ProviderOpts, 1, 3)
-	opts[0] = openid.WithSelectAccount()
+	opts = append(opts, openid.WithSelectAccount())
 	if identityProvider.OIDCIDPTemplate.IsIDTokenMapping {
 		opts = append(opts, openid.WithIDTokenMapping())
 	}
