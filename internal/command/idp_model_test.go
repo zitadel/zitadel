@@ -2,7 +2,11 @@ package command
 
 import (
 	"context"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -12,11 +16,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	oidc_pkg "github.com/zitadel/oidc/v3/pkg/oidc"
+	"golang.org/x/oauth2"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	providers "github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
+	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/idp/providers/zitadel"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -449,6 +455,65 @@ func TestOIDCIDPWriteModel_ToProvider_WithPKCE(t *testing.T) {
 	require.True(t, discoveryRequested.Load(), "expected OIDC discovery to be requested")
 
 	assertProviderUsesPKCE(t, provider)
+}
+
+func TestOIDCIDPWriteModel_ToProvider_TokenEndpointAuthMethod(t *testing.T) {
+	var issuer string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		assert.NoError(t, json.NewEncoder(w).Encode(&oidc_pkg.DiscoveryConfiguration{
+			Issuer:                issuer,
+			AuthorizationEndpoint: issuer + "/authorize",
+			TokenEndpoint:         issuer + "/token",
+		}))
+	}))
+	t.Cleanup(server.Close)
+	issuer = server.URL
+
+	key, err := rsa.GenerateKey(rand.Reader, 2048)
+	require.NoError(t, err)
+	keyPEM := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)})
+
+	tests := []struct {
+		name       string
+		wm         *OIDCIDPWriteModel
+		wantSecret string
+		wantSigner bool
+		wantPKCE   bool
+	}{
+		{
+			name: "client secret (default)",
+			wm: &OIDCIDPWriteModel{
+				ClientSecret: &crypto.CryptoValue{Algorithm: "plain", Crypted: []byte("clientSecret"), KeyID: "keyID"},
+			},
+			wantSecret: "clientSecret",
+		},
+		{
+			name: "private_key_jwt",
+			wm: &OIDCIDPWriteModel{
+				TokenEndpointAuthMethod: domain.OIDCTokenEndpointAuthMethodPrivateKeyJWT,
+				PrivateKey:              &crypto.CryptoValue{Algorithm: "plain", Crypted: keyPEM, KeyID: "keyID"},
+				KeyID:                   "kid",
+			},
+			wantSigner: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.wm.Name = "OIDC"
+			tt.wm.Issuer = issuer
+			tt.wm.ClientID = "clientID"
+			provider, err := tt.wm.ToProvider("https://zitadel.example.com/idps/callback", plainTextEncryption{}, http.DefaultClient)
+			require.NoError(t, err)
+			relyingParty := provider.(*oidc.Provider).RelyingParty
+			assert.Equal(t, tt.wantSecret, relyingParty.OAuthConfig().ClientSecret)
+			assert.Equal(t, tt.wantSigner, relyingParty.Signer() != nil)
+			assert.Equal(t, tt.wantPKCE, relyingParty.IsPKCE())
+			if tt.wantSecret == "" {
+				assert.Equal(t, oauth2.AuthStyleInParams, relyingParty.OAuthConfig().Endpoint.AuthStyle)
+			}
+		})
+	}
 }
 
 func TestZitadelIDPWriteModel_ToProvider(t *testing.T) {

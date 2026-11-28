@@ -215,14 +215,17 @@ func (wm *OAuthIDPWriteModel) GetProviderOptions() idp.Options {
 type OIDCIDPWriteModel struct {
 	eventstore.WriteModel
 
-	Name             string
-	ID               string
-	Issuer           string
-	ClientID         string
-	ClientSecret     *crypto.CryptoValue
-	Scopes           []string
-	IsIDTokenMapping bool
-	UsePKCE          bool
+	Name                    string
+	ID                      string
+	Issuer                  string
+	ClientID                string
+	ClientSecret            *crypto.CryptoValue
+	Scopes                  []string
+	IsIDTokenMapping        bool
+	UsePKCE                 bool
+	TokenEndpointAuthMethod domain.OIDCTokenEndpointAuthMethod
+	PrivateKey              *crypto.CryptoValue
+	KeyID                   string
 	idp.Options
 
 	State domain.IDPState
@@ -264,6 +267,9 @@ func (wm *OIDCIDPWriteModel) reduceAddedEvent(e *idp.OIDCIDPAddedEvent) {
 	wm.Scopes = e.Scopes
 	wm.IsIDTokenMapping = e.IsIDTokenMapping
 	wm.UsePKCE = e.UsePKCE
+	wm.TokenEndpointAuthMethod = e.TokenEndpointAuthMethod
+	wm.PrivateKey = e.PrivateKey
+	wm.KeyID = e.KeyID
 	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
 }
@@ -290,6 +296,15 @@ func (wm *OIDCIDPWriteModel) reduceChangedEvent(e *idp.OIDCIDPChangedEvent) {
 	if e.UsePKCE != nil {
 		wm.UsePKCE = *e.UsePKCE
 	}
+	if e.TokenEndpointAuthMethod != nil {
+		wm.TokenEndpointAuthMethod = *e.TokenEndpointAuthMethod
+	}
+	if e.PrivateKey != nil {
+		wm.PrivateKey = e.PrivateKey
+	}
+	if e.KeyID != nil {
+		wm.KeyID = *e.KeyID
+	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 
@@ -301,6 +316,9 @@ func (wm *OIDCIDPWriteModel) NewChanges(
 	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
 	idTokenMapping, usePKCE bool,
+	tokenEndpointAuthMethod domain.OIDCTokenEndpointAuthMethod,
+	privateKey []byte,
+	keyID string,
 	options idp.Options,
 ) ([]idp.OIDCIDPChanges, error) {
 	changes := make([]idp.OIDCIDPChanges, 0)
@@ -330,6 +348,19 @@ func (wm *OIDCIDPWriteModel) NewChanges(
 	}
 	if wm.UsePKCE != usePKCE {
 		changes = append(changes, idp.ChangeOIDCUsePKCE(usePKCE))
+	}
+	if wm.TokenEndpointAuthMethod != tokenEndpointAuthMethod {
+		changes = append(changes, idp.ChangeOIDCTokenEndpointAuthMethod(tokenEndpointAuthMethod))
+	}
+	if len(privateKey) > 0 {
+		encryptedKey, err := crypto.Crypt(privateKey, secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeOIDCPrivateKey(encryptedKey))
+	}
+	if wm.KeyID != keyID {
+		changes = append(changes, idp.ChangeOIDCKeyID(keyID))
 	}
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {
@@ -383,12 +414,11 @@ func (wm *OIDCIDPWriteModel) reduceOIDCConfigChangedEvent(e *idpconfig.OIDCConfi
 }
 
 func (wm *OIDCIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, httpClient *http.Client) (providers.Provider, error) {
-	secret, err := crypto.DecryptString(wm.ClientSecret, idpAlg)
+	secret, opts, err := oidc.ClientAuth(wm.TokenEndpointAuthMethod, wm.ClientSecret, wm.PrivateKey, wm.KeyID, idpAlg)
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]oidc.ProviderOpts, 1, 7)
-	opts[0] = oidc.WithSelectAccount()
+	opts = append(opts, oidc.WithSelectAccount())
 	if wm.IsIDTokenMapping {
 		opts = append(opts, oidc.WithIDTokenMapping())
 	}

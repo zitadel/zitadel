@@ -159,6 +159,16 @@ message OIDCConfig {
     ];
 }
 
+// Client authentication method used on the token endpoint of the identity provider.
+enum OIDCTokenEndpointAuthMethod {
+    // Defaults to client secret.
+    OIDC_TOKEN_ENDPOINT_AUTH_METHOD_UNSPECIFIED = 0;
+    // Authenticate with client_id and client_secret.
+    OIDC_TOKEN_ENDPOINT_AUTH_METHOD_CLIENT_SECRET = 1;
+    // Authenticate with a client assertion JWT signed with a private key (RFC 7523).
+    OIDC_TOKEN_ENDPOINT_AUTH_METHOD_PRIVATE_KEY_JWT = 2;
+}
+
 enum OIDCMappingField {
     OIDC_MAPPING_FIELD_UNSPECIFIED = 0;
     OIDC_MAPPING_FIELD_PREFERRED_USERNAME = 1;
@@ -389,6 +399,10 @@ message GenericOIDCConfig {
             example: "true";
         }
     ];
+    // Client authentication method used on the token endpoint of the identity provider.
+    OIDCTokenEndpointAuthMethod token_endpoint_auth_method = 6;
+    // ID of the private key used for the private_key_jwt auth method.
+    string key_id = 7;
 }
 
 message GitHubConfig {

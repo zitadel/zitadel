@@ -246,27 +246,33 @@ func updateGenericOAuthProviderToCommand(req *admin_pb.UpdateGenericOAuthProvide
 
 func addGenericOIDCProviderToCommand(req *admin_pb.AddGenericOIDCProviderRequest) command.GenericOIDCProvider {
 	return command.GenericOIDCProvider{
-		Name:             req.Name,
-		Issuer:           req.Issuer,
-		ClientID:         req.ClientId,
-		ClientSecret:     req.ClientSecret,
-		Scopes:           req.Scopes,
-		IsIDTokenMapping: req.IsIdTokenMapping,
-		UsePKCE:          req.UsePkce,
-		IDPOptions:       idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Name:                    req.Name,
+		Issuer:                  req.Issuer,
+		ClientID:                req.ClientId,
+		ClientSecret:            req.ClientSecret,
+		Scopes:                  req.Scopes,
+		IsIDTokenMapping:        req.IsIdTokenMapping,
+		UsePKCE:                 req.UsePkce,
+		TokenEndpointAuthMethod: idp_grpc.OIDCTokenEndpointAuthMethodToDomain(req.GetTokenEndpointAuthMethod()),
+		PrivateKey:              req.GetPrivateKey(),
+		KeyID:                   req.GetKeyId(),
+		IDPOptions:              idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 
 func updateGenericOIDCProviderToCommand(req *admin_pb.UpdateGenericOIDCProviderRequest) command.GenericOIDCProvider {
 	return command.GenericOIDCProvider{
-		Name:             req.Name,
-		Issuer:           req.Issuer,
-		ClientID:         req.ClientId,
-		ClientSecret:     req.ClientSecret,
-		Scopes:           req.Scopes,
-		IsIDTokenMapping: req.IsIdTokenMapping,
-		UsePKCE:          req.UsePkce,
-		IDPOptions:       idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Name:                    req.Name,
+		Issuer:                  req.Issuer,
+		ClientID:                req.ClientId,
+		ClientSecret:            req.ClientSecret,
+		Scopes:                  req.Scopes,
+		IsIDTokenMapping:        req.IsIdTokenMapping,
+		UsePKCE:                 req.UsePkce,
+		TokenEndpointAuthMethod: idp_grpc.OIDCTokenEndpointAuthMethodToDomain(req.GetTokenEndpointAuthMethod()),
+		PrivateKey:              req.GetPrivateKey(),
+		KeyID:                   req.GetKeyId(),
+		IDPOptions:              idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 

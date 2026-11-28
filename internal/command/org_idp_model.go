@@ -179,6 +179,9 @@ func (wm *OrgOIDCIDPWriteModel) NewChangedEvent(
 	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
 	idTokenMapping, usePKCE bool,
+	tokenEndpointAuthMethod domain.OIDCTokenEndpointAuthMethod,
+	privateKey []byte,
+	keyID string,
 	options idp.Options,
 ) (*org.OIDCIDPChangedEvent, error) {
 
@@ -191,6 +194,9 @@ func (wm *OrgOIDCIDPWriteModel) NewChangedEvent(
 		scopes,
 		idTokenMapping,
 		usePKCE,
+		tokenEndpointAuthMethod,
+		privateKey,
+		keyID,
 		options,
 	)
 	if err != nil || len(changes) == 0 {

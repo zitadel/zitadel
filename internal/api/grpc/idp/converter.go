@@ -519,12 +519,33 @@ func oauthConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OAut
 func oidcConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OIDCIDPTemplate) {
 	providerConfig.Config = &idp_pb.ProviderConfig_Oidc{
 		Oidc: &idp_pb.GenericOIDCConfig{
-			ClientId:         template.ClientID,
-			Issuer:           template.Issuer,
-			Scopes:           template.Scopes,
-			IsIdTokenMapping: template.IsIDTokenMapping,
-			UsePkce:          template.UsePKCE,
+			ClientId:                template.ClientID,
+			Issuer:                  template.Issuer,
+			Scopes:                  template.Scopes,
+			IsIdTokenMapping:        template.IsIDTokenMapping,
+			UsePkce:                 template.UsePKCE,
+			TokenEndpointAuthMethod: oidcTokenEndpointAuthMethodToPb(template.TokenEndpointAuthMethod),
+			KeyId:                   template.KeyID,
 		},
+	}
+}
+
+func oidcTokenEndpointAuthMethodToPb(method domain.OIDCTokenEndpointAuthMethod) idp_pb.OIDCTokenEndpointAuthMethod {
+	switch method {
+	case domain.OIDCTokenEndpointAuthMethodPrivateKeyJWT:
+		return idp_pb.OIDCTokenEndpointAuthMethod_OIDC_TOKEN_ENDPOINT_AUTH_METHOD_PRIVATE_KEY_JWT
+	default:
+		return idp_pb.OIDCTokenEndpointAuthMethod_OIDC_TOKEN_ENDPOINT_AUTH_METHOD_CLIENT_SECRET
+	}
+}
+
+// OIDCTokenEndpointAuthMethodToDomain maps unspecified to client secret, the default.
+func OIDCTokenEndpointAuthMethodToDomain(method idp_pb.OIDCTokenEndpointAuthMethod) domain.OIDCTokenEndpointAuthMethod {
+	switch method {
+	case idp_pb.OIDCTokenEndpointAuthMethod_OIDC_TOKEN_ENDPOINT_AUTH_METHOD_PRIVATE_KEY_JWT:
+		return domain.OIDCTokenEndpointAuthMethodPrivateKeyJWT
+	default:
+		return domain.OIDCTokenEndpointAuthMethodClientSecret
 	}
 }
 
