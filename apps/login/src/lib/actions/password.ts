@@ -24,6 +24,7 @@ import {
   listAuthenticationMethodTypes,
   passwordReset,
   searchUsers,
+  ServiceConfig,
   setPassword,
   setUserPassword,
 } from "@/lib/server/zitadel";
@@ -143,6 +144,67 @@ export type UpdateSessionCommand = {
   requestId?: string;
 };
 
+/**
+ * True if the API rejected the credentials of a password check, as opposed to the session being unusable.
+ * A wrong password and a locked user come with CredentialsCheckError details, which
+ * `setSessionAndUpdateCookie` rethrows as an object carrying `failedAttempts` (0 for a user that
+ * was locked without failed attempts). A wrong password is always `InvalidArgument`,
+ * also if those details are missing.
+ */
+function isCredentialsRejection(error: unknown): boolean {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+  return "failedAttempts" in error || (isClassifiedError(error) && error.code === Code.InvalidArgument);
+}
+
+/**
+ * Maps a failed password check to the error shown to the user. With `ignoreUnknownUsernames`
+ * the message is the same as for an unknown user, the settings of the request context decide
+ * (an unknown user has no organization the settings could be taken from).
+ */
+async function passwordCheckFailure({
+  serviceConfig,
+  t,
+  error,
+  organization,
+  loginSettingsByContext,
+}: {
+  serviceConfig: ServiceConfig;
+  t: Awaited<ReturnType<typeof getTranslations>>;
+  error: unknown;
+  organization?: string;
+  loginSettingsByContext?: LoginSettings;
+}): Promise<{ error: string }> {
+  const failedAttempts =
+    error && typeof error === "object" && "failedAttempts" in error ? Number(error.failedAttempts) : undefined;
+
+  if (failedAttempts) {
+    recordAuthFailure("password", "invalid_password", organization);
+    if (loginSettingsByContext?.ignoreUnknownUsernames) {
+      return { error: t("errors.failedToAuthenticateNoLimit") };
+    }
+    const lockoutSettings = await getLockoutSettings({ serviceConfig, orgId: organization });
+
+    const hasLimit = lockoutSettings?.maxPasswordAttempts !== undefined && lockoutSettings?.maxPasswordAttempts > BigInt(0);
+    const locked = hasLimit && failedAttempts >= lockoutSettings?.maxPasswordAttempts;
+    const messageKey = hasLimit ? "errors.failedToAuthenticate" : "errors.failedToAuthenticateNoLimit";
+
+    return {
+      error: t(messageKey, {
+        failedAttempts,
+        maxPasswordAttempts: hasLimit ? String(lockoutSettings?.maxPasswordAttempts ?? 0) : "?",
+        lockoutMessage: locked ? t("errors.accountLockedContactAdmin") : "",
+      }),
+    };
+  }
+  recordAuthFailure("password", "session_creation_failed", organization);
+  if (loginSettingsByContext?.ignoreUnknownUsernames) {
+    return { error: t("errors.failedToAuthenticateNoLimit") };
+  }
+  return { error: t("errors.couldNotCreateSessionForUser") };
+}
+
 export async function sendPassword(
   command: UpdateSessionCommand,
 ): Promise<{ error: string } | { redirect: string } | { samlData: { url: string; fields: Record<string, string> } }> {
@@ -210,9 +272,26 @@ export async function sendPassword(
         // Force fallback if settings can't be loaded
         throw new Error("Could not load login settings");
       }
-    } catch {
+    } catch (error) {
+      // Every password check counts towards the lockout policy, so a password the API rejected
+      // on the existing session must not be checked a second time on a new session.
+      if (isCredentialsRejection(error)) {
+        loginSettingsByContext = await getLoginSettings({
+          serviceConfig,
+          organization: command.organization ?? command.defaultOrganization,
+        });
+
+        if (!loginSettingsByContext) {
+          // this is a fake error message to hide that the user does not even exist
+          recordAuthFailure("password", "settings_unavailable", command.organization);
+          return { error: t("errors.couldNotVerifyPassword") };
+        }
+
+        return passwordCheckFailure({ serviceConfig, t, error, organization: command.organization, loginSettingsByContext });
+      }
+
       logger.warn("[Password] Could not update session");
-      // If the session was terminated or any other error occurred during update,
+      // The session can no longer be used (terminated, expired, removed, ...),
       // we fall back to creating a new session.
       sessionCookie = undefined;
       session = undefined;
@@ -319,32 +398,8 @@ export async function sendPassword(
         });
         session = result.session;
         sessionCookie = result.sessionCookie;
-      } catch (error: any) {
-        if ("failedAttempts" in error && error.failedAttempts) {
-          recordAuthFailure("password", "invalid_password", command.organization);
-          if (loginSettingsByContext?.ignoreUnknownUsernames) {
-            return { error: t("errors.failedToAuthenticateNoLimit") };
-          }
-          const lockoutSettings = await getLockoutSettings({ serviceConfig, orgId: command.organization });
-
-          const hasLimit =
-            lockoutSettings?.maxPasswordAttempts !== undefined && lockoutSettings?.maxPasswordAttempts > BigInt(0);
-          const locked = hasLimit && error.failedAttempts >= lockoutSettings?.maxPasswordAttempts;
-          const messageKey = hasLimit ? "errors.failedToAuthenticate" : "errors.failedToAuthenticateNoLimit";
-
-          return {
-            error: t(messageKey, {
-              failedAttempts: error.failedAttempts,
-              maxPasswordAttempts: hasLimit ? String(lockoutSettings?.maxPasswordAttempts ?? 0) : "?",
-              lockoutMessage: locked ? t("errors.accountLockedContactAdmin") : "",
-            }),
-          };
-        }
-        recordAuthFailure("password", "session_creation_failed", command.organization);
-        if (loginSettingsByContext?.ignoreUnknownUsernames) {
-          return { error: t("errors.failedToAuthenticateNoLimit") };
-        }
-        return { error: t("errors.couldNotCreateSessionForUser") };
+      } catch (error) {
+        return passwordCheckFailure({ serviceConfig, t, error, organization: command.organization, loginSettingsByContext });
       }
     } else {
       // this is a fake error message to hide that the user does not even exist

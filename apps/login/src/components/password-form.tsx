@@ -7,7 +7,7 @@ import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
 import { AutoSubmitForm } from "./auto-submit-form";
@@ -41,6 +41,9 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
   const [samlData, setSamlData] = useState<{ url: string; fields: Record<string, string> } | null>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
+  // Pending until the page the password check redirects to is shown. The form stays disabled
+  // meanwhile, a second submit would check the password again and rotate the session token.
+  const [navigating, startNavigation] = useTransition();
 
   const router = useRouter();
 
@@ -59,7 +62,12 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
         requestId,
       });
 
-      handleServerActionResponse(response, router, setSamlData, setError);
+      handleServerActionResponse(
+        response,
+        { push: (url) => startNavigation(() => router.push(url)) },
+        setSamlData,
+        setError,
+      );
     } catch {
       setError(t("verify.errors.couldNotVerifyPassword"));
     } finally {
@@ -126,7 +134,7 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
               className="hover:text-primary-light-500 dark:hover:text-primary-dark-500 text-sm transition-all"
               onClick={() => resetPasswordAndContinue()}
               type="button"
-              disabled={loading}
+              disabled={loading || navigating}
               data-testid="reset-button"
             >
               <Translated i18nKey="verify.resetPassword" namespace="password" />
@@ -155,11 +163,12 @@ export function PasswordForm({ loginSettings, loginName, organization, defaultOr
             type="submit"
             className="self-end"
             variant={ButtonVariants.Primary}
-            disabled={loading || !formState.isValid}
+            disabled={loading || navigating || !formState.isValid}
             onClick={handleSubmit(submitPassword)}
             data-testid="submit-button"
           >
-            {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="verify.submit" namespace="password" />
+            {(loading || navigating) && <Spinner className="mr-2 h-5 w-5" />}{" "}
+            <Translated i18nKey="verify.submit" namespace="password" />
           </Button>
         </div>
       </form>
