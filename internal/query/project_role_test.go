@@ -1,12 +1,17 @@
 package query
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
 	"fmt"
 	"regexp"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 var (
@@ -175,6 +180,59 @@ func Test_ProjectRolePrepares(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+		})
+	}
+}
+
+func Test_projectRolesCheckPermission(t *testing.T) {
+	roles := func() []*ProjectRole {
+		return []*ProjectRole{
+			{ProjectID: "project1", ResourceOwner: "org1", Key: "admin"},
+			{ProjectID: "project1", ResourceOwner: "org1", Key: "viewer"},
+			{ProjectID: "project2", ResourceOwner: "org1", Key: "admin"},
+		}
+	}
+	tests := []struct {
+		name string
+		// readableProjects are the project IDs the caller has project.role.read on.
+		readableProjects []string
+		want             []*ProjectRole
+	}{
+		{
+			name:             "member of one project sees only its roles",
+			readableProjects: []string{"project1"},
+			want: []*ProjectRole{
+				{ProjectID: "project1", ResourceOwner: "org1", Key: "admin"},
+				{ProjectID: "project1", ResourceOwner: "org1", Key: "viewer"},
+			},
+		},
+		{
+			name:             "member of both projects sees all roles",
+			readableProjects: []string{"project1", "project2"},
+			want:             roles(),
+		},
+		{
+			name:             "no permission",
+			readableProjects: []string{},
+			want:             []*ProjectRole{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			checkPermission := func(_ context.Context, permission, _, resourceID string) error {
+				if permission != domain.PermissionProjectRoleRead {
+					return errors.New("unexpected permission " + permission)
+				}
+				for _, projectID := range tt.readableProjects {
+					if resourceID == projectID {
+						return nil
+					}
+				}
+				return errors.New("permission denied")
+			}
+			projectRoles := &ProjectRoles{ProjectRoles: roles()}
+			projectRolesCheckPermission(context.Background(), projectRoles, checkPermission)
+			require.Equal(t, tt.want, projectRoles.ProjectRoles)
 		})
 	}
 }

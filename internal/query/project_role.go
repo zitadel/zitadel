@@ -85,13 +85,16 @@ type ProjectRoleSearchQueries struct {
 func projectRolesCheckPermission(ctx context.Context, projectRoles *ProjectRoles, permissionCheck domain.PermissionCheck) {
 	projectRoles.ProjectRoles = slices.DeleteFunc(projectRoles.ProjectRoles,
 		func(projectRole *ProjectRole) bool {
-			return projectRoleCheckPermission(ctx, projectRole.ResourceOwner, projectRole.Key, permissionCheck) != nil
+			return projectRoleCheckPermission(ctx, projectRole.ResourceOwner, projectRole.ProjectID, permissionCheck) != nil
 		},
 	)
 }
 
-func projectRoleCheckPermission(ctx context.Context, resourceOwner string, grantID string, permissionCheck domain.PermissionCheck) error {
-	return permissionCheck(ctx, domain.PermissionProjectGrantRead, resourceOwner, grantID)
+// projectRoleCheckPermission checks project.role.read on the role's project,
+// like projectRolePermissionCheckV2 does, so that a project membership
+// (whose context is the project ID) can read the project's roles.
+func projectRoleCheckPermission(ctx context.Context, resourceOwner string, projectID string, permissionCheck domain.PermissionCheck) error {
+	return permissionCheck(ctx, domain.PermissionProjectRoleRead, resourceOwner, projectID)
 }
 
 func projectRolePermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *ProjectRoleSearchQueries) sq.SelectBuilder {
