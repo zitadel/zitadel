@@ -390,7 +390,35 @@ func (i *Instance) CreateOIDCCredentialsClient(ctx context.Context) (machine *ma
 	if err != nil {
 		return nil, "", "", "", err
 	}
+	if err = i.awaitMachineSecret(ctx, machine.GetUserId()); err != nil {
+		return nil, "", "", "", err
+	}
 	return machine, name, secret.GetClientId(), secret.GetClientSecret(), nil
+}
+
+// awaitMachineSecret waits until the users projection holds the secret of the machine user.
+// The client credentials grant reads the projection without triggering it,
+// so a token request sent right after GenerateMachineSecret can fail with Errors.User.Machine.Secret.NotExisting.
+// GetUserByID triggers the users projection and reports whether the secret is there.
+func (i *Instance) awaitMachineSecret(ctx context.Context, userID string) error {
+	waitFor, tick := WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	timeout := time.After(waitFor)
+	for {
+		resp, err := i.Client.UserV2.GetUserByID(ctx, &user_v2.GetUserByIDRequest{UserId: userID})
+		if err == nil && resp.GetUser().GetMachine().GetHasSecret() {
+			return nil
+		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-timeout:
+			if err != nil {
+				return fmt.Errorf("machine secret of user %s: %w", userID, err)
+			}
+			return fmt.Errorf("machine secret of user %s not in the users projection after %s", userID, waitFor)
+		case <-time.After(tick):
+		}
+	}
 }
 
 func (i *Instance) CreateOIDCCredentialsClientInactive(ctx context.Context) (machine *management.AddMachineUserResponse, name, clientID, clientSecret string, err error) {
