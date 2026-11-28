@@ -5276,6 +5276,55 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 			},
 		},
 		{
+			name: "no changes after team and key ID change",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewAppleIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"",
+								"clientID",
+								"teamID",
+								"keyID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("privateKey"),
+								},
+								nil,
+								idp.Options{},
+							)),
+						eventFromEventPusher(
+							func() eventstore.Command {
+								event, _ := instance.NewAppleIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+									"id1",
+									[]idp.AppleIDPChanges{
+										idp.ChangeAppleTeamID("teamID2"),
+										idp.ChangeAppleKeyID("keyID2"),
+									},
+								)
+								return event
+							}(),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: AppleProvider{
+					ClientID: "clientID",
+					TeamID:   "teamID2",
+					KeyID:    "keyID2",
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+		{
 			name: "change ok",
 			fields: fields{
 				eventstore: expectEventstore(
