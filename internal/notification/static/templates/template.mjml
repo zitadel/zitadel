@@ -28,9 +28,13 @@
       {{end}}
       <mj-section>
         <mj-column width="60%">
+          {{if .IncludeGreeting}}
           <mj-text font-size="24px" font-weight="500">{{.Greeting}}</mj-text>
+          {{end}}
           <mj-text font-size="16px" line-height="1.5" font-weight="light">{{.Text}}</mj-text>
+          {{if .IncludeButton}}
           <mj-button css-class="shadow" border-radius="6px" href="{{.URL}}" rel="noopener noreferrer" background-color="{{.PrimaryColor}}" font-size="14px" font-weight="500" >{{.ButtonText}}</mj-button>
+          {{end}}
 
           {{if .IncludeFooter}}
           <mj-divider
