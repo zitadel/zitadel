@@ -76,7 +76,7 @@ export class ActionsTwoTargetsComponent {
         await this.actionService.updateTarget(request);
       } else {
         const resp = await this.actionService.createTarget(request);
-        console.log(`Your singing key: ${resp.signingKey}`);
+        console.log(`Your signing key: ${resp.signingKey}`);
       }
 
       await new Promise((res) => setTimeout(res, 1000));
