@@ -65,6 +65,7 @@ describe("Theme Configuration", () => {
         layout: "top-to-bottom",
         appearance: "flat",
         spacing: "regular",
+        logoMaxHeight: 80,
       });
     });
 
@@ -73,6 +74,7 @@ describe("Theme Configuration", () => {
       expect(DEFAULT_THEME.layout).toBe("top-to-bottom");
       expect(DEFAULT_THEME.appearance).toBe("flat");
       expect(DEFAULT_THEME.spacing).toBe("regular");
+      expect(DEFAULT_THEME.logoMaxHeight).toBe(80);
     });
   });
 
@@ -83,6 +85,7 @@ describe("Theme Configuration", () => {
       delete process.env.NEXT_PUBLIC_THEME_APPEARANCE;
       delete process.env.NEXT_PUBLIC_THEME_SPACING;
       delete process.env.NEXT_PUBLIC_THEME_BACKGROUND_IMAGE;
+      delete process.env.NEXT_PUBLIC_THEME_LOGO_MAX_HEIGHT;
 
       const config = getThemeConfig();
 
@@ -91,6 +94,31 @@ describe("Theme Configuration", () => {
       expect(config.appearance).toBe(DEFAULT_THEME.appearance);
       expect(config.spacing).toBe(DEFAULT_THEME.spacing);
       expect(config.componentRoundness).toEqual(DEFAULT_COMPONENT_ROUNDNESS);
+      expect(config.logoMaxHeight).toBe(DEFAULT_THEME.logoMaxHeight);
+    });
+
+    describe("logoMaxHeight", () => {
+      afterEach(() => {
+        delete process.env.NEXT_PUBLIC_THEME_LOGO_MAX_HEIGHT;
+      });
+
+      it("should read a positive value from the environment variable", () => {
+        process.env.NEXT_PUBLIC_THEME_LOGO_MAX_HEIGHT = "120";
+
+        expect(getThemeConfig().logoMaxHeight).toBe(120);
+      });
+
+      it("should accept fractional values", () => {
+        process.env.NEXT_PUBLIC_THEME_LOGO_MAX_HEIGHT = "62.5";
+
+        expect(getThemeConfig().logoMaxHeight).toBe(62.5);
+      });
+
+      it.each(["0", "-40", "abc", ""])("should fall back to the default for invalid value %j", (value) => {
+        process.env.NEXT_PUBLIC_THEME_LOGO_MAX_HEIGHT = value;
+
+        expect(getThemeConfig().logoMaxHeight).toBe(DEFAULT_THEME.logoMaxHeight);
+      });
     });
 
     it("should use global roundness from environment variable", () => {

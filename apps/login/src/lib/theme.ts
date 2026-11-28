@@ -22,6 +22,7 @@ export interface ThemeConfig {
   backgroundImage?: string;
   appearance: ThemeAppearance;
   spacing: ThemeSpacing;
+  logoMaxHeight: number; // Upper bound in px for the branding logo's rendered height
 }
 
 // Default component-specific roundness configuration
@@ -42,7 +43,21 @@ export const DEFAULT_THEME: ThemeConfig = {
   layout: "top-to-bottom",
   appearance: "flat",
   spacing: "regular",
+  logoMaxHeight: 80,
 };
+
+// Parse a positive pixel value from an environment variable or a caller-supplied
+// override, ignoring anything that isn't a finite number greater than zero.
+// Falsy input (undefined, empty string, 0, NaN) falls back, as do Infinity and
+// negative numbers.
+export function parsePixelValue(raw: string | number | undefined, fallback: number): number {
+  if (!raw) {
+    return fallback;
+  }
+
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
 
 // Get theme configuration from environment variables
 export function getThemeConfig(): ThemeConfig {
@@ -69,6 +84,7 @@ export function getThemeConfig(): ThemeConfig {
     backgroundImage: process.env.NEXT_PUBLIC_THEME_BACKGROUND_IMAGE || undefined,
     appearance: (process.env.NEXT_PUBLIC_THEME_APPEARANCE as ThemeAppearance) || DEFAULT_THEME.appearance,
     spacing: (process.env.NEXT_PUBLIC_THEME_SPACING as ThemeSpacing) || DEFAULT_THEME.spacing,
+    logoMaxHeight: parsePixelValue(process.env.NEXT_PUBLIC_THEME_LOGO_MAX_HEIGHT, DEFAULT_THEME.logoMaxHeight),
   };
 }
 
