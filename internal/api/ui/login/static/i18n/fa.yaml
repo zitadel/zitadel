@@ -1,0 +1,543 @@
+Login:
+  Title: خوش آمدید!
+  Description: اطلاعات ورود خود را وارد کنید.
+  TitleLinking: ورود برای اتصال کاربر
+  DescriptionLinking: برای اتصال کاربر خارجی خود، اطلاعات ورود را وارد کنید.
+  LoginNameLabel: نام ورود
+  UsernamePlaceHolder: نام کاربری
+  LoginnamePlaceHolder: username@domain
+  ExternalUserDescription: ورود با یک کاربر خارجی.
+  MustBeMemberOfOrg: کاربر باید عضو سازمان {{.OrgName}} باشد.
+  RegisterButtonText: ثبت‌نام
+  NextButtonText: بعدی
+
+LDAP:
+  Title: ورود
+  Description: اطلاعات ورود خود را وارد کنید.
+  LoginNameLabel: نام ورود
+  PasswordLabel: گذرواژه
+  NextButtonText: بعدی
+
+SelectAccount:
+  Title: انتخاب حساب
+  Description: از حساب خود استفاده کنید
+  TitleLinking: انتخاب حساب برای اتصال کاربر
+  DescriptionLinking: حسابی را که می‌خواهید به کاربر خارجی خود متصل کنید انتخاب کنید.
+  OtherUser: کاربر دیگر
+  SessionState0: فعال
+  SessionState1: خارج شده
+  MustBeMemberOfOrg: کاربر باید عضو سازمان {{.OrgName}} باشد.
+
+Password:
+  Title: گذرواژه
+  Description: اطلاعات ورود خود را وارد کنید.
+  PasswordLabel: گذرواژه
+  MinLength: باید حداقل
+  MinLengthp2: نویسه باشد.
+  MaxLength: باید کمتر از ۷۰ نویسه باشد.
+  HasUppercase: باید شامل یک حرف بزرگ باشد.
+  HasLowercase: باید شامل یک حرف کوچک باشد.
+  HasNumber: باید شامل یک عدد باشد.
+  HasSymbol: باید شامل یک نماد باشد.
+  Confirmation: تکرار گذرواژه مطابقت دارد.
+  ResetLinkText: بازنشانی گذرواژه
+  BackButtonText: بازگشت
+  NextButtonText: بعدی
+
+UsernameChange:
+  Title: تغییر نام کاربری
+  Description: نام کاربری جدید خود را تعیین کنید
+  UsernameLabel: نام کاربری
+  CancelButtonText: لغو
+  NextButtonText: بعدی
+
+UsernameChangeDone:
+  Title: نام کاربری تغییر کرد
+  Description: نام کاربری شما با موفقیت تغییر کرد.
+  NextButtonText: بعدی
+
+InitPassword:
+  Title: تعیین گذرواژه
+  Description: کدی دریافت کرده‌اید که برای تعیین گذرواژهٔ جدید باید آن را در فرم زیر وارد کنید.
+  CodeLabel: کد
+  NewPasswordLabel: گذرواژهٔ جدید
+  NewPasswordConfirmLabel: تکرار گذرواژه
+  ResendButtonText: ارسال دوبارهٔ کد
+  NextButtonText: بعدی
+
+InitPasswordDone:
+  Title: گذرواژه تعیین شد
+  Description: گذرواژه با موفقیت تعیین شد
+  NextButtonText: بعدی
+  CancelButtonText: لغو
+
+InitUser:
+  Title: فعال‌سازی کاربر
+  Description: ایمیل خود را با کد زیر تأیید کرده و گذرواژهٔ خود را تعیین کنید.
+  CodeLabel: کد
+  NewPasswordLabel: گذرواژهٔ جدید
+  NewPasswordConfirm: تکرار گذرواژه
+  NextButtonText: بعدی
+  ResendButtonText: ارسال دوبارهٔ کد
+
+InitUserDone:
+  Title: کاربر فعال شد
+  Description: ایمیل تأیید و گذرواژه با موفقیت تعیین شد
+  NextButtonText: بعدی
+  CancelButtonText: لغو
+
+InviteUser:
+  Title: فعال‌سازی کاربر
+  Description: ایمیل خود را با کد زیر تأیید کرده و گذرواژهٔ خود را تعیین کنید.
+  CodeLabel: کد
+  NewPasswordLabel: گذرواژهٔ جدید
+  NewPasswordConfirm: تکرار گذرواژه
+  NextButtonText: بعدی
+  ResendButtonText: ارسال دوبارهٔ کد
+
+InitMFAPrompt:
+  Title: راه‌اندازی احراز هویت دومرحله‌ای
+  Description: احراز هویت دومرحله‌ای امنیت بیشتری برای حساب کاربری شما فراهم می‌کند و تضمین می‌کند که تنها شما به حساب خود دسترسی دارید.
+  Provider0: برنامهٔ احراز هویت (مانند Google/Microsoft Authenticator، Authy)
+  Provider1: وابسته به دستگاه (مانند FaceID، Windows Hello، اثر انگشت)
+  Provider3: رمز یک‌بار مصرف پیامکی
+  Provider4: رمز یک‌بار مصرف ایمیلی
+  NextButtonText: بعدی
+  SkipButtonText: رد کردن
+
+InitMFAOTP:
+  Title: تأیید دومرحله‌ای
+  Description: عامل دوم خود را ایجاد کنید. اگر برنامهٔ احراز هویت ندارید، یکی را دانلود کنید.
+  OTPDescription: کد را با برنامهٔ احراز هویت خود (مانند Google/Microsoft Authenticator، Authy) اسکن کنید یا کلید محرمانه را کپی کرده و کد تولیدشده را در زیر وارد کنید.
+  SecretLabel: کلید محرمانه
+  CodeLabel: کد
+  NextButtonText: بعدی
+  CancelButtonText: لغو
+
+InitMFAOTPSMS:
+  Title: تأیید دومرحله‌ای
+  DescriptionPhone: عامل دوم خود را ایجاد کنید. برای تأیید، شمارهٔ تلفن خود را وارد کنید.
+  DescriptionCode: عامل دوم خود را ایجاد کنید. برای تأیید شمارهٔ تلفن، کد دریافتی را وارد کنید.
+  CountryCodeLabel: کشور
+  PhoneLabel: تلفن
+  CodeLabel: کد
+  EditButtonText: ویرایش
+  ResendButtonText: ارسال دوبارهٔ کد
+  NextButtonText: بعدی
+
+InitMFAU2F:
+  Title: افزودن کلید امنیتی
+  Description: کلید امنیتی یک روش تأیید است که می‌تواند درون تلفن شما تعبیه شده باشد، از بلوتوث استفاده کند یا مستقیماً به درگاه USB رایانهٔ شما وصل شود.
+  TokenNameLabel: نام کلید امنیتی / دستگاه
+  NotSupported: مرورگر شما از WebAuthN پشتیبانی نمی‌کند. لطفاً مطمئن شوید که به‌روز است یا از مرورگر دیگری استفاده کنید (مانند Chrome، Safari، Firefox)
+  RegisterTokenButtonText: افزودن کلید امنیتی
+  ErrorRetry: دوباره تلاش کنید، یک چالش جدید ایجاد کنید یا روش دیگری را انتخاب کنید.
+
+InitMFADone:
+  Title: احراز هویت دومرحله‌ای تأیید شد
+  Description: عالی! احراز هویت دومرحله‌ای را با موفقیت راه‌اندازی کردید و حساب شما بسیار امن‌تر شد. این عامل باید در هر ورود وارد شود.
+  NextButtonText: بعدی
+  CancelButtonText: لغو
+
+MFAProvider:
+  Provider0: برنامهٔ احراز هویت (مانند Google/Microsoft Authenticator، Authy)
+  Provider1: وابسته به دستگاه (مانند FaceID، Windows Hello، اثر انگشت)
+  Provider3: رمز یک‌بار مصرف پیامکی
+  Provider4: رمز یک‌بار مصرف ایمیلی
+  ChooseOther: یا گزینهٔ دیگری را انتخاب کنید
+
+VerifyMFAOTP:
+  Title: تأیید عامل دوم
+  Description: عامل دوم خود را تأیید کنید
+  CodeLabel: کد
+  NextButtonText: بعدی
+
+VerifyOTP:
+  Title: تأیید عامل دوم
+  Description: عامل دوم خود را تأیید کنید
+  CodeLabel: کد
+  ResendButtonText: ارسال دوبارهٔ کد
+  NextButtonText: بعدی
+
+VerifyMFAU2F:
+  Title: تأیید دومرحله‌ای
+  Description: عامل دوم خود را با دستگاه ثبت‌شده تأیید کنید (مانند FaceID، Windows Hello، اثر انگشت)
+  NotSupported: مرورگر شما از WebAuthN پشتیبانی نمی‌کند. مطمئن شوید از جدیدترین نسخه استفاده می‌کنید یا به یک مرورگر پشتیبانی‌شده تغییر دهید (Chrome، Safari، Firefox)
+  ErrorRetry: دوباره تلاش کنید، یک درخواست جدید ایجاد کنید یا روش دیگری را انتخاب کنید.
+  ValidateTokenButtonText: تأیید عامل دوم
+
+Passwordless:
+  Title: ورود بدون گذرواژه
+  Description: با روش‌های احراز هویت دستگاه خود مانند FaceID، Windows Hello یا اثر انگشت وارد شوید.
+  NotSupported: مرورگر شما از WebAuthN پشتیبانی نمی‌کند. لطفاً مطمئن شوید که به‌روز است یا از مرورگر دیگری استفاده کنید (مانند Chrome، Safari، Firefox)
+  ErrorRetry: دوباره تلاش کنید، یک چالش جدید ایجاد کنید یا روش دیگری را انتخاب کنید.
+  LoginWithPwButtonText: ورود با گذرواژه
+  ValidateTokenButtonText: ورود بدون گذرواژه
+
+PasswordlessPrompt:
+  Title: راه‌اندازی ورود بدون گذرواژه
+  Description: آیا می‌خواهید ورود بدون گذرواژه را راه‌اندازی کنید؟ (روش‌های احراز هویت دستگاه شما مانند FaceID، Windows Hello یا اثر انگشت)
+  DescriptionInit: باید ورود بدون گذرواژه را راه‌اندازی کنید. برای ثبت دستگاه خود از پیوندی که دریافت کرده‌اید استفاده کنید.
+  PasswordlessButtonText: ورود بدون گذرواژه
+  NextButtonText: بعدی
+  SkipButtonText: رد کردن
+
+PasswordlessRegistration:
+  Title: راه‌اندازی ورود بدون گذرواژه
+  Description: یک نام (مانند MyMobilePhone، MacBook و غیره) وارد کنید و سپس روی دکمهٔ «ثبت ورود بدون گذرواژه» در زیر کلیک کنید.
+  TokenNameLabel: نام دستگاه
+  NotSupported: مرورگر شما از WebAuthN پشتیبانی نمی‌کند. لطفاً مطمئن شوید که به‌روز است یا از مرورگر دیگری استفاده کنید (مانند Chrome، Safari، Firefox)
+  RegisterTokenButtonText: ثبت ورود بدون گذرواژه
+  ErrorRetry: دوباره تلاش کنید، یک چالش جدید ایجاد کنید یا روش دیگری را انتخاب کنید.
+
+PasswordlessRegistrationDone:
+  Title: ورود بدون گذرواژه راه‌اندازی شد
+  Description: دستگاه برای ورود بدون گذرواژه با موفقیت اضافه شد.
+  DescriptionClose: اکنون می‌توانید این پنجره را ببندید.
+  NextButtonText: بعدی
+  CancelButtonText: لغو
+
+PasswordChange:
+  Title: تغییر گذرواژه
+  Description: گذرواژهٔ خود را تغییر دهید. گذرواژهٔ قدیمی و جدید خود را وارد کنید.
+  ExpiredDescription: گذرواژهٔ شما منقضی شده است و باید تغییر کند. گذرواژهٔ قدیمی و جدید خود را وارد کنید.
+  OldPasswordLabel: گذرواژهٔ قدیمی
+  NewPasswordLabel: گذرواژهٔ جدید
+  NewPasswordConfirmLabel: تکرار گذرواژه
+  CancelButtonText: لغو
+  NextButtonText: بعدی
+  Footer: پانویس
+
+PasswordChangeDone:
+  Title: تغییر گذرواژه
+  Description: گذرواژهٔ شما با موفقیت تغییر کرد.
+  NextButtonText: بعدی
+
+PasswordResetDone:
+  Title: پیوند بازنشانی گذرواژه ارسال شد
+  Description: برای بازنشانی گذرواژه، ایمیل خود را بررسی کنید.
+  NextButtonText: بعدی
+
+EmailVerification:
+  Title: تأیید ایمیل
+  Description: ایمیلی برای تأیید نشانی شما ارسال کردیم. لطفاً کد را در فرم زیر وارد کنید.
+  CodeLabel: کد
+  NextButtonText: بعدی
+  ResendButtonText: ارسال دوبارهٔ کد
+
+EmailVerificationDone:
+  Title: تأیید ایمیل
+  Description: نشانی ایمیل شما با موفقیت تأیید شد.
+  NextButtonText: بعدی
+  CancelButtonText: لغو
+  LoginButtonText: ورود
+
+RegisterOption:
+  Title: گزینه‌های ثبت‌نام
+  Description: روش ثبت‌نام را انتخاب کنید
+  RegisterUsernamePasswordButtonText: با نام کاربری و گذرواژه
+  ExternalLoginDescription: یا با یک کاربر خارجی ثبت‌نام کنید
+  LoginButtonText: ورود
+
+RegistrationUser:
+  Title: ثبت‌نام
+  Description: اطلاعات کاربری خود را وارد کنید. نشانی ایمیل شما به‌عنوان نام ورود استفاده خواهد شد.
+  DescriptionOrgRegister: اطلاعات کاربری خود را وارد کنید.
+  EmailLabel: ایمیل
+  UsernameLabel: نام کاربری
+  FirstnameLabel: نام
+  LastnameLabel: نام خانوادگی
+  LanguageLabel: زبان
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Persian: فارسی
+  GenderLabel: جنسیت
+  Female: زن
+  Male: مرد
+  Diverse: متفاوت / X
+  PasswordLabel: گذرواژه
+  PasswordConfirmLabel: تکرار گذرواژه
+  TosAndPrivacyLabel: شرایط و ضوابط
+  TosConfirm: می‌پذیرم
+  TosLinkText: شرایط استفاده
+  PrivacyConfirm: می‌پذیرم
+  PrivacyLinkText: سیاست حریم خصوصی
+  ExternalLogin: یا با یک کاربر خارجی ثبت‌نام کنید
+  BackButtonText: ورود
+  NextButtonText: بعدی
+
+ExternalRegistrationUserOverview:
+  Title: ثبت‌نام کاربر خارجی
+  Description: اطلاعات کاربری شما را از ارائه‌دهندهٔ انتخاب‌شده دریافت کردیم. اکنون می‌توانید آن‌ها را تغییر داده یا تکمیل کنید.
+  EmailLabel: ایمیل
+  UsernameLabel: نام کاربری
+  FirstnameLabel: نام
+  LastnameLabel: نام خانوادگی
+  NicknameLabel: نام مستعار
+  PhoneLabel: شمارهٔ تلفن
+  LanguageLabel: زبان
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Persian: فارسی
+  TosAndPrivacyLabel: شرایط و ضوابط
+  TosConfirm: می‌پذیرم
+  TosLinkText: شرایط استفاده
+  PrivacyConfirm: می‌پذیرم
+  PrivacyLinkText: سیاست حریم خصوصی
+  ExternalLogin: یا با یک کاربر خارجی ثبت‌نام کنید
+  BackButtonText: بازگشت
+  NextButtonText: ذخیره
+
+RegistrationOrg:
+  Title: ثبت سازمان
+  Description: نام سازمان و اطلاعات کاربری خود را وارد کنید.
+  OrgNameLabel: نام سازمان
+  EmailLabel: ایمیل
+  UsernameLabel: نام کاربری
+  FirstnameLabel: نام
+  LastnameLabel: نام خانوادگی
+  PasswordLabel: گذرواژه
+  PasswordConfirmLabel: تکرار گذرواژه
+  TosAndPrivacyLabel: شرایط و ضوابط
+  TosConfirm: می‌پذیرم
+  TosLinkText: شرایط استفاده
+  PrivacyConfirm: می‌پذیرم
+  PrivacyLinkText: سیاست حریم خصوصی
+  SaveButtonText: ایجاد سازمان
+
+LoginSuccess:
+  Title: ورود موفقیت‌آمیز بود
+  AutoRedirectDescription: به‌طور خودکار به برنامهٔ خود بازگردانده می‌شوید. در غیر این صورت، روی دکمهٔ زیر کلیک کنید. پس از آن می‌توانید پنجره را ببندید.
+  RedirectedDescription: اکنون می‌توانید این پنجره را ببندید.
+  NextButtonText: بعدی
+
+LogoutDone:
+  Title: خارج شدید
+  Description: با موفقیت از حساب خود خارج شدید.
+  LoginButtonText: ورود
+
+LinkingUserPrompt:
+  Title: کاربر موجود پیدا شد
+  Description: "آیا می‌خواهید حساب موجود خود را متصل کنید:"
+  LinkButtonText: اتصال
+  OtherButtonText: گزینه‌های دیگر
+
+LinkingUsersDone:
+  Title: اتصال کاربر
+  Description: کاربر متصل شد.
+  CancelButtonText: لغو
+  NextButtonText: بعدی
+
+ExternalNotFound:
+  Title: کاربر خارجی پیدا نشد
+  Description: کاربر خارجی پیدا نشد. آیا می‌خواهید کاربر خود را متصل کنید یا یک کاربر جدید به‌طور خودکار ثبت شود؟
+  NoOptionAvailable: هیچ حسابی مطابق با کاربر خارجی شما پیدا نشد و امکان ایجاد حساب جدید وجود ندارد. لطفاً با مدیر سیستم یا پشتیبانی تماس بگیرید.
+  LinkButtonText: اتصال
+  AutoRegisterButtonText: ثبت‌نام
+  TosAndPrivacyLabel: شرایط و ضوابط
+  TosConfirm: می‌پذیرم
+  TosLinkText: شرایط استفاده
+  PrivacyConfirm: می‌پذیرم
+  PrivacyLinkText: سیاست حریم خصوصی
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Romanian: Română
+  Turkish: Türkçe
+  Ukrainian: Українська
+  Arabic: العربية
+  Persian: فارسی
+DeviceAuth:
+  Title: مجوز دستگاه
+  UserCode:
+    Label: کد کاربر
+    Description: کد کاربری نمایش‌داده‌شده روی دستگاه را وارد کنید.
+    ButtonNext: بعدی
+  Action:
+    Description: اعطای دسترسی به دستگاه.
+    GrantDevice: شما در حال اعطای دسترسی به دستگاه
+    AccessToScopes: برای دامنه‌های دسترسی زیر هستید
+    Button:
+      Allow: اجازه
+      Deny: رد
+  Done:
+    Description: انجام شد.
+    Approved: مجوز دستگاه تأیید شد. اکنون می‌توانید به دستگاه بازگردید.
+    Denied: مجوز دستگاه رد شد. اکنون می‌توانید به دستگاه بازگردید.
+
+Footer:
+  PoweredBy: قدرت گرفته از
+  Tos: شرایط استفاده
+  PrivacyPolicy: سیاست حریم خصوصی
+  Help: راهنما
+  SupportEmail: ایمیل پشتیبانی
+
+SignIn: ورود با {{.Provider}}
+
+Errors:
+  Internal: یک خطای داخلی رخ داد
+  AuthRequest:
+    NotFound: درخواست احراز هویت پیدا نشد
+    UserAgentNotCorresponding: عامل کاربر (User Agent) مطابقت ندارد
+    UserAgentNotFound: شناسهٔ عامل کاربر پیدا نشد
+    TokenNotFound: توکن پیدا نشد
+    RequestTypeNotSupported: نوع درخواست پشتیبانی نمی‌شود
+    MissingParameters: پارامترهای الزامی وجود ندارند
+  User:
+    NotFound: کاربر پیدا نشد
+    AlreadyExists: کاربر از قبل وجود دارد
+    Inactive: کاربر غیرفعال است
+    NotFoundOnOrg: کاربر در سازمان انتخاب‌شده پیدا نشد
+    NotAllowedOrg: کاربر عضو سازمان موردنیاز نیست
+    NotMatchingUserID: کاربر با کاربر درخواست احراز هویت مطابقت ندارد
+    UserIDMissing: شناسهٔ کاربر خالی است
+    Invalid: اطلاعات کاربر نامعتبر است
+    DomainNotAllowedAsUsername: دامنه از قبل رزرو شده است و قابل استفاده نیست
+    NotAllowedToLink: کاربر مجاز به اتصال با ارائه‌دهندهٔ ورود خارجی نیست
+    Profile:
+      NotFound: نمایه پیدا نشد
+      NotChanged: نمایه تغییر نکرد
+      Empty: نمایه خالی است
+      FirstNameEmpty: نام در نمایه خالی است
+      LastNameEmpty: نام خانوادگی در نمایه خالی است
+      IDMissing: شناسهٔ نمایه وجود ندارد
+    Email:
+      NotFound: ایمیل پیدا نشد
+      Invalid: ایمیل نامعتبر است
+      AlreadyVerified: ایمیل از قبل تأیید شده است
+      NotChanged: ایمیل تغییر نکرد
+      Empty: ایمیل خالی است
+      IDMissing: شناسهٔ ایمیل وجود ندارد
+    Phone:
+      NotFound: تلفن پیدا نشد
+      Invalid: تلفن نامعتبر است
+      AlreadyVerified: تلفن از قبل تأیید شده است
+      Empty: تلفن خالی است
+      NotChanged: تلفن تغییر نکرد
+    Address:
+      NotFound: نشانی پیدا نشد
+      NotChanged: نشانی تغییر نکرد
+    Username:
+      AlreadyExists: نام کاربری قبلاً گرفته شده است
+      Reserved: نام کاربری قبلاً گرفته شده است
+      Empty: نام کاربری خالی است
+    Password:
+      ConfirmationWrong: تکرار گذرواژه اشتباه است
+      Empty: گذرواژه خالی است
+      Invalid: گذرواژه نامعتبر است
+      InvalidAndLocked: گذرواژه نامعتبر است و کاربر قفل شده است؛ با مدیر سیستم تماس بگیرید.
+      NotChanged: گذرواژهٔ جدید نمی‌تواند با گذرواژهٔ فعلی شما یکسان باشد
+    UsernameOrPassword:
+      Invalid: نام کاربری یا گذرواژه نامعتبر است
+    PasswordComplexityPolicy:
+      NotFound: سیاست گذرواژه پیدا نشد
+      MinLength: گذرواژه خیلی کوتاه است
+      HasLower: گذرواژه باید شامل حرف کوچک باشد
+      HasUpper: گذرواژه باید شامل حرف بزرگ باشد
+      HasNumber: گذرواژه باید شامل عدد باشد
+      HasSymbol: گذرواژه باید شامل نماد باشد
+    Code:
+      Expired: کد منقضی شده است
+      Invalid: کد نامعتبر است
+      Empty: کد خالی است
+      CryptoCodeNil: کد رمزنگاری‌شده خالی است
+      NotFound: کد پیدا نشد
+      GeneratorAlgNotSupported: الگوریتم تولیدکننده پشتیبانی نمی‌شود
+    EmailVerify:
+      UserIDEmpty: شناسهٔ کاربر خالی است
+    ExternalData:
+      CouldNotRead: داده‌های خارجی به‌درستی خوانده نشدند
+    MFA:
+      NoProviders: هیچ ارائه‌دهندهٔ احراز هویت چندعاملی در دسترس نیست
+      OTP:
+        AlreadyReady: احراز هویت چندعاملی با رمز یک‌بار مصرف (OTP) از قبل راه‌اندازی شده است
+        NotExisting: احراز هویت چندعاملی با رمز یک‌بار مصرف (OTP) وجود ندارد
+        InvalidCode: کد نامعتبر است
+        Reused: این کد قبلاً استفاده شده است. لطفاً منتظر کد جدید بمانید
+        NotReady: احراز هویت چندعاملی با رمز یک‌بار مصرف (OTP) آماده نیست
+    Locked: کاربر قفل شده است
+    SomethingWentWrong: مشکلی پیش آمد
+    NotActive: کاربر فعال نیست
+    ExternalIDP:
+      IDPTypeNotImplemented: نوع ارائه‌دهندهٔ هویت پیاده‌سازی نشده است
+      NotAllowed: ارائه‌دهندهٔ ورود خارجی مجاز نیست
+      IDPConfigIDEmpty: شناسهٔ ارائه‌دهندهٔ هویت خالی است
+      ExternalUserIDEmpty: شناسهٔ کاربر خارجی خالی است
+      UserDisplayNameEmpty: نام نمایشی کاربر خالی است
+      NoExternalUserData: هیچ دادهٔ کاربر خارجی دریافت نشد
+      CreationNotAllowed: ایجاد کاربر جدید در این ارائه‌دهنده مجاز نیست
+      LinkingNotAllowed: اتصال کاربر در این ارائه‌دهنده مجاز نیست
+      NoOptionAllowed: در این ارائه‌دهنده نه ایجاد و نه اتصال کاربر مجاز است. لطفاً با مدیر سیستم تماس بگیرید.
+      LoginFailedSwitchLocal: |
+        ورود از طریق ارائه‌دهندهٔ هویت خارجی ناموفق بود. بازگشت به ورود محلی.
+
+        جزئیات خطا: {{.Details}}
+    GrantRequired: ورود امکان‌پذیر نیست. کاربر باید حداقل یک مجوز روی این برنامه داشته باشد. لطفاً با مدیر سیستم تماس بگیرید.
+    ProjectRequired: ورود امکان‌پذیر نیست. سازمان کاربر باید به این پروژه دسترسی داده شده باشد. لطفاً با مدیر سیستم تماس بگیرید.
+  IdentityProvider:
+    InvalidConfig: پیکربندی ارائه‌دهندهٔ هویت نامعتبر است
+  IAM:
+    LockoutPolicy:
+      NotExisting: سیاست قفل حساب وجود ندارد
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: ثبت‌نام مجاز نیست
+  DeviceAuth:
+    NotExisting: کد کاربر وجود ندارد
+
+optional: (اختیاری)
