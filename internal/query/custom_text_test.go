@@ -10,6 +10,7 @@ import (
 
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -186,5 +187,34 @@ func Test_CustomTextPrepares(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
+	}
+}
+
+func Test_registrationOptionKeyToDomain(t *testing.T) {
+	result := new(domain.CustomLoginText)
+	texts := []*CustomText{
+		{Key: domain.LoginKeyRegistrationOptionTitle, Text: "Title"},
+		{Key: domain.LoginKeyRegistrationOptionDescription, Text: "Desc"},
+		{Key: domain.LoginKeyRegistrationOptionExternalLoginDescription, Text: "ExtDesc"},
+		{Key: domain.LoginKeyRegistrationOptionUserNameButtonText, Text: "UserBtn"},
+		{Key: domain.LoginKeyRegistrationOptionLoginButtonText, Text: "LoginBtn"},
+	}
+	for _, txt := range texts {
+		registrationOptionKeyToDomain(txt, result)
+	}
+	if result.RegisterOption.Title != "Title" {
+		t.Errorf("expected Title, got %s", result.RegisterOption.Title)
+	}
+	if result.RegisterOption.Description != "Desc" {
+		t.Errorf("expected Desc, got %s", result.RegisterOption.Description)
+	}
+	if result.RegisterOption.ExternalLoginDescription != "ExtDesc" {
+		t.Errorf("expected ExtDesc, got %s", result.RegisterOption.ExternalLoginDescription)
+	}
+	if result.RegisterOption.RegisterUsernamePasswordButtonText != "UserBtn" {
+		t.Errorf("expected UserBtn, got %s", result.RegisterOption.RegisterUsernamePasswordButtonText)
+	}
+	if result.RegisterOption.LoginButtonText != "LoginBtn" {
+		t.Errorf("expected LoginBtn, got %s", result.RegisterOption.LoginButtonText)
 	}
 }
