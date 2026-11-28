@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"log/slog"
 	"net"
 	"strings"
 	"time"
@@ -93,6 +94,25 @@ func (a *AuthRequest) GetSubject() string {
 
 func (a *AuthRequest) oidc() *domain.AuthRequestOIDC {
 	return a.Request.(*domain.AuthRequestOIDC)
+}
+
+func (a *AuthRequest) LogValue() slog.Value {
+	if a == nil || a.AuthRequest == nil {
+		return slog.Value{}
+	}
+	var scopes []string
+	if a.Request != nil {
+		if oidcReq, ok := a.Request.(*domain.AuthRequestOIDC); ok && oidcReq != nil {
+			scopes = oidcReq.Scopes
+		}
+	}
+	return slog.GroupValue(
+		slog.String("id", a.ID),
+		slog.String("client_id", a.GetClientID()),
+		slog.String("instance_id", a.InstanceID),
+		slog.Any("scopes", scopes),
+		slog.String("redirect_uri", a.GetRedirectURI()),
+	)
 }
 
 func AuthRequestFromBusiness(authReq *domain.AuthRequest) (_ *AuthRequest, err error) {
