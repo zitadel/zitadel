@@ -39,19 +39,28 @@ func (s *executionError) Unwrap() error {
 	return s.parent
 }
 
-func (h *Handler) eventsToStatements(ctx context.Context, tx *sql.Tx, events []eventstore.Event) (statements []*Statement, err error) {
+func (h *Handler) eventsToStatements(ctx context.Context, tx *sql.Tx, events []eventstore.Event, currentState *state, minPosition decimal.Decimal) (statements []*Statement, err error) {
 	statements = make([]*Statement, 0, len(events))
 
+	r := h.resumeFrom(currentState, minPosition)
+	previousPosition, offset := seedFilterOffset(currentState, r)
 	for _, event := range events {
 		statement, err := h.reduce(event)
 		if err != nil {
 			logging.Log(ctx, errorLevel(err), "reduce failed", "err", err, "event", failureFromEvent(event, err))
-			if shouldContinue := h.handleFailedStmt(ctx, tx, failureFromEvent(event, err)); shouldContinue {
-				// count the skipped event as processed, so the cursor moves past it like for a skipped statement
-				statements = append(statements, NewNoOpStatement(event))
-				continue
+			if shouldContinue := h.handleFailedStmt(ctx, tx, failureFromEvent(event, err)); !shouldContinue {
+				return statements, &executionError{err}
 			}
-			return statements, &executionError{err}
+			// count the skipped event as processed, so the cursor moves past it like for a skipped statement
+			statement = NewNoOpStatement(event)
+		}
+		if !h.filterOffsetIsCursor {
+			previousPosition, offset = nextFilterOffset(previousPosition, offset, event.Position())
+			// A reducer may return a nil statement without an error; keep it nil so
+			// executeStatement panics and processEvents recovers (#11713).
+			if statement != nil {
+				statement.offset = offset
+			}
 		}
 		statements = append(statements, statement)
 	}
@@ -88,6 +97,7 @@ type Statement struct {
 	CreationDate time.Time
 
 	inTxOrder uint32
+	offset    uint32
 
 	Execute Exec
 }

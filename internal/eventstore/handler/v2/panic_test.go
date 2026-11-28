@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/sloggcp"
@@ -108,7 +109,7 @@ func TestHandler_eventsToStatements_recoversPanic(t *testing.T) {
 				err        error
 			)
 			require.NotPanics(t, func() {
-				statements, err = h.eventsToStatements(t.Context(), tx, []eventstore.Event{passwordChangedEvent()})
+				statements, err = h.eventsToStatements(t.Context(), tx, []eventstore.Event{passwordChangedEvent()}, &state{}, decimal.Decimal{})
 			})
 			if tt.wantErr {
 				assert.Empty(t, statements)
@@ -117,7 +118,10 @@ func TestHandler_eventsToStatements_recoversPanic(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				// the skipped event is counted as processed, so the cursor moves past it
-				assert.Equal(t, []*Statement{NewNoOpStatement(passwordChangedEvent())}, statements)
+				require.Len(t, statements, 1)
+				want := NewNoOpStatement(passwordChangedEvent())
+				want.offset = 1
+				assert.Equal(t, []*Statement{want}, statements)
 			}
 			assert.NoError(t, mock.ExpectationsWereMet())
 		})
@@ -420,7 +424,7 @@ func TestHandler_eventsToStatements_logLevel(t *testing.T) {
 			expectFailedEvent(mock, tt.errText)
 			h := &Handler{projection: tt.projection, maxFailureCount: 1}
 
-			_, err := h.eventsToStatements(ctx, tx, []eventstore.Event{passwordChangedEvent()})
+			_, err := h.eventsToStatements(ctx, tx, []eventstore.Event{passwordChangedEvent()}, &state{}, decimal.Decimal{})
 			require.NoError(t, err)
 
 			var record struct {

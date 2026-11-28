@@ -196,10 +196,12 @@ type Steps struct {
 	s74Apps7OIDCConfigsAddRegistrationToken *Apps7OIDCConfigsAddRegistrationToken
 	s75Apps7OIDCConfigsAddAppLinkConfig     *Apps7OIDCConfigsAddAppLinkConfig
 	s76Users14LoginEqualityIndexes          *Users14LoginEqualityIndexes
-	s77StampEventPositionAtInsert           *StampEventPositionAtInsert
 	s78UniqueConstraintOwners               *UniqueConstraintOwners
 	s80Users14InstanceResourceOwnerIndex    *Users14InstanceResourceOwnerIndex
+	s81CommandsToEventsClockTimestamp       *CommandsToEventsClockTimestamp
+	s82CurrentStatesInTxOrder               *CurrentStatesInTxOrder
 	BackfillUniqueConstraintOwners          *BackfillUniqueConstraintOwners
+	ProjectionCursorFinalize                *ProjectionCursorFinalize
 	RelationalTables                        *TransactionalTables
 }
 

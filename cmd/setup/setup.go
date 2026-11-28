@@ -259,77 +259,28 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s74Apps7OIDCConfigsAddRegistrationToken = &Apps7OIDCConfigsAddRegistrationToken{dbClient: dbClient}
 	steps.s75Apps7OIDCConfigsAddAppLinkConfig = &Apps7OIDCConfigsAddAppLinkConfig{dbClient: dbClient}
 	steps.s76Users14LoginEqualityIndexes = &Users14LoginEqualityIndexes{dbClient: dbClient}
-	steps.s77StampEventPositionAtInsert = &StampEventPositionAtInsert{dbClient: dbClient}
 	steps.s78UniqueConstraintOwners = &UniqueConstraintOwners{dbClient: dbClient}
 	steps.s80Users14InstanceResourceOwnerIndex = &Users14InstanceResourceOwnerIndex{dbClient: dbClient}
+	steps.s81CommandsToEventsClockTimestamp = &CommandsToEventsClockTimestamp{dbClient: dbClient}
+	steps.s82CurrentStatesInTxOrder = &CurrentStatesInTxOrder{dbClient: dbClient}
 	if steps.BackfillUniqueConstraintOwners == nil {
 		steps.BackfillUniqueConstraintOwners = &BackfillUniqueConstraintOwners{}
 	}
 	steps.BackfillUniqueConstraintOwners.dbClient = dbClient
 	steps.BackfillUniqueConstraintOwners.Version = build.Version()
+	if steps.ProjectionCursorFinalize == nil {
+		steps.ProjectionCursorFinalize = &ProjectionCursorFinalize{}
+	}
+	steps.ProjectionCursorFinalize.dbClient = dbClient
+	steps.ProjectionCursorFinalize.eventstore = eventstoreClient
+	steps.ProjectionCursorFinalize.Version = build.Version()
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	if err != nil {
 		return fmt.Errorf("unable to create projections: %w", err)
 	}
 
-	for _, step := range []migration.Migration{
-		steps.s14NewEventsTable,
-		steps.s40InitPushFunc,
-		steps.s1ProjectionTable,
-		steps.s2AssetsTable,
-		steps.s28AddFieldTable,
-		steps.s31AddAggregateIndexToFields,
-		steps.s46InitPermissionFunctions,
-		steps.FirstInstance,
-		steps.s5LastFailed,
-		steps.s6OwnerRemoveColumns,
-		steps.s7LogstoreTables,
-		steps.s8AuthTokens,
-		steps.s12AddOTPColumns,
-		steps.s13FixQuotaProjection,
-		steps.s15CurrentStates,
-		steps.s16UniqueConstraintsLower,
-		steps.s17AddOffsetToUniqueConstraints,
-		steps.s19AddCurrentStatesIndex,
-		steps.s20AddByUserSessionIndex,
-		steps.s22ActiveInstancesIndex,
-		steps.s23CorrectGlobalUniqueConstraints,
-		steps.s24AddActorToAuthTokens,
-		steps.s26AuthUsers3,
-		steps.s29FillFieldsForProjectGrant,
-		steps.s30FillFieldsForOrgDomainVerified,
-		steps.s34AddCacheSchema,
-		steps.s35AddPositionToIndexEsWm,
-		steps.s36FillV2Milestones,
-		steps.s38BackChannelLogoutNotificationStart,
-		steps.s44ReplaceCurrentSequencesIndex,
-		steps.s45CorrectProjectOwners,
-		steps.s47FillMembershipFields,
-		steps.s49InitPermittedOrgsFunction,
-		steps.s50IDPTemplate6UsePKCE,
-		steps.s51IDPTemplate6RootCA,
-		steps.s52IDPTemplate6LDAP2,
-		steps.s53InitPermittedOrgsFunction,
-		steps.s54InstancePositionIndex,
-		steps.s55ExecutionHandlerStart,
-		steps.s56IDPTemplate6SAMLFederatedLogout,
-		steps.s57CreateResourceCounts,
-		steps.s58ReplaceLoginNames3View,
-		steps.s60GenerateSystemID,
-		steps.s61IDPTemplate6SAMLSignatureAlgorithm,
-		steps.s62HTTPProviderAddSigningKey,
-		steps.s63AlterResourceCounts,
-		steps.s64ChangePushPosition,
-		steps.s65FixUserMetadata5Index,
-		steps.s67SyncMemberRoleFields,
-		steps.s69CacheTablesLogged,
-		steps.s70AddEventStoreCommandEnforceOwner,
-		steps.s76Users14LoginEqualityIndexes,
-		steps.s77StampEventPositionAtInsert,
-		steps.s78UniqueConstraintOwners,
-		steps.s80Users14InstanceResourceOwnerIndex,
-	} {
+	for _, step := range oneShotMigrations(steps) {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
 			return
@@ -375,6 +326,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 			VacuumThreshold:  config.Eventstore.Autovacuum.VacuumThreshold,
 			AnalyzeThreshold: config.Eventstore.Autovacuum.AnalyzeThreshold,
 		},
+		steps.ProjectionCursorFinalize,
 	}
 	repeatableSteps = append(repeatableSteps, triggerSteps(dbClient)...)
 
@@ -426,6 +378,67 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		return setupErr
 	}
 	return nil
+}
+
+func oneShotMigrations(steps *Steps) []migration.Migration {
+	return []migration.Migration{
+		steps.s14NewEventsTable,
+		steps.s40InitPushFunc,
+		steps.s1ProjectionTable,
+		steps.s2AssetsTable,
+		steps.s28AddFieldTable,
+		steps.s31AddAggregateIndexToFields,
+		steps.s46InitPermissionFunctions,
+		steps.FirstInstance,
+		steps.s5LastFailed,
+		steps.s6OwnerRemoveColumns,
+		steps.s7LogstoreTables,
+		steps.s8AuthTokens,
+		steps.s12AddOTPColumns,
+		steps.s13FixQuotaProjection,
+		steps.s15CurrentStates,
+		steps.s16UniqueConstraintsLower,
+		steps.s17AddOffsetToUniqueConstraints,
+		steps.s19AddCurrentStatesIndex,
+		steps.s20AddByUserSessionIndex,
+		steps.s22ActiveInstancesIndex,
+		steps.s23CorrectGlobalUniqueConstraints,
+		steps.s24AddActorToAuthTokens,
+		steps.s26AuthUsers3,
+		steps.s82CurrentStatesInTxOrder,
+		steps.s29FillFieldsForProjectGrant,
+		steps.s30FillFieldsForOrgDomainVerified,
+		steps.s34AddCacheSchema,
+		steps.s35AddPositionToIndexEsWm,
+		steps.s36FillV2Milestones,
+		steps.s38BackChannelLogoutNotificationStart,
+		steps.s44ReplaceCurrentSequencesIndex,
+		steps.s45CorrectProjectOwners,
+		steps.s47FillMembershipFields,
+		steps.s49InitPermittedOrgsFunction,
+		steps.s50IDPTemplate6UsePKCE,
+		steps.s51IDPTemplate6RootCA,
+		steps.s52IDPTemplate6LDAP2,
+		steps.s53InitPermittedOrgsFunction,
+		steps.s54InstancePositionIndex,
+		steps.s55ExecutionHandlerStart,
+		steps.s56IDPTemplate6SAMLFederatedLogout,
+		steps.s57CreateResourceCounts,
+		steps.s58ReplaceLoginNames3View,
+		steps.s60GenerateSystemID,
+		steps.s61IDPTemplate6SAMLSignatureAlgorithm,
+		steps.s62HTTPProviderAddSigningKey,
+		steps.s63AlterResourceCounts,
+		steps.s64ChangePushPosition,
+		steps.s65FixUserMetadata5Index,
+		steps.s67SyncMemberRoleFields,
+		steps.s69CacheTablesLogged,
+		steps.s70AddEventStoreCommandEnforceOwner,
+		steps.s76Users14LoginEqualityIndexes,
+		steps.s78UniqueConstraintOwners,
+		steps.s80Users14InstanceResourceOwnerIndex,
+		steps.s81CommandsToEventsClockTimestamp,
+	}
 }
 
 func executeMigration(ctx context.Context, eventstoreClient *eventstore.Eventstore, step migration.Migration, errorMsg string) error {
@@ -524,7 +537,7 @@ func startCommandsQueries(
 
 	adminView, err := admin_view.StartView(dbClient)
 	logging.OnError(ctx, err).Fatal("unable to start admin view")
-	admin_handler.Register(ctx,
+	err = admin_handler.Register(ctx,
 		admin_handler.Config{
 			Client:                dbClient,
 			Eventstore:            eventstoreClient,
@@ -534,6 +547,7 @@ func startCommandsQueries(
 		adminView,
 		staticStorage,
 	)
+	logging.OnError(ctx, err).Fatal("unable to register admin projections")
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
 
@@ -572,7 +586,7 @@ func startCommandsQueries(
 
 	authView, err := auth_view.StartView(dbClient, keys.OIDC, queries, eventstoreClient)
 	logging.OnError(ctx, err).Fatal("unable to start auth view")
-	auth_handler.Register(ctx,
+	err = auth_handler.Register(ctx,
 		auth_handler.Config{
 			Client:                dbClient,
 			Eventstore:            eventstoreClient,
@@ -582,6 +596,7 @@ func startCommandsQueries(
 		authView,
 		queries,
 	)
+	logging.OnError(ctx, err).Fatal("unable to register auth projections")
 
 	authZRepo, err := authz.Start(queries, eventstoreClient, dbClient, keys.OIDC, config.ExternalSecure)
 	logging.OnError(ctx, err).Fatal("unable to start authz repo")

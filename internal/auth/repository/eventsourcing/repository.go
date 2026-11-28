@@ -37,7 +37,9 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 		return nil, err
 	}
 
-	auth_handler.Register(ctx, conf.Spooler, view, queries)
+	if err := auth_handler.Register(ctx, conf.Spooler, view, queries); err != nil {
+		return nil, err
+	}
 	auth_handler.Start(ctx)
 
 	authReq := cache.Start(dbClient, conf.AmountOfCachedAuthRequests)

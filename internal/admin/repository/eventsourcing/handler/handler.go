@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	handler2 "github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/static"
 )
 
@@ -37,19 +38,25 @@ type ConfigOverwrites struct {
 
 var projections []*handler.Handler
 
-func Register(ctx context.Context, config Config, view *view.View, static static.Storage) {
+func Register(ctx context.Context, config Config, view *view.View, static static.Storage) error {
 	if static == nil {
-		return
+		return nil
+	}
+
+	filterOffsetIsCursor, err := projection.FilterOffsetIsCursorFromEventstore(ctx, config.Eventstore)
+	if err != nil {
+		return fmt.Errorf("unable to detect projection cursor compatibility: %w", err)
 	}
 
 	// make sure the slice does not contain old values
 	projections = nil
 
 	projections = append(projections, newStyling(ctx,
-		config.overwrite("Styling"),
+		config.overwrite("Styling", filterOffsetIsCursor),
 		static,
 		view,
 	))
+	return nil
 }
 
 func Projections() []*handler2.Handler {
@@ -82,15 +89,16 @@ func ProjectInstance(ctx context.Context) error {
 	return nil
 }
 
-func (config Config) overwrite(viewModel string) handler2.Config {
+func (config Config) overwrite(viewModel string, filterOffsetIsCursor bool) handler2.Config {
 	c := handler2.Config{
-		Client:              config.Client,
-		Eventstore:          config.Eventstore,
-		BulkLimit:           uint16(config.BulkLimit),
-		RequeueEvery:        3 * time.Minute,
-		MaxFailureCount:     uint8(config.FailureCountUntilSkip),
-		TransactionDuration: config.TransactionDuration,
-		ActiveInstancer:     config.ActiveInstancer,
+		Client:               config.Client,
+		Eventstore:           config.Eventstore,
+		BulkLimit:            uint16(config.BulkLimit),
+		RequeueEvery:         3 * time.Minute,
+		MaxFailureCount:      uint8(config.FailureCountUntilSkip),
+		TransactionDuration:  config.TransactionDuration,
+		ActiveInstancer:      config.ActiveInstancer,
+		FilterOffsetIsCursor: filterOffsetIsCursor,
 	}
 	overwrite, ok := config.Handlers[viewModel]
 	if !ok {
