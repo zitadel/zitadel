@@ -17,7 +17,7 @@ export function loginByUsernamePassword(user: User, client = Client()) {
   const loginUI = initLogin(undefined, client);
   const loginNameResponse = enterLoginName(loginUI, user);
   const passwordResponse = enterPassword(loginNameResponse, user);
-  return token(new URL(passwordResponse.url).searchParams.get('code'));
+  return exchangeAuthorizationCode(new URL(passwordResponse.url).searchParams.get('code'));
 }
 
 const initLoginTrend = new Trend('login_ui_init_login_duration', true);
@@ -94,10 +94,10 @@ function enterPassword(page: Response, user: User): Response {
   return response;
 }
 
-const tokenTrend = new Trend('login_ui_token_duration', true);
-function token(code = '') {
+const exchangeAuthorizationCodeTrend = new Trend('login_ui_token_duration', true);
+export function exchangeAuthorizationCode(code: string | null = '') {
   check(code, {
-    'code set': (c) => (c !== undefined && c !== null) || fail('code was not set'),
+    'code set': (c) => (c !== undefined && c !== null && c !== '') || fail('code was not set'),
   });
   const response = http.post(
     url('/oauth/v2/token'),
@@ -115,17 +115,17 @@ function token(code = '') {
     },
   );
 
-  tokenTrend.add(response.timings.duration);
+  exchangeAuthorizationCodeTrend.add(response.timings.duration);
   check(response, {
     'token status ok': (r) =>
       (r.status >= 200 && r.status < 300) || fail(`invalid token response status: ${r.status} body: ${r.body}`),
   });
-  const token = new Tokens(response.json() as JSONObject);
-  check(token, {
+  const tokens = new Tokens(response.json() as JSONObject);
+  check(tokens, {
     'access token created': (t) => t.accessToken !== undefined,
     'id token created': (t) => t.idToken !== undefined,
     'info created': (t) => t.info !== undefined,
   });
 
-  return token;
+  return tokens;
 }
