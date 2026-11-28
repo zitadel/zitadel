@@ -107,6 +107,9 @@ export class DetailFormComponent implements OnInit {
   }
 
   public submitForm(profile: HumanProfile): void {
+    if (this.profileForm.invalid) {
+      return;
+    }
     this.submitData.emit({ ...profile, ...this.profileForm.getRawValue() });
   }
 
